@@ -30,7 +30,7 @@ namespace WpfMPD
         }
 
         /// <summary>
-        /// MPD Status Class 
+        /// Status Class 
         /// </summary>
         /// 
         public class Status
@@ -92,9 +92,8 @@ namespace WpfMPD
             }
         }
 
-
         /// <summary>
-        /// MPC Class 
+        /// MPC (MPD Client) Class 
         /// </summary>
 
         #region MPC PRIVATE FIELD declaration
@@ -104,9 +103,9 @@ namespace WpfMPD
         private ObservableCollection<Song> _songs = new ObservableCollection<Song>();
         private ObservableCollection<String> _playLists = new ObservableCollection<String>();
 
-        #endregion END MPC PRIVATE FIELD declaration
+        #endregion END of MPC PRIVATE FIELD declaration
 
-        #region MPC PUBLIC PROPERTY FIELD declaration
+        #region MPC PUBLIC PROPERTY FIELD
 
         public Status MPDStatus
         {
@@ -135,10 +134,10 @@ namespace WpfMPD
             get { return this._playLists; }
         }
 
-        #endregion END MPC PUBLIC PROPERTY FIELD declaration
+        #endregion END of MPC PUBLIC PROPERTY FIELD
 
-        #region MPC METHODS
 
+        // MPC Constructor
         public MPC()
         {
             _st = new Status();
@@ -147,6 +146,8 @@ namespace WpfMPD
             BindingOperations.EnableCollectionSynchronization(this._songs, new object());
 
         }
+        
+        #region MPC METHODS
 
         private static async Task<List<string>> SendRequest(string server, int port, string mpdCommand)
         {
@@ -158,7 +159,7 @@ namespace WpfMPD
             {
                 TcpClient client = new TcpClient();
                 await client.ConnectAsync(ep.Address, port);
-                System.Diagnostics.Debug.WriteLine("\n\n" + "□Server " + server + " connected.");
+                System.Diagnostics.Debug.WriteLine("\n\n" + "Server " + server + " connected.");
 
                 NetworkStream networkStream = client.GetStream();
                 StreamWriter writer = new StreamWriter(networkStream);
@@ -170,14 +171,14 @@ namespace WpfMPD
 
                 //first check MPD's initial response on connect.
                 string responseLine = await reader.ReadLineAsync();
-                System.Diagnostics.Debug.WriteLine("□Connected response: " + responseLine);
+                System.Diagnostics.Debug.WriteLine("Connected response: " + responseLine);
 
-                //todo check if "OK MPD"
+                //TODO check if it starts with "OK MPD"
 
                 //if it's ok, then request command.
                 string requestData = mpdCommand;
                 await writer.WriteLineAsync(requestData);
-                System.Diagnostics.Debug.WriteLine("□Request: " + requestData);
+                System.Diagnostics.Debug.WriteLine("Request: " + requestData);
 
                 //read a single line.
                 //responseLine = await reader.ReadLineAsync();
@@ -202,17 +203,18 @@ namespace WpfMPD
                         break;
                     }
                 }
-                //debug
-                //System.Diagnostics.Debug.WriteLine("■Response (multilines): " + responseMultline);
+
+                //debug output
+                System.Diagnostics.Debug.WriteLine("Response lines: " + responseMultline);
 
                 client.Close();
-                System.Diagnostics.Debug.WriteLine("□Connection closed.");
+                System.Diagnostics.Debug.WriteLine("Connection closed.");
 
                 return MPDResponse;//responseMultline;//responseLine;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("■Error: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
                 //TODO:
                 return null; //ex.Message;
             }
@@ -235,7 +237,7 @@ namespace WpfMPD
             catch (Exception ex)
             {
                 //error
-                System.Diagnostics.Debug.WriteLine("■■Error■■@MPDQueryStatus(): " + ex.Message + "■■");
+                System.Diagnostics.Debug.WriteLine("Error@MPDQueryStatus(): " + ex.Message);
             }
             return false;
         }
@@ -356,15 +358,13 @@ namespace WpfMPD
             var listItem = _songs.Where(i => i.ID == _st.MPDSongID);
             if (listItem != null)
             {
-                System.Diagnostics.Debug.WriteLine("StatusResponse linq. _songs.Where?");
                 foreach (var item in listItem)
                 {
                     _currentSong = item as Song;
+                    System.Diagnostics.Debug.WriteLine("StatusResponse linq: _songs.Where?="+ _currentSong.Title);
                 }
             }
-
-
-
+            
             return true;
         }
 
@@ -387,7 +387,7 @@ namespace WpfMPD
             catch (Exception ex)
             {
                 //error
-                System.Diagnostics.Debug.WriteLine("■■Error■■@MPDQueryCurrentPlaylist(): " + ex.Message + "■■");
+                System.Diagnostics.Debug.WriteLine("Error@MPDQueryCurrentPlaylist(): " + ex.Message);
             }
             return false;
         }
@@ -441,7 +441,7 @@ namespace WpfMPD
                     if (sng.ID == _st.MPDSongID)
                     {
                         _currentSong = sng;
-                        //
+                        //debug
                         System.Diagnostics.Debug.WriteLine(sng.ID + ":" + sng.Title + " - is current.");
                     }
 
@@ -483,7 +483,7 @@ namespace WpfMPD
             catch (Exception ex)
             {
                 //error
-                System.Diagnostics.Debug.WriteLine("■■Error■■@MPDQueryPlaylists(): " + ex.Message + "■■");
+                System.Diagnostics.Debug.WriteLine("Error@MPDQueryPlaylists(): " + ex.Message);
             }
             return false;
         }
@@ -551,7 +551,7 @@ namespace WpfMPD
             catch (Exception ex)
             {
                 //error
-                System.Diagnostics.Debug.WriteLine("■■Error■■@MPDPlaybackPlay: " + ex.Message + "■■");
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackPlay: " + ex.Message);
             }
             return false;
         }
@@ -608,7 +608,7 @@ namespace WpfMPD
             catch (Exception ex)
             {
                 //error
-                System.Diagnostics.Debug.WriteLine("■■Error■■: " + ex.Message + "■■");
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackPause: " + ex.Message);
             }
 
             return false;
@@ -666,7 +666,7 @@ namespace WpfMPD
             catch (Exception ex)
             {
                 //error
-                System.Diagnostics.Debug.WriteLine("■■Error■■: " + ex.Message + "■■");
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackResume: " + ex.Message);
             }
 
             return false;
@@ -724,7 +724,7 @@ namespace WpfMPD
             catch (Exception ex)
             {
                 //error
-                System.Diagnostics.Debug.WriteLine("■■Error■■: " + ex.Message + "■■");
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackStop: " + ex.Message);
             }
 
             return false;
@@ -755,7 +755,7 @@ namespace WpfMPD
             catch (Exception ex)
             {
                 //error
-                System.Diagnostics.Debug.WriteLine("■■Error■■: " + ex.Message + "■■");
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackNext: " + ex.Message);
             }
             return false;
         }
@@ -785,12 +785,12 @@ namespace WpfMPD
             catch (Exception ex)
             {
                 //error
-                System.Diagnostics.Debug.WriteLine("■■Error■■: " + ex.Message + "■■");
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackPrev: " + ex.Message);
             }
             return false;
         }
 
-        public async Task<bool> MPDPlaybackSetVol(int v)
+        public async Task<bool> MPDSetVolume(int v)
         {
             if (v == _st.MPDVolume)
             {
@@ -820,13 +820,127 @@ namespace WpfMPD
             catch (Exception ex)
             {
                 //error
-                System.Diagnostics.Debug.WriteLine("■■Error■■: " + ex.Message + "■■");
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetVol: " + ex.Message);
             }
             return false;
         }
 
+        public async Task<bool> MPDSetRepeat(bool on)
+        {
+            if (_st.MPDRepeat == on)
+            {
+                return true;
+            }
 
-        #endregion MPD METHODS
+            try
+            {
+                //todo settings form.
+                string server = "192.168.3.123";
+                int port = 6600;
+                string data = "command_list_begin" + "\n";
+
+                if (on) { 
+                    data = data + "repeat 1" + "\n";
+                }
+                else
+                {
+                    data = data + "repeat 0" + "\n";
+                }
+                data = data + "status" + "\n" + "command_list_end";
+
+                //send task
+                Task<List<string>> tsResponse = SendRequest(server, port, data);
+
+                //send task excution and wait.
+                await tsResponse;
+
+                return ParseStatusResponse(tsResponse.Result);
+
+            }
+            catch (Exception ex)
+            {
+                //error
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetRepeat: " + ex.Message);
+            }
+            return false;
+        }
+
+        public async Task<bool> MPDSetRandom(bool on)
+        {
+            if (_st.MPDRandom == on)
+            {
+                return true;
+            }
+
+            try
+            {
+                //todo settings form.
+                string server = "192.168.3.123";
+                int port = 6600;
+                string data = "command_list_begin" + "\n";
+
+                if (on)
+                {
+                    data = data + "random 1" + "\n";
+                }
+                else
+                {
+                    data = data + "random 0" + "\n";
+                }
+                data = data + "status" + "\n" + "command_list_end";
+
+                //send task
+                Task<List<string>> tsResponse = SendRequest(server, port, data);
+
+                //send task excution and wait.
+                await tsResponse;
+
+                return ParseStatusResponse(tsResponse.Result);
+
+            }
+            catch (Exception ex)
+            {
+                //error
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetRandom: " + ex.Message);
+            }
+            return false;
+        }
+
+        public async Task<bool> MPDChangePlaylist(string PlaylistName)
+        {
+            if (PlaylistName != "")
+            {
+
+                //todo settings form.
+                string server = "192.168.3.123";
+                int port = 6600;
+                string data = "command_list_begin" + "\n";
+
+                data = data + "clear" +  "\n";
+
+                data = data + "load " + PlaylistName + "\n";
+
+                if (_st.MPDState == Status.MPDPlayState.Play) { 
+                    data = data + "play" + "\n";
+                }
+
+                data = data + "status" + "\n" + "command_list_end";
+
+                //send task
+                Task<List<string>> tsResponse = SendRequest(server, port, data);
+
+                //send task excution and wait.
+                await tsResponse;
+
+                return ParseStatusResponse(tsResponse.Result);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        #endregion END of MPD METHODS
 
 
         /// END OF MPC Client Class 

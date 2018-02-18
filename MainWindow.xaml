@@ -14,7 +14,17 @@
     
     <Window.Resources>
     </Window.Resources>
-
+    
+    <Window.Style>
+        <Style TargetType="Window">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                    <Setter Property="Cursor" Value="Wait" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Style>
+    
     <Grid Background="Transparent">
 
         <Grid.RowDefinitions>
@@ -66,21 +76,21 @@
                 HorizontalAlignment="Center" Height="42" Width="42" 
                 Background="Transparent" Foreground="White"
                 Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8L13,12L8,16M14,8H16V16H14"
-                Style="{StaticResource PathButton}">
+                Style="{StaticResource PathButton}" Command="{Binding PlayNextCommand}" >
             </Button>
 
             <Button x:Name="BackButton" Grid.Column="0" 
                 HorizontalAlignment="Center" Height="42" Width="42"
                 Background="Transparent" Foreground="White"
                 Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8H10V16H8M16,8V16L11,12"
-                Style="{StaticResource PathButton}">
+                Style="{StaticResource PathButton}" Command="{Binding PlayPrevCommand}" >
             </Button>
         </Grid>
 
         <ComboBox x:Name="Playlist" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" 
                   Margin="0 0 0 0" Padding="0 0 0 0"
                   Background="Transparent" Foreground="White" Style="{StaticResource ComboBoxFlatStyle}"
-                  ItemsSource="{Binding Playlists}"
+                  ItemsSource="{Binding Playlists}" SelectedValue="{Binding SelectedPlaylist}"
                   Tag="Current Play Queue">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
@@ -364,7 +374,7 @@
                     Foreground="Gray" Background="Transparent" Maximum="100" Margin="6 0 6 0">
             </Slider>
 
-            <ToggleButton x:Name="ShuffleButton" Grid.Column="2" IsChecked="{Binding Random}"
+            <ToggleButton x:Name="ShuffleButton" Grid.Column="2" IsChecked="{Binding Mode=TwoWay,Path=Random}"
                     Template="{StaticResource PathToggleButton}" Width="16" Height="16" Padding="0" Margin="4" 
                     VerticalAlignment="Center" HorizontalAlignment="Center"
                     Foreground="White"

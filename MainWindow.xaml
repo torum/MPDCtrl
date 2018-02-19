@@ -4,15 +4,23 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfMPD"
-        xmlns:common="clr-namespace:WpfMPD.Common"
         mc:Ignorable="d"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:common="clr-namespace:WpfMPD.Common"
         common:EnableDragHelper.EnableDrag="false"
         common:MaximizeDoubleClickHelper.MaximizeDoubleClick="True"
         Background="Transparent" AllowsTransparency="True" WindowStyle="None" WindowStartupLocation="CenterScreen"
         Title="MPD Ctrl" Height="520" Width="300"
         DataContext="{StaticResource MainViewModel}">
     
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction  Command="{Binding WindowClosingCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
     <Window.Resources>
+        
     </Window.Resources>
     
     <Window.Style>
@@ -43,6 +51,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="29"/>
         </Grid.ColumnDefinitions>
+        
         <Rectangle Grid.RowSpan="9" Grid.ColumnSpan="3" common:EnableDragHelper.EnableDrag="true"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
@@ -370,8 +379,11 @@
                     Foreground="White" Content="M17,17H7V14L3,18L7,22V19H19V13H17M7,7H17V10L21,6L17,2V5H5V11H7V7Z">
             </ToggleButton>
 
-            <Slider x:Name="SliderSeek" Grid.Column="1" VerticalAlignment="Center" 
-                    Foreground="Gray" Background="Transparent" Maximum="100" Margin="6 0 6 0">
+            <Slider x:Name="SliderSeek" Grid.Column="1" 
+                    VerticalAlignment="Center"  Margin="6 0 6 0"
+                    Foreground="Gray" Background="Transparent" 
+                    Minimum="0" Maximum="{Binding Mode=TwoWay,Path=Time}"
+                    Value="{Binding Mode=TwoWay,Path=Elapsed}">
             </Slider>
 
             <ToggleButton x:Name="ShuffleButton" Grid.Column="2" IsChecked="{Binding Mode=TwoWay,Path=Random}"

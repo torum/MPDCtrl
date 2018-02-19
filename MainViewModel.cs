@@ -26,6 +26,8 @@ namespace WpfMPD
         private double _volume;
         private bool _repeat;
         private bool _random;
+        private double _time;
+        private double _elapsed;
         private string _selecctedPlaylist;
         private static string _pathPlayButton = "M15,16H13V8H15M11,16H9V8H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         private static string _pathPauseButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
@@ -38,6 +40,7 @@ namespace WpfMPD
         private ICommand _setVolumeCommand;
         private ICommand _changeSongCommand;
         private ICommand _changePlaylistCommand;
+        private ICommand _windowClosingCommand;
 
         #endregion END of PRIVATE FIELD declaration
 
@@ -68,7 +71,6 @@ namespace WpfMPD
                         {
                             ChangeSongCommand.Execute(null);
                         }
-
                     }
                 }
             }
@@ -87,16 +89,21 @@ namespace WpfMPD
             }
             set
             {
-                _selecctedPlaylist = value;
-                this.NotifyPropertyChanged("SelectedPlaylist");
-
-                System.Diagnostics.Debug.WriteLine("\n\nPlaylist_SelectionChanged: " + value);
-
-                if (ChangePlaylistCommand.CanExecute(null))
+                if (_selecctedPlaylist != value)
                 {
-                    ChangePlaylistCommand.Execute(null);
-                }
+                    _selecctedPlaylist = value;
+                    this.NotifyPropertyChanged("SelectedPlaylist");
 
+                    if (_selecctedPlaylist != "")
+                    {
+                        System.Diagnostics.Debug.WriteLine("\n\nPlaylist_SelectionChanged: " + _selecctedPlaylist);
+
+                        if (ChangePlaylistCommand.CanExecute(null))
+                        {
+                            ChangePlaylistCommand.Execute(null);
+                        }
+                    }
+                }
             }
         }
 
@@ -125,7 +132,7 @@ namespace WpfMPD
 
                 if (Convert.ToDouble(_MPC.MPDStatus.MPDVolume) != value) {
 
-                    //TODO try using ValueChanged Event using <i:Interaction.Triggers>
+                    //TODO try using ValueChanged Event using <i:Interaction.Triggers>  ?
                     if (SetVolumeCommand.CanExecute(null))
                     {
                         SetVolumeCommand.Execute(null);
@@ -173,6 +180,32 @@ namespace WpfMPD
             }
         }
 
+        public double Time
+        {
+            get
+            {
+                return this._time;
+            }
+            set
+            {
+                this._time = value;
+                this.NotifyPropertyChanged("Time");
+            }
+        }
+
+        public double Elapsed
+        {
+            get
+            {
+                return this._elapsed;
+            }
+            set
+            {
+                this._elapsed = value;
+                this.NotifyPropertyChanged("Elapsed");
+            }
+        }
+
         public bool IsChanged
         {
             get
@@ -209,29 +242,45 @@ namespace WpfMPD
             //Initialize play button with "play" state.
             this.PlayButton = _pathPlayButton;
 
+            this._selecctedPlaylist = "";
+
             //Assign commands
             this._playCommand = new WpfMPD.Common.RelayCommand(this.PlayCommand_ExecuteAsync, this.PlayCommand_CanExecute);
             this._playNextCommand = new WpfMPD.Common.RelayCommand(this.PlayNextCommand_ExecuteAsync, this.PlayNextCommand_CanExecute);
             this._playPrevCommand = new WpfMPD.Common.RelayCommand(this.PlayPrevCommand_ExecuteAsync, this.PlayPrevCommand_CanExecute);
-
             this._setRepeatCommand = new WpfMPD.Common.RelayCommand(this.SetRpeatCommand_ExecuteAsync, this.SetRpeatCommand_CanExecute);
             this._setRandomCommand = new WpfMPD.Common.RelayCommand(this.SetRandomCommand_ExecuteAsync, this.SetRandomCommand_CanExecute);
             this._setVolumeCommand = new WpfMPD.Common.RelayCommand(this.SetVolumeCommand_ExecuteAsync, this.SetVolumeCommand_CanExecute);
-
             this._changeSongCommand = new WpfMPD.Common.RelayCommand(this.ChangeSongCommand_ExecuteAsync, this.ChangeSongCommand_CanExecute);
             this._changePlaylistCommand = new WpfMPD.Common.RelayCommand(this.ChangePlaylistCommand_ExecuteAsync, this.ChangePlaylistCommand_CanExecute);
+            this._windowClosingCommand = new WpfMPD.Common.RelayCommand(this.WindowClosingCommand_Execute, this.WindowClosingCommand_CanExecute);
 
             //Create MPC instance.
             this._MPC = new MPC();
 
+            //Assigned idle event.
+            this._MPC.StatusChanged += new MPC.MPDStatusChanged(OnStatusChanged);
+
             //Connect to MPD server and query status and info.
             QueryStatus();
-            QueryCurrentPlayQueue();
-            QueryPlaylists();
+
+
+            //start idle.
+            //ConnectIdle();
             
         }
 
         #region PRIVATE METHODS
+
+        private async void ConnectIdle()
+        {
+            await _MPC.MPDIdleConnect();
+        }
+
+        private async void DisConnectIdle()
+        {
+            bool isDone = await _MPC.MPDIdleDisConnect();
+        }
 
         private async void QueryStatus()
         {
@@ -243,6 +292,12 @@ namespace WpfMPD
 
                 UpdateButtonStatus();
 
+                QueryCurrentPlayQueue();
+
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("QueryStatus returned ACK." + "\n");
             }
         }
 
@@ -256,12 +311,20 @@ namespace WpfMPD
                 {
                     //System.Diagnostics.Debug.WriteLine("QueryCurrentPlaylist is done.");
 
-                    //let listview know it is changed. 
-                    this.SelectedSong = _MPC.MPDCurrentSong;
+                    //change it quietly.
+                    this._selectedSong = _MPC.MPDCurrentSong;
+                    //let listview know it is changed.
+                    this.NotifyPropertyChanged("SelectedSong");
 
                     //Listview selection changed event in the code behind takes care ScrollIntoView. 
                     //This is a VIEW matter.
-                    IsBusy = false;
+
+                    QueryPlaylists();
+
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue returned ACK." + "\n");
                 }
             }
             finally {
@@ -277,9 +340,16 @@ namespace WpfMPD
             {
                 //System.Diagnostics.Debug.WriteLine("QueryPlaylists is done.");
 
-                //selected item should read "Current Play Queue"
+                //selected item should now read "Current Play Queue"
                 //https://stackoverflow.com/questions/2343446/default-text-for-templated-combo-box?rq=1
 
+                //start idle.
+                ConnectIdle();
+
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("QueryPlaylists returned ACK." + "\n");
             }
         }
 
@@ -305,10 +375,19 @@ namespace WpfMPD
                     }
             }
 
-            this.Volume = Convert.ToDouble(_MPC.MPDStatus.MPDVolume);
-            this.Random = _MPC.MPDStatus.MPDRandom;
-            this.Repeat = _MPC.MPDStatus.MPDRepeat;
+            // "quietly" update view.
+            this._volume = Convert.ToDouble(_MPC.MPDStatus.MPDVolume);
+            this.NotifyPropertyChanged("Volume");
 
+            this._random = _MPC.MPDStatus.MPDRandom;
+            this.NotifyPropertyChanged("Random");
+
+            this._repeat = _MPC.MPDStatus.MPDRepeat;
+            this.NotifyPropertyChanged("Repeat");
+
+            // no need to care about "double" updates.
+            this.Time = Convert.ToDouble(_MPC.MPDStatus.MPDSongTime);
+            this.Elapsed = Convert.ToDouble(_MPC.MPDStatus.MPDSongElapsed);
         }
 
         #endregion END of PRIVATE METHODS
@@ -351,22 +430,17 @@ namespace WpfMPD
             if (isDone)
             {
                 UpdateButtonStatus();
-            }
 
-            //if playlist changes, and random sets on, don't know which is current untill status is returned.
-            //so,
-            //let listview know it is changed. 
-            if (this._selectedSong == null)
-            {
-                this.SelectedSong = _MPC.MPDCurrentSong;
+                //change it quietly.
+                this._selectedSong = _MPC.MPDCurrentSong;
+                //let listview know it is changed.
+                this.NotifyPropertyChanged("SelectedSong");
             }
             else
             {
-                if (_MPC.MPDCurrentSong.ID != this._selectedSong.ID)
-                {
-                    this.SelectedSong = _MPC.MPDCurrentSong;
-                }
+                System.Diagnostics.Debug.WriteLine("PlayCommand returned ACK." + "\n");
             }
+
         }
 
         public ICommand PlayNextCommand { get { return this._playNextCommand; } }
@@ -379,15 +453,20 @@ namespace WpfMPD
 
         public async void PlayNextCommand_ExecuteAsync()
         {
-            bool isDone = false;
-            isDone = await _MPC.MPDPlaybackNext();
+            bool isDone = await _MPC.MPDPlaybackNext();
 
             if (isDone)
             {
                 UpdateButtonStatus();
 
-                //let listview know it is changed. 
-                this.SelectedSong = _MPC.MPDCurrentSong;
+                //change it quietly.
+                this._selectedSong = _MPC.MPDCurrentSong;
+                //let listview know it is changed.
+                this.NotifyPropertyChanged("SelectedSong");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("PlayNextCommand returned ACK." + "\n");
             }
         }
 
@@ -401,15 +480,20 @@ namespace WpfMPD
 
         public async void PlayPrevCommand_ExecuteAsync()
         {
-            bool isDone = false;
-            isDone = await _MPC.MPDPlaybackPrev();
+            bool isDone = await _MPC.MPDPlaybackPrev();
 
             if (isDone)
             {
                 UpdateButtonStatus();
 
-                //let listview know it is changed. 
-                this.SelectedSong = _MPC.MPDCurrentSong;
+                //change it quietly.
+                this._selectedSong = _MPC.MPDCurrentSong;
+                //let listview know it is changed.
+                this.NotifyPropertyChanged("SelectedSong");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("PlayPrevCommand returned ACK. " + "\n");
             }
         }
 
@@ -423,8 +507,7 @@ namespace WpfMPD
 
         public async void SetRpeatCommand_ExecuteAsync()
         {
-            bool isDone = false;
-            isDone = await _MPC.MPDSetRepeat(this._repeat);
+            bool isDone = await _MPC.MPDSetRepeat(this._repeat);
 
             if (isDone)
             {
@@ -442,8 +525,7 @@ namespace WpfMPD
 
         public async void SetRandomCommand_ExecuteAsync()
         {
-            bool isDone = false;
-            isDone = await _MPC.MPDSetRandom(this._random);
+            bool isDone = await _MPC.MPDSetRandom(this._random);
 
             if (isDone)
             {
@@ -461,8 +543,7 @@ namespace WpfMPD
 
         public async void SetVolumeCommand_ExecuteAsync()
         {
-            bool isDone = false;
-            isDone = await _MPC.MPDSetVolume(Convert.ToInt32(this._volume));
+            bool isDone = await _MPC.MPDSetVolume(Convert.ToInt32(this._volume));
 
             if (isDone)
             {
@@ -480,12 +561,16 @@ namespace WpfMPD
 
         public async void ChangeSongCommand_ExecuteAsync()
         {
-            bool isDone = false;
-            isDone = await _MPC.MPDPlaybackPlay(_selectedSong.ID);
+            bool isDone = await _MPC.MPDPlaybackPlay(_selectedSong.ID);
 
             if (isDone)
             {
                 UpdateButtonStatus();
+
+                //change it quietly.
+                this._selectedSong = _MPC.MPDCurrentSong;
+                //let listview know it is changed.
+                this.NotifyPropertyChanged("SelectedSong");
             }
         }
 
@@ -499,19 +584,27 @@ namespace WpfMPD
 
         public async void ChangePlaylistCommand_ExecuteAsync()
         {
-            //IsBusy = true;
-            try {
-                bool isDone = false;
-                isDone = await _MPC.MPDChangePlaylist(this._selecctedPlaylist);
+            if (this._selecctedPlaylist == "") return;
 
-                if (isDone)
-                {
-                    QueryCurrentPlayQueue();
+            this._selectedSong = null;
 
+            //MPD >> clear load playlistinfo > returns and updates playlist.
+            bool isDone = await _MPC.MPDChangePlaylist(this._selecctedPlaylist);
+            if (isDone)
+            {
+                //Start play. MPD >> play status > returns and update status.
+                isDone = await _MPC.MPDPlaybackPlay();
+                if (isDone) { 
+
+                    UpdateButtonStatus();
+
+                    //this.SelectedSong = _MPC.MPDCurrentSong; //  <-don't
+
+                    //change it quietly.
+                    this._selectedSong = _MPC.MPDCurrentSong;
+                    //let listview know it is changed.
+                    this.NotifyPropertyChanged("SelectedSong");
                 }
-            }
-            finally { 
-                //IsBusy = false;
             }
 
             //TODO make other controls disabled
@@ -519,9 +612,33 @@ namespace WpfMPD
 
         }
 
+        public ICommand WindowClosingCommand { get { return this._windowClosingCommand; } }
+
+        public bool WindowClosingCommand_CanExecute()
+        {
+            return true;
+        }
+
+        public void WindowClosingCommand_Execute()
+        {
+            //https://stackoverflow.com/questions/3683450/handling-the-window-closing-event-with-wpf-mvvm-light-toolkit
+            //TODO close connection, save ini setting etc.
+            
+            //System.Diagnostics.Debug.WriteLine("WindowClosingCommand");
+
+            //disconnect idle connection.
+            DisConnectIdle();
+        }
+
+
         #endregion END of COMMANDS
 
         #region EVENTS
+
+        private void OnStatusChanged(MPC sender, object data)
+        {
+            System.Diagnostics.Debug.WriteLine("OnStatusChanged: " + (data as string));
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using System.Text;
 
 namespace WpfMPD
 {
@@ -45,6 +46,8 @@ namespace WpfMPD
             private bool _repeat;
             private bool _random;
             private string _songID;
+            private int _songTime;
+            private int _songElapsed;
 
             public MPDPlayState MPDState
             {
@@ -86,6 +89,24 @@ namespace WpfMPD
                 }
             }
 
+            public int MPDSongTime
+            {
+                get { return _songTime; }
+                set
+                {
+                    _songTime = value;
+                }
+            }
+
+            public int MPDSongElapsed
+            {
+                get { return _songElapsed; }
+                set
+                {
+                    _songElapsed = value;
+                }
+            }
+
             public Status()
             {
                 //constructor
@@ -102,10 +123,11 @@ namespace WpfMPD
         private Song _currentSong;
         private ObservableCollection<Song> _songs = new ObservableCollection<Song>();
         private ObservableCollection<String> _playLists = new ObservableCollection<String>();
+        private EventDrivenTCPClient _idleClient;
 
         #endregion END of MPC PRIVATE FIELD declaration
 
-        #region MPC PUBLIC PROPERTY FIELD
+        #region MPC PUBLIC PROPERTY and EVENT FIELD
 
         public Status MPDStatus
         {
@@ -134,6 +156,9 @@ namespace WpfMPD
             get { return this._playLists; }
         }
 
+        public delegate void MPDStatusChanged(MPC sender, object data);
+        public event MPDStatusChanged StatusChanged;
+
         #endregion END of MPC PUBLIC PROPERTY FIELD
 
 
@@ -142,12 +167,100 @@ namespace WpfMPD
         {
             _st = new Status();
 
-            //Enable multithreaded sync
+            //Enable multithreaded manupilations of ObservableCollections...
             BindingOperations.EnableCollectionSynchronization(this._songs, new object());
+            BindingOperations.EnableCollectionSynchronization(this._playLists, new object());
+
+            //Initialize idle tcp client
+            _idleClient = new EventDrivenTCPClient(IPAddress.Parse("192.168.3.123"), int.Parse("6600"));
+            _idleClient.ReceiveTimeout = 500000;
+            _idleClient.AutoReconnect = false;
+            _idleClient.DataReceived += new EventDrivenTCPClient.delDataReceived(IdleClient_DataReceived);
+            _idleClient.ConnectionStatusChanged += new EventDrivenTCPClient.delConnectionStatusChanged(IdleClient_ConnectionStatusChanged);
 
         }
-        
+
         #region MPC METHODS
+
+        public async Task<bool> MPDIdleConnect()
+        {
+            //Idle client connect
+            try
+            {
+                if (_idleClient.ConnectionState != EventDrivenTCPClient.ConnectionStatus.Connected)
+                {
+                    await Task.Run(() => { _idleClient.Connect(); });
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                //error
+                System.Diagnostics.Debug.WriteLine("Error@MPDIdleConnect(): " + ex.Message);
+                return false;
+            }
+            
+        }
+
+        public async Task<bool> MPDIdleDisConnect()
+        {
+            //Idle client close connection
+            try
+            {
+                if (_idleClient.ConnectionState == EventDrivenTCPClient.ConnectionStatus.Connected) {
+                    await Task.Run(() => { _idleClient.Disconnect(); });
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                //error
+                System.Diagnostics.Debug.WriteLine("Error@MPDIdleDisConnect(): " + ex.Message);
+                return false;
+            }
+        }
+
+        //Fired when the connection status changes in the TCP client
+        private void IdleClient_ConnectionStatusChanged(EventDrivenTCPClient sender, EventDrivenTCPClient.ConnectionStatus status)
+        {
+            //System.Diagnostics.Debug.WriteLine("IdleConnection: " + status.ToString());
+
+            if (status == EventDrivenTCPClient.ConnectionStatus.Connected)
+            {
+                //
+            }
+        }
+
+        //Fired when new data is received in the TCP client
+        private void IdleClient_DataReceived(EventDrivenTCPClient sender, object data)
+        {
+            //System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived: " + (data as string) );
+
+            if ((data as string).StartsWith("OK MPD"))
+            {
+                //Connected and received OK. So go idle.
+                sender.Send("idle player mixer options playlist stored_playlist\n");
+            }
+            else
+            {
+                
+                //TODO do something.
+
+                /*
+                 changed: playlist
+                 changed: player
+                 changed: options
+                 OK
+                */
+
+                //Fire up changed event.
+                StatusChanged?.Invoke(this, data);
+
+                //go idle and wait
+                sender.Send("idle player mixer options playlist stored_playlist\n");
+            }
+            
+        }
 
         private static async Task<List<string>> SendRequest(string server, int port, string mpdCommand)
         {
@@ -159,62 +272,69 @@ namespace WpfMPD
             {
                 TcpClient client = new TcpClient();
                 await client.ConnectAsync(ep.Address, port);
-                System.Diagnostics.Debug.WriteLine("\n\n" + "Server " + server + " connected.");
+
+                //System.Diagnostics.Debug.WriteLine("\n\n" + "Server " + server + " connected.");
 
                 NetworkStream networkStream = client.GetStream();
                 StreamWriter writer = new StreamWriter(networkStream);
                 StreamReader reader = new StreamReader(networkStream);
                 writer.AutoFlush = true;
 
-                //await writer.WriteLineAsync(requestData);
-                //System.Diagnostics.Debug.WriteLine("Request: " + requestData);
-
                 //first check MPD's initial response on connect.
                 string responseLine = await reader.ReadLineAsync();
-                System.Diagnostics.Debug.WriteLine("Connected response: " + responseLine);
 
-                //TODO check if it starts with "OK MPD"
+                //System.Diagnostics.Debug.WriteLine("Connected response: " + responseLine);
 
-                //if it's ok, then request command.
-                string requestData = mpdCommand;
-                await writer.WriteLineAsync(requestData);
-                System.Diagnostics.Debug.WriteLine("Request: " + requestData);
+                List<string> responseMultiLines = new List<string>();
 
-                //read a single line.
-                //responseLine = await reader.ReadLineAsync();
-                //System.Diagnostics.Debug.WriteLine("Response: " + responseLine);
+                //Check if it starts with "OK MPD"
+                if (responseLine.StartsWith("OK MPD")) {
 
-                //read multiple lines untill "OK".
-                List<string> MPDResponse = new List<string>();
-                string responseMultline = "";
-                while (!reader.EndOfStream)
-                {
-                    responseLine = await reader.ReadLineAsync();
-                    //System.Diagnostics.Debug.WriteLine("Response loop: " + responseLine);
+                    //if it's ok, then request command.
+                    string requestData = mpdCommand;
+                    await writer.WriteLineAsync(requestData);
 
-                    if ((responseLine != "OK") && (responseLine != ""))  
+                    System.Diagnostics.Debug.WriteLine("Request: " + requestData);
+
+                    //read multiple lines untill "OK".
+                    while (!reader.EndOfStream)
                     {
-                        responseMultline = responseMultline + responseLine + "\n";
-                        MPDResponse.Add(responseLine);
-                    }
-                    else
-                    {
-                        responseMultline = responseMultline + responseLine;
-                        break;
+                        responseLine = await reader.ReadLineAsync();
+
+                        //System.Diagnostics.Debug.WriteLine("Response loop: " + responseLine);
+
+                        if ((responseLine != "OK") && (responseLine != ""))
+                        {
+                            responseMultiLines.Add(responseLine);
+
+                            if (responseLine.StartsWith("ACK"))
+                            {
+                                System.Diagnostics.Debug.WriteLine("Response ACK: " + responseLine + "\n");
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                 }
+                else
+                {
+                    responseMultiLines.Add(responseLine);
 
-                //debug output
-                System.Diagnostics.Debug.WriteLine("Response lines: " + responseMultline);
+                    System.Diagnostics.Debug.WriteLine("Connect ACK: " + responseLine + "\n");
+                }
 
                 client.Close();
-                System.Diagnostics.Debug.WriteLine("Connection closed.");
+                
+                //System.Diagnostics.Debug.WriteLine("Connection closed.");
 
-                return MPDResponse;//responseMultline;//responseLine;
+                return responseMultiLines;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("Error@SendRequest: " + ex.Message);
                 //TODO:
                 return null; //ex.Message;
             }
@@ -247,21 +367,32 @@ namespace WpfMPD
             Dictionary<string, string> MPDStatusValues = new Dictionary<string, string>();
             foreach (string value in sl)
             {
+                if (value.StartsWith("ACK")) { return false; }
+
                 string[] StatusValuePair = value.Split(':');
                 if (StatusValuePair.Length > 1)
                 {
                     if (MPDStatusValues.ContainsKey(StatusValuePair[0].Trim()))
                     {
-                        MPDStatusValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim();
+                        if (StatusValuePair.Length == 2) { 
+                            MPDStatusValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim();
+                        }
+                        else if (StatusValuePair.Length == 3)
+                        {
+                            MPDStatusValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim() +':'+ StatusValuePair[2].Trim();
+                        } 
+
                     }
                     else
                     {
-                        MPDStatusValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
+                        if (StatusValuePair.Length == 2)
+                        {
+                            MPDStatusValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
+                        }else if (StatusValuePair.Length == 3)
+                        {
+                            MPDStatusValues.Add(StatusValuePair[0].Trim(), (StatusValuePair[1].Trim() +":"+ StatusValuePair[2].Trim()));
+                        }
                     }
-                }
-                else
-                {
-                    //shuldn't be happening.
                 }
             }
 
@@ -351,8 +482,24 @@ namespace WpfMPD
                 }
             }
 
-            //more?
+            if (MPDStatusValues.ContainsKey("time"))
+            {
+                //System.Diagnostics.Debug.WriteLine(MPDStatusValues["time"]);
+                try
+                {
+                    if (MPDStatusValues["time"].Split(':').Length > 1)
+                    {
+                        _st.MPDSongTime = Int32.Parse(MPDStatusValues["time"].Split(':')[1].Trim());
+                        _st.MPDSongElapsed = Int32.Parse(MPDStatusValues["time"].Split(':')[0].Trim());
+                    }
+                }
+                catch (FormatException e)
+                {
+                    System.Diagnostics.Debug.WriteLine(e.Message);
+                }
+            }
 
+            //TODO: more?
 
 
             var listItem = _songs.Where(i => i.ID == _st.MPDSongID);
@@ -361,7 +508,8 @@ namespace WpfMPD
                 foreach (var item in listItem)
                 {
                     _currentSong = item as Song;
-                    System.Diagnostics.Debug.WriteLine("StatusResponse linq: _songs.Where?="+ _currentSong.Title);
+
+                    //System.Diagnostics.Debug.WriteLine("StatusResponse linq: _songs.Where?="+ _currentSong.Title);
                 }
             }
             
@@ -382,7 +530,6 @@ namespace WpfMPD
 
                 return ParsePlaylistInfoResponse(tsResponse.Result);
 
-
             }
             catch (Exception ex)
             {
@@ -401,6 +548,8 @@ namespace WpfMPD
             {
                 //System.Diagnostics.Debug.WriteLine("@ParsePlaylistInfoResponse(): " + value);
 
+                if (value.StartsWith("ACK")) { return false; }
+
                 string[] StatusValuePair = value.Split(':');
                 if (StatusValuePair.Length > 1)
                 {
@@ -413,10 +562,6 @@ namespace WpfMPD
                         SongValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
                     }
 
-                }
-                else
-                {
-                    //shuldn't be happening.
                 }
 
                 if (SongValues.ContainsKey("Id"))
@@ -441,8 +586,8 @@ namespace WpfMPD
                     if (sng.ID == _st.MPDSongID)
                     {
                         _currentSong = sng;
-                        //debug
-                        System.Diagnostics.Debug.WriteLine(sng.ID + ":" + sng.Title + " - is current.");
+
+                        //System.Diagnostics.Debug.WriteLine(sng.ID + ":" + sng.Title + " - is current.");
                     }
 
                     _songs.Add(sng);
@@ -494,8 +639,9 @@ namespace WpfMPD
 
             foreach (string value in sl)
             {
-
                 //System.Diagnostics.Debug.WriteLine("@ParsePlaylistsResponse(): " + value + "");
+
+                if (value.StartsWith("ACK")) { return false; }
 
                 if (value.StartsWith("playlist:")) {
                     if (value.Split(':').Length > 1) { 
@@ -537,9 +683,7 @@ namespace WpfMPD
                 //send task
                 Task<List<string>> tsResponse = SendRequest(server, port, data);
 
-                //send task excution and wait.
                 await tsResponse;
-
 
                 //Alternatively just
                 //string sResponse = await SendRequest(server, port, data);
@@ -564,43 +708,14 @@ namespace WpfMPD
                 string server = "192.168.3.123";
                 int port = 6600;
                 string data = "command_list_begin" + "\n";
-                /*
-                switch (st.MPDState)
-                {
-                    case Status.MPDPlayState.Play:
-                        {
-                            //PlayButton.Content = "Pause";
-                            data = data + "pause 1" + "\n"; //or "stop"
-                            break;
-                        }
-                    case Status.MPDPlayState.Pause:
-                        {
-                            //PlayButton.Content = "Start";
-                            data = data + "pause 0" + "\n";
-                            break;
-                        }
-                    case Status.MPDPlayState.Stop:
-                        {
-                            //PlayButton.Content = "Play";
-                            data = data + "play" + "\n";
-                            break;
-                        }
-                }
-                */
+
                 data = data + "pause 1" + "\n";
 
                 data = data + "status" + "\n" + "command_list_end";
 
-                //send task
                 Task<List<string>> tsResponse = SendRequest(server, port, data);
 
-                //send task excution and wait.
                 await tsResponse;
-
-
-                //Alternatively just
-                //string sResponse = await SendRequest(server, port, data);
-                //"Received response: " + tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
 
@@ -622,43 +737,14 @@ namespace WpfMPD
                 string server = "192.168.3.123";
                 int port = 6600;
                 string data = "command_list_begin" + "\n";
-                /*
-                switch (st.MPDState)
-                {
-                    case Status.MPDPlayState.Play:
-                        {
-                            //PlayButton.Content = "Pause";
-                            data = data + "pause 1" + "\n"; //or "stop"
-                            break;
-                        }
-                    case Status.MPDPlayState.Pause:
-                        {
-                            //PlayButton.Content = "Start";
-                            data = data + "pause 0" + "\n";
-                            break;
-                        }
-                    case Status.MPDPlayState.Stop:
-                        {
-                            //PlayButton.Content = "Play";
-                            data = data + "play" + "\n";
-                            break;
-                        }
-                }
-                */
+
                 data = data + "pause 0" + "\n";
 
                 data = data + "status" + "\n" + "command_list_end";
 
-                //send task
                 Task<List<string>> tsResponse = SendRequest(server, port, data);
 
-                //send task excution and wait.
                 await tsResponse;
-
-
-                //Alternatively just
-                //string sResponse = await SendRequest(server, port, data);
-                //"Received response: " + tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
 
@@ -680,43 +766,14 @@ namespace WpfMPD
                 string server = "192.168.3.123";
                 int port = 6600;
                 string data = "command_list_begin" + "\n";
-                /*
-                switch (st.MPDState)
-                {
-                    case Status.MPDPlayState.Play:
-                        {
-                            //PlayButton.Content = "Pause";
-                            data = data + "pause 1" + "\n"; //or "stop"
-                            break;
-                        }
-                    case Status.MPDPlayState.Pause:
-                        {
-                            //PlayButton.Content = "Start";
-                            data = data + "pause 0" + "\n";
-                            break;
-                        }
-                    case Status.MPDPlayState.Stop:
-                        {
-                            //PlayButton.Content = "Play";
-                            data = data + "play" + "\n";
-                            break;
-                        }
-                }
-                */
+
                 data = data + "stop" + "\n";
 
                 data = data + "status" + "\n" + "command_list_end";
 
-                //send task
                 Task<List<string>> tsResponse = SendRequest(server, port, data);
 
-                //send task excution and wait.
                 await tsResponse;
-
-
-                //Alternatively just
-                //string sResponse = await SendRequest(server, port, data);
-                //"Received response: " + tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
 
@@ -739,14 +796,17 @@ namespace WpfMPD
                 int port = 6600;
                 string data = "command_list_begin" + "\n";
 
+                if (_st.MPDState != Status.MPDPlayState.Play)
+                {
+                    data = data + "play" + "\n";
+                }
+
                 data = data + "next" + "\n";
 
                 data = data + "status" + "\n" + "command_list_end";
 
-                //send task
                 Task<List<string>> tsResponse = SendRequest(server, port, data);
 
-                //send task excution and wait.
                 await tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
@@ -771,12 +831,15 @@ namespace WpfMPD
 
                 data = data + "previous" + "\n";
 
+                if (_st.MPDState != Status.MPDPlayState.Play)
+                {
+                    data = data + "play" + "\n";
+                }
+
                 data = data + "status" + "\n" + "command_list_end";
 
-                //send task
                 Task<List<string>> tsResponse = SendRequest(server, port, data);
 
-                //send task excution and wait.
                 await tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
@@ -802,16 +865,15 @@ namespace WpfMPD
                 //todo settings form.
                 string server = "192.168.3.123";
                 int port = 6600;
+                //string data = "setvol " + v.ToString();
                 string data = "command_list_begin" + "\n";
-
+                
                 data = data + "setvol " + v.ToString() + "\n";
 
                 data = data + "status" + "\n" + "command_list_end";
 
-                //send task
                 Task<List<string>> tsResponse = SendRequest(server, port, data);
 
-                //send task excution and wait.
                 await tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
@@ -848,10 +910,8 @@ namespace WpfMPD
                 }
                 data = data + "status" + "\n" + "command_list_end";
 
-                //send task
                 Task<List<string>> tsResponse = SendRequest(server, port, data);
 
-                //send task excution and wait.
                 await tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
@@ -889,10 +949,8 @@ namespace WpfMPD
                 }
                 data = data + "status" + "\n" + "command_list_end";
 
-                //send task
                 Task<List<string>> tsResponse = SendRequest(server, port, data);
 
-                //send task excution and wait.
                 await tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
@@ -906,9 +964,9 @@ namespace WpfMPD
             return false;
         }
 
-        public async Task<bool> MPDChangePlaylist(string PlaylistName)
+        public async Task<bool> MPDChangePlaylist(string playlistName)
         {
-            if (PlaylistName != "")
+            if (playlistName.Trim() != "")
             {
 
                 //todo settings form.
@@ -918,21 +976,20 @@ namespace WpfMPD
 
                 data = data + "clear" +  "\n";
 
-                data = data + "load " + PlaylistName + "\n";
+                data = data + "load " + playlistName + "\n";
 
                 if (_st.MPDState == Status.MPDPlayState.Play) { 
-                    data = data + "play" + "\n";
+                    //data = data + "play" + "\n";
                 }
 
-                data = data + "status" + "\n" + "command_list_end";
+                //data = data + "status" + "\n" + "command_list_end";
+                data = data + "playlistinfo" + "\n" + "command_list_end";
 
-                //send task
                 Task<List<string>> tsResponse = SendRequest(server, port, data);
 
-                //send task excution and wait.
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                return ParsePlaylistInfoResponse(tsResponse.Result);
             }
             else
             {
@@ -945,4 +1002,422 @@ namespace WpfMPD
 
         /// END OF MPC Client Class 
     }
+
+
+
+
+    /// <summary>
+    /// Event driven TCP client wrapper
+    /// https://www.daniweb.com/programming/software-development/code/422291/user-friendly-asynchronous-event-driven-tcp-client
+    /// </summary>
+    public class EventDrivenTCPClient : IDisposable
+    {
+        #region Consts/Default values
+        const int DEFAULTTIMEOUT = 5000; //Default to 5 seconds on all timeouts
+        const int RECONNECTINTERVAL = 2000; //Default to 2 seconds reconnect attempt rate
+        #endregion
+
+        #region Components, Events, Delegates, and CTOR
+        //Timer used to detect receive timeouts
+        private System.Timers.Timer tmrReceiveTimeout = new System.Timers.Timer();
+        private System.Timers.Timer tmrSendTimeout = new System.Timers.Timer();
+        private System.Timers.Timer tmrConnectTimeout = new System.Timers.Timer();
+        public delegate void delDataReceived(EventDrivenTCPClient sender, object data);
+        public event delDataReceived DataReceived;
+        public delegate void delConnectionStatusChanged(EventDrivenTCPClient sender, ConnectionStatus status);
+        public event delConnectionStatusChanged ConnectionStatusChanged;
+        public enum ConnectionStatus
+        {
+            NeverConnected,
+            Connecting,
+            Connected,
+            AutoReconnecting,
+            DisconnectedByUser,
+            DisconnectedByHost,
+            ConnectFail_Timeout,
+            ReceiveFail_Timeout,
+            SendFail_Timeout,
+            SendFail_NotConnected,
+            Error
+        }
+        public EventDrivenTCPClient(IPAddress ip, int port, bool autoreconnect = true)
+        {
+            this._IP = ip;
+            this._Port = port;
+            this._AutoReconnect = autoreconnect;
+            this._client = new TcpClient(AddressFamily.InterNetwork);
+            this._client.NoDelay = true; //Disable the nagel algorithm for simplicity
+            ReceiveTimeout = DEFAULTTIMEOUT;
+            SendTimeout = DEFAULTTIMEOUT;
+            ConnectTimeout = DEFAULTTIMEOUT;
+            ReconnectInterval = RECONNECTINTERVAL;
+            tmrReceiveTimeout.AutoReset = false;
+            tmrReceiveTimeout.Elapsed += new System.Timers.ElapsedEventHandler(tmrReceiveTimeout_Elapsed);
+            tmrConnectTimeout.AutoReset = false;
+            tmrConnectTimeout.Elapsed += new System.Timers.ElapsedEventHandler(tmrConnectTimeout_Elapsed);
+            tmrSendTimeout.AutoReset = false;
+            tmrSendTimeout.Elapsed += new System.Timers.ElapsedEventHandler(tmrSendTimeout_Elapsed);
+
+            ConnectionState = ConnectionStatus.NeverConnected;
+        }
+        #endregion
+
+        #region Private methods/Event Handlers
+        void tmrSendTimeout_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            this.ConnectionState = ConnectionStatus.SendFail_Timeout;
+            DisconnectByHost();
+        }
+        void tmrReceiveTimeout_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            this.ConnectionState = ConnectionStatus.ReceiveFail_Timeout;
+            DisconnectByHost();
+        }
+        void tmrConnectTimeout_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            ConnectionState = ConnectionStatus.ConnectFail_Timeout;
+            DisconnectByHost();
+        }
+        private void DisconnectByHost()
+        {
+            this.ConnectionState = ConnectionStatus.DisconnectedByHost;
+            tmrReceiveTimeout.Stop();
+            if (AutoReconnect)
+                Reconnect();
+        }
+        private void Reconnect()
+        {
+            if (this.ConnectionState == ConnectionStatus.Connected)
+                return;
+            this.ConnectionState = ConnectionStatus.AutoReconnecting;
+            try
+            {
+                this._client.Client.BeginDisconnect(true, new AsyncCallback(cbDisconnectByHostComplete), this._client.Client);
+            }
+            catch { }
+        }
+        #endregion
+
+        #region Public Methods
+        /// <summary>
+        /// Try connecting to the remote host
+        /// </summary>
+        public void Connect()
+        {
+            if (this.ConnectionState == ConnectionStatus.Connected)
+                return;
+            this.ConnectionState = ConnectionStatus.Connecting;
+            tmrConnectTimeout.Start();
+            this._client.BeginConnect(this._IP, this._Port, new AsyncCallback(cbConnect), this._client.Client);
+        }
+        /// <summary>
+        /// Try disconnecting from the remote host
+        /// </summary>
+        public void Disconnect()
+        {
+            if (this.ConnectionState != ConnectionStatus.Connected)
+                return;
+            this._client.Client.BeginDisconnect(true, new AsyncCallback(cbDisconnectComplete), this._client.Client);
+        }
+        /// <summary>
+        /// Try sending a string to the remote host
+        /// </summary>
+        /// <param name="data">The data to send</param>
+        public void Send(string data)
+        {
+            if (this.ConnectionState != ConnectionStatus.Connected)
+            {
+                this.ConnectionState = ConnectionStatus.SendFail_NotConnected;
+                return;
+            }
+            var bytes = _encode.GetBytes(data);
+            SocketError err = new SocketError();
+            tmrSendTimeout.Start();
+            this._client.Client.BeginSend(bytes, 0, bytes.Length, SocketFlags.None, out err, new AsyncCallback(cbSendComplete), this._client.Client);
+            if (err != SocketError.Success)
+            {
+                Action doDCHost = new Action(DisconnectByHost);
+                doDCHost.Invoke();
+            }
+        }
+        /// <summary>
+        /// Try sending byte data to the remote host
+        /// </summary>
+        /// <param name="data">The data to send</param>
+        public void Send(byte[] data)
+        {
+            if (this.ConnectionState != ConnectionStatus.Connected)
+                throw new InvalidOperationException("Cannot send data, socket is not connected");
+            SocketError err = new SocketError();
+            this._client.Client.BeginSend(data, 0, data.Length, SocketFlags.None, out err, new AsyncCallback(cbSendComplete), this._client.Client);
+            if (err != SocketError.Success)
+            {
+                Action doDCHost = new Action(DisconnectByHost);
+                doDCHost.Invoke();
+            }
+        }
+        public void Dispose()
+        {
+            this._client.Close();
+            this._client.Client.Dispose();
+        }
+        #endregion
+
+        #region Callbacks
+        private void cbConnectComplete()
+        {
+            if (_client.Connected == true)
+            {
+                tmrConnectTimeout.Stop();
+                ConnectionState = ConnectionStatus.Connected;
+                this._client.Client.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, new AsyncCallback(cbDataReceived), this._client.Client);
+            }
+            else
+            {
+                ConnectionState = ConnectionStatus.Error;
+            }
+        }
+        private void cbDisconnectByHostComplete(IAsyncResult result)
+        {
+            var r = result.AsyncState as Socket;
+            if (r == null)
+                throw new InvalidOperationException("Invalid IAsyncResult - Could not interpret as a socket object");
+            r.EndDisconnect(result);
+            if (this.AutoReconnect)
+            {
+                Action doConnect = new Action(Connect);
+                doConnect.Invoke();
+                return;
+            }
+        }
+        private void cbDisconnectComplete(IAsyncResult result)
+        {
+            var r = result.AsyncState as Socket;
+            if (r == null)
+                throw new InvalidOperationException("Invalid IAsyncResult - Could not interpret as a socket object");
+            r.EndDisconnect(result);
+            this.ConnectionState = ConnectionStatus.DisconnectedByUser;
+
+        }
+        private void cbConnect(IAsyncResult result)
+        {
+            var sock = result.AsyncState as Socket;
+            if (result == null)
+                throw new InvalidOperationException("Invalid IAsyncResult - Could not interpret as a socket object");
+            if (!sock.Connected)
+            {
+                if (AutoReconnect)
+                {
+                    System.Threading.Thread.Sleep(ReconnectInterval);
+                    Action reconnect = new Action(Connect);
+                    reconnect.Invoke();
+                    return;
+                }
+                else
+                    return;
+            }
+            sock.EndConnect(result);
+            var callBack = new Action(cbConnectComplete);
+            callBack.Invoke();
+        }
+        private void cbSendComplete(IAsyncResult result)
+        {
+            var r = result.AsyncState as Socket;
+            if (r == null)
+                throw new InvalidOperationException("Invalid IAsyncResult - Could not interpret as a socket object");
+            SocketError err = new SocketError();
+            r.EndSend(result, out err);
+            if (err != SocketError.Success)
+            {
+                Action doDCHost = new Action(DisconnectByHost);
+                doDCHost.Invoke();
+            }
+            else
+            {
+                lock (SyncLock)
+                {
+                    tmrSendTimeout.Stop();
+                }
+            }
+        }
+        private void cbChangeConnectionStateComplete(IAsyncResult result)
+        {
+            var r = result.AsyncState as EventDrivenTCPClient;
+            if (r == null)
+                throw new InvalidOperationException("Invalid IAsyncResult - Could not interpret as a EDTC object");
+            r.ConnectionStatusChanged.EndInvoke(result);
+        }
+        private void cbDataReceived(IAsyncResult result)
+        {
+            var sock = result.AsyncState as Socket;
+            if (sock == null)
+                throw new InvalidOperationException("Invalid IASyncResult - Could not interpret as a socket");
+            SocketError err = new SocketError();
+            int bytes = sock.EndReceive(result, out err);  
+            if (bytes == 0 || err != SocketError.Success)
+            {
+                lock (SyncLock)
+                {
+                    tmrReceiveTimeout.Start();
+                    return;
+                }
+            }
+            else
+            {
+                lock (SyncLock)
+                {
+                    tmrReceiveTimeout.Stop();
+                }
+            }
+            if (DataReceived != null)
+            {
+                DataReceived.BeginInvoke(this, _encode.GetString(dataBuffer, 0, bytes), new AsyncCallback(cbDataRecievedCallbackComplete), this);
+            }
+        }
+        private void cbDataRecievedCallbackComplete(IAsyncResult result)
+        {
+            var r = result.AsyncState as EventDrivenTCPClient;
+            if (r == null)
+                throw new InvalidOperationException("Invalid IAsyncResult - Could not interpret as EDTC object");
+            r.DataReceived.EndInvoke(result);
+            SocketError err = new SocketError();
+            this._client.Client.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, out err, new AsyncCallback(cbDataReceived), this._client.Client);
+            if (err != SocketError.Success)
+            {
+                Action doDCHost = new Action(DisconnectByHost);
+                doDCHost.Invoke();
+            }
+        }
+        #endregion
+
+        #region Properties and members
+        private IPAddress _IP = IPAddress.None;
+        private ConnectionStatus _ConStat;
+        private TcpClient _client;
+        private byte[] dataBuffer = new byte[5000];
+        private bool _AutoReconnect = false;
+        private int _Port = 0;
+        private Encoding _encode = Encoding.Default;
+        object _SyncLock = new object();
+        /// <summary>
+        /// Syncronizing object for asyncronous operations
+        /// </summary>
+        public object SyncLock
+        {
+            get
+            {
+                return _SyncLock;
+            }
+        }
+        /// <summary>
+        /// Encoding to use for sending and receiving
+        /// </summary>
+        public Encoding DataEncoding
+        {
+            get
+            {
+                return _encode;
+            }
+            set
+            {
+                _encode = value;
+            }
+        }
+        /// <summary>
+        /// Current state that the connection is in
+        /// </summary>
+        public ConnectionStatus ConnectionState
+        {
+            get
+            {
+                return _ConStat;
+            }
+            private set
+            {
+                bool raiseEvent = value != _ConStat;
+                _ConStat = value;
+                if (ConnectionStatusChanged != null && raiseEvent)
+                    ConnectionStatusChanged.BeginInvoke(this, _ConStat, new AsyncCallback(cbChangeConnectionStateComplete), this);
+            }
+        }
+        /// <summary>
+        /// True to autoreconnect at the given reconnection interval after a remote host closes the connection
+        /// </summary>
+        public bool AutoReconnect
+        {
+            get
+            {
+                return _AutoReconnect;
+            }
+            set
+            {
+                _AutoReconnect = value;
+            }
+        }
+        public int ReconnectInterval { get; set; }
+        /// <summary>
+        /// IP of the remote host
+        /// </summary>
+        public IPAddress IP
+        {
+            get
+            {
+                return _IP;
+            }
+        }
+        /// <summary>
+        /// Port to connect to on the remote host
+        /// </summary>
+        public int Port
+        {
+            get
+            {
+                return _Port;
+            }
+        }
+        /// <summary>
+        /// Time to wait after a receive operation is attempted before a timeout event occurs
+        /// </summary>
+        public int ReceiveTimeout
+        {
+            get
+            {
+                return (int)tmrReceiveTimeout.Interval;
+            }
+            set
+            {
+                tmrReceiveTimeout.Interval = (double)value;
+            }
+        }
+        /// <summary>
+        /// Time to wait after a send operation is attempted before a timeout event occurs
+        /// </summary>
+        public int SendTimeout
+        {
+            get
+            {
+                return (int)tmrSendTimeout.Interval;
+            }
+            set
+            {
+                tmrSendTimeout.Interval = (double)value;
+            }
+        }
+        /// <summary>
+        /// Time to wait after a connection is attempted before a timeout event occurs
+        /// </summary>
+        public int ConnectTimeout
+        {
+            get
+            {
+                return (int)tmrConnectTimeout.Interval;
+            }
+            set
+            {
+                tmrConnectTimeout.Interval = (double)value;
+            }
+        }
+        #endregion       
+    }
+
 }

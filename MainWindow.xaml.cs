@@ -98,7 +98,7 @@ namespace WpfMPD
 
             Loaded += MainWindow_Loaded;
 
-            this.Topmost = true;
+            //this.Topmost = true;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)

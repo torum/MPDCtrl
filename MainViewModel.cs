@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
-
+using System.Windows.Threading;
 
 namespace WpfMPD
 {
@@ -32,6 +32,7 @@ namespace WpfMPD
         private static string _pathPlayButton = "M15,16H13V8H15M11,16H9V8H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         private static string _pathPauseButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         private static string _pathStopButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
+        private DispatcherTimer elapsedTimer;
         private ICommand _playCommand;
         private ICommand _playNextCommand;
         private ICommand _playPrevCommand;
@@ -65,7 +66,7 @@ namespace WpfMPD
 
                     System.Diagnostics.Debug.WriteLine("\n\nListView_SelectionChanged: " + value.Title);
 
-                    if (_MPC.MPDCurrentSong.ID != value.ID)
+                    if (_MPC.MpdCurrentSong.ID != value.ID)
                     {
                         if (ChangeSongCommand.CanExecute(null))
                         {
@@ -130,7 +131,7 @@ namespace WpfMPD
                 this._volume = value;
                 this.NotifyPropertyChanged("Volume");
 
-                if (Convert.ToDouble(_MPC.MPDStatus.MPDVolume) != value) {
+                if (Convert.ToDouble(_MPC.MpdStatus.MpdVolume) != value) {
 
                     //TODO try using ValueChanged Event using <i:Interaction.Triggers>  ?
                     if (SetVolumeCommand.CanExecute(null))
@@ -153,7 +154,7 @@ namespace WpfMPD
                 this._repeat = value;
                 this.NotifyPropertyChanged("Repeat");
 
-                if (_MPC.MPDStatus.MPDRepeat != value) {
+                if (_MPC.MpdStatus.MpdRepeat != value) {
                     if (SetRpeatCommand.CanExecute(null))
                     {
                         SetRpeatCommand.Execute(null);
@@ -170,7 +171,7 @@ namespace WpfMPD
                 this._random = value;
                 this.NotifyPropertyChanged("Random");
 
-                if (_MPC.MPDStatus.MPDRandom != value)
+                if (_MPC.MpdStatus.MpdRandom != value)
                 {
                     if (SetRandomCommand.CanExecute(null))
                     {
@@ -203,6 +204,8 @@ namespace WpfMPD
             {
                 this._elapsed = value;
                 this.NotifyPropertyChanged("Elapsed");
+
+                //TODO seek
             }
         }
 
@@ -259,14 +262,18 @@ namespace WpfMPD
             this._MPC = new MPC();
 
             //Assigned idle event.
-            this._MPC.StatusChanged += new MPC.MPDStatusChanged(OnStatusChanged);
+            this._MPC.StatusChanged += new MPC.MpdStatusChanged(OnStatusChanged);
+
+            //Song time elapsed timer.
+            elapsedTimer = new DispatcherTimer();
+            elapsedTimer.Interval = TimeSpan.FromMilliseconds(1000);//new TimeSpan(0, 0, 1);
+            elapsedTimer.Tick += new EventHandler(ElapsedTimer);
 
             //Connect to MPD server and query status and info.
             QueryStatus();
 
-
-            //start idle.
-            //ConnectIdle();
+            //start idle connection, but don't start idle mode yet.
+            ConnectIdle();
             
         }
 
@@ -274,26 +281,25 @@ namespace WpfMPD
 
         private async void ConnectIdle()
         {
-            await _MPC.MPDIdleConnect();
+            await _MPC.MpdIdleConnect();
         }
 
         private async void DisConnectIdle()
         {
-            bool isDone = await _MPC.MPDIdleDisConnect();
+            bool isDone = await _MPC.MpdIdleDisConnect();
         }
 
         private async void QueryStatus()
         {
-
-            bool isDone = await _MPC.MPDQueryStatus();
+            bool isDone = await _MPC.MpdQueryStatus();
             if (isDone)
             {
                 //System.Diagnostics.Debug.WriteLine("QueryStatus is done.");
 
                 UpdateButtonStatus();
 
+                //retrieve play queue
                 QueryCurrentPlayQueue();
-
             }
             else
             {
@@ -306,21 +312,21 @@ namespace WpfMPD
             IsBusy = true;
             try
             {
-                bool isDone = await _MPC.MPDQueryCurrentPlaylist();
+                bool isDone = await _MPC.MpdQueryCurrentPlaylist();
                 if (isDone)
                 {
                     //System.Diagnostics.Debug.WriteLine("QueryCurrentPlaylist is done.");
 
                     //change it quietly.
-                    this._selectedSong = _MPC.MPDCurrentSong;
+                    this._selectedSong = _MPC.MpdCurrentSong;
                     //let listview know it is changed.
                     this.NotifyPropertyChanged("SelectedSong");
 
                     //Listview selection changed event in the code behind takes care ScrollIntoView. 
                     //This is a VIEW matter.
 
+                    //retrieve playlists
                     QueryPlaylists();
-
                 }
                 else
                 {
@@ -334,8 +340,7 @@ namespace WpfMPD
 
         private async void QueryPlaylists()
         {
-
-            bool isDone = await _MPC.MPDQueryPlaylists();
+            bool isDone = await _MPC.MpdQueryPlaylists();
             if (isDone)
             {
                 //System.Diagnostics.Debug.WriteLine("QueryPlaylists is done.");
@@ -343,9 +348,8 @@ namespace WpfMPD
                 //selected item should now read "Current Play Queue"
                 //https://stackoverflow.com/questions/2343446/default-text-for-templated-combo-box?rq=1
 
-                //start idle.
-                ConnectIdle();
-
+                //start idle mode. //TODO is this the right place?
+                isDone = await _MPC.MpdIdleStart();
             }
             else
             {
@@ -356,19 +360,19 @@ namespace WpfMPD
         private void UpdateButtonStatus()
         {
             //Play button
-            switch (_MPC.MPDStatus.MPDState)
+            switch (_MPC.MpdStatus.MpdState)
             {
-                case MPC.Status.MPDPlayState.Play:
+                case MPC.Status.MpdPlayState.Play:
                     {
                         this.PlayButton = _pathPlayButton;
                         break;
                     }
-                case MPC.Status.MPDPlayState.Pause:
+                case MPC.Status.MpdPlayState.Pause:
                     {
                         this.PlayButton = _pathPauseButton;
                         break;
                     }
-                case MPC.Status.MPDPlayState.Stop:
+                case MPC.Status.MpdPlayState.Stop:
                     {
                         this.PlayButton = _pathStopButton;
                         break;
@@ -376,18 +380,43 @@ namespace WpfMPD
             }
 
             // "quietly" update view.
-            this._volume = Convert.ToDouble(_MPC.MPDStatus.MPDVolume);
+            this._volume = Convert.ToDouble(_MPC.MpdStatus.MpdVolume);
             this.NotifyPropertyChanged("Volume");
 
-            this._random = _MPC.MPDStatus.MPDRandom;
+            this._random = _MPC.MpdStatus.MpdRandom;
             this.NotifyPropertyChanged("Random");
 
-            this._repeat = _MPC.MPDStatus.MPDRepeat;
+            this._repeat = _MPC.MpdStatus.MpdRepeat;
             this.NotifyPropertyChanged("Repeat");
 
-            // no need to care about "double" updates.
-            this.Time = Convert.ToDouble(_MPC.MPDStatus.MPDSongTime);
-            this.Elapsed = Convert.ToDouble(_MPC.MPDStatus.MPDSongElapsed);
+            // no need to care about "double" updates for time.
+            this.Time = _MPC.MpdStatus.MpdSongTime;
+
+            this._elapsed = _MPC.MpdStatus.MpdSongElapsed;
+            this.NotifyPropertyChanged("Elapsed");
+
+            //start elapsed timer.
+            if (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
+            {
+                elapsedTimer.Start();
+            }
+            else
+            {
+                elapsedTimer.Stop();
+            }
+        }
+
+        private void ElapsedTimer(object sender, EventArgs e)
+        {
+            if ((_elapsed < _time) && (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play))
+            {
+                this._elapsed += 1;
+                this.NotifyPropertyChanged("Elapsed");
+            }
+            else
+            {
+                elapsedTimer.Stop();
+            }
         }
 
         #endregion END of PRIVATE METHODS
@@ -405,24 +434,24 @@ namespace WpfMPD
         public async void PlayCommand_ExecuteAsync()
         {
             bool isDone = false;
-            switch (_MPC.MPDStatus.MPDState)
+            switch (_MPC.MpdStatus.MpdState)
             {
-                case MPC.Status.MPDPlayState.Play:
+                case MPC.Status.MpdPlayState.Play:
                     {
                         //State>>Play: So, send Pause command
-                        isDone = await _MPC.MPDPlaybackPause();
+                        isDone = await _MPC.MpdPlaybackPause();
                         break;
                     }
-                case MPC.Status.MPDPlayState.Pause:
+                case MPC.Status.MpdPlayState.Pause:
                     {
                         //State>>Pause: So, send Resume command
-                        isDone = await _MPC.MPDPlaybackResume();
+                        isDone = await _MPC.MpdPlaybackResume();
                         break;
                     }
-                case MPC.Status.MPDPlayState.Stop:
+                case MPC.Status.MpdPlayState.Stop:
                     {
                         //State>>Stop: So, send Play command
-                        isDone = await _MPC.MPDPlaybackPlay();
+                        isDone = await _MPC.MpdPlaybackPlay();
                         break;
                     }
             }
@@ -432,7 +461,7 @@ namespace WpfMPD
                 UpdateButtonStatus();
 
                 //change it quietly.
-                this._selectedSong = _MPC.MPDCurrentSong;
+                this._selectedSong = _MPC.MpdCurrentSong;
                 //let listview know it is changed.
                 this.NotifyPropertyChanged("SelectedSong");
             }
@@ -453,14 +482,14 @@ namespace WpfMPD
 
         public async void PlayNextCommand_ExecuteAsync()
         {
-            bool isDone = await _MPC.MPDPlaybackNext();
+            bool isDone = await _MPC.MpdPlaybackNext();
 
             if (isDone)
             {
                 UpdateButtonStatus();
 
                 //change it quietly.
-                this._selectedSong = _MPC.MPDCurrentSong;
+                this._selectedSong = _MPC.MpdCurrentSong;
                 //let listview know it is changed.
                 this.NotifyPropertyChanged("SelectedSong");
             }
@@ -480,14 +509,14 @@ namespace WpfMPD
 
         public async void PlayPrevCommand_ExecuteAsync()
         {
-            bool isDone = await _MPC.MPDPlaybackPrev();
+            bool isDone = await _MPC.MpdPlaybackPrev();
 
             if (isDone)
             {
                 UpdateButtonStatus();
 
                 //change it quietly.
-                this._selectedSong = _MPC.MPDCurrentSong;
+                this._selectedSong = _MPC.MpdCurrentSong;
                 //let listview know it is changed.
                 this.NotifyPropertyChanged("SelectedSong");
             }
@@ -507,7 +536,7 @@ namespace WpfMPD
 
         public async void SetRpeatCommand_ExecuteAsync()
         {
-            bool isDone = await _MPC.MPDSetRepeat(this._repeat);
+            bool isDone = await _MPC.MpdSetRepeat(this._repeat);
 
             if (isDone)
             {
@@ -525,7 +554,7 @@ namespace WpfMPD
 
         public async void SetRandomCommand_ExecuteAsync()
         {
-            bool isDone = await _MPC.MPDSetRandom(this._random);
+            bool isDone = await _MPC.MpdSetRandom(this._random);
 
             if (isDone)
             {
@@ -543,7 +572,7 @@ namespace WpfMPD
 
         public async void SetVolumeCommand_ExecuteAsync()
         {
-            bool isDone = await _MPC.MPDSetVolume(Convert.ToInt32(this._volume));
+            bool isDone = await _MPC.MpdSetVolume(Convert.ToInt32(this._volume));
 
             if (isDone)
             {
@@ -561,14 +590,14 @@ namespace WpfMPD
 
         public async void ChangeSongCommand_ExecuteAsync()
         {
-            bool isDone = await _MPC.MPDPlaybackPlay(_selectedSong.ID);
+            bool isDone = await _MPC.MpdPlaybackPlay(_selectedSong.ID);
 
             if (isDone)
             {
                 UpdateButtonStatus();
 
                 //change it quietly.
-                this._selectedSong = _MPC.MPDCurrentSong;
+                this._selectedSong = _MPC.MpdCurrentSong;
                 //let listview know it is changed.
                 this.NotifyPropertyChanged("SelectedSong");
             }
@@ -589,11 +618,11 @@ namespace WpfMPD
             this._selectedSong = null;
 
             //MPD >> clear load playlistinfo > returns and updates playlist.
-            bool isDone = await _MPC.MPDChangePlaylist(this._selecctedPlaylist);
+            bool isDone = await _MPC.MpdChangePlaylist(this._selecctedPlaylist);
             if (isDone)
             {
                 //Start play. MPD >> play status > returns and update status.
-                isDone = await _MPC.MPDPlaybackPlay();
+                isDone = await _MPC.MpdPlaybackPlay();
                 if (isDone) { 
 
                     UpdateButtonStatus();
@@ -601,7 +630,7 @@ namespace WpfMPD
                     //this.SelectedSong = _MPC.MPDCurrentSong; //  <-don't
 
                     //change it quietly.
-                    this._selectedSong = _MPC.MPDCurrentSong;
+                    this._selectedSong = _MPC.MpdCurrentSong;
                     //let listview know it is changed.
                     this.NotifyPropertyChanged("SelectedSong");
                 }
@@ -635,9 +664,14 @@ namespace WpfMPD
 
         #region EVENTS
 
-        private void OnStatusChanged(MPC sender, object data)
+        private async void OnStatusChanged(MPC sender, object data)
         {
             System.Diagnostics.Debug.WriteLine("OnStatusChanged: " + (data as string));
+
+            //TODO do something here.
+
+            //Start idle mode again.
+            bool isDone = await _MPC.MpdIdleStart();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

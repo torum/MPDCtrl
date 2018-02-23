@@ -15,8 +15,9 @@ namespace WpfMPD.Common
         public NoiseEffect()
         {
             PixelShader pixelShader = new PixelShader();
-            //pixelShader.UriSource = new Uri("/WpfMPD;component/Common/Noise.ps", UriKind.Relative);
-            pixelShader.UriSource = new Uri("pack://application:,,,/WpfMPD;component/Common/Noise.ps");
+            //pixelShader.UriSource = new Uri("/AcrylicWPF;component/Noise.ps", UriKind.Relative);
+            pixelShader.UriSource = new Uri("/WpfMPD;component/Common/Noise.ps", UriKind.Relative);
+            //pixelShader.UriSource = new Uri("pack://application:,,,/WpfMPD;component/Common/Noise.ps");
             this.PixelShader = pixelShader;
             BitmapImage bitmap = new BitmapImage();
             bitmap.BeginInit();

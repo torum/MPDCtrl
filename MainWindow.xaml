@@ -106,11 +106,11 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
 
-            <ListView Grid.Row="3" Grid.Column="1" x:Name="DebugListView"
+            <ListView Grid.Row="3" Grid.Column="1" x:Name="SongListView"
                   Foreground="Gray" BorderBrush="Gray" BorderThickness="0" Background="Transparent"
                   Padding="0 0 4 0"
                   ItemsSource="{Binding Songs}" SelectedItem="{Binding Mode=TwoWay,Path=SelectedSong}" SelectionMode="Extended"
-                  SelectionChanged="DebugListView_SelectionChanged"
+                  SelectionChanged="SongListView_SelectionChanged"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                       ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListView.Resources>
@@ -140,7 +140,7 @@
                     (GradientBrush.GradientStops)[0].(GradientStop.Color)"
                                                 Storyboard.TargetName="Rect">
                                                             <EasingColorKeyFrame KeyTime="0"
-                                         Value="White" />
+                                         Value="Gainsboro" />
                                                         </ColorAnimationUsingKeyFrames>
                                                     </Storyboard>
                                                 </VisualState>
@@ -150,7 +150,7 @@
                     (GradientBrush.GradientStops)[0].(GradientStop.Color)"
                                                 Storyboard.TargetName="Rect">
                                                             <EasingColorKeyFrame KeyTime="0"
-                                         Value="Gray" />
+                                         Value="#CCC" />
                                                         </ColorAnimationUsingKeyFrames>
                                                     </Storyboard>
                                                 </VisualState>
@@ -160,7 +160,7 @@
                     (GradientBrush.GradientStops)[0].(GradientStop.Color)"
                                                 Storyboard.TargetName="Rect">
                                                             <EasingColorKeyFrame KeyTime="0"
-                                         Value="#323232" />
+                                         Value="Gray" />
                                                         </ColorAnimationUsingKeyFrames>
                                                     </Storyboard>
                                                 </VisualState>
@@ -210,8 +210,8 @@
                                             <LinearGradientBrush StartPoint="0,1" EndPoint="0,0" Opacity="0.1">
                                                 <LinearGradientBrush.GradientStops>
                                                     <GradientStopCollection>
-                                                        <GradientStop Color="#323232"/>
-                                                        <GradientStop Color="#323232" Offset="1.0" />
+                                                        <GradientStop Color="Transparent"/>
+                                                        <GradientStop Color="Transparent" Offset="1.0" />
                                                     </GradientStopCollection>
                                                 </LinearGradientBrush.GradientStops>
                                             </LinearGradientBrush>
@@ -280,8 +280,8 @@
                                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" Opacity="0.1">
                                                 <LinearGradientBrush.GradientStops>
                                                     <GradientStopCollection>
-                                                        <GradientStop Color="#323232"/>
-                                                        <GradientStop Color="#323232" Offset="1.0" />
+                                                        <GradientStop Color="Transparent"/>
+                                                        <GradientStop Color="Transparent" Offset="1.0" />
                                                     </GradientStopCollection>
                                                 </LinearGradientBrush.GradientStops>
                                             </LinearGradientBrush>

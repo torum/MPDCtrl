@@ -57,8 +57,6 @@ namespace WpfMPD
     }
 
 
-
-
     /// <summary>
     /// MainWindow.xaml
     /// </summary>
@@ -106,26 +104,25 @@ namespace WpfMPD
             EnableBlur();
         }
 
-
-
         private void PathButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
 
-        private void DebugListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void SongListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            //DebugListView.ScrollIntoView(DebugListView.SelectedItem);
+            SongListView.ScrollIntoView(SongListView.SelectedItem);
 
-            //TODO listview flickering...
-            
-            DebugListView.ScrollToCenterOfView(DebugListView.SelectedItem);
+            // Listview flickering...
+            //SongListView.ScrollToCenterOfView(SongListView.SelectedItem);
 
         }
     }
 
 
+
+    /*
     //When listview slection changes, automatically show selected item in the view area.
     public static class ItemsControlExtensions
     {
@@ -142,7 +139,7 @@ namespace WpfMPD
                 }));
             }
         }
-
+        
         private static bool TryScrollToCenterOfView(this ItemsControl itemsControl, object item)
         {
             // Find the container
@@ -196,7 +193,7 @@ namespace WpfMPD
             if (VisualTreeHelper.GetChildrenCount(visual) == 0) return null;
             return VisualTreeHelper.GetChild(visual, 0);
         }
-    }
+        */
 
 
     //ScrollIntoViewForListView Behavior
@@ -312,7 +309,5 @@ namespace WpfMPD
             }
         }
         */
-
-
 
 }

@@ -677,7 +677,7 @@
 
                     <!--Border colors-->
                     <Color x:Key="BorderLightColor">#FFCCCCCC</Color>
-                    <Color x:Key="BorderMediumColor">#FFCCCCCC</Color> 
+                    <Color x:Key="BorderMediumColor">#FFCCCCCC</Color>
                     <Color x:Key="BorderDarkColor">#FFCCCCCC</Color>
 
                     <Color x:Key="PressedBorderLightColor">#FF888888</Color>
@@ -818,7 +818,7 @@
                             </Setter.Value>
                         </Setter>
                     </Style>
-                    
+
                     <Style x:Key="SliderButtonStyleIncrease"
        TargetType="{x:Type RepeatButton}">
                         <Setter Property="SnapsToDevicePixels"
@@ -1209,12 +1209,6 @@
                 </ResourceDictionary>
 
 
-                <!-- TransGradListview -->
-                <ResourceDictionary>
-
-                </ResourceDictionary>
-                
-                
                 <!-- NoChromeButtons -->
                 <ResourceDictionary>
                     <!--

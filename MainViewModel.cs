@@ -1,4 +1,22 @@
-﻿using System;
+﻿/// 
+/// 
+/// MPD Ctrl
+/// 
+/// 
+/// TODO:
+///  Idle connection changed event.
+///  Seek.
+///  Volume slider's design XAML.
+///  Error handling.
+///  Settings page.
+///  Media keys.
+///
+/// Known issue:
+///  listview flickering.
+///
+/// 
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,7 +50,7 @@ namespace WpfMPD
         private static string _pathPlayButton = "M15,16H13V8H15M11,16H9V8H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         private static string _pathPauseButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         private static string _pathStopButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
-        private DispatcherTimer elapsedTimer;
+        private DispatcherTimer _elapsedTimer;
         private ICommand _playCommand;
         private ICommand _playNextCommand;
         private ICommand _playPrevCommand;
@@ -265,16 +283,16 @@ namespace WpfMPD
             this._MPC.StatusChanged += new MPC.MpdStatusChanged(OnStatusChanged);
 
             //Song time elapsed timer.
-            elapsedTimer = new DispatcherTimer();
-            elapsedTimer.Interval = TimeSpan.FromMilliseconds(1000);//new TimeSpan(0, 0, 1);
-            elapsedTimer.Tick += new EventHandler(ElapsedTimer);
+            _elapsedTimer = new DispatcherTimer();
+            _elapsedTimer.Interval = TimeSpan.FromMilliseconds(1000);//new TimeSpan(0, 0, 1);
+            _elapsedTimer.Tick += new EventHandler(ElapsedTimer);
 
             //Connect to MPD server and query status and info.
             QueryStatus();
 
             //start idle connection, but don't start idle mode yet.
             ConnectIdle();
-            
+
         }
 
         #region PRIVATE METHODS
@@ -289,57 +307,74 @@ namespace WpfMPD
             bool isDone = await _MPC.MpdIdleDisConnect();
         }
 
+        private async void OnStatusChanged(MPC sender, object data)
+        {
+            System.Diagnostics.Debug.WriteLine("OnStatusChanged: " + (data as string));
+
+            //TODO do something here.
+
+            //Start idle mode again.
+            bool isDone = await _MPC.MpdIdleStart();
+        }
+
         private async void QueryStatus()
         {
+            IsBusy = true;
             bool isDone = await _MPC.MpdQueryStatus();
             if (isDone)
             {
                 //System.Diagnostics.Debug.WriteLine("QueryStatus is done.");
 
                 UpdateButtonStatus();
+                IsBusy = false;
 
                 //retrieve play queue
                 QueryCurrentPlayQueue();
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("QueryStatus returned ACK." + "\n");
+                IsBusy = false;
+                //TODO: connection fail to establish. 
+                // Let user know.
+                System.Diagnostics.Debug.WriteLine("QueryStatus returned with false." + "\n");
             }
+            
         }
 
         private async void QueryCurrentPlayQueue()
         {
             IsBusy = true;
-            try
+            bool isDone = await _MPC.MpdQueryCurrentPlaylist();
+            if (isDone)
             {
-                bool isDone = await _MPC.MpdQueryCurrentPlaylist();
-                if (isDone)
-                {
-                    //System.Diagnostics.Debug.WriteLine("QueryCurrentPlaylist is done.");
+                //System.Diagnostics.Debug.WriteLine("QueryCurrentPlaylist is done.");
 
-                    //change it quietly.
-                    this._selectedSong = _MPC.MpdCurrentSong;
-                    //let listview know it is changed.
-                    this.NotifyPropertyChanged("SelectedSong");
+                //change it quietly.
+                this._selectedSong = _MPC.MpdCurrentSong;
+                //let listview know it is changed.
+                this.NotifyPropertyChanged("SelectedSong");
 
-                    //Listview selection changed event in the code behind takes care ScrollIntoView. 
-                    //This is a VIEW matter.
+                //Listview selection changed event in the code behind takes care ScrollIntoView. 
+                //This is a VIEW matter.
 
-                    //retrieve playlists
-                    QueryPlaylists();
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue returned ACK." + "\n");
-                }
-            }
-            finally {
                 IsBusy = false;
+
+                //retrieve playlists
+                QueryPlaylists();
             }
+            else
+            {
+                IsBusy = false;
+                //TODO: connection fail to establish. 
+                // Let user know.
+                System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue returned false." + "\n");
+            }
+
         }
 
         private async void QueryPlaylists()
         {
+            IsBusy = true;
             bool isDone = await _MPC.MpdQueryPlaylists();
             if (isDone)
             {
@@ -348,12 +383,17 @@ namespace WpfMPD
                 //selected item should now read "Current Play Queue"
                 //https://stackoverflow.com/questions/2343446/default-text-for-templated-combo-box?rq=1
 
+                IsBusy = false;
+
                 //start idle mode. //TODO is this the right place?
                 isDone = await _MPC.MpdIdleStart();
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("QueryPlaylists returned ACK." + "\n");
+                IsBusy = false;
+                //TODO: connection fail to establish. 
+                // Let user know.
+                System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
             }
         }
 
@@ -398,11 +438,11 @@ namespace WpfMPD
             //start elapsed timer.
             if (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
             {
-                elapsedTimer.Start();
+                _elapsedTimer.Start();
             }
             else
             {
-                elapsedTimer.Stop();
+                _elapsedTimer.Stop();
             }
         }
 
@@ -415,7 +455,7 @@ namespace WpfMPD
             }
             else
             {
-                elapsedTimer.Stop();
+                _elapsedTimer.Stop();
             }
         }
 
@@ -664,15 +704,6 @@ namespace WpfMPD
 
         #region EVENTS
 
-        private async void OnStatusChanged(MPC sender, object data)
-        {
-            System.Diagnostics.Debug.WriteLine("OnStatusChanged: " + (data as string));
-
-            //TODO do something here.
-
-            //Start idle mode again.
-            bool isDone = await _MPC.MpdIdleStart();
-        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

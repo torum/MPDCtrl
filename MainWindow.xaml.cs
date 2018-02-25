@@ -64,7 +64,7 @@ namespace WpfMPD
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        // For the acrylic effects
         [DllImport("user32.dll")]
         internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
 
@@ -91,7 +91,6 @@ namespace WpfMPD
         }
 
 
-
         public MainWindow()
         {
             InitializeComponent();
@@ -103,6 +102,7 @@ namespace WpfMPD
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            // For the acrylic effects
             EnableBlur();
         }
 
@@ -118,13 +118,15 @@ namespace WpfMPD
 
             //DebugListView.ScrollIntoView(DebugListView.SelectedItem);
 
+            //TODO listview flickering...
+            
             DebugListView.ScrollToCenterOfView(DebugListView.SelectedItem);
 
         }
     }
 
 
-
+    //When listview slection changes, automatically show selected item in the view area.
     public static class ItemsControlExtensions
     {
         public static void ScrollToCenterOfView(this ItemsControl itemsControl, object item)
@@ -197,7 +199,7 @@ namespace WpfMPD
     }
 
 
-    //Behavior
+    //ScrollIntoViewForListView Behavior
     //https://stackoverflow.com/questions/10135850/how-do-i-scrollintoview-after-changing-the-filter-on-a-listview-in-a-mvvm-wpf
     //https://stackoverflow.com/questions/33597483/wpf-mvvm-scrollintoview
     //https://stackoverflow.com/questions/16866309/listbox-scroll-into-view-with-mvvm

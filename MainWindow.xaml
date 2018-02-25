@@ -114,7 +114,6 @@
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                       ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListView.Resources>
-
                     <Style x:Key="ThumbStyle" TargetType="{x:Type Thumb}">
                         <Setter Property="Margin" Value="0,0,0,0" />
                         <Setter Property="Padding" Value="0,0,0,0" />
@@ -124,17 +123,72 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type Thumb}">
-                                    <Border CornerRadius="0" 
+                                    <Rectangle x:Name="Rect" Height="8" Width="24">
+                                        <Rectangle.Fill>
+                                            <LinearGradientBrush EndPoint="0.5,1"
+                                 StartPoint="0.5,0">
+                                                <GradientStop Color="Gainsboro"
+                            Offset="1" />
+                                                <GradientStop Color="#ccc" />
+                                            </LinearGradientBrush>
+                                        </Rectangle.Fill>
+                                        <VisualStateManager.VisualStateGroups>
+                                            <VisualStateGroup x:Name="CommonStates">
+                                                <VisualState x:Name="Normal">
+                                                    <Storyboard>
+                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).
+                    (GradientBrush.GradientStops)[0].(GradientStop.Color)"
+                                                Storyboard.TargetName="Rect">
+                                                            <EasingColorKeyFrame KeyTime="0"
+                                         Value="White" />
+                                                        </ColorAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                                <VisualState x:Name="MouseOver">
+                                                    <Storyboard>
+                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).
+                    (GradientBrush.GradientStops)[0].(GradientStop.Color)"
+                                                Storyboard.TargetName="Rect">
+                                                            <EasingColorKeyFrame KeyTime="0"
+                                         Value="Gray" />
+                                                        </ColorAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                                <VisualState x:Name="Pressed">
+                                                    <Storyboard>
+                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).
+                    (GradientBrush.GradientStops)[0].(GradientStop.Color)"
+                                                Storyboard.TargetName="Rect">
+                                                            <EasingColorKeyFrame KeyTime="0"
+                                         Value="#323232" />
+                                                        </ColorAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                                <VisualState x:Name="Disabled">
+                                                    <Storyboard>
+                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).
+                    (GradientBrush.GradientStops)[0].(GradientStop.Color)"
+                                                Storyboard.TargetName="Rect">
+                                                            <EasingColorKeyFrame KeyTime="0"
+                                         Value="#eee" />
+                                                        </ColorAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                        </VisualStateManager.VisualStateGroups>
+                                    </Rectangle>
+                                    <!-- <Border CornerRadius="0" 
                                             Background="{TemplateBinding Background}" 
                                             BorderBrush="{TemplateBinding BorderBrush}" 
                                             BorderThickness="{TemplateBinding BorderThickness}" 
                                             Height="8" />
+                                    -->
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
                     </Style>
 
-                    <Style x:Key="RepeatButtonStyle" TargetType="{x:Type RepeatButton}">
+                    <Style x:Key="RepeatButtonStyleInc" TargetType="{x:Type RepeatButton}">
                         <Setter Property="Margin" Value="0,0,0,0" />
                         <Setter Property="Background" Value="Transparent" />
                         <Setter Property="BorderThickness" Value="0" />
@@ -143,7 +197,7 @@
                                 <ControlTemplate TargetType="{x:Type RepeatButton}">
                                     <Border x:Name="Border" Margin="1" CornerRadius="0" BorderThickness="0">
                                         <Border.BorderBrush>
-                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" Opacity="0">
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" Opacity="1">
                                                 <LinearGradientBrush.GradientStops>
                                                     <GradientStopCollection>
                                                         <GradientStop Color="{DynamicResource BorderMediumColor}" Offset="0.0" />
@@ -153,11 +207,11 @@
                                             </LinearGradientBrush>
                                         </Border.BorderBrush>
                                         <Border.Background>
-                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" Opacity="0">
+                                            <LinearGradientBrush StartPoint="0,1" EndPoint="0,0" Opacity="0.1">
                                                 <LinearGradientBrush.GradientStops>
                                                     <GradientStopCollection>
-                                                        <GradientStop Color="{DynamicResource ControlLightColor}"/>
-                                                        <GradientStop Color="{DynamicResource ControlMediumColor}" Offset="1.0" />
+                                                        <GradientStop Color="#323232"/>
+                                                        <GradientStop Color="#323232" Offset="1.0" />
                                                     </GradientStopCollection>
                                                 </LinearGradientBrush.GradientStops>
                                             </LinearGradientBrush>
@@ -165,7 +219,83 @@
                                         <VisualStateManager.VisualStateGroups>
                                             <VisualStateGroup x:Name="CommonStates">
                                                 <VisualState x:Name="Normal" />
-                                                <VisualState x:Name="MouseOver" />
+                                                <VisualState x:Name="MouseOver">
+                                                    <Storyboard>
+                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)">
+                                                            <EasingColorKeyFrame KeyTime="0" Value="Gainsboro" />
+                                                        </ColorAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                                <VisualState x:Name="Pressed">
+                                                    <Storyboard>
+                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)">
+                                                            <EasingColorKeyFrame KeyTime="0" Value="{StaticResource ControlPressedColor}" />
+                                                        </ColorAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                                <VisualState x:Name="Disabled">
+                                                    <Storyboard>
+                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetName="Arrow" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
+                                                            <EasingColorKeyFrame KeyTime="0" Value="{StaticResource DisabledForegroundColor}" />
+                                                        </ColorAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                        </VisualStateManager.VisualStateGroups>
+                                        <Path x:Name="Arrow"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Data="{Binding Content, 
+                                            RelativeSource={RelativeSource TemplatedParent}}" >
+                                            <Path.Fill>
+                                                <SolidColorBrush Color="Gainsboro"/>
+                                            </Path.Fill>
+                                        </Path>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+
+                    </Style>
+
+                    <Style x:Key="RepeatButtonStyleDec" TargetType="{x:Type RepeatButton}">
+                        <Setter Property="Margin" Value="0,0,0,0" />
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                    <Border x:Name="Border" Margin="1" CornerRadius="0" BorderThickness="0">
+                                        <Border.BorderBrush>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" Opacity="1">
+                                                <LinearGradientBrush.GradientStops>
+                                                    <GradientStopCollection>
+                                                        <GradientStop Color="{DynamicResource BorderMediumColor}" Offset="0.0" />
+                                                        <GradientStop Color="{DynamicResource BorderDarkColor}" Offset="1.0" />
+                                                    </GradientStopCollection>
+                                                </LinearGradientBrush.GradientStops>
+                                            </LinearGradientBrush>
+                                        </Border.BorderBrush>
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" Opacity="0.1">
+                                                <LinearGradientBrush.GradientStops>
+                                                    <GradientStopCollection>
+                                                        <GradientStop Color="#323232"/>
+                                                        <GradientStop Color="#323232" Offset="1.0" />
+                                                    </GradientStopCollection>
+                                                </LinearGradientBrush.GradientStops>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                        <VisualStateManager.VisualStateGroups>
+                                            <VisualStateGroup x:Name="CommonStates">
+                                                <VisualState x:Name="Normal" />
+                                                <VisualState x:Name="MouseOver">
+                                                    <Storyboard>
+                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)">
+                                                            <EasingColorKeyFrame KeyTime="0" Value="Gainsboro" />
+                                                        </ColorAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
                                                 <VisualState x:Name="Pressed">
                                                     <Storyboard>
                                                         <ColorAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)">
@@ -208,22 +338,22 @@
                             <Border Grid.RowSpan="3" CornerRadius="0" Background="Transparent" />
                             <RepeatButton Grid.Row="0" Height="18" Command="ScrollBar.LineUpCommand"
                                           Content="M 0 4 L 8 4 L 4 0 Z" 
-                                          Style="{StaticResource RepeatButtonStyle}"/>
+                                          Style="{StaticResource RepeatButtonStyleInc}"/>
                             <Track x:Name="PART_Track" Grid.Row="1" IsDirectionReversed="true">
                                 <Track.DecreaseRepeatButton>
                                     <RepeatButton Command="ScrollBar.PageUpCommand" 
-                                                  Style="{StaticResource RepeatButtonStyle}"/>
+                                                  Style="{StaticResource RepeatButtonStyleDec}"/>
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
                                     <Thumb Style="{StaticResource ThumbStyle}"></Thumb>
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
                                     <RepeatButton Command="ScrollBar.PageDownCommand" 
-                                                  Style="{StaticResource RepeatButtonStyle}"/>
+                                                  Style="{StaticResource RepeatButtonStyleInc}"/>
                                 </Track.IncreaseRepeatButton>
                             </Track>
                             <RepeatButton Grid.Row="3" Height="18" Command="ScrollBar.LineDownCommand" Content="M 0 0 L 4 4 L 8 0 Z" 
-                                          Style="{StaticResource RepeatButtonStyle}"/>
+                                          Style="{StaticResource RepeatButtonStyleDec}"/>
                         </Grid>
                     </ControlTemplate>
 
@@ -377,6 +507,8 @@
                 <Slider x:Name="SliderSeek" Grid.Column="1" 
                     VerticalAlignment="Center"  Margin="6 0 6 0"
                     Foreground="Gray" Background="Transparent" 
+                    IsMoveToPointEnabled="True"
+                    Style="{StaticResource SeekSliderButtonStyle}"
                     Minimum="1" Maximum="{Binding Mode=TwoWay,Path=Time}"
                     Value="{Binding Mode=TwoWay,Path=Elapsed}">
                 </Slider>
@@ -391,6 +523,7 @@
             </Grid>
 
             <Slider x:Name="SliderVol" Grid.Row="7" Grid.Column="1" 
+                    IsMoveToPointEnabled="True" Margin="4 0 4 0"
                 Foreground="Gainsboro" Maximum="100" Value="{Binding Volume}"
                 VerticalAlignment="Center" Style="{StaticResource CircleSliderButtonStyle}">
                 <Slider.Background>

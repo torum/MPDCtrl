@@ -1,4 +1,19 @@
-﻿using System;
+﻿/// 
+/// 
+/// MPD Ctrl
+/// 
+/// 
+/// TODO:
+///  Error handling.
+///  Settings.
+///
+/// Known issue:
+///  
+///
+/// 
+
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,10 +33,8 @@ namespace WpfMPD
 {
     public class MPC
     {
-
-
         /// <summary>
-        /// Song Class 
+        /// Song Class for ObservableCollection. 
         /// </summary>
         /// 
         public class Song
@@ -31,7 +44,7 @@ namespace WpfMPD
         }
 
         /// <summary>
-        /// Status Class 
+        /// Status Class. It holds current MPD "status" information.
         /// </summary>
         /// 
         public class Status
@@ -117,7 +130,7 @@ namespace WpfMPD
         }
 
         /// <summary>
-        /// MPC (MPD Client) Class 
+        /// Main MPC (MPD Client) Class. 
         /// </summary>
 
         #region MPC PRIVATE FIELD declaration
@@ -313,12 +326,14 @@ namespace WpfMPD
             IPEndPoint ep = new IPEndPoint(IPAddress.Parse(server), port);
             ipAddress = ep.Address;
 
+            List<string> responseMultiLines = new List<string>();
+
             try
             {
                 TcpClient client = new TcpClient();
                 await client.ConnectAsync(ep.Address, port);
 
-                //System.Diagnostics.Debug.WriteLine("\n\n" + "Server " + server + " connected.");
+                System.Diagnostics.Debug.WriteLine("\n\n" + "Server " + server + " connected.");
 
                 NetworkStream networkStream = client.GetStream();
                 StreamWriter writer = new StreamWriter(networkStream);
@@ -328,12 +343,11 @@ namespace WpfMPD
                 //first check MPD's initial response on connect.
                 string responseLine = await reader.ReadLineAsync();
 
-                //System.Diagnostics.Debug.WriteLine("Connected response: " + responseLine);
-
-                List<string> responseMultiLines = new List<string>();
+                System.Diagnostics.Debug.WriteLine("Connected response: " + responseLine);
 
                 //Check if it starts with "OK MPD"
-                if (responseLine.StartsWith("OK MPD")) {
+                if (responseLine.StartsWith("OK MPD"))
+                {
 
                     //if it's ok, then request command.
                     await writer.WriteLineAsync(mpdCommand);
@@ -367,26 +381,26 @@ namespace WpfMPD
                 {
                     responseMultiLines.Add(responseLine);
 
-                    System.Diagnostics.Debug.WriteLine("Connect MPD error: " + responseLine + "\n");
+                    System.Diagnostics.Debug.WriteLine("MPD returned an error on connect: " + responseLine + "\n");
                 }
 
                 client.Close();
-                
-                //System.Diagnostics.Debug.WriteLine("Connection closed.");
+                System.Diagnostics.Debug.WriteLine("Connection closed.");
 
                 return responseMultiLines;
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@SendRequest: " + ex.Message);
-                //TODO:
-                return null; //ex.Message;
+                //TODO: Show error message to user.
+                // 'System.Net.Sockets.SocketException'
+                // 接続済みの呼び出し先が一定の時間を過ぎても正しく応答しなかったため、接続できませんでした。または接続済みのホストが応答しなかったため、確立された接続は失敗しました。
+                return null;
             }
         }
 
         public async Task<bool> MpdQueryStatus()
         {
-            //connect and update Status object instance.
             try
             {
                 //todo settings form.
@@ -408,8 +422,9 @@ namespace WpfMPD
         private bool ParseStatusResponse(List<string> sl)
         {
             if (sl == null) { return false; }
+            if (sl.Count == 0) { return false; }
 
-            Dictionary<string, string> MPDStatusValues = new Dictionary<string, string>();
+            Dictionary<string, string> MpdStatusValues = new Dictionary<string, string>();
             foreach (string value in sl)
             {
                 if (value.StartsWith("ACK")) { return false; }
@@ -417,14 +432,14 @@ namespace WpfMPD
                 string[] StatusValuePair = value.Split(':');
                 if (StatusValuePair.Length > 1)
                 {
-                    if (MPDStatusValues.ContainsKey(StatusValuePair[0].Trim()))
+                    if (MpdStatusValues.ContainsKey(StatusValuePair[0].Trim()))
                     {
-                        if (StatusValuePair.Length == 2) { 
-                            MPDStatusValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim();
+                        if (StatusValuePair.Length == 2) {
+                            MpdStatusValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim();
                         }
                         else if (StatusValuePair.Length == 3)
                         {
-                            MPDStatusValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim() +':'+ StatusValuePair[2].Trim();
+                            MpdStatusValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim() +':'+ StatusValuePair[2].Trim();
                         } 
 
                     }
@@ -432,19 +447,19 @@ namespace WpfMPD
                     {
                         if (StatusValuePair.Length == 2)
                         {
-                            MPDStatusValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
+                            MpdStatusValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
                         }else if (StatusValuePair.Length == 3)
                         {
-                            MPDStatusValues.Add(StatusValuePair[0].Trim(), (StatusValuePair[1].Trim() +":"+ StatusValuePair[2].Trim()));
+                            MpdStatusValues.Add(StatusValuePair[0].Trim(), (StatusValuePair[1].Trim() +":"+ StatusValuePair[2].Trim()));
                         }
                     }
                 }
             }
 
             //state
-            if (MPDStatusValues.ContainsKey("state"))
+            if (MpdStatusValues.ContainsKey("state"))
             {
-                switch (MPDStatusValues["state"])
+                switch (MpdStatusValues["state"])
                 {
                     case "play":
                         {
@@ -465,11 +480,11 @@ namespace WpfMPD
             }
 
             //volume
-            if (MPDStatusValues.ContainsKey("volume"))
+            if (MpdStatusValues.ContainsKey("volume"))
             {
                 try
                 {
-                    _st.MpdVolume = Int32.Parse(MPDStatusValues["volume"]);
+                    _st.MpdVolume = Int32.Parse(MpdStatusValues["volume"]);
                 }
                 catch (FormatException e)
                 {
@@ -479,18 +494,18 @@ namespace WpfMPD
 
             //songID
             _st.MpdSongID = "";
-            if (MPDStatusValues.ContainsKey("songid"))
+            if (MpdStatusValues.ContainsKey("songid"))
             {
-                _st.MpdSongID = MPDStatusValues["songid"];
+                _st.MpdSongID = MpdStatusValues["songid"];
             }
 
             //repeat opt bool
-            if (MPDStatusValues.ContainsKey("repeat"))
+            if (MpdStatusValues.ContainsKey("repeat"))
             {
                 try
                 {
-                    //if (Int32.Parse(MPDStatusValues["repeat"]) > 0)
-                    if (MPDStatusValues["repeat"] == "1")
+                    //if (Int32.Parse(MpdStatusValues["repeat"]) > 0)
+                    if (MpdStatusValues["repeat"] == "1")
                     {
                         _st.MpdRepeat = true;
                     }
@@ -507,11 +522,11 @@ namespace WpfMPD
             }
 
             //random opt bool
-            if (MPDStatusValues.ContainsKey("random"))
+            if (MpdStatusValues.ContainsKey("random"))
             {
                 try
                 {
-                    if (Int32.Parse(MPDStatusValues["random"]) > 0)
+                    if (Int32.Parse(MpdStatusValues["random"]) > 0)
                     {
                         _st.MpdRandom = true;
                     }
@@ -527,15 +542,15 @@ namespace WpfMPD
                 }
             }
 
-            if (MPDStatusValues.ContainsKey("time"))
+            if (MpdStatusValues.ContainsKey("time"))
             {
-                //System.Diagnostics.Debug.WriteLine(MPDStatusValues["time"]);
+                //System.Diagnostics.Debug.WriteLine(MpdStatusValues["time"]);
                 try
                 {
-                    if (MPDStatusValues["time"].Split(':').Length > 1)
+                    if (MpdStatusValues["time"].Split(':').Length > 1)
                     {
-                        _st.MpdSongTime = Double.Parse(MPDStatusValues["time"].Split(':')[1].Trim());
-                        _st.MpdSongElapsed = Double.Parse(MPDStatusValues["time"].Split(':')[0].Trim());
+                        _st.MpdSongTime = Double.Parse(MpdStatusValues["time"].Split(':')[1].Trim());
+                        _st.MpdSongElapsed = Double.Parse(MpdStatusValues["time"].Split(':')[0].Trim());
                     }
                 }
                 catch (FormatException e)
@@ -544,20 +559,20 @@ namespace WpfMPD
                 }
             }
 
-            if (MPDStatusValues.ContainsKey("elapsed"))
+            if (MpdStatusValues.ContainsKey("elapsed"))
             {
                 try
                 {
-                    _st.MpdSongElapsed = Double.Parse(MPDStatusValues["elapsed"]);
+                    _st.MpdSongElapsed = Double.Parse(MpdStatusValues["elapsed"]);
                 }
                 catch { }
             }
 
-            if (MPDStatusValues.ContainsKey("duration"))
+            if (MpdStatusValues.ContainsKey("duration"))
             {
                 try
                 {
-                    _st.MpdSongTime = Double.Parse(MPDStatusValues["duration"]);
+                    _st.MpdSongTime = Double.Parse(MpdStatusValues["duration"]);
                 }
                 catch { }
             }
@@ -607,6 +622,7 @@ namespace WpfMPD
             _songs.Clear();
 
             if (sl == null) { return false; }
+            if (sl.Count == 0) { return false; }
 
             Dictionary<string, string> SongValues = new Dictionary<string, string>();
             foreach (string value in sl)
@@ -702,6 +718,7 @@ namespace WpfMPD
             _playLists.Clear();
 
             if (sl == null) { return false; }
+            if (sl.Count == 0) { return false; }
 
             foreach (string value in sl)
             {

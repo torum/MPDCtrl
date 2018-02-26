@@ -4,10 +4,10 @@
 /// https://github.com/torumyax/MPD-Ctrl
 /// 
 /// TODO:
-///  Idle connection changed event.
 ///  Media keys.
-///  User friendly error message.
+///  Save settings
 ///  Settings page.
+///  User friendly error message.
 ///
 /// Known issue:
 ///
@@ -347,9 +347,6 @@ namespace WpfMPD
                 }
             }
 
-            //TODO:
-            //if (IsBusy) { return; }
-
 
             if ((isPlayer && isPlaylist))
             {
@@ -368,7 +365,7 @@ namespace WpfMPD
                 if (isDone)
                 {
                     System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryCurrentPlaylist> is done.");
-                    
+
                     // Update status.
                     isDone = await sender.MpdQueryStatus();
                     if (isDone)
@@ -436,7 +433,7 @@ namespace WpfMPD
                 IsBusy = true;
 
                 // Reset view.
-                _MPC.CurrentQueue.Clear();
+                sender.CurrentQueue.Clear();
                 this._selectedSong = null;
                 this.NotifyPropertyChanged("SelectedSong");
                 this._selecctedPlaylist = "";
@@ -448,7 +445,7 @@ namespace WpfMPD
                 if (isDone)
                 {
                     System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryCurrentPlaylist> is done.");
-                    
+
                     // Update status.
                     isDone = await sender.MpdQueryStatus();
                     if (isDone)
@@ -513,13 +510,13 @@ namespace WpfMPD
             }
             else if (isPlayer)
             {
-               
+
                 IsBusy = true;
 
                 // Reset view.
-                //this._selectedSong = null;
-                //this.NotifyPropertyChanged("SelectedSong");
-                //UpdateButtonStatus();
+                this._selectedSong = null;
+                this.NotifyPropertyChanged("SelectedSong");
+                UpdateButtonStatus();
 
                 // Update status.
                 bool isDone = await sender.MpdQueryStatus();
@@ -530,7 +527,8 @@ namespace WpfMPD
                     UpdateButtonStatus();
 
                     // Change it quietly.
-                    if (sender.MpdCurrentSong != null) { 
+                    if (sender.MpdCurrentSong != null)
+                    {
                         this._selectedSong = sender.MpdCurrentSong;
                         // Let listview know it is changed.
                         this.NotifyPropertyChanged("SelectedSong");
@@ -573,16 +571,44 @@ namespace WpfMPD
                     // Let user know.
                     System.Diagnostics.Debug.WriteLine("MpdQueryStatus returned with false." + "\n");
                 }
+            }
+            else if (isStoredPlaylist)
+            {
+                this._selecctedPlaylist = "";
+                this.NotifyPropertyChanged("SelectedPlaylist");
 
+                if (isStoredPlaylist)
+                {
+                    // Retrieve playlists
+                    sender.Playlists.Clear();
+                    bool isDone = await sender.MpdQueryPlaylists();
+                    if (isDone)
+                    {
+                        //System.Diagnostics.Debug.WriteLine("QueryPlaylists is done.");
 
+                        // Selected item should now read "Current Play Queue"
+                        //https://stackoverflow.com/questions/2343446/default-text-for-templated-combo-box?rq=1
 
+                        IsBusy = false;
+                    }
+                    else
+                    {
+                        IsBusy = false;
+                        //TODO: Let user know.
+                        System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
+                    }
 
+                    //Testing
+                    await _MPC.MpdIdleStart();
+                }
+                else
+                {
+                    IsBusy = false;
+                }
             }
 
             // Don't.It's already done.
             //bool isDone = await _MPC.MpdIdleStart();
-
-
         }
 
         private async void QueryStatus()
@@ -737,7 +763,7 @@ namespace WpfMPD
 
         public bool PlayCommand_CanExecute()
         {
-            if (this.IsBusy) { return false; } 
+            //if (this.IsBusy) { return false; } 
             if (_MPC.CurrentQueue.Count < 1) { return false; }
             return true;
         }
@@ -788,7 +814,7 @@ namespace WpfMPD
 
         public bool PlayNextCommand_CanExecute()
         {
-            if (this.IsBusy) { return false; }
+            //if (this.IsBusy) { return false; }
             if (_MPC.CurrentQueue.Count < 1) { return false; }
             return true;
         }
@@ -817,7 +843,7 @@ namespace WpfMPD
 
         public bool PlayPrevCommand_CanExecute()
         {
-            if (this.IsBusy) { return false; }
+            //if (this.IsBusy) { return false; }
             if (_MPC.CurrentQueue.Count < 1) { return false; }
             return true;
         }
@@ -846,7 +872,7 @@ namespace WpfMPD
 
         public bool SetRpeatCommand_CanExecute()
         {
-            if (this.IsBusy) { return false; }
+            //if (this.IsBusy) { return false; }
             return true;
         }
 
@@ -869,7 +895,7 @@ namespace WpfMPD
 
         public bool SetRandomCommand_CanExecute()
         {
-            if (this.IsBusy) { return false; }
+            //if (this.IsBusy) { return false; }
             return true;
         }
 
@@ -892,7 +918,7 @@ namespace WpfMPD
 
         public bool SetVolumeCommand_CanExecute()
         {
-            if (this.IsBusy) { return false; }
+            //if (this.IsBusy) { return false; }
             return true;
         }
 

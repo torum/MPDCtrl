@@ -5,7 +5,7 @@
 /// 
 /// TODO:
 ///  More error handling.
-///  Settings.
+///  Read from settings.
 ///
 /// Known issue:
 ///  
@@ -665,8 +665,9 @@ namespace WpfMPD
         private bool ParsePlaylistInfoResponse(List<string> sl)
         {
             if (sl == null) { return false; }
-            //if (sl.Count == 0) { return false; }
+
             try {
+                // Don't.
                 //_songs.Clear();
 
                 Dictionary<string, string> SongValues = new Dictionary<string, string>();
@@ -779,9 +780,9 @@ namespace WpfMPD
         private bool ParsePlaylistsResponse(List<string> sl)
         {
             if (sl == null) { return false; }
-            //if (sl.Count == 0) { return false; }
 
-            _playLists.Clear();
+            // Don't.
+            //_playLists.Clear();
 
             foreach (string value in sl)
             {

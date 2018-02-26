@@ -12,17 +12,31 @@
         Background="Transparent" AllowsTransparency="True" WindowStyle="None" WindowStartupLocation="CenterScreen"
         Title="MPD Ctrl" Height="520" Width="300"
         DataContext="{StaticResource MainViewModel}">
-    
+    <Window.Resources></Window.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
             <i:InvokeCommandAction  Command="{Binding WindowClosingCommand}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    
-    <Window.Resources>
-        
-    </Window.Resources>
-    
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding COMMANDTORUN}"
+                            Key="Play" />
+        <KeyBinding Command="{Binding COMMANDTORUN}"
+                            Key="MediaPlayPause" />
+        <KeyBinding Command="{Binding COMMANDTORUN}"
+                            Key="MediaNextTrack" />
+        <KeyBinding Command="{Binding COMMANDTORUN}"
+                            Key="MediaPreviousTrack" />
+        <KeyBinding Command="{Binding COMMANDTORUN}"
+                            Key="MediaStop" />
+        <KeyBinding Command="{Binding COMMANDTORUN}"
+                            Key="VolumeMute" />
+        <KeyBinding Command="{Binding COMMANDTORUN}"
+                            Key="VolumeDown" />
+        <KeyBinding Command="{Binding COMMANDTORUN}"
+                            Key="VolumeUp" />
+    </Window.InputBindings>
+
     <Window.Style>
         <Style TargetType="Window">
             <Style.Triggers>
@@ -39,6 +53,11 @@
                 VerticalAlignment="Stretch"
                 Fill="Black" 
                 Opacity="0.6">
+            <Rectangle.ContextMenu>
+                <ContextMenu>
+                    <MenuItem x:Name="mStayOnTop" Header="Stay on top" Click="MenuItem_mStayOnTop_Click"/>
+                </ContextMenu>
+            </Rectangle.ContextMenu>
         </Rectangle>
         <Grid>
             <Grid.RowDefinitions>

@@ -95,7 +95,7 @@ namespace WpfMPD
 
             Loaded += MainWindow_Loaded;
 
-            //this.Topmost = true;
+            //
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -117,6 +117,19 @@ namespace WpfMPD
             // Listview flickering...
             //SongListView.ScrollToCenterOfView(SongListView.SelectedItem);
 
+        }
+
+        private void MenuItem_mStayOnTop_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.Topmost) {
+                this.Topmost = false;
+                mStayOnTop.IsChecked = false;
+            }
+            else
+            {
+                this.Topmost = true;
+                mStayOnTop.IsChecked = true;
+            }
         }
     }
 

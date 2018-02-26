@@ -28,6 +28,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace WpfMPD
 {
@@ -58,7 +59,7 @@ namespace WpfMPD
             private int _volume;
             private bool _repeat;
             private bool _random;
-            private string _songID;
+            private string _songID = "";
             private double _songTime;
             private double _songElapsed;
 
@@ -183,14 +184,14 @@ namespace WpfMPD
         {
             _st = new Status();
 
-            //Enable multithreaded manupilations of ObservableCollections...
+            // Enable multithreaded manupilations of ObservableCollections...
             BindingOperations.EnableCollectionSynchronization(this._songs, new object());
             BindingOperations.EnableCollectionSynchronization(this._playLists, new object());
 
-            //Initialize idle tcp client
+            // Initialize idle tcp client.
             _idleClient = new EventDrivenTCPClient(IPAddress.Parse("192.168.3.123"), int.Parse("6600"));
-            _idleClient.ReceiveTimeout = 500000;
-            _idleClient.AutoReconnect = false;
+            _idleClient.ReceiveTimeout = 999999999;
+            _idleClient.AutoReconnect = true;
             _idleClient.DataReceived += new EventDrivenTCPClient.delDataReceived(IdleClient_DataReceived);
             _idleClient.ConnectionStatusChanged += new EventDrivenTCPClient.delConnectionStatusChanged(IdleClient_ConnectionStatusChanged);
 
@@ -250,19 +251,46 @@ namespace WpfMPD
 
         private void IdleClient_DataReceived(EventDrivenTCPClient sender, object data)
         {
-            //fired when new data is received in the TCP client
+            // Fired when new data is received in the TCP client.
 
-            //System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived: " + (data as string) );
+            System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived: " + (data as string) );
 
             if ((data as string).StartsWith("OK MPD"))
             {
-                //Connected and received OK. So go idle.
-                //sender.Send("idle player mixer options playlist stored_playlist\n");
+                // Connected to MPD and received OK. Now we are idling and wait.
             }
             else
             {
-                
-                //TODO do something.
+                // Init List which is later used in StatusChangeEvent.
+                List<string> SubSystems = new List<string>();
+
+                try
+                {
+                    string[] Lines = Regex.Split((data as string), "\n");
+
+                    foreach (string line in Lines)
+                    {
+                        string[] Values;
+                        if (line != "" && line != "OK")
+                        {
+                            Values = line.Split(':');
+                            if (Values.Length > 1)
+                            {
+                                //System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived lines loop: " + Values[1]);
+                                SubSystems.Add(Values[1].Trim());
+                            }
+                        }
+                    }
+                    
+                    if (SubSystems.Count > 0) {
+                        // Fire up changed event.
+                        StatusChanged?.Invoke(this, SubSystems);
+                    }
+                }
+                catch
+                {
+                    System.Diagnostics.Debug.WriteLine("Error@IdleConnection DataReceived: " + (data as string));
+                }
 
                 /*
                  changed: playlist
@@ -271,11 +299,10 @@ namespace WpfMPD
                  OK
                 */
 
-                //Fire up changed event.
-                StatusChanged?.Invoke(this, data);
-
-                //go idle and wait
+                // Go idle again and wait.
                 //sender.Send("idle player mixer options playlist stored_playlist\n");
+
+
             }
             
         }
@@ -422,12 +449,18 @@ namespace WpfMPD
         private bool ParseStatusResponse(List<string> sl)
         {
             if (sl == null) { return false; }
-            if (sl.Count == 0) { return false; }
+            if (sl.Count == 0) { return false; } 
 
             Dictionary<string, string> MpdStatusValues = new Dictionary<string, string>();
             foreach (string value in sl)
             {
-                if (value.StartsWith("ACK")) { return false; }
+                //System.Diagnostics.Debug.WriteLine("ParseStatusResponse loop: " + value);
+
+                if (value.StartsWith("ACK"))
+                {
+                    System.Diagnostics.Debug.WriteLine("ACK@ParseStatusResponse: " + value);
+                    return false;
+                }
 
                 string[] StatusValuePair = value.Split(':');
                 if (StatusValuePair.Length > 1)
@@ -497,6 +530,28 @@ namespace WpfMPD
             if (MpdStatusValues.ContainsKey("songid"))
             {
                 _st.MpdSongID = MpdStatusValues["songid"];
+
+                if (_st.MpdSongID != "") {
+                    // Set currentSong.
+                    try
+                    {
+                        var listItem = _songs.Where(i => i.ID == _st.MpdSongID);
+                        if (listItem != null)
+                        {
+                            foreach (var item in listItem)
+                            {
+                                this._currentSong = item as Song;
+                                break;
+                                //System.Diagnostics.Debug.WriteLine("StatusResponse linq: _songs.Where?="+ _currentSong.Title);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // System.NullReferenceException
+                        System.Diagnostics.Debug.WriteLine("Error@StatusResponse linq: _songs.Where?: " + ex.Message);
+                    }
+                }
             }
 
             //repeat opt bool
@@ -576,22 +631,12 @@ namespace WpfMPD
                 }
                 catch { }
             }
-
-
+            
             //TODO: more?
 
 
-            var listItem = _songs.Where(i => i.ID == _st.MpdSongID);
-            if (listItem != null)
-            {
-                foreach (var item in listItem)
-                {
-                    _currentSong = item as Song;
 
-                    //System.Diagnostics.Debug.WriteLine("StatusResponse linq: _songs.Where?="+ _currentSong.Title);
-                }
-            }
-            
+
             return true;
         }
 
@@ -619,68 +664,86 @@ namespace WpfMPD
 
         private bool ParsePlaylistInfoResponse(List<string> sl)
         {
-            _songs.Clear();
-
             if (sl == null) { return false; }
-            if (sl.Count == 0) { return false; }
+            //if (sl.Count == 0) { return false; }
+            try {
+                //_songs.Clear();
 
-            Dictionary<string, string> SongValues = new Dictionary<string, string>();
-            foreach (string value in sl)
-            {
-                //System.Diagnostics.Debug.WriteLine("@ParsePlaylistInfoResponse(): " + value);
-
-                if (value.StartsWith("ACK")) { return false; }
-
-                string[] StatusValuePair = value.Split(':');
-                if (StatusValuePair.Length > 1)
+                Dictionary<string, string> SongValues = new Dictionary<string, string>();
+                foreach (string value in sl)
                 {
-                    if (SongValues.ContainsKey(StatusValuePair[0].Trim()))
+                    //System.Diagnostics.Debug.WriteLine("@ParsePlaylistInfoResponse() loop: " + value);
+
+                    if (value.StartsWith("ACK"))
                     {
-                        SongValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim();
+                        System.Diagnostics.Debug.WriteLine("ACK@ParsePlaylistInfoResponse: " + value);
+                        return false;
                     }
-                    else
+
+                    try
                     {
-                        SongValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
-                    }
-
-                }
-
-                if (SongValues.ContainsKey("Id"))
-                {
-
-                    Song sng = new Song();
-                    sng.ID = SongValues["Id"];
-
-                    if (SongValues.ContainsKey("Title"))
-                    {
-                        sng.Title = SongValues["Title"];
-                    }
-                    else
-                    {
-                        sng.Title = "- no title";
-                        if (SongValues.ContainsKey("file"))
+                        string[] StatusValuePair = value.Split(':');
+                        if (StatusValuePair.Length > 1)
                         {
-                            sng.Title = Path.GetFileName(SongValues["file"]);
+                            if (SongValues.ContainsKey(StatusValuePair[0].Trim()))
+                            {
+                                SongValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim();
+                            }
+                            else
+                            {
+                                SongValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
+                            }
+
                         }
-                    }
 
-                    if (sng.ID == _st.MpdSongID)
+                        if (SongValues.ContainsKey("Id"))
+                        {
+
+                            Song sng = new Song();
+                            sng.ID = SongValues["Id"];
+
+                            if (SongValues.ContainsKey("Title"))
+                            {
+                                sng.Title = SongValues["Title"];
+                            }
+                            else
+                            {
+                                sng.Title = "- no title";
+                                if (SongValues.ContainsKey("file"))
+                                {
+                                    sng.Title = Path.GetFileName(SongValues["file"]);
+                                }
+                            }
+
+
+                            if (sng.ID == _st.MpdSongID)
+                            {
+                                this._currentSong = sng;
+
+                                //System.Diagnostics.Debug.WriteLine(sng.ID + ":" + sng.Title + " - is current.");
+                            }
+
+
+                            SongValues.Clear();
+
+                            _songs.Add(sng);
+                        }
+                        
+                    }
+                    catch (Exception ex)
                     {
-                        _currentSong = sng;
-
-                        //System.Diagnostics.Debug.WriteLine(sng.ID + ":" + sng.Title + " - is current.");
+                        System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse: " + ex.Message);
+                        return false;
                     }
-
-                    _songs.Add(sng);
-
-                    SongValues.Clear();
 
                 }
-
-
+                return true;
             }
-
-            return true;
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse: " + ex.Message);
+                return false;
+            }
         }
 
         public async Task<bool> MpdQueryPlaylists()
@@ -715,29 +778,29 @@ namespace WpfMPD
 
         private bool ParsePlaylistsResponse(List<string> sl)
         {
-            _playLists.Clear();
-
             if (sl == null) { return false; }
-            if (sl.Count == 0) { return false; }
+            //if (sl.Count == 0) { return false; }
+
+            _playLists.Clear();
 
             foreach (string value in sl)
             {
-                //System.Diagnostics.Debug.WriteLine("@ParsePlaylistsResponse(): " + value + "");
+                //System.Diagnostics.Debug.WriteLine("@ParsePlaylistsResponse() loop: " + value + "");
 
-                if (value.StartsWith("ACK")) { return false; }
+                if (value.StartsWith("ACK"))
+                {
+                    System.Diagnostics.Debug.WriteLine("ACK@ParsePlaylistsResponse: " + value);
+                    return false;
+                }
 
                 if (value.StartsWith("playlist:")) {
                     if (value.Split(':').Length > 1) { 
-                    _playLists.Add(value.Split(':')[1].Trim());
+                        _playLists.Add(value.Split(':')[1].Trim());
                     }
                 }
                 else if (value.StartsWith("Last-Modified: ") || (value.StartsWith("OK"))) 
                 {
-                    //ignore
-                }
-                else
-                {
-                    //ignore
+                    // Ignoring for now.
                 }
             }
             return true;
@@ -903,12 +966,12 @@ namespace WpfMPD
                 int port = 6600;
                 string data = "command_list_begin" + "\n";
 
+                data = data + "next" + "\n";
+
                 if (_st.MpdState != Status.MpdPlayState.Play)
                 {
                     data = data + "play" + "\n";
                 }
-
-                data = data + "next" + "\n";
 
                 data = data + "status" + "\n" + "command_list_end";
 

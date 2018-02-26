@@ -1,10 +1,10 @@
 ﻿/// 
 /// 
 /// MPD Ctrl
-/// 
+/// https://github.com/torumyax/MPD-Ctrl
 /// 
 /// TODO:
-///  Error handling.
+///  More error handling.
 ///  Settings.
 ///
 /// Known issue:
@@ -778,6 +778,34 @@ namespace WpfMPD
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackPlay: " + ex.Message);
+            }
+            return false;
+        }
+
+        public async Task<bool> MpdPlaybackSeek(string songID, int seekTime)
+        {
+            if ((songID == "") || (seekTime == 0)) { return false; }
+            try
+            {
+                //todo settings form.
+                string server = "192.168.3.123";
+                int port = 6600;
+                string data = "command_list_begin" + "\n";
+
+                data = data + "seekid " + songID + " " + seekTime.ToString() + "\n";
+
+                data = data + "status" + "\n" + "command_list_end";
+
+                //send task
+                Task<List<string>> tsResponse = SendRequest(server, port, data);
+
+                await tsResponse;
+                return ParseStatusResponse(tsResponse.Result);
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdPlaybackSeek: " + ex.Message);
             }
             return false;
         }

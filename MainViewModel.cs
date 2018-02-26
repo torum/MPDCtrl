@@ -1,18 +1,15 @@
 ﻿/// 
 /// 
 /// MPD Ctrl
-/// 
+/// https://github.com/torumyax/MPD-Ctrl
 /// 
 /// TODO:
 ///  Idle connection changed event.
-///  Seek.
-///  Volume slider's design XAML.
-///  Error handling.
-///  Settings page.
 ///  Media keys.
+///  More error handling.
+///  Settings page.
 ///
 /// Known issue:
-///  listview flickering.
 ///
 /// 
 
@@ -57,6 +54,7 @@ namespace WpfMPD
         private ICommand _setRepeatCommand;
         private ICommand _setRandomCommand;
         private ICommand _setVolumeCommand;
+        private ICommand _setSeekCommand;
         private ICommand _changeSongCommand;
         private ICommand _changePlaylistCommand;
         private ICommand _windowClosingCommand;
@@ -223,7 +221,12 @@ namespace WpfMPD
                 this._elapsed = value;
                 this.NotifyPropertyChanged("Elapsed");
 
-                //TODO seek
+                System.Diagnostics.Debug.WriteLine("\n\nSlider_Elapsed Changed: " + value.ToString());
+
+                if (SetSeekCommand.CanExecute(null))
+                {
+                    SetSeekCommand.Execute(null);
+                }
             }
         }
 
@@ -272,6 +275,7 @@ namespace WpfMPD
             this._setRepeatCommand = new WpfMPD.Common.RelayCommand(this.SetRpeatCommand_ExecuteAsync, this.SetRpeatCommand_CanExecute);
             this._setRandomCommand = new WpfMPD.Common.RelayCommand(this.SetRandomCommand_ExecuteAsync, this.SetRandomCommand_CanExecute);
             this._setVolumeCommand = new WpfMPD.Common.RelayCommand(this.SetVolumeCommand_ExecuteAsync, this.SetVolumeCommand_CanExecute);
+            this._setSeekCommand = new WpfMPD.Common.RelayCommand(this.SetSeekCommand_ExecuteAsync, this.SetSeekCommand_CanExecute);
             this._changeSongCommand = new WpfMPD.Common.RelayCommand(this.ChangeSongCommand_ExecuteAsync, this.ChangeSongCommand_CanExecute);
             this._changePlaylistCommand = new WpfMPD.Common.RelayCommand(this.ChangePlaylistCommand_ExecuteAsync, this.ChangePlaylistCommand_CanExecute);
             this._windowClosingCommand = new WpfMPD.Common.RelayCommand(this.WindowClosingCommand_Execute, this.WindowClosingCommand_CanExecute);
@@ -618,6 +622,35 @@ namespace WpfMPD
             {
                 UpdateButtonStatus();
             }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("\n\nMpdSetVolume returned false");
+            }
+        }
+
+        public ICommand SetSeekCommand { get { return this._setSeekCommand; } }
+
+        public bool SetSeekCommand_CanExecute()
+        {
+            //TODO if (this.IsBusy) { return false; } else { return true; }
+            return true;
+        }
+
+        public async void SetSeekCommand_ExecuteAsync()
+        {
+            
+            bool isDone = await _MPC.MpdPlaybackSeek(_MPC.MpdStatus.MpdSongID, Convert.ToInt32(this._elapsed));
+
+            if (isDone)
+            {
+                //Don't need to. Timer takes care of updating slider elapsed value.
+                //UpdateButtonStatus();
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("\n\nMpdPlaybackSeek returned false");
+            }
+            
         }
 
         public ICommand ChangeSongCommand { get { return this._changeSongCommand; } }

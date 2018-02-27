@@ -136,6 +136,8 @@ namespace WpfMPD
 
         #region MPC PRIVATE FIELD declaration
 
+        private string _h;
+        private int _p;
         private Status _st;
         private Song _currentSong;
         private ObservableCollection<Song> _songs = new ObservableCollection<Song>();
@@ -145,6 +147,24 @@ namespace WpfMPD
         #endregion END of MPC PRIVATE FIELD declaration
 
         #region MPC PUBLIC PROPERTY and EVENT FIELD
+
+        public string MpdHost
+        {
+            get { return _h; }
+            set
+            {
+                _h = value;
+            }
+        }
+
+        public int MpdPort
+        {
+            get { return _p; }
+            set
+            {
+                _p = value;
+            }
+        }
 
         public Status MpdStatus
         {
@@ -180,18 +200,19 @@ namespace WpfMPD
         #endregion END of MPC PUBLIC PROPERTY FIELD
 
         // MPC Constructor
-        public MPC()
+        public MPC(string h, int p)
         {
-            _st = new Status();
+            this._h = h;
+            this._p = p;
+            this._st = new Status();
 
             // Enable multithreaded manupilations of ObservableCollections...
             BindingOperations.EnableCollectionSynchronization(this._songs, new object());
             BindingOperations.EnableCollectionSynchronization(this._playLists, new object());
 
             // Initialize idle tcp client.
-            _idleClient = new EventDrivenTCPClient(IPAddress.Parse("192.168.3.123"), int.Parse("6600"));
+            _idleClient = new EventDrivenTCPClient(IPAddress.Parse(_h), _p, true);
             _idleClient.ReceiveTimeout = 999999999;
-            _idleClient.AutoReconnect = true;
             _idleClient.DataReceived += new EventDrivenTCPClient.delDataReceived(IdleClient_DataReceived);
             _idleClient.ConnectionStatusChanged += new EventDrivenTCPClient.delConnectionStatusChanged(IdleClient_ConnectionStatusChanged);
 
@@ -430,12 +451,9 @@ namespace WpfMPD
         {
             try
             {
-                //todo settings form.
-                string server = "192.168.3.123";
-                int port = 6600;
                 string mpdCommand = "status";
 
-                Task<List<string>> tsResponse = SendRequest(server, port, mpdCommand);
+                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 await tsResponse;
                 return ParseStatusResponse(tsResponse.Result);
             }
@@ -644,12 +662,9 @@ namespace WpfMPD
         {
             try
             {
-                //todo settings form.
-                string server = "192.168.3.123";
-                int port = 6600;
                 string mpdCommand = "playlistinfo";
 
-                Task<List<string>> tsResponse = SendRequest(server, port, mpdCommand);
+                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 await tsResponse;
 
                 return ParsePlaylistInfoResponse(tsResponse.Result);
@@ -751,12 +766,9 @@ namespace WpfMPD
         {
             try
             {
-                //todo settings form.
-                string server = "192.168.3.123";
-                int port = 6600;
                 string mpdCommand = "listplaylists";
 
-                Task<List<string>> tsResponse = SendRequest(server, port, mpdCommand);
+                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 await tsResponse;
 
                 /*
@@ -811,24 +823,21 @@ namespace WpfMPD
         {
             try
             {
-                //todo settings form.
-                string server = "192.168.3.123";
-                int port = 6600;
-                string data = "command_list_begin" + "\n";
+                string mpdCommand = "command_list_begin" + "\n";
 
                 if (songID != "")
                 {
-                    data = data + "playid " + songID + "\n";
+                    mpdCommand = mpdCommand + "playid " + songID + "\n";
                 }
                 else
                 {
-                    data = data + "play" + "\n";
+                    mpdCommand = mpdCommand + "play" + "\n";
                 }
 
-                data = data + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
 
                 //send task
-                Task<List<string>> tsResponse = SendRequest(server, port, data);
+                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
 
                 await tsResponse;
 
@@ -851,17 +860,14 @@ namespace WpfMPD
             if ((songID == "") || (seekTime == 0)) { return false; }
             try
             {
-                //todo settings form.
-                string server = "192.168.3.123";
-                int port = 6600;
-                string data = "command_list_begin" + "\n";
+                string mpdCommand = "command_list_begin" + "\n";
 
-                data = data + "seekid " + songID + " " + seekTime.ToString() + "\n";
+                mpdCommand = mpdCommand + "seekid " + songID + " " + seekTime.ToString() + "\n";
 
-                data = data + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
 
                 //send task
-                Task<List<string>> tsResponse = SendRequest(server, port, data);
+                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
 
                 await tsResponse;
                 return ParseStatusResponse(tsResponse.Result);
@@ -878,16 +884,13 @@ namespace WpfMPD
         {
             try
             {
-                //todo settings form.
-                string server = "192.168.3.123";
-                int port = 6600;
-                string data = "command_list_begin" + "\n";
+                string mpdCommand = "command_list_begin" + "\n";
 
-                data = data + "pause 1" + "\n";
+                mpdCommand = mpdCommand + "pause 1" + "\n";
 
-                data = data + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
 
-                Task<List<string>> tsResponse = SendRequest(server, port, data);
+                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
 
                 await tsResponse;
 
@@ -906,16 +909,13 @@ namespace WpfMPD
         {
             try
             {
-                //todo settings form.
-                string server = "192.168.3.123";
-                int port = 6600;
-                string data = "command_list_begin" + "\n";
+                string mpdCommand = "command_list_begin" + "\n";
 
-                data = data + "pause 0" + "\n";
+                mpdCommand = mpdCommand + "pause 0" + "\n";
 
-                data = data + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
 
-                Task<List<string>> tsResponse = SendRequest(server, port, data);
+                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
 
                 await tsResponse;
 
@@ -934,16 +934,13 @@ namespace WpfMPD
         {
             try
             {
-                //todo settings form.
-                string server = "192.168.3.123";
-                int port = 6600;
-                string data = "command_list_begin" + "\n";
+                string mpdCommand = "command_list_begin" + "\n";
 
-                data = data + "stop" + "\n";
+                mpdCommand = mpdCommand + "stop" + "\n";
 
-                data = data + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
 
-                Task<List<string>> tsResponse = SendRequest(server, port, data);
+                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
 
                 await tsResponse;
 
@@ -962,21 +959,18 @@ namespace WpfMPD
         {
             try
             {
-                //todo settings form.
-                string server = "192.168.3.123";
-                int port = 6600;
-                string data = "command_list_begin" + "\n";
+                string mpdCommand = "command_list_begin" + "\n";
 
-                data = data + "next" + "\n";
+                mpdCommand = mpdCommand + "next" + "\n";
 
                 if (_st.MpdState != Status.MpdPlayState.Play)
                 {
-                    data = data + "play" + "\n";
+                    mpdCommand = mpdCommand + "play" + "\n";
                 }
 
-                data = data + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
 
-                Task<List<string>> tsResponse = SendRequest(server, port, data);
+                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
 
                 await tsResponse;
 
@@ -994,21 +988,18 @@ namespace WpfMPD
         {
             try
             {
-                //todo settings form.
-                string server = "192.168.3.123";
-                int port = 6600;
-                string data = "command_list_begin" + "\n";
+                string mpdCommand = "command_list_begin" + "\n";
 
-                data = data + "previous" + "\n";
+                mpdCommand = mpdCommand + "previous" + "\n";
 
                 if (_st.MpdState != Status.MpdPlayState.Play)
                 {
-                    data = data + "play" + "\n";
+                    mpdCommand = mpdCommand + "play" + "\n";
                 }
 
-                data = data + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
 
-                Task<List<string>> tsResponse = SendRequest(server, port, data);
+                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
 
                 await tsResponse;
 
@@ -1028,17 +1019,14 @@ namespace WpfMPD
 
             try
             {
-                //todo settings form.
-                string server = "192.168.3.123";
-                int port = 6600;
                 //string data = "setvol " + v.ToString();
-                string data = "command_list_begin" + "\n";
-                
-                data = data + "setvol " + v.ToString() + "\n";
+                string mpdCommand = "command_list_begin" + "\n";
 
-                data = data + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "setvol " + v.ToString() + "\n";
 
-                Task<List<string>> tsResponse = SendRequest(server, port, data);
+                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
+
+                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
 
                 await tsResponse;
 
@@ -1059,21 +1047,18 @@ namespace WpfMPD
 
             try
             {
-                //todo settings form.
-                string server = "192.168.3.123";
-                int port = 6600;
-                string data = "command_list_begin" + "\n";
+                string mpdCommand = "command_list_begin" + "\n";
 
-                if (on) { 
-                    data = data + "repeat 1" + "\n";
+                if (on) {
+                    mpdCommand = mpdCommand + "repeat 1" + "\n";
                 }
                 else
                 {
-                    data = data + "repeat 0" + "\n";
+                    mpdCommand = mpdCommand + "repeat 0" + "\n";
                 }
-                data = data + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
 
-                Task<List<string>> tsResponse = SendRequest(server, port, data);
+                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
 
                 await tsResponse;
 
@@ -1094,22 +1079,19 @@ namespace WpfMPD
 
             try
             {
-                //todo settings form.
-                string server = "192.168.3.123";
-                int port = 6600;
-                string data = "command_list_begin" + "\n";
+                string mpdCommand = "command_list_begin" + "\n";
 
                 if (on)
                 {
-                    data = data + "random 1" + "\n";
+                    mpdCommand = mpdCommand + "random 1" + "\n";
                 }
                 else
                 {
-                    data = data + "random 0" + "\n";
+                    mpdCommand = mpdCommand + "random 0" + "\n";
                 }
-                data = data + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
 
-                Task<List<string>> tsResponse = SendRequest(server, port, data);
+                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
 
                 await tsResponse;
 
@@ -1128,18 +1110,15 @@ namespace WpfMPD
         {
             if (playlistName.Trim() != "")
             {
-                //todo settings form.
-                string server = "192.168.3.123";
-                int port = 6600;
-                string data = "command_list_begin" + "\n";
+                string mpdCommand = "command_list_begin" + "\n";
 
-                data = data + "clear" +  "\n";
+                mpdCommand = mpdCommand + "clear" +  "\n";
 
-                data = data + "load " + playlistName + "\n";
+                mpdCommand = mpdCommand + "load " + playlistName + "\n";
 
-                data = data + "playlistinfo" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "playlistinfo" + "\n" + "command_list_end";
 
-                Task<List<string>> tsResponse = SendRequest(server, port, data);
+                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
 
                 await tsResponse;
 

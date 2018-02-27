@@ -24,15 +24,45 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
+using System.Configuration;
 
 namespace WpfMPD
 {
+    /// <summary>
+    /// profile Class for ObservableCollection. 
+    /// </summary>
+    /// 
+    [Serializable]
+    public class Profile
+    {
+        public string Host { get; set; }
+        public int Port { get; set; }
+    }
+
+
+    public class ProfileSettings
+    {
+        public ObservableCollection<Profile> Profiles;// = new ObservableCollection<Profile>();
+        public ProfileSettings()
+        {
+            Profiles = new ObservableCollection<Profile>();
+        }
+    }
 
     public class MainViewModel : INotifyPropertyChanged
     {
 
+
+
+        /// <summary>
+        /// MainViewModel Class. 
+        /// </summary>
+        /// 
         #region PRIVATE FIELD DECLARATION
-        
+
+        private string _defaultHost;
+        private int _defaultPort;
+        private Profile _profile;
         private MPC _MPC;
         private MPC.Song _selectedSong;
         private bool _isChanged;
@@ -256,6 +286,9 @@ namespace WpfMPD
             }
         }
 
+        public ProfileSettings Prof;
+        
+
         #endregion END of PUBLIC PROPERTY FIELD
 
         //Constructor
@@ -280,8 +313,38 @@ namespace WpfMPD
             this._changePlaylistCommand = new WpfMPD.Common.RelayCommand(this.ChangePlaylistCommand_ExecuteAsync, this.ChangePlaylistCommand_CanExecute);
             this._windowClosingCommand = new WpfMPD.Common.RelayCommand(this.WindowClosingCommand_Execute, this.WindowClosingCommand_CanExecute);
 
+
+            // Upgrade settings.
+            MPDCtrl.Properties.Settings.Default.Upgrade();
+            // Load settings.
+
+            // Begin test.
+
+
+            if (MPDCtrl.Properties.Settings.Default.Profiles == null)
+            {
+                MPDCtrl.Properties.Settings.Default.Profiles = new ProfileSettings();
+
+                //TODO: show settings dialog.
+                Profile profile = new Profile
+                {
+                    Host = "192.168.3.123",
+                    Port = 6600
+                };
+
+                MPDCtrl.Properties.Settings.Default.Profiles.Profiles.Add(profile);
+
+                // Make it default;
+                MPDCtrl.Properties.Settings.Default.DefaultHost = profile.Host;
+                MPDCtrl.Properties.Settings.Default.DefaultPort = profile.Port;
+            }
+            this._defaultHost = MPDCtrl.Properties.Settings.Default.DefaultHost;
+            this._defaultPort = MPDCtrl.Properties.Settings.Default.DefaultPort;
+
+            // End test.
+
             //Create MPC instance.
-            this._MPC = new MPC();
+            this._MPC = new MPC(this._defaultHost, this._defaultPort);
 
             //Assigned idle event.
             this._MPC.StatusChanged += new MPC.MpdStatusChanged(OnStatusChanged);
@@ -296,7 +359,6 @@ namespace WpfMPD
 
             //start idle connection, but don't start idle mode yet.
             ConnectIdle();
-
         }
 
         #region PRIVATE METHODS
@@ -1053,10 +1115,12 @@ namespace WpfMPD
 
         public void WindowClosingCommand_Execute()
         {
-            //https://stackoverflow.com/questions/3683450/handling-the-window-closing-event-with-wpf-mvvm-light-toolkit
-            //TODO close connection, save ini setting etc.
-            
-            //System.Diagnostics.Debug.WriteLine("WindowClosingCommand");
+            System.Diagnostics.Debug.WriteLine("WindowClosingCommand");
+
+            MPDCtrl.Properties.Settings.Default.DefaultHost = this._defaultHost;
+            MPDCtrl.Properties.Settings.Default.DefaultPort = this._defaultPort;
+
+            MPDCtrl.Properties.Settings.Default.Save();
 
             //disconnect idle connection.
             DisConnectIdle();

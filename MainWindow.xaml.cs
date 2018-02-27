@@ -95,13 +95,19 @@ namespace WpfMPD
 
             Loaded += MainWindow_Loaded;
 
-            //
+
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // For the acrylic effects
             EnableBlur();
+
+            if ((MPDCtrl.Properties.Settings.Default.MainWindow_Left != 0) && MPDCtrl.Properties.Settings.Default.MainWindow_Top != 0) {
+                Left = MPDCtrl.Properties.Settings.Default.MainWindow_Left;
+                Top = MPDCtrl.Properties.Settings.Default.MainWindow_Top;
+            }
+            this.Topmost = MPDCtrl.Properties.Settings.Default.TopMost;
         }
 
         private void PathButton_Click(object sender, RoutedEventArgs e)
@@ -130,6 +136,17 @@ namespace WpfMPD
                 this.Topmost = true;
                 mStayOnTop.IsChecked = true;
             }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (WindowState == WindowState.Normal)
+            {
+                MPDCtrl.Properties.Settings.Default.MainWindow_Left = Left;
+                MPDCtrl.Properties.Settings.Default.MainWindow_Top = Top;
+            }
+            MPDCtrl.Properties.Settings.Default.TopMost = this.Topmost;
+            MPDCtrl.Properties.Settings.Default.Save();
         }
     }
 

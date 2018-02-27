@@ -11,6 +11,7 @@
         common:MaximizeDoubleClickHelper.MaximizeDoubleClick="True"
         Background="Transparent" AllowsTransparency="True" WindowStyle="None" WindowStartupLocation="CenterScreen"
         Title="MPD Ctrl" Height="520" Width="300"
+        Closing="Window_Closing"
         DataContext="{StaticResource MainViewModel}">
     <Window.Resources></Window.Resources>
     <i:Interaction.Triggers>

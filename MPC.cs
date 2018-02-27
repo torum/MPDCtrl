@@ -197,7 +197,7 @@ namespace WpfMPD
 
         public event MpdStatusChanged StatusChanged;
 
-        #endregion END of MPC PUBLIC PROPERTY FIELD
+        #endregion END of MPC PUBLIC PROPERTY and EVENT FIELD
 
         // MPC Constructor
         public MPC(string h, int p)
@@ -206,7 +206,7 @@ namespace WpfMPD
             this._p = p;
             this._st = new Status();
 
-            // Enable multithreaded manupilations of ObservableCollections...
+            // Enable synch with background thread.
             BindingOperations.EnableCollectionSynchronization(this._songs, new object());
             BindingOperations.EnableCollectionSynchronization(this._playLists, new object());
 
@@ -274,7 +274,7 @@ namespace WpfMPD
         {
             // Fired when new data is received in the TCP client.
 
-            System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived: " + (data as string) );
+            //System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived: " + (data as string) );
 
             if ((data as string).StartsWith("OK MPD"))
             {
@@ -321,9 +321,7 @@ namespace WpfMPD
                 */
 
                 // Go idle again and wait.
-                //sender.Send("idle player mixer options playlist stored_playlist\n");
-
-
+                sender.Send("idle player mixer options playlist stored_playlist\n");
             }
             
         }
@@ -355,7 +353,7 @@ namespace WpfMPD
             {
                 if (_idleClient.ConnectionState == EventDrivenTCPClient.ConnectionStatus.Connected)
                 {
-                    await Task.Run(() => { _idleClient.Send("noidle"); });
+                    await Task.Run(() => { _idleClient.Send("noidle\n"); });
                     return true;
                 }
                 else { return false; }
@@ -381,7 +379,7 @@ namespace WpfMPD
                 TcpClient client = new TcpClient();
                 await client.ConnectAsync(ep.Address, port);
 
-                System.Diagnostics.Debug.WriteLine("\n\n" + "Server " + server + " connected.");
+                System.Diagnostics.Debug.WriteLine("\nServer " + server + " connected.");
 
                 NetworkStream networkStream = client.GetStream();
                 StreamWriter writer = new StreamWriter(networkStream);
@@ -391,21 +389,30 @@ namespace WpfMPD
                 //first check MPD's initial response on connect.
                 string responseLine = await reader.ReadLineAsync();
 
+                if (responseLine == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("Connected response: null");
+                    return null;
+                }
                 System.Diagnostics.Debug.WriteLine("Connected response: " + responseLine);
 
                 //Check if it starts with "OK MPD"
                 if (responseLine.StartsWith("OK MPD"))
                 {
+                    System.Diagnostics.Debug.WriteLine("Request: " + mpdCommand);
 
                     //if it's ok, then request command.
                     await writer.WriteLineAsync(mpdCommand);
-
-                    System.Diagnostics.Debug.WriteLine("Request: " + mpdCommand);
 
                     //read multiple lines untill "OK".
                     while (!reader.EndOfStream)
                     {
                         responseLine = await reader.ReadLineAsync();
+                        if (responseLine == null)
+                        {
+                            System.Diagnostics.Debug.WriteLine("reader.ReadLineAsync(): null");
+                            break;
+                        }
 
                         //System.Diagnostics.Debug.WriteLine("Response loop: " + responseLine);
 
@@ -441,8 +448,7 @@ namespace WpfMPD
             {
                 System.Diagnostics.Debug.WriteLine("Error@SendRequest: " + ex.Message);
                 //TODO: Show error message to user.
-                // 'System.Net.Sockets.SocketException'
-                // 接続済みの呼び出し先が一定の時間を過ぎても正しく応答しなかったため、接続できませんでした。または接続済みのホストが応答しなかったため、確立された接続は失敗しました。
+                // eg 'System.Net.Sockets.SocketException'
                 return null;
             }
         }
@@ -548,28 +554,38 @@ namespace WpfMPD
             if (MpdStatusValues.ContainsKey("songid"))
             {
                 _st.MpdSongID = MpdStatusValues["songid"];
-
+                
                 if (_st.MpdSongID != "") {
+                    
+                    /*
                     // Set currentSong.
                     try
                     {
-                        var listItem = _songs.Where(i => i.ID == _st.MpdSongID);
-                        if (listItem != null)
-                        {
-                            foreach (var item in listItem)
-                            {
-                                this._currentSong = item as Song;
-                                break;
-                                //System.Diagnostics.Debug.WriteLine("StatusResponse linq: _songs.Where?="+ _currentSong.Title);
-                            }
+                        var item = _songs.FirstOrDefault(i => i.ID == _st.MpdSongID);
+                        if (item != null) {
+                            this._currentSong = (item as Song);
                         }
+
+                        //var listItem = _songs.Where(i => i.ID == _st.MpdSongID);
+                        //if (listItem != null)
+                        //{
+                        //    foreach (var item in listItem)
+                        //    {
+                        //        this._currentSong = item as Song;
+                        //        break;
+                        //        //System.Diagnostics.Debug.WriteLine("StatusResponse linq: _songs.Where?="+ _currentSong.Title);
+                        //    }
+                        //}
+
                     }
                     catch (Exception ex)
                     {
                         // System.NullReferenceException
                         System.Diagnostics.Debug.WriteLine("Error@StatusResponse linq: _songs.Where?: " + ex.Message);
                     }
+                    */
                 }
+                
             }
 
             //repeat opt bool
@@ -677,6 +693,34 @@ namespace WpfMPD
             return false;
         }
 
+        public async Task<bool> MpdChangePlaylist(string playlistName)
+        {
+            if (playlistName.Trim() != "")
+            {
+                string mpdCommand = "command_list_begin" + "\n";
+
+                mpdCommand = mpdCommand + "clear" + "\n";
+
+                mpdCommand = mpdCommand + "load " + playlistName.Trim() + "\n";
+                //Testing. 
+                mpdCommand = mpdCommand + "play" + "\n";
+
+                mpdCommand = mpdCommand + "playlistinfo" + "\n";
+
+                mpdCommand = mpdCommand + "command_list_end";
+
+                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+
+                await tsResponse;
+
+                return ParsePlaylistInfoResponse(tsResponse.Result);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         private bool ParsePlaylistInfoResponse(List<string> sl)
         {
             if (sl == null) { return false; }
@@ -742,7 +786,13 @@ namespace WpfMPD
 
                             SongValues.Clear();
 
-                            _songs.Add(sng);
+                            try { 
+                                _songs.Add(sng);
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse _songs.Add: " + ex.Message);
+                            }
                         }
                         
                     }
@@ -1106,29 +1156,6 @@ namespace WpfMPD
             return false;
         }
 
-        public async Task<bool> MpdChangePlaylist(string playlistName)
-        {
-            if (playlistName.Trim() != "")
-            {
-                string mpdCommand = "command_list_begin" + "\n";
-
-                mpdCommand = mpdCommand + "clear" +  "\n";
-
-                mpdCommand = mpdCommand + "load " + playlistName + "\n";
-
-                mpdCommand = mpdCommand + "playlistinfo" + "\n" + "command_list_end";
-
-                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
-
-                await tsResponse;
-
-                return ParsePlaylistInfoResponse(tsResponse.Result);
-            }
-            else
-            {
-                return false;
-            }
-        }
 
         #endregion END of MPD METHODS
 

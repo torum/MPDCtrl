@@ -10,7 +10,7 @@
 ///  User friendly error message.
 ///
 /// Known issue:
-///
+///  When maximized, scrollber is weird...There are some extra spaces.
 /// 
 
 using System;
@@ -29,7 +29,7 @@ using System.Configuration;
 namespace WpfMPD
 {
     /// <summary>
-    /// profile Class for ObservableCollection. 
+    /// Profile Class for ObservableCollection. 
     /// </summary>
     /// 
     [Serializable]
@@ -39,10 +39,13 @@ namespace WpfMPD
         public int Port { get; set; }
     }
 
-
+    /// <summary>
+    /// ProfileSettings Class for storing in the settings. 
+    /// </summary>
+    /// 
     public class ProfileSettings
     {
-        public ObservableCollection<Profile> Profiles;// = new ObservableCollection<Profile>();
+        public ObservableCollection<Profile> Profiles;
         public ProfileSettings()
         {
             Profiles = new ObservableCollection<Profile>();

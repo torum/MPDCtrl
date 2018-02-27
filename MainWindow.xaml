@@ -20,21 +20,21 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Window.InputBindings>
-        <KeyBinding Command="{Binding COMMANDTORUN}"
+        <KeyBinding Command="{Binding PlayCommand}"
                             Key="Play" />
-        <KeyBinding Command="{Binding COMMANDTORUN}"
+        <KeyBinding Command="{Binding PlayCommand}"
                             Key="MediaPlayPause" />
-        <KeyBinding Command="{Binding COMMANDTORUN}"
+        <KeyBinding Command="{Binding PlayNextCommand}"
                             Key="MediaNextTrack" />
-        <KeyBinding Command="{Binding COMMANDTORUN}"
+        <KeyBinding Command="{Binding PlayPrevCommand}"
                             Key="MediaPreviousTrack" />
-        <KeyBinding Command="{Binding COMMANDTORUN}"
+        <KeyBinding Command="{Binding PlayStopCommand}"
                             Key="MediaStop" />
-        <KeyBinding Command="{Binding COMMANDTORUN}"
+        <KeyBinding Command="{Binding VolumeMuteCommand}"
                             Key="VolumeMute" />
-        <KeyBinding Command="{Binding COMMANDTORUN}"
+        <KeyBinding Command="{Binding VolumeDownCommand}"
                             Key="VolumeDown" />
-        <KeyBinding Command="{Binding COMMANDTORUN}"
+        <KeyBinding Command="{Binding VolumeUpCommand}"
                             Key="VolumeUp" />
     </Window.InputBindings>
 
@@ -91,9 +91,6 @@
                 Background="Transparent" Foreground="White"
                 RenderTransformOrigin="0.5,0.5"
                 Style="{StaticResource PathButton}" Command="{Binding PlayCommand}" Content="{Binding PlayButton}">
-                    <!--
-                M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z
-                -->
                 </Button>
 
                 <Button x:Name="NextButton" Grid.Column="2" 

@@ -31,7 +31,6 @@ namespace WpfMPD
     /// <summary>
     /// Profile Class for ObservableCollection. 
     /// </summary>
-    /// 
     [Serializable]
     public class Profile
     {
@@ -42,7 +41,6 @@ namespace WpfMPD
     /// <summary>
     /// ProfileSettings Class for storing in the settings. 
     /// </summary>
-    /// 
     public class ProfileSettings
     {
         public ObservableCollection<Profile> Profiles;
@@ -52,13 +50,11 @@ namespace WpfMPD
         }
     }
 
+    /// <summary>
+    /// MainViewModel Class. 
+    /// </summary>
     public class MainViewModel : INotifyPropertyChanged
     {
-
-        /// <summary>
-        /// MainViewModel Class. 
-        /// </summary>
-        /// 
         #region PRIVATE FIELD DECLARATION
 
         private string _defaultHost;
@@ -88,6 +84,13 @@ namespace WpfMPD
         private ICommand _changeSongCommand;
         private ICommand _changePlaylistCommand;
         private ICommand _windowClosingCommand;
+
+        private ICommand _playPauseCommand;
+        private ICommand _playStopCommand;
+        private ICommand _volumeMuteCommand;
+        private ICommand _volumeDownCommand;
+        private ICommand _volumeUpCommand;
+
 
         #endregion END of PRIVATE FIELD declaration
 
@@ -288,17 +291,17 @@ namespace WpfMPD
 
         #endregion END of PUBLIC PROPERTY FIELD
 
-        //Constructor
+        // Constructor
         public MainViewModel()
         {
             this._isChanged = false;
 
-            //Initialize play button with "play" state.
+            // Initialize play button with "play" state.
             this.PlayButton = _pathPlayButton;
 
             this._selecctedPlaylist = "";
 
-            //Assign commands
+            // Assign commands
             this._playCommand = new WpfMPD.Common.RelayCommand(this.PlayCommand_ExecuteAsync, this.PlayCommand_CanExecute);
             this._playNextCommand = new WpfMPD.Common.RelayCommand(this.PlayNextCommand_ExecuteAsync, this.PlayNextCommand_CanExecute);
             this._playPrevCommand = new WpfMPD.Common.RelayCommand(this.PlayPrevCommand_ExecuteAsync, this.PlayPrevCommand_CanExecute);
@@ -310,13 +313,19 @@ namespace WpfMPD
             this._changePlaylistCommand = new WpfMPD.Common.RelayCommand(this.ChangePlaylistCommand_ExecuteAsync, this.ChangePlaylistCommand_CanExecute);
             this._windowClosingCommand = new WpfMPD.Common.RelayCommand(this.WindowClosingCommand_Execute, this.WindowClosingCommand_CanExecute);
 
+            this._playPauseCommand = new WpfMPD.Common.RelayCommand(this.PlayPauseCommand_Execute, this.PlayPauseCommand_CanExecute);
+            this._playStopCommand = new WpfMPD.Common.RelayCommand(this.PlayStopCommand_Execute, this.PlayStopCommand_CanExecute);
+            this._volumeMuteCommand = new WpfMPD.Common.RelayCommand(this.VolumeMuteCommand_Execute, this.VolumeMuteCommand_CanExecute);
+            this._volumeDownCommand = new WpfMPD.Common.RelayCommand(this.VolumeDownCommand_Execute, this.VolumeDownCommand_CanExecute);
+            this._volumeUpCommand = new WpfMPD.Common.RelayCommand(this.VolumeUpCommand_Execute, this.VolumeUpCommand_CanExecute);
 
-            // Upgrade settings.
-            MPDCtrl.Properties.Settings.Default.Upgrade();
+
+        // Upgrade settings.
+        MPDCtrl.Properties.Settings.Default.Upgrade();
+
             // Load settings.
 
             // Begin test.
-
 
             if (MPDCtrl.Properties.Settings.Default.Profiles == null)
             {
@@ -344,24 +353,23 @@ namespace WpfMPD
             //MPDCtrl.Properties.Settings.Default.DefaultHost = this._defaultHost;
             //MPDCtrl.Properties.Settings.Default.DefaultPort = this._defaultPort;
 
-
             // End test.
 
-            //Create MPC instance.
+            // Create MPC instance.
             this._MPC = new MPC(this._defaultHost, this._defaultPort);
 
             //Assigned idle event.
             this._MPC.StatusChanged += new MPC.MpdStatusChanged(OnStatusChanged);
 
-            //Song time elapsed timer.
+            // Song's time elapsed timer.
             _elapsedTimer = new DispatcherTimer();
             _elapsedTimer.Interval = TimeSpan.FromMilliseconds(1000);//new TimeSpan(0, 0, 1);
             _elapsedTimer.Tick += new EventHandler(ElapsedTimer);
 
-            //Connect to MPD server and query status and info.
+            // Connect to MPD server and query status and info.
             QueryStatus();
 
-            //start idle connection, but don't start idle mode yet.
+            // Start idle connection, but don't start idle mode yet.
             ConnectIdle();
         }
 
@@ -1277,6 +1285,115 @@ namespace WpfMPD
             DisConnectIdle();
         }
 
+        public ICommand PlayPauseCommand { get { return this._playPauseCommand; } }
+
+        public bool PlayPauseCommand_CanExecute()
+        {
+            return true;
+        }
+
+        public async void PlayPauseCommand_Execute()
+        {
+            bool isDone = await _MPC.MpdPlaybackPause();
+            if (isDone)
+            {
+                // Idle connection takes care of the rest.
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("PlayPauseCommand returned false.");
+            }
+        }
+
+        public ICommand PlayStopCommand { get { return this._playStopCommand; } }
+
+        public bool PlayStopCommand_CanExecute()
+        {
+            return true;
+        }
+
+        public async void PlayStopCommand_Execute()
+        {
+            bool isDone = await _MPC.MpdPlaybackStop();
+            if (isDone)
+            {
+                // Idle connection takes care of the rest.
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("PlayStopCommand returned false.");
+            }
+        }
+
+        public ICommand VolumeMuteCommand { get { return this._volumeMuteCommand; } }
+
+        public bool VolumeMuteCommand_CanExecute()
+        {
+            return true;
+        }
+
+        public async void VolumeMuteCommand_Execute()
+        {
+            bool isDone = await _MPC.MpdSetVolume(0);
+            if (isDone)
+            {
+                // Don't. Let idle connection do the job.
+                //UpdateButtonStatus();
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("\nVolumeMuteCommand returned false.");
+            }
+        }
+
+        public ICommand VolumeDownCommand { get { return this._volumeDownCommand; } }
+
+        public bool VolumeDownCommand_CanExecute()
+        {
+            return true;
+        }
+
+        public async void VolumeDownCommand_Execute()
+        {
+            if (this._volume >= 10) {
+                bool isDone = await _MPC.MpdSetVolume(Convert.ToInt32(this._volume - 10));
+                if (isDone)
+                {
+                    // Don't. Let idle connection do the job.
+                    //UpdateButtonStatus();
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("\nVolumeDownCommand returned false.");
+                }
+            }
+        }
+
+        public ICommand VolumeUpCommand { get { return this._volumeUpCommand; } }
+
+        public bool VolumeUpCommand_CanExecute()
+        {
+            return true;
+        }
+
+        public async void VolumeUpCommand_Execute()
+        {
+            if (this._volume <= 90)
+            {
+                bool isDone = await _MPC.MpdSetVolume(Convert.ToInt32(this._volume + 10));
+                if (isDone)
+                {
+                    // Don't. Let idle connection do the job.
+                    //UpdateButtonStatus();
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("\nVolumeUpCommand returned false.");
+                }
+            }
+        }
+
+ 
         #endregion END of COMMANDS
 
         #region EVENTS

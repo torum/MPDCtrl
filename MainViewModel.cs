@@ -4,10 +4,11 @@
 /// https://github.com/torumyax/MPD-Ctrl
 /// 
 /// TODO:
-///  Media keys.
-///  Password encryption.
-///  Settings page.
+///  Sorting(playlists)
+///  Settings page. Password encryption.
+///  I18n
 ///  User friendly error message.
+///  Test against Mopidy.
 ///
 /// Known issue:
 ///  When maximized, scrollber is weird...There are some extra spaces.
@@ -57,10 +58,11 @@ namespace WpfMPD
     {
         #region PRIVATE FIELD DECLARATION
 
+        private MPC _MPC;
         private string _defaultHost;
         private int _defaultPort;
-        private MPC _MPC;
         private MPC.Song _selectedSong;
+        private string _selecctedPlaylist;
         private bool _isChanged;
         private bool _isBusy;
         private string _playButton;
@@ -69,11 +71,10 @@ namespace WpfMPD
         private bool _random;
         private double _time;
         private double _elapsed;
-        private string _selecctedPlaylist;
+        private DispatcherTimer _elapsedTimer;
         private static string _pathPlayButton = "M15,16H13V8H15M11,16H9V8H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         private static string _pathPauseButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         private static string _pathStopButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
-        private DispatcherTimer _elapsedTimer;
         private ICommand _playCommand;
         private ICommand _playNextCommand;
         private ICommand _playPrevCommand;
@@ -84,13 +85,11 @@ namespace WpfMPD
         private ICommand _changeSongCommand;
         private ICommand _changePlaylistCommand;
         private ICommand _windowClosingCommand;
-
         private ICommand _playPauseCommand;
         private ICommand _playStopCommand;
         private ICommand _volumeMuteCommand;
         private ICommand _volumeDownCommand;
         private ICommand _volumeUpCommand;
-
 
         #endregion END of PRIVATE FIELD declaration
 
@@ -312,7 +311,6 @@ namespace WpfMPD
             this._changeSongCommand = new WpfMPD.Common.RelayCommand(this.ChangeSongCommand_ExecuteAsync, this.ChangeSongCommand_CanExecute);
             this._changePlaylistCommand = new WpfMPD.Common.RelayCommand(this.ChangePlaylistCommand_ExecuteAsync, this.ChangePlaylistCommand_CanExecute);
             this._windowClosingCommand = new WpfMPD.Common.RelayCommand(this.WindowClosingCommand_Execute, this.WindowClosingCommand_CanExecute);
-
             this._playPauseCommand = new WpfMPD.Common.RelayCommand(this.PlayPauseCommand_Execute, this.PlayPauseCommand_CanExecute);
             this._playStopCommand = new WpfMPD.Common.RelayCommand(this.PlayStopCommand_Execute, this.PlayStopCommand_CanExecute);
             this._volumeMuteCommand = new WpfMPD.Common.RelayCommand(this.VolumeMuteCommand_Execute, this.VolumeMuteCommand_CanExecute);
@@ -320,8 +318,8 @@ namespace WpfMPD
             this._volumeUpCommand = new WpfMPD.Common.RelayCommand(this.VolumeUpCommand_Execute, this.VolumeUpCommand_CanExecute);
 
 
-        // Upgrade settings.
-        MPDCtrl.Properties.Settings.Default.Upgrade();
+            // Upgrade settings.
+            MPDCtrl.Properties.Settings.Default.Upgrade();
 
             // Load settings.
 
@@ -352,6 +350,10 @@ namespace WpfMPD
             // Save settings.
             //MPDCtrl.Properties.Settings.Default.DefaultHost = this._defaultHost;
             //MPDCtrl.Properties.Settings.Default.DefaultPort = this._defaultPort;
+
+
+            //this._defaultHost = "192.168.3.2";
+            //this._defaultPort = 6600;
 
             // End test.
 
@@ -421,7 +423,7 @@ namespace WpfMPD
                 }
             }
 
-            // Little dirty, but since our ObservableCollection isn't thread safe...
+            // Little dirty, but ObservableCollection isn't thread safe, so...
             if (IsBusy) {
                 await Task.Delay(1000);
                 if (IsBusy)
@@ -823,6 +825,11 @@ namespace WpfMPD
 
                 //selected item should now read "Current Play Queue"
                 //https://stackoverflow.com/questions/2343446/default-text-for-templated-combo-box?rq=1
+
+
+                //TODO: sort.
+
+                //animals = animals.OrderByDescending(a => a.Name);
 
                 IsBusy = false;
 

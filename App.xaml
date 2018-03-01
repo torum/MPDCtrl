@@ -10,6 +10,8 @@
 
                 <ResourceDictionary>
                     <local:MainViewModel x:Key="MainViewModel" />
+
+                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
                 </ResourceDictionary>
 
 

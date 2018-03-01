@@ -59,5 +59,122 @@ namespace MPDCtrl.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Cancel に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Cancel {
+            get {
+                return ResourceManager.GetString("Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Close に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Close {
+            get {
+                return ResourceManager.GetString("Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Connect に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Connect {
+            get {
+                return ResourceManager.GetString("Connect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Default MPD server に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string DefaultMPDServer {
+            get {
+                return ResourceManager.GetString("DefaultMPDServer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Host に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Host {
+            get {
+                return ResourceManager.GetString("Host", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Unable to connect to specified MPD server. Please go back and check your connection settings or the permission settings on your MPD server. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MPDConnectionError {
+            get {
+                return ResourceManager.GetString("MPDConnectionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Optional に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Optional {
+            get {
+                return ResourceManager.GetString("Optional", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Password に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Password {
+            get {
+                return ResourceManager.GetString("Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Port に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Port {
+            get {
+                return ResourceManager.GetString("Port", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Profile に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Profile {
+            get {
+                return ResourceManager.GetString("Profile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Saved profiles に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SavedProfiles {
+            get {
+                return ResourceManager.GetString("SavedProfiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Settings に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings {
+            get {
+                return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Stay on top に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StayOnTop {
+            get {
+                return ResourceManager.GetString("StayOnTop", resourceCulture);
+            }
+        }
     }
 }

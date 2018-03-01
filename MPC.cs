@@ -206,7 +206,7 @@ namespace WpfMPD
             this._p = p;
             this._st = new Status();
 
-            // Enable synch with UI and background thread. BUT IT DOES NOT MEAN THREAD SAFE.
+            // Enable synch with UI and background thread. BUT IT DOES NOT MEAN IT'S THREAD SAFE.
             BindingOperations.EnableCollectionSynchronization(this._songs, new object());
             BindingOperations.EnableCollectionSynchronization(this._playLists, new object());
 

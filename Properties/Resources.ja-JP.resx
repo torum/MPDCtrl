@@ -118,42 +118,42 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>キャンセル</value>
   </data>
   <data name="Close" xml:space="preserve">
-    <value>Close</value>
+    <value>閉じる</value>
   </data>
   <data name="Connect" xml:space="preserve">
-    <value>Connect</value>
+    <value>接続</value>
   </data>
   <data name="DefaultMPDServer" xml:space="preserve">
-    <value>Default MPD server</value>
+    <value>デフォルトのMPD サーバー</value>
   </data>
   <data name="Host" xml:space="preserve">
-    <value>Host</value>
+    <value>ホスト</value>
   </data>
   <data name="MPDConnectionError" xml:space="preserve">
-    <value>Unable to connect to specified MPD server. Please go back and check your connection settings or the permission settings on your MPD server.</value>
+    <value>指定されたMPDサーバーに接続できませんでした。接続先設定を見直すか、MPDサーバーのパーミッションを確認してください。</value>
   </data>
   <data name="Optional" xml:space="preserve">
-    <value>Optional</value>
+    <value>任意</value>
   </data>
   <data name="Password" xml:space="preserve">
-    <value>Password</value>
+    <value>パスワード</value>
   </data>
   <data name="Port" xml:space="preserve">
-    <value>Port</value>
+    <value>ポート</value>
   </data>
   <data name="Profile" xml:space="preserve">
-    <value>Profile</value>
+    <value>プロファイル</value>
   </data>
   <data name="SavedProfiles" xml:space="preserve">
-    <value>Saved profiles</value>
+    <value>保存済みプロファイル</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>設定</value>
   </data>
   <data name="StayOnTop" xml:space="preserve">
-    <value>Stay on top</value>
+    <value>常に最前面</value>
   </data>
 </root>

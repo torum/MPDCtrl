@@ -4,9 +4,8 @@
 /// https://github.com/torumyax/MPD-Ctrl
 /// 
 /// TODO:
-///  Sorting(playlists)
 ///  Settings page. Password encryption.
-///  I18n
+///  I18n (use resource strings) Eng, Ja
 ///  User friendly error message.
 ///  Test against Mopidy.
 ///
@@ -37,6 +36,8 @@ namespace WpfMPD
     {
         public string Host { get; set; }
         public int Port { get; set; }
+        public string Name { get; set; }
+        public bool Default { get; set; }
     }
 
     /// <summary>
@@ -45,8 +46,9 @@ namespace WpfMPD
     public class ProfileSettings
     {
         public ObservableCollection<Profile> Profiles;
-        public ProfileSettings()
+        public  ProfileSettings()
         {
+            System.Diagnostics.Debug.WriteLine("ProfileSettings: ");
             Profiles = new ObservableCollection<Profile>();
         }
     }
@@ -54,7 +56,7 @@ namespace WpfMPD
     /// <summary>
     /// MainViewModel Class. 
     /// </summary>
-    public class MainViewModel : INotifyPropertyChanged
+    public class MainViewModel : INotifyPropertyChanged, IDataErrorInfo
     {
         #region PRIVATE FIELD DECLARATION
 
@@ -72,6 +74,7 @@ namespace WpfMPD
         private double _time;
         private double _elapsed;
         private DispatcherTimer _elapsedTimer;
+        private bool _showSettings;
         private static string _pathPlayButton = "M15,16H13V8H15M11,16H9V8H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         private static string _pathPauseButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         private static string _pathStopButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
@@ -90,6 +93,7 @@ namespace WpfMPD
         private ICommand _volumeMuteCommand;
         private ICommand _volumeDownCommand;
         private ICommand _volumeUpCommand;
+        private ICommand _showSettingsCommand;
 
         #endregion END of PRIVATE FIELD declaration
 
@@ -288,6 +292,71 @@ namespace WpfMPD
             }
         }
 
+        public bool ShowSettings
+        {
+            get { return this._showSettings; }
+            set {
+                this._showSettings = value;
+                this.NotifyPropertyChanged("IsVisible");
+                this.NotifyPropertyChanged("ShowSettings");
+            }
+        }
+
+        public bool IsVisible
+        {
+            get {
+                if (this._showSettings)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+
+        public ObservableCollection<Profile> ProfileList
+        {
+            get
+            {
+                return MPDCtrl.Properties.Settings.Default.Profiles.Profiles;
+            }
+        }
+        
+        public string Host
+        {
+            get { return this._defaultHost; }
+            set
+            {
+                //TODO: validate input!
+                this._defaultHost = value;
+                this.NotifyPropertyChanged("Host");
+            }
+        }
+
+        public string Port
+        {
+            get { return this._defaultPort.ToString(); }
+            set
+            {
+                // Validate input. Test with i;
+                if (Int32.TryParse(value, out int i))
+                {
+                    //Int32.TryParse(value, out this._defaultPort)
+                    // Change the value only when test was successfull.
+                    this._defaultPort = i;
+                    ClearErrror("Port");
+                }
+                else
+                {
+                    SetError("Port", "Error: Part number must be consist of numbers.");
+                }
+                this.NotifyPropertyChanged("Port");
+
+            }
+        }
+
         #endregion END of PUBLIC PROPERTY FIELD
 
         // Constructor
@@ -316,8 +385,8 @@ namespace WpfMPD
             this._volumeMuteCommand = new WpfMPD.Common.RelayCommand(this.VolumeMuteCommand_Execute, this.VolumeMuteCommand_CanExecute);
             this._volumeDownCommand = new WpfMPD.Common.RelayCommand(this.VolumeDownCommand_Execute, this.VolumeDownCommand_CanExecute);
             this._volumeUpCommand = new WpfMPD.Common.RelayCommand(this.VolumeUpCommand_Execute, this.VolumeUpCommand_CanExecute);
-
-
+            this._showSettingsCommand = new WpfMPD.Common.RelayCommand(this.ShowSettingsCommand_Execute, this.ShowSettingsCommand_CanExecute);
+            
             // Upgrade settings.
             MPDCtrl.Properties.Settings.Default.Upgrade();
 
@@ -325,15 +394,25 @@ namespace WpfMPD
 
             // Begin test.
 
+            //MPDCtrl.Properties.Settings.Default.Profiles = null;
+            //MPDCtrl.Properties.Settings.Default.Profiles.Profiles.Clear();
+
             if (MPDCtrl.Properties.Settings.Default.Profiles == null)
             {
                 MPDCtrl.Properties.Settings.Default.Profiles = new ProfileSettings();
+            }
 
-                //TODO: show settings dialog.
+            if (MPDCtrl.Properties.Settings.Default.Profiles.Profiles.Count < 1)
+            {
+                ShowSettings = true;
+
+                //TMP: show settings dialog.
                 Profile profile = new Profile
                 {
                     Host = "192.168.3.123",
-                    Port = 6600
+                    Port = 6600,
+                    Name = "192.168.3.123:6600",
+                    Default = true
                 };
 
                 MPDCtrl.Properties.Settings.Default.Profiles.Profiles.Add(profile);
@@ -344,8 +423,16 @@ namespace WpfMPD
                 // Save settings.
                 MPDCtrl.Properties.Settings.Default.Save();
             }
+            else
+            {
+                ShowSettings = false;
+            }
+
+            // Set
             this._defaultHost = MPDCtrl.Properties.Settings.Default.DefaultHost;
             this._defaultPort = MPDCtrl.Properties.Settings.Default.DefaultPort;
+
+            
 
             // Save settings.
             //MPDCtrl.Properties.Settings.Default.DefaultHost = this._defaultHost;
@@ -1400,21 +1487,75 @@ namespace WpfMPD
             }
         }
 
- 
+        public ICommand ShowSettingsCommand { get { return this._showSettingsCommand; } }
+
+        public bool ShowSettingsCommand_CanExecute()
+        {
+            return true;
+        }
+
+        public void ShowSettingsCommand_Execute()
+        {
+            if (ShowSettings)
+            {
+                ShowSettings = false;
+            }
+            else { 
+                ShowSettings = true;
+            }
+        }
+
         #endregion END of COMMANDS
 
-        #region EVENTS
 
+        #region == implement of INotifyPropertyChanged ==
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion END of EVENTS
-
 
         private void NotifyPropertyChanged(string info)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
         }
+
+        #endregion
+
+        #region == implemnt of IDataErrorInfo ==
+
+        // IDataErrorInfo用のエラーメッセージを保持する辞書
+        private Dictionary<string, string> _ErrorMessages = new Dictionary<string, string>();
+
+        // IDataErrorInfo.Error の実装
+        string IDataErrorInfo.Error
+        {
+            get { return (_ErrorMessages.Count > 0) ? "Has Error" : null; }
+        }
+
+        // IDataErrorInfo.Item の実装
+        string IDataErrorInfo.this[string columnName]
+        {
+            get
+            {
+                if (_ErrorMessages.ContainsKey(columnName))
+                    return _ErrorMessages[columnName];
+                else
+                    return null;
+            }
+        }
+
+        // エラーメッセージのセット
+        protected void SetError(string propertyName, string errorMessage)
+        {
+            _ErrorMessages[propertyName] = errorMessage;
+        }
+
+        // エラーメッセージのクリア
+        protected void ClearErrror(string propertyName)
+        {
+            if (_ErrorMessages.ContainsKey(propertyName))
+                _ErrorMessages.Remove(propertyName);
+        }
+
+        #endregion
 
     }
 

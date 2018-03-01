@@ -57,7 +57,7 @@
                 Opacity="0.6">
             <Rectangle.ContextMenu>
                 <ContextMenu>
-                    <MenuItem x:Name="mStayOnTop" Header="{x:Static properties:Resources.StayOnTop}" Click="MenuItem_mStayOnTop_Click"/>
+                    <MenuItem x:Name="mStayOnTop" Header="{x:Static properties:Resources.StayOnTop}" Click="MenuItem_mStayOnTop_Click" IsCheckable="True"/>
                 </ContextMenu>
             </Rectangle.ContextMenu>
         </Rectangle>
@@ -79,13 +79,20 @@
                 <ColumnDefinition Width="29"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="1" Text="MPD Ctrl" 
+            <TextBlock Grid.Column="1" Text="MPD Ctrl for Desktop" 
                        TextElement.Foreground="WhiteSmoke" 
+                       HorizontalAlignment="Center"
                        VerticalAlignment="Bottom" 
                        TextElement.FontWeight="Bold"
                        Visibility="{Binding ShowSettings,Converter={StaticResource BooleanToVisibilityConverter}}"></TextBlock>
 
-
+            <TextBlock Grid.Column="1" Text="{Binding ErrorMessage}" 
+                       TextElement.Foreground="Yellow" 
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center" 
+                       TextElement.FontWeight="Bold"
+                       Visibility="{Binding IsVisible,Converter={StaticResource BooleanToVisibilityConverter}}"></TextBlock>
+            
             <Grid Grid.Row="6" Grid.Column="1" Width="230" 
                   Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.ColumnDefinitions>
@@ -594,7 +601,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="24"/>
                         <RowDefinition Height="8"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Column="0" Grid.Row="0"
@@ -603,17 +610,27 @@
 
                     <StackPanel Grid.Row="2">
                         <TextBlock Text="{x:Static properties:Resources.Host}" TextElement.Foreground="White"></TextBlock>
-                        <TextBox Text="{Binding Host}"
-                            Margin="0 4 0 12"></TextBox>
+                        <TextBox Text="{Binding Host, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                            Margin="0 4 0 12">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox">
+                                    <Style.Triggers>
+                                        <Trigger Property="Validation.HasError" Value="true">
+                                            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
                         <TextBlock Text="{x:Static properties:Resources.Port}" TextElement.Foreground="White"></TextBlock>
-                        <TextBox x:Name="TBPort"
-                            Text="{Binding Port, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                        <TextBox
+                            Text="{Binding Port, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Margin="0 4 142 12">
                             <TextBox.Style>
                                 <Style TargetType="TextBox">
                                     <Style.Triggers>
                                         <Trigger Property="Validation.HasError" Value="true">
-                                            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)[0].ErrorContent}" />
+                                            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors).CurrentItem.ErrorContent}" />
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
@@ -623,14 +640,19 @@
                         <TextBox Margin="0 4 48 12" ToolTip="{x:Static properties:Resources.Optional}"></TextBox>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
-                            <Button Content="{x:Static properties:Resources.Connect}" Padding="4" Width="100"></Button>
+                            <Button Content="{x:Static properties:Resources.Connect}" Command="{Binding NewConnectinSettingCommand}" Padding="4" Width="100"></Button>
                             <Button Content="{x:Static properties:Resources.Cancel}" Command="{Binding ShowSettingsCommand}" Padding="4" Width="100" Margin="24 0 0 0"></Button>
                         </StackPanel>
                     </StackPanel>
-                    <StackPanel Grid.Row="3" Margin="0 24 0 0">
-                        <TextBlock Text="{x:Static properties:Resources.SavedProfiles}" TextElement.Foreground="White" Margin="0 0 0 0"></TextBlock>
-                        <ListView HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Margin="0 4 0 0"
-                                  ItemsSource="{Binding ProfileList}">
+                    <Grid Grid.Row="3" Margin="0 24 0 0" VerticalAlignment="Stretch" >
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="{x:Static properties:Resources.SavedProfiles}" TextElement.Foreground="White" Margin="0 0 0 0"></TextBlock>
+                        <ListView Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Margin="0 4 0 0" MinHeight="148"
+                                  ItemsSource="{Binding ProfileList}" SelectedItem="{Binding SelectedProfile}">
                             <ListView.View>
                                 <GridView>
                                     <GridView.ColumnHeaderContainerStyle>
@@ -666,7 +688,11 @@
                                 </GridView>
                             </ListView.View>
                         </ListView>
-                    </StackPanel>
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
+                            <Button Content="{x:Static properties:Resources.Add}" Command="{Binding AddConnectinSettingCommand}" Padding="4" Width="100"></Button>
+                            <Button Content="{x:Static properties:Resources.Delete}" Command="{Binding DeleteConnectinSettingCommand}" Padding="4" Width="100" Margin="24 0 0 0"></Button>
+                        </StackPanel>
+                    </Grid>
 
                 </Grid>
             </StackPanel>

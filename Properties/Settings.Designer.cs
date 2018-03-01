@@ -49,30 +49,6 @@ namespace MPDCtrl.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string DefaultHost {
-            get {
-                return ((string)(this["DefaultHost"]));
-            }
-            set {
-                this["DefaultHost"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("6600")]
-        public int DefaultPort {
-            get {
-                return ((int)(this["DefaultPort"]));
-            }
-            set {
-                this["DefaultPort"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool TopMost {
             get {
@@ -85,12 +61,25 @@ namespace MPDCtrl.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("null")]
         public global::WpfMPD.ProfileSettings Profiles {
             get {
                 return ((global::WpfMPD.ProfileSettings)(this["Profiles"]));
             }
             set {
                 this["Profiles"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DefaultProfileID {
+            get {
+                return ((string)(this["DefaultProfileID"]));
+            }
+            set {
+                this["DefaultProfileID"] = value;
             }
         }
     }

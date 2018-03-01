@@ -4,8 +4,7 @@
 /// https://github.com/torumyax/MPD-Ctrl
 /// 
 /// TODO:
-///  Settings page. Password encryption.
-///  I18n (use resource strings) Eng, Ja
+///  Password encryption.
 ///  User friendly error message.
 ///  Test against Mopidy.
 ///
@@ -25,11 +24,12 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 using System.Configuration;
+using System.Net;
 
 namespace WpfMPD
 {
     /// <summary>
-    /// Profile Class for ObservableCollection. 
+    /// Profile Class for ObservableCollection<Profile>. 
     /// </summary>
     [Serializable]
     public class Profile
@@ -37,18 +37,17 @@ namespace WpfMPD
         public string Host { get; set; }
         public int Port { get; set; }
         public string Name { get; set; }
-        public bool Default { get; set; }
+        public string ID { get; set; }
     }
 
     /// <summary>
-    /// ProfileSettings Class for storing in the settings. 
+    /// ProfileSettings. Wrapper Class for storing ObservableCollection<Profile> in the settings. 
     /// </summary>
     public class ProfileSettings
     {
         public ObservableCollection<Profile> Profiles;
         public  ProfileSettings()
         {
-            System.Diagnostics.Debug.WriteLine("ProfileSettings: ");
             Profiles = new ObservableCollection<Profile>();
         }
     }
@@ -75,6 +74,8 @@ namespace WpfMPD
         private double _elapsed;
         private DispatcherTimer _elapsedTimer;
         private bool _showSettings;
+        private string _errorMessage;
+        private Profile _profile;
         private static string _pathPlayButton = "M15,16H13V8H15M11,16H9V8H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         private static string _pathPauseButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         private static string _pathStopButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
@@ -95,13 +96,25 @@ namespace WpfMPD
         private ICommand _volumeUpCommand;
         private ICommand _showSettingsCommand;
 
+        private ICommand _newConnectinSettingCommand;
+        private ICommand _addConnectinSettingCommand;
+        private ICommand _deleteConnectinSettingCommand;
+
         #endregion END of PRIVATE FIELD declaration
 
         #region PUBLIC PROPERTY FIELD
 
         public ObservableCollection<MPC.Song> Songs
         {
-            get { return _MPC.CurrentQueue; }
+            get { if (_MPC != null)
+                {
+                    return _MPC.CurrentQueue;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
         public MPC.Song SelectedSong
@@ -114,15 +127,17 @@ namespace WpfMPD
             {
                 _selectedSong = value;
                 this.NotifyPropertyChanged("SelectedSong");
-
-                if ((value != null) && (_MPC.MpdCurrentSong != null))
+                if (_MPC != null)
                 {
-                    //System.Diagnostics.Debug.WriteLine("\n\nListView_SelectionChanged: " + value.Title);
-                    if (_MPC.MpdCurrentSong.ID != value.ID)
+                    if ((value != null) && (_MPC.MpdCurrentSong != null))
                     {
-                        if (ChangeSongCommand.CanExecute(null))
+                        //System.Diagnostics.Debug.WriteLine("\n\nListView_SelectionChanged: " + value.Title);
+                        if (_MPC.MpdCurrentSong.ID != value.ID)
                         {
-                            ChangeSongCommand.Execute(null);
+                            if (ChangeSongCommand.CanExecute(null))
+                            {
+                                ChangeSongCommand.Execute(null);
+                            }
                         }
                     }
                 }
@@ -131,7 +146,15 @@ namespace WpfMPD
 
         public ObservableCollection<string> Playlists
         {
-            get { return _MPC.Playlists; }
+            get {
+                if (_MPC != null) { 
+                    return _MPC.Playlists;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
         public string SelectedPlaylist
@@ -323,14 +346,64 @@ namespace WpfMPD
                 return MPDCtrl.Properties.Settings.Default.Profiles.Profiles;
             }
         }
-        
+
+        public Profile SelectedProfile
+        {
+            get
+            {
+                return this._profile;
+            }
+            set
+            {
+                this._profile = value;
+                if (this._profile != null) {
+                    // work around validation.
+                    this._defaultHost = this._profile.Host;
+                    this.NotifyPropertyChanged("Host");
+                    this._defaultPort = this._profile.Port;
+                    this.NotifyPropertyChanged("Port");
+                }
+                else
+                {
+                    this._defaultHost = "";
+                    this.NotifyPropertyChanged("Host");
+                    this._defaultPort = 6600;
+                    this.NotifyPropertyChanged("Port");
+                }
+                this.NotifyPropertyChanged("SelectedProfile");
+            }
+        }
+
         public string Host
         {
             get { return this._defaultHost; }
             set
             {
-                //TODO: validate input!
+                ClearErrror("Host");
                 this._defaultHost = value;
+
+                // Validate input!
+                if (value == "")
+                {
+                    SetError("Host", "Error: Host must be epecified.");
+                }
+                else {
+                    this._defaultHost = value;
+                    IPAddress ipAddress = null;
+                    try {
+                        ipAddress = IPAddress.Parse(value);
+                        if (ipAddress != null) {
+                            //
+                            //ClearErrror("Host");
+                            IsChanged = true;
+                        }
+                    }
+                    catch
+                    {
+                        //System.FormatException
+                        SetError("Host", "Error: Invalid address format.");
+                    }
+                }
                 this.NotifyPropertyChanged("Host");
             }
         }
@@ -340,6 +413,7 @@ namespace WpfMPD
             get { return this._defaultPort.ToString(); }
             set
             {
+                ClearErrror("Port");
                 // Validate input. Test with i;
                 if (Int32.TryParse(value, out int i))
                 {
@@ -347,6 +421,7 @@ namespace WpfMPD
                     // Change the value only when test was successfull.
                     this._defaultPort = i;
                     ClearErrror("Port");
+                    IsChanged = true;
                 }
                 else
                 {
@@ -357,6 +432,19 @@ namespace WpfMPD
             }
         }
 
+        public string ErrorMessage
+        {
+            get
+            {
+                return this._errorMessage;
+            }
+            set
+            {
+                this._errorMessage = value;
+                this.NotifyPropertyChanged("ErrorMessage");
+            }
+        }
+        
         #endregion END of PUBLIC PROPERTY FIELD
 
         // Constructor
@@ -368,6 +456,7 @@ namespace WpfMPD
             this.PlayButton = _pathPlayButton;
 
             this._selecctedPlaylist = "";
+            this._defaultPort = 6600;
 
             // Assign commands
             this._playCommand = new WpfMPD.Common.RelayCommand(this.PlayCommand_ExecuteAsync, this.PlayCommand_CanExecute);
@@ -386,87 +475,85 @@ namespace WpfMPD
             this._volumeDownCommand = new WpfMPD.Common.RelayCommand(this.VolumeDownCommand_Execute, this.VolumeDownCommand_CanExecute);
             this._volumeUpCommand = new WpfMPD.Common.RelayCommand(this.VolumeUpCommand_Execute, this.VolumeUpCommand_CanExecute);
             this._showSettingsCommand = new WpfMPD.Common.RelayCommand(this.ShowSettingsCommand_Execute, this.ShowSettingsCommand_CanExecute);
-            
-            // Upgrade settings.
+
+            this._newConnectinSettingCommand = new WpfMPD.Common.RelayCommand(this.NewConnectinSettingCommand_Execute, this.NewConnectinSettingCommand_CanExecute);
+            this._addConnectinSettingCommand = new WpfMPD.Common.RelayCommand(this.AddConnectinSettingCommand_Execute, this.AddConnectinSettingCommand_CanExecute);
+            this._deleteConnectinSettingCommand = new WpfMPD.Common.RelayCommand(this.DeleteConnectinSettingCommand_Execute, this.DeleteConnectinSettingCommand_CanExecute);
+
+
+
+            // Upgrade settings. (just in case.)
             MPDCtrl.Properties.Settings.Default.Upgrade();
 
             // Load settings.
 
-            // Begin test.
-
             //MPDCtrl.Properties.Settings.Default.Profiles = null;
             //MPDCtrl.Properties.Settings.Default.Profiles.Profiles.Clear();
 
+            // Must be the first time.
             if (MPDCtrl.Properties.Settings.Default.Profiles == null)
             {
                 MPDCtrl.Properties.Settings.Default.Profiles = new ProfileSettings();
             }
 
+            // Profile setting is empty.
             if (MPDCtrl.Properties.Settings.Default.Profiles.Profiles.Count < 1)
             {
                 ShowSettings = true;
-
-                //TMP: show settings dialog.
-                Profile profile = new Profile
-                {
-                    Host = "192.168.3.123",
-                    Port = 6600,
-                    Name = "192.168.3.123:6600",
-                    Default = true
-                };
-
-                MPDCtrl.Properties.Settings.Default.Profiles.Profiles.Add(profile);
-
-                // Make it default;
-                MPDCtrl.Properties.Settings.Default.DefaultHost = profile.Host;
-                MPDCtrl.Properties.Settings.Default.DefaultPort = profile.Port;
-                // Save settings.
-                MPDCtrl.Properties.Settings.Default.Save();
             }
             else
             {
-                ShowSettings = false;
+                var item = ProfileList.FirstOrDefault(i => i.ID == MPDCtrl.Properties.Settings.Default.DefaultProfileID);
+                if (item != null)
+                {
+                    // This should propagate _defaultHost and _defaultPort
+                    SelectedProfile = (item as Profile);
+                    // just in case.
+                    ShowSettings = false;
+                    // start client.
+                    StartConnection();
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Profile where DefaultProfileID is NULL");
+                    ShowSettings = true;
+                }
             }
+        }
 
-            // Set
-            this._defaultHost = MPDCtrl.Properties.Settings.Default.DefaultHost;
-            this._defaultPort = MPDCtrl.Properties.Settings.Default.DefaultPort;
+        #region PRIVATE METHODS
 
-            
-
-            // Save settings.
-            //MPDCtrl.Properties.Settings.Default.DefaultHost = this._defaultHost;
-            //MPDCtrl.Properties.Settings.Default.DefaultPort = this._defaultPort;
-
-
-            //this._defaultHost = "192.168.3.2";
-            //this._defaultPort = 6600;
-
-            // End test.
-
+        private async Task<bool> StartConnection()
+        {
             // Create MPC instance.
             this._MPC = new MPC(this._defaultHost, this._defaultPort);
 
-            //Assigned idle event.
+            // Assign idle event.
             this._MPC.StatusChanged += new MPC.MpdStatusChanged(OnStatusChanged);
+            this._MPC.ErrorReturned += new MPC.MpdError(OnError);
 
-            // Song's time elapsed timer.
+            // Init Song's time elapsed timer.
             _elapsedTimer = new DispatcherTimer();
             _elapsedTimer.Interval = TimeSpan.FromMilliseconds(1000);//new TimeSpan(0, 0, 1);
             _elapsedTimer.Tick += new EventHandler(ElapsedTimer);
 
             // Connect to MPD server and query status and info.
-            QueryStatus();
+            if (await QueryStatus()) {
+                // Start idle connection, but don't start idle mode yet.
+                if (await ConnectIdle())
+                {
+                    // Start idle.
+                    //return await _MPC.MpdIdleStart();
+                    return true;
+                }
+            }
 
-            // Start idle connection, but don't start idle mode yet.
-            ConnectIdle();
+            return false;
         }
 
-        #region PRIVATE METHODS
-
-        private async void ConnectIdle()
+        private async Task<bool> ConnectIdle()
         {
-            await _MPC.MpdIdleConnect();
+            return await _MPC.MpdIdleConnect();
         }
 
         private async void DisConnectIdle()
@@ -834,19 +921,19 @@ namespace WpfMPD
             //bool isDone = await _MPC.MpdIdleStart();
         }
 
-        private async void QueryStatus()
+        private async Task<bool> QueryStatus()
         {
             //IsBusy = true;
             bool isDone = await _MPC.MpdQueryStatus();
             if (isDone)
             {
-                //System.Diagnostics.Debug.WriteLine("QueryStatus is done.");
+                System.Diagnostics.Debug.WriteLine("QueryStatus is done.");
 
                 UpdateButtonStatus();
                 //IsBusy = false;
 
-                //retrieve play queue
-                QueryCurrentPlayQueue();
+                // Retrieve play queue
+                return await QueryCurrentPlayQueue();
             }
             else
             {
@@ -854,16 +941,17 @@ namespace WpfMPD
                 //TODO: connection fail to establish. 
                 // Let user know.
                 System.Diagnostics.Debug.WriteLine("QueryStatus returned with false." + "\n");
+                return false;
             }
         }
 
-        private async void QueryCurrentPlayQueue()
+        private async Task<bool> QueryCurrentPlayQueue()
         {
             IsBusy = true;
             bool isDone = await _MPC.MpdQueryCurrentPlaylist();
             if (isDone)
             {
-                //System.Diagnostics.Debug.WriteLine("QueryCurrentPlaylist is done.");
+                System.Diagnostics.Debug.WriteLine("QueryCurrentPlaylist is done.");
 
                 if (_MPC.CurrentQueue.Count > 0) {
                     
@@ -881,55 +969,55 @@ namespace WpfMPD
                     this._selectedSong = _MPC.MpdCurrentSong;
                     // Let listview know it is changed.
                     this.NotifyPropertyChanged("SelectedSong");
-                    
 
-                    //Listview selection changed event in the code behind takes care ScrollIntoView. 
-                    //This is a VIEW matter.
+                    // Listview selection changed event in the code behind takes care ScrollIntoView. 
+                    // This is a VIEW matter.
                 }
 
                 IsBusy = false;
 
-                //retrieve playlists
-                QueryPlaylists();
+                // Retrieve playlists
+                return await QueryPlaylists();
             }
             else
             {
                 IsBusy = false;
-                //TODO: connection fail to establish. 
                 // Let user know.
                 System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue returned false." + "\n");
+                return false;
             }
 
         }
 
-        private async void QueryPlaylists()
+        private async Task<bool> QueryPlaylists()
         {
             IsBusy = true;
             bool isDone = await _MPC.MpdQueryPlaylists();
             if (isDone)
             {
-                //System.Diagnostics.Debug.WriteLine("QueryPlaylists is done.");
+                System.Diagnostics.Debug.WriteLine("QueryPlaylists is done.");
 
                 //selected item should now read "Current Play Queue"
                 //https://stackoverflow.com/questions/2343446/default-text-for-templated-combo-box?rq=1
 
-
-                //TODO: sort.
-
-                //animals = animals.OrderByDescending(a => a.Name);
-
                 IsBusy = false;
 
-                //start idle mode. //TODO is this the right place?
-                isDone = await _MPC.MpdIdleStart();
+                return true;
             }
             else
             {
                 IsBusy = false;
-                //TODO: connection fail to establish. 
                 // Let user know.
                 System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
+                return false;
             }
+        }
+
+        private void OnError(MPC sender, object data)
+        {
+            if (data == null) { return; }
+
+            ErrorMessage = (data as string);
         }
 
         private void UpdateButtonStatus()
@@ -1003,6 +1091,7 @@ namespace WpfMPD
         public bool PlayCommand_CanExecute()
         {
             if (this.IsBusy) { return false; } 
+            if (_MPC == null) { return false; }
             if (_MPC.CurrentQueue.Count < 1) { return false; }
             return true;
         }
@@ -1064,6 +1153,7 @@ namespace WpfMPD
         public bool PlayNextCommand_CanExecute()
         {
             if (this.IsBusy) { return false; }
+            if (_MPC == null) { return false; }
             if (_MPC.CurrentQueue.Count < 1) { return false; }
             return true;
         }
@@ -1103,6 +1193,7 @@ namespace WpfMPD
         public bool PlayPrevCommand_CanExecute()
         {
             if (this.IsBusy) { return false; }
+            if (_MPC == null) { return false; }
             if (_MPC.CurrentQueue.Count < 1) { return false; }
             return true;
         }
@@ -1142,6 +1233,7 @@ namespace WpfMPD
         public bool SetRpeatCommand_CanExecute()
         {
             //if (this.IsBusy) { return false; }
+            if (_MPC == null) { return false; }
             return true;
         }
 
@@ -1165,6 +1257,7 @@ namespace WpfMPD
         public bool SetRandomCommand_CanExecute()
         {
             //if (this.IsBusy) { return false; }
+            if (_MPC == null) { return false; }
             return true;
         }
 
@@ -1188,6 +1281,7 @@ namespace WpfMPD
         public bool SetVolumeCommand_CanExecute()
         {
             //if (this.IsBusy) { return false; }
+            if (_MPC == null) { return false; }
             return true;
         }
 
@@ -1211,6 +1305,7 @@ namespace WpfMPD
         public bool SetSeekCommand_CanExecute()
         {
             if (this.IsBusy) { return false; }
+            if (_MPC == null) { return false; }
             return true;
         }
 
@@ -1236,6 +1331,7 @@ namespace WpfMPD
         public bool ChangeSongCommand_CanExecute()
         {
             if (this.IsBusy) { return false; }
+            if (_MPC == null) { return false; }
             if (_MPC.CurrentQueue.Count < 1) { return false; }
             if (_selectedSong == null) { return false; }
             return true;
@@ -1276,6 +1372,7 @@ namespace WpfMPD
         public bool ChangePlaylistCommand_CanExecute()
         {
             //if (this.IsBusy) { return false; }
+            if (_MPC == null) { return false; }
             if (this._selecctedPlaylist == "") { return false; }
             return true;
         }
@@ -1376,13 +1473,16 @@ namespace WpfMPD
             //System.Diagnostics.Debug.WriteLine("WindowClosingCommand");
 
             // Disconnect idle connection.
-            DisConnectIdle();
+            if (_MPC != null) {
+                DisConnectIdle();
+            }
         }
 
         public ICommand PlayPauseCommand { get { return this._playPauseCommand; } }
 
         public bool PlayPauseCommand_CanExecute()
         {
+            if (_MPC == null) { return false; }
             return true;
         }
 
@@ -1403,6 +1503,7 @@ namespace WpfMPD
 
         public bool PlayStopCommand_CanExecute()
         {
+            if (_MPC == null) { return false; }
             return true;
         }
 
@@ -1423,6 +1524,7 @@ namespace WpfMPD
 
         public bool VolumeMuteCommand_CanExecute()
         {
+            if (_MPC == null) { return false; }
             return true;
         }
 
@@ -1444,6 +1546,7 @@ namespace WpfMPD
 
         public bool VolumeDownCommand_CanExecute()
         {
+            if (_MPC == null) { return false; }
             return true;
         }
 
@@ -1467,6 +1570,7 @@ namespace WpfMPD
 
         public bool VolumeUpCommand_CanExecute()
         {
+            if (_MPC == null) { return false; }
             return true;
         }
 
@@ -1500,15 +1604,153 @@ namespace WpfMPD
             {
                 ShowSettings = false;
             }
-            else { 
+            else {
+                IsChanged = false;
+
                 ShowSettings = true;
             }
+        }
+
+        public ICommand NewConnectinSettingCommand { get { return this._newConnectinSettingCommand; } }
+
+        public bool NewConnectinSettingCommand_CanExecute()
+        {
+            //if (_ErrorMessages.Count > 0) { return false; }
+            //if (!IsChanged) { return false; }
+            //if (this._defaultHost == "") { return false; }
+            //if (IsBusy) { return false; }
+            return true;
+        }
+
+        public async void NewConnectinSettingCommand_Execute()
+        {
+            // New connection from Setting.
+            //TODO:
+
+            // Validate Host input!
+            if (this._defaultHost == "")
+            {
+                SetError("Host", "Error: Host must be epecified.");
+                this.NotifyPropertyChanged("Host");
+                return;
+            }
+            else
+            {
+                IPAddress ipAddress = null;
+                try
+                {
+                    ipAddress = IPAddress.Parse(this._defaultHost);
+                    if (ipAddress != null)
+                    {
+                        // Good.
+                    }
+                }
+                catch
+                {
+                    //System.FormatException
+                    SetError("Host", "Error: Invalid address format.");
+                    this.NotifyPropertyChanged("Host");
+                    return;
+                }
+            }
+
+            if (_MPC != null) {
+                await this._MPC.MpdIdleStop();
+                await this._MPC.MpdIdleDisConnect();
+
+                _MPC.CurrentQueue.Clear();
+                _MPC.Playlists.Clear();
+                _MPC.MpdCurrentSong = null;
+                _MPC = null;
+            }
+
+            IsBusy = true;
+            if (await StartConnection())
+            {
+                IsBusy = false;
+                ShowSettings = false;
+
+                if (this._profile == null)
+                {
+                    Profile profile = new Profile
+                    {
+                        Host = this._defaultHost,
+                        Port = this._defaultPort,
+                        Name = this._defaultHost + ":" + this._defaultPort.ToString(),
+                        ID = Guid.NewGuid().ToString(),
+                    };
+
+                    MPDCtrl.Properties.Settings.Default.Profiles.Profiles.Add(profile);
+
+                    this._profile = profile;
+
+                    // Make it default;
+                    MPDCtrl.Properties.Settings.Default.DefaultProfileID = profile.ID;
+                }
+                else
+                {
+                    this._profile.Host = this._defaultHost;
+                    this._profile.Port = this._defaultPort;
+
+                }
+
+                this.NotifyPropertyChanged("SelectedProfile");
+                this.NotifyPropertyChanged("Playlists");
+
+                // Save settings.
+                MPDCtrl.Properties.Settings.Default.Save();
+            }
+            else
+            {
+                IsBusy = false;
+                //TODO: show error?
+                //ErrorMessage = "Error...";
+                System.Diagnostics.Debug.WriteLine("Failed@NewConnectinSettingCommand_Execute");
+            }
+
+            this.NotifyPropertyChanged("Songs");
+        }
+
+        public ICommand AddConnectinSettingCommand { get { return this._addConnectinSettingCommand; } }
+
+        public bool AddConnectinSettingCommand_CanExecute()
+        {
+            return true;
+        }
+
+        public void AddConnectinSettingCommand_Execute()
+        {
+            // Add a new profile.
+            MPDCtrl.Properties.Settings.Default.DefaultProfileID = "";
+            SelectedProfile = null;
+
+        }
+
+        public ICommand DeleteConnectinSettingCommand { get { return this._deleteConnectinSettingCommand; } }
+
+        public bool DeleteConnectinSettingCommand_CanExecute()
+        {
+            if (SelectedProfile == null) { return false; }
+            return true;
+        }
+
+        public void DeleteConnectinSettingCommand_Execute()
+        {
+            // Delete the selected profile entry. 
+            if (this._profile != null) {
+                try
+                {
+                    MPDCtrl.Properties.Settings.Default.Profiles.Profiles.Remove(this._profile);
+                }
+                catch { }
+            }
+            SelectedProfile = null;
         }
 
         #endregion END of COMMANDS
 
 
-        #region == implement of INotifyPropertyChanged ==
+        #region == INotifyPropertyChanged ==
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -1519,18 +1761,15 @@ namespace WpfMPD
 
         #endregion
 
-        #region == implemnt of IDataErrorInfo ==
+        #region == IDataErrorInfo ==
 
-        // IDataErrorInfo用のエラーメッセージを保持する辞書
         private Dictionary<string, string> _ErrorMessages = new Dictionary<string, string>();
 
-        // IDataErrorInfo.Error の実装
         string IDataErrorInfo.Error
         {
             get { return (_ErrorMessages.Count > 0) ? "Has Error" : null; }
         }
 
-        // IDataErrorInfo.Item の実装
         string IDataErrorInfo.this[string columnName]
         {
             get
@@ -1538,22 +1777,22 @@ namespace WpfMPD
                 if (_ErrorMessages.ContainsKey(columnName))
                     return _ErrorMessages[columnName];
                 else
-                    return null;
+                    return "";
             }
         }
 
-        // エラーメッセージのセット
         protected void SetError(string propertyName, string errorMessage)
         {
             _ErrorMessages[propertyName] = errorMessage;
         }
 
-        // エラーメッセージのクリア
         protected void ClearErrror(string propertyName)
         {
             if (_ErrorMessages.ContainsKey(propertyName))
-                _ErrorMessages.Remove(propertyName);
+                //_ErrorMessages.Remove(propertyName);
+                _ErrorMessages[propertyName] = "";
         }
+
 
         #endregion
 

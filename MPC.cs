@@ -197,6 +197,10 @@ namespace WpfMPD
 
         public event MpdStatusChanged StatusChanged;
 
+        public delegate void MpdError(MPC sender, object data);
+
+        public event MpdError ErrorReturned;
+
         #endregion END of MPC PUBLIC PROPERTY and EVENT FIELD
 
         // MPC Constructor
@@ -273,6 +277,7 @@ namespace WpfMPD
             if ((data as string).StartsWith("OK MPD"))
             {
                 // Connected to MPD and received OK. Now we are idling and wait.
+                sender.Send("idle player mixer options playlist stored_playlist\n");
             }
             else
             {
@@ -465,7 +470,10 @@ namespace WpfMPD
 
         private bool ParseStatusResponse(List<string> sl)
         {
-            if (sl == null) { return false; }
+            if (sl == null) {
+                // Fire up error event.
+                ErrorReturned?.Invoke(this, "ConnectedResponse@ParseStatusResponse: null");
+                return false; }
             if (sl.Count == 0) { return false; } 
 
             Dictionary<string, string> MpdStatusValues = new Dictionary<string, string>();
@@ -476,6 +484,7 @@ namespace WpfMPD
                 if (value.StartsWith("ACK"))
                 {
                     System.Diagnostics.Debug.WriteLine("ACK@ParseStatusResponse: " + value);
+                    ErrorReturned?.Invoke(this, "ACK@ParseStatusResponse: " + value);
                     return false;
                 }
 
@@ -717,7 +726,9 @@ namespace WpfMPD
 
         private bool ParsePlaylistInfoResponse(List<string> sl)
         {
-            if (sl == null) { return false; }
+            if (sl == null) {
+                ErrorReturned?.Invoke(this, "Connected response@ParsePlaylistInfoResponse: null");
+                return false; }
 
             try {
                 // Don't. Not good when multithreading. Make sure you clear the collection before calling MpdQueryCurrentPlaylist().
@@ -731,6 +742,7 @@ namespace WpfMPD
                     if (value.StartsWith("ACK"))
                     {
                         System.Diagnostics.Debug.WriteLine("ACK@ParsePlaylistInfoResponse: " + value);
+                        ErrorReturned?.Invoke(this, "ACK@ParsePlaylistInfoResponse: " + value);
                         return false;
                     }
 
@@ -834,7 +846,9 @@ namespace WpfMPD
 
         private bool ParsePlaylistsResponse(List<string> sl)
         {
-            if (sl == null) { return false; }
+            if (sl == null) {
+                ErrorReturned?.Invoke(this, "Connected response@ParsePlaylistsResponse: null");
+                return false; }
 
             // Don't. Not good when multithreading. Make sure you clear the collection before calling MpdQueryCurrentPlaylist().
             //_playLists.Clear();
@@ -849,6 +863,7 @@ namespace WpfMPD
                 if (value.StartsWith("ACK"))
                 {
                     System.Diagnostics.Debug.WriteLine("ACK@ParsePlaylistsResponse: " + value);
+                    ErrorReturned?.Invoke(this, "ACK@ParsePlaylistsResponse: " + value);
                     return false;
                 }
 

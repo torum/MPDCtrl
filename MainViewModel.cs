@@ -487,9 +487,6 @@ namespace WpfMPD
 
             // Load settings.
 
-            //MPDCtrl.Properties.Settings.Default.Profiles = null;
-            //MPDCtrl.Properties.Settings.Default.Profiles.Profiles.Clear();
-
             // Must be the first time.
             if (MPDCtrl.Properties.Settings.Default.Profiles == null)
             {
@@ -506,7 +503,7 @@ namespace WpfMPD
                 var item = ProfileList.FirstOrDefault(i => i.ID == MPDCtrl.Properties.Settings.Default.DefaultProfileID);
                 if (item != null)
                 {
-                    // This should propagate _defaultHost and _defaultPort
+                    // This should propagate values for _defaultHost and _defaultPort.
                     SelectedProfile = (item as Profile);
                     // just in case.
                     ShowSettings = false;
@@ -544,10 +541,13 @@ namespace WpfMPD
                 {
                     // Start idle.
                     //return await _MPC.MpdIdleStart();
+                    // Or not.
+
+                    ErrorMessage = "";
+
                     return true;
                 }
             }
-
             return false;
         }
 
@@ -1017,6 +1017,7 @@ namespace WpfMPD
         {
             if (data == null) { return; }
 
+            //TODO: How and when do you clear the error message?
             ErrorMessage = (data as string);
         }
 
@@ -1625,7 +1626,6 @@ namespace WpfMPD
         public async void NewConnectinSettingCommand_Execute()
         {
             // New connection from Setting.
-            //TODO:
 
             // Validate Host input!
             if (this._defaultHost == "")
@@ -1683,9 +1683,6 @@ namespace WpfMPD
                     MPDCtrl.Properties.Settings.Default.Profiles.Profiles.Add(profile);
 
                     this._profile = profile;
-
-                    // Make it default;
-                    MPDCtrl.Properties.Settings.Default.DefaultProfileID = profile.ID;
                 }
                 else
                 {
@@ -1693,6 +1690,9 @@ namespace WpfMPD
                     this._profile.Port = this._defaultPort;
 
                 }
+
+                // Make it default;
+                MPDCtrl.Properties.Settings.Default.DefaultProfileID = this._profile.ID;
 
                 this.NotifyPropertyChanged("SelectedProfile");
                 this.NotifyPropertyChanged("Playlists");
@@ -1703,8 +1703,7 @@ namespace WpfMPD
             else
             {
                 IsBusy = false;
-                //TODO: show error?
-                //ErrorMessage = "Error...";
+                //TODO: show error.
                 System.Diagnostics.Debug.WriteLine("Failed@NewConnectinSettingCommand_Execute");
             }
 

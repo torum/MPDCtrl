@@ -61,7 +61,6 @@ namespace MPDCtrl.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("null")]
         public global::WpfMPD.ProfileSettings Profiles {
             get {
                 return ((global::WpfMPD.ProfileSettings)(this["Profiles"]));

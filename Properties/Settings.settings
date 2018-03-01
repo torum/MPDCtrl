@@ -12,7 +12,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="Profiles" Type="WpfMPD.ProfileSettings" Scope="User">
-      <Value Profile="(Default)">null</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="DefaultProfileID" Type="System.String" Scope="User">
       <Value Profile="(Default)" />

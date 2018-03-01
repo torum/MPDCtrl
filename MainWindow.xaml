@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfMPD"
         mc:Ignorable="d"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        
         xmlns:common="clr-namespace:WpfMPD.Common"
         common:EnableDragHelper.EnableDrag="false"
         common:MaximizeDoubleClickHelper.MaximizeDoubleClick="True"
@@ -15,11 +15,22 @@
         Closing="Window_Closing"
         DataContext="{StaticResource MainViewModel}">
     <Window.Resources></Window.Resources>
+    <!-- 
+    I don't like to include Microsoft.Expression.Interactions.dll, System.Windows.Interactivity.dll, and all the crap just for this.
+    
+    Removed:
+    Microsoft.Expression.Interactions
+    System.Windows.Interactivity
+    
+    Assigned WindowClosingCommand at Close button.
+    
+    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
             <i:InvokeCommandAction  Command="{Binding WindowClosingCommand}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
+    -->
     <Window.InputBindings>
         <KeyBinding Command="{Binding PlayCommand}"
                             Key="Play" />
@@ -660,6 +671,7 @@
                                             <Setter Property="Visibility" Value="Visible" />
                                             <Setter Property="HorizontalContentAlignment" Value="Left" />
                                             <Setter Property="Padding" Value="6 2 6 2" />
+
                                         </Style>
                                     </GridView.ColumnHeaderContainerStyle>
 
@@ -676,10 +688,11 @@
                                     <GridViewColumn Header="" Width="24">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Viewbox Width="12" Height="12">
+                                                <Viewbox Width="12" Height="12" x:Name="DefaultCheck">
                                                     <Canvas Width="18" Height="18">
                                                         <Path Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" 
-                                                  Fill="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}}}" />
+                                                  Fill="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}}}" 
+                                                              Visibility="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}},Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                                     </Canvas>
                                                 </Viewbox>
                                             </DataTemplate>
@@ -687,6 +700,8 @@
                                     </GridViewColumn>
                                 </GridView>
                             </ListView.View>
+
+
                         </ListView>
                         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
                             <Button Content="{x:Static properties:Resources.Add}" Command="{Binding AddConnectinSettingCommand}" Padding="4" Width="100"></Button>
@@ -702,7 +717,7 @@
             Foreground="Red" ToolTip="{x:Static properties:Resources.Close}"
             Height="24" Width="24" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 5 4 0"
             Content="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"
-            Click="PathButton_Click">
+            Click="PathButton_Click" Command="{Binding WindowClosingCommand}">
             </Button>
         </Grid>
     </Grid>

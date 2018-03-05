@@ -16,9 +16,12 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
 using System.Windows.Interop;
 using System.Runtime.InteropServices;
+using System.Globalization;
 
 namespace WpfMPD
 {
+    // Code behind - View.
+    // All the things related to VIEW and Windows specific matter.
 
     // from AcrylicWPF example
     //https://github.com/bbougot/AcrylicWPF
@@ -56,13 +59,12 @@ namespace WpfMPD
         // ...
     }
 
-
     /// <summary>
     /// MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        // For the acrylic effects
+        // For the acrylic effects. Win32API? Cross-platform? What is it? w
         [DllImport("user32.dll")]
         internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
 
@@ -88,14 +90,13 @@ namespace WpfMPD
             Marshal.FreeHGlobal(accentPtr);
         }
 
-
         public MainWindow()
         {
+            //MPDCtrl.Properties.Resources.Culture = CultureInfo.GetCultureInfo("en-US"); //or ja-JP
+
             InitializeComponent();
 
             Loaded += MainWindow_Loaded;
-
-
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -108,6 +109,14 @@ namespace WpfMPD
                 Top = MPDCtrl.Properties.Settings.Default.MainWindow_Top;
             }
             this.Topmost = MPDCtrl.Properties.Settings.Default.TopMost;
+            if (this.Topmost)
+            {
+                mStayOnTop.IsChecked = true;
+            }
+            else
+            {
+                mStayOnTop.IsChecked = false;
+            }
         }
 
         private void PathButton_Click(object sender, RoutedEventArgs e)
@@ -149,7 +158,6 @@ namespace WpfMPD
             MPDCtrl.Properties.Settings.Default.Save();
         }
     }
-
 
 
     /*
@@ -225,12 +233,12 @@ namespace WpfMPD
         }
         */
 
-
-    //ScrollIntoViewForListView Behavior
+    /*
+    // ScrollIntoViewForListView Behavior
     //https://stackoverflow.com/questions/10135850/how-do-i-scrollintoview-after-changing-the-filter-on-a-listview-in-a-mvvm-wpf
     //https://stackoverflow.com/questions/33597483/wpf-mvvm-scrollintoview
     //https://stackoverflow.com/questions/16866309/listbox-scroll-into-view-with-mvvm
-    /*
+    
     public class ScrollIntoViewForListView : Behavior<ListView>
     {
         /// <summary>

@@ -4,12 +4,14 @@
 /// https://github.com/torumyax/MPD-Ctrl
 /// 
 /// TODO:
+///  About tab.
 ///  Password encryption.
-///  User friendly error message.
 ///  Test against Mopidy.
+///  TrayIcon?
+///  Debug tab?
 ///
 /// Known issue:
-///  When maximized, scrollber is weird...There are some extra spaces.
+///  When maximized, there are some extra spaces in the scrollber.
 /// 
 
 using System;
@@ -95,7 +97,6 @@ namespace WpfMPD
         private ICommand _volumeDownCommand;
         private ICommand _volumeUpCommand;
         private ICommand _showSettingsCommand;
-
         private ICommand _newConnectinSettingCommand;
         private ICommand _addConnectinSettingCommand;
         private ICommand _deleteConnectinSettingCommand;
@@ -206,17 +207,21 @@ namespace WpfMPD
                 this._volume = value;
                 this.NotifyPropertyChanged("Volume");
 
-                if (Convert.ToDouble(_MPC.MpdStatus.MpdVolume) != value) {
-
-                    //TODO try using ValueChanged Event using <i:Interaction.Triggers>  ?
-                    if (SetVolumeCommand.CanExecute(null))
-                    {
-                        SetVolumeCommand.Execute(null);
-                    }
-                }
-                else
+                if (_MPC != null)
                 {
-                    //System.Diagnostics.Debug.WriteLine("Volume value is the same. Skipping.");
+                    if (Convert.ToDouble(_MPC.MpdStatus.MpdVolume) != value)
+                    {
+
+                        //TODO try using ValueChanged Event using <i:Interaction.Triggers>  ?
+                        if (SetVolumeCommand.CanExecute(null))
+                        {
+                            SetVolumeCommand.Execute(null);
+                        }
+                    }
+                    else
+                    {
+                        //System.Diagnostics.Debug.WriteLine("Volume value is the same. Skipping.");
+                    }
                 }
             }
         }
@@ -229,10 +234,14 @@ namespace WpfMPD
                 this._repeat = value;
                 this.NotifyPropertyChanged("Repeat");
 
-                if (_MPC.MpdStatus.MpdRepeat != value) {
-                    if (SetRpeatCommand.CanExecute(null))
+                if (_MPC != null)
+                {
+                    if (_MPC.MpdStatus.MpdRepeat != value)
                     {
-                        SetRpeatCommand.Execute(null);
+                        if (SetRpeatCommand.CanExecute(null))
+                        {
+                            SetRpeatCommand.Execute(null);
+                        }
                     }
                 }
             }
@@ -246,11 +255,15 @@ namespace WpfMPD
                 this._random = value;
                 this.NotifyPropertyChanged("Random");
 
-                if (_MPC.MpdStatus.MpdRandom != value)
+                if (_MPC != null)
                 {
-                    if (SetRandomCommand.CanExecute(null))
+
+                    if (_MPC.MpdStatus.MpdRandom != value)
                     {
-                        SetRandomCommand.Execute(null);
+                        if (SetRandomCommand.CanExecute(null))
+                        {
+                            SetRandomCommand.Execute(null);
+                        }
                     }
                 }
             }
@@ -279,8 +292,6 @@ namespace WpfMPD
             {
                 this._elapsed = value;
                 this.NotifyPropertyChanged("Elapsed");
-
-                //System.Diagnostics.Debug.WriteLine("\n\nSlider_Elapsed Changed: " + value.ToString());
 
                 if (SetSeekCommand.CanExecute(null))
                 {
@@ -531,12 +542,12 @@ namespace WpfMPD
 
             // Init Song's time elapsed timer.
             _elapsedTimer = new DispatcherTimer();
-            _elapsedTimer.Interval = TimeSpan.FromMilliseconds(1000);//new TimeSpan(0, 0, 1);
+            _elapsedTimer.Interval = TimeSpan.FromMilliseconds(1000);
             _elapsedTimer.Tick += new EventHandler(ElapsedTimer);
 
             // Connect to MPD server and query status and info.
             if (await QueryStatus()) {
-                // Start idle connection, but don't start idle mode yet.
+                // Start idle connection.
                 if (await ConnectIdle())
                 {
                     // Start idle.

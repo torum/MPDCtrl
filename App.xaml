@@ -4,16 +4,12 @@
              xmlns:local="clr-namespace:WpfMPD"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-
         <ResourceDictionary>
+
+            <local:MainViewModel x:Key="MainViewModel" />
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            
             <ResourceDictionary.MergedDictionaries>
-
-                <ResourceDictionary>
-                    <local:MainViewModel x:Key="MainViewModel" />
-
-                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-                </ResourceDictionary>
-
 
                 <!-- PathToggleButton 
                 https://docs.microsoft.com/en-us/dotnet/framework/wpf/controls/togglebutton-syles-and-templates
@@ -511,6 +507,7 @@
 
                 </ResourceDictionary>
 
+                
                 <!-- SeekSilderButtonStyle -->
                 <ResourceDictionary>
 
@@ -1419,9 +1416,6 @@
 
 
                 </ResourceDictionary>
-                
-                
-                
                 
 
             </ResourceDictionary.MergedDictionaries>

@@ -216,7 +216,7 @@ namespace WpfMPD
 
             // Initialize idle tcp client.
             _idleClient = new EventDrivenTCPClient(IPAddress.Parse(_h), _p, true);
-            _idleClient.ReceiveTimeout = 999999999;
+            //_idleClient.ReceiveTimeout = disabled in the source.
             _idleClient.DataReceived += new EventDrivenTCPClient.delDataReceived(IdleClient_DataReceived);
             _idleClient.ConnectionStatusChanged += new EventDrivenTCPClient.delConnectionStatusChanged(IdleClient_ConnectionStatusChanged);
 
@@ -273,6 +273,8 @@ namespace WpfMPD
         private void IdleClient_DataReceived(EventDrivenTCPClient sender, object data)
         {
             //System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived: " + (data as string) );
+
+            if (data == null) { return; }
 
             if ((data as string).StartsWith("OK MPD"))
             {
@@ -472,7 +474,7 @@ namespace WpfMPD
         {
             if (sl == null) {
                 // Fire up error event.
-                ErrorReturned?.Invoke(this, "ConnectedResponse@ParseStatusResponse: null");
+                ErrorReturned?.Invoke(this, "Connection Error: (@C1)");
                 return false; }
             if (sl.Count == 0) { return false; } 
 
@@ -484,7 +486,7 @@ namespace WpfMPD
                 if (value.StartsWith("ACK"))
                 {
                     System.Diagnostics.Debug.WriteLine("ACK@ParseStatusResponse: " + value);
-                    ErrorReturned?.Invoke(this, "ACK@ParseStatusResponse: " + value);
+                    ErrorReturned?.Invoke(this, "MPD Error (@C1): " + value);
                     return false;
                 }
 
@@ -727,7 +729,8 @@ namespace WpfMPD
         private bool ParsePlaylistInfoResponse(List<string> sl)
         {
             if (sl == null) {
-                ErrorReturned?.Invoke(this, "Connected response@ParsePlaylistInfoResponse: null");
+                System.Diagnostics.Debug.WriteLine("ConError@ParsePlaylistInfoResponse: null");
+                ErrorReturned?.Invoke(this, "Connection Error: (@C2)");
                 return false; }
 
             try {
@@ -742,7 +745,7 @@ namespace WpfMPD
                     if (value.StartsWith("ACK"))
                     {
                         System.Diagnostics.Debug.WriteLine("ACK@ParsePlaylistInfoResponse: " + value);
-                        ErrorReturned?.Invoke(this, "ACK@ParsePlaylistInfoResponse: " + value);
+                        ErrorReturned?.Invoke(this, "MPD Error (@C2): " + value);
                         return false;
                     }
 
@@ -847,7 +850,8 @@ namespace WpfMPD
         private bool ParsePlaylistsResponse(List<string> sl)
         {
             if (sl == null) {
-                ErrorReturned?.Invoke(this, "Connected response@ParsePlaylistsResponse: null");
+                System.Diagnostics.Debug.WriteLine("Connected response@ParsePlaylistsResponse: null");
+                ErrorReturned?.Invoke(this, "Connection Error: (C3)");
                 return false; }
 
             // Don't. Not good when multithreading. Make sure you clear the collection before calling MpdQueryCurrentPlaylist().
@@ -863,7 +867,7 @@ namespace WpfMPD
                 if (value.StartsWith("ACK"))
                 {
                     System.Diagnostics.Debug.WriteLine("ACK@ParsePlaylistsResponse: " + value);
-                    ErrorReturned?.Invoke(this, "ACK@ParsePlaylistsResponse: " + value);
+                    ErrorReturned?.Invoke(this, "MPD Error (@C3): " + value);
                     return false;
                 }
 
@@ -1172,13 +1176,10 @@ namespace WpfMPD
             return false;
         }
 
-
         #endregion END of MPD METHODS
 
         /// END OF MPC Client Class 
     }
-
-
 
 
     /// <summary>
@@ -1433,7 +1434,7 @@ namespace WpfMPD
             {
                 lock (SyncLock)
                 {
-                    tmrReceiveTimeout.Start();
+                    //tmrReceiveTimeout.Start();
                     return;
                 }
             }
@@ -1441,7 +1442,7 @@ namespace WpfMPD
             {
                 lock (SyncLock)
                 {
-                    tmrReceiveTimeout.Stop();
+                    //tmrReceiveTimeout.Stop();
                 }
             }
             if (DataReceived != null)

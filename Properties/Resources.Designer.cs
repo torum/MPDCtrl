@@ -61,6 +61,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   About に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string About {
+            get {
+                return ResourceManager.GetString("About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Add に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Add {
@@ -129,6 +138,15 @@ namespace MPDCtrl.Properties {
         public static string MPDConnectionError {
             get {
                 return ResourceManager.GetString("MPDConnectionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   OK に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OK {
+            get {
+                return ResourceManager.GetString("OK", resourceCulture);
             }
         }
         

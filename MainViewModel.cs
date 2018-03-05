@@ -4,9 +4,11 @@
 /// https://github.com/torumyax/MPD-Ctrl
 /// 
 /// TODO:
+/// -- Priority 1 --
 ///  About tab.
 ///  Password encryption.
 ///  Test against Mopidy.
+///  -- Priority 2 --
 ///  TrayIcon?
 ///  Debug tab?
 ///
@@ -399,7 +401,6 @@ namespace WpfMPD
                     SetError("Host", "Error: Host must be epecified.");
                 }
                 else {
-                    this._defaultHost = value;
                     IPAddress ipAddress = null;
                     try {
                         ipAddress = IPAddress.Parse(value);

@@ -157,6 +157,11 @@ namespace WpfMPD
             MPDCtrl.Properties.Settings.Default.TopMost = this.Topmost;
             MPDCtrl.Properties.Settings.Default.Save();
         }
+
+        private void Hyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/torumyax/MPD-Ctrl");
+        }
     }
 
 

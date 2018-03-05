@@ -5,11 +5,12 @@
 /// 
 /// TODO:
 /// -- Priority 1 --
-///  About tab.
 ///  Password encryption.
 ///  Test against Mopidy.
 ///  -- Priority 2 --
+///  Better error messages.
 ///  TrayIcon?
+///  Use FluentWPF
 ///  Debug tab?
 ///
 /// Known issue:
@@ -40,12 +41,13 @@ namespace WpfMPD
     {
         public string Host { get; set; }
         public int Port { get; set; }
+        public string Password { get; set; }
         public string Name { get; set; }
         public string ID { get; set; }
     }
 
     /// <summary>
-    /// ProfileSettings. Wrapper Class for storing ObservableCollection<Profile> in the settings. 
+    /// Wrapper Class for storing ObservableCollection<Profile> in the settings. 
     /// </summary>
     public class ProfileSettings
     {
@@ -66,6 +68,7 @@ namespace WpfMPD
         private MPC _MPC;
         private string _defaultHost;
         private int _defaultPort;
+        private string _defaultPassword;
         private MPC.Song _selectedSong;
         private string _selecctedPlaylist;
         private bool _isChanged;
@@ -375,6 +378,8 @@ namespace WpfMPD
                     this.NotifyPropertyChanged("Host");
                     this._defaultPort = this._profile.Port;
                     this.NotifyPropertyChanged("Port");
+                    this._defaultPassword = String.IsNullOrEmpty(this._profile.Password) ? "" : this._profile.Password;
+                    this.NotifyPropertyChanged("Password");
                 }
                 else
                 {
@@ -382,6 +387,8 @@ namespace WpfMPD
                     this.NotifyPropertyChanged("Host");
                     this._defaultPort = 6600;
                     this.NotifyPropertyChanged("Port");
+                    this._defaultPassword = "";
+                    this.NotifyPropertyChanged("Password");
                 }
                 this.NotifyPropertyChanged("SelectedProfile");
             }
@@ -395,17 +402,16 @@ namespace WpfMPD
                 ClearErrror("Host");
                 this._defaultHost = value;
 
-                // Validate input!
+                // Validate input.
                 if (value == "")
                 {
-                    SetError("Host", "Error: Host must be epecified.");
+                    SetError("Host", "Error: Host must be epecified."); //TODO: translate.
                 }
                 else {
                     IPAddress ipAddress = null;
                     try {
                         ipAddress = IPAddress.Parse(value);
                         if (ipAddress != null) {
-                            //
                             //ClearErrror("Host");
                             IsChanged = true;
                         }
@@ -413,7 +419,7 @@ namespace WpfMPD
                     catch
                     {
                         //System.FormatException
-                        SetError("Host", "Error: Invalid address format.");
+                        SetError("Host", "Error: Invalid address format."); //TODO: translate.
                     }
                 }
                 this.NotifyPropertyChanged("Host");
@@ -437,10 +443,21 @@ namespace WpfMPD
                 }
                 else
                 {
-                    SetError("Port", "Error: Part number must be consist of numbers.");
+                    SetError("Port", "Error: Part number must be consist of numbers."); //TODO: translate.
                 }
                 this.NotifyPropertyChanged("Port");
 
+            }
+        }
+
+        public string Password
+        {
+            get { return this._defaultPassword; }
+            set
+            {
+                ClearErrror("Password");
+                this._defaultPassword = value;
+                this.NotifyPropertyChanged("Password");
             }
         }
 
@@ -466,9 +483,11 @@ namespace WpfMPD
 
             // Initialize play button with "play" state.
             this.PlayButton = _pathPlayButton;
-
+            // Initialize connection setting.
             this._selecctedPlaylist = "";
-            this._defaultPort = 6600;
+            this._defaultHost = ""; //127.0.0.1
+            this._defaultPort = 6600;            
+            this._defaultPassword = "";
 
             // Assign commands
             this._playCommand = new WpfMPD.Common.RelayCommand(this.PlayCommand_ExecuteAsync, this.PlayCommand_CanExecute);
@@ -487,17 +506,15 @@ namespace WpfMPD
             this._volumeDownCommand = new WpfMPD.Common.RelayCommand(this.VolumeDownCommand_Execute, this.VolumeDownCommand_CanExecute);
             this._volumeUpCommand = new WpfMPD.Common.RelayCommand(this.VolumeUpCommand_Execute, this.VolumeUpCommand_CanExecute);
             this._showSettingsCommand = new WpfMPD.Common.RelayCommand(this.ShowSettingsCommand_Execute, this.ShowSettingsCommand_CanExecute);
-
             this._newConnectinSettingCommand = new WpfMPD.Common.RelayCommand(this.NewConnectinSettingCommand_Execute, this.NewConnectinSettingCommand_CanExecute);
             this._addConnectinSettingCommand = new WpfMPD.Common.RelayCommand(this.AddConnectinSettingCommand_Execute, this.AddConnectinSettingCommand_CanExecute);
             this._deleteConnectinSettingCommand = new WpfMPD.Common.RelayCommand(this.DeleteConnectinSettingCommand_Execute, this.DeleteConnectinSettingCommand_CanExecute);
 
 
-
+            // Load settings.
+            
             // Upgrade settings. (just in case.)
             MPDCtrl.Properties.Settings.Default.Upgrade();
-
-            // Load settings.
 
             // Must be the first time.
             if (MPDCtrl.Properties.Settings.Default.Profiles == null)
@@ -535,7 +552,7 @@ namespace WpfMPD
         private async Task<bool> StartConnection()
         {
             // Create MPC instance.
-            this._MPC = new MPC(this._defaultHost, this._defaultPort);
+            this._MPC = new MPC(this._defaultHost, this._defaultPort, this._defaultPassword);
 
             // Assign idle event.
             this._MPC.StatusChanged += new MPC.MpdStatusChanged(OnStatusChanged);
@@ -545,6 +562,8 @@ namespace WpfMPD
             _elapsedTimer = new DispatcherTimer();
             _elapsedTimer.Interval = TimeSpan.FromMilliseconds(1000);
             _elapsedTimer.Tick += new EventHandler(ElapsedTimer);
+
+            ErrorMessage = "Connecting...";
 
             // Connect to MPD server and query status and info.
             if (await QueryStatus()) {
@@ -617,6 +636,7 @@ namespace WpfMPD
                     await Task.Delay(1000);
                     if (IsBusy)
                     {
+                        ErrorMessage = "OnStatusUpdate time out.";
                         System.Diagnostics.Debug.WriteLine("OnStatusChanged: TIME OUT");
                         return;
                     }
@@ -1401,6 +1421,7 @@ namespace WpfMPD
                     await Task.Delay(1500);
                     if (IsBusy)
                     {
+                        ErrorMessage = "Change playlist time out.";
                         System.Diagnostics.Debug.WriteLine("ChangePlaylistCommand_ExecuteAsync: TIME OUT");
                         return;
                     }
@@ -1639,10 +1660,10 @@ namespace WpfMPD
         {
             // New connection from Setting.
 
-            // Validate Host input!
+            // Validate Host input.
             if (this._defaultHost == "")
             {
-                SetError("Host", "Error: Host must be epecified.");
+                SetError("Host", "Error: Host must be epecified."); //TODO: translate
                 this.NotifyPropertyChanged("Host");
                 return;
             }
@@ -1660,7 +1681,7 @@ namespace WpfMPD
                 catch
                 {
                     //System.FormatException
-                    SetError("Host", "Error: Invalid address format.");
+                    SetError("Host", "Error: Invalid address format."); //TODO: translate
                     this.NotifyPropertyChanged("Host");
                     return;
                 }
@@ -1673,6 +1694,7 @@ namespace WpfMPD
                 _MPC.CurrentQueue.Clear();
                 _MPC.Playlists.Clear();
                 _MPC.MpdCurrentSong = null;
+                _MPC.MpdStop = true;
                 _MPC = null;
             }
 
@@ -1688,6 +1710,7 @@ namespace WpfMPD
                     {
                         Host = this._defaultHost,
                         Port = this._defaultPort,
+                        Password = this._defaultPassword.Trim(),
                         Name = this._defaultHost + ":" + this._defaultPort.ToString(),
                         ID = Guid.NewGuid().ToString(),
                     };
@@ -1700,7 +1723,7 @@ namespace WpfMPD
                 {
                     this._profile.Host = this._defaultHost;
                     this._profile.Port = this._defaultPort;
-
+                    this._profile.Password = this._defaultPassword.Trim();
                 }
 
                 // Make it default;

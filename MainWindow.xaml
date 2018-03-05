@@ -19,7 +19,7 @@
         DataContext="{StaticResource MainViewModel}">
     
     <!-- 
-    I don't like to include Microsoft.Expression.Interactions.dll, System.Windows.Interactivity.dll, 
+    I don't like to include Microsoft.Expression.Interactions.dll, System.Windows.Interactivity.dll 
     and all that crap just for this.
     
     <i:Interaction.Triggers>
@@ -719,7 +719,7 @@
                                 </TextBox.Style>
                             </TextBox>
                             <TextBlock Text="{x:Static properties:Resources.Password}" TextElement.Foreground="White"></TextBlock>
-                            <TextBox Margin="0 4 0 12" ToolTip="{x:Static properties:Resources.Optional}"></TextBox>
+                            <TextBox Text="{Binding Password, Mode=TwoWay}" Margin="0 4 0 12" ToolTip="{x:Static properties:Resources.Optional}"></TextBox>
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
                                 <Button Content="{x:Static properties:Resources.Connect}" Command="{Binding NewConnectinSettingCommand}" Padding="4" Width="100" IsDefault="False"></Button>

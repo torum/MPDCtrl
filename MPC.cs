@@ -4,8 +4,7 @@
 /// https://github.com/torumyax/MPD-Ctrl
 /// 
 /// TODO:
-///  More error handling.
-///  Read from settings.
+///  More detailed error handling.
 ///
 /// Known issue:
 ///  
@@ -138,6 +137,7 @@ namespace WpfMPD
 
         private string _h;
         private int _p;
+        private string _a;
         private Status _st;
         private Song _currentSong;
         private ObservableCollection<Song> _songs = new ObservableCollection<Song>();
@@ -201,13 +201,16 @@ namespace WpfMPD
 
         public event MpdError ErrorReturned;
 
+        public bool MpdStop { get; set; }
+
         #endregion END of MPC PUBLIC PROPERTY and EVENT FIELD
 
         // MPC Constructor
-        public MPC(string h, int p)
+        public MPC(string h, int p, string a)
         {
             this._h = h;
             this._p = p;
+            this._a = a;
             this._st = new Status();
 
             // Enable synch with UI and background thread. BUT IT DOES NOT MEAN IT'S THREAD SAFE.
@@ -279,7 +282,15 @@ namespace WpfMPD
             if ((data as string).StartsWith("OK MPD"))
             {
                 // Connected to MPD and received OK. Now we are idling and wait.
-                sender.Send("idle player mixer options playlist stored_playlist\n");
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    sender.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
+                }
+                else
+                {
+                    sender.Send("idle player mixer options playlist stored_playlist\n");
+                }
+                    
             }
             else
             {
@@ -293,7 +304,7 @@ namespace WpfMPD
                     foreach (string line in Lines)
                     {
                         string[] Values;
-                        if (line != "" && line != "OK")
+                        if (line.Trim() != "" && line != "OK")
                         {
                             Values = line.Split(':');
                             if (Values.Length > 1)
@@ -322,7 +333,14 @@ namespace WpfMPD
                 */
 
                 // Go idle again and wait.
-                sender.Send("idle player mixer options playlist stored_playlist\n");
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    sender.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
+                }
+                else
+                {
+                    sender.Send("idle player mixer options playlist stored_playlist\n");
+                }
             }
         }
 
@@ -458,6 +476,16 @@ namespace WpfMPD
             try
             {
                 string mpdCommand = "status";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+
+                    mpdCommand = mpdCommand + "status" + "\n";
+
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
 
                 Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 await tsResponse;
@@ -472,6 +500,7 @@ namespace WpfMPD
 
         private bool ParseStatusResponse(List<string> sl)
         {
+            if (this.MpdStop) { return false; }
             if (sl == null) {
                 // Fire up error event.
                 ErrorReturned?.Invoke(this, "Connection Error: (@C1)");
@@ -684,6 +713,16 @@ namespace WpfMPD
             try
             {
                 string mpdCommand = "playlistinfo";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+
+                    mpdCommand = mpdCommand + "playlistinfo" + "\n";
+
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
 
                 Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 await tsResponse;
@@ -703,6 +742,11 @@ namespace WpfMPD
             if (playlistName.Trim() != "")
             {
                 string mpdCommand = "command_list_begin" + "\n";
+
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                }
 
                 mpdCommand = mpdCommand + "clear" + "\n";
 
@@ -728,6 +772,7 @@ namespace WpfMPD
 
         private bool ParsePlaylistInfoResponse(List<string> sl)
         {
+            if (this.MpdStop) { return false; }
             if (sl == null) {
                 System.Diagnostics.Debug.WriteLine("ConError@ParsePlaylistInfoResponse: null");
                 ErrorReturned?.Invoke(this, "Connection Error: (@C2)");
@@ -825,6 +870,16 @@ namespace WpfMPD
             try
             {
                 string mpdCommand = "listplaylists";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+
+                    mpdCommand = mpdCommand + "listplaylists" + "\n";
+
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
 
                 Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 await tsResponse;
@@ -849,6 +904,7 @@ namespace WpfMPD
 
         private bool ParsePlaylistsResponse(List<string> sl)
         {
+            if (this.MpdStop) { return false; }
             if (sl == null) {
                 System.Diagnostics.Debug.WriteLine("Connected response@ParsePlaylistsResponse: null");
                 ErrorReturned?.Invoke(this, "Connection Error: (C3)");
@@ -898,6 +954,10 @@ namespace WpfMPD
             try
             {
                 string mpdCommand = "command_list_begin" + "\n";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                }
 
                 if (songID != "")
                 {
@@ -932,9 +992,14 @@ namespace WpfMPD
         public async Task<bool> MpdPlaybackSeek(string songID, int seekTime)
         {
             if ((songID == "") || (seekTime == 0)) { return false; }
+
             try
             {
                 string mpdCommand = "command_list_begin" + "\n";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                }
 
                 mpdCommand = mpdCommand + "seekid " + songID + " " + seekTime.ToString() + "\n";
 
@@ -959,6 +1024,10 @@ namespace WpfMPD
             try
             {
                 string mpdCommand = "command_list_begin" + "\n";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                }
 
                 mpdCommand = mpdCommand + "pause 1" + "\n";
 
@@ -984,6 +1053,10 @@ namespace WpfMPD
             try
             {
                 string mpdCommand = "command_list_begin" + "\n";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                }
 
                 mpdCommand = mpdCommand + "pause 0" + "\n";
 
@@ -1009,6 +1082,10 @@ namespace WpfMPD
             try
             {
                 string mpdCommand = "command_list_begin" + "\n";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                }
 
                 mpdCommand = mpdCommand + "stop" + "\n";
 
@@ -1034,6 +1111,10 @@ namespace WpfMPD
             try
             {
                 string mpdCommand = "command_list_begin" + "\n";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                }
 
                 mpdCommand = mpdCommand + "next" + "\n";
 
@@ -1063,6 +1144,10 @@ namespace WpfMPD
             try
             {
                 string mpdCommand = "command_list_begin" + "\n";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                }
 
                 mpdCommand = mpdCommand + "previous" + "\n";
 
@@ -1094,6 +1179,10 @@ namespace WpfMPD
             try
             {
                 string mpdCommand = "command_list_begin" + "\n";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                }
 
                 mpdCommand = mpdCommand + "setvol " + v.ToString() + "\n";
 
@@ -1120,6 +1209,10 @@ namespace WpfMPD
             try
             {
                 string mpdCommand = "command_list_begin" + "\n";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                }
 
                 if (on) {
                     mpdCommand = mpdCommand + "repeat 1" + "\n";
@@ -1128,6 +1221,7 @@ namespace WpfMPD
                 {
                     mpdCommand = mpdCommand + "repeat 0" + "\n";
                 }
+
                 mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
 
                 Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
@@ -1151,6 +1245,10 @@ namespace WpfMPD
             try
             {
                 string mpdCommand = "command_list_begin" + "\n";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                }
 
                 if (on)
                 {
@@ -1160,6 +1258,7 @@ namespace WpfMPD
                 {
                     mpdCommand = mpdCommand + "random 0" + "\n";
                 }
+
                 mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
 
                 Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);

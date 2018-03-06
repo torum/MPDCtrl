@@ -142,6 +142,22 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   The MIT License
+        ///Copyright (c) 2018 torumyax
+        ///
+        ///Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &quot;Software&quot;), to deal
+        ///in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        ///copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+        ///
+        ///The above copyright notice [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string License {
+            get {
+                return ResourceManager.GetString("License", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Unable to connect to specified MPD server. Please go back and check your connection settings or the permission settings on your MPD server. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MPDConnectionError {

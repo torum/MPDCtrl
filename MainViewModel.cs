@@ -5,7 +5,6 @@
 /// 
 /// TODO:
 /// -- Priority 1 --
-///  Password encryption.
 ///  Test against Mopidy.
 ///  -- Priority 2 --
 ///  Better error messages.
@@ -375,15 +374,15 @@ namespace WpfMPD
             {
                 this._profile = value;
                 if (this._profile != null) {
-                    // work around validation.
+                    // Workaround validation.
                     this._defaultHost = this._profile.Host;
                     this.NotifyPropertyChanged("Host");
                     this._defaultPort = this._profile.Port;
                     this.NotifyPropertyChanged("Port");
                     //this._defaultPassword = String.IsNullOrEmpty(this._profile.Password) ? "" : this._profile.Password;
                     this._defaultPassword = Decrypt(this._profile.Password);
-                    this.Password = DummyPassword(this._defaultPassword); //set dummy.
-                   
+                    // Set dummy "*"s for PasswordBox.
+                    this.Password = DummyPassword(this._defaultPassword); 
                 }
                 else
                 {
@@ -454,7 +453,7 @@ namespace WpfMPD
             }
         }
 
-        // Dummy.
+        // Dummy "*"'s for PasswordBox.
         public string Password
         {
             get
@@ -469,18 +468,6 @@ namespace WpfMPD
                 this.NotifyPropertyChanged("Password");
             }
         }
-
-        private string DummyPassword(string s)
-        {
-            if (String.IsNullOrEmpty(s)) { return ""; }
-            string e = "";
-            for (int i = 1; i <= s.Length; i++)
-            {
-                e = e + "*";
-            }
-            return e;
-        }
-        
 
         public string ErrorMessage
         {
@@ -1070,9 +1057,11 @@ namespace WpfMPD
         private void OnError(MPC sender, object data)
         {
             if (data == null) { return; }
-
-            //TODO: How and when do you clear the error message?
-            ErrorMessage = (data as string);
+            string s = (data as string);
+            string patternStr = @"[{\[].+?[}\]]";//@"[.*?]";
+            s = System.Text.RegularExpressions.Regex.Replace(s, patternStr, string.Empty);
+            s = s.Replace("ACK  ", string.Empty);
+            ErrorMessage = s;
         }
 
         private void UpdateButtonStatus()
@@ -1173,6 +1162,17 @@ namespace WpfMPD
             {
                 return "";
             }
+        }
+
+        private string DummyPassword(string s)
+        {
+            if (String.IsNullOrEmpty(s)) { return ""; }
+            string e = "";
+            for (int i = 1; i <= s.Length; i++)
+            {
+                e = e + "*";
+            }
+            return e;
         }
 
         #endregion END of PRIVATE METHODS

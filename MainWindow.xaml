@@ -836,9 +836,10 @@
                         <TextBlock Margin="4">
                             <Hyperlink NavigateUri="https://github.com/torumyax/MPD-Ctrl" Click="Hyperlink_Click">https://github.com/torumyax/MPD-Ctrl</Hyperlink>
                         </TextBlock>
+                        <TextBox Margin="4 24 4 4" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" Height="200" Text="{x:Static properties:Resources.License}"/>
                         <Button Content="{x:Static properties:Resources.OK}" 
                                 Width="100" 
-                                Margin="48"
+                                Margin="24"
                                 Command="{Binding ShowSettingsCommand}"></Button>
                     </StackPanel>
                     

@@ -507,7 +507,6 @@
 
                 </ResourceDictionary>
 
-                
                 <!-- SeekSilderButtonStyle -->
                 <ResourceDictionary>
 
@@ -1207,7 +1206,6 @@
 
                 </ResourceDictionary>
 
-
                 <!-- NoChromeButtons -->
                 <ResourceDictionary>
                     <!--
@@ -1263,7 +1261,6 @@
 
 
                 </ResourceDictionary>
-
 
                 <!-- Flat ComboBox -->
                 <ResourceDictionary>
@@ -1417,7 +1414,7 @@
 
                 </ResourceDictionary>
 
-
+                <!-- NoChromeTabControl -->
                 <ResourceDictionary>
                     <Style x:Key="NoChromeTabControl" TargetType="{x:Type TabControl}">
                         <Setter Property="OverridesDefaultStyle" Value="False" />

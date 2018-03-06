@@ -160,24 +160,18 @@ namespace WpfMPD
 
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start("https://github.com/torumyax/MPD-Ctrl");
+            //UWP test complains about this. So, disabled.
+            //System.Diagnostics.Process.Start("https://github.com/torumyax/MPD-Ctrl");
         }
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
             (sender as PasswordBox).Tag = "";
-
         }
 
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             PasswordBox.Password = "";
-            /*
-            if ((PasswordBox.Tag as String) == "")
-            {
-                PasswordBox.Password = "";
-            }
-            */
         }
     }
 
@@ -309,7 +303,6 @@ namespace WpfMPD
         }
     }
     */
-
 
     /*
         // don't need to use this..anymore.

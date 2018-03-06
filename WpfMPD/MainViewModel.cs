@@ -8,13 +8,14 @@
 ///  Test against Mopidy.
 ///  -- Priority 2 --
 ///  Better error messages.
-///  TrayIcon?
+///  TrayIcon.
 ///  Use FluentWPF
-///  Debug tab?
+///  Debug tab.
 ///
 /// Known issue:
 ///  When maximized, there are some extra spaces in the scrollber.
 /// 
+
 
 using System;
 using System.Collections.Generic;
@@ -618,34 +619,39 @@ namespace WpfMPD
                 if (subsystem == "player")
                 {
                     isPlayer = true;
+                    System.Diagnostics.Debug.WriteLine("OnStatusChanged: player");
                 }
                 else if (subsystem == "mixer")
                 {
+                    System.Diagnostics.Debug.WriteLine("OnStatusChanged: mixer");
                     isPlayer = true;
                 }
                 else if (subsystem == "options")
                 {
+                    System.Diagnostics.Debug.WriteLine("OnStatusChanged: options");
                     isPlayer = true;
                 }
                 else if (subsystem == "playlist")
                 {
+                    System.Diagnostics.Debug.WriteLine("OnStatusChanged: playlist");
                     isPlaylist = true;
                 }
                 else if (subsystem == "stored_playlist")
                 {
+                    System.Diagnostics.Debug.WriteLine("OnStatusChanged: stored_playlist");
                     isStoredPlaylist = true;
                 }
             }
 
             // Little dirty, but ObservableCollection isn't thread safe, so...
             if (IsBusy) {
-                await Task.Delay(1000);
+                await Task.Delay(1500);
                 if (IsBusy)
                 {
-                    await Task.Delay(1000);
+                    await Task.Delay(1500);
                     if (IsBusy)
                     {
-                        ErrorMessage = "OnStatusUpdate time out.";
+                        //ErrorMessage = "OnStatusUpdate time out.";
                         System.Diagnostics.Debug.WriteLine("OnStatusChanged: TIME OUT");
                         return;
                     }
@@ -1716,8 +1722,8 @@ namespace WpfMPD
             return true;
         }
 
-        public async void NewConnectinSettingCommand_Execute(object param)
         //public async void NewConnectinSettingCommand_Execute()
+        public async void NewConnectinSettingCommand_Execute(object param)
         {
             // New connection from Setting.
 
@@ -1750,7 +1756,9 @@ namespace WpfMPD
 
             // for Unbindable PasswordBox.
             var passwordBox = param as PasswordBox;
-            this._defaultPassword = passwordBox.Password;
+            if (!String.IsNullOrEmpty(passwordBox.Password)) { 
+                this._defaultPassword = passwordBox.Password;
+            }
 
             if (_MPC != null) {
                 await this._MPC.MpdIdleStop();

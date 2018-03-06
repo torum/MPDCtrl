@@ -830,7 +830,7 @@
 
                     <StackPanel>
                         <Label Content="" TextElement.Foreground="White"/>
-                        <Label Content="MPD Ctrl for Desktop 0.1.0" TextElement.Foreground="White"/>
+                        <Label Content="MPD Ctrl for Desktop 1.1.1" TextElement.Foreground="White"/>
                         <Label Content="Developer: torumyax" TextElement.Foreground="White"/>
                         <Label Content="Website: " TextElement.Foreground="White"/>
                         <TextBlock Margin="4">

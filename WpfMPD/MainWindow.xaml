@@ -833,10 +833,12 @@
                         <Label Content="MPD Ctrl for Desktop 1.1.1" TextElement.Foreground="White"/>
                         <Label Content="Developer: torumyax" TextElement.Foreground="White"/>
                         <Label Content="Website: " TextElement.Foreground="White"/>
-                        <TextBlock Margin="4">
+                        <TextBox Text="https://github.com/torumyax/MPD-Ctrl" Margin="4" Background="Transparent" TextElement.Foreground="White" BorderThickness="0" IsReadOnly="True">
+                            <!--
                             <Hyperlink NavigateUri="https://github.com/torumyax/MPD-Ctrl" Click="Hyperlink_Click">https://github.com/torumyax/MPD-Ctrl</Hyperlink>
-                        </TextBlock>
-                        <TextBox Margin="4 24 4 4" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" Height="200" Text="{x:Static properties:Resources.License}"/>
+                            -->
+                        </TextBox>
+                        <TextBox Margin="4 36 4 4" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" Height="200" Text="{x:Static properties:Resources.License}"/>
                         <Button Content="{x:Static properties:Resources.OK}" 
                                 Width="100" 
                                 Margin="24"

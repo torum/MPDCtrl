@@ -5,14 +5,21 @@
 /// 
 /// TODO:
 /// -- Priority 1 --
-///  Test against Mopidy.
+///  Test against Mopidy. > done. See below "Known issues"
 ///  -- Priority 2 --
 ///  Better error messages.
 ///  TrayIcon.
 ///  Use FluentWPF
 ///  Debug tab.
 ///
-/// Known issue:
+/// Known issues:
+///  Mopidy does not accept command_list_begin + password
+///   command_list_begin
+///   password hogehoge
+///   status
+///   command_list_end
+///  hence > no password.
+///  
 ///  When maximized, there are some extra spaces in the scrollber.
 /// 
 

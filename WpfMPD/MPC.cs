@@ -7,7 +7,12 @@
 ///  More detailed error handling.
 ///
 /// Known issue:
-///  
+///  Mopidy does not accept command_list_begin + password
+///   command_list_begin
+///   password hogehoge
+///   status
+///   command_list_end
+///  hence > no password.
 
 
 using System;

@@ -133,6 +133,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Developer: torumyax に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Developer {
+            get {
+                return ResourceManager.GetString("Developer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Host に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Host {
@@ -235,6 +244,24 @@ namespace MPDCtrl.Properties {
         public static string StayOnTop {
             get {
                 return ResourceManager.GetString("StayOnTop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Website: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Website {
+            get {
+                return ResourceManager.GetString("Website", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   https://github.com/torumyax/MPD-Ctrl に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string WebsiteURL {
+            get {
+                return ResourceManager.GetString("WebsiteURL", resourceCulture);
             }
         }
     }

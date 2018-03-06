@@ -9,16 +9,22 @@
 ///  -- Priority 2 --
 ///  Better error messages.
 ///  TrayIcon.
+///  Sync version number with AppX somehow.
 ///  Use FluentWPF
 ///  Debug tab.
 ///
 /// Known issues:
 ///  Mopidy does not accept command_list_begin + password
-///   command_list_begin
-///   password hogehoge
-///   status
-///   command_list_end
-///  hence > no password.
+///   https://github.com/mopidy/mopidy/issues/1661
+///    command_list_begin
+///    password hogehoge
+///    status
+///    command_list_end
+///   hence > no password.
+///  Mopidy issues unnecessary multiple idle subsystem events 
+///   https://github.com/mopidy/mopidy/issues/1662
+///  Mopidy has some issue with M3U and UTF-8, Ext M3Us.
+///    https://github.com/mopidy/mopidy/issues/1370
 ///  
 ///  When maximized, there are some extra spaces in the scrollber.
 /// 

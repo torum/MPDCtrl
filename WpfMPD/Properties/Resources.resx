@@ -141,6 +141,9 @@
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
+  <data name="Developer" xml:space="preserve">
+    <value>Developer: torumyax</value>
+  </data>
   <data name="Host" xml:space="preserve">
     <value>Host</value>
   </data>
@@ -184,5 +187,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OU
   </data>
   <data name="StayOnTop" xml:space="preserve">
     <value>Stay on top</value>
+  </data>
+  <data name="Website" xml:space="preserve">
+    <value>Website:</value>
+  </data>
+  <data name="WebsiteURL" xml:space="preserve">
+    <value>https://github.com/torumyax/MPD-Ctrl</value>
   </data>
 </root>

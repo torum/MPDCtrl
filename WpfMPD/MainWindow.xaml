@@ -831,9 +831,9 @@
                     <StackPanel>
                         <Label Content="" TextElement.Foreground="White"/>
                         <Label Content="MPD Ctrl for Desktop 1.1.1" TextElement.Foreground="White"/>
-                        <Label Content="Developer: torumyax" TextElement.Foreground="White"/>
-                        <Label Content="Website: " TextElement.Foreground="White"/>
-                        <TextBox Text="https://github.com/torumyax/MPD-Ctrl" Margin="4" Background="Transparent" TextElement.Foreground="White" BorderThickness="0" IsReadOnly="True">
+                        <Label Content="{x:Static properties:Resources.Developer}" TextElement.Foreground="White"/>
+                        <Label Content="{x:Static properties:Resources.Website}" TextElement.Foreground="White"/>
+                        <TextBox Text="{x:Static properties:Resources.WebsiteURL}" Margin="4" Background="Transparent" TextElement.Foreground="White" BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Center">
                             <!--
                             <Hyperlink NavigateUri="https://github.com/torumyax/MPD-Ctrl" Click="Hyperlink_Click">https://github.com/torumyax/MPD-Ctrl</Hyperlink>
                             -->

@@ -141,6 +141,9 @@
   <data name="Delete" xml:space="preserve">
     <value>削除</value>
   </data>
+  <data name="Developer" xml:space="preserve">
+    <value>開発者：torumyax</value>
+  </data>
   <data name="Host" xml:space="preserve">
     <value>ホスト</value>
   </data>
@@ -180,5 +183,11 @@ Copyright (c) 2018 torumyax
   </data>
   <data name="StayOnTop" xml:space="preserve">
     <value>常に最前面</value>
+  </data>
+  <data name="Website" xml:space="preserve">
+    <value>ウェブサイト：</value>
+  </data>
+  <data name="WebsiteURL" xml:space="preserve">
+    <value>https://github.com/torumyax/MPD-Ctrl</value>
   </data>
 </root>

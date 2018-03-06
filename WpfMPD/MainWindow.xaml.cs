@@ -92,6 +92,7 @@ namespace WpfMPD
 
         public MainWindow()
         {
+            // Testing purpus only. Don't forget to comment this out if you uncomment.
             //MPDCtrl.Properties.Resources.Culture = CultureInfo.GetCultureInfo("en-US"); //or ja-JP
 
             InitializeComponent();

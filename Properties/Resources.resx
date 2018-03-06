@@ -132,6 +132,9 @@
   <data name="Connect" xml:space="preserve">
     <value>Connect</value>
   </data>
+  <data name="Connecting" xml:space="preserve">
+    <value>Connecting...</value>
+  </data>
   <data name="DefaultMPDServer" xml:space="preserve">
     <value>Default MPD server</value>
   </data>

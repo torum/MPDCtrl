@@ -719,10 +719,48 @@
                                 </TextBox.Style>
                             </TextBox>
                             <TextBlock Text="{x:Static properties:Resources.Password}" TextElement.Foreground="White"></TextBlock>
-                            <TextBox Text="{Binding Password, Mode=TwoWay}" Margin="0 4 0 12" ToolTip="{x:Static properties:Resources.Optional}"></TextBox>
+                            <PasswordBox x:Name="PasswordBox" PasswordChar="*" Tag="{Binding Password}" Margin="0 4 0 12" ToolTip="{x:Static properties:Resources.Optional}" PasswordChanged="PasswordBox_PasswordChanged">
+                                <PasswordBox.Style>
+                                    <Style TargetType="{x:Type PasswordBox}">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type PasswordBox}">
+                                                    <Grid Background="{TemplateBinding Background}">
+                                                        <ScrollViewer x:Name="PART_ContentHost"/>
+                                                        <TextBlock x:Name="UserMessage"
+                                                                   Margin="5,0,5,0"
+                                                                   Text="{Binding Password}" 
+                                                                   IsHitTestVisible="False"
+                                                                   HorizontalAlignment="Left"
+                                                                   VerticalAlignment="Center"
+                                                                   Visibility="Visible"/>
+                                                    </Grid>
+                                                    <ControlTemplate.Triggers>
+                                                        <MultiTrigger>
+                                                            <MultiTrigger.Conditions>
+                                                                <Condition Property="Tag" Value=""/>
+                                                            </MultiTrigger.Conditions>
+                                                            <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
+                                                            <Setter Property="Text" TargetName="UserMessage" Value=""/>
+                                                        </MultiTrigger>
+                                                        <MultiTrigger>
+                                                            <MultiTrigger.Conditions>
+                                                                <Condition Property="IsKeyboardFocusWithin" Value="true"/>
+                                                            </MultiTrigger.Conditions>
+                                                            <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
+                                                            <Setter Property="Text" TargetName="UserMessage" Value=""/>
+                                                        </MultiTrigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </PasswordBox.Style>
+                            </PasswordBox>
+                            
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
-                                <Button Content="{x:Static properties:Resources.Connect}" Command="{Binding NewConnectinSettingCommand}" Padding="4" Width="100" IsDefault="False"></Button>
+                                <Button Content="{x:Static properties:Resources.Connect}" Command="{Binding NewConnectinSettingCommand}" CommandParameter="{Binding ElementName=PasswordBox}" Padding="4" Width="100" IsDefault="False"></Button>
                                 <Button Content="{x:Static properties:Resources.Cancel}" Command="{Binding ShowSettingsCommand}" Padding="4" Width="100" Margin="24 0 0 0"></Button>
                             </StackPanel>
                         </StackPanel>
@@ -737,7 +775,8 @@
                             <TextBlock Grid.Row="0" Text="{x:Static properties:Resources.SavedProfiles}" TextElement.Foreground="White" Margin="0 0 0 0"></TextBlock>
                             <ListView Grid.Row="1" 
                                       HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Margin="0 4 0 0" MinHeight="74"
-                                      ItemsSource="{Binding ProfileList}" SelectedItem="{Binding SelectedProfile}">
+                                      ItemsSource="{Binding ProfileList}" SelectedItem="{Binding SelectedProfile}"
+                                      SelectionChanged="ListView_SelectionChanged">
                                 <ListView.View>
                                     <GridView>
                                         <GridView.ColumnHeaderContainerStyle>

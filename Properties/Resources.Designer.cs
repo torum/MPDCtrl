@@ -106,6 +106,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Connecting... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Connecting {
+            get {
+                return ResourceManager.GetString("Connecting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Default MPD server に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string DefaultMPDServer {

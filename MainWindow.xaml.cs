@@ -162,6 +162,23 @@ namespace WpfMPD
         {
             System.Diagnostics.Process.Start("https://github.com/torumyax/MPD-Ctrl");
         }
+
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            (sender as PasswordBox).Tag = "";
+
+        }
+
+        private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            PasswordBox.Password = "";
+            /*
+            if ((PasswordBox.Tag as String) == "")
+            {
+                PasswordBox.Password = "";
+            }
+            */
+        }
     }
 
 

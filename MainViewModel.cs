@@ -30,6 +30,8 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using System.Configuration;
 using System.Net;
+using System.Security.Cryptography;
+using System.Windows.Controls;
 
 namespace WpfMPD
 {
@@ -153,7 +155,7 @@ namespace WpfMPD
         public ObservableCollection<string> Playlists
         {
             get {
-                if (_MPC != null) { 
+                if (_MPC != null) {
                     return _MPC.Playlists;
                 }
                 else
@@ -378,8 +380,10 @@ namespace WpfMPD
                     this.NotifyPropertyChanged("Host");
                     this._defaultPort = this._profile.Port;
                     this.NotifyPropertyChanged("Port");
-                    this._defaultPassword = String.IsNullOrEmpty(this._profile.Password) ? "" : this._profile.Password;
-                    this.NotifyPropertyChanged("Password");
+                    //this._defaultPassword = String.IsNullOrEmpty(this._profile.Password) ? "" : this._profile.Password;
+                    this._defaultPassword = Decrypt(this._profile.Password);
+                    this.Password = DummyPassword(this._defaultPassword); //set dummy.
+                   
                 }
                 else
                 {
@@ -450,16 +454,33 @@ namespace WpfMPD
             }
         }
 
+        // Dummy.
         public string Password
         {
-            get { return this._defaultPassword; }
+            get
+            {
+                return DummyPassword(this._defaultPassword);
+                //return this._defaultPassword;
+            }
             set
             {
-                ClearErrror("Password");
-                this._defaultPassword = value;
+                //ClearErrror("Password");
+                //this._defaultPassword = value.Trim();
                 this.NotifyPropertyChanged("Password");
             }
         }
+
+        private string DummyPassword(string s)
+        {
+            if (String.IsNullOrEmpty(s)) { return ""; }
+            string e = "";
+            for (int i = 1; i <= s.Length; i++)
+            {
+                e = e + "*";
+            }
+            return e;
+        }
+        
 
         public string ErrorMessage
         {
@@ -506,13 +527,14 @@ namespace WpfMPD
             this._volumeDownCommand = new WpfMPD.Common.RelayCommand(this.VolumeDownCommand_Execute, this.VolumeDownCommand_CanExecute);
             this._volumeUpCommand = new WpfMPD.Common.RelayCommand(this.VolumeUpCommand_Execute, this.VolumeUpCommand_CanExecute);
             this._showSettingsCommand = new WpfMPD.Common.RelayCommand(this.ShowSettingsCommand_Execute, this.ShowSettingsCommand_CanExecute);
-            this._newConnectinSettingCommand = new WpfMPD.Common.RelayCommand(this.NewConnectinSettingCommand_Execute, this.NewConnectinSettingCommand_CanExecute);
+            //this._newConnectinSettingCommand = new WpfMPD.Common.RelayCommand(, this.NewConnectinSettingCommand_CanExecute);
+            this._newConnectinSettingCommand = new WpfMPD.Common.GenericRelayCommand<object>(param => this.NewConnectinSettingCommand_Execute(param), param => this.NewConnectinSettingCommand_CanExecute());
             this._addConnectinSettingCommand = new WpfMPD.Common.RelayCommand(this.AddConnectinSettingCommand_Execute, this.AddConnectinSettingCommand_CanExecute);
             this._deleteConnectinSettingCommand = new WpfMPD.Common.RelayCommand(this.DeleteConnectinSettingCommand_Execute, this.DeleteConnectinSettingCommand_CanExecute);
 
-
-            // Load settings.
             
+            // Load settings.
+
             // Upgrade settings. (just in case.)
             MPDCtrl.Properties.Settings.Default.Upgrade();
 
@@ -563,7 +585,7 @@ namespace WpfMPD
             _elapsedTimer.Interval = TimeSpan.FromMilliseconds(1000);
             _elapsedTimer.Tick += new EventHandler(ElapsedTimer);
 
-            ErrorMessage = "Connecting...";
+            ErrorMessage = MPDCtrl.Properties.Resources.Connecting; //"Connecting...";
 
             // Connect to MPD server and query status and info.
             if (await QueryStatus()) {
@@ -1115,6 +1137,44 @@ namespace WpfMPD
             }
         }
 
+        private string Encrypt(string s)
+        {
+            if (String.IsNullOrEmpty(s)) { return ""; }
+
+            byte[] entropy = new byte[] { 0x72, 0xa2, 0x12, 0x04 };
+
+            try {
+                byte[] userData = System.Text.Encoding.UTF8.GetBytes(s);
+
+                byte[] encryptedData = ProtectedData.Protect(userData, entropy, DataProtectionScope.CurrentUser);
+
+                return System.Convert.ToBase64String(encryptedData);
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        private string Decrypt(string s)
+        {
+            if (String.IsNullOrEmpty(s)) { return ""; }
+
+            byte[] entropy = new byte[] { 0x72, 0xa2, 0x12, 0x04 };
+
+            try {
+                byte[] encryptedData = System.Convert.FromBase64String(s);
+
+                byte[] userData = ProtectedData.Unprotect(encryptedData, entropy, DataProtectionScope.CurrentUser);
+
+                return System.Text.Encoding.UTF8.GetString(userData);
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
         #endregion END of PRIVATE METHODS
 
         #region COMMANDS
@@ -1652,11 +1712,12 @@ namespace WpfMPD
             //if (_ErrorMessages.Count > 0) { return false; }
             //if (!IsChanged) { return false; }
             //if (this._defaultHost == "") { return false; }
-            //if (IsBusy) { return false; }
+            if (IsBusy) { return false; }
             return true;
         }
 
-        public async void NewConnectinSettingCommand_Execute()
+        public async void NewConnectinSettingCommand_Execute(object param)
+        //public async void NewConnectinSettingCommand_Execute()
         {
             // New connection from Setting.
 
@@ -1687,6 +1748,10 @@ namespace WpfMPD
                 }
             }
 
+            // for Unbindable PasswordBox.
+            var passwordBox = param as PasswordBox;
+            this._defaultPassword = passwordBox.Password;
+
             if (_MPC != null) {
                 await this._MPC.MpdIdleStop();
                 await this._MPC.MpdIdleDisConnect();
@@ -1710,7 +1775,7 @@ namespace WpfMPD
                     {
                         Host = this._defaultHost,
                         Port = this._defaultPort,
-                        Password = this._defaultPassword.Trim(),
+                        Password = Encrypt(this._defaultPassword),
                         Name = this._defaultHost + ":" + this._defaultPort.ToString(),
                         ID = Guid.NewGuid().ToString(),
                     };
@@ -1723,7 +1788,7 @@ namespace WpfMPD
                 {
                     this._profile.Host = this._defaultHost;
                     this._profile.Port = this._defaultPort;
-                    this._profile.Password = this._defaultPassword.Trim();
+                    this._profile.Password = Encrypt(this._defaultPassword);
                 }
 
                 // Make it default;

@@ -242,8 +242,27 @@ namespace WpfMPD
             bool isDone = await _commandClient.Connect();
             if (!isDone)
             {
-                System.Diagnostics.Debug.WriteLine("Connected response@ParsePlaylistsResponse: null");
-                ErrorReturned?.Invoke(this, "Connection Error: (C0)");
+                if (_commandClient.ConnectionState == CommandTCPClient.ConnectionStatus.Error)
+                {
+                    // Network error
+                    System.Diagnostics.Debug.WriteLine("MpdCmdConnect(): _commandClient.Connect() returned false. Network error.");
+                    ErrorReturned?.Invoke(this, "Connection Error: (C0)");
+                }
+                else
+                {
+                    if (_commandClient.Connected())
+                    {
+                        // MPD did not return anything.
+                        System.Diagnostics.Debug.WriteLine("MpdCmdConnect(): _commandClient.Connect() returned false. Result null.");
+                        ErrorReturned?.Invoke(this, "Connection Error: (MPD null return)");
+                    }
+                    else
+                    {
+                        // MPD did not return "OK"
+                        System.Diagnostics.Debug.WriteLine("MpdCmdConnect(): _commandClient.Connect() returned false. MPD did not return OK.");
+                        ErrorReturned?.Invoke(this, "Connection Error: (MPD Non-OK)");
+                    }
+                }
             }
             return isDone;
         }
@@ -1415,7 +1434,12 @@ namespace WpfMPD
             try {
                 await _client.ConnectAsync(this._ip, this._p);
 
-                System.Diagnostics.Debug.WriteLine("\n**Server connected.");
+                if (this._client.Connected)
+                {
+                    this.ConnectionState = ConnectionStatus.Connected;
+                    System.Diagnostics.Debug.WriteLine("\n**Server connected.");
+                }
+
                 this.ConnectionState = ConnectionStatus.Receiving;
 
                 NetworkStream networkStream = this._client.GetStream();
@@ -1430,8 +1454,6 @@ namespace WpfMPD
                     this.ConnectionState = ConnectionStatus.Error;
                     return false;
                 }
-
-                this.ConnectionState = ConnectionStatus.Connected;
 
                 System.Diagnostics.Debug.WriteLine("**Connected response: " + responseLine);
 

@@ -4,7 +4,8 @@
 /// https://github.com/torumyax/MPD-Ctrl
 /// 
 /// TODO:
-///  More detailed error handling.
+///  More detailed error message for users.
+///  lock object.
 ///
 /// Known issue:
 ///  Mopidy does not accept command_list_begin + password
@@ -25,16 +26,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows.Data;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
-using System.Globalization;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -152,6 +148,8 @@ namespace WpfMPD
         private ObservableCollection<Song> _songs = new ObservableCollection<Song>();
         private ObservableCollection<String> _playLists = new ObservableCollection<String>();
         private EventDrivenTCPClient _idleClient;
+        //object _objLock = new object();
+        private CommandTCPClient _commandClient;
 
         #endregion END of MPC PRIVATE FIELD declaration
 
@@ -227,172 +225,36 @@ namespace WpfMPD
             BindingOperations.EnableCollectionSynchronization(this._playLists, new object());
 
             // Initialize idle tcp client.
-            _idleClient = new EventDrivenTCPClient(IPAddress.Parse(_h), _p, true);
-            //_idleClient.ReceiveTimeout = disabled in the source.
+            _idleClient = new EventDrivenTCPClient(IPAddress.Parse(this._h), this._p, true);
+            //_idleClient.ReceiveTimeout = Disabled. Hard coded in the source.
             _idleClient.DataReceived += new EventDrivenTCPClient.delDataReceived(IdleClient_DataReceived);
             _idleClient.ConnectionStatusChanged += new EventDrivenTCPClient.delConnectionStatusChanged(IdleClient_ConnectionStatusChanged);
+
+            // Initialize cmd tcp client.
+            _commandClient = new CommandTCPClient(IPAddress.Parse(this._h), this._p, this._a);
 
         }
 
         #region MPC METHODS
 
-        public async Task<bool> MpdIdleConnect()
+        public async Task<bool> MpdCmdConnect()
         {
-            //Idle client connect
-            try
+            bool isDone = await _commandClient.Connect();
+            if (!isDone)
             {
-                if (_idleClient.ConnectionState != EventDrivenTCPClient.ConnectionStatus.Connected)
-                {
-                    await Task.Run(() => { _idleClient.Connect(); });
-                }
-                return true;
+                System.Diagnostics.Debug.WriteLine("Connected response@ParsePlaylistsResponse: null");
+                ErrorReturned?.Invoke(this, "Connection Error: (C0)");
             }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MpdIdleConnect: " + ex.Message);
-                return false;
-            }
-            
+            return isDone;
         }
 
-        public async Task<bool> MpdIdleDisConnect()
+        public bool MpdCmdDisConnect()
         {
-            // Close Idle client connection.
-            try
-            {
-                if (_idleClient.ConnectionState == EventDrivenTCPClient.ConnectionStatus.Connected) {
-                    await Task.Run(() => { _idleClient.Disconnect(); });
-                }
-                return true;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MpdIdleDisConnect(): " + ex.Message);
-                return false;
-            }
-        }
-        
-        private void IdleClient_ConnectionStatusChanged(EventDrivenTCPClient sender, EventDrivenTCPClient.ConnectionStatus status)
-        {
-            //System.Diagnostics.Debug.WriteLine("IdleConnection: " + status.ToString());
-
-            if (status == EventDrivenTCPClient.ConnectionStatus.Connected)
-            {
-                //
-            }
+            _commandClient.DisConnect();
+            return true;
         }
 
-        private void IdleClient_DataReceived(EventDrivenTCPClient sender, object data)
-        {
-            System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived: " + (data as string) );
-
-            if (data == null) { return; }
-
-            if ((data as string).StartsWith("OK MPD"))
-            {
-                // Connected to MPD and received OK. Now we are idling and wait.
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    sender.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
-                }
-                else
-                {
-                    sender.Send("idle player mixer options playlist stored_playlist\n");
-                }
-                    
-            }
-            else
-            {
-                // Init List which is later used in StatusChangeEvent.
-                List<string> SubSystems = new List<string>();
-
-                try
-                {
-                    string[] Lines = Regex.Split((data as string), "\n");
-
-                    foreach (string line in Lines)
-                    {
-                        string[] Values;
-                        if (line.Trim() != "" && line != "OK")
-                        {
-                            Values = line.Split(':');
-                            if (Values.Length > 1)
-                            {
-                                //System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived lines loop: " + Values[1]);
-                                SubSystems.Add(Values[1].Trim());
-                            }
-                        }
-                    }
-                    
-                    if (SubSystems.Count > 0) {
-                        // Fire up changed event.
-                        StatusChanged?.Invoke(this, SubSystems);
-                    }
-                }
-                catch
-                {
-                    System.Diagnostics.Debug.WriteLine("Error@IdleConnection DataReceived: " + (data as string));
-                }
-
-                /*
-                 changed: playlist
-                 changed: player
-                 changed: options
-                 OK
-                */
-
-                // Go idle again and wait.
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    sender.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
-                }
-                else
-                {
-                    sender.Send("idle player mixer options playlist stored_playlist\n");
-                }
-            }
-        }
-
-        public async Task<bool> MpdIdleStart()
-        {
-            //Idle client send "idle" command
-            try
-            {
-                if (_idleClient.ConnectionState == EventDrivenTCPClient.ConnectionStatus.Connected)
-                {
-                    await Task.Run(() => { _idleClient.Send("idle player mixer options playlist stored_playlist\n"); });
-                    return true;
-                }
-                else { return false; }
-                
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MPDIdleStart(): " + ex.Message);
-                return false;
-            }
-        }
-
-        public async Task<bool> MpdIdleStop()
-        {
-            //Idle client send "noidle" command
-            try
-            {
-                if (_idleClient.ConnectionState == EventDrivenTCPClient.ConnectionStatus.Connected)
-                {
-                    await Task.Run(() => { _idleClient.Send("noidle\n"); });
-                    return true;
-                }
-                else { return false; }
-
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MPDIdleStop(): " + ex.Message);
-                return false;
-            }
-        }
-
+        /*
         private static async Task<List<string>> SendRequest(string server, int port, string mpdCommand)
         {
             IPAddress ipAddress = null;
@@ -479,6 +341,7 @@ namespace WpfMPD
                 return null;
             }
         }
+        */
 
         public async Task<bool> MpdQueryStatus()
         {
@@ -496,7 +359,8 @@ namespace WpfMPD
                     mpdCommand = mpdCommand + "command_list_end";
                 }
 
-                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
                 return ParseStatusResponse(tsResponse.Result);
             }
@@ -596,17 +460,21 @@ namespace WpfMPD
             if (MpdStatusValues.ContainsKey("songid"))
             {
                 _st.MpdSongID = MpdStatusValues["songid"];
-                
+                //System.Diagnostics.Debug.WriteLine("StatusResponse songid:"+ _st.MpdSongID);
+                /*
                 if (_st.MpdSongID != "") {
-                    
                     // Not good when multithreading.
-                    /*
+
                     // Set currentSong.
                     try
                     {
-                        var item = _songs.FirstOrDefault(i => i.ID == _st.MpdSongID);
-                        if (item != null) {
-                            this._currentSong = (item as Song);
+                        lock (_objLock)
+                        {
+                            var item = _songs.FirstOrDefault(i => i.ID == _st.MpdSongID);
+                            if (item != null)
+                            {
+                                this._currentSong = (item as Song);
+                            }
                         }
 
                         //var listItem = _songs.Where(i => i.ID == _st.MpdSongID);
@@ -626,9 +494,8 @@ namespace WpfMPD
                         // System.NullReferenceException
                         System.Diagnostics.Debug.WriteLine("Error@StatusResponse linq: _songs.Where?: " + ex.Message);
                     }
-                    */
                 }
-                
+                */
             }
 
             // Repeat opt bool.
@@ -733,7 +600,8 @@ namespace WpfMPD
                     mpdCommand = mpdCommand + "command_list_end";
                 }
 
-                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
                 return ParsePlaylistInfoResponse(tsResponse.Result);
@@ -744,39 +612,6 @@ namespace WpfMPD
                 System.Diagnostics.Debug.WriteLine("Error@MPDQueryCurrentPlaylist(): " + ex.Message);
             }
             return false;
-        }
-
-        public async Task<bool> MpdChangePlaylist(string playlistName)
-        {
-            if (playlistName.Trim() != "")
-            {
-                string mpdCommand = "command_list_begin" + "\n";
-
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                }
-
-                mpdCommand = mpdCommand + "clear" + "\n";
-
-                mpdCommand = mpdCommand + "load " + playlistName.Trim() + "\n";
-                //Testing. 
-                mpdCommand = mpdCommand + "play" + "\n";
-
-                mpdCommand = mpdCommand + "playlistinfo" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-
-                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
-
-                await tsResponse;
-
-                return ParsePlaylistInfoResponse(tsResponse.Result);
-            }
-            else
-            {
-                return false;
-            }
         }
 
         private bool ParsePlaylistInfoResponse(List<string> sl)
@@ -816,7 +651,6 @@ namespace WpfMPD
                             {
                                 SongValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
                             }
-
                         }
 
                         if (SongValues.ContainsKey("Id"))
@@ -848,23 +682,25 @@ namespace WpfMPD
 
                             SongValues.Clear();
 
-                            try { 
+                            try
+                            {
                                 _songs.Add(sng);
                             }
                             catch (Exception ex)
                             {
                                 System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse _songs.Add: " + ex.Message);
+                                return false;
                             }
                         }
-                        
+
                     }
                     catch (Exception ex)
                     {
                         System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse: " + ex.Message);
                         return false;
                     }
-
                 }
+
                 return true;
             }
             catch (Exception ex)
@@ -890,7 +726,8 @@ namespace WpfMPD
                     mpdCommand = mpdCommand + "command_list_end";
                 }
 
-                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
                 /*
@@ -977,11 +814,13 @@ namespace WpfMPD
                     mpdCommand = mpdCommand + "play" + "\n";
                 }
 
-                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n";
+
+                mpdCommand = mpdCommand + "command_list_end";
 
                 // Send task
-                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
-
+                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
                 // Alternatively just
@@ -1012,11 +851,13 @@ namespace WpfMPD
 
                 mpdCommand = mpdCommand + "seekid " + songID + " " + seekTime.ToString() + "\n";
 
-                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n";
+
+                mpdCommand = mpdCommand + "command_list_end";
 
                 // Send task
-                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
-
+                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
                 return ParseStatusResponse(tsResponse.Result);
 
@@ -1040,10 +881,12 @@ namespace WpfMPD
 
                 mpdCommand = mpdCommand + "pause 1" + "\n";
 
-                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n";
 
-                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                mpdCommand = mpdCommand + "command_list_end";
 
+                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
@@ -1069,10 +912,12 @@ namespace WpfMPD
 
                 mpdCommand = mpdCommand + "pause 0" + "\n";
 
-                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n";
 
-                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                mpdCommand = mpdCommand + "command_list_end";
 
+                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
@@ -1098,10 +943,12 @@ namespace WpfMPD
 
                 mpdCommand = mpdCommand + "stop" + "\n";
 
-                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n";
 
-                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                mpdCommand = mpdCommand + "command_list_end";
 
+                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
@@ -1132,10 +979,12 @@ namespace WpfMPD
                     mpdCommand = mpdCommand + "play" + "\n";
                 }
 
-                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n";
 
-                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                mpdCommand = mpdCommand + "command_list_end";
 
+                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
@@ -1165,10 +1014,12 @@ namespace WpfMPD
                     mpdCommand = mpdCommand + "play" + "\n";
                 }
 
-                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n";
 
-                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                mpdCommand = mpdCommand + "command_list_end";
 
+                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
@@ -1195,10 +1046,12 @@ namespace WpfMPD
 
                 mpdCommand = mpdCommand + "setvol " + v.ToString() + "\n";
 
-                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n";
 
-                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                mpdCommand = mpdCommand + "command_list_end";
 
+                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
@@ -1231,10 +1084,12 @@ namespace WpfMPD
                     mpdCommand = mpdCommand + "repeat 0" + "\n";
                 }
 
-                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n";
 
-                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                mpdCommand = mpdCommand + "command_list_end";
 
+                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
@@ -1268,10 +1123,12 @@ namespace WpfMPD
                     mpdCommand = mpdCommand + "random 0" + "\n";
                 }
 
-                mpdCommand = mpdCommand + "status" + "\n" + "command_list_end";
+                mpdCommand = mpdCommand + "status" + "\n";
 
-                Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                mpdCommand = mpdCommand + "command_list_end";
 
+                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
                 return ParseStatusResponse(tsResponse.Result);
@@ -1284,9 +1141,403 @@ namespace WpfMPD
             return false;
         }
 
+        public async Task<bool> MpdChangePlaylist(string playlistName)
+        {
+            if (playlistName.Trim() != "")
+            {
+                string mpdCommand = "command_list_begin" + "\n";
+
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                }
+
+                mpdCommand = mpdCommand + "clear" + "\n";
+
+                mpdCommand = mpdCommand + "load " + playlistName.Trim() + "\n";
+                
+                mpdCommand = mpdCommand + "play" + "\n";
+
+                //Testing. Trust idle connection will notify us or not.  
+                //mpdCommand = mpdCommand + "playlistinfo" + "\n";
+
+                mpdCommand = mpdCommand + "command_list_end";
+
+                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
+                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
+                await tsResponse;
+
+                //return ParsePlaylistInfoResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private bool ParseVoidResponse(List<string> sl)
+        {
+            if (this.MpdStop) { return false; }
+            if (sl == null)
+            {
+                System.Diagnostics.Debug.WriteLine("ConError@ParseVoidResponse: null");
+                ErrorReturned?.Invoke(this, "Connection Error: (@C)");
+                return false;
+            }
+
+            try
+            {
+                foreach (string value in sl)
+                {
+                    //System.Diagnostics.Debug.WriteLine("@ParseVoidResponse() loop: " + value);
+
+                    if (value.StartsWith("ACK"))
+                    {
+                        System.Diagnostics.Debug.WriteLine("ACK@ParseVoidResponse: " + value);
+                        ErrorReturned?.Invoke(this, "MPD Error (@C): " + value);
+                        return false;
+                    }
+
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@ParseVoidResponse: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool MpdIdleConnect()
+        {
+            //Idle client connect
+            try
+            {
+                if (_idleClient.ConnectionState != EventDrivenTCPClient.ConnectionStatus.Connected)
+                {
+                    _idleClient.Connect(); 
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdIdleConnect: " + ex.Message);
+                return false;
+            }
+
+        }
+
+        public bool MpdIdleDisConnect()
+        {
+            // Close Idle client connection.
+            try
+            {
+                if (_idleClient.ConnectionState == EventDrivenTCPClient.ConnectionStatus.Connected)
+                {
+                    _idleClient.Disconnect();
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdIdleDisConnect(): " + ex.Message);
+                return false;
+            }
+        }
+
+        private void IdleClient_ConnectionStatusChanged(EventDrivenTCPClient sender, EventDrivenTCPClient.ConnectionStatus status)
+        {
+            //System.Diagnostics.Debug.WriteLine("IdleConnection: " + status.ToString());
+
+            if (status == EventDrivenTCPClient.ConnectionStatus.Connected)
+            {
+                //
+            }
+        }
+
+        private void IdleClient_DataReceived(EventDrivenTCPClient sender, object data)
+        {
+            System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived: " + (data as string));
+
+            if (data == null) { return; }
+
+            if ((data as string).StartsWith("OK MPD"))
+            {
+                // Connected to MPD and received OK. Now we are idling and wait.
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    sender.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
+                }
+                else
+                {
+                    sender.Send("idle player mixer options playlist stored_playlist\n");
+                }
+
+            }
+            else
+            {
+                // Init List which is later used in StatusChangeEvent.
+                List<string> SubSystems = new List<string>();
+
+                try
+                {
+                    string[] Lines = Regex.Split((data as string), "\n");
+
+                    foreach (string line in Lines)
+                    {
+                        string[] Values;
+                        if (line.Trim() != "" && line != "OK")
+                        {
+                            Values = line.Split(':');
+                            if (Values.Length > 1)
+                            {
+                                //System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived lines loop: " + Values[1]);
+                                SubSystems.Add(Values[1].Trim());
+                            }
+                        }
+                    }
+
+                    if (SubSystems.Count > 0)
+                    {
+                        // Fire up changed event.
+                        StatusChanged?.Invoke(this, SubSystems);
+                    }
+                }
+                catch
+                {
+                    System.Diagnostics.Debug.WriteLine("Error@IdleConnection DataReceived: " + (data as string));
+                }
+
+                /*
+                 changed: playlist
+                 changed: player
+                 changed: options
+                 OK
+                */
+
+                // Go idle again and wait.
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    sender.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
+                }
+                else
+                {
+                    sender.Send("idle player mixer options playlist stored_playlist\n");
+                }
+            }
+        }
+
+        public async Task<bool> MpdIdleStart()
+        {
+            // Not really using.
+            // send "idle" command
+            try
+            {
+                if (_idleClient.ConnectionState == EventDrivenTCPClient.ConnectionStatus.Connected)
+                {
+                    await Task.Run(() => { _idleClient.Send("idle player mixer options playlist stored_playlist\n"); });
+                    return true;
+                }
+                else { return false; }
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MPDIdleStart(): " + ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> MpdIdleStop()
+        {
+            //Idle client send "noidle" command
+            try
+            {
+                if (_idleClient.ConnectionState == EventDrivenTCPClient.ConnectionStatus.Connected)
+                {
+                    await Task.Run(() => { _idleClient.Send("noidle\n"); });
+                    return true;
+                }
+                else { return false; }
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MPDIdleStop(): " + ex.Message);
+                return false;
+            }
+        }
+
         #endregion END of MPD METHODS
 
         /// END OF MPC Client Class 
+    }
+
+    public class CommandTCPClient
+    {
+        private TcpClient _client;
+        private ConnectionStatus _conStatus;
+        private IPAddress _ip = IPAddress.None;
+        private int _p = 0;
+        private string _a = "";
+
+        //TODO: make this an error object to pass in error event.
+        public enum ConnectionStatus
+        {
+            NeverConnected,
+            Connecting,
+            Connected,
+            Receiving,
+            DisconnectedByUser,
+            Error
+        }
+
+        public CommandTCPClient(IPAddress ip, int port, string auth)
+        {
+            this._ip = ip;
+            this._p = port;
+            this._a = auth;
+            this._client = new TcpClient();
+            ConnectionState = ConnectionStatus.NeverConnected;
+        }
+
+        public async Task<bool> Connect()
+        {
+            if (this._client.Connected)
+            {
+                return true;
+            }
+
+            this.ConnectionState = ConnectionStatus.Connecting;
+
+            try {
+                await _client.ConnectAsync(this._ip, this._p);
+
+                System.Diagnostics.Debug.WriteLine("\n**Server connected.");
+                this.ConnectionState = ConnectionStatus.Receiving;
+
+                NetworkStream networkStream = this._client.GetStream();
+                StreamReader reader = new StreamReader(networkStream);
+
+                // First check MPD's initial response on connect.
+                string responseLine = await reader.ReadLineAsync();
+
+                if (responseLine == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("**Connected response: null");
+                    this.ConnectionState = ConnectionStatus.Error;
+                    return false;
+                }
+
+                this.ConnectionState = ConnectionStatus.Connected;
+
+                System.Diagnostics.Debug.WriteLine("**Connected response: " + responseLine);
+
+                if (responseLine.StartsWith("OK MPD"))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("**Error@Connect: " + ex.Message);
+                this.ConnectionState = ConnectionStatus.Error;
+                return false;
+            }
+        }
+
+        //TODO: make static or...
+        public async Task<List<string>> SendCommand(string cmd)
+        {
+            if (!this._client.Connected)
+            {
+                if (ConnectionState == ConnectionStatus.DisconnectedByUser) { return null; }
+                System.Diagnostics.Debug.WriteLine("**CommandTCPClient: disconnected. Try re-connect.");
+
+                bool isDone = await this.Connect();
+                if (!isDone)
+                {
+                    System.Diagnostics.Debug.WriteLine("**CommandTCPClient: re-connect failed.");
+                    return null;
+                }
+            }
+
+            NetworkStream networkStream = this._client.GetStream();
+            StreamWriter writer = new StreamWriter(networkStream);
+            StreamReader reader = new StreamReader(networkStream);
+            writer.AutoFlush = true;
+
+            System.Diagnostics.Debug.WriteLine("**Request: " + cmd);
+
+            await writer.WriteLineAsync(cmd);
+
+            string responseLine;
+            List<string> responseMultiLines = new List<string>();
+
+            // Read multiple lines untill "OK".
+            while (!reader.EndOfStream)
+            {
+                responseLine = await reader.ReadLineAsync();
+                if (responseLine == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("**reader.ReadLineAsync(): null");
+                    break;
+                }
+
+                //System.Diagnostics.Debug.WriteLine("Response loop: " + responseLine);
+
+                if ((responseLine != "OK") && (responseLine != ""))
+                {
+                    responseMultiLines.Add(responseLine);
+                    if (responseLine.StartsWith("ACK"))
+                    {
+                        System.Diagnostics.Debug.WriteLine("**Response ACK: " + responseLine + "\n");
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return responseMultiLines;
+        }
+
+        public bool DisConnect()
+        {
+            if (this._client.Connected) {
+                ConnectionState = ConnectionStatus.DisconnectedByUser;
+                this._client.Close();
+                System.Diagnostics.Debug.WriteLine("**Connection closed.");
+            }
+            return true;
+        }
+
+        public bool Connected()
+        {
+            return this._client.Connected;
+        }
+
+        public ConnectionStatus ConnectionState
+        {
+            get
+            {
+                return _conStatus;
+            }
+            private set
+            {
+                //bool raiseEvent = value != _conStatus;
+                _conStatus = value;
+                //if (ConnectionStatusChanged != null && raiseEvent)
+                //    ConnectionStatusChanged.BeginInvoke(this, _conStatus, new AsyncCallback(cbChangeConnectionStateComplete), this);
+            }
+        }
     }
 
 

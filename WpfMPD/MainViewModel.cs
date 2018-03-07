@@ -7,7 +7,7 @@
 /// -- Priority 1 --
 ///  Test against Mopidy. > done. See below "Known issues"
 ///  -- Priority 2 --
-///  Better error messages.
+///  Better error messages for users.
 ///  TrayIcon.
 ///  Sync version number with AppX somehow.
 ///  Use FluentWPF
@@ -387,6 +387,8 @@ namespace WpfMPD
             set
             {
                 this._profile = value;
+                ClearErrror("Host");
+                ClearErrror("Port");
                 if (this._profile != null) {
                     // Workaround validation.
                     this._defaultHost = this._profile.Host;
@@ -407,6 +409,7 @@ namespace WpfMPD
                     this._defaultPassword = "";
                     this.NotifyPropertyChanged("Password");
                 }
+
                 this.NotifyPropertyChanged("SelectedProfile");
             }
         }
@@ -559,6 +562,8 @@ namespace WpfMPD
                     SelectedProfile = (item as Profile);
                     // just in case.
                     ShowSettings = false;
+
+                    
                     // start client.
                     StartConnection();
                 }
@@ -588,31 +593,25 @@ namespace WpfMPD
 
             ErrorMessage = MPDCtrl.Properties.Resources.Connecting; //"Connecting...";
 
-            // Connect to MPD server and query status and info.
-            if (await QueryStatus()) {
-                // Start idle connection.
-                if (await ConnectIdle())
+            if (await _MPC.MpdCmdConnect())
+            {
+                // Connect to MPD server and query status and info.
+                if (await QueryStatus())
                 {
-                    // Start idle.
-                    //return await _MPC.MpdIdleStart();
-                    // Or not.
-
-                    ErrorMessage = "";
-
-                    return true;
+                    // Connect and start "idle" connection.
+                    if (_MPC.MpdIdleConnect())
+                    {
+                        ErrorMessage = "";
+                        return true;
+                    }
                 }
             }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("MpdCmdConnect@StartConnection() failed.");
+            }
+
             return false;
-        }
-
-        private async Task<bool> ConnectIdle()
-        {
-            return await _MPC.MpdIdleConnect();
-        }
-
-        private async void DisConnectIdle()
-        {
-            bool isDone = await _MPC.MpdIdleDisConnect();
         }
 
         private async void OnStatusChanged(MPC sender, object data)
@@ -631,27 +630,27 @@ namespace WpfMPD
 
                 if (subsystem == "player")
                 {
+                    //System.Diagnostics.Debug.WriteLine("OnStatusChanged: player");
                     isPlayer = true;
-                    System.Diagnostics.Debug.WriteLine("OnStatusChanged: player");
                 }
                 else if (subsystem == "mixer")
                 {
-                    System.Diagnostics.Debug.WriteLine("OnStatusChanged: mixer");
+                    //System.Diagnostics.Debug.WriteLine("OnStatusChanged: mixer");
                     isPlayer = true;
                 }
                 else if (subsystem == "options")
                 {
-                    System.Diagnostics.Debug.WriteLine("OnStatusChanged: options");
+                    //System.Diagnostics.Debug.WriteLine("OnStatusChanged: options");
                     isPlayer = true;
                 }
                 else if (subsystem == "playlist")
                 {
-                    System.Diagnostics.Debug.WriteLine("OnStatusChanged: playlist");
+                    //System.Diagnostics.Debug.WriteLine("OnStatusChanged: playlist");
                     isPlaylist = true;
                 }
                 else if (subsystem == "stored_playlist")
                 {
-                    System.Diagnostics.Debug.WriteLine("OnStatusChanged: stored_playlist");
+                    //System.Diagnostics.Debug.WriteLine("OnStatusChanged: stored_playlist");
                     isStoredPlaylist = true;
                 }
             }
@@ -673,19 +672,78 @@ namespace WpfMPD
 
             if ((isPlayer && isPlaylist))
             {
-                System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlayer & isPlaylist");
+                //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlayer & isPlaylist");
 
                 IsBusy = true;
 
                 // Reset view.
                 sender.CurrentQueue.Clear();
                 this._selectedSong = null;
-                //this.NotifyPropertyChanged("SelectedSong");
-                //this._selecctedPlaylist = "";
-                //this.NotifyPropertyChanged("SelectedPlaylist");
-                //UpdateButtonStatus();
 
                 // Get updated information.
+                bool isDone = await sender.MpdQueryStatus();
+                if (isDone)
+                {
+                    System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryStatus> is done.");
+
+                    isDone = await sender.MpdQueryCurrentPlaylist();
+                    if (isDone)
+                    {
+                        System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryCurrentPlaylist> is done.");
+
+                        // Combo selected item should now read "Current Play Queue"
+                        _selecctedPlaylist = "";
+                        this.NotifyPropertyChanged("SelectedPlaylist");
+
+                        if (sender.MpdCurrentSong != null)
+                        {
+                            this._selectedSong = sender.MpdCurrentSong;
+                            this.NotifyPropertyChanged("SelectedSong");
+                            System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer & isPlaylist SelectedSong is : " + this._selectedSong.Title);
+                        }
+
+                        //IsBusy = false;
+                        UpdateButtonStatus();
+
+                        if (isStoredPlaylist)
+                        {
+                            // Retrieve playlists
+                            sender.Playlists.Clear();
+                            isDone = await sender.MpdQueryPlaylists();
+                            if (isDone)
+                            {
+                                System.Diagnostics.Debug.WriteLine("QueryPlaylists is done.");
+
+                                IsBusy = false;
+                            }
+                            else
+                            {
+                                IsBusy = false;
+                                //TODO: Let user know.
+                                System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
+                            }
+                        }
+                        else
+                        {
+                            IsBusy = false;
+                        }
+                    }
+                    else
+                    {
+                        IsBusy = false;
+                        //TODO: Let user know.
+                        System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue returned false." + "\n");
+                    }
+                }
+                else
+                {
+                    IsBusy = false;
+                    // Let user know.
+                    System.Diagnostics.Debug.WriteLine("MpdQueryStatus returned with false." + "\n");
+                }
+
+
+                /*
                 bool isDone = await sender.MpdQueryCurrentPlaylist();
                 if (isDone)
                 {
@@ -700,24 +758,27 @@ namespace WpfMPD
                     {
                         System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryStatus> is done.");
 
-                        try
+                        if (sender.MpdCurrentSong == null)
                         {
-                            var item = _MPC.CurrentQueue.FirstOrDefault(i => i.ID == _MPC.MpdStatus.MpdSongID);
-                            if (item != null)
+                            try
                             {
-                                //sender.MpdCurrentSong = (item as MPC.Song);
-                                this._selectedSong = (item as MPC.Song);
-                                this.NotifyPropertyChanged("SelectedSong");
-                                System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer & isPlaylist SelectedSong is : " + this._selectedSong.Title);
+                                var item = _MPC.CurrentQueue.FirstOrDefault(i => i.ID == _MPC.MpdStatus.MpdSongID);
+                                if (item != null)
+                                {
+                                    //sender.MpdCurrentSong = (item as MPC.Song);
+                                    this._selectedSong = (item as MPC.Song);
+                                    this.NotifyPropertyChanged("SelectedSong");
+                                    System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer & isPlaylist SelectedSong is : " + this._selectedSong.Title);
+                                }
+                                else
+                                {
+                                    System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer & isPlaylist SelectedSong is NULL");
+                                }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer & isPlaylist SelectedSong is NULL");
+                                System.Diagnostics.Debug.WriteLine("_MPC.CurrentQueue.FirstOrDefault@(isPlaylist) failed: " + ex.Message);
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine("_MPC.CurrentQueue.FirstOrDefault@(isPlaylist) failed: " + ex.Message);
                         }
 
                         // Listview selection changed event in the code behind takes care ScrollIntoView. 
@@ -725,9 +786,6 @@ namespace WpfMPD
 
                         IsBusy = false;
                         UpdateButtonStatus();
-
-                        //Testing
-                        //await _MPC.MpdIdleStart();
                     }
                     else
                     {
@@ -768,19 +826,17 @@ namespace WpfMPD
                     //TODO: Let user know.
                     System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue returned false." + "\n");
                 }
+                */
+
             }
             else if (isPlaylist)
             {
-                System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlaylist");
+                //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlaylist");
                 IsBusy = true;
 
                 // Reset view.
                 sender.CurrentQueue.Clear();
                 this._selectedSong = null;
-                //this.NotifyPropertyChanged("SelectedSong");
-                //this._selecctedPlaylist = "";
-                //this.NotifyPropertyChanged("SelectedPlaylist");
-                //UpdateButtonStatus();
 
                 // Get updated information.
                 bool isDone = await sender.MpdQueryCurrentPlaylist();
@@ -791,37 +847,64 @@ namespace WpfMPD
                     _selecctedPlaylist = "";
                     this.NotifyPropertyChanged("SelectedPlaylist");
 
+                    //IsBusy = false;
+                    UpdateButtonStatus();
+
+                    if (isStoredPlaylist)
+                    {
+                        // Retrieve playlists
+                        sender.Playlists.Clear();
+                        isDone = await sender.MpdQueryPlaylists();
+                        if (isDone)
+                        {
+                            //System.Diagnostics.Debug.WriteLine("QueryPlaylists is done.");
+
+                            // Selected item should now read "Current Play Queue"
+                            //https://stackoverflow.com/questions/2343446/default-text-for-templated-combo-box?rq=1
+
+                            IsBusy = false;
+                        }
+                        else
+                        {
+                            IsBusy = false;
+                            System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
+                        }
+                    }
+                    else
+                    {
+                        IsBusy = false;
+                    }
+                    /*
                     // Update status.
                     isDone = await sender.MpdQueryStatus();
                     if (isDone)
                     {
                         System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryStatus> is done.");
 
-                        try
-                        {
-                            var item = _MPC.CurrentQueue.FirstOrDefault(i => i.ID == _MPC.MpdStatus.MpdSongID);
-                            if (item != null)
+                        if (sender.MpdCurrentSong == null) {
+                            try
                             {
-                                //sender.MpdCurrentSong = (item as MPC.Song);
-                                this._selectedSong = (item as MPC.Song);
-                                this.NotifyPropertyChanged("SelectedSong");
-                                System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlaylist SelectedSong is : " + this._selectedSong.Title);
+                                var item = _MPC.CurrentQueue.FirstOrDefault(i => i.ID == _MPC.MpdStatus.MpdSongID);
+                                if (item != null)
+                                {
+                                    //sender.MpdCurrentSong = (item as MPC.Song);
+                                    this._selectedSong = (item as MPC.Song);
+                                    this.NotifyPropertyChanged("SelectedSong");
+                                    System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlaylist SelectedSong is : " + this._selectedSong.Title);
+                                }
+                                else
+                                {
+                                    System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlaylist SelectedSong is NULL");
+                                }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlaylist SelectedSong is NULL");
+                                System.Diagnostics.Debug.WriteLine("_MPC.CurrentQueue.FirstOrDefault@(isPlaylist) failed: " + ex.Message);
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine("_MPC.CurrentQueue.FirstOrDefault@(isPlaylist) failed: " + ex.Message);
                         }
 
                         IsBusy = false;
                         UpdateButtonStatus();
-
-                        //Testing
-                        //await _MPC.MpdIdleStart();
 
                         if (isStoredPlaylist)
                         {
@@ -855,17 +938,17 @@ namespace WpfMPD
                         // Let user know.
                         System.Diagnostics.Debug.WriteLine("MpdQueryStatus returned with false." + "\n");
                     }
+                    */
                 }
                 else
                 {
                     IsBusy = false;
-                    //TODO: Let user know.
                     System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue returned false." + "\n");
                 }
             }
             else if (isPlayer)
             {
-                System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlayer");
+                //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlayer");
 
                 IsBusy = true;
 
@@ -902,12 +985,10 @@ namespace WpfMPD
 
                     // Listview selection changed event in the code behind takes care ScrollIntoView. 
                     // This is a VIEW matter.
+                    
 
-                    IsBusy = false;
+                    //IsBusy = false;
                     UpdateButtonStatus();
-
-                    //Testing
-                    //await _MPC.MpdIdleStart();
 
                     if (isStoredPlaylist)
                     {
@@ -921,29 +1002,29 @@ namespace WpfMPD
                             // Selected item should now read "Current Play Queue"
                             //https://stackoverflow.com/questions/2343446/default-text-for-templated-combo-box?rq=1
 
-                            //IsBusy = false;
+                            IsBusy = false;
                         }
                         else
                         {
                             IsBusy = false;
-                            //TODO: Let user know.
                             System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
                         }
                     }
                     else
                     {
-                        //IsBusy = false;
+                        IsBusy = false;
                     }
                 }
                 else
                 {
                     IsBusy = false;
-                    // Let user know.
                     System.Diagnostics.Debug.WriteLine("MpdQueryStatus returned with false." + "\n");
                 }
             }
             else if (isStoredPlaylist)
             {
+                IsBusy = true;
+
                 this._selecctedPlaylist = "";
                 this.NotifyPropertyChanged("SelectedPlaylist");
 
@@ -959,26 +1040,19 @@ namespace WpfMPD
                         // Selected item should now read "Current Play Queue"
                         //https://stackoverflow.com/questions/2343446/default-text-for-templated-combo-box?rq=1
 
-                        //IsBusy = false;
+                        IsBusy = false;
                     }
                     else
                     {
-                        //IsBusy = false;
-                        //TODO: Let user know.
+                        IsBusy = false;
                         System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
                     }
-
-                    //Testing
-                    //await _MPC.MpdIdleStart();
                 }
                 else
                 {
                     IsBusy = false;
                 }
             }
-
-            // Don't.It's already done.
-            //bool isDone = await _MPC.MpdIdleStart();
         }
 
         private async Task<bool> QueryStatus()
@@ -1500,7 +1574,7 @@ namespace WpfMPD
                     await Task.Delay(1500);
                     if (IsBusy)
                     {
-                        ErrorMessage = "Change playlist time out.";
+                        //ErrorMessage = "Change playlist time out.";
                         System.Diagnostics.Debug.WriteLine("ChangePlaylistCommand_ExecuteAsync: TIME OUT");
                         return;
                     }
@@ -1585,9 +1659,11 @@ namespace WpfMPD
         {
             //System.Diagnostics.Debug.WriteLine("WindowClosingCommand");
 
-            // Disconnect idle connection.
+            // Disconnect connections.
             if (_MPC != null) {
-                DisConnectIdle();
+                _MPC.MpdIdleDisConnect();
+                _MPC.MpdStop = true;
+                _MPC.MpdCmdDisConnect();
             }
         }
 
@@ -1775,7 +1851,7 @@ namespace WpfMPD
 
             if (_MPC != null) {
                 await this._MPC.MpdIdleStop();
-                await this._MPC.MpdIdleDisConnect();
+                this._MPC.MpdIdleDisConnect();
 
                 _MPC.CurrentQueue.Clear();
                 _MPC.Playlists.Clear();

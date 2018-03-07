@@ -1483,6 +1483,7 @@ namespace WpfMPD
             // Read multiple lines untill "OK".
             while (!reader.EndOfStream)
             {
+                if (ConnectionState == ConnectionStatus.DisconnectedByUser) { return null; }
                 responseLine = await reader.ReadLineAsync();
                 if (responseLine == null)
                 {

@@ -1088,7 +1088,14 @@ namespace WpfMPD
                 System.Diagnostics.Debug.WriteLine("QueryCurrentPlaylist is done.");
 
                 if (_MPC.CurrentQueue.Count > 0) {
-                    
+
+                    if (_MPC.MpdCurrentSong != null)
+                    {
+                        this._selectedSong = _MPC.MpdCurrentSong;
+                        this.NotifyPropertyChanged("SelectedSong");
+                        System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer & isPlaylist SelectedSong is : " + this._selectedSong.Title);
+                    }
+                    /*
                     var listItem = _MPC.CurrentQueue.Where(i => i.ID == _MPC.MpdStatus.MpdSongID);
                     if (listItem != null)
                     {
@@ -1106,6 +1113,8 @@ namespace WpfMPD
 
                     // Listview selection changed event in the code behind takes care ScrollIntoView. 
                     // This is a VIEW matter.
+
+                    */
                 }
 
                 IsBusy = false;
@@ -1525,6 +1534,22 @@ namespace WpfMPD
 
         public async void ChangeSongCommand_ExecuteAsync()
         {
+            // Little dirty, but since our ObservableCollection isn't thread safe...
+            if (IsBusy)
+            {
+                await Task.Delay(1000);
+                if (IsBusy)
+                {
+                    await Task.Delay(1500);
+                    if (IsBusy)
+                    {
+                        //ErrorMessage = "Change playlist time out.";
+                        System.Diagnostics.Debug.WriteLine("ChangeSongCommand_ExecuteAsync: TIME OUT");
+                        return;
+                    }
+                }
+            }
+
             bool isDone = await _MPC.MpdPlaybackPlay(_selectedSong.ID);
             if (isDone)
             {
@@ -1590,7 +1615,7 @@ namespace WpfMPD
             //_MPC.CurrentQueue.Clear();
             //this._selectedSong = null;
 
-            //MPD >> clear load playlistinfo > returns and updates playlist.
+            // No longer load lists. Just tell it to change.
             bool isDone = await _MPC.MpdChangePlaylist(this._selecctedPlaylist);
             if (isDone)
             {

@@ -1582,21 +1582,27 @@ namespace WpfMPD
             }
 
             if (this._selecctedPlaylist == "") { return; }
-           
-            IsBusy = true;
 
-            _MPC.CurrentQueue.Clear();
-            this._selectedSong = null;
+            // Don't set isBusy or clear. We are not gonna change anything. Let idle client handle updates.
+
+            //IsBusy = true;
+
+            //_MPC.CurrentQueue.Clear();
+            //this._selectedSong = null;
 
             //MPD >> clear load playlistinfo > returns and updates playlist.
             bool isDone = await _MPC.MpdChangePlaylist(this._selecctedPlaylist);
             if (isDone)
             {
-                _selecctedPlaylist = "";
-                this.NotifyPropertyChanged("SelectedPlaylist");
+                // Don't show "Current Play Que yet."
+                //_selecctedPlaylist = "";
+                //this.NotifyPropertyChanged("SelectedPlaylist");
 
+                // Let idle client handle updates.
+
+                /*
                 if (_MPC.CurrentQueue.Count > 0) {
-                    /*
+                    
                     //Start play. MPD >> play status > returns and update status.
                     isDone = await _MPC.MpdPlaybackPlay();
                     if (isDone)
@@ -1633,14 +1639,15 @@ namespace WpfMPD
                     {
                         System.Diagnostics.Debug.WriteLine("\n\nMpdPlaybackPlay returned false");
                     }
-                    */
+                    
                 }
-                
-                IsBusy = false;
+                */
+                //IsBusy = false;
             }
             else
             {
                 System.Diagnostics.Debug.WriteLine("\n\nMpdChangePlaylist returned false");
+                //IsBusy = false;
             }
 
             //TODO make other controls disabled

@@ -1180,50 +1180,56 @@ namespace WpfMPD
 
         private void UpdateButtonStatus()
         {
-            //Play button
-            switch (_MPC.MpdStatus.MpdState)
-            {
-                case MPC.Status.MpdPlayState.Play:
-                    {
-                        this.PlayButton = _pathPlayButton;
-                        break;
-                    }
-                case MPC.Status.MpdPlayState.Pause:
-                    {
-                        this.PlayButton = _pathPauseButton;
-                        break;
-                    }
-                case MPC.Status.MpdPlayState.Stop:
-                    {
-                        this.PlayButton = _pathStopButton;
-                        break;
-                    }
+            try {
+                //Play button
+                switch (_MPC.MpdStatus.MpdState)
+                {
+                    case MPC.Status.MpdPlayState.Play:
+                        {
+                            this.PlayButton = _pathPlayButton;
+                            break;
+                        }
+                    case MPC.Status.MpdPlayState.Pause:
+                        {
+                            this.PlayButton = _pathPauseButton;
+                            break;
+                        }
+                    case MPC.Status.MpdPlayState.Stop:
+                        {
+                            this.PlayButton = _pathStopButton;
+                            break;
+                        }
+                }
+
+                // "quietly" update view.
+                this._volume = Convert.ToDouble(_MPC.MpdStatus.MpdVolume);
+                this.NotifyPropertyChanged("Volume");
+
+                this._random = _MPC.MpdStatus.MpdRandom;
+                this.NotifyPropertyChanged("Random");
+
+                this._repeat = _MPC.MpdStatus.MpdRepeat;
+                this.NotifyPropertyChanged("Repeat");
+
+                // no need to care about "double" updates for time.
+                this.Time = _MPC.MpdStatus.MpdSongTime;
+
+                this._elapsed = _MPC.MpdStatus.MpdSongElapsed;
+                this.NotifyPropertyChanged("Elapsed");
+
+                //start elapsed timer.
+                if (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
+                {
+                    _elapsedTimer.Start();
+                }
+                else
+                {
+                    _elapsedTimer.Stop();
+                }
             }
-
-            // "quietly" update view.
-            this._volume = Convert.ToDouble(_MPC.MpdStatus.MpdVolume);
-            this.NotifyPropertyChanged("Volume");
-
-            this._random = _MPC.MpdStatus.MpdRandom;
-            this.NotifyPropertyChanged("Random");
-
-            this._repeat = _MPC.MpdStatus.MpdRepeat;
-            this.NotifyPropertyChanged("Repeat");
-
-            // no need to care about "double" updates for time.
-            this.Time = _MPC.MpdStatus.MpdSongTime;
-
-            this._elapsed = _MPC.MpdStatus.MpdSongElapsed;
-            this.NotifyPropertyChanged("Elapsed");
-
-            //start elapsed timer.
-            if (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
+            catch
             {
-                _elapsedTimer.Start();
-            }
-            else
-            {
-                _elapsedTimer.Stop();
+                System.Diagnostics.Debug.WriteLine("Error@UpdateButtonStatus");
             }
         }
 

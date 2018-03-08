@@ -405,205 +405,214 @@ namespace WpfMPD
             if (sl.Count == 0) { return false; } 
 
             Dictionary<string, string> MpdStatusValues = new Dictionary<string, string>();
-            foreach (string value in sl)
-            {
-                //System.Diagnostics.Debug.WriteLine("ParseStatusResponse loop: " + value);
 
-                if (value.StartsWith("ACK"))
-                {
-                    System.Diagnostics.Debug.WriteLine("ACK@ParseStatusResponse: " + value);
-                    ErrorReturned?.Invoke(this, "MPD Error (@C1): " + value);
-                    return false;
-                }
+            try {
 
-                string[] StatusValuePair = value.Split(':');
-                if (StatusValuePair.Length > 1)
+                foreach (string value in sl)
                 {
-                    if (MpdStatusValues.ContainsKey(StatusValuePair[0].Trim()))
+                    //System.Diagnostics.Debug.WriteLine("ParseStatusResponse loop: " + value);
+
+                    if (value.StartsWith("ACK"))
                     {
-                        if (StatusValuePair.Length == 2) {
-                            MpdStatusValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim();
-                        }
-                        else if (StatusValuePair.Length == 3)
-                        {
-                            MpdStatusValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim() +':'+ StatusValuePair[2].Trim();
-                        } 
-
+                        System.Diagnostics.Debug.WriteLine("ACK@ParseStatusResponse: " + value);
+                        ErrorReturned?.Invoke(this, "MPD Error (@C1): " + value);
+                        return false;
                     }
-                    else
+
+                    string[] StatusValuePair = value.Split(':');
+                    if (StatusValuePair.Length > 1)
                     {
-                        if (StatusValuePair.Length == 2)
+                        if (MpdStatusValues.ContainsKey(StatusValuePair[0].Trim()))
                         {
-                            MpdStatusValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
-                        }else if (StatusValuePair.Length == 3)
-                        {
-                            MpdStatusValues.Add(StatusValuePair[0].Trim(), (StatusValuePair[1].Trim() +":"+ StatusValuePair[2].Trim()));
-                        }
-                    }
-                }
-            }
-
-            // Play state
-            if (MpdStatusValues.ContainsKey("state"))
-            {
-                switch (MpdStatusValues["state"])
-                {
-                    case "play":
-                        {
-                            _st.MpdState = Status.MpdPlayState.Play;
-                            break;
-                        }
-                    case "pause":
-                        {
-                            _st.MpdState = Status.MpdPlayState.Pause;
-                            break;
-                        }
-                    case "stop":
-                        {
-                            _st.MpdState = Status.MpdPlayState.Stop;
-                            break;
-                        }
-                }
-            }
-
-            // Volume
-            if (MpdStatusValues.ContainsKey("volume"))
-            {
-                try
-                {
-                    _st.MpdVolume = Int32.Parse(MpdStatusValues["volume"]);
-                }
-                catch (FormatException e)
-                {
-                    System.Diagnostics.Debug.WriteLine(e.Message);
-                }
-            }
-
-            // songID
-            _st.MpdSongID = "";
-            if (MpdStatusValues.ContainsKey("songid"))
-            {
-                _st.MpdSongID = MpdStatusValues["songid"];
-                //System.Diagnostics.Debug.WriteLine("StatusResponse songid:"+ _st.MpdSongID);
-                /*
-                if (_st.MpdSongID != "") {
-                    // Not good when multithreading.
-
-                    // Set currentSong.
-                    try
-                    {
-                        lock (_objLock)
-                        {
-                            var item = _songs.FirstOrDefault(i => i.ID == _st.MpdSongID);
-                            if (item != null)
+                            if (StatusValuePair.Length == 2)
                             {
-                                this._currentSong = (item as Song);
+                                MpdStatusValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim();
+                            }
+                            else if (StatusValuePair.Length == 3)
+                            {
+                                MpdStatusValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim() + ':' + StatusValuePair[2].Trim();
+                            }
+
+                        }
+                        else
+                        {
+                            if (StatusValuePair.Length == 2)
+                            {
+                                MpdStatusValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
+                            }
+                            else if (StatusValuePair.Length == 3)
+                            {
+                                MpdStatusValues.Add(StatusValuePair[0].Trim(), (StatusValuePair[1].Trim() + ":" + StatusValuePair[2].Trim()));
                             }
                         }
-
-                        //var listItem = _songs.Where(i => i.ID == _st.MpdSongID);
-                        //if (listItem != null)
-                        //{
-                        //    foreach (var item in listItem)
-                        //    {
-                        //        this._currentSong = item as Song;
-                        //        break;
-                        //        //System.Diagnostics.Debug.WriteLine("StatusResponse linq: _songs.Where?="+ _currentSong.Title);
-                        //    }
-                        //}
-
-                    }
-                    catch (Exception ex)
-                    {
-                        // System.NullReferenceException
-                        System.Diagnostics.Debug.WriteLine("Error@StatusResponse linq: _songs.Where?: " + ex.Message);
                     }
                 }
-                */
-            }
 
-            // Repeat opt bool.
-            if (MpdStatusValues.ContainsKey("repeat"))
+                // Play state
+                if (MpdStatusValues.ContainsKey("state"))
+                {
+                    switch (MpdStatusValues["state"])
+                    {
+                        case "play":
+                            {
+                                _st.MpdState = Status.MpdPlayState.Play;
+                                break;
+                            }
+                        case "pause":
+                            {
+                                _st.MpdState = Status.MpdPlayState.Pause;
+                                break;
+                            }
+                        case "stop":
+                            {
+                                _st.MpdState = Status.MpdPlayState.Stop;
+                                break;
+                            }
+                    }
+                }
+
+                // Volume
+                if (MpdStatusValues.ContainsKey("volume"))
+                {
+                    try
+                    {
+                        _st.MpdVolume = Int32.Parse(MpdStatusValues["volume"]);
+                    }
+                    catch (FormatException e)
+                    {
+                        System.Diagnostics.Debug.WriteLine(e.Message);
+                    }
+                }
+
+                // songID
+                _st.MpdSongID = "";
+                if (MpdStatusValues.ContainsKey("songid"))
+                {
+                    _st.MpdSongID = MpdStatusValues["songid"];
+                    //System.Diagnostics.Debug.WriteLine("StatusResponse songid:"+ _st.MpdSongID);
+                    /*
+                    if (_st.MpdSongID != "") {
+                        // Not good when multithreading.
+
+                        // Set currentSong.
+                        try
+                        {
+                            lock (_objLock)
+                            {
+                                var item = _songs.FirstOrDefault(i => i.ID == _st.MpdSongID);
+                                if (item != null)
+                                {
+                                    this._currentSong = (item as Song);
+                                }
+                            }
+
+                            //var listItem = _songs.Where(i => i.ID == _st.MpdSongID);
+                            //if (listItem != null)
+                            //{
+                            //    foreach (var item in listItem)
+                            //    {
+                            //        this._currentSong = item as Song;
+                            //        break;
+                            //        //System.Diagnostics.Debug.WriteLine("StatusResponse linq: _songs.Where?="+ _currentSong.Title);
+                            //    }
+                            //}
+
+                        }
+                        catch (Exception ex)
+                        {
+                            // System.NullReferenceException
+                            System.Diagnostics.Debug.WriteLine("Error@StatusResponse linq: _songs.Where?: " + ex.Message);
+                        }
+                    }
+                    */
+                }
+
+                // Repeat opt bool.
+                if (MpdStatusValues.ContainsKey("repeat"))
+                {
+                    try
+                    {
+                        if (MpdStatusValues["repeat"] == "1")
+                        {
+                            _st.MpdRepeat = true;
+                        }
+                        else
+                        {
+                            _st.MpdRepeat = false;
+                        }
+
+                    }
+                    catch (FormatException e)
+                    {
+                        System.Diagnostics.Debug.WriteLine(e.Message);
+                    }
+                }
+
+                // Random opt bool.
+                if (MpdStatusValues.ContainsKey("random"))
+                {
+                    try
+                    {
+                        if (Int32.Parse(MpdStatusValues["random"]) > 0)
+                        {
+                            _st.MpdRandom = true;
+                        }
+                        else
+                        {
+                            _st.MpdRandom = false;
+                        }
+
+                    }
+                    catch (FormatException e)
+                    {
+                        System.Diagnostics.Debug.WriteLine(e.Message);
+                    }
+                }
+
+                // Song time.
+                if (MpdStatusValues.ContainsKey("time"))
+                {
+                    //System.Diagnostics.Debug.WriteLine(MpdStatusValues["time"]);
+                    try
+                    {
+                        if (MpdStatusValues["time"].Split(':').Length > 1)
+                        {
+                            _st.MpdSongTime = Double.Parse(MpdStatusValues["time"].Split(':')[1].Trim());
+                            _st.MpdSongElapsed = Double.Parse(MpdStatusValues["time"].Split(':')[0].Trim());
+                        }
+                    }
+                    catch (FormatException e)
+                    {
+                        System.Diagnostics.Debug.WriteLine(e.Message);
+                    }
+                }
+
+                // Song time elapsed.
+                if (MpdStatusValues.ContainsKey("elapsed"))
+                {
+                    try
+                    {
+                        _st.MpdSongElapsed = Double.Parse(MpdStatusValues["elapsed"]);
+                    }
+                    catch { }
+                }
+
+                // Song duration.
+                if (MpdStatusValues.ContainsKey("duration"))
+                {
+                    try
+                    {
+                        _st.MpdSongTime = Double.Parse(MpdStatusValues["duration"]);
+                    }
+                    catch { }
+                }
+
+                //TODO: more?
+            }
+            catch(Exception ex)
             {
-                try
-                {
-                    if (MpdStatusValues["repeat"] == "1")
-                    {
-                        _st.MpdRepeat = true;
-                    }
-                    else
-                    {
-                        _st.MpdRepeat = false;
-                    }
-
-                }
-                catch (FormatException e)
-                {
-                    System.Diagnostics.Debug.WriteLine(e.Message);
-                }
+                System.Diagnostics.Debug.WriteLine("Error@ParseStatusResponse:" + ex.Message);
             }
-
-            // Random opt bool.
-            if (MpdStatusValues.ContainsKey("random"))
-            {
-                try
-                {
-                    if (Int32.Parse(MpdStatusValues["random"]) > 0)
-                    {
-                        _st.MpdRandom = true;
-                    }
-                    else
-                    {
-                        _st.MpdRandom = false;
-                    }
-
-                }
-                catch (FormatException e)
-                {
-                    System.Diagnostics.Debug.WriteLine(e.Message);
-                }
-            }
-
-            // Song time.
-            if (MpdStatusValues.ContainsKey("time"))
-            {
-                //System.Diagnostics.Debug.WriteLine(MpdStatusValues["time"]);
-                try
-                {
-                    if (MpdStatusValues["time"].Split(':').Length > 1)
-                    {
-                        _st.MpdSongTime = Double.Parse(MpdStatusValues["time"].Split(':')[1].Trim());
-                        _st.MpdSongElapsed = Double.Parse(MpdStatusValues["time"].Split(':')[0].Trim());
-                    }
-                }
-                catch (FormatException e)
-                {
-                    System.Diagnostics.Debug.WriteLine(e.Message);
-                }
-            }
-
-            // Song time elapsed.
-            if (MpdStatusValues.ContainsKey("elapsed"))
-            {
-                try
-                {
-                    _st.MpdSongElapsed = Double.Parse(MpdStatusValues["elapsed"]);
-                }
-                catch { }
-            }
-
-            // Song duration.
-            if (MpdStatusValues.ContainsKey("duration"))
-            {
-                try
-                {
-                    _st.MpdSongTime = Double.Parse(MpdStatusValues["duration"]);
-                }
-                catch { }
-            }
-            
-            //TODO: more?
-
 
             return true;
         }
@@ -1519,47 +1528,58 @@ namespace WpfMPD
 
                         System.Diagnostics.Debug.WriteLine("**Request: " + cmd);
 
-                        await writer.WriteLineAsync(cmd);
+                        try
+                        { 
+                            await writer.WriteLineAsync(cmd);
 
-                        using (StreamReader reader = new StreamReader(networkStream))
-                        {
-                            try
+                            using (StreamReader reader = new StreamReader(networkStream))
                             {
-                                string responseLine;
-                                // Read multiple lines untill "OK".
-                                while (!reader.EndOfStream)
+                                try
                                 {
-                                    if (ConnectionState == ConnectionStatus.DisconnectedByUser) { return null; }
-                                    responseLine = await reader.ReadLineAsync();
-                                    if (responseLine == null)
+                                    string responseLine;
+                                    // Read multiple lines untill "OK".
+                                    while (!reader.EndOfStream)
                                     {
-                                        System.Diagnostics.Debug.WriteLine("**reader.ReadLineAsync(): null");
-                                        break;
-                                    }
-
-                                    //System.Diagnostics.Debug.WriteLine("Response loop: " + responseLine);
-
-                                    if ((responseLine != "OK") && (responseLine != ""))
-                                    {
-                                        responseMultiLines.Add(responseLine);
-                                        if (responseLine.StartsWith("ACK"))
+                                        if (ConnectionState == ConnectionStatus.DisconnectedByUser) { return null; }
+                                        responseLine = await reader.ReadLineAsync();
+                                        if (responseLine == null)
                                         {
-                                            System.Diagnostics.Debug.WriteLine("**Response ACK: " + responseLine + "\n");
+                                            System.Diagnostics.Debug.WriteLine("**Error@SendCommand@reader.ReadLineAsync(): null");
+                                            break;
+                                        }
+
+                                        //System.Diagnostics.Debug.WriteLine("Response loop: " + responseLine);
+
+                                        if ((responseLine != "OK") && (responseLine != ""))
+                                        {
+                                            responseMultiLines.Add(responseLine);
+                                            if (responseLine.StartsWith("ACK"))
+                                            {
+                                                System.Diagnostics.Debug.WriteLine("**Response ACK: " + responseLine + "\n");
+                                                break;
+                                            }
+                                        }
+                                        else
+                                        {
                                             break;
                                         }
                                     }
-                                    else
-                                    {
-                                        break;
-                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    System.Diagnostics.Debug.WriteLine("**Error@SendCommand: " + ex.Message);
+                                    ConnectionState = ConnectionStatus.Error;
+
                                 }
                             }
-                            catch (IOException)
-                            {
-                                System.Diagnostics.Debug.WriteLine("**Error@SendCommand: IOException");
-                                ConnectionState = ConnectionStatus.DisconnectedByHost;
-                            }
                         }
+                        catch(Exception ex)
+                        {
+                            ConnectionState = ConnectionStatus.Error;
+                            System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: " + ex.Message);
+                        }
+
+
                     }
                 }
             }

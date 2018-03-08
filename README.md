@@ -13,8 +13,8 @@ Enter the host address and port, then hit "Connect".
 Supported languages:  
 English and Japanese.
   
-![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/WpfMPD/files/bin/MPD-Ctrl_Screenshot1.png?raw=true)  
+![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/WPF/WpfMPD/files/bin/MPD-Ctrl_Screenshot1.png?raw=true)  
 
   
   
-![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/WpfMPD/files/bin/MPD-Ctrl_Screenshot_setting.png?raw=true)  
+![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/WPF/WpfMPD/files/bin/MPD-Ctrl_Screenshot_setting.png?raw=true)  

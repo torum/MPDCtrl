@@ -563,8 +563,9 @@ namespace WpfMPD
                     // just in case.
                     ShowSettings = false;
 
-                    
-                    // start client.
+
+                    // Start client.
+                    //Task.Run(() => StartConnection()); // Oops.
                     StartConnection();
                 }
                 else
@@ -677,7 +678,11 @@ namespace WpfMPD
                 //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlayer & isPlaylist");
 
                 // Reset view.
-                sender.CurrentQueue.Clear();
+                //sender.CurrentQueue.Clear();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    sender.CurrentQueue.Clear();
+                });
                 this._selectedSong = null;
 
                 // Get updated information.
@@ -833,7 +838,11 @@ namespace WpfMPD
                 //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlaylist");
 
                 // Reset view.
-                sender.CurrentQueue.Clear();
+                //sender.CurrentQueue.Clear();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    sender.CurrentQueue.Clear();
+                });
                 this._selectedSong = null;
 
                 // Get updated information.
@@ -999,7 +1008,11 @@ namespace WpfMPD
                     if (isStoredPlaylist)
                     {
                         // Retrieve playlists
-                        sender.Playlists.Clear();
+                        //sender.Playlists.Clear();
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            sender.Playlists.Clear();
+                        });
                         isDone = await sender.MpdQueryPlaylists();
                         if (isDone)
                         {
@@ -1039,7 +1052,11 @@ namespace WpfMPD
                 if (isStoredPlaylist)
                 {
                     // Retrieve playlists
-                    sender.Playlists.Clear();
+                    //sender.Playlists.Clear();
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        sender.Playlists.Clear();
+                    });
                     bool isDone = await sender.MpdQueryPlaylists();
                     if (isDone)
                     {
@@ -1062,7 +1079,6 @@ namespace WpfMPD
                 }
             }
 
-            
         }
 
         private async Task<bool> QueryStatus()
@@ -1103,7 +1119,7 @@ namespace WpfMPD
                     {
                         this._selectedSong = _MPC.MpdCurrentSong;
                         this.NotifyPropertyChanged("SelectedSong");
-                        System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer & isPlaylist SelectedSong is : " + this._selectedSong.Title);
+                        System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueueSelectedSong is : " + this._selectedSong.Title);
                     }
                     /*
                     var listItem = _MPC.CurrentQueue.Where(i => i.ID == _MPC.MpdStatus.MpdSongID);
@@ -2002,7 +2018,12 @@ namespace WpfMPD
 
         private void NotifyPropertyChanged(string info)
         {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
+            //this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
+            });
         }
 
         #endregion

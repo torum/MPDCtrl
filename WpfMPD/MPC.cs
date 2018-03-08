@@ -1307,10 +1307,16 @@ namespace WpfMPD
                 {
                     sender.Send("idle player mixer options playlist stored_playlist\n");
                 }
-
             }
             else
             {
+                /*
+                 changed: playlist
+                 changed: player
+                 changed: options
+                 OK
+                */
+
                 // Init List which is later used in StatusChangeEvent.
                 List<string> SubSystems = new List<string>();
 
@@ -1343,13 +1349,6 @@ namespace WpfMPD
                     System.Diagnostics.Debug.WriteLine("Error@IdleConnection DataReceived: " + (data as string));
                 }
 
-                /*
-                 changed: playlist
-                 changed: player
-                 changed: options
-                 OK
-                */
-
                 // Go idle again and wait.
                 if (!string.IsNullOrEmpty(this._a))
                 {
@@ -1364,7 +1363,6 @@ namespace WpfMPD
 
         public async Task<bool> MpdIdleStart()
         {
-            // Not really using.
             // send "idle" command
             try
             {
@@ -1447,6 +1445,7 @@ namespace WpfMPD
             */
             using (this._client = new TcpClient())
             {
+                this._client.NoDelay = true;
                 this.ConnectionState = ConnectionStatus.Connecting;
 
                 try
@@ -1857,6 +1856,8 @@ namespace WpfMPD
                 {
                     tmrSendTimeout.Stop();
                 }
+                //////////////////////////////// Testing.
+                this._client.Client.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, new AsyncCallback(cbDataReceived), this._client.Client);
             }
         }
         private void cbChangeConnectionStateComplete(IAsyncResult result)
@@ -1877,6 +1878,7 @@ namespace WpfMPD
             {
                 lock (SyncLock)
                 {
+                    //Tesing.
                     //tmrReceiveTimeout.Start();
                     return;
                 }

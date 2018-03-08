@@ -250,6 +250,10 @@ namespace WpfMPD
                 }
                 else
                 {
+                    // MPD did not return "OK"
+                    System.Diagnostics.Debug.WriteLine("MpdCmdConnect(): _commandClient.Connect() returned false.");
+                    ErrorReturned?.Invoke(this, "Connection Error: (MPD Non-OK)");
+                    /*
                     if (_commandClient.Connected())
                     {
                         // MPD did not return anything.
@@ -262,6 +266,7 @@ namespace WpfMPD
                         System.Diagnostics.Debug.WriteLine("MpdCmdConnect(): _commandClient.Connect() returned false. MPD did not return OK.");
                         ErrorReturned?.Invoke(this, "Connection Error: (MPD Non-OK)");
                     }
+                    */
                 }
             }
             return isDone;
@@ -1410,6 +1415,7 @@ namespace WpfMPD
             Connected,
             Receiving,
             DisconnectedByUser,
+            DisconnectedByHost,
             Error
         }
 
@@ -1418,20 +1424,80 @@ namespace WpfMPD
             this._ip = ip;
             this._p = port;
             this._a = auth;
-            this._client = new TcpClient();
+            //this._client = new TcpClient();
             ConnectionState = ConnectionStatus.NeverConnected;
         }
 
         public async Task<bool> Connect()
         {
+            /*
             if (this._client.Connected)
             {
                 return true;
             }
+            */
+            using (this._client = new TcpClient())
+            {
+                this.ConnectionState = ConnectionStatus.Connecting;
 
-            this.ConnectionState = ConnectionStatus.Connecting;
+                try
+                {
+                    await _client.ConnectAsync(this._ip, this._p);
 
-            try {
+                    if (this._client.Connected)
+                    {
+                        this.ConnectionState = ConnectionStatus.Connected;
+                        System.Diagnostics.Debug.WriteLine("\n**Server connected.");
+                    }
+
+                    this.ConnectionState = ConnectionStatus.Receiving;
+
+                    //NetworkStream networkStream = this._client.GetStream();
+                    using (NetworkStream networkStream = this._client.GetStream())
+                    {
+                        using (StreamReader reader = new StreamReader(networkStream))
+                        {
+                            // First check MPD's initial response on connect.
+                            string responseLine = await reader.ReadLineAsync();
+
+                            if (responseLine == null)
+                            {
+                                System.Diagnostics.Debug.WriteLine("**Connected response: null");
+                                this.ConnectionState = ConnectionStatus.Error;
+                                return false;
+                            }
+
+                            System.Diagnostics.Debug.WriteLine("**Connected response: " + responseLine);
+
+                            if (responseLine.StartsWith("OK MPD"))
+                            {
+                                //send idle?
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("**Error@Connect: " + ex.Message);
+                    this.ConnectionState = ConnectionStatus.Error;
+                    return false;
+                }
+            }
+        }
+
+        //TODO: make static or...
+        public async Task<List<string>> SendCommand(string cmd)
+        {
+
+            List<string> responseMultiLines = new List<string>();
+
+            using (this._client = new TcpClient())
+            {
                 await _client.ConnectAsync(this._ip, this._p);
 
                 if (this._client.Connected)
@@ -1442,111 +1508,86 @@ namespace WpfMPD
 
                 this.ConnectionState = ConnectionStatus.Receiving;
 
-                NetworkStream networkStream = this._client.GetStream();
-                StreamReader reader = new StreamReader(networkStream);
-
-                // First check MPD's initial response on connect.
-                string responseLine = await reader.ReadLineAsync();
-
-                if (responseLine == null)
+                //NetworkStream networkStream = this._client.GetStream();
+                //StreamWriter writer = new StreamWriter(networkStream);
+                //StreamReader reader = new StreamReader(networkStream);
+                using (NetworkStream networkStream = this._client.GetStream())
                 {
-                    System.Diagnostics.Debug.WriteLine("**Connected response: null");
-                    this.ConnectionState = ConnectionStatus.Error;
-                    return false;
-                }
-
-                System.Diagnostics.Debug.WriteLine("**Connected response: " + responseLine);
-
-                if (responseLine.StartsWith("OK MPD"))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("**Error@Connect: " + ex.Message);
-                this.ConnectionState = ConnectionStatus.Error;
-                return false;
-            }
-        }
-
-        //TODO: make static or...
-        public async Task<List<string>> SendCommand(string cmd)
-        {
-            if (!this._client.Connected)
-            {
-                if (ConnectionState == ConnectionStatus.DisconnectedByUser) { return null; }
-                System.Diagnostics.Debug.WriteLine("**CommandTCPClient: disconnected. Try re-connect.");
-
-                bool isDone = await this.Connect();
-                if (!isDone)
-                {
-                    System.Diagnostics.Debug.WriteLine("**CommandTCPClient: re-connect failed.");
-                    return null;
-                }
-            }
-
-            NetworkStream networkStream = this._client.GetStream();
-            StreamWriter writer = new StreamWriter(networkStream);
-            StreamReader reader = new StreamReader(networkStream);
-            writer.AutoFlush = true;
-
-            System.Diagnostics.Debug.WriteLine("**Request: " + cmd);
-
-            await writer.WriteLineAsync(cmd);
-
-            string responseLine;
-            List<string> responseMultiLines = new List<string>();
-
-            // Read multiple lines untill "OK".
-            while (!reader.EndOfStream)
-            {
-                if (ConnectionState == ConnectionStatus.DisconnectedByUser) { return null; }
-                responseLine = await reader.ReadLineAsync();
-                if (responseLine == null)
-                {
-                    System.Diagnostics.Debug.WriteLine("**reader.ReadLineAsync(): null");
-                    break;
-                }
-
-                //System.Diagnostics.Debug.WriteLine("Response loop: " + responseLine);
-
-                if ((responseLine != "OK") && (responseLine != ""))
-                {
-                    responseMultiLines.Add(responseLine);
-                    if (responseLine.StartsWith("ACK"))
+                    using (StreamWriter writer = new StreamWriter(networkStream))
                     {
-                        System.Diagnostics.Debug.WriteLine("**Response ACK: " + responseLine + "\n");
-                        break;
+                        writer.AutoFlush = true;
+
+                        System.Diagnostics.Debug.WriteLine("**Request: " + cmd);
+
+                        await writer.WriteLineAsync(cmd);
+
+                        using (StreamReader reader = new StreamReader(networkStream))
+                        {
+                            try
+                            {
+                                string responseLine;
+                                // Read multiple lines untill "OK".
+                                while (!reader.EndOfStream)
+                                {
+                                    if (ConnectionState == ConnectionStatus.DisconnectedByUser) { return null; }
+                                    responseLine = await reader.ReadLineAsync();
+                                    if (responseLine == null)
+                                    {
+                                        System.Diagnostics.Debug.WriteLine("**reader.ReadLineAsync(): null");
+                                        break;
+                                    }
+
+                                    //System.Diagnostics.Debug.WriteLine("Response loop: " + responseLine);
+
+                                    if ((responseLine != "OK") && (responseLine != ""))
+                                    {
+                                        responseMultiLines.Add(responseLine);
+                                        if (responseLine.StartsWith("ACK"))
+                                        {
+                                            System.Diagnostics.Debug.WriteLine("**Response ACK: " + responseLine + "\n");
+                                            break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                            catch (IOException)
+                            {
+                                System.Diagnostics.Debug.WriteLine("**Error@SendCommand: IOException");
+                                ConnectionState = ConnectionStatus.DisconnectedByHost;
+                            }
+                        }
                     }
                 }
-                else
-                {
-                    break;
-                }
             }
+
             return responseMultiLines;
         }
 
         public bool DisConnect()
         {
-            if (this._client.Connected) {
-                ConnectionState = ConnectionStatus.DisconnectedByUser;
-                this._client.Close();
-                System.Diagnostics.Debug.WriteLine("**Connection closed.");
+            ConnectionState = ConnectionStatus.DisconnectedByUser;
+            /*
+            if (this._client != null) {
+                if (this._client.Connected)
+                {
+                    this._client.Close();
+                    System.Diagnostics.Debug.WriteLine("**Connection closed.");
+                }
             }
+            */
             return true;
         }
-
+        
         public bool Connected()
         {
-            return this._client.Connected;
+            //return this._client.Connected;
+            return true;
         }
-
+        
         public ConnectionStatus ConnectionState
         {
             get

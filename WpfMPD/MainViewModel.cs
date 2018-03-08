@@ -702,9 +702,6 @@ namespace WpfMPD
                             System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer & isPlaylist SelectedSong is : " + this._selectedSong.Title);
                         }
 
-                        //IsBusy = false;
-                        UpdateButtonStatus();
-
                         if (isStoredPlaylist)
                         {
                             // Retrieve playlists
@@ -727,6 +724,9 @@ namespace WpfMPD
                         {
                             IsBusy = false;
                         }
+
+                        IsBusy = false;
+                        UpdateButtonStatus();
                     }
                     else
                     {
@@ -963,7 +963,7 @@ namespace WpfMPD
                 {
                     System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryStatus> is done.");
 
-
+                    /*
                     if (_MPC.CurrentQueue.Count > 0)
                     {
 
@@ -974,34 +974,28 @@ namespace WpfMPD
                             System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer & isPlaylist SelectedSong is : " + this._selectedSong.Title);
                         }
                     }
-                        /*
-                        try
+                    */
+                    // Need to re select here in case of ...
+                    try
+                    {
+                        var item = _MPC.CurrentQueue.FirstOrDefault(i => i.ID == _MPC.MpdStatus.MpdSongID);
+                        if (item != null)
                         {
-                            var item = _MPC.CurrentQueue.FirstOrDefault(i => i.ID == _MPC.MpdStatus.MpdSongID);
-                            if (item != null)
-                            {
-                                //sender.MpdCurrentSong = (item as MPC.Song);
-                                this._selectedSong = (item as MPC.Song);
-                                this.NotifyPropertyChanged("SelectedSong");
-                                System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer SelectedSong is : " + this._selectedSong.Title);
-                            }
-                            else
-                            {
-                                System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer SelectedSong is NULL");
-                            }
+                            //sender.MpdCurrentSong = (item as MPC.Song);
+                            this._selectedSong = (item as MPC.Song);
+                            this.NotifyPropertyChanged("SelectedSong");
+                            System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer SelectedSong is : " + this._selectedSong.Title);
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            System.Diagnostics.Debug.WriteLine("_MPC.CurrentQueue.FirstOrDefault@(isPlayer) failed: " + ex.Message);
+                            System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer SelectedSong is NULL");
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine("_MPC.CurrentQueue.FirstOrDefault@(isPlayer) failed: " + ex.Message);
+                    }
 
-                        // Listview selection changed event in the code behind takes care ScrollIntoView. 
-                        // This is a VIEW matter.
-                        */
-
-
-                    //IsBusy = false;
-                    UpdateButtonStatus();
 
                     if (isStoredPlaylist)
                     {
@@ -1027,6 +1021,9 @@ namespace WpfMPD
                     {
                         IsBusy = false;
                     }
+
+                    IsBusy = false;
+                    UpdateButtonStatus();
                 }
                 else
                 {
@@ -1175,7 +1172,9 @@ namespace WpfMPD
             string s = (data as string);
             string patternStr = @"[{\[].+?[}\]]";//@"[.*?]";
             s = System.Text.RegularExpressions.Regex.Replace(s, patternStr, string.Empty);
-            s = s.Replace("ACK  ", string.Empty);
+            s = s.Replace("ACK ", string.Empty);
+            s = s.Replace("{} ", string.Empty);
+            s = s.Replace("[] ", string.Empty);
             ErrorMessage = s;
         }
 

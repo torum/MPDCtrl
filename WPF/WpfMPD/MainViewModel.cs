@@ -5,7 +5,7 @@
 /// 
 /// TODO:
 /// -- Priority 1 --
-///  Test against Mopidy. > done. See below "Known issues"
+/// AppX and Microsoft Store. 
 ///  -- Priority 2 --
 ///  Better error messages for users.
 ///  TrayIcon.
@@ -191,7 +191,7 @@ namespace WpfMPD
                     _selecctedPlaylist = value;
                     this.NotifyPropertyChanged("SelectedPlaylist");
 
-                    if (_selecctedPlaylist != "")
+                    if (!string.IsNullOrEmpty(_selecctedPlaylist))
                     {
                         //System.Diagnostics.Debug.WriteLine("\n\nPlaylist_SelectionChanged: " + _selecctedPlaylist);
 
@@ -1113,7 +1113,8 @@ namespace WpfMPD
             {
                 System.Diagnostics.Debug.WriteLine("QueryCurrentPlaylist is done.");
 
-                if (_MPC.CurrentQueue.Count > 0) {
+                // not good to check count here?
+                //if (_MPC.CurrentQueue.Count > 0) {
 
                     if (_MPC.MpdCurrentSong != null)
                     {
@@ -1121,27 +1122,7 @@ namespace WpfMPD
                         this.NotifyPropertyChanged("SelectedSong");
                         System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueueSelectedSong is : " + this._selectedSong.Title);
                     }
-                    /*
-                    var listItem = _MPC.CurrentQueue.Where(i => i.ID == _MPC.MpdStatus.MpdSongID);
-                    if (listItem != null)
-                    {
-                        foreach (var item in listItem)
-                        {
-                            this._MPC.MpdCurrentSong = (item as MPC.Song);
-                            break;
-                            
-                        }
-                    }
-                    // Change it "quietly".
-                    this._selectedSong = _MPC.MpdCurrentSong;
-                    // Let listview know it is changed.
-                    this.NotifyPropertyChanged("SelectedSong");
-
-                    // Listview selection changed event in the code behind takes care ScrollIntoView. 
-                    // This is a VIEW matter.
-
-                    */
-                }
+                //}
 
                 IsBusy = false;
 

@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Data;
 using System.Threading.Tasks;
 using System.Net.Sockets;
@@ -46,6 +47,7 @@ namespace WpfMPD
         {
             public string ID { get; set; }
             public string Title { get; set; }
+            public string Artist { get; set; }
         }
 
         /// <summary>
@@ -705,6 +707,22 @@ namespace WpfMPD
                                 }
                             }
 
+                            if (SongValues.ContainsKey("Artist"))
+                            {
+                                sng.Artist = SongValues["Artist"];
+                            }
+                            else
+                            {
+                                if (SongValues.ContainsKey("AlbumArtist"))
+                                {
+                                    sng.Artist = SongValues["AlbumArtist"];
+                                }
+                                else
+                                {
+                                    sng.Artist = "...";
+                                }
+                            }
+
 
                             if (sng.ID == _st.MpdSongID)
                             {
@@ -717,7 +735,11 @@ namespace WpfMPD
 
                             try
                             {
-                                _songs.Add(sng);
+                                //_songs.Add(sng);
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    _songs.Add(sng);
+                                });
                             }
                             catch (Exception ex)
                             {

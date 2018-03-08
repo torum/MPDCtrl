@@ -660,7 +660,7 @@ namespace WpfMPD
                 await Task.Delay(1500);
                 if (IsBusy)
                 {
-                    await Task.Delay(1500);
+                    await Task.Delay(1000);
                     if (IsBusy)
                     {
                         //ErrorMessage = "OnStatusUpdate time out.";
@@ -670,11 +670,11 @@ namespace WpfMPD
                 }
             }
 
+            IsBusy = true;
+
             if ((isPlayer && isPlaylist))
             {
                 //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlayer & isPlaylist");
-
-                IsBusy = true;
 
                 // Reset view.
                 sender.CurrentQueue.Clear();
@@ -699,7 +699,7 @@ namespace WpfMPD
                         {
                             this._selectedSong = sender.MpdCurrentSong;
                             this.NotifyPropertyChanged("SelectedSong");
-                            System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer & isPlaylist SelectedSong is : " + this._selectedSong.Title);
+                            //System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer & isPlaylist SelectedSong is : " + this._selectedSong.Title);
                         }
 
                         if (isStoredPlaylist)
@@ -716,7 +716,6 @@ namespace WpfMPD
                             else
                             {
                                 IsBusy = false;
-                                //TODO: Let user know.
                                 System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
                             }
                         }
@@ -725,8 +724,9 @@ namespace WpfMPD
                             IsBusy = false;
                         }
 
-                        IsBusy = false;
-                        UpdateButtonStatus();
+                        // Testing
+                        Application.Current.Dispatcher.Invoke(() => UpdateButtonStatus());
+                        Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
                     }
                     else
                     {
@@ -738,7 +738,6 @@ namespace WpfMPD
                 else
                 {
                     IsBusy = false;
-                    // Let user know.
                     System.Diagnostics.Debug.WriteLine("MpdQueryStatus returned with false." + "\n");
                 }
 
@@ -832,7 +831,6 @@ namespace WpfMPD
             else if (isPlaylist)
             {
                 //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlaylist");
-                IsBusy = true;
 
                 // Reset view.
                 sender.CurrentQueue.Clear();
@@ -847,8 +845,6 @@ namespace WpfMPD
                     _selecctedPlaylist = "";
                     this.NotifyPropertyChanged("SelectedPlaylist");
 
-                    //IsBusy = false;
-                    UpdateButtonStatus();
 
                     if (isStoredPlaylist)
                     {
@@ -874,6 +870,11 @@ namespace WpfMPD
                     {
                         IsBusy = false;
                     }
+
+                    //IsBusy = false;
+                    Application.Current.Dispatcher.Invoke(() => UpdateButtonStatus());
+                    Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
+
                     /*
                     // Update status.
                     isDone = await sender.MpdQueryStatus();
@@ -950,8 +951,6 @@ namespace WpfMPD
             {
                 //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlayer");
 
-                IsBusy = true;
-
                 // Reset view.
                 //this._selectedSong = null;
                 //this.NotifyPropertyChanged("SelectedSong");
@@ -1022,8 +1021,9 @@ namespace WpfMPD
                         IsBusy = false;
                     }
 
-                    IsBusy = false;
-                    UpdateButtonStatus();
+                    // Testing
+                    Application.Current.Dispatcher.Invoke(() => UpdateButtonStatus());
+                    Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
                 }
                 else
                 {
@@ -1033,8 +1033,6 @@ namespace WpfMPD
             }
             else if (isStoredPlaylist)
             {
-                IsBusy = true;
-
                 this._selecctedPlaylist = "";
                 this.NotifyPropertyChanged("SelectedPlaylist");
 
@@ -1063,6 +1061,8 @@ namespace WpfMPD
                     IsBusy = false;
                 }
             }
+
+            
         }
 
         private async Task<bool> QueryStatus()
@@ -1144,7 +1144,7 @@ namespace WpfMPD
 
         private async Task<bool> QueryPlaylists()
         {
-            IsBusy = true;
+            //IsBusy = true;
             bool isDone = await _MPC.MpdQueryPlaylists();
             if (isDone)
             {
@@ -1153,13 +1153,13 @@ namespace WpfMPD
                 //selected item should now read "Current Play Queue"
                 //https://stackoverflow.com/questions/2343446/default-text-for-templated-combo-box?rq=1
 
-                IsBusy = false;
+                //IsBusy = false;
 
                 return true;
             }
             else
             {
-                IsBusy = false;
+                //IsBusy = false;
                 // Let user know.
                 System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
                 return false;
@@ -1608,7 +1608,7 @@ namespace WpfMPD
                 await Task.Delay(1000);
                 if (IsBusy)
                 {
-                    await Task.Delay(1500);
+                    await Task.Delay(1000);
                     if (IsBusy)
                     {
                         //ErrorMessage = "Change playlist time out.";

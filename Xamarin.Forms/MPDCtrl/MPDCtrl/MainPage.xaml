@@ -43,11 +43,12 @@
                HorizontalOptions="Center" IsVisible="True"/>
 
         <Picker x:Name="PlaylistsPicker" Grid.Row="1" Grid.Column="1" 
-                ItemsSource="{Binding Playlists}"
+                ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist, Mode=TwoWay}"
                 IsVisible="True"/>
 
         <ListView Grid.Row="2" Grid.Column="1"
-                  ItemsSource="{Binding Songs}" SelectedItem="{Binding SelectedSong}">
+                  ItemsSource="{Binding Songs}" SelectedItem="{Binding SelectedSong, Mode=TwoWay}"
+                  ItemSelected="ListView_ItemSelected">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ImageCell Text="{Binding Title}"
@@ -106,7 +107,7 @@
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Text="mute"></Button>
             <Slider Grid.Column="1" x:Name="VolumeSlider"
-                    Value="{Binding Volume}"
+                    Value="{Binding Volume, Mode=TwoWay}"
                     Maximum="100"/>
             <Button Grid.Column="2" Text="max"></Button>
         </Grid>

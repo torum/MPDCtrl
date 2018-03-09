@@ -1,4 +1,10 @@
-﻿using System;
+﻿
+
+// Always 
+//(Songs.Count < 1) 
+
+
+using System;
 using System.ComponentModel;
 using System.Windows.Input;
 using System.Net;
@@ -99,15 +105,14 @@ namespace MPDCtrl
                 this.NotifyPropertyChanged("SelectedSong");
                 if (_MPC != null)
                 {
-                    if ((value != null) && (_MPC.MpdCurrentSong != null))
+                    if (value != null) 
                     {
-                        //System.Diagnostics.Debug.WriteLine("\n\nListView_SelectionChanged: " + value.Title);
-                        if (_MPC.MpdCurrentSong.ID != value.ID)
+                        if (_MPC.MpdStatus.MpdSongID != value.ID)
                         {
-                            //if (ChangeSongCommand.CanExecute(null))
-                            //{
-                            //    ChangeSongCommand.Execute(null);
-                            //}
+                            if (ChangeSongCommand.CanExecute(null))
+                            {
+                                ChangeSongCommand.Execute(null);
+                            }
                         }
                     }
                 }
@@ -142,14 +147,14 @@ namespace MPDCtrl
                     _selecctedPlaylist = value;
                     this.NotifyPropertyChanged("SelectedPlaylist");
 
-                    if (_selecctedPlaylist != "")
+                    if (!string.IsNullOrEmpty(_selecctedPlaylist))
                     {
                         //System.Diagnostics.Debug.WriteLine("\n\nPlaylist_SelectionChanged: " + _selecctedPlaylist);
 
-                        //if (ChangePlaylistCommand.CanExecute(null))
-                        //{
-                        //    ChangePlaylistCommand.Execute(null);
-                        //}
+                        if (ChangePlaylistCommand.CanExecute(null))
+                        {
+                            ChangePlaylistCommand.Execute(null);
+                        }
                     }
                 }
             }
@@ -170,12 +175,10 @@ namespace MPDCtrl
                 {
                     if (Convert.ToDouble(_MPC.MpdStatus.MpdVolume) != value)
                     {
-
-                        //TODO try using ValueChanged Event using <i:Interaction.Triggers>  ?
-                        //if (SetVolumeCommand.CanExecute(null))
-                        //{
-                        //    SetVolumeCommand.Execute(null);
-                        //}
+                        if (SetVolumeCommand.CanExecute(null))
+                        {
+                            SetVolumeCommand.Execute(null);
+                        }
                     }
                     else
                     {
@@ -346,10 +349,13 @@ namespace MPDCtrl
             this._addConnectinSettingCommand = new MPDCtrl.RelayCommand(this.AddConnectinSettingCommand_Execute, this.AddConnectinSettingCommand_CanExecute);
             this._deleteConnectinSettingCommand = new MPDCtrl.RelayCommand(this.DeleteConnectinSettingCommand_Execute, this.DeleteConnectinSettingCommand_CanExecute);
 
-            //Task.Run(() => StartConnection()); // Bad.
-            StartConnection();
+            Start();
         }
 
+        private async void Start()
+        {
+            await StartConnection();
+        }
 
         private async Task<bool> StartConnection()
         {
@@ -359,7 +365,6 @@ namespace MPDCtrl
             // Assign idle event.
             this._MPC.StatusChanged += new MPC.MpdStatusChanged(OnStatusChanged);
             this._MPC.ErrorReturned += new MPC.MpdError(OnError);
-
 
             //ErrorMessage = MPDCtrl.Properties.Resources.Connecting; //"Connecting...";
             ErrorMessage = "Connecting...";
@@ -588,27 +593,56 @@ namespace MPDCtrl
                 {
                     System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryStatus> is done.");
 
-                    // Need to re select here in case of ...
-                    try
+                    bool needReselect = false;
+                    if (sender.MpdCurrentSong != null)
                     {
-                        var item = _MPC.CurrentQueue.FirstOrDefault(i => i.ID == _MPC.MpdStatus.MpdSongID);
-                        if (item != null)
+                        if (sender.MpdCurrentSong.ID != _MPC.MpdStatus.MpdSongID)
                         {
-                            //sender.MpdCurrentSong = (item as MPC.Song);
-                            this._selectedSong = (item as MPC.Song);
-                            this.NotifyPropertyChanged("SelectedSong");
-                            System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer SelectedSong is : " + this._selectedSong.Title);
-                        }
-                        else
-                        {
-                            System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer SelectedSong is NULL");
+                            needReselect = true;
                         }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        System.Diagnostics.Debug.WriteLine("_MPC.CurrentQueue.FirstOrDefault@(isPlayer) failed: " + ex.Message);
+                        needReselect = true;
+                    }
+                    if (this._selectedSong != null) { 
+                        if (this._selectedSong.ID != _MPC.MpdStatus.MpdSongID)
+                        {
+                            needReselect = true;
+                        }
+                    }else
+                    {
+                        needReselect = true;
                     }
 
+                    if (needReselect)
+                    {
+                        // Need to re select here in case of ... subsystem == "player" alone called. 
+                        // "status" command result alone does not set "MpdCurrentSong"
+                        try
+                        {
+                            Device.BeginInvokeOnMainThread(() =>
+                            {
+                                var item = _MPC.CurrentQueue.FirstOrDefault(i => i.ID == _MPC.MpdStatus.MpdSongID);
+                                if (item != null)
+                                {
+                                    sender.MpdCurrentSong = (item as MPC.Song); // just in case.
+                                    this._selectedSong = (item as MPC.Song);
+                                }
+                                else
+                                {
+                                    System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer SelectedSong is NULL");
+                                }
+                            });
+                            // Update UI
+                            this.NotifyPropertyChanged("SelectedSong");
+
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine("_MPC.CurrentQueue.FirstOrDefault@(isPlayer) failed: " + ex.Message);
+                        }
+                    }
 
                     if (isStoredPlaylist)
                     {
@@ -705,17 +739,26 @@ namespace MPDCtrl
             {
                 System.Diagnostics.Debug.WriteLine("QueryCurrentPlaylist is done.");
 
-                if (_MPC.CurrentQueue.Count > 0)
-                {
+                // Not good.
+                //if (_MPC.CurrentQueue.Count > 0)
+                //{
 
                     if (_MPC.MpdCurrentSong != null)
                     {
                         this._selectedSong = _MPC.MpdCurrentSong;
                         this.NotifyPropertyChanged("SelectedSong");
-                        //System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue SelectedSong is : " + this._selectedSong.Title);
+                        System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue SelectedSong is : " + this._selectedSong.Title);
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue MpdCurrentSong is null");
                     }
 
-                }
+                //}
+                //else
+                //{
+                //    System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue NOT CurrentQueue.Count > 0");
+                //}
 
                 //IsBusy = false;
 
@@ -844,7 +887,8 @@ namespace MPDCtrl
         {
             if (this.IsBusy) { return false; }
             if (_MPC == null) { return false; }
-            if (_MPC.CurrentQueue.Count < 1) { return false; }
+            //TODO:
+            //if (Songs.Count < 1) { return false; }
             return true;
         }
 
@@ -1063,7 +1107,7 @@ namespace MPDCtrl
                 }
             }
 
-            if (this._selecctedPlaylist == "") { return; }
+            if (String.IsNullOrEmpty(this._selecctedPlaylist)) { return; }
 
             // Don't set isBusy or clear. We are not gonna change anything. Let idle client handle updates.
 

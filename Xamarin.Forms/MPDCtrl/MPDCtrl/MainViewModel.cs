@@ -412,18 +412,12 @@ namespace MPDCtrl
                 // Connect to MPD server and query status and info.
                 if (await QueryStatus())
                 {
-
-                    //Testing.
-                    //this.NotifyPropertyChanged("Volume");
-
                     // Connect and start "idle" connection.
                     if (_MPC.MpdIdleConnect())
                     {
-                        ErrorMessage = "";
+                        ErrorMessage = "Current Play Queue";
                         return true;
                     }
-
-                   
                 }
             }
             else
@@ -476,24 +470,14 @@ namespace MPDCtrl
                     isStoredPlaylist = true;
                 }
             }
-            /*
+
             while (_isBusy)
             {
-                await Task.Delay(1);
-                
-                if (alMixer && isPlayer)
-                {
-                    System.Diagnostics.Debug.WriteLine("OnStatusChanged: mixer TIME OUT");
-                    ErrorMessage = "";
-                    IsBusy = false;
-                    return;
-                }
-                
+                await Task.Delay(10);
             }
-            */
 
             // Little dirty, but ObservableCollection isn't thread safe, so...
-            
+            /*
             while (_isBusy)
             {
                 if (alMixer && isPlayer)
@@ -519,7 +503,7 @@ namespace MPDCtrl
                     }
                 }
             }
-            
+            */
 
             IsBusy = true;
 
@@ -549,7 +533,7 @@ namespace MPDCtrl
                     isDone = await sender.MpdQueryCurrentPlaylist();
                     if (isDone)
                     {
-                        ErrorMessage = "";
+                        ErrorMessage = "Current Play Queue";
 
                         System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryCurrentPlaylist> is done.");
 
@@ -561,7 +545,11 @@ namespace MPDCtrl
                         {
                             this._selectedSong = sender.MpdCurrentSong;
                             this.NotifyPropertyChanged("SelectedSong");
-                            //System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer & isPlaylist SelectedSong is : " + this._selectedSong.Title);
+                            System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer & isPlaylist SelectedSong is : " + this._selectedSong.Title);
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer & isPlaylist MpdCurrentSong is : null");
                         }
 
                         if (isStoredPlaylist)
@@ -625,7 +613,7 @@ namespace MPDCtrl
                 bool isDone = await sender.MpdQueryCurrentPlaylist();
                 if (isDone)
                 {
-                    ErrorMessage = "";
+                    ErrorMessage = "Current Play Queue";
 
                     System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryCurrentPlaylist> is done.");
 
@@ -680,7 +668,7 @@ namespace MPDCtrl
                 bool isDone = await sender.MpdQueryStatus();
                 if (isDone)
                 {
-                    ErrorMessage = "";
+                    ErrorMessage = "Current Play Queue";
 
                     System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryStatus> is done.");
 
@@ -849,7 +837,7 @@ namespace MPDCtrl
                     {
                         System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue MpdCurrentSong is null");
                     }
-
+                
                 //}
                 //else
                 //{
@@ -877,9 +865,6 @@ namespace MPDCtrl
             if (isDone)
             {
                 System.Diagnostics.Debug.WriteLine("QueryPlaylists is done.");
-
-                //selected item should now read "Current Play Queue"
-                //https://stackoverflow.com/questions/2343446/default-text-for-templated-combo-box?rq=1
 
                 //IsBusy = false;
 
@@ -1523,13 +1508,13 @@ namespace MPDCtrl
         }
         */
         
-        protected void NotifyPropertyChanged(string propertyName)
+        protected virtual void NotifyPropertyChanged(string propertyName)
         {
             Device.BeginInvokeOnMainThread(
-                () =>
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-                });
+                          () =>
+                          {
+                              PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                          });
         }
         
 

@@ -1492,7 +1492,9 @@ Id: 22637
 
         public static async Task<List<string>> DoSendCommand(TcpClient TCP, string cmd)
         {
-            //await Task.Delay(1000);
+            // It's a magic. Everything works..iPhone, and NotifyPropertyChanged("SelectedSong") in UWP works with this...
+            await Task.Delay(100);
+
             List<string> responseMultiLines = new List<string>();
             //bool mpdRespomseOK = false;
 

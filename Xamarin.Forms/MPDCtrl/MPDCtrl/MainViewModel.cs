@@ -173,6 +173,7 @@ namespace MPDCtrl
 
                 if (_MPC != null)
                 {
+                    /*
                     if (Convert.ToDouble(_MPC.MpdStatus.MpdVolume) != value)
                     {
                         if (SetVolumeCommand.CanExecute(null))
@@ -184,6 +185,43 @@ namespace MPDCtrl
                     {
                         //System.Diagnostics.Debug.WriteLine("Volume value is the same. Skipping.");
                     }
+                    */
+
+                    // If we have a timer and we are in this event handler, a user is still interact with the slider
+                    // we stop the timer
+                    if (_timer != null)
+                        _timer.Stop();
+
+                    System.Diagnostics.Debug.WriteLine("Volume value is still changing Skipping.");
+
+                    // we always create a new instance of DispatcherTimer
+                    _timer = new System.Timers.Timer();
+                    _timer.AutoReset = false;
+
+                    // if one second passes, that means our user has stopped interacting with the slider
+                    // we do real event
+                    _timer.Interval = (double)1000;
+                    _timer.Elapsed += new System.Timers.ElapsedEventHandler(DoChangeVolume);
+
+                    _timer.Start();
+                }
+            }
+        }
+        private System.Timers.Timer _timer = null;
+        private void DoChangeVolume(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (_MPC != null)
+            {
+                if (Convert.ToDouble(_MPC.MpdStatus.MpdVolume) != this._volume)
+                {
+                    if (SetVolumeCommand.CanExecute(null))
+                    {
+                        SetVolumeCommand.Execute(null);
+                    }
+                }
+                else
+                {
+                    //System.Diagnostics.Debug.WriteLine("Volume value is the same. Skipping.");
                 }
             }
         }
@@ -374,12 +412,18 @@ namespace MPDCtrl
                 // Connect to MPD server and query status and info.
                 if (await QueryStatus())
                 {
+
+                    //Testing.
+                    //this.NotifyPropertyChanged("Volume");
+
                     // Connect and start "idle" connection.
                     if (_MPC.MpdIdleConnect())
                     {
                         ErrorMessage = "";
                         return true;
                     }
+
+                   
                 }
             }
             else
@@ -398,6 +442,7 @@ namespace MPDCtrl
             // player mixer options playlist stored_playlist
 
             bool isPlayer = false;
+            bool alMixer = false;
             bool isPlaylist = false;
             bool isStoredPlaylist = false;
             foreach (var subsystem in (data as List<string>))
@@ -413,6 +458,7 @@ namespace MPDCtrl
                 {
                     //System.Diagnostics.Debug.WriteLine("OnStatusChanged: mixer");
                     isPlayer = true;
+                    alMixer = true;
                 }
                 else if (subsystem == "options")
                 {
@@ -430,28 +476,59 @@ namespace MPDCtrl
                     isStoredPlaylist = true;
                 }
             }
+            /*
+            while (_isBusy)
+            {
+                await Task.Delay(1);
+                
+                if (alMixer && isPlayer)
+                {
+                    System.Diagnostics.Debug.WriteLine("OnStatusChanged: mixer TIME OUT");
+                    ErrorMessage = "";
+                    IsBusy = false;
+                    return;
+                }
+                
+            }
+            */
 
             // Little dirty, but ObservableCollection isn't thread safe, so...
-            if (IsBusy)
+            
+            while (_isBusy)
             {
-                await Task.Delay(1500);
-                if (IsBusy)
+                if (alMixer && isPlayer)
                 {
-                    await Task.Delay(1000);
-                    if (IsBusy)
+                    System.Diagnostics.Debug.WriteLine("OnStatusChanged: mixer SKIPING");
+                    //IsBusy = false;
+                    return;
+                }
+                await Task.Delay(500);
+                if (_isBusy)
+                {
+                    await Task.Delay(1500);
+                    if (_isBusy)
                     {
-                        //ErrorMessage = "OnStatusUpdate time out.";
-                        System.Diagnostics.Debug.WriteLine("OnStatusChanged: TIME OUT");
-                        return;
+                        await Task.Delay(1000);
+                        if (_isBusy)
+                        {
+                            //ErrorMessage = "OnStatusUpdate time out.";
+                            System.Diagnostics.Debug.WriteLine("OnStatusChanged: TIME OUT");
+                            IsBusy = false;
+                            //return;
+                        }
                     }
                 }
             }
+            
 
             IsBusy = true;
+
+            ErrorMessage = "Loading......";
 
             if ((isPlayer && isPlaylist))
             {
                 //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlayer & isPlaylist");
+                IsBusy = true;
 
                 // Reset view.
                 Device.BeginInvokeOnMainThread(
@@ -465,11 +542,15 @@ namespace MPDCtrl
                 bool isDone = await sender.MpdQueryStatus();
                 if (isDone)
                 {
+                    ErrorMessage = "Loading..."; 
+
                     System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryStatus> is done.");
 
                     isDone = await sender.MpdQueryCurrentPlaylist();
                     if (isDone)
                     {
+                        ErrorMessage = "";
+
                         System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryCurrentPlaylist> is done.");
 
                         // Combo selected item should now read "Current Play Queue"
@@ -525,7 +606,11 @@ namespace MPDCtrl
             }
             else if (isPlaylist)
             {
+
+                ErrorMessage = "Loading...";
+
                 //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlaylist");
+                IsBusy = true;
 
                 // Reset view.
                 //sender.CurrentQueue.Clear();
@@ -540,6 +625,8 @@ namespace MPDCtrl
                 bool isDone = await sender.MpdQueryCurrentPlaylist();
                 if (isDone)
                 {
+                    ErrorMessage = "";
+
                     System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryCurrentPlaylist> is done.");
 
                     _selecctedPlaylist = "";
@@ -585,12 +672,16 @@ namespace MPDCtrl
             }
             else if (isPlayer)
             {
+                ErrorMessage = "Loading...";
+
                 //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlayer");
 
                 // Update status.
                 bool isDone = await sender.MpdQueryStatus();
                 if (isDone)
                 {
+                    ErrorMessage = "";
+
                     System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryStatus> is done.");
 
                     bool needReselect = false;
@@ -621,6 +712,7 @@ namespace MPDCtrl
                         // "status" command result alone does not set "MpdCurrentSong"
                         try
                         {
+                            
                             Device.BeginInvokeOnMainThread(() =>
                             {
                                 var item = _MPC.CurrentQueue.FirstOrDefault(i => i.ID == _MPC.MpdStatus.MpdSongID);
@@ -636,7 +728,7 @@ namespace MPDCtrl
                             });
                             // Update UI
                             this.NotifyPropertyChanged("SelectedSong");
-
+                            
                         }
                         catch (Exception ex)
                         {
@@ -646,6 +738,8 @@ namespace MPDCtrl
 
                     if (isStoredPlaylist)
                     {
+                        IsBusy = true;
+
                         // Retrieve playlists
                         sender.Playlists.Clear();
                         isDone = await sender.MpdQueryPlaylists();
@@ -681,6 +775,8 @@ namespace MPDCtrl
             }
             else if (isStoredPlaylist)
             {
+                IsBusy = true;
+
                 this._selecctedPlaylist = "";
                 this.NotifyPropertyChanged("SelectedPlaylist");
 
@@ -836,7 +932,10 @@ namespace MPDCtrl
 
                 // "quietly" update view.
                 this._volume = Convert.ToDouble(_MPC.MpdStatus.MpdVolume);
-                this.NotifyPropertyChanged("Volume");
+                //Testing.
+                if (!IsBusy) { 
+                    this.NotifyPropertyChanged("Volume");
+                }
 
                 this._random = _MPC.MpdStatus.MpdRandom;
                 this.NotifyPropertyChanged("Random");
@@ -885,7 +984,7 @@ namespace MPDCtrl
 
         public bool PlayCommand_CanExecute()
         {
-            if (this.IsBusy) { return false; }
+            //if (this.IsBusy) { return false; }
             if (_MPC == null) { return false; }
             //TODO:
             //if (Songs.Count < 1) { return false; }
@@ -930,9 +1029,10 @@ namespace MPDCtrl
 
         public bool PlayNextCommand_CanExecute()
         {
-            if (this.IsBusy) { return false; }
+            //if (this.IsBusy) { return false; }
             if (_MPC == null) { return false; }
-            if (_MPC.CurrentQueue.Count < 1) { return false; }
+            //TODO:
+            //if (_MPC.CurrentQueue.Count < 1) { return false; }
             return true;
         }
 
@@ -950,9 +1050,10 @@ namespace MPDCtrl
 
         public bool PlayPrevCommand_CanExecute()
         {
-            if (this.IsBusy) { return false; }
+            //if (this.IsBusy) { return false; }
             if (_MPC == null) { return false; }
-            if (_MPC.CurrentQueue.Count < 1) { return false; }
+            //TODO:
+            //if (_MPC.CurrentQueue.Count < 1) { return false; }
             return true;
         }
 
@@ -1027,7 +1128,7 @@ namespace MPDCtrl
 
         public bool SetSeekCommand_CanExecute()
         {
-            if (this.IsBusy) { return false; }
+            //if (this.IsBusy) { return false; }
             if (_MPC == null) { return false; }
             return true;
         }
@@ -1047,22 +1148,24 @@ namespace MPDCtrl
 
         public bool ChangeSongCommand_CanExecute()
         {
-            if (this.IsBusy) { return false; }
+            //if (this.IsBusy) { return false; }
             if (_MPC == null) { return false; }
-            if (_MPC.CurrentQueue.Count < 1) { return false; }
+            //TODO:
+            //if (_MPC.CurrentQueue.Count < 1) { return false; }
             if (_selectedSong == null) { return false; }
             return true;
         }
 
         public async void ChangeSongCommand_ExecuteAsync()
         {
+            /*
             // Little dirty, but since our ObservableCollection isn't thread safe...
             if (IsBusy)
             {
-                await Task.Delay(1000);
+                await Task.Delay(5);
                 if (IsBusy)
                 {
-                    await Task.Delay(1500);
+                    await Task.Delay(10);
                     if (IsBusy)
                     {
                         //ErrorMessage = "Change playlist time out.";
@@ -1071,6 +1174,7 @@ namespace MPDCtrl
                     }
                 }
             }
+            */
 
             bool isDone = await _MPC.MpdPlaybackPlay(_selectedSong.ID);
             if (!isDone)

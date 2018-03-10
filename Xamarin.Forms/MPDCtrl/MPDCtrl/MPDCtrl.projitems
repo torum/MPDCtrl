@@ -21,8 +21,44 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)MainViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MPC.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlaylistPage.xaml.cs">
+      <DependentUpon>PlaylistPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)SettingsPage.xaml.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)TabbedPageMain.xaml.cs">
+      <DependentUpon>TabbedPageMain.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)Assets\play-circle.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\music-note-36-black.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\music-note-36.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\pause-circle-86.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\play-circle-86.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\playlist-check-36-black.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\skip-next-circle-48.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\skip-previous-circle-48.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)PlaylistPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)SettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)TabbedPageMain.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

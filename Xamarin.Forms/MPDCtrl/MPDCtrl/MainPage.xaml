@@ -4,11 +4,12 @@
              xmlns:local="clr-namespace:MPDCtrl"
              xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
              ios:Page.UseSafeArea="true"
-             x:Class="MPDCtrl.MainPage">
+             x:Class="MPDCtrl.MainPage"
+             Title="Main">
     <ContentPage.Padding>
         <OnPlatform x:TypeArguments="Thickness">
-            <On Platform="iOS" Value="0, 24, 0, 24" />
-            <On Platform="UWP" Value="0, 0, 0, 24" />
+            <On Platform="iOS" Value="0, 0, 0, 0" />
+            <On Platform="WinPhone" Value="0, 0, 0, 12" />
         </OnPlatform>
     </ContentPage.Padding>
     <ContentPage.BindingContext>
@@ -18,18 +19,40 @@
         <ResourceDictionary>
             <OnPlatform x:Key="PlayButtonImage" 
                     x:TypeArguments="FileImageSource"
-                    WinPhone="Assets\play-circle.png"
-                    iOS="Assets/play-circle.png"/>
+                    WinPhone="Assets\play-circle-86.png"
+                    iOS="Assets/play-circle-86.png"/>
+            <OnPlatform x:Key="PauseButtonImage" 
+                    x:TypeArguments="FileImageSource"
+                    WinPhone="Assets\pause-circle-86.png"
+                    iOS="Assets/pause-circle-86.png"/>
+            <OnPlatform x:Key="MusicButtonImage" 
+                    x:TypeArguments="FileImageSource"
+                    WinPhone="Assets\music-note-36.png"
+                    iOS="Assets/music-note-36-black.png"/>
+            <OnPlatform x:Key="NextButtonImage" 
+                    x:TypeArguments="FileImageSource"
+                    WinPhone="Assets\skip-next-circle-48.png"
+                    iOS="Assets/skip-next-circle-48.png"/>
+            <OnPlatform x:Key="PrevButtonImage" 
+                    x:TypeArguments="FileImageSource"
+                    WinPhone="Assets\skip-previous-circle-48.png"
+                    iOS="Assets/skip-previous-circle-48.png"/>
+            <OnPlatform x:Key="PlaylistButtonImage" 
+                    x:TypeArguments="FileImageSource"
+                    WinPhone="Assets\playlist-check-36-black.png"
+                    iOS="Assets/playlist-check-36-black.png"/>
         </ResourceDictionary>
     </ContentPage.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="48" />
-            <RowDefinition Height="48" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="4" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="4" />
             <RowDefinition Height="48" />
-            <RowDefinition Height="auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="48" />
+            <RowDefinition Height="12" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4" />
@@ -37,23 +60,43 @@
             <ColumnDefinition Width="4" />
         </Grid.ColumnDefinitions>
 
-        <Label Grid.Row="0" Grid.Column="1"
+        <Grid Grid.Row="0" Grid.Column="1" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="4" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="48" />
+            </Grid.ColumnDefinitions>
+            <Button x:Name="ShowSettingsButton" Text="Settings" Grid.Row="1" Grid.Column="0" 
+                    Clicked="ShowSettingsButton_Clicked"
+                    IsVisible="False"></Button>
+            <Button x:Name="PickPlaylistButton" Grid.Row="1" Grid.Column="2" 
+                    Image="{StaticResource PlaylistButtonImage}"
+                    Clicked="PickPlaylistButton_Clicked"></Button> 
+            <Label Grid.Row="1" Grid.Column="1"
                Text="{Binding ErrorMessage}"
                VerticalOptions="Center" 
                HorizontalOptions="Center" IsVisible="True"/>
-
-        <Picker x:Name="PlaylistsPicker" Grid.Row="1" Grid.Column="1" 
+        </Grid>
+        
+        <!--
+        <Picker x:Name="PlaylistsPicker" Grid.Row="0" Grid.Column="1" 
                 ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist, Mode=TwoWay}"
-                IsVisible="True"/>
+                IsVisible="False"/>
+        -->
+        
 
-        <ListView Grid.Row="2" Grid.Column="1"
+        <ListView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
                   ItemsSource="{Binding Songs}" SelectedItem="{Binding SelectedSong, Mode=TwoWay}"
                   ItemSelected="ListView_ItemSelected">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ImageCell Text="{Binding Title}"
                                Detail="{Binding Artist}"
-                               ImageSource="{Binding SongIcon}">
+                               ImageSource="{StaticResource MusicButtonImage}">
                     </ImageCell>
                     <!--
                     <ViewCell>
@@ -65,7 +108,7 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Grid Grid.Row="3" Grid.Column="1">
+        <Grid Grid.Row="4" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
@@ -78,25 +121,39 @@
             <Slider Grid.Column="1" x:Name="SeekSlider"/>
             <Button Grid.Column="2"></Button>
         </Grid>
-        <Grid Grid.Row="4" Grid.Column="1">
+        <Grid Grid.Row="5" Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="86" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Text="Back" HorizontalOptions="End"></Button>
-            <Button Grid.Column="1" x:Name="PlayButton"
-                    Text="{Binding LabelText}" WidthRequest="86"
+            <Button Grid.Column="0" HorizontalOptions="End"
+                    BorderWidth="0"
+                    WidthRequest="86"
+                    HeightRequest="86"
                     BackgroundColor="Transparent"
-                    Command="{Binding PlayCommand}">
+                    Command="{Binding PlayPrevCommand}"
+                    Image="{StaticResource PrevButtonImage}"></Button>
+            <Button Grid.Column="1" x:Name="PlayButton"
+                    BorderWidth="0"
+                    WidthRequest="100"
+                    HeightRequest="100"
+                    BackgroundColor="Transparent"
+                    Command="{Binding PlayCommand}"
+                    Image="{StaticResource PlayButtonImage}">
             </Button>
-            <!-- Image="{StaticResource PlayButtonImage}"  -->
-            <Button Grid.Column="2" Text="Next" HorizontalOptions="Start"></Button>
+            <Button Grid.Column="2" HorizontalOptions="Start"
+                    BorderWidth="0"
+                    WidthRequest="86"
+                    HeightRequest="86"
+                    BackgroundColor="Transparent"
+                    Command="{Binding PlayNextCommand}"
+                    Image="{StaticResource NextButtonImage}"></Button>
         </Grid>
-        <Grid Grid.Row="5" Grid.Column="1">
+        <Grid Grid.Row="6" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>

@@ -22,6 +22,8 @@ namespace MPDCtrl.UWP
             this.InitializeComponent();
 
             LoadApplication(new MPDCtrl.App());
+
+
         }
     }
 }

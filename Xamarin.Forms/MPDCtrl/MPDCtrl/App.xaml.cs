@@ -13,10 +13,14 @@ namespace MPDCtrl
 		{
 			InitializeComponent();
 
-			MainPage = new MPDCtrl.MainPage();
-		}
+            //MainPage = new MPDCtrl.MainPage();
+            //MainPage = new NavigationPage(new MainPage());
+            //MainPage = new NavigationPage(new TabbedPageMain());
 
-		protected override void OnStart ()
+            MainPage = new MPDCtrl.TabbedPageMain();
+        }
+
+        protected override void OnStart ()
 		{
 			// Handle when your app starts
 		}

@@ -651,6 +651,7 @@ Id: 22637
                                     {
                                         _songs.Add(sng);
                                     });
+
                             }
                             catch (Exception ex)
                             {
@@ -779,18 +780,16 @@ Id: 22637
                     mpdCommand = mpdCommand + "play" + "\n";
                 }
 
-                mpdCommand = mpdCommand + "status" + "\n";
+                //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                // Alternatively just
-                //string sResponse = await SendRequest(server, port, data);
-                //"Received response: " + tsResponse;
+                //return ParseStatusResponse(tsResponse.Result);
 
-                return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -814,14 +813,15 @@ Id: 22637
 
                 mpdCommand = mpdCommand + "seekid " + songID + " " + seekTime.ToString() + "\n";
 
-                mpdCommand = mpdCommand + "status" + "\n";
+                //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -843,14 +843,15 @@ Id: 22637
 
                 mpdCommand = mpdCommand + "pause 1" + "\n";
 
-                mpdCommand = mpdCommand + "status" + "\n";
+                //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -873,14 +874,15 @@ Id: 22637
 
                 mpdCommand = mpdCommand + "pause 0" + "\n";
 
-                mpdCommand = mpdCommand + "status" + "\n";
+                //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -903,14 +905,15 @@ Id: 22637
 
                 mpdCommand = mpdCommand + "stop" + "\n";
 
-                mpdCommand = mpdCommand + "status" + "\n";
+                //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -938,14 +941,15 @@ Id: 22637
                     mpdCommand = mpdCommand + "play" + "\n";
                 }
 
-                mpdCommand = mpdCommand + "status" + "\n";
+                //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -972,14 +976,15 @@ Id: 22637
                     mpdCommand = mpdCommand + "play" + "\n";
                 }
 
-                mpdCommand = mpdCommand + "status" + "\n";
+                //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -1003,14 +1008,15 @@ Id: 22637
 
                 mpdCommand = mpdCommand + "setvol " + v.ToString() + "\n";
 
-                mpdCommand = mpdCommand + "status" + "\n";
+                //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -1040,14 +1046,15 @@ Id: 22637
                     mpdCommand = mpdCommand + "repeat 0" + "\n";
                 }
 
-                mpdCommand = mpdCommand + "status" + "\n";
+                //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -1078,14 +1085,15 @@ Id: 22637
                     mpdCommand = mpdCommand + "random 0" + "\n";
                 }
 
-                mpdCommand = mpdCommand + "status" + "\n";
+                //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -1280,6 +1288,7 @@ Id: 22637
                     System.Diagnostics.Debug.WriteLine("IdleConnection Going idle again.");
                     sender.Send("idle player mixer options playlist stored_playlist\n");
                 }
+              
             }
         }
 
@@ -1328,21 +1337,24 @@ Id: 22637
         /// END OF MPC Client Class 
     }
 
+
     public class CommandTCPClient
     {
         private TcpClient _TCP;
         private IPAddress _ip = IPAddress.None;
         private int _p = 0;
         private string _a = "";
-        private int _retryAttempt;
+        private int _retryAttempt = 0;
 
         public CommandTCPClient()
         {
             this._TCP = new TcpClient();
             //this._client.NoDelay = true;
+            this._TCP.ReceiveTimeout = 1000;
+
             // KeepAlive testing.
             this._TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-            _retryAttempt = 0;
+
         }
 
         public async Task<bool> Connect(IPAddress ip, int port, string auth)
@@ -1350,19 +1362,29 @@ Id: 22637
             _ip = ip;
             _p = port;
             _a = auth;
-
+            _retryAttempt = 0;
             return await DoConnect(ip, port, auth);
         }
 
         public async Task<bool> ReConnect()
         {
+            if (_retryAttempt > 0)
+            {
+                return false;
+            }
+
+            _retryAttempt++;
+
             try { 
                 this._TCP.Close();
             }
             catch { }
+            //await Task.Delay(10);
 
             this._TCP = new TcpClient();
             //this._client.NoDelay = true;
+            this._TCP.ReceiveTimeout = 1000;
+
             // KeepAlive testing.
             this._TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
@@ -1390,6 +1412,7 @@ Id: 22637
 
                 if (responseLine.StartsWith("OK MPD"))
                 {
+                    _retryAttempt = 0;
                     return true;
                 }
                 else
@@ -1409,38 +1432,96 @@ Id: 22637
 
         public async Task<List<string>> SendCommand(string cmd)
         {
-            List<string> responseMultiLines = new List<string>();
-            bool mpdRespomseOK = false;
+            Task<List<string>> tsResponse =  DoSendCommand(this._TCP, cmd);
 
+            try { 
+                await tsResponse;
+            }
+            catch (IOException)
+            {
+                //System.IO.IOException
+                //Unable to transfer data on the transport connection: An established connection was aborted by the software in your host machine.
+
+                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: IOException");
+
+                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: IOException - TRYING TO RECONNECT.");
+                //await Task.Delay(10);
+                // Reconnect.
+                if (await ReConnect())
+                {
+                    return await DoSendCommand(_TCP, cmd);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: IOException - GIVING UP reconnect.");
+                    return null;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: " + ex.Message);
+                return null;
+            }
+
+            if ((tsResponse.Result.Count == 0)  && (!IsConnected))
+            {
+                System.Diagnostics.Debug.WriteLine("**responseMultiLines.Count == 0 & !IsConnected");
+
+                System.Diagnostics.Debug.WriteLine("**TRYING TO RECONNECT.");
+                //await Task.Delay(10);
+
+                // Reconnect.
+                if (await ReConnect())
+                {
+                    return await DoSendCommand(_TCP, cmd);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("**Error@SendCommand@responseMultiLines.Count == 0: GIVING UP RECONNECT.");
+                    return null;
+                }
+            }
+
+            //_retryAttempt = 0;
+
+            return tsResponse.Result;
+
+            //return await DoSendCommand(this._TCP, cmd, 0);
+        }
+
+        public static async Task<List<string>> DoSendCommand(TcpClient TCP, string cmd)
+        {
+            //await Task.Delay(1000);
+            List<string> responseMultiLines = new List<string>();
+            //bool mpdRespomseOK = false;
+
+            NetworkStream networkStream = TCP.GetStream();
+            StreamWriter writer = new StreamWriter(networkStream);
+            StreamReader reader = new StreamReader(networkStream);
+            writer.AutoFlush = true;
+
+            System.Diagnostics.Debug.WriteLine("**Request: " + cmd);
+
+            await writer.WriteLineAsync(cmd);
+
+            System.Diagnostics.Debug.WriteLine("**Waiting Response...");
             try
             {
-                NetworkStream networkStream = _TCP.GetStream();
-                StreamWriter writer = new StreamWriter(networkStream);
-                StreamReader reader = new StreamReader(networkStream);
-                writer.AutoFlush = true;
+                string responseLine;
 
-                System.Diagnostics.Debug.WriteLine("**Request: " + cmd);
-
-                await writer.WriteLineAsync(cmd);
-
-                try
+                //while ((responseLine = reader.ReadLine()) != null)
+                while (!reader.EndOfStream)
                 {
-                    string responseLine;
-                    // Read multiple lines untill "OK".
-                    while (!reader.EndOfStream)
+                    if (!String.IsNullOrEmpty(responseLine = await reader.ReadLineAsync()))
                     {
-                        responseLine = await reader.ReadLineAsync();
-                        if (responseLine == null)
-                        {
-                            System.Diagnostics.Debug.WriteLine("**Error@SendCommand@reader.ReadLineAsync(): null");
-                            break;
-                        }
+                        //System.Diagnostics.Debug.WriteLine("**ResponseLine:" + responseLine);
 
-                        //System.Diagnostics.Debug.WriteLine("**Response loop: " + responseLine);
-
+                        // Read multiple lines untill "OK".
                         if (!responseLine.StartsWith("OK"))
                         {
                             responseMultiLines.Add(responseLine);
+
                             if (responseLine.StartsWith("ACK"))
                             {
                                 System.Diagnostics.Debug.WriteLine("**Response ACK: " + responseLine + "\n");
@@ -1449,17 +1530,27 @@ Id: 22637
                         }
                         else
                         {
-                            mpdRespomseOK = true;
+                            //Testing.
+                            responseMultiLines.Add(responseLine);
+
+                            //mpdRespomseOK = true;
                             break;
                         }
                     }
+                    else
+                    {
+                        //
+                        break;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WhileReadLineAsync: " + ex.Message);
-                }
-
             }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WhileReadLineAsync: " + ex.Message);
+                //
+            }
+
+            /*
             catch (IOException)
             {
                 //System.IO.IOException
@@ -1474,11 +1565,12 @@ Id: 22637
                 }
 
                 System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: IOException - TRYING TO RECONNECT.");
+                //await Task.Delay(10);
                 // Reconnect.
                 if (await ReConnect())
                 {
                     _retryAttempt++;
-                    return await SendCommand(cmd);
+                    return await DoSendCommand(_TCP, cmd, _retryAttempt);
                 }
                 else
                 {
@@ -1492,17 +1584,19 @@ Id: 22637
                 System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: " + ex.Message);
                 return null;
             }
-            
-            if ((responseMultiLines.Count == 0) && (!mpdRespomseOK) && (!IsConnected))
+
+            if (((responseMultiLines.Count == 0) && (!mpdRespomseOK)))// && (!IsConnected))
             {
-                System.Diagnostics.Debug.WriteLine("**responseMultiLines.Count == 0, !mpdRespomseOK, !IsConnected");
+                System.Diagnostics.Debug.WriteLine("**responseMultiLines.Count == 0 & !mpdRespomseOK or !IsConnected");
 
                 System.Diagnostics.Debug.WriteLine("**TRYING TO RECONNECT.");
+                //await Task.Delay(10);
+
                 // Reconnect.
                 if (await ReConnect())
                 {
                     _retryAttempt++;
-                    return await SendCommand(cmd);
+                    return await DoSendCommand(_TCP, cmd, _retryAttempt);
                 }
                 else
                 {
@@ -1510,8 +1604,10 @@ Id: 22637
                     return null;
                 }
             }
-            
+
             _retryAttempt = 0;
+            */
+
 
             return responseMultiLines;
         }
@@ -1584,6 +1680,9 @@ Id: 22637
     /// <summary>
     /// Event driven TCP client wrapper
     /// https://www.daniweb.com/programming/software-development/code/422291/user-friendly-asynchronous-event-driven-tcp-client
+    /// 
+    /// Modified to use Task. Added Disable TimeoutReceive.
+    /// 
     /// </summary>
     public class EventDrivenTCPClient : IDisposable
     {
@@ -1813,6 +1912,8 @@ Id: 22637
                 {
                     tmrSendTimeout.Stop();
                 }
+
+                // Added. Testing...................
                 this._client.Client.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, new AsyncCallback(cbDataReceived), this._client.Client);
             }
         }
@@ -1851,6 +1952,7 @@ Id: 22637
             if (DataReceived != null)
             {
                 //DataReceived.BeginInvoke(this, _encode.GetString(dataBuffer, 0, bytes), new AsyncCallback(cbDataRecievedCallbackComplete), this);
+                // Modified.
                 Task.Run(() => { DataReceived.Invoke(this, _encode.GetString(dataBuffer, 0, bytes)); });
             }
         }
@@ -1919,6 +2021,7 @@ Id: 22637
                 _ConStat = value;
                 if (ConnectionStatusChanged != null && raiseEvent)
                     //ConnectionStatusChanged.BeginInvoke(this, _ConStat, new AsyncCallback(cbChangeConnectionStateComplete), this);
+                    // Modified.
                     Task.Run(() => { ConnectionStatusChanged(this, _ConStat); });
             }
         }
@@ -2000,7 +2103,7 @@ Id: 22637
             }
         }
 
-        /// 
+        /// Added.
         public bool DisableReceiveTimeout
         {
             get

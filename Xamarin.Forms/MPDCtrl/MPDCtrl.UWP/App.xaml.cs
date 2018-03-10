@@ -39,7 +39,10 @@ namespace MPDCtrl.UWP
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-
+            // SET window size.
+            Windows.UI.ViewManagement.ApplicationView.PreferredLaunchViewSize = new Size(386, 798);
+            Windows.UI.ViewManagement.ApplicationView.PreferredLaunchWindowingMode = Windows.UI.ViewManagement.ApplicationViewWindowingMode.PreferredLaunchViewSize;
+            Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(320, 798));
 
             Frame rootFrame = Window.Current.Content as Frame;
 

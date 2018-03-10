@@ -220,6 +220,7 @@ namespace WpfMPD
             }
         }
 
+        /*
         public double Volume
         {
             get
@@ -249,6 +250,59 @@ namespace WpfMPD
                 }
             }
         }
+        */
+        public double Volume
+        {
+            get
+            {
+                return _volume;
+            }
+            set
+            {
+                this._volume = value;
+                this.NotifyPropertyChanged("Volume");
+
+                if (_MPC != null)
+                {
+                    // If we have a timer and we are in this event handler, a user is still interact with the slider
+                    // we stop the timer
+                    if (_timer != null)
+                        _timer.Stop();
+
+                    System.Diagnostics.Debug.WriteLine("Volume value is still changing. Skipping.");
+
+                    // we always create a new instance of DispatcherTimer
+                    _timer = new System.Timers.Timer();
+                    _timer.AutoReset = false;
+
+                    // if one second passes, that means our user has stopped interacting with the slider
+                    // we do real event
+                    _timer.Interval = (double)1000;
+                    _timer.Elapsed += new System.Timers.ElapsedEventHandler(DoChangeVolume);
+
+                    _timer.Start();
+                }
+            }
+        }
+        private System.Timers.Timer _timer = null;
+        private void DoChangeVolume(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (_MPC != null)
+            {
+                if (Convert.ToDouble(_MPC.MpdStatus.MpdVolume) != this._volume)
+                {
+                    if (SetVolumeCommand.CanExecute(null))
+                    {
+                        SetVolumeCommand.Execute(null);
+                    }
+                }
+                else
+                {
+                    //System.Diagnostics.Debug.WriteLine("Volume value is the same. Skipping.");
+                }
+            }
+        }
+
 
         public bool Repeat
         {

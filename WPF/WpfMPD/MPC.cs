@@ -1879,7 +1879,7 @@ namespace WpfMPD
                     tmrSendTimeout.Stop();
                 }
                 //////////////////////////////// Testing.
-                this._client.Client.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, new AsyncCallback(cbDataReceived), this._client.Client);
+                //this._client.Client.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, new AsyncCallback(cbDataReceived), this._client.Client);
             }
         }
         private void cbChangeConnectionStateComplete(IAsyncResult result)

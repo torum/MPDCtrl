@@ -192,8 +192,6 @@ namespace MPDCtrl
                     if (_timer != null)
                         _timer.Stop();
 
-                    System.Diagnostics.Debug.WriteLine("Volume value is still changing Skipping.");
-
                     // we always create a new instance of DispatcherTimer
                     _timer = new System.Timers.Timer();
                     _timer.AutoReset = false;
@@ -432,7 +430,7 @@ namespace MPDCtrl
         {
             if (data == null) { return; }
 
-            // list of SubSystems we are subscribing.
+            // The list of SubSystems we are subscribing.
             // player mixer options playlist stored_playlist
 
             bool isPlayer = false;
@@ -476,7 +474,7 @@ namespace MPDCtrl
                 await Task.Delay(10);
             }
 
-            // Little dirty, but ObservableCollection isn't thread safe, so...
+            // Little dirty, but... heck. 
             /*
             while (_isBusy)
             {
@@ -511,8 +509,8 @@ namespace MPDCtrl
 
             if ((isPlayer && isPlaylist))
             {
-                //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlayer & isPlaylist");
-                IsBusy = true;
+                System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlayer & isPlaylist");
+                //IsBusy = true;
 
                 // Reset view.
                 Device.BeginInvokeOnMainThread(
@@ -574,14 +572,13 @@ namespace MPDCtrl
                             IsBusy = false;
                         }
 
-                        // Testing
                         Device.BeginInvokeOnMainThread(() => UpdateButtonStatus());
+                        //TODO: Oops.
                         //Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
                     }
                     else
                     {
                         IsBusy = false;
-                        //TODO: Let user know.
                         System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue returned false." + "\n");
                     }
                 }
@@ -597,8 +594,8 @@ namespace MPDCtrl
 
                 ErrorMessage = "Loading...";
 
-                //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlaylist");
-                IsBusy = true;
+                System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlaylist");
+                //IsBusy = true;
 
                 // Reset view.
                 //sender.CurrentQueue.Clear();
@@ -648,8 +645,8 @@ namespace MPDCtrl
 
                     //IsBusy = false;
                     Device.BeginInvokeOnMainThread(() => UpdateButtonStatus());
+                    //TODO: Oops.
                     //Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
-
 
                 }
                 else
@@ -662,7 +659,7 @@ namespace MPDCtrl
             {
                 ErrorMessage = "Loading...";
 
-                //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlayer");
+                System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlayer");
 
                 // Update status.
                 bool isDone = await sender.MpdQueryStatus();
@@ -708,6 +705,7 @@ namespace MPDCtrl
                                 {
                                     sender.MpdCurrentSong = (item as MPC.Song); // just in case.
                                     this._selectedSong = (item as MPC.Song);
+                                    System.Diagnostics.Debug.WriteLine("OnStatusChanged isPlayer SelectedSong is : " + this._selectedSong.Title);
                                 }
                                 else
                                 {
@@ -753,7 +751,9 @@ namespace MPDCtrl
 
                     // Testing
                     Device.BeginInvokeOnMainThread(() => UpdateButtonStatus());
+                    //TODO: Opps.
                     //Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
+
                 }
                 else
                 {
@@ -763,7 +763,7 @@ namespace MPDCtrl
             }
             else if (isStoredPlaylist)
             {
-                IsBusy = true;
+                //IsBusy = true;
 
                 this._selecctedPlaylist = "";
                 this.NotifyPropertyChanged("SelectedPlaylist");
@@ -805,7 +805,7 @@ namespace MPDCtrl
 
                 UpdateButtonStatus();
 
-                // Retrieve play queue
+                // Retrieve play queue.
                 return await QueryCurrentPlayQueue();
             }
             else
@@ -844,8 +844,6 @@ namespace MPDCtrl
                 //    System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue NOT CurrentQueue.Count > 0");
                 //}
 
-                //IsBusy = false;
-
                 // Retrieve playlists
                 return await QueryPlaylists();
             }
@@ -873,7 +871,6 @@ namespace MPDCtrl
             else
             {
                 //IsBusy = false;
-                // Let user know.
                 System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
                 return false;
             }

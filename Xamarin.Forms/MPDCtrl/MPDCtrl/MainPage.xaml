@@ -12,9 +12,11 @@
             <On Platform="WinPhone" Value="0, 0, 0, 12" />
         </OnPlatform>
     </ContentPage.Padding>
+<!--
     <ContentPage.BindingContext>
         <local:MainViewModel />
     </ContentPage.BindingContext>
+    -->
     <ContentPage.Resources>
         <ResourceDictionary>
             <OnPlatform x:Key="PlayButtonImage" 
@@ -70,11 +72,9 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="48" />
             </Grid.ColumnDefinitions>
-            <Button x:Name="ShowSettingsButton" Text="Settings" Grid.Row="1" Grid.Column="0" 
-                    Clicked="ShowSettingsButton_Clicked"
-                    IsVisible="False"></Button>
             <Button x:Name="PickPlaylistButton" Grid.Row="1" Grid.Column="2" 
                     Image="{StaticResource PlaylistButtonImage}"
+                    BackgroundColor="Transparent"
                     Clicked="PickPlaylistButton_Clicked"></Button> 
             <Label Grid.Row="1" Grid.Column="1"
                Text="{Binding ErrorMessage}"

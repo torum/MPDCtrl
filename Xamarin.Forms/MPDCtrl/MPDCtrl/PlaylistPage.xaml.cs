@@ -16,5 +16,11 @@ namespace MPDCtrl
 		{
 			InitializeComponent ();
 		}
-	}
+
+        private async void PlaylistsListview_ItemTapped(object sender, ItemTappedEventArgs e)
+        {
+            await Navigation.PopAsync();
+            //await Navigation.PushAsync(p);
+        }
+    }
 }

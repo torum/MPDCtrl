@@ -9,16 +9,20 @@ namespace MPDCtrl
 {
 	public partial class App : Application
 	{
-		public App ()
+        public App ()
 		{
 			InitializeComponent();
 
             //MainPage = new MPDCtrl.MainPage();
+
             //MainPage = new NavigationPage(new MainPage());
             //MainPage = new NavigationPage(new TabbedPageMain());
 
+            
+
             MainPage = new MPDCtrl.TabbedPageMain();
         }
+
 
         protected override void OnStart ()
 		{

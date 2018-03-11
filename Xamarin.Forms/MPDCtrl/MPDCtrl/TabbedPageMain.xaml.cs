@@ -12,16 +12,29 @@ namespace MPDCtrl
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class TabbedPageMain : TabbedPage
     {
+
+        
+
         public TabbedPageMain ()
         {
             //InitializeComponent();
 
-            Children.Add(new NavigationPage(new MainPage())
+
+            MainPage mp = new MainPage
+            {
+                BindingContext = new MainViewModel()
+            };
+            SettingsPage sp = new SettingsPage
+            {
+                BindingContext = mp.BindingContext
+            };
+
+            Children.Add(new NavigationPage(mp)
             {
                 Title = "Home",
                 //Icon = Images.Tab_Navigate
             });
-            Children.Add(new NavigationPage(new SettingsPage())
+            Children.Add(new NavigationPage(sp)
             {
                 Title = "Settings",
                 //Icon = Images.Tab_Navigate

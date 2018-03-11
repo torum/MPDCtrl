@@ -25,12 +25,11 @@ namespace MPDCtrl
 
         private async void PickPlaylistButton_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new PlaylistPage());
-        }
-
-        private async void ShowSettingsButton_Clicked(object sender, EventArgs e)
-        {
-            await Navigation.PushAsync(new SettingsPage());
+            Page p = new PlaylistPage
+            {
+                BindingContext = this.BindingContext
+            };
+            await Navigation.PushAsync(p);
         }
 
         private void VolumeSlider_ValueChanged(object sender, ValueChangedEventArgs e)

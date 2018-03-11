@@ -224,13 +224,12 @@ namespace MPDCtrl
             this._a = a;
             this._st = new Status();
 
-            // Enable synch with UI and background thread. BUT IT DOES NOT MEAN IT'S THREAD SAFE.
+            // Oops.
             //BindingOperations.EnableCollectionSynchronization(this._songs, new object());
             //BindingOperations.EnableCollectionSynchronization(this._playLists, new object());
 
             // Initialize idle tcp client.
             _idleClient = new EventDrivenTCPClient(IPAddress.Parse(this._h), this._p, true);
-            //_idleClient.ReceiveTimeout = Disabled. Hard coded in the source.
             _idleClient.DisableReceiveTimeout = true;
             _idleClient.DataReceived += new EventDrivenTCPClient.delDataReceived(IdleClient_DataReceived);
             _idleClient.ConnectionStatusChanged += new EventDrivenTCPClient.delConnectionStatusChanged(IdleClient_ConnectionStatusChanged);
@@ -1210,22 +1209,11 @@ Id: 22637
 
         private void IdleClient_ConnectionStatusChanged(EventDrivenTCPClient sender, EventDrivenTCPClient.ConnectionStatus status)
         {
-            System.Diagnostics.Debug.WriteLine("IdleConnection: " + status.ToString());
+            System.Diagnostics.Debug.WriteLine("--IdleConnection: " + status.ToString());
 
             if (status == EventDrivenTCPClient.ConnectionStatus.Connected)
             {
-                //
-            }
-        }
-
-        private void IdleClient_DataReceived(EventDrivenTCPClient sender, object data)
-        {
-            System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived: " + (data as string));
-
-            if (data == null) { return; }
-
-            if ((data as string).StartsWith("OK MPD"))
-            {
+                /*
                 // Connected to MPD and received OK. Now we are idling and wait.
                 if (!string.IsNullOrEmpty(this._a))
                 {
@@ -1233,12 +1221,49 @@ Id: 22637
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("IdleConnection OK MPD, Going idle.");
+                    System.Diagnostics.Debug.WriteLine("--IdleConnection established, Start idle.");
                     sender.Send("idle player mixer options playlist stored_playlist\n");
                 }
+                */
+            }
+        }
+
+        private void IdleClient_DataReceived(EventDrivenTCPClient sender, object data)
+        {
+            System.Diagnostics.Debug.WriteLine("\n--IdleConnection DataReceived: \n" + (data as string).TrimEnd());
+
+            if (data == null) { return; }
+
+            //Testing. vv Now we handle initial "idle" command at IdleClient_ConnectionStatusChanged. 
+            if ((data as string).StartsWith("OK MPD"))
+            {
+                
+                // Connected to MPD and received OK. Now we are idling and wait.
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    _idleClient.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("IdleConnection OK MPD, Start idle.\n");
+                    _idleClient.Send("idle player mixer options playlist stored_playlist\n");
+                }
+                
             }
             else
             {
+
+                // Go idle again and wait.
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    sender.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("--IdleConnection Going idle again.");
+                    sender.Send("idle player mixer options playlist stored_playlist\n");
+                }
+
                 /*
                  changed: playlist
                  changed: player
@@ -1275,9 +1300,11 @@ Id: 22637
                 }
                 catch
                 {
-                    System.Diagnostics.Debug.WriteLine("Error@IdleConnection DataReceived: " + (data as string));
+                    System.Diagnostics.Debug.WriteLine("--Error@IdleConnection DataReceived: " + (data as string));
                 }
 
+
+                /*
                 // Go idle again and wait.
                 if (!string.IsNullOrEmpty(this._a))
                 {
@@ -1288,7 +1315,8 @@ Id: 22637
                     System.Diagnostics.Debug.WriteLine("IdleConnection Going idle again.");
                     sender.Send("idle player mixer options playlist stored_playlist\n");
                 }
-              
+                */
+
             }
         }
 
@@ -1349,12 +1377,11 @@ Id: 22637
         public CommandTCPClient()
         {
             this._TCP = new TcpClient();
-            //this._client.NoDelay = true;
+            this._TCP.NoDelay = true;
             this._TCP.ReceiveTimeout = 1000;
 
             // KeepAlive testing.
             this._TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-
         }
 
         public async Task<bool> Connect(IPAddress ip, int port, string auth)
@@ -1370,19 +1397,23 @@ Id: 22637
         {
             if (_retryAttempt > 0)
             {
+                System.Diagnostics.Debug.WriteLine("**SendCommand@ReConnect() _retryAttempt > 0");
                 return false;
             }
 
             _retryAttempt++;
 
-            try { 
+            try {
                 this._TCP.Close();
+                //this._TCP.Client.Dispose();
+                //this._TCP.Client.Disconnect(true);
             }
             catch { }
-            //await Task.Delay(10);
+
+            await Task.Delay(500);
 
             this._TCP = new TcpClient();
-            //this._client.NoDelay = true;
+            this._TCP.NoDelay = true;
             this._TCP.ReceiveTimeout = 1000;
 
             // KeepAlive testing.
@@ -1404,11 +1435,11 @@ Id: 22637
 
                 if (responseLine == null)
                 {
-                    System.Diagnostics.Debug.WriteLine("**DoConnected response: null");
+                    System.Diagnostics.Debug.WriteLine("**DoConnect response: null");
                     return false;
                 }
 
-                System.Diagnostics.Debug.WriteLine("**DoConnected response: " + responseLine);
+                System.Diagnostics.Debug.WriteLine("**DoConnect response: " + responseLine);
 
                 if (responseLine.StartsWith("OK MPD"))
                 {
@@ -1424,7 +1455,7 @@ Id: 22637
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("**Error@DoConnected: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("**Error@DoConnect: " + ex.Message);
                 return false;
             }
 
@@ -1442,10 +1473,8 @@ Id: 22637
                 //System.IO.IOException
                 //Unable to transfer data on the transport connection: An established connection was aborted by the software in your host machine.
 
-                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: IOException");
+                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@Read/WriteLineAsync: IOException - TRYING TO RECONNECT.");
 
-                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: IOException - TRYING TO RECONNECT.");
-                //await Task.Delay(10);
                 // Reconnect.
                 if (await ReConnect())
                 {
@@ -1453,23 +1482,20 @@ Id: 22637
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: IOException - GIVING UP reconnect.");
+                    System.Diagnostics.Debug.WriteLine("**Error@SendCommand@Read/WriteLineAsync: IOException - GIVING UP reconnect.");
                     return null;
                 }
 
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@Read/WriteLineAsync: " + ex.Message);
                 return null;
             }
 
             if ((tsResponse.Result.Count == 0)  && (!IsConnected))
             {
-                System.Diagnostics.Debug.WriteLine("**responseMultiLines.Count == 0 & !IsConnected");
-
-                System.Diagnostics.Debug.WriteLine("**TRYING TO RECONNECT.");
-                //await Task.Delay(10);
+                System.Diagnostics.Debug.WriteLine("**@SendCommand@responseMultiLines.Count == 0 & !IsConnected - TRYING TO RECONNECT");
 
                 // Reconnect.
                 if (await ReConnect())
@@ -1483,134 +1509,63 @@ Id: 22637
                 }
             }
 
-            //_retryAttempt = 0;
-
             return tsResponse.Result;
-
-            //return await DoSendCommand(this._TCP, cmd, 0);
         }
 
-        public static async Task<List<string>> DoSendCommand(TcpClient TCP, string cmd)
+        public static async Task<List<string>> DoSendCommand(TcpClient tcp, string cmd)
         {
             // It's a magic. Everything works..iPhone, and NotifyPropertyChanged("SelectedSong") in UWP works with this...
             await Task.Delay(100);
 
             List<string> responseMultiLines = new List<string>();
-            //bool mpdRespomseOK = false;
 
-            NetworkStream networkStream = TCP.GetStream();
+            NetworkStream networkStream = tcp.GetStream();
             StreamWriter writer = new StreamWriter(networkStream);
             StreamReader reader = new StreamReader(networkStream);
-            writer.AutoFlush = true;
+            //writer.AutoFlush = true;
 
             System.Diagnostics.Debug.WriteLine("**Request: " + cmd);
 
             await writer.WriteLineAsync(cmd);
+            await writer.FlushAsync();
 
             System.Diagnostics.Debug.WriteLine("**Waiting Response...");
-            try
+
+            string responseLine;
+
+            while (!reader.EndOfStream)
             {
-                string responseLine;
-
-                //while ((responseLine = reader.ReadLine()) != null)
-                while (!reader.EndOfStream)
+                if (!String.IsNullOrEmpty(responseLine = await reader.ReadLineAsync()))
                 {
-                    if (!String.IsNullOrEmpty(responseLine = await reader.ReadLineAsync()))
+                    //System.Diagnostics.Debug.WriteLine("**ResponseLine:" + responseLine);
+
+                    // Read multiple lines untill "OK".
+                    if (!responseLine.StartsWith("OK"))
                     {
-                        //System.Diagnostics.Debug.WriteLine("**ResponseLine:" + responseLine);
+                        responseMultiLines.Add(responseLine);
 
-                        // Read multiple lines untill "OK".
-                        if (!responseLine.StartsWith("OK"))
+                        if (responseLine.StartsWith("ACK"))
                         {
-                            responseMultiLines.Add(responseLine);
-
-                            if (responseLine.StartsWith("ACK"))
-                            {
-                                System.Diagnostics.Debug.WriteLine("**Response ACK: " + responseLine + "\n");
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            //Testing.
-                            responseMultiLines.Add(responseLine);
-
-                            //mpdRespomseOK = true;
+                            System.Diagnostics.Debug.WriteLine("**Response ACK: " + responseLine + "\n");
                             break;
                         }
                     }
                     else
                     {
-                        //
+                        responseMultiLines.Add(responseLine);
+
+                        System.Diagnostics.Debug.WriteLine("**Response line(s) received 'tll OK.");
+
                         break;
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WhileReadLineAsync: " + ex.Message);
-                //
-            }
-
-            /*
-            catch (IOException)
-            {
-                //System.IO.IOException
-                //Unable to transfer data on the transport connection: An established connection was aborted by the software in your host machine.
-
-                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: IOException");
-
-                if (_retryAttempt > 1)
-                {
-                    System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: IOException _retryAttempt > 1");
-                    return null;
-                }
-
-                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: IOException - TRYING TO RECONNECT.");
-                //await Task.Delay(10);
-                // Reconnect.
-                if (await ReConnect())
-                {
-                    _retryAttempt++;
-                    return await DoSendCommand(_TCP, cmd, _retryAttempt);
-                }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: IOException - GIVING UP reconnect.");
-                    return null;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@WriteLineAsync: " + ex.Message);
-                return null;
-            }
-
-            if (((responseMultiLines.Count == 0) && (!mpdRespomseOK)))// && (!IsConnected))
-            {
-                System.Diagnostics.Debug.WriteLine("**responseMultiLines.Count == 0 & !mpdRespomseOK or !IsConnected");
-
-                System.Diagnostics.Debug.WriteLine("**TRYING TO RECONNECT.");
-                //await Task.Delay(10);
-
-                // Reconnect.
-                if (await ReConnect())
-                {
-                    _retryAttempt++;
-                    return await DoSendCommand(_TCP, cmd, _retryAttempt);
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("**Error@SendCommand@responseMultiLines.Count == 0: GIVING UP RECONNECT.");
-                    return null;
+                    break;
                 }
             }
 
-            _retryAttempt = 0;
-            */
-
-
+            await Task.Delay(100);
             return responseMultiLines;
         }
 
@@ -1668,13 +1623,13 @@ Id: 22637
                 try
                 {
                     this._TCP.Close();
+                    this._TCP.Client.Dispose();
                     System.Diagnostics.Debug.WriteLine("**Connection closed.");
                 }
                 catch { }
             }
             return true;
         }
-
 
     }
 
@@ -1683,7 +1638,7 @@ Id: 22637
     /// Event driven TCP client wrapper
     /// https://www.daniweb.com/programming/software-development/code/422291/user-friendly-asynchronous-event-driven-tcp-client
     /// 
-    /// Modified to use Task. Added Disable TimeoutReceive.
+    /// Modified to use Task. Added disable TimeoutReceive.
     /// 
     /// </summary>
     public class EventDrivenTCPClient : IDisposable
@@ -1846,7 +1801,10 @@ Id: 22637
             {
                 tmrConnectTimeout.Stop();
                 ConnectionState = ConnectionStatus.Connected;
+
+                System.Diagnostics.Debug.WriteLine("^^cbConnectComplete, BeginReceive");
                 this._client.Client.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, new AsyncCallback(cbDataReceived), this._client.Client);
+
             }
             else
             {
@@ -1914,11 +1872,9 @@ Id: 22637
                 {
                     tmrSendTimeout.Stop();
                 }
-
-                // Added. Testing...................
-                this._client.Client.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, new AsyncCallback(cbDataReceived), this._client.Client);
             }
         }
+        /* No longer used.
         private void cbChangeConnectionStateComplete(IAsyncResult result)
         {
             var r = result.AsyncState as EventDrivenTCPClient;
@@ -1926,6 +1882,7 @@ Id: 22637
                 throw new InvalidOperationException("Invalid IAsyncResult - Could not interpret as a EDTC object");
             r.ConnectionStatusChanged.EndInvoke(result);
         }
+        */
         private void cbDataReceived(IAsyncResult result)
         {
             var sock = result.AsyncState as Socket;
@@ -1953,11 +1910,16 @@ Id: 22637
             }
             if (DataReceived != null)
             {
+                // Old code.
                 //DataReceived.BeginInvoke(this, _encode.GetString(dataBuffer, 0, bytes), new AsyncCallback(cbDataRecievedCallbackComplete), this);
-                // Modified.
+
+                // Modified. Substitute for DataReceived.BeginInvoke cbDataRecievedCallbackComplete
                 Task.Run(() => { DataReceived.Invoke(this, _encode.GetString(dataBuffer, 0, bytes)); });
+                System.Diagnostics.Debug.WriteLine("^^cbDataRecieved&CallbackComplete, BeginReceive...");
+                this._client.Client.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, new AsyncCallback(cbDataReceived), this._client.Client);
             }
         }
+        /* No longer used.
         private void cbDataRecievedCallbackComplete(IAsyncResult result)
         {
             var r = result.AsyncState as EventDrivenTCPClient;
@@ -1965,13 +1927,14 @@ Id: 22637
                 throw new InvalidOperationException("Invalid IAsyncResult - Could not interpret as EDTC object");
             r.DataReceived.EndInvoke(result);
             SocketError err = new SocketError();
-            this._client.Client.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, out err, new AsyncCallback(cbDataReceived), this._client.Client);
+            //this._client.Client.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, out err, new AsyncCallback(cbDataReceived), this._client.Client);
             if (err != SocketError.Success)
             {
                 Action doDCHost = new Action(DisconnectByHost);
                 doDCHost.Invoke();
             }
         }
+        */
         #endregion
 
         #region Properties and members

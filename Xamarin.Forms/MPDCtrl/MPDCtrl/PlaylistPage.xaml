@@ -5,8 +5,16 @@
              xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
              ios:Page.UseSafeArea="true"
              x:Class="MPDCtrl.PlaylistPage"
+             NavigationPage.HasNavigationBar="False"
              Title="Playlists">
-
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <OnPlatform x:Key="PlaylistPlayButtonImage" 
+                    x:TypeArguments="FileImageSource"
+                    WinPhone="Assets\playlist-play-36.png"
+                    iOS="Assets/playlist-play-36.png-black.png"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <ContentPage.Content>
         <Grid>
             <Grid.RowDefinitions>
@@ -32,7 +40,8 @@
                     <DataTemplate>
                         <ImageCell 
                             Text="{Binding Path=.}" 
-                            Detail=" ">
+                            Detail=" "
+                            ImageSource="{StaticResource PlaylistPlayButtonImage}">
                         </ImageCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>

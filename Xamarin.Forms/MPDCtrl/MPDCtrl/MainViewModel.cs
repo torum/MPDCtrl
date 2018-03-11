@@ -1,7 +1,32 @@
-﻿
+﻿/// 
+/// 
+/// MPD Ctrl for iOS
+/// https://github.com/torumyax/MPD-Ctrl
+/// 
+/// TODO:
+/// -- Priority 1 --
+/// 
+/// -- Priority 2 --
+///  Better error messages for users.
+///  Debug tab.
+///  
+/// -- Goal --
+/// AppX and Microsoft Store. 
+///
+/// Known issues:
+/// 
+/// xam plugins:
+/// https://github.com/jamesmontemagno/SettingsPlugin
 
-// Always 
-//(Songs.Count < 1) 
+// Xamarin issues.
+//
+// Xamarin NavigationPage.SetHasNavigationBar false doesn't work 
+// https://github.com/xamarin/Xamarin.Forms/issues/1437
+// https://github.com/xamarin/Xamarin.Forms/issues/1627
+
+// Xamarin ListView.ScrollTo doesn't animate on UWP #2048
+// https://github.com/xamarin/Xamarin.Forms/issues/2048
+
 
 
 using System;
@@ -407,6 +432,8 @@ namespace MPDCtrl
 
             if (await _MPC.MpdCmdConnect())
             {
+                ErrorMessage = "Receiving...";
+
                 // Connect to MPD server and query status and info.
                 if (await QueryStatus())
                 {
@@ -434,7 +461,6 @@ namespace MPDCtrl
             // player mixer options playlist stored_playlist
 
             bool isPlayer = false;
-            bool alMixer = false;
             bool isPlaylist = false;
             bool isStoredPlaylist = false;
             foreach (var subsystem in (data as List<string>))
@@ -450,7 +476,6 @@ namespace MPDCtrl
                 {
                     //System.Diagnostics.Debug.WriteLine("OnStatusChanged: mixer");
                     isPlayer = true;
-                    alMixer = true;
                 }
                 else if (subsystem == "options")
                 {
@@ -505,7 +530,7 @@ namespace MPDCtrl
 
             IsBusy = true;
 
-            ErrorMessage = "Loading......";
+            ErrorMessage = "Connecting...";
 
             if ((isPlayer && isPlaylist))
             {
@@ -805,6 +830,8 @@ namespace MPDCtrl
 
                 UpdateButtonStatus();
 
+                ErrorMessage = "Loading...";
+
                 // Retrieve play queue.
                 return await QueryCurrentPlayQueue();
             }
@@ -837,12 +864,14 @@ namespace MPDCtrl
                     {
                         System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue MpdCurrentSong is null");
                     }
-                
+
                 //}
                 //else
                 //{
                 //    System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue NOT CurrentQueue.Count > 0");
                 //}
+
+                ErrorMessage = "Retrieving...";
 
                 // Retrieve playlists
                 return await QueryPlaylists();

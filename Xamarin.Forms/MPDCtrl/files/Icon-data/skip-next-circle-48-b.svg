@@ -12,10 +12,10 @@
    height="24"
    viewBox="0 0 24 24"
    id="svg4"
-   sodipodi:docname="playlist-check-36.svg"
-   inkscape:export-filename="C:\Users\torum\Desktop\playlist-check.png"
-   inkscape:export-xdpi="144"
-   inkscape:export-ydpi="144"
+   sodipodi:docname="skip-next-circle-48-b.svg"
+   inkscape:export-filename="C:\Users\torum\Desktop\skip-next-circle.png"
+   inkscape:export-xdpi="192"
+   inkscape:export-ydpi="192"
    inkscape:version="0.92.1 r15371">
   <metadata
      id="metadata10">
@@ -25,7 +25,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -40,19 +40,19 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1666"
-     inkscape:window-height="1236"
+     inkscape:window-width="1412"
+     inkscape:window-height="1078"
      id="namedview6"
      showgrid="false"
      inkscape:zoom="9.8333333"
-     inkscape:cx="-5.1355933"
+     inkscape:cx="-17.542373"
      inkscape:cy="12"
-     inkscape:window-x="1676"
-     inkscape:window-y="585"
+     inkscape:window-x="1737"
+     inkscape:window-y="620"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg4" />
   <path
-     d="M14,10H2V12H14V10M14,6H2V8H14V6M2,16H10V14H2V16M21.5,11.5L23,13L16,20L11.5,15.5L13,14L16,17L21.5,11.5Z"
+     d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8L13,12L8,16M14,8H16V16H14"
      id="path2"
-     style="fill:#f0f0f0;fill-opacity:1" />
+     style="fill:#000000;fill-opacity:0.7903226" />
 </svg>

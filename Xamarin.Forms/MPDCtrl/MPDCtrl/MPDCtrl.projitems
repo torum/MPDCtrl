@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -35,13 +36,30 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)Assets\home-circle-36-black.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\home-circle-36.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\music-note-36-black.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\music-note-36.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\pause-circle-86-black.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\pause-circle-86.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\play-circle-86-black.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\play-circle-86.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\playlist-check-36-black.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\playlist-check-36.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\playlist-play-36-black.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\playlist-play-36.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\repeat-36-black.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\repeat-36.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\settings-36-black.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\settings-36.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\shuffle-variant-36-black.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\shuffle-variant-36.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\skip-next-circle-48-black.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\skip-next-circle-48.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\skip-previous-circle-48-black.png" />
     <Content Include="$(MSBuildThisFileDirectory)Assets\skip-previous-circle-48.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\volume-mute-36-black.png" />
+    <Content Include="$(MSBuildThisFileDirectory)Assets\volume-mute-36.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)PlaylistPage.xaml">

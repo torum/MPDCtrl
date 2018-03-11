@@ -11,7 +11,9 @@ namespace MPDCtrl
     {
 		public MainPage()
 		{
-			InitializeComponent();
+            NavigationPage.SetHasNavigationBar(this, false);
+
+            InitializeComponent();
 		}
 
         private void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)

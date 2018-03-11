@@ -14,7 +14,9 @@ namespace MPDCtrl
 	{
 		public SettingsPage ()
 		{
-			InitializeComponent ();
+            NavigationPage.SetHasNavigationBar(this, false);
+
+            InitializeComponent ();
 		}
 	}
 }

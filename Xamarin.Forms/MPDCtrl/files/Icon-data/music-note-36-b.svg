@@ -12,8 +12,8 @@
    height="24"
    viewBox="0 0 24 24"
    id="svg4"
-   sodipodi:docname="playlist-check-36.svg"
-   inkscape:export-filename="C:\Users\torum\Desktop\playlist-check.png"
+   sodipodi:docname="music-note-36-b.svg"
+   inkscape:export-filename="C:\Users\torum\Desktop\music-note.png"
    inkscape:export-xdpi="144"
    inkscape:export-ydpi="144"
    inkscape:version="0.92.1 r15371">
@@ -25,7 +25,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -40,19 +40,20 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1666"
-     inkscape:window-height="1236"
+     inkscape:window-width="1673"
+     inkscape:window-height="1250"
      id="namedview6"
      showgrid="false"
      inkscape:zoom="9.8333333"
-     inkscape:cx="-5.1355933"
+     inkscape:cx="-22.271187"
      inkscape:cy="12"
-     inkscape:window-x="1676"
-     inkscape:window-y="585"
+     inkscape:window-x="1264"
+     inkscape:window-y="374"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg4" />
   <path
-     d="M14,10H2V12H14V10M14,6H2V8H14V6M2,16H10V14H2V16M21.5,11.5L23,13L16,20L11.5,15.5L13,14L16,17L21.5,11.5Z"
+     d="m 11.457627,6.7627119 v 5.1270051 c -0.276836,-0.09412 -0.553672,-0.143954 -0.830508,-0.143954 -1.3841812,0 -2.4915258,1.107344 -2.4915258,2.491525 0,1.384181 1.1073446,2.491526 2.4915258,2.491526 1.38418,0 2.491525,-1.107345 2.491525,-2.491526 V 8.4237288 h 2.214689 V 6.7627119 Z"
      id="path2"
-     style="fill:#f0f0f0;fill-opacity:1" />
+     style="fill:#000000;fill-opacity:0.78431374;stroke-width:0.55367231"
+     inkscape:connector-curvature="0" />
 </svg>

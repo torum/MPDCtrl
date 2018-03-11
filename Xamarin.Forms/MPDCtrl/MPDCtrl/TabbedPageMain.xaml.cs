@@ -13,11 +13,11 @@ namespace MPDCtrl
     public partial class TabbedPageMain : TabbedPage
     {
 
-        
-
         public TabbedPageMain ()
         {
             //InitializeComponent();
+
+            NavigationPage.SetHasNavigationBar(this, false);
 
 
             MainPage mp = new MainPage

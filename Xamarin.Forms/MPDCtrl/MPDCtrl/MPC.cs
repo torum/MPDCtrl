@@ -4,19 +4,23 @@
 /// https://github.com/torumyax/MPD-Ctrl
 /// 
 /// TODO:
+/// 
+/// Send Ping regurally so that the tcp client can detect disconnection and try to reconnect.
 ///  More detailed error message for users.
-///  lock object.
 ///
 /// Known issue:
+/// 
+/// Mopidy related:
 ///  Mopidy does not accept command_list_begin + password
 ///   https://github.com/mopidy/mopidy/issues/1661
 ///    command_list_begin
-///    password hogehoge
+///    password hoge
 ///    status
 ///    command_list_end
-///   hence > no password.
+///  
 ///  Mopidy issues unnecessary multiple idle subsystem events 
 ///   https://github.com/mopidy/mopidy/issues/1662
+///   
 ///  Mopidy has some issue with M3U and UTF-8, Ext M3Us.
 ///    https://github.com/mopidy/mopidy/issues/1370
 ///    
@@ -764,6 +768,34 @@ Id: 22637
         {
             try
             {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = mpdCommand + "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    if (songID != "")
+                    {
+                        mpdCommand = mpdCommand + "playid " + songID + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = mpdCommand + "play" + "\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    if (songID != "")
+                    {
+                        mpdCommand = "playid " + songID;
+                    }
+                    else
+                    {
+                        mpdCommand = "play";
+                    }
+                }
+
+                /*
                 string mpdCommand = "command_list_begin" + "\n";
                 if (!string.IsNullOrEmpty(this._a))
                 {
@@ -782,12 +814,12 @@ Id: 22637
                 //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
+                */
 
-                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
+                Task <List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
                 //return ParseStatusResponse(tsResponse.Result);
-
                 return ParseVoidResponse(tsResponse.Result);
 
             }
@@ -804,6 +836,19 @@ Id: 22637
 
             try
             {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = mpdCommand + "seekid " + songID + " " + seekTime.ToString() + "\n";
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    mpdCommand = "seekid " + songID + " " + seekTime.ToString();
+                }
+                /*
                 string mpdCommand = "command_list_begin" + "\n";
                 if (!string.IsNullOrEmpty(this._a))
                 {
@@ -815,6 +860,7 @@ Id: 22637
                 //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
+                */
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
@@ -834,6 +880,19 @@ Id: 22637
         {
             try
             {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = mpdCommand + "pause 1" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    mpdCommand = "pause 1";
+                }
+                /*
                 string mpdCommand = "command_list_begin" + "\n";
                 if (!string.IsNullOrEmpty(this._a))
                 {
@@ -845,6 +904,7 @@ Id: 22637
                 //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
+                */
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
@@ -865,6 +925,19 @@ Id: 22637
         {
             try
             {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = mpdCommand + "pause 0" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    mpdCommand = "pause 0";
+                }
+                /*
                 string mpdCommand = "command_list_begin" + "\n";
                 if (!string.IsNullOrEmpty(this._a))
                 {
@@ -876,6 +949,7 @@ Id: 22637
                 //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
+                */
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
@@ -896,6 +970,19 @@ Id: 22637
         {
             try
             {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = mpdCommand + "stop" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    mpdCommand = "stop";
+                }
+                /*
                 string mpdCommand = "command_list_begin" + "\n";
                 if (!string.IsNullOrEmpty(this._a))
                 {
@@ -907,6 +994,7 @@ Id: 22637
                 //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
+                */
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
@@ -927,6 +1015,19 @@ Id: 22637
         {
             try
             {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = mpdCommand + "next" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    mpdCommand = "next";
+                }
+                /*
                 string mpdCommand = "command_list_begin" + "\n";
                 if (!string.IsNullOrEmpty(this._a))
                 {
@@ -939,10 +1040,12 @@ Id: 22637
                 {
                     mpdCommand = mpdCommand + "play" + "\n";
                 }
+                
 
                 //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
+                */
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
@@ -962,6 +1065,19 @@ Id: 22637
         {
             try
             {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = mpdCommand + "previous" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    mpdCommand = "previous";
+                }
+                /*
                 string mpdCommand = "command_list_begin" + "\n";
                 if (!string.IsNullOrEmpty(this._a))
                 {
@@ -978,8 +1094,9 @@ Id: 22637
                 //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
+                */
 
-                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
+                Task <List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
                 //return ParseStatusResponse(tsResponse.Result);
@@ -999,6 +1116,19 @@ Id: 22637
 
             try
             {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = mpdCommand + "setvol " + v.ToString() + "\n";
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    mpdCommand = "setvol " + v.ToString();
+                }
+                /*
                 string mpdCommand = "command_list_begin" + "\n";
                 if (!string.IsNullOrEmpty(this._a))
                 {
@@ -1010,6 +1140,7 @@ Id: 22637
                 //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
+                */
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
@@ -1031,6 +1162,33 @@ Id: 22637
 
             try
             {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    if (on)
+                    {
+                        mpdCommand = mpdCommand + "repeat 1" + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = mpdCommand + "repeat 0" + "\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    if (on)
+                    {
+                        mpdCommand = "repeat 1";
+                    }
+                    else
+                    {
+                        mpdCommand = "repeat 0";
+                    }
+                }
+                /*
                 string mpdCommand = "command_list_begin" + "\n";
                 if (!string.IsNullOrEmpty(this._a))
                 {
@@ -1048,6 +1206,7 @@ Id: 22637
                 //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
+                */
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
@@ -1069,6 +1228,33 @@ Id: 22637
 
             try
             {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    if (on)
+                    {
+                        mpdCommand = mpdCommand + "random 1" + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = mpdCommand + "random 0" + "\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    if (on)
+                    {
+                        mpdCommand = "random 1";
+                    }
+                    else
+                    {
+                        mpdCommand = "random 0";
+                    }
+                }
+                /*
                 string mpdCommand = "command_list_begin" + "\n";
                 if (!string.IsNullOrEmpty(this._a))
                 {
@@ -1087,6 +1273,7 @@ Id: 22637
                 //mpdCommand = mpdCommand + "status" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
+                */
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
@@ -1107,6 +1294,19 @@ Id: 22637
             if (playlistName.Trim() != "")
             {
                 string mpdCommand = "command_list_begin" + "\n";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                }
+                mpdCommand = mpdCommand + "clear" + "\n";
+
+                mpdCommand = mpdCommand + "load " + playlistName.Trim() + "\n";
+
+                mpdCommand = mpdCommand + "play" + "\n";
+
+                mpdCommand = mpdCommand + "command_list_end";
+                /*
+                string mpdCommand = "command_list_begin" + "\n";
 
                 if (!string.IsNullOrEmpty(this._a))
                 {
@@ -1123,6 +1323,7 @@ Id: 22637
                 //mpdCommand = mpdCommand + "playlistinfo" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
+                */
 
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
@@ -1365,7 +1566,9 @@ Id: 22637
         /// END OF MPC Client Class 
     }
 
-
+    /// <summary>
+    ///  TCP client wrapper
+    /// </summary>
     public class CommandTCPClient
     {
         private TcpClient _TCP;
@@ -1638,7 +1841,8 @@ Id: 22637
     /// Event driven TCP client wrapper
     /// https://www.daniweb.com/programming/software-development/code/422291/user-friendly-asynchronous-event-driven-tcp-client
     /// 
-    /// Modified to use Task. Added disable TimeoutReceive.
+    /// 1. Modified to use Task. 
+    /// 2. Added DisableReceiveTimeout property.
     /// 
     /// </summary>
     public class EventDrivenTCPClient : IDisposable
@@ -1713,6 +1917,7 @@ Id: 22637
         {
             this.ConnectionState = ConnectionStatus.DisconnectedByHost;
             tmrReceiveTimeout.Stop();
+            System.Diagnostics.Debug.WriteLine("^^DisconnectedByHost, AutoReconnecting...");
             if (AutoReconnect)
                 Reconnect();
         }

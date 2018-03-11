@@ -12,8 +12,8 @@
    height="24"
    viewBox="0 0 24 24"
    id="svg4"
-   sodipodi:docname="playlist-check-36.svg"
-   inkscape:export-filename="C:\Users\torum\Desktop\playlist-check.png"
+   sodipodi:docname="playlist-play-36.svg"
+   inkscape:export-filename="C:\Users\torum\Source\Repos\MPDCtrl\MPDCtrl\files\Icon-data\todo\playlist-play.png"
    inkscape:export-xdpi="144"
    inkscape:export-ydpi="144"
    inkscape:version="0.92.1 r15371">
@@ -25,7 +25,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -40,19 +40,19 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1666"
-     inkscape:window-height="1236"
+     inkscape:window-width="1554"
+     inkscape:window-height="1173"
      id="namedview6"
      showgrid="false"
      inkscape:zoom="9.8333333"
-     inkscape:cx="-5.1355933"
+     inkscape:cx="12"
      inkscape:cy="12"
-     inkscape:window-x="1676"
-     inkscape:window-y="585"
+     inkscape:window-x="571"
+     inkscape:window-y="422"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg4" />
   <path
-     d="M14,10H2V12H14V10M14,6H2V8H14V6M2,16H10V14H2V16M21.5,11.5L23,13L16,20L11.5,15.5L13,14L16,17L21.5,11.5Z"
+     d="M19,9H2V11H19V9M19,5H2V7H19V5M2,15H15V13H2V15M17,13V19L22,16L17,13Z"
      id="path2"
      style="fill:#f0f0f0;fill-opacity:1" />
 </svg>

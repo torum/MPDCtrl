@@ -5,6 +5,7 @@
              xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
              ios:Page.UseSafeArea="true"
              x:Class="MPDCtrl.MainPage"
+             NavigationPage.HasNavigationBar="False"
              Title="Main">
     <ContentPage.Padding>
         <OnPlatform x:TypeArguments="Thickness">
@@ -22,11 +23,11 @@
             <OnPlatform x:Key="PlayButtonImage" 
                     x:TypeArguments="FileImageSource"
                     WinPhone="Assets\play-circle-86.png"
-                    iOS="Assets/play-circle-86.png"/>
+                    iOS="Assets/play-circle-86-black.png"/>
             <OnPlatform x:Key="PauseButtonImage" 
                     x:TypeArguments="FileImageSource"
                     WinPhone="Assets\pause-circle-86.png"
-                    iOS="Assets/pause-circle-86.png"/>
+                    iOS="Assets/pause-circle-86-black.png"/>
             <OnPlatform x:Key="MusicButtonImage" 
                     x:TypeArguments="FileImageSource"
                     WinPhone="Assets\music-note-36.png"
@@ -34,15 +35,27 @@
             <OnPlatform x:Key="NextButtonImage" 
                     x:TypeArguments="FileImageSource"
                     WinPhone="Assets\skip-next-circle-48.png"
-                    iOS="Assets/skip-next-circle-48.png"/>
+                    iOS="Assets/skip-next-circle-48-black.png"/>
             <OnPlatform x:Key="PrevButtonImage" 
                     x:TypeArguments="FileImageSource"
                     WinPhone="Assets\skip-previous-circle-48.png"
-                    iOS="Assets/skip-previous-circle-48.png"/>
+                    iOS="Assets/skip-previous-circle-48-black.png"/>
             <OnPlatform x:Key="PlaylistButtonImage" 
                     x:TypeArguments="FileImageSource"
-                    WinPhone="Assets\playlist-check-36-black.png"
+                    WinPhone="Assets\playlist-check-36.png"
                     iOS="Assets/playlist-check-36-black.png"/>
+            <OnPlatform x:Key="MuteButtonImage" 
+                    x:TypeArguments="FileImageSource"
+                    WinPhone="Assets\volume-mute-36.png"
+                    iOS="Assets/volume-mute-36-black.png"/>
+            <OnPlatform x:Key="RepeatButtonImage" 
+                    x:TypeArguments="FileImageSource"
+                    WinPhone="Assets\repeat-36.png"
+                    iOS="Assets/repeat-36-black.png"/>
+            <OnPlatform x:Key="ShuffleButtonImage" 
+                    x:TypeArguments="FileImageSource"
+                    WinPhone="Assets\shuffle-variant-36.png"
+                    iOS="Assets/shuffle-variant-36-black.png"/>
         </ResourceDictionary>
     </ContentPage.Resources>
     <Grid>
@@ -74,21 +87,17 @@
             </Grid.ColumnDefinitions>
             <Button x:Name="PickPlaylistButton" Grid.Row="1" Grid.Column="2" 
                     Image="{StaticResource PlaylistButtonImage}"
+                    BorderWidth="0"
+                    WidthRequest="48"
+                    HeightRequest="48"
                     BackgroundColor="Transparent"
-                    Clicked="PickPlaylistButton_Clicked"></Button> 
+                    Clicked="PickPlaylistButton_Clicked"></Button>
             <Label Grid.Row="1" Grid.Column="1"
                Text="{Binding ErrorMessage}"
                VerticalOptions="Center" 
                HorizontalOptions="Center" IsVisible="True"/>
         </Grid>
         
-        <!--
-        <Picker x:Name="PlaylistsPicker" Grid.Row="0" Grid.Column="1" 
-                ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist, Mode=TwoWay}"
-                IsVisible="False"/>
-        -->
-        
-
         <ListView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
                   ItemsSource="{Binding Songs}" SelectedItem="{Binding SelectedSong, Mode=TwoWay}"
                   ItemSelected="ListView_ItemSelected">
@@ -108,6 +117,7 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+        
         <Grid Grid.Row="4" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -117,10 +127,21 @@
                 <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="0.5*" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0"></Button>
+            <Button Grid.Column="0"
+                    Image="{StaticResource RepeatButtonImage}"
+                    BorderWidth="0"
+                    WidthRequest="48"
+                    HeightRequest="48"
+                    BackgroundColor="Transparent"></Button>
             <Slider Grid.Column="1" x:Name="SeekSlider"/>
-            <Button Grid.Column="2"></Button>
+            <Button Grid.Column="2"
+                    Image="{StaticResource ShuffleButtonImage}"
+                    BorderWidth="0"
+                    WidthRequest="48"
+                    HeightRequest="48"
+                    BackgroundColor="Transparent"></Button>
         </Grid>
+        
         <Grid Grid.Row="5" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -153,6 +174,7 @@
                     Command="{Binding PlayNextCommand}"
                     Image="{StaticResource NextButtonImage}"></Button>
         </Grid>
+        
         <Grid Grid.Row="6" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -162,13 +184,17 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Text="mute"></Button>
-            <Slider Grid.Column="1" x:Name="VolumeSlider"
+            <Button Grid.Column="0"
+                    Image="{StaticResource MuteButtonImage}"
+                    BorderWidth="0"
+                    WidthRequest="48"
+                    HeightRequest="48"
+                    BackgroundColor="Transparent"></Button>
+            <Slider Grid.Column="1" Grid.ColumnSpan="2" x:Name="VolumeSlider"
                     Value="{Binding Volume, Mode=TwoWay}"
                     Maximum="100"/>
-            <Button Grid.Column="2" Text="max"></Button>
         </Grid>
+        
     </Grid>
-
 
 </ContentPage>

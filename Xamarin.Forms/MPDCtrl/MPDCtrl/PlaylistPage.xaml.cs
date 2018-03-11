@@ -14,7 +14,9 @@ namespace MPDCtrl
 	{
 		public PlaylistPage ()
 		{
-			InitializeComponent ();
+            NavigationPage.SetHasNavigationBar(this, false);
+
+            InitializeComponent ();
 		}
 
         private async void PlaylistsListview_ItemTapped(object sender, ItemTappedEventArgs e)

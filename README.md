@@ -1,8 +1,8 @@
 # MPD-Ctrl
 
-MPD Ctrl for Windows desktop(WPF) and MPD Ctrl for mobile cross-platform(Xamarin.Forms).
+MPD Ctrl for Windows desktop(WPF) and MPD Ctrl for iOS(Xamarin.Forms).
 
-**MPD Ctrl for Windows desktop(WPF)** is a light-weight, desktop gadget-like, client app for the MPD (Music player daemon) http://www.musicpd.org/ . It should also work with MPD-compatible servers such as Mopidy https://www.mopidy.com/ or forked-daapd http://ejurgensen.github.io/forked-daapd/. **MPD Ctrl for mobile cross-platform(Xamarin.Forms)** is under developement.
+**MPD Ctrl for Windows desktop(WPF)** is a light-weight, desktop gadget-like, client app for the MPD (Music player daemon) http://www.musicpd.org/ . It should also work with MPD-compatible servers such as Mopidy https://www.mopidy.com/ or forked-daapd http://ejurgensen.github.io/forked-daapd/. 
 
 Requirement:  
 Windows 10 ("Fall Creators Update/.NET Framework 4.7.1" or later) and a host running MPD.  
@@ -14,10 +14,9 @@ Supported languages:
 English and Japanese.
   
 ![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/WPF/WpfMPD/files/bin/MPD-Ctrl_Screenshot1.png?raw=true)  
-
-  
   
 ![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/WPF/WpfMPD/files/bin/MPD-Ctrl_Screenshot_setting.png?raw=true)  
 
-
-
+  
+**MPD Ctrl for iOS(Xamarin.Forms)** is under developement.  
+  

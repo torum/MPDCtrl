@@ -18,9 +18,14 @@ English and Japanese.
 ![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/WPF/WpfMPD/files/bin/MPD-Ctrl_Screenshot_setting.png?raw=true)  
 
   
+  -  
+   
 **MPD Ctrl for iOS and UWP (Xamarin.Forms)** is under developement .   
   
 Screenshot of the UWP app version for testing and developing. Alpha stage.
-![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/Xamarin.Forms/MPDCtrl/files/screenshots/uwp-pre-screnshot.png?raw=true)    
+![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/Xamarin.Forms/MPDCtrl/files/screenshots/uwp-pre-screnshot.png?raw=true)  
+  
+![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/Xamarin.Forms/MPDCtrl/files/screenshots/iOS-pre-screnshot.png?raw=true)  
 
+  
   

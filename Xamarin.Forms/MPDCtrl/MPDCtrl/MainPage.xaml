@@ -148,7 +148,9 @@
                     WidthRequest="36"
                     HeightRequest="36"
                     BackgroundColor="Transparent"></Button>
-            <Slider Grid.Column="1" x:Name="SeekSlider"/>
+            <Slider Grid.Column="1" x:Name="SeekSlider"
+                    Maximum="{Binding Path=Time}" Minimum="0" 
+                    Value="{Binding Mode=TwoWay,Path=Elapsed}"/>
             <Button Grid.Column="2"
                     Image="{StaticResource ShuffleButtonImage}"
                     Command="{Binding SetRandomCommand}"

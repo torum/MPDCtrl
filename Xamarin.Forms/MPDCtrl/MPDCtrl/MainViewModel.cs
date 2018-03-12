@@ -5,10 +5,13 @@
 /// 
 /// TODO:
 /// -- Priority 1 --
-/// 
+///  Settings page.
+///  Icons...
+///  Detect resize
+///   https://forums.xamarin.com/discussion/87615/detecting-device-orientation
 /// -- Priority 2 --
+///  i18n
 ///  Better error messages for users.
-///  Debug tab.
 ///  
 /// -- Goal --
 /// AppX and Microsoft Store. 
@@ -26,6 +29,13 @@
 
 // Xamarin ListView.ScrollTo doesn't animate on UWP #2048
 // https://github.com/xamarin/Xamarin.Forms/issues/2048
+// 
+// Slider crashes when Minimum value greater than zero and set before Max value in XAML #1943
+// https://github.com/xamarin/Xamarin.Forms/issues/1943
+//
+// I think I've found a bug...
+// PropertyChangedEventArgs updates Slider's binding value #2073
+// https://github.com/xamarin/Xamarin.Forms/issues/2073
 
 
 
@@ -62,7 +72,7 @@ namespace MPDCtrl
         private bool _random;
         private double _time;
         private double _elapsed;
-        private Timer _elapsedTimer;
+        private System.Timers.Timer _elapsedTimer;
         private bool _showSettings;
         private string _errorMessage;
         //private Profile _profile;
@@ -201,23 +211,23 @@ namespace MPDCtrl
 
                     // If we have a timer and we are in this event handler, a user is still interact with the slider
                     // we stop the timer
-                    if (_timer != null)
-                        _timer.Stop();
+                    if (_volumeDelayTimer != null)
+                        _volumeDelayTimer.Stop();
 
                     // we always create a new instance of DispatcherTimer
-                    _timer = new System.Timers.Timer();
-                    _timer.AutoReset = false;
+                    _volumeDelayTimer = new System.Timers.Timer();
+                    _volumeDelayTimer.AutoReset = false;
 
                     // if one second passes, that means our user has stopped interacting with the slider
                     // we do real event
-                    _timer.Interval = (double)1000;
-                    _timer.Elapsed += new System.Timers.ElapsedEventHandler(DoChangeVolume);
+                    _volumeDelayTimer.Interval = (double)1000;
+                    _volumeDelayTimer.Elapsed += new System.Timers.ElapsedEventHandler(DoChangeVolume);
 
-                    _timer.Start();
+                    _volumeDelayTimer.Start();
                 }
             }
         }
-        private System.Timers.Timer _timer = null;
+        private System.Timers.Timer _volumeDelayTimer = null;
         private void DoChangeVolume(object sender, System.Timers.ElapsedEventArgs e)
         {
             if (_MPC != null)
@@ -300,13 +310,21 @@ namespace MPDCtrl
             }
             set
             {
-                this._elapsed = value;
-                this.NotifyPropertyChanged("Elapsed");
+                if (value < this._time) {
+                    this._elapsed = value;
+                    this.NotifyPropertyChanged("Elapsed");
 
-                //if (SetSeekCommand.CanExecute(null))
-                //{
-                //    SetSeekCommand.Execute(null);
-                //}
+                    if (SetSeekCommand.CanExecute(null))
+                    {
+                        //SetSeekCommand.Execute(null);
+
+                        //TODO:
+                        System.Diagnostics.Debug.WriteLine("\n--This should not be happening unless user manually changed.");
+                        // I think I've found a bug...
+                        // PropertyChangedEventArgs updates Slider's binding value #2073
+                        // https://github.com/xamarin/Xamarin.Forms/issues/2073
+                    }
+                }
             }
         }
 
@@ -386,6 +404,9 @@ namespace MPDCtrl
             this._defaultPort = 6600;
             this._defaultPassword = "";
 
+            Elapsed = 1.000;
+            Time = 100.000;
+
             // Assign commands
             this._playCommand = new MPDCtrl.RelayCommand(this.PlayCommand_ExecuteAsync, this.PlayCommand_CanExecute);
             this._playNextCommand = new MPDCtrl.RelayCommand(this.PlayNextCommand_ExecuteAsync, this.PlayNextCommand_CanExecute);
@@ -407,6 +428,11 @@ namespace MPDCtrl
             //this._newConnectinSettingCommand = new MPDCtrl.GenericRelayCommand<object>(param => this.NewConnectinSettingCommand_Execute(param), param => this.NewConnectinSettingCommand_CanExecute());
             this._addConnectinSettingCommand = new MPDCtrl.RelayCommand(this.AddConnectinSettingCommand_Execute, this.AddConnectinSettingCommand_CanExecute);
             this._deleteConnectinSettingCommand = new MPDCtrl.RelayCommand(this.DeleteConnectinSettingCommand_Execute, this.DeleteConnectinSettingCommand_CanExecute);
+
+            // Init Song's time elapsed timer.
+            _elapsedTimer = new System.Timers.Timer();
+            _elapsedTimer.Interval = (double)1000;
+            _elapsedTimer.Elapsed += new System.Timers.ElapsedEventHandler(ElapsedTimer);
 
             Start();
         }
@@ -955,11 +981,11 @@ namespace MPDCtrl
                 //start elapsed timer.
                 if (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
                 {
-                    //_elapsedTimer.Start();
+                    _elapsedTimer.Start();
                 }
                 else
                 {
-                    //_elapsedTimer.Stop();
+                    _elapsedTimer.Stop();
                 }
             }
             catch
@@ -968,16 +994,17 @@ namespace MPDCtrl
             }
         }
 
-        private void ElapsedTimer(object sender, EventArgs e)
+        private void ElapsedTimer(object sender, System.Timers.ElapsedEventArgs e)//(object sender, EventArgs e)
         {
-            if ((_elapsed < _time) && (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play))
+            if ((_elapsed <= _time) && (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play))
             {
                 this._elapsed += 1;
+                System.Diagnostics.Debug.WriteLine("NotifyPropertyChanged Elapsed");
                 this.NotifyPropertyChanged("Elapsed");
             }
             else
             {
-                //_elapsedTimer.Stop();
+                _elapsedTimer.Stop();
             }
         }
 

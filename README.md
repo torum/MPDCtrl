@@ -4,9 +4,9 @@ MPD Ctrl is a client app for the [MPD (Music player daemon)](http://www.musicpd.
   
 **MPD Ctrl for Windows desktop**(WPF) and **MPD Ctrl for mobile cross-platform**(Xamarin.Forms).  
 
-### MPD Ctrl for Windows desktop(WPF)
+### MPD Ctrl for Windows desktop
 
-MPD Ctrl for Windows desktop(WPF) is a light-weight, desktop gadget-like, client app for the MPD. It runs on Windows desktop.
+MPD Ctrl for Windows desktop (WPF) is a desktop gadget-like light-weight client app for the MPD.
 
 - Requirement:  
 Windows 10 ("Fall Creators Update/.NET Framework 4.7.1" or later) and a host running MPD.  
@@ -24,7 +24,7 @@ English and Japanese.
   
  
    
-### MPD Ctrl for mobile cross-platform (Xamarin.Forms)
+### MPD Ctrl for mobile cross-platform
 
 MPD Ctrl for iOS and UWP (Xamarin.Forms) is currently under developement.   
   

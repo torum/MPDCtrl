@@ -61,6 +61,11 @@
                     x:TypeArguments="FileImageSource"
                     WinPhone="Assets\timer-sand-36.png"
                     iOS="Assets/timer-sand-36-black.png"/>
+
+            <OnPlatform x:Key="cbColor" x:TypeArguments="Color">
+                <On Platform="iOS">#CCCCCC</On>
+                <On Platform="WinPhone">#CCCCCC</On>
+            </OnPlatform>
         </ResourceDictionary>
     </ContentPage.Resources>
     <Grid>
@@ -145,21 +150,24 @@
             <helper:Checkbox Grid.Column="0"
                     Image="{StaticResource RepeatButtonImage}"
                     Command="{Binding SetRpeatCommand}"
-                    BorderWidth="0"
+                    BorderWidth="2"
                     WidthRequest="36"
                     HeightRequest="36"
                     BackgroundColor="Transparent"
-                             IsChecked="{Binding Repeat}"></helper:Checkbox>
+                             TextColor="{StaticResource cbColor}"
+                             IsChecked="{Binding Repeat}">
+            </helper:Checkbox>
             <Slider Grid.Column="1" x:Name="SeekSlider"
                     Maximum="{Binding Path=Time}" Minimum="0" 
                     Value="{Binding Mode=TwoWay,Path=Elapsed}"/>
             <helper:Checkbox Grid.Column="2"
                     Image="{StaticResource ShuffleButtonImage}"
                     Command="{Binding SetRandomCommand}"
-                    BorderWidth="0"
+                    BorderWidth="2"
                     WidthRequest="36"
                     HeightRequest="36"
                     BackgroundColor="Transparent"
+                             TextColor="{StaticResource cbColor}"
                              IsChecked="{Binding Random}"></helper:Checkbox>
         </Grid>
         

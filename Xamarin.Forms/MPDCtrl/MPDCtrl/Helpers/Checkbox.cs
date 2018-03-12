@@ -9,11 +9,12 @@ namespace MPDCtrl.Helpers
     {
         public Checkbox()
         {
-            //base.Image = "Assets/newcbu.png";
+            //base.Image = ";
             base.Clicked += new EventHandler(OnClicked);
             base.BackgroundColor = Color.Transparent;
-            base.BorderWidth = 0;
+            base.BorderWidth = 2;
             base.BorderColor = Color.Transparent;
+            base.TextColor = Color.Default;
         }
 
         public static BindableProperty IsCheckedProperty = BindableProperty.Create(
@@ -46,15 +47,17 @@ namespace MPDCtrl.Helpers
         {
             if (newValue != null && (Boolean)newValue == true)
             {
-                //((Checkbox)bindable).Image = "Assets/repeat-36.png";
-                ((Checkbox)bindable).BorderWidth = 1;
+                //((Checkbox)bindable).Image = "";
+                //((Checkbox)bindable).BorderWidth = 1;
                 ((Checkbox)bindable).BorderColor = ((Checkbox)bindable).TextColor;
+                //((Checkbox)bindable).BackgroundColor = ((Checkbox)bindable).TextColor;
             }
             else
             {
-                //((Checkbox)bindable).Image = "Assets/shuffle-variant-36.png";
-                ((Checkbox)bindable).BorderWidth = 0;
+                //((Checkbox)bindable).Image = "";
+                //((Checkbox)bindable).BorderWidth = 0;
                 ((Checkbox)bindable).BorderColor = Color.Transparent;
+                //((Checkbox)bindable).BackgroundColor = Color.Transparent;
             }
         }
 

@@ -3,26 +3,26 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MPDCtrl"
              xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
-             ios:Page.UseSafeArea="true"
+             ios:Page.UseSafeArea="False"
+             NavigationPage.HasNavigationBar="True"
              x:Class="MPDCtrl.PlaylistPage"
-             NavigationPage.HasNavigationBar="False"
              Title="Playlists">
     <ContentPage.Resources>
         <ResourceDictionary>
             <OnPlatform x:Key="PlaylistPlayButtonImage" 
                     x:TypeArguments="FileImageSource"
                     WinPhone="Assets\playlist-play-36.png"
-                    iOS="Assets/playlist-play-36.png-black.png"/>
+                    iOS="Assets/playlist-play-36-black.png"/>
         </ResourceDictionary>
     </ContentPage.Resources>
     <ContentPage.Content>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="4" />
+                <RowDefinition Height="0" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="4" />
-                <RowDefinition Height="12" />
+                <RowDefinition Height="0" />
+                <RowDefinition Height="0" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="4" />
@@ -31,11 +31,13 @@
             </Grid.ColumnDefinitions>
             <ListView x:Name="PlaylistsListview" Grid.Row="2"  Grid.Column="0" Grid.ColumnSpan="3"
                 ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist, Path=., Mode=TwoWay}" ItemTapped="PlaylistsListview_ItemTapped">
+                <!-- 
                 <ListView.Header>
                     <StackLayout Padding="10,5,0,15">
                         <Label Text="Playlists" HorizontalOptions="Center"/>
                     </StackLayout>
                 </ListView.Header>
+                -->
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ImageCell 

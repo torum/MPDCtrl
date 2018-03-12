@@ -14,7 +14,7 @@ namespace MPDCtrl
 	{
 		public PlaylistPage ()
 		{
-            NavigationPage.SetHasNavigationBar(this, false);
+            //NavigationPage.SetHasNavigationBar(this, false);
 
             InitializeComponent ();
 		}

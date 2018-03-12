@@ -17,7 +17,7 @@ namespace MPDCtrl
         {
             //InitializeComponent();
 
-            NavigationPage.SetHasNavigationBar(this, false);
+            //NavigationPage.SetHasNavigationBar(this, false);
 
 
             MainPage mp = new MainPage
@@ -32,12 +32,12 @@ namespace MPDCtrl
             Children.Add(new NavigationPage(mp)
             {
                 Title = "Home",
-                //Icon = Images.Tab_Navigate
+                Icon = "Assets/home-circle-36-black.png"//Images.Tab_Navigate
             });
             Children.Add(new NavigationPage(sp)
             {
                 Title = "Settings",
-                //Icon = Images.Tab_Navigate
+                Icon = "Assets/settings-36-black.png"//Images.Tab_Navigate
             });
         }
     }

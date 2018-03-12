@@ -154,7 +154,7 @@ namespace MPDCtrl
         private ObservableCollection<Song> _songs = new ObservableCollection<Song>();
         private ObservableCollection<String> _playLists = new ObservableCollection<String>();
         private EventDrivenTCPClient _idleClient;
-        //object _objLock = new object();
+        object _objLock = new object();
         private CommandTCPClient _commandClient;
 
         #endregion END of MPC PRIVATE FIELD declaration
@@ -535,7 +535,7 @@ namespace MPDCtrl
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParsePlaylistInfoResponse(tsResponse.Result);
+                return await ParsePlaylistInfoResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -545,18 +545,38 @@ namespace MPDCtrl
             return false;
         }
 
-        private bool ParsePlaylistInfoResponse(List<string> sl)
+        private async Task<bool> ParsePlaylistInfoResponse(List<string> sl)
         {
             if (this.MpdStop) { return false; }
             if (sl == null) {
                 System.Diagnostics.Debug.WriteLine("ConError@ParsePlaylistInfoResponse: null");
                 ErrorReturned?.Invoke(this, "Connection Error: (@C2)");
                 return false; }
-
-            try {
-                // Don't. Not good when multithreading. Make sure you clear the collection before calling MpdQueryCurrentPlaylist().
-                //_songs.Clear();
-
+            /*
+file: Creedence Clearwater Revival/Chronicle, Vol. 1/11 Who'll Stop the Rain.mp3
+Last-Modified: 2011-08-03T16:08:06Z
+Artist: Creedence Clearwater Revival
+AlbumArtist: Creedence Clearwater Revival
+Title: Who'll Stop the Rain
+Album: Chronicle, Vol. 1
+Track: 11
+Date: 1976
+Genre: Rock
+Composer: John Fogerty
+Time: 149
+duration: 149.149
+Pos: 5
+Id: 22637
+            */
+            try
+            {
+                /*
+                Device.BeginInvokeOnMainThread(
+                    () =>
+                    {
+                        _songs.Clear();
+                    });
+                */
                 Dictionary<string, string> SongValues = new Dictionary<string, string>();
                 foreach (string value in sl)
                 {
@@ -583,26 +603,9 @@ namespace MPDCtrl
                                 SongValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
                             }
                         }
-                        /*
-file: Creedence Clearwater Revival/Chronicle, Vol. 1/11 Who'll Stop the Rain.mp3
-Last-Modified: 2011-08-03T16:08:06Z
-Artist: Creedence Clearwater Revival
-AlbumArtist: Creedence Clearwater Revival
-Title: Who'll Stop the Rain
-Album: Chronicle, Vol. 1
-Track: 11
-Date: 1976
-Genre: Rock
-Composer: John Fogerty
-Time: 149
-duration: 149.149
-Pos: 5
-Id: 22637
-                         */
 
                         if (SongValues.ContainsKey("Id"))
                         {
-
                             Song sng = new Song();
                             sng.ID = SongValues["Id"];
 
@@ -634,27 +637,29 @@ Id: 22637
                                     sng.Artist = "...";
                                 }
                             }
-                            //
-
-
+                            
                             if (sng.ID == _st.MpdSongID)
                             {
                                 this._currentSong = sng;
                                 //System.Diagnostics.Debug.WriteLine(sng.ID + ":" + sng.Title + " - is current.");
                             }
 
-
                             SongValues.Clear();
 
                             try
                             {
-                                //_songs.Add(sng);
-                                Device.BeginInvokeOnMainThread(
-                                    () =>
-                                    {
-                                        _songs.Add(sng);
-                                    });
+                                // https://stackoverflow.com/questions/2091988/how-do-i-update-an-observablecollection-via-a-worker-thread
+                                Device.BeginInvokeOnMainThread(new Action(
+                                        () =>
+                                        {
+                                            _songs.Add(sng);
+                                            
+                                        }));
 
+                                // This will significantly slows down the load but gives more ui responsiveness.
+                                await Task.Delay(10);
+
+                                //_songs.Add(sng);
                             }
                             catch (Exception ex)
                             {
@@ -1582,6 +1587,7 @@ Id: 22637
             this._TCP = new TcpClient();
             this._TCP.NoDelay = true;
             this._TCP.ReceiveTimeout = 1000;
+            this._TCP.SendTimeout = 1000;
 
             // KeepAlive testing.
             this._TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
@@ -1618,6 +1624,7 @@ Id: 22637
             this._TCP = new TcpClient();
             this._TCP.NoDelay = true;
             this._TCP.ReceiveTimeout = 1000;
+            this._TCP.SendTimeout = 1000;
 
             // KeepAlive testing.
             this._TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);

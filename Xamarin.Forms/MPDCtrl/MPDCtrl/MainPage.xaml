@@ -3,9 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MPDCtrl"
              xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
-             ios:Page.UseSafeArea="true"
              x:Class="MPDCtrl.MainPage"
-             NavigationPage.HasNavigationBar="False"
+             ios:Page.UseSafeArea="False"
+             NavigationPage.HasNavigationBar="True"
              Title="Main">
     <ContentPage.Padding>
         <OnPlatform x:TypeArguments="Thickness">
@@ -46,8 +46,8 @@
                     iOS="Assets/playlist-check-36-black.png"/>
             <OnPlatform x:Key="MuteButtonImage" 
                     x:TypeArguments="FileImageSource"
-                    WinPhone="Assets\volume-mute-36.png"
-                    iOS="Assets/volume-mute-36-black.png"/>
+                    WinPhone="Assets\volume-off-36.png"
+                    iOS="Assets/volume-off-36-black.png"/>
             <OnPlatform x:Key="RepeatButtonImage" 
                     x:TypeArguments="FileImageSource"
                     WinPhone="Assets\repeat-36.png"
@@ -56,18 +56,22 @@
                     x:TypeArguments="FileImageSource"
                     WinPhone="Assets\shuffle-variant-36.png"
                     iOS="Assets/shuffle-variant-36-black.png"/>
+            <OnPlatform x:Key="TimerButtonImage" 
+                    x:TypeArguments="FileImageSource"
+                    WinPhone="Assets\timer-sand-36.png"
+                    iOS="Assets/timer-sand-36-black.png"/>
         </ResourceDictionary>
     </ContentPage.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="4" />
+            <RowDefinition Height="0" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="4" />
-            <RowDefinition Height="48" />
+            <RowDefinition Height="0" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="48" />
-            <RowDefinition Height="12" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="8" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4" />
@@ -75,30 +79,40 @@
             <ColumnDefinition Width="4" />
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Row="0" Grid.Column="1" >
+        <Grid Grid.Row="0" Grid.Column="1" x:Name="TitleGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="4" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="36" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="36" />
             </Grid.ColumnDefinitions>
-            <Button x:Name="PickPlaylistButton" Grid.Row="1" Grid.Column="2" 
-                    Image="{StaticResource PlaylistButtonImage}"
+
+            <Button x:Name="InfoButton" Grid.Row="1" Grid.Column="0"
+                    Image="{StaticResource TimerButtonImage}"
                     BorderWidth="0"
-                    WidthRequest="48"
-                    HeightRequest="48"
+                    WidthRequest="36"
+                    HeightRequest="36"
                     BackgroundColor="Transparent"
-                    Clicked="PickPlaylistButton_Clicked"></Button>
+                    IsVisible="{Binding IsWorking}"></Button>
+            
             <Label Grid.Row="1" Grid.Column="1"
                Text="{Binding ErrorMessage}"
                VerticalOptions="Center" 
                HorizontalOptions="Center" IsVisible="True"/>
+            
+            <Button x:Name="PickPlaylistButton" Grid.Row="1" Grid.Column="2" 
+                    Image="{StaticResource PlaylistButtonImage}"
+                    BorderWidth="0"
+                    WidthRequest="36"
+                    HeightRequest="36"
+                    BackgroundColor="Transparent"
+                    Clicked="PickPlaylistButton_Clicked"></Button>
         </Grid>
         
-        <ListView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+        <ListView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" x:Name="SongsGrid"
                   ItemsSource="{Binding Songs}" SelectedItem="{Binding SelectedSong, Mode=TwoWay}"
                   ItemSelected="ListView_ItemSelected">
             <ListView.ItemTemplate>
@@ -117,32 +131,34 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        
-        <Grid Grid.Row="4" Grid.Column="1">
+
+        <Grid Grid.Row="4" Grid.Column="1" x:Name="SeekOptionsGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.5*" />
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="0.5*" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0"
                     Image="{StaticResource RepeatButtonImage}"
+                    Command="{Binding SetRpeatCommand}"
                     BorderWidth="0"
-                    WidthRequest="48"
-                    HeightRequest="48"
+                    WidthRequest="36"
+                    HeightRequest="36"
                     BackgroundColor="Transparent"></Button>
             <Slider Grid.Column="1" x:Name="SeekSlider"/>
             <Button Grid.Column="2"
                     Image="{StaticResource ShuffleButtonImage}"
+                    Command="{Binding SetRandomCommand}"
                     BorderWidth="0"
-                    WidthRequest="48"
-                    HeightRequest="48"
+                    WidthRequest="36"
+                    HeightRequest="36"
                     BackgroundColor="Transparent"></Button>
         </Grid>
         
-        <Grid Grid.Row="5" Grid.Column="1">
+        <Grid Grid.Row="5" Grid.Column="1" x:Name="PlaybackGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
@@ -160,8 +176,8 @@
                     Image="{StaticResource PrevButtonImage}"></Button>
             <Button Grid.Column="1" x:Name="PlayButton"
                     BorderWidth="0"
-                    WidthRequest="100"
-                    HeightRequest="100"
+                    WidthRequest="86"
+                    HeightRequest="86"
                     BackgroundColor="Transparent"
                     Command="{Binding PlayCommand}"
                     Image="{StaticResource PlayButtonImage}">
@@ -175,7 +191,7 @@
                     Image="{StaticResource NextButtonImage}"></Button>
         </Grid>
         
-        <Grid Grid.Row="6" Grid.Column="1">
+        <Grid Grid.Row="6" Grid.Column="1" x:Name="VolumeGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
@@ -186,9 +202,10 @@
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0"
                     Image="{StaticResource MuteButtonImage}"
+                    Command="{Binding VolumeMuteCommand}"
                     BorderWidth="0"
-                    WidthRequest="48"
-                    HeightRequest="48"
+                    WidthRequest="36"
+                    HeightRequest="36"
                     BackgroundColor="Transparent"></Button>
             <Slider Grid.Column="1" Grid.ColumnSpan="2" x:Name="VolumeSlider"
                     Value="{Binding Volume, Mode=TwoWay}"

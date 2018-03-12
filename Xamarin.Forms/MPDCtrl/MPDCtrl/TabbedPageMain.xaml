@@ -2,7 +2,10 @@
 <TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MPDCtrl.TabbedPageMain"
-            xmlns:local="clr-namespace:MPDCtrl">
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+             ios:Page.UseSafeArea="False"
+             NavigationPage.HasNavigationBar="True"
+             xmlns:local="clr-namespace:MPDCtrl">
     <!--
     <local:MainPage/>
     <local:SettingsPage/>

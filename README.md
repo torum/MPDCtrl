@@ -26,9 +26,9 @@ English and Japanese.
    
 ### MPD Ctrl for mobile cross-platform
 
-MPD Ctrl for iOS and UWP (Xamarin.Forms) is currently under developement.   
+MPD Ctrl for iOS and Windows mobile (Xamarin.Forms) is currently under developement.   
   
-Below are screenshots of the UWP and iOS apps. They are very early alpha stages.  
+Below are screenshots of the Windows mobile and iOS apps. They are very early alpha stages.  
 
 ![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/Xamarin.Forms/MPDCtrl/files/screenshots/uwp-pre-screnshot.png?raw=true)  
   

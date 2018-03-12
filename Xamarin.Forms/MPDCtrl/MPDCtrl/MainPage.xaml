@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:MPDCtrl"
              xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
              x:Class="MPDCtrl.MainPage"
+             xmlns:helper="clr-namespace:MPDCtrl.Helpers"
              ios:Page.UseSafeArea="False"
              NavigationPage.HasNavigationBar="True"
              Title="Main">
@@ -141,23 +142,25 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0"
+            <helper:Checkbox Grid.Column="0"
                     Image="{StaticResource RepeatButtonImage}"
                     Command="{Binding SetRpeatCommand}"
                     BorderWidth="0"
                     WidthRequest="36"
                     HeightRequest="36"
-                    BackgroundColor="Transparent"></Button>
+                    BackgroundColor="Transparent"
+                             IsChecked="{Binding Repeat}"></helper:Checkbox>
             <Slider Grid.Column="1" x:Name="SeekSlider"
                     Maximum="{Binding Path=Time}" Minimum="0" 
                     Value="{Binding Mode=TwoWay,Path=Elapsed}"/>
-            <Button Grid.Column="2"
+            <helper:Checkbox Grid.Column="2"
                     Image="{StaticResource ShuffleButtonImage}"
                     Command="{Binding SetRandomCommand}"
                     BorderWidth="0"
                     WidthRequest="36"
                     HeightRequest="36"
-                    BackgroundColor="Transparent"></Button>
+                    BackgroundColor="Transparent"
+                             IsChecked="{Binding Random}"></helper:Checkbox>
         </Grid>
         
         <Grid Grid.Row="5" Grid.Column="1" x:Name="PlaybackGrid">
@@ -176,14 +179,17 @@
                     BackgroundColor="Transparent"
                     Command="{Binding PlayPrevCommand}"
                     Image="{StaticResource PrevButtonImage}"></Button>
-            <Button Grid.Column="1" x:Name="PlayButton"
+            <helper:Toggle Grid.Column="1" x:Name="PlayButton"
                     BorderWidth="0"
                     WidthRequest="86"
                     HeightRequest="86"
                     BackgroundColor="Transparent"
                     Command="{Binding PlayCommand}"
-                    Image="{StaticResource PlayButtonImage}">
-            </Button>
+                    Image="{StaticResource PlayButtonImage}"
+                           OnImageSource="{StaticResource PauseButtonImage}"
+                           OffImageSource="{StaticResource PlayButtonImage}"
+                           IsOn="{Binding IsPlaying}">
+            </helper:Toggle>
             <Button Grid.Column="2" HorizontalOptions="Start"
                     BorderWidth="0"
                     WidthRequest="86"

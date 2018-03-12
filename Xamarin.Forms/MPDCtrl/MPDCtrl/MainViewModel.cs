@@ -6,6 +6,8 @@
 /// TODO:
 /// -- Priority 1 --
 ///  Settings page.
+///   xam plugins:
+///   https://github.com/jamesmontemagno/SettingsPlugin
 ///  Icons...
 ///  Detect resize
 ///   https://forums.xamarin.com/discussion/87615/detecting-device-orientation
@@ -17,9 +19,7 @@
 /// AppX and Microsoft Store. 
 ///
 /// Known issues:
-/// 
-/// xam plugins:
-/// https://github.com/jamesmontemagno/SettingsPlugin
+
 
 // Xamarin issues.
 //
@@ -33,8 +33,8 @@
 // Slider crashes when Minimum value greater than zero and set before Max value in XAML #1943
 // https://github.com/xamarin/Xamarin.Forms/issues/1943
 //
-// I think I've found a bug...
-// PropertyChangedEventArgs updates Slider's binding value #2073
+// 
+// PropertyChangedEventArgs updates binding value #2073
 // https://github.com/xamarin/Xamarin.Forms/issues/2073
 
 
@@ -56,13 +56,14 @@ namespace MPDCtrl
     {
         #region PRIVATE FIELD declaration
 
-        const string CurrentPlayQueue = "Play Queue";
+        const string CurrentPlayQueue = "Current Play Queue";
 
         private MPC _MPC;
         private string _defaultHost;
         private int _defaultPort;
         private string _defaultPassword;
         private MPC.Song _selectedSong;
+        private bool _isPlaying;
         private string _selecctedPlaylist;
         private bool _isBusy;
         private bool _isWorking;
@@ -123,17 +124,19 @@ namespace MPDCtrl
             }
             set
             {
-                _selectedSong = value;
-                this.NotifyPropertyChanged("SelectedSong");
-                if (_MPC != null)
-                {
-                    if (value != null) 
+                if (_selectedSong != value) {
+                    _selectedSong = value;
+                    this.NotifyPropertyChanged("SelectedSong");
+                    if (_MPC != null)
                     {
-                        if (_MPC.MpdStatus.MpdSongID != value.ID)
+                        if (value != null)
                         {
-                            if (ChangeSongCommand.CanExecute(null))
+                            if (_MPC.MpdStatus.MpdSongID != value.ID)
                             {
-                                ChangeSongCommand.Execute(null);
+                                if (ChangeSongCommand.CanExecute(null))
+                                {
+                                    ChangeSongCommand.Execute(null);
+                                }
                             }
                         }
                     }
@@ -182,6 +185,18 @@ namespace MPDCtrl
             }
         }
 
+        public bool IsPlaying
+        {
+            get
+            {
+                return _isPlaying;
+            }
+            set {
+                _isPlaying = value;
+                this.NotifyPropertyChanged("IsPlaying");
+            }
+        }
+
         public double Volume
         {
             get
@@ -190,40 +205,38 @@ namespace MPDCtrl
             }
             set
             {
-                this._volume = value;
-                this.NotifyPropertyChanged("Volume");
+                if (_volume != value) {
+                    this._volume = value;
+                    this.NotifyPropertyChanged("Volume");
 
-                if (_MPC != null)
-                {
-                    /*
-                    if (Convert.ToDouble(_MPC.MpdStatus.MpdVolume) != value)
+                    if (_MPC != null)
                     {
-                        if (SetVolumeCommand.CanExecute(null))
+                        /*
+                        if (Convert.ToDouble(_MPC.MpdStatus.MpdVolume) != value)
                         {
-                            SetVolumeCommand.Execute(null);
+                            if (SetVolumeCommand.CanExecute(null))
+                            {
+                                SetVolumeCommand.Execute(null);
+                            }
                         }
+                        */
+
+                        // If we have a timer and we are in this event handler, a user is still interact with the slider
+                        // we stop the timer
+                        if (_volumeDelayTimer != null)
+                            _volumeDelayTimer.Stop();
+
+                        // we always create a new instance of DispatcherTimer
+                        _volumeDelayTimer = new System.Timers.Timer();
+                        _volumeDelayTimer.AutoReset = false;
+
+                        // if one second passes, that means our user has stopped interacting with the slider
+                        // we do real event
+                        _volumeDelayTimer.Interval = (double)1000;
+                        _volumeDelayTimer.Elapsed += new System.Timers.ElapsedEventHandler(DoChangeVolume);
+
+                        _volumeDelayTimer.Start();
                     }
-                    else
-                    {
-                        //System.Diagnostics.Debug.WriteLine("Volume value is the same. Skipping.");
-                    }
-                    */
-
-                    // If we have a timer and we are in this event handler, a user is still interact with the slider
-                    // we stop the timer
-                    if (_volumeDelayTimer != null)
-                        _volumeDelayTimer.Stop();
-
-                    // we always create a new instance of DispatcherTimer
-                    _volumeDelayTimer = new System.Timers.Timer();
-                    _volumeDelayTimer.AutoReset = false;
-
-                    // if one second passes, that means our user has stopped interacting with the slider
-                    // we do real event
-                    _volumeDelayTimer.Interval = (double)1000;
-                    _volumeDelayTimer.Elapsed += new System.Timers.ElapsedEventHandler(DoChangeVolume);
-
-                    _volumeDelayTimer.Start();
                 }
             }
         }
@@ -251,17 +264,19 @@ namespace MPDCtrl
             get { return _repeat; }
             set
             {
-                this._repeat = value;
-                this.NotifyPropertyChanged("Repeat");
+                if (this._repeat != value) {
+                    this._repeat = value;
+                    this.NotifyPropertyChanged("Repeat");
 
-                if (_MPC != null)
-                {
-                    if (_MPC.MpdStatus.MpdRepeat != value)
+                    if (_MPC != null)
                     {
-                        //if (SetRpeatCommand.CanExecute(null))
-                        //{
-                        //    SetRpeatCommand.Execute(null);
-                        //}
+                        if (_MPC.MpdStatus.MpdRepeat != value)
+                        {
+                            if (SetRpeatCommand.CanExecute(null))
+                            {
+                                SetRpeatCommand.Execute(null);
+                            }
+                        }
                     }
                 }
             }
@@ -272,18 +287,19 @@ namespace MPDCtrl
             get { return _random; }
             set
             {
-                this._random = value;
-                this.NotifyPropertyChanged("Random");
+                if (this._random != value) {
+                    this._random = value;
+                    this.NotifyPropertyChanged("Random");
 
-                if (_MPC != null)
-                {
-
-                    if (_MPC.MpdStatus.MpdRandom != value)
+                    if (_MPC != null)
                     {
-                        //if (SetRandomCommand.CanExecute(null))
-                        //{
-                        //    SetRandomCommand.Execute(null);
-                        //}
+                        if (_MPC.MpdStatus.MpdRandom != value)
+                        {
+                            if (SetRandomCommand.CanExecute(null))
+                            {
+                                SetRandomCommand.Execute(null);
+                            }
+                        }
                     }
                 }
             }
@@ -310,19 +326,13 @@ namespace MPDCtrl
             }
             set
             {
-                if (value < this._time) {
+                if ((value < this._time) && _elapsed != value) {
                     this._elapsed = value;
                     this.NotifyPropertyChanged("Elapsed");
 
                     if (SetSeekCommand.CanExecute(null))
                     {
-                        //SetSeekCommand.Execute(null);
-
-                        //TODO:
-                        System.Diagnostics.Debug.WriteLine("\n--This should not be happening unless user manually changed.");
-                        // I think I've found a bug...
-                        // PropertyChangedEventArgs updates Slider's binding value #2073
-                        // https://github.com/xamarin/Xamarin.Forms/issues/2073
+                        SetSeekCommand.Execute(null);
                     }
                 }
             }
@@ -430,9 +440,9 @@ namespace MPDCtrl
             this._deleteConnectinSettingCommand = new MPDCtrl.RelayCommand(this.DeleteConnectinSettingCommand_Execute, this.DeleteConnectinSettingCommand_CanExecute);
 
             // Init Song's time elapsed timer.
-            _elapsedTimer = new System.Timers.Timer();
-            _elapsedTimer.Interval = (double)1000;
-            _elapsedTimer.Elapsed += new System.Timers.ElapsedEventHandler(ElapsedTimer);
+            this._elapsedTimer = new System.Timers.Timer();
+            this._elapsedTimer.Interval = (double)1000;
+            this._elapsedTimer.Elapsed += new System.Timers.ElapsedEventHandler(ElapsedTimer);
 
             Start();
         }
@@ -451,15 +461,16 @@ namespace MPDCtrl
             this._MPC.StatusChanged += new MPC.MpdStatusChanged(OnStatusChanged);
             this._MPC.ErrorReturned += new MPC.MpdError(OnError);
 
-            //Test for iOS.
             await Task.Delay(100);
 
+            //TODO: i18n
             //ErrorMessage = MPDCtrl.Properties.Resources.Connecting; //"Connecting...";
             ErrorMessage = "Connecting...";
 
             IsWorking = true;
             if (await _MPC.MpdCmdConnect())
             {
+                //TODO: i18n
                 ErrorMessage = "Updating...";
 
                 // Connect to MPD server and query status and info.
@@ -570,7 +581,6 @@ namespace MPDCtrl
                         System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryCurrentPlaylist> is done.");
 
                         _selecctedPlaylist = "";
-                        this.NotifyPropertyChanged("SelectedPlaylist");
 
                         if (sender.MpdCurrentSong != null)
                         {
@@ -652,8 +662,6 @@ namespace MPDCtrl
                     System.Diagnostics.Debug.WriteLine("OnStatusChanged <MpdQueryCurrentPlaylist> is done.");
 
                     _selecctedPlaylist = "";
-                    this.NotifyPropertyChanged("SelectedPlaylist");
-
 
                     if (isStoredPlaylist)
                     {
@@ -802,7 +810,6 @@ namespace MPDCtrl
             else if (isStoredPlaylist)
             {
                 this._selecctedPlaylist = "";
-                this.NotifyPropertyChanged("SelectedPlaylist");
 
                 if (isStoredPlaylist)
                 {
@@ -945,24 +952,28 @@ namespace MPDCtrl
                     case MPC.Status.MpdPlayState.Play:
                         {
                             //this.PlayButton = _pathPlayButton;
+                            IsPlaying = true;
                             break;
                         }
                     case MPC.Status.MpdPlayState.Pause:
                         {
                             //this.PlayButton = _pathPauseButton;
+                            IsPlaying = false;
                             break;
                         }
                     case MPC.Status.MpdPlayState.Stop:
                         {
                             //this.PlayButton = _pathStopButton;
+                            IsPlaying = false;
                             break;
                         }
                 }
 
-                // "quietly" update view.
+                // Not in Xamarin.Forms -> "quietly" update view.
+                ////// https://github.com/xamarin/Xamarin.Forms/issues/2073
+
                 this._volume = Convert.ToDouble(_MPC.MpdStatus.MpdVolume);
-                //Testing.
-                if (!IsBusy) { 
+                if (!_isBusy) { 
                     this.NotifyPropertyChanged("Volume");
                 }
 
@@ -972,20 +983,21 @@ namespace MPDCtrl
                 this._repeat = _MPC.MpdStatus.MpdRepeat;
                 this.NotifyPropertyChanged("Repeat");
 
-                // no need to care about "double" updates for time.
+                // Not apply in Xamarin.Forms > No need to care about "double" updates for time.
+                // https://github.com/xamarin/Xamarin.Forms/issues/2073
                 this.Time = _MPC.MpdStatus.MpdSongTime;
 
                 this._elapsed = _MPC.MpdStatus.MpdSongElapsed;
                 this.NotifyPropertyChanged("Elapsed");
 
-                //start elapsed timer.
+                // Start elapsed timer.
                 if (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
                 {
-                    _elapsedTimer.Start();
+                    this._elapsedTimer.Start();
                 }
                 else
                 {
-                    _elapsedTimer.Stop();
+                    this._elapsedTimer.Stop();
                 }
             }
             catch
@@ -994,17 +1006,17 @@ namespace MPDCtrl
             }
         }
 
-        private void ElapsedTimer(object sender, System.Timers.ElapsedEventArgs e)//(object sender, EventArgs e)
+        private void ElapsedTimer(object sender, System.Timers.ElapsedEventArgs e)
         {
             if ((_elapsed <= _time) && (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play))
             {
+                // In Xamarin.Forms, it's same as Elapsed +=1;
                 this._elapsed += 1;
-                System.Diagnostics.Debug.WriteLine("NotifyPropertyChanged Elapsed");
                 this.NotifyPropertyChanged("Elapsed");
             }
             else
             {
-                _elapsedTimer.Stop();
+                this._elapsedTimer.Stop();
             }
         }
 

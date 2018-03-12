@@ -329,7 +329,38 @@ namespace MPDCtrl
                 if ((value < this._time) && _elapsed != value) {
                     this._elapsed = value;
                     this.NotifyPropertyChanged("Elapsed");
+                    /*
+                    if (SetSeekCommand.CanExecute(null))
+                    {
+                        SetSeekCommand.Execute(null);
+                    }
+                    */
 
+                    // If we have a timer and we are in this event handler, a user is still interact with the slider
+                    // we stop the timer
+                    if (_elapsedDelayTimer != null)
+                        _elapsedDelayTimer.Stop();
+
+                    // we always create a new instance of DispatcherTimer
+                    _elapsedDelayTimer = new System.Timers.Timer();
+                    _elapsedDelayTimer.AutoReset = false;
+
+                    // if one second passes, that means our user has stopped interacting with the slider
+                    // we do real event
+                    _elapsedDelayTimer.Interval = (double)1000;
+                    _elapsedDelayTimer.Elapsed += new System.Timers.ElapsedEventHandler(DoChangeElapsed);
+
+                    _elapsedDelayTimer.Start();
+                }
+            }
+        }
+        private System.Timers.Timer _elapsedDelayTimer = null;
+        private void DoChangeElapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (_MPC != null)
+            {
+                if ((this._elapsed < this._time))
+                {
                     if (SetSeekCommand.CanExecute(null))
                     {
                         SetSeekCommand.Execute(null);

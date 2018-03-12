@@ -259,32 +259,35 @@ namespace WpfMPD
             }
             set
             {
-                this._volume = value;
-                this.NotifyPropertyChanged("Volume");
-
-                if (_MPC != null)
+                if (_volume != value)
                 {
-                    // If we have a timer and we are in this event handler, a user is still interact with the slider
-                    // we stop the timer
-                    if (_timer != null)
-                        _timer.Stop();
+                    this._volume = value;
+                    this.NotifyPropertyChanged("Volume");
 
-                    System.Diagnostics.Debug.WriteLine("Volume value is still changing. Skipping.");
+                    if (_MPC != null)
+                    {
+                        // If we have a timer and we are in this event handler, a user is still interact with the slider
+                        // we stop the timer
+                        if (_volumeDelayTimer != null)
+                            _volumeDelayTimer.Stop();
 
-                    // we always create a new instance of DispatcherTimer
-                    _timer = new System.Timers.Timer();
-                    _timer.AutoReset = false;
+                        System.Diagnostics.Debug.WriteLine("Volume value is still changing. Skipping.");
 
-                    // if one second passes, that means our user has stopped interacting with the slider
-                    // we do real event
-                    _timer.Interval = (double)1000;
-                    _timer.Elapsed += new System.Timers.ElapsedEventHandler(DoChangeVolume);
+                        // we always create a new instance of DispatcherTimer
+                        _volumeDelayTimer = new System.Timers.Timer();
+                        _volumeDelayTimer.AutoReset = false;
 
-                    _timer.Start();
+                        // if one second passes, that means our user has stopped interacting with the slider
+                        // we do real event
+                        _volumeDelayTimer.Interval = (double)1000;
+                        _volumeDelayTimer.Elapsed += new System.Timers.ElapsedEventHandler(DoChangeVolume);
+
+                        _volumeDelayTimer.Start();
+                    }
                 }
             }
         }
-        private System.Timers.Timer _timer = null;
+        private System.Timers.Timer _volumeDelayTimer = null;
         private void DoChangeVolume(object sender, System.Timers.ElapsedEventArgs e)
         {
             if (_MPC != null)
@@ -302,7 +305,6 @@ namespace WpfMPD
                 }
             }
         }
-
 
         public bool Repeat
         {
@@ -368,12 +370,52 @@ namespace WpfMPD
             }
             set
             {
-                this._elapsed = value;
-                this.NotifyPropertyChanged("Elapsed");
-
-                if (SetSeekCommand.CanExecute(null))
+                if ((value < this._time) && _elapsed != value)
                 {
-                    SetSeekCommand.Execute(null);
+                    this._elapsed = value;
+                    this.NotifyPropertyChanged("Elapsed");
+                    /*
+                    if (SetSeekCommand.CanExecute(null))
+                    {
+                        SetSeekCommand.Execute(null);
+                    }
+                    */
+
+                    // If we have a timer and we are in this event handler, a user is still interact with the slider
+                    // we stop the timer
+                    if (_elapsedDelayTimer != null)
+                        _elapsedDelayTimer.Stop();
+
+                    System.Diagnostics.Debug.WriteLine("Elapsed value is still changing. Skipping.");
+
+                    // we always create a new instance of DispatcherTimer
+                    _elapsedDelayTimer = new System.Timers.Timer();
+                    _elapsedDelayTimer.AutoReset = false;
+
+                    // if one second passes, that means our user has stopped interacting with the slider
+                    // we do real event
+                    _elapsedDelayTimer.Interval = (double)1000;
+                    _elapsedDelayTimer.Elapsed += new System.Timers.ElapsedEventHandler(DoChangeElapsed);
+
+                    _elapsedDelayTimer.Start();
+                }
+            }
+        }
+        private System.Timers.Timer _elapsedDelayTimer = null;
+        private void DoChangeElapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (_MPC != null)
+            {
+                if ((this._elapsed < this._time))
+                {
+                    if (SetSeekCommand.CanExecute(null))
+                    {
+                        SetSeekCommand.Execute(null);
+                    }
+                }
+                else
+                {
+                    //System.Diagnostics.Debug.WriteLine("Volume value is the same. Skipping.");
                 }
             }
         }

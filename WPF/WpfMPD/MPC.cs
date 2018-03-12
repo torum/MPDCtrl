@@ -639,7 +639,7 @@ namespace WpfMPD
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParsePlaylistInfoResponse(tsResponse.Result);
+                return await ParsePlaylistInfoResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -649,7 +649,7 @@ namespace WpfMPD
             return false;
         }
 
-        private bool ParsePlaylistInfoResponse(List<string> sl)
+        private async Task<bool> ParsePlaylistInfoResponse(List<string> sl)
         {
             if (this.MpdStop) { return false; }
             if (sl == null) {
@@ -740,6 +740,8 @@ namespace WpfMPD
                                 {
                                     _songs.Add(sng);
                                 });
+
+                                //await Task.Delay(1);
                             }
                             catch (Exception ex)
                             {
@@ -1314,7 +1316,7 @@ namespace WpfMPD
 
         private void IdleClient_DataReceived(EventDrivenTCPClient sender, object data)
         {
-            System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived: " + (data as string));
+            System.Diagnostics.Debug.WriteLine("\n--IdleConnection DataReceived: \n" + (data as string).TrimEnd());
 
             if (data == null) { return; }
 
@@ -1327,11 +1329,24 @@ namespace WpfMPD
                 }
                 else
                 {
+                    System.Diagnostics.Debug.WriteLine("--IdleConnection OK MPD, Start idle.");
                     sender.Send("idle player mixer options playlist stored_playlist\n");
                 }
             }
             else
             {
+
+                // Go idle again and wait.
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    sender.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("--IdleConnection Going idle again");
+                    sender.Send("idle player mixer options playlist stored_playlist\n");
+                }
+
                 /*
                  changed: playlist
                  changed: player
@@ -1368,18 +1383,20 @@ namespace WpfMPD
                 }
                 catch
                 {
-                    System.Diagnostics.Debug.WriteLine("Error@IdleConnection DataReceived: " + (data as string));
+                    System.Diagnostics.Debug.WriteLine("--Error@IdleConnection DataReceived: " + (data as string));
                 }
+                /*
 
-                // Go idle again and wait.
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    sender.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
-                }
-                else
-                {
-                    sender.Send("idle player mixer options playlist stored_playlist\n");
-                }
+                    // Go idle again and wait.
+                    if (!string.IsNullOrEmpty(this._a))
+                    {
+                        sender.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
+                    }
+                    else
+                    {
+                        sender.Send("idle player mixer options playlist stored_playlist\n");
+                    }
+                 */
             }
         }
 
@@ -1467,6 +1484,7 @@ namespace WpfMPD
             */
             using (this._client = new TcpClient())
             {
+                this._client.ReceiveTimeout = 1000;
                 this._client.NoDelay = true;
                 this.ConnectionState = ConnectionStatus.Connecting;
 
@@ -1879,7 +1897,7 @@ namespace WpfMPD
                     tmrSendTimeout.Stop();
                 }
                 //////////////////////////////// Testing.
-                //this._client.Client.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, new AsyncCallback(cbDataReceived), this._client.Client);
+                //r.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, new AsyncCallback(cbDataReceived), r);
             }
         }
         private void cbChangeConnectionStateComplete(IAsyncResult result)

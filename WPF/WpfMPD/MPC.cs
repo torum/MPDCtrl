@@ -280,95 +280,6 @@ namespace WpfMPD
             return true;
         }
 
-        /*
-        private static async Task<List<string>> SendRequest(string server, int port, string mpdCommand)
-        {
-            IPAddress ipAddress = null;
-            IPEndPoint ep = new IPEndPoint(IPAddress.Parse(server), port);
-            ipAddress = ep.Address;
-
-            List<string> responseMultiLines = new List<string>();
-
-            try
-            {
-                TcpClient client = new TcpClient();
-                await client.ConnectAsync(ep.Address, port);
-
-                System.Diagnostics.Debug.WriteLine("\nServer " + server + " connected.");
-
-                NetworkStream networkStream = client.GetStream();
-                StreamWriter writer = new StreamWriter(networkStream);
-                StreamReader reader = new StreamReader(networkStream);
-                writer.AutoFlush = true;
-
-                //first check MPD's initial response on connect.
-                string responseLine = await reader.ReadLineAsync();
-
-                if (responseLine == null)
-                {
-                    System.Diagnostics.Debug.WriteLine("Connected response: null");
-                    return null;
-                }
-                System.Diagnostics.Debug.WriteLine("Connected response: " + responseLine);
-
-                //Check if it starts with "OK MPD"
-                if (responseLine.StartsWith("OK MPD"))
-                {
-                    System.Diagnostics.Debug.WriteLine("Request: " + mpdCommand);
-
-                    //if it's ok, then request command.
-                    await writer.WriteLineAsync(mpdCommand);
-
-                    //read multiple lines untill "OK".
-                    while (!reader.EndOfStream)
-                    {
-                        responseLine = await reader.ReadLineAsync();
-                        if (responseLine == null)
-                        {
-                            System.Diagnostics.Debug.WriteLine("reader.ReadLineAsync(): null");
-                            break;
-                        }
-
-                        //System.Diagnostics.Debug.WriteLine("Response loop: " + responseLine);
-
-                        if ((responseLine != "OK") && (responseLine != ""))
-                        {
-                            responseMultiLines.Add(responseLine);
-
-                            if (responseLine.StartsWith("ACK"))
-                            {
-                                System.Diagnostics.Debug.WriteLine("Response ACK: " + responseLine + "\n");
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    responseMultiLines.Add(responseLine);
-
-                    System.Diagnostics.Debug.WriteLine("MPD returned an error on connect: " + responseLine + "\n");
-                }
-
-                client.Close();
-                System.Diagnostics.Debug.WriteLine("Connection closed.");
-
-                return responseMultiLines;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@SendRequest: " + ex.Message);
-                //TODO: Show error message to user.
-                // eg 'System.Net.Sockets.SocketException'
-                return null;
-            }
-        }
-        */
-
         public async Task<bool> MpdQueryStatus()
         {
             try
@@ -385,7 +296,6 @@ namespace WpfMPD
                     mpdCommand = mpdCommand + "command_list_end";
                 }
 
-                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
                 return ParseStatusResponse(tsResponse.Result);
@@ -658,8 +568,14 @@ namespace WpfMPD
                 return false; }
 
             try {
-                // Don't. Not good when multithreading. Make sure you clear the collection before calling MpdQueryCurrentPlaylist().
-                //_songs.Clear();
+                // Make sure you clear the collection before calling MpdQueryCurrentPlaylist().
+                /*
+                Device.BeginInvokeOnMainThread(
+                    () =>
+                    {
+                        _songs.Clear();
+                    });
+                */
 
                 Dictionary<string, string> SongValues = new Dictionary<string, string>();
                 foreach (string value in sl)
@@ -741,6 +657,7 @@ namespace WpfMPD
                                     _songs.Add(sng);
                                 });
 
+                                // 
                                 //await Task.Delay(1);
                             }
                             catch (Exception ex)
@@ -856,35 +773,38 @@ namespace WpfMPD
         {
             try
             {
-                string mpdCommand = "command_list_begin" + "\n";
+                string mpdCommand = "";
                 if (!string.IsNullOrEmpty(this._a))
                 {
+                    mpdCommand = mpdCommand + "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                }
-
-                if (songID != "")
-                {
-                    mpdCommand = mpdCommand + "playid " + songID + "\n";
+                    if (songID != "")
+                    {
+                        mpdCommand = mpdCommand + "playid " + songID + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = mpdCommand + "play" + "\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end";
                 }
                 else
                 {
-                    mpdCommand = mpdCommand + "play" + "\n";
+                    if (songID != "")
+                    {
+                        mpdCommand = "playid " + songID;
+                    }
+                    else
+                    {
+                        mpdCommand = "play";
+                    }
                 }
 
-                mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-
-                // Send task
-                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                // Alternatively just
-                //string sResponse = await SendRequest(server, port, data);
-                //"Received response: " + tsResponse;
-
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -900,23 +820,24 @@ namespace WpfMPD
 
             try
             {
-                string mpdCommand = "command_list_begin" + "\n";
+                string mpdCommand = "";
                 if (!string.IsNullOrEmpty(this._a))
                 {
+                    mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = mpdCommand + "seekid " + songID + " " + seekTime.ToString() + "\n";
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    mpdCommand = "seekid " + songID + " " + seekTime.ToString();
                 }
 
-                mpdCommand = mpdCommand + "seekid " + songID + " " + seekTime.ToString() + "\n";
-
-                mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-
-                // Send task
-                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
-                return ParseStatusResponse(tsResponse.Result);
+
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -930,23 +851,24 @@ namespace WpfMPD
         {
             try
             {
-                string mpdCommand = "command_list_begin" + "\n";
+                string mpdCommand = "";
                 if (!string.IsNullOrEmpty(this._a))
                 {
+                    mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = mpdCommand + "pause 1" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    mpdCommand = "pause 1";
                 }
 
-                mpdCommand = mpdCommand + "pause 1" + "\n";
-
-                mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-
-                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -961,23 +883,24 @@ namespace WpfMPD
         {
             try
             {
-                string mpdCommand = "command_list_begin" + "\n";
+                string mpdCommand = "";
                 if (!string.IsNullOrEmpty(this._a))
                 {
+                    mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = mpdCommand + "pause 0" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    mpdCommand = "pause 0";
                 }
 
-                mpdCommand = mpdCommand + "pause 0" + "\n";
-
-                mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-
-                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -992,23 +915,24 @@ namespace WpfMPD
         {
             try
             {
-                string mpdCommand = "command_list_begin" + "\n";
+                string mpdCommand = "";
                 if (!string.IsNullOrEmpty(this._a))
                 {
+                    mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = mpdCommand + "stop" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    mpdCommand = "stop";
                 }
 
-                mpdCommand = mpdCommand + "stop" + "\n";
-
-                mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-
-                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -1023,28 +947,24 @@ namespace WpfMPD
         {
             try
             {
-                string mpdCommand = "command_list_begin" + "\n";
+                string mpdCommand = "";
                 if (!string.IsNullOrEmpty(this._a))
                 {
+                    mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = mpdCommand + "next" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end";
                 }
-
-                mpdCommand = mpdCommand + "next" + "\n";
-
-                if (_st.MpdState != Status.MpdPlayState.Play)
+                else
                 {
-                    mpdCommand = mpdCommand + "play" + "\n";
+                    mpdCommand = "next";
                 }
 
-                mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-
-                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -1058,28 +978,24 @@ namespace WpfMPD
         {
             try
             {
-                string mpdCommand = "command_list_begin" + "\n";
+                string mpdCommand = "";
                 if (!string.IsNullOrEmpty(this._a))
                 {
+                    mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = mpdCommand + "previous" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end";
                 }
-
-                mpdCommand = mpdCommand + "previous" + "\n";
-
-                if (_st.MpdState != Status.MpdPlayState.Play)
+                else
                 {
-                    mpdCommand = mpdCommand + "play" + "\n";
+                    mpdCommand = "previous";
                 }
 
-                mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-
-                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -1091,27 +1007,28 @@ namespace WpfMPD
 
         public async Task<bool> MpdSetVolume(int v)
         {
-            if (v == _st.MpdVolume){return true;}
+            if (v == _st.MpdVolume) { return true; }
 
             try
             {
-                string mpdCommand = "command_list_begin" + "\n";
+                string mpdCommand = "";
                 if (!string.IsNullOrEmpty(this._a))
                 {
+                    mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = mpdCommand + "setvol " + v.ToString() + "\n";
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    mpdCommand = "setvol " + v.ToString();
                 }
 
-                mpdCommand = mpdCommand + "setvol " + v.ToString() + "\n";
-
-                mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-
-                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -1123,33 +1040,42 @@ namespace WpfMPD
 
         public async Task<bool> MpdSetRepeat(bool on)
         {
-            if (_st.MpdRepeat == on){ return true;}
+            if (_st.MpdRepeat == on) { return true; }
 
             try
             {
-                string mpdCommand = "command_list_begin" + "\n";
+                string mpdCommand = "";
                 if (!string.IsNullOrEmpty(this._a))
                 {
+                    mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                }
-
-                if (on) {
-                    mpdCommand = mpdCommand + "repeat 1" + "\n";
+                    if (on)
+                    {
+                        mpdCommand = mpdCommand + "repeat 1" + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = mpdCommand + "repeat 0" + "\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end";
                 }
                 else
                 {
-                    mpdCommand = mpdCommand + "repeat 0" + "\n";
+                    if (on)
+                    {
+                        mpdCommand = "repeat 1";
+                    }
+                    else
+                    {
+                        mpdCommand = "repeat 0";
+                    }
                 }
 
-                mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-
-                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -1161,34 +1087,42 @@ namespace WpfMPD
 
         public async Task<bool> MpdSetRandom(bool on)
         {
-            if (_st.MpdRandom == on){return true;}
+            if (_st.MpdRandom == on) { return true; }
 
             try
             {
-                string mpdCommand = "command_list_begin" + "\n";
+                string mpdCommand = "";
                 if (!string.IsNullOrEmpty(this._a))
                 {
+                    mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                }
-
-                if (on)
-                {
-                    mpdCommand = mpdCommand + "random 1" + "\n";
+                    if (on)
+                    {
+                        mpdCommand = mpdCommand + "random 1" + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = mpdCommand + "random 0" + "\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end";
                 }
                 else
                 {
-                    mpdCommand = mpdCommand + "random 0" + "\n";
+                    if (on)
+                    {
+                        mpdCommand = "random 1";
+                    }
+                    else
+                    {
+                        mpdCommand = "random 0";
+                    }
                 }
 
-                mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-
-                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return ParseStatusResponse(tsResponse.Result);
+                //return ParseStatusResponse(tsResponse.Result);
+                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -1214,13 +1148,11 @@ namespace WpfMPD
                 mpdCommand = mpdCommand + "load " + playlistName.Trim() + "\n";
                 
                 mpdCommand = mpdCommand + "play" + "\n";
-
-                //Testing. Trust idle connection will notify us or not.  
+ 
                 //mpdCommand = mpdCommand + "playlistinfo" + "\n";
 
                 mpdCommand = mpdCommand + "command_list_end";
 
-                //Task<List<string>> tsResponse = SendRequest(_h, _p, mpdCommand);
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
@@ -1538,9 +1470,9 @@ namespace WpfMPD
             }
         }
 
-        //TODO: make static or...
         public async Task<List<string>> SendCommand(string cmd)
         {
+            //await Task.Delay(10);
 
             List<string> responseMultiLines = new List<string>();
 

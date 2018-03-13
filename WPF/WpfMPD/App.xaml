@@ -11,7 +11,8 @@
             
             <ResourceDictionary.MergedDictionaries>
 
-                <!-- https://github.com/sourcechord/FluentWPF -->
+                <!-- FluentWPF
+                https://github.com/sourcechord/FluentWPF -->
                 <ResourceDictionary Source="pack://application:,,,/FluentWPF;component/Styles/Controls.xaml" />
 
                 <!-- PathToggleButton 
@@ -570,10 +571,8 @@
                                 <ControlTemplate TargetType="Thumb">
                                     <Rectangle x:Name="Rect" Height="12" Width="8">
                                         <Rectangle.Fill>
-                                            <LinearGradientBrush EndPoint="0.5,1"
-                                 StartPoint="0.5,0">
-                                                <GradientStop Color="Gainsboro"
-                            Offset="1" />
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="Gainsboro" Offset="1" />
                                                 <GradientStop Color="#ccc" />
                                             </LinearGradientBrush>
                                         </Rectangle.Fill>
@@ -585,8 +584,7 @@
                                                         <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).
                     (GradientBrush.GradientStops)[0].(GradientStop.Color)"
                                                 Storyboard.TargetName="Rect">
-                                                            <EasingColorKeyFrame KeyTime="0"
-                                         Value="Gray" />
+                                                            <EasingColorKeyFrame KeyTime="0" Value="Gray" />
                                                         </ColorAnimationUsingKeyFrames>
                                                     </Storyboard>
                                                 </VisualState>
@@ -595,8 +593,7 @@
                                                         <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).
                     (GradientBrush.GradientStops)[0].(GradientStop.Color)"
                                                 Storyboard.TargetName="Rect">
-                                                            <EasingColorKeyFrame KeyTime="0"
-                                         Value="#323232" />
+                                                            <EasingColorKeyFrame KeyTime="0" Value="#323232" />
                                                         </ColorAnimationUsingKeyFrames>
                                                     </Storyboard>
                                                 </VisualState>
@@ -605,8 +602,7 @@
                                                         <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).
                     (GradientBrush.GradientStops)[0].(GradientStop.Color)"
                                                 Storyboard.TargetName="Rect">
-                                                            <EasingColorKeyFrame KeyTime="0"
-                                         Value="#eee" />
+                                                            <EasingColorKeyFrame KeyTime="0" Value="#eee" />
                                                         </ColorAnimationUsingKeyFrames>
                                                     </Storyboard>
                                                 </VisualState>

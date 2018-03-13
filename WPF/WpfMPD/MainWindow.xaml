@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WpfMPD"
         mc:Ignorable="d"
         xmlns:common="clr-namespace:WpfMPD.Common"
-        common:EnableDragHelper.EnableDrag="True"
+        common:EnableDragHelper.EnableDrag="False"
         common:MaximizeDoubleClickHelper.MaximizeDoubleClick="True"
         Background="Transparent"
                   
@@ -15,10 +15,14 @@
         fw:AcrylicWindow.ShowTitleBar="False"
         fw:AcrylicWindow.ExtendViewIntoTitleBar="True"
         BorderThickness="0"
-
+        fw:AcrylicWindow.TintOpacity="0.2"
+                  fw:AcrylicWindow.TintColor="WhiteSmoke"
+                  fw:AcrylicWindow.FallbackColor="Transparent"
+                  
         WindowStartupLocation="CenterScreen"
         Title="MPD Ctrl" 
         Height="520" Width="300"
+                  MinHeight="520" MinWidth="300"
         xmlns:properties="clr-namespace:MPDCtrl.Properties"
         Closing="Window_Closing"
         DataContext="{StaticResource MainViewModel}">
@@ -76,23 +80,13 @@
         </Style>
     </fw:AcrylicWindow.Style>
 
-    <fw:AcrylicWindow.Resources></fw:AcrylicWindow.Resources>
-    <fw:AcrylicWindow.ContextMenu>
-        <ContextMenu>
-            <MenuItem x:Name="mStayOnTop" Header="{x:Static properties:Resources.StayOnTop}" 
-                              Click="MenuItem_mStayOnTop_Click" 
-                              IsCheckable="True"/>
-        </ContextMenu>
-    </fw:AcrylicWindow.ContextMenu>
     <Grid x:Name="BackgroundGrid" 
-          Background="Black" Opacity="0.8">
-        <!--
+          Background="Transparent">
         <Rectangle x:Name="AcrylicBackground" 
                    common:EnableDragHelper.EnableDrag="true"
                    HorizontalAlignment="Stretch"
                    VerticalAlignment="Stretch"
-                   Fill="Black" 
-                   Opacity="0.6">
+                   Fill="Black" Opacity="0.6">
             <Rectangle.ContextMenu>
                 <ContextMenu>
                     <MenuItem x:Name="mStayOnTop" Header="{x:Static properties:Resources.StayOnTop}" 
@@ -101,7 +95,6 @@
                 </ContextMenu>
             </Rectangle.ContextMenu>
         </Rectangle>
-        -->
         <Grid x:Name="LayoutGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="42"/>
@@ -219,23 +212,21 @@
                       ItemsSource="{Binding Songs}" SelectedItem="{Binding Mode=TwoWay,Path=SelectedSong}" SelectionMode="Extended"
                       SelectionChanged="SongListView_SelectionChanged"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+                      ScrollViewer.VerticalScrollBarVisibility="Visible">
                 <ListView.Resources>
                     <Style x:Key="ThumbStyle" TargetType="{x:Type Thumb}">
                         <Setter Property="Margin" Value="0,0,0,0" />
                         <Setter Property="Padding" Value="0,0,0,0" />
                         <Setter Property="BorderBrush" Value="Gray" />
                         <Setter Property="Background" Value="Gainsboro" />
-                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="BorderThickness" Value="0" />
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type Thumb}">
-                                    <Rectangle x:Name="Rect" Height="8" Width="24">
+                                    <Rectangle x:Name="Rect" Width="24">
                                         <Rectangle.Fill>
-                                            <LinearGradientBrush EndPoint="0.5,1"
-                                 StartPoint="0.5,0">
-                                                <GradientStop Color="Gainsboro"
-                            Offset="1" />
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="Gainsboro" Offset="1" />
                                                 <GradientStop Color="#ccc" />
                                             </LinearGradientBrush>
                                         </Rectangle.Fill>
@@ -243,12 +234,18 @@
                                             <VisualStateGroup x:Name="CommonStates">
                                                 <VisualState x:Name="Normal">
                                                     <Storyboard>
+                                                        <!--
                                                         <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).
                     (GradientBrush.GradientStops)[0].(GradientStop.Color)"
                                                 Storyboard.TargetName="Rect">
                                                             <EasingColorKeyFrame KeyTime="0"
-                                         Value="Gainsboro" />
+                                         Value="#CCC" />
                                                         </ColorAnimationUsingKeyFrames>
+                                                        -->
+                                                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetProperty="Opacity"
+                                                Storyboard.TargetName="Rect" >
+                                                            <EasingDoubleKeyFrame KeyTime="0" Value="0.1"/>
+                                                        </DoubleAnimationUsingKeyFrames>
                                                     </Storyboard>
                                                 </VisualState>
                                                 <VisualState x:Name="MouseOver">
@@ -259,6 +256,10 @@
                                                             <EasingColorKeyFrame KeyTime="0"
                                          Value="#CCC" />
                                                         </ColorAnimationUsingKeyFrames>
+                                                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetProperty="Opacity"
+                                                Storyboard.TargetName="Rect" >
+                                                            <EasingDoubleKeyFrame KeyTime="0" Value="0.6"/>
+                                                        </DoubleAnimationUsingKeyFrames>
                                                     </Storyboard>
                                                 </VisualState>
                                                 <VisualState x:Name="Pressed">
@@ -302,7 +303,7 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type RepeatButton}">
-                                    <Border x:Name="Border" Margin="1" CornerRadius="0" BorderThickness="0">
+                                    <Border x:Name="Border" Margin="0" CornerRadius="0" BorderThickness="0">
                                         <Border.BorderBrush>
                                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" Opacity="1">
                                                 <LinearGradientBrush.GradientStops>
@@ -372,7 +373,7 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type RepeatButton}">
-                                    <Border x:Name="Border" Margin="1" CornerRadius="0" BorderThickness="0">
+                                    <Border x:Name="Border" Margin="0" CornerRadius="0" BorderThickness="0">
                                         <Border.BorderBrush>
                                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" Opacity="1">
                                                 <LinearGradientBrush.GradientStops>
@@ -459,7 +460,8 @@
                                                   Style="{StaticResource RepeatButtonStyleInc}"/>
                                 </Track.IncreaseRepeatButton>
                             </Track>
-                            <RepeatButton Grid.Row="3" Height="18" Command="ScrollBar.LineDownCommand" Content="M 0 0 L 4 4 L 8 0 Z" 
+                            <RepeatButton Grid.Row="3" Height="18" Command="ScrollBar.LineDownCommand" 
+                                          Content="M 0 0 L 4 4 L 8 0 Z" 
                                           Style="{StaticResource RepeatButtonStyleDec}"/>
                         </Grid>
                     </ControlTemplate>
@@ -502,9 +504,19 @@
 
                     <Style TargetType="{x:Type ScrollBar}">
                         <Setter Property="Margin" Value="0,0,0,0" />
-                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="BorderThickness" Value="0" />
+                        <!--
                         <Setter Property="Template" Value="{StaticResource VerticalScrollBar}"/>
+                        -->
+                        <Style.Triggers>
+                            <Trigger Property="Orientation" Value="Vertical">
+                                <Setter Property="Width" Value="18"/>
+                                <Setter Property="Height" Value="Auto" />
+                                <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
+                            </Trigger>
+                        </Style.Triggers>
                     </Style>
+
 
                 </ListView.Resources>
                 <ListView.View>

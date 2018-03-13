@@ -1,19 +1,25 @@
 ﻿/// 
 /// 
-/// MPD Ctrl
+/// MPD Ctrl for WPF
 /// https://github.com/torumyax/MPD-Ctrl
 /// 
 /// TODO:
 /// -- Priority 1 --
-/// AppX and Microsoft Store. 
-///  -- Priority 2 --
+///  
+///  "isWorking" busy indicater
+///  Stop changing mouse curser
+///  Microsoft Store. 
+///  
+/// -- Priority 2 --
 ///  Better error messages for users.
 ///  TrayIcon.
-///  Sync version number with AppX somehow.
-///  Use FluentWPF
-///  Debug tab.
+///  
+///  Full "Master-Detail" View! Full fledged client?
 ///
 /// Known issues:
+/// 
+/// 
+/// Mopidy related issues:
 ///  Mopidy does not accept command_list_begin + password
 ///   https://github.com/mopidy/mopidy/issues/1661
 ///    command_list_begin
@@ -25,9 +31,6 @@
 ///   https://github.com/mopidy/mopidy/issues/1662
 ///  Mopidy has some issue with M3U and UTF-8, Ext M3Us.
 ///    https://github.com/mopidy/mopidy/issues/1370
-///  
-///  When maximized, there are some extra spaces in the scrollber.
-/// 
 
 
 using System;
@@ -88,6 +91,7 @@ namespace WpfMPD
         private string _selecctedPlaylist;
         private bool _isChanged;
         private bool _isBusy;
+        private bool _isWorking;
         private string _playButton;
         private double _volume;
         private bool _repeat;
@@ -220,37 +224,6 @@ namespace WpfMPD
             }
         }
 
-        /*
-        public double Volume
-        {
-            get
-            {
-                return _volume;
-            }
-            set
-            {
-                this._volume = value;
-                this.NotifyPropertyChanged("Volume");
-
-                if (_MPC != null)
-                {
-                    if (Convert.ToDouble(_MPC.MpdStatus.MpdVolume) != value)
-                    {
-
-                        //TODO try using ValueChanged Event using <i:Interaction.Triggers>  ?
-                        if (SetVolumeCommand.CanExecute(null))
-                        {
-                            SetVolumeCommand.Execute(null);
-                        }
-                    }
-                    else
-                    {
-                        //System.Diagnostics.Debug.WriteLine("Volume value is the same. Skipping.");
-                    }
-                }
-            }
-        }
-        */
         public double Volume
         {
             get
@@ -443,6 +416,19 @@ namespace WpfMPD
             {
                 this._isBusy = value;
                 this.NotifyPropertyChanged("IsBusy");
+            }
+        }
+
+        public bool IsWorking
+        {
+            get
+            {
+                return this._isWorking;
+            }
+            set
+            {
+                this._isWorking = value;
+                this.NotifyPropertyChanged("IsWorking");
             }
         }
 
@@ -695,6 +681,7 @@ namespace WpfMPD
 
             ErrorMessage = MPDCtrl.Properties.Resources.Connecting; //"Connecting...";
 
+            IsWorking = true;
             if (await _MPC.MpdCmdConnect())
             {
                 // Connect to MPD server and query status and info.
@@ -704,6 +691,7 @@ namespace WpfMPD
                     if (_MPC.MpdIdleConnect())
                     {
                         ErrorMessage = "";
+                        IsWorking = false;
                         return true;
                     }
                 }
@@ -713,6 +701,7 @@ namespace WpfMPD
                 System.Diagnostics.Debug.WriteLine("MpdCmdConnect@StartConnection() failed.");
             }
 
+            IsWorking = false;
             return false;
         }
 
@@ -720,7 +709,7 @@ namespace WpfMPD
         {
             if (data == null) { return; }
 
-            // list of SubSystems we are subscribing.
+            // The list of SubSystems we are subscribing:
             // player mixer options playlist stored_playlist
 
             bool isPlayer = false;
@@ -757,8 +746,9 @@ namespace WpfMPD
                 }
             }
 
-            // Little dirty, but ObservableCollection isn't thread safe, so...
-            if (IsBusy) {
+            // Little dirty, but...
+            if (IsBusy)
+            {
                 await Task.Delay(1500);
                 if (IsBusy)
                 {
@@ -772,14 +762,28 @@ namespace WpfMPD
                 }
             }
 
+            /*
+            int c = 0;
+            while (_isBusy)
+            {
+                c++;
+                await Task.Delay(10);
+                if (c > (100 * 100))
+                {
+                    System.Diagnostics.Debug.WriteLine("OnStatusChanged: TIME OUT");
+                    IsBusy = false;
+                }
+            }
+            */
+
             IsBusy = true;
+            IsWorking = true;
 
             if ((isPlayer && isPlaylist))
             {
                 //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlayer & isPlaylist");
 
                 // Reset view.
-                //sender.CurrentQueue.Clear();
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     sender.CurrentQueue.Clear();
@@ -818,32 +822,35 @@ namespace WpfMPD
                                 System.Diagnostics.Debug.WriteLine("QueryPlaylists is done.");
 
                                 IsBusy = false;
+                                IsWorking = false;
                             }
                             else
                             {
                                 IsBusy = false;
+                                IsWorking = false;
                                 System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
                             }
                         }
                         else
                         {
                             IsBusy = false;
+                            IsWorking = false;
                         }
 
-                        // Testing
                         Application.Current.Dispatcher.Invoke(() => UpdateButtonStatus());
                         Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
                     }
                     else
                     {
                         IsBusy = false;
-                        //TODO: Let user know.
+                        IsWorking = false;
                         System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue returned false." + "\n");
                     }
                 }
                 else
                 {
                     IsBusy = false;
+                    IsWorking = false;
                     System.Diagnostics.Debug.WriteLine("MpdQueryStatus returned with false." + "\n");
                 }
             }
@@ -852,7 +859,6 @@ namespace WpfMPD
                 //System.Diagnostics.Debug.WriteLine("OnStatusChanged: isPlaylist");
 
                 // Reset view.
-                //sender.CurrentQueue.Clear();
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     sender.CurrentQueue.Clear();
@@ -882,16 +888,19 @@ namespace WpfMPD
                             //https://stackoverflow.com/questions/2343446/default-text-for-templated-combo-box?rq=1
 
                             IsBusy = false;
+                            IsWorking = false;
                         }
                         else
                         {
                             IsBusy = false;
+                            IsWorking = false;
                             System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
                         }
                     }
                     else
                     {
                         IsBusy = false;
+                        IsWorking = false;
                     }
 
                     //IsBusy = false;
@@ -902,6 +911,7 @@ namespace WpfMPD
                 else
                 {
                     IsBusy = false;
+                    IsWorking = false;
                     System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue returned false." + "\n");
                 }
             }
@@ -986,16 +996,19 @@ namespace WpfMPD
                             //https://stackoverflow.com/questions/2343446/default-text-for-templated-combo-box?rq=1
 
                             IsBusy = false;
+                            IsWorking = false;
                         }
                         else
                         {
                             IsBusy = false;
+                            IsWorking = false;
                             System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
                         }
                     }
                     else
                     {
                         IsBusy = false;
+                        IsWorking = false;
                     }
 
                     // Testing
@@ -1005,6 +1018,7 @@ namespace WpfMPD
                 else
                 {
                     IsBusy = false;
+                    IsWorking = false;
                     System.Diagnostics.Debug.WriteLine("MpdQueryStatus returned with false." + "\n");
                 }
             }
@@ -1030,16 +1044,19 @@ namespace WpfMPD
                         //https://stackoverflow.com/questions/2343446/default-text-for-templated-combo-box?rq=1
 
                         IsBusy = false;
+                        IsWorking = false;
                     }
                     else
                     {
                         IsBusy = false;
+                        IsWorking = false;
                         System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
                     }
                 }
                 else
                 {
                     IsBusy = false;
+                    IsWorking = false;
                 }
             }
 
@@ -1047,23 +1064,20 @@ namespace WpfMPD
 
         private async Task<bool> QueryStatus()
         {
-            //IsBusy = true;
+            IsWorking = true;
             bool isDone = await _MPC.MpdQueryStatus();
+            IsWorking = false;
             if (isDone)
             {
                 System.Diagnostics.Debug.WriteLine("QueryStatus is done.");
 
                 UpdateButtonStatus();
-                //IsBusy = false;
 
                 // Retrieve play queue
                 return await QueryCurrentPlayQueue();
             }
             else
             {
-                //IsBusy = false;
-                //TODO: connection fail to establish. 
-                // Let user know.
                 System.Diagnostics.Debug.WriteLine("QueryStatus returned with false." + "\n");
                 return false;
             }
@@ -1072,7 +1086,9 @@ namespace WpfMPD
         private async Task<bool> QueryCurrentPlayQueue()
         {
             IsBusy = true;
+            IsWorking = true;
             bool isDone = await _MPC.MpdQueryCurrentPlaylist();
+            IsWorking = false;
             if (isDone)
             {
                 System.Diagnostics.Debug.WriteLine("QueryCurrentPlaylist is done.");
@@ -1096,7 +1112,7 @@ namespace WpfMPD
             else
             {
                 IsBusy = false;
-                // Let user know.
+                IsWorking = false;
                 System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue returned false." + "\n");
                 return false;
             }
@@ -1105,8 +1121,9 @@ namespace WpfMPD
 
         private async Task<bool> QueryPlaylists()
         {
-            //IsBusy = true;
+            IsWorking = true;
             bool isDone = await _MPC.MpdQueryPlaylists();
+            IsWorking = false;
             if (isDone)
             {
                 System.Diagnostics.Debug.WriteLine("QueryPlaylists is done.");
@@ -1121,7 +1138,6 @@ namespace WpfMPD
             else
             {
                 //IsBusy = false;
-                // Let user know.
                 System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
                 return false;
             }

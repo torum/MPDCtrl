@@ -68,7 +68,7 @@ namespace WpfMPD
     public partial class MainWindow
     {
         /*
-        // For the acrylic effects. Win32API? Cross-platform? What is it? w
+        // For the acrylic effects. 
         [DllImport("user32.dll")]
         internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
 
@@ -93,8 +93,8 @@ namespace WpfMPD
 
             Marshal.FreeHGlobal(accentPtr);
         }
+        */
 
-*/
         public MainWindow()
         {
             // Testing purpus only. Don't forget to comment this out if you uncomment.
@@ -110,10 +110,19 @@ namespace WpfMPD
             // For the acrylic effects
             //EnableBlur();
 
-            if ((MPDCtrl.Properties.Settings.Default.MainWindow_Left != 0) && MPDCtrl.Properties.Settings.Default.MainWindow_Top != 0) {
+            // Load window pos setting.
+            if ((MPDCtrl.Properties.Settings.Default.MainWindow_Left != 0) 
+                && (MPDCtrl.Properties.Settings.Default.MainWindow_Top != 0)
+                && (MPDCtrl.Properties.Settings.Default.MainWindow_Width != 0)
+                && (MPDCtrl.Properties.Settings.Default.MainWindow_Height != 0)
+                )
+            {
                 Left = MPDCtrl.Properties.Settings.Default.MainWindow_Left;
                 Top = MPDCtrl.Properties.Settings.Default.MainWindow_Top;
+                Width = MPDCtrl.Properties.Settings.Default.MainWindow_Width;
+                Height = MPDCtrl.Properties.Settings.Default.MainWindow_Height;
             }
+            // TopMost opts.
             this.Topmost = MPDCtrl.Properties.Settings.Default.TopMost;
             if (this.Topmost)
             {
@@ -155,10 +164,13 @@ namespace WpfMPD
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            // Save window pos.
             if (WindowState == WindowState.Normal)
             {
                 MPDCtrl.Properties.Settings.Default.MainWindow_Left = Left;
                 MPDCtrl.Properties.Settings.Default.MainWindow_Top = Top;
+                MPDCtrl.Properties.Settings.Default.MainWindow_Height = Height;
+                MPDCtrl.Properties.Settings.Default.MainWindow_Width = Width;
             }
             MPDCtrl.Properties.Settings.Default.TopMost = this.Topmost;
             MPDCtrl.Properties.Settings.Default.Save();

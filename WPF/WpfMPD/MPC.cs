@@ -639,7 +639,7 @@ namespace WpfMPD
                 Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
                 await tsResponse;
 
-                return await ParsePlaylistInfoResponse(tsResponse.Result);
+                return ParsePlaylistInfoResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
@@ -649,7 +649,7 @@ namespace WpfMPD
             return false;
         }
 
-        private async Task<bool> ParsePlaylistInfoResponse(List<string> sl)
+        private bool ParsePlaylistInfoResponse(List<string> sl)
         {
             if (this.MpdStop) { return false; }
             if (sl == null) {

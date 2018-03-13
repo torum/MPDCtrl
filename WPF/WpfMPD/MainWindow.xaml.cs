@@ -23,6 +23,7 @@ namespace WpfMPD
     // Code behind - View.
     // All the things related to VIEW and Windows specific matter.
 
+    /*
     // from AcrylicWPF example
     //https://github.com/bbougot/AcrylicWPF
 
@@ -58,12 +59,15 @@ namespace WpfMPD
         WCA_ACCENT_POLICY = 19
         // ...
     }
+    */
+
 
     /// <summary>
     /// MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
+        /*
         // For the acrylic effects. Win32API? Cross-platform? What is it? w
         [DllImport("user32.dll")]
         internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
@@ -90,6 +94,7 @@ namespace WpfMPD
             Marshal.FreeHGlobal(accentPtr);
         }
 
+*/
         public MainWindow()
         {
             // Testing purpus only. Don't forget to comment this out if you uncomment.
@@ -103,7 +108,7 @@ namespace WpfMPD
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // For the acrylic effects
-            EnableBlur();
+            //EnableBlur();
 
             if ((MPDCtrl.Properties.Settings.Default.MainWindow_Left != 0) && MPDCtrl.Properties.Settings.Default.MainWindow_Top != 0) {
                 Left = MPDCtrl.Properties.Settings.Default.MainWindow_Left;

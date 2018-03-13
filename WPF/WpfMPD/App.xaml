@@ -11,6 +11,9 @@
             
             <ResourceDictionary.MergedDictionaries>
 
+                <!-- https://github.com/sourcechord/FluentWPF -->
+                <ResourceDictionary Source="pack://application:,,,/FluentWPF;component/Styles/Controls.xaml" />
+
                 <!-- PathToggleButton 
                 https://docs.microsoft.com/en-us/dotnet/framework/wpf/controls/togglebutton-syles-and-templates
                 -->

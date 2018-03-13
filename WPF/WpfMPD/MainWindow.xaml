@@ -1,4 +1,4 @@
-﻿<Window x:Class="WpfMPD.MainWindow"
+﻿<fw:AcrylicWindow x:Class="WpfMPD.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,18 +6,26 @@
         xmlns:local="clr-namespace:WpfMPD"
         mc:Ignorable="d"
         xmlns:common="clr-namespace:WpfMPD.Common"
-        common:EnableDragHelper.EnableDrag="false"
+        common:EnableDragHelper.EnableDrag="True"
         common:MaximizeDoubleClickHelper.MaximizeDoubleClick="True"
-        Background="Transparent" 
-        AllowsTransparency="True" 
-        WindowStyle="None"
+        Background="Transparent"
+                  
+        xmlns:fw="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
+        fw:AcrylicWindow.Enabled="True"
+        fw:AcrylicWindow.ShowTitleBar="False"
+        fw:AcrylicWindow.ExtendViewIntoTitleBar="True"
+        BorderThickness="0"
+
         WindowStartupLocation="CenterScreen"
         Title="MPD Ctrl" 
         Height="520" Width="300"
         xmlns:properties="clr-namespace:MPDCtrl.Properties"
         Closing="Window_Closing"
         DataContext="{StaticResource MainViewModel}">
-    
+    <!-- 
+        AllowsTransparency="True" 
+        WindowStyle="None"
+    -->
     <!-- 
     I don't like to include Microsoft.Expression.Interactions.dll, System.Windows.Interactivity.dll 
     and all that crap just for this.
@@ -38,8 +46,8 @@
     Assigned 
     + WindowClosingCommand at Close button.
     -->
-    
-    <Window.InputBindings>
+
+    <fw:AcrylicWindow.InputBindings>
         <KeyBinding Command="{Binding PlayCommand}"
                             Key="Play" />
         <KeyBinding Command="{Binding PlayCommand}"
@@ -56,9 +64,9 @@
                             Key="VolumeDown" />
         <KeyBinding Command="{Binding VolumeUpCommand}"
                             Key="VolumeUp" />
-    </Window.InputBindings>
+    </fw:AcrylicWindow.InputBindings>
 
-    <Window.Style>
+    <fw:AcrylicWindow.Style>
         <Style TargetType="Window">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsBusy}" Value="True">
@@ -66,12 +74,19 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-    </Window.Style>
-    
-    <Window.Resources></Window.Resources>
-    
+    </fw:AcrylicWindow.Style>
+
+    <fw:AcrylicWindow.Resources></fw:AcrylicWindow.Resources>
+    <fw:AcrylicWindow.ContextMenu>
+        <ContextMenu>
+            <MenuItem x:Name="mStayOnTop" Header="{x:Static properties:Resources.StayOnTop}" 
+                              Click="MenuItem_mStayOnTop_Click" 
+                              IsCheckable="True"/>
+        </ContextMenu>
+    </fw:AcrylicWindow.ContextMenu>
     <Grid x:Name="BackgroundGrid" 
-          Background="Transparent">
+          Background="Black" Opacity="0.8">
+        <!--
         <Rectangle x:Name="AcrylicBackground" 
                    common:EnableDragHelper.EnableDrag="true"
                    HorizontalAlignment="Stretch"
@@ -86,7 +101,7 @@
                 </ContextMenu>
             </Rectangle.ContextMenu>
         </Rectangle>
-        
+        -->
         <Grid x:Name="LayoutGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="42"/>
@@ -861,4 +876,4 @@
     
     </Grid>
 
-</Window>
+</fw:AcrylicWindow>

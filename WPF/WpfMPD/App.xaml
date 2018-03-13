@@ -522,14 +522,14 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="RepeatButton">
-                                    <Border  Background="#323232"
+                                    <Border x:Name="Border" Background="#323232"
                                               BorderBrush="Transparent" Height="13" BorderThickness="0 5 0 5"/>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="Gainsboro"/>
+                                            <Setter TargetName="Border" Property="Background" Value="Gray"/>
                                         </Trigger>
                                         <Trigger Property="IsPressed" Value="True">
-                                            <Setter Property="BorderBrush" Value="White"/>
+                                            <Setter TargetName="Border" Property="BorderBrush" Value="White"/>
                                         </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
@@ -549,10 +549,10 @@
 
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="Gainsboro"/>
+                                            <Setter TargetName="Border" Property="Background" Value="Gainsboro"/>
                                         </Trigger>
                                         <Trigger Property="IsPressed" Value="True">
-                                            <Setter Property="BorderBrush" Value="White"/>
+                                            <Setter TargetName="Border" Property="BorderBrush" Value="White"/>
                                         </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
@@ -770,12 +770,12 @@
                                                         <ColorAnimationUsingKeyFrames Storyboard.TargetName="Border"
                                                 Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[0].(GradientStop.Color)">
                                                             <EasingColorKeyFrame KeyTime="0"
-                                         Value="{StaticResource ControlLightColor}" />
+                                         Value="{StaticResource ControlMouseOverColor}" />
                                                         </ColorAnimationUsingKeyFrames>
                                                         <ColorAnimationUsingKeyFrames Storyboard.TargetName="Border"
                                                 Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)">
                                                             <EasingColorKeyFrame KeyTime="0"
-                                         Value="{StaticResource ControlLightColor}" />
+                                         Value="{StaticResource ControlMouseOverColor}" />
                                                         </ColorAnimationUsingKeyFrames>
                                                     </Storyboard>
                                                 </VisualState>

@@ -1313,7 +1313,7 @@ namespace MPDCtrl
             if (str.StartsWith("changed:"))
             {
 
-                System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa changed: " + str);
+                System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa ParseData changed: " + str);
 
                 // Init List which is later used in StatusChangeEvent.
                 List<string> SubSystems = str.Split('\n').ToList();
@@ -1415,7 +1415,7 @@ namespace MPDCtrl
                 }
                 catch
                 {
-                    System.Diagnostics.Debug.WriteLine("--Error@IdleConnection DataReceived: " + str);
+                    System.Diagnostics.Debug.WriteLine("--Error@IdleConnection DataReceived ParseData: " + str);
                 }
 
             }
@@ -1498,8 +1498,8 @@ Id: 22637
                     await Task.Delay(100);
                     if (c > (100 * 100))
                     {
-                        System.Diagnostics.Debug.WriteLine("OnStatusChanged: TIME OUT");
-                        //_isBusy = false;
+                        System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa ParseData: TIME OUT");
+                        _isBusy = false;
                     }
                 }
 
@@ -1530,7 +1530,7 @@ OK
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa NON: " + str);
+                System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa ParseData NON: " + str);
 
             }
         }
@@ -1615,9 +1615,12 @@ OK
 
             this._TCP = new TcpClient();
             //this._TCP.NoDelay = true;
-            this._TCP.ReceiveTimeout = System.Threading.Timeout.Infinite;
+            // This will crash on iPhone.
+            //this._TCP.ReceiveTimeout = System.Threading.Timeout.Infinite;
+            this._TCP.ReceiveTimeout = 0;
             this._TCP.SendTimeout = 5000;
-            this._TCP.Client.ReceiveTimeout = System.Threading.Timeout.Infinite;
+            this._TCP.Client.ReceiveTimeout = 0;
+            //this._TCP.Client.ReceiveTimeout = System.Threading.Timeout.Infinite;
             // KeepAlive testing.
             this._TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
@@ -1646,9 +1649,9 @@ OK
 
             this._TCP = new TcpClient();
             //this._TCP.NoDelay = true;
-            this._TCP.ReceiveTimeout = System.Threading.Timeout.Infinite;
+            this._TCP.ReceiveTimeout = 0;//System.Threading.Timeout.Infinite;
             this._TCP.SendTimeout = 5000;
-            this._TCP.Client.ReceiveTimeout = System.Threading.Timeout.Infinite;
+            this._TCP.Client.ReceiveTimeout = 0;//System.Threading.Timeout.Infinite;
             // KeepAlive testing.
             this._TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
@@ -1726,29 +1729,22 @@ OK
                 }
                 else
                 {
-                    if (err != SocketError.Success)
+                    //if (err != SocketError.Success)
+                    System.Diagnostics.Debug.WriteLine("ReceiveCallback bytesRead 0");
+
+                    this.ConnectionState = ConnectionStatus.DisconnectedByHost;
+
+                    if (!string.IsNullOrEmpty(state.sb.ToString().Trim()))
                     {
-                        //
-                        System.Diagnostics.Debug.WriteLine("ReceiveCallback res: err != SocketError.Success");
-                        ConnectionState = ConnectionStatus.ReceiveFail_Timeout;
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("ReceiveCallback bytesRead 0");
-                        ConnectionState = ConnectionStatus.ReceiveFail_Timeout;
-
-                        if (!string.IsNullOrEmpty(state.sb.ToString().Trim()))
-                        {
-                            await Task.Run(() => { DataReceived?.Invoke(this, state.sb.ToString()); });
-                        }
-
-                        //receiveDone.Set();
-
-                        state = new StateObject();
-                        state.workSocket = client;
-                        client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
+                        await Task.Run(() => { DataReceived?.Invoke(this, state.sb.ToString()); });
                     }
 
+                    //receiveDone.Set();
+
+                    if (!await ReConnect())
+                    {
+                        System.Diagnostics.Debug.WriteLine("**ReceiveCallback: bytesRead 0 - GIVING UP reconnect.");
+                    }
                 }
 
             }

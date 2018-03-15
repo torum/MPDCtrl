@@ -494,7 +494,7 @@ namespace MPDCtrl
             this._MPC.Connected += new MPC.MpdConnected(OnConnected);
             this._MPC.StatusUpdate += new MPC.MpdStatusUpdate(OnStatusUpdate);
 
-            await Task.Delay(100);
+            //await Task.Delay(100);
 
             //TODO: i18n
             //ErrorMessage = MPDCtrl.Properties.Resources.Connecting; //"Connecting...";

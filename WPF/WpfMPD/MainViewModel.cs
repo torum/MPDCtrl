@@ -31,6 +31,7 @@
 ///   https://github.com/mopidy/mopidy/issues/1662
 ///  Mopidy has some issue with M3U and UTF-8, Ext M3Us.
 ///    https://github.com/mopidy/mopidy/issues/1370
+///    
 
 
 using System;
@@ -815,7 +816,10 @@ namespace WpfMPD
                         if (isStoredPlaylist)
                         {
                             // Retrieve playlists
-                            sender.Playlists.Clear();
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                sender.Playlists.Clear();
+                            });
                             isDone = await sender.MpdQueryPlaylists();
                             if (isDone)
                             {
@@ -878,7 +882,10 @@ namespace WpfMPD
                     if (isStoredPlaylist)
                     {
                         // Retrieve playlists
-                        sender.Playlists.Clear();
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            sender.Playlists.Clear();
+                        });
                         isDone = await sender.MpdQueryPlaylists();
                         if (isDone)
                         {

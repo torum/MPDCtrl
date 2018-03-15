@@ -763,7 +763,11 @@ namespace WpfMPD
             slTmp.Sort();
             foreach (string v in slTmp)
             {
-                _playLists.Add(v);
+                //_playLists.Add(v);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    _playLists.Add(v);
+                });
             }
 
             return true;

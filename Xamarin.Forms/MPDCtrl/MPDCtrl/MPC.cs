@@ -4,8 +4,9 @@
 /// https://github.com/torumyax/MPD-Ctrl
 /// 
 /// TODO:
-/// 
-/// Send Ping regurally so that the tcp client can detect disconnection and try to reconnect.
+///  TCP connection error trap.
+///  MPD password test.
+///  Send Ping regurally so that the tcp client can detect disconnection and try to reconnect.
 ///  More detailed error message for users.
 ///
 /// Known issue:
@@ -38,6 +39,7 @@ using System.Collections.ObjectModel;
 using System.Text;
 using System.Text.RegularExpressions;
 using Xamarin.Forms;
+using System.Threading;
 
 namespace MPDCtrl
 {
@@ -84,7 +86,6 @@ namespace MPDCtrl
                 get { return _volume; }
                 set
                 {
-                    //todo check value. "0-100 or -1 if the volume cannot be determined"
                     _volume = value;
                 }
             }
@@ -146,6 +147,7 @@ namespace MPDCtrl
 
         #region MPC PRIVATE FIELD declaration
 
+        private bool _isBusy;
         private string _h;
         private int _p;
         private string _a;
@@ -153,9 +155,7 @@ namespace MPDCtrl
         private Song _currentSong;
         private ObservableCollection<Song> _songs = new ObservableCollection<Song>();
         private ObservableCollection<String> _playLists = new ObservableCollection<String>();
-        private EventDrivenTCPClient _idleClient;
-        object _objLock = new object();
-        private CommandTCPClient _commandClient;
+        private AsynchronousTCPClient _asyncClient;
 
         #endregion END of MPC PRIVATE FIELD declaration
 
@@ -216,6 +216,14 @@ namespace MPDCtrl
 
         public event MpdError ErrorReturned;
 
+        public delegate void MpdConnected(MPC sender);
+
+        public event MpdConnected Connected;
+
+        public delegate void MpdStatusUpdate(MPC sender, object data);
+
+        public event MpdStatusUpdate StatusUpdate;
+
         public bool MpdStop { get; set; }
 
         #endregion END of MPC PUBLIC PROPERTY and EVENT FIELD
@@ -228,84 +236,99 @@ namespace MPDCtrl
             this._a = a;
             this._st = new Status();
 
-            // Oops.
-            //BindingOperations.EnableCollectionSynchronization(this._songs, new object());
-            //BindingOperations.EnableCollectionSynchronization(this._playLists, new object());
-
-            // Initialize idle tcp client.
-            _idleClient = new EventDrivenTCPClient(IPAddress.Parse(this._h), this._p, true);
-            _idleClient.DisableReceiveTimeout = true;
-            _idleClient.DataReceived += new EventDrivenTCPClient.delDataReceived(IdleClient_DataReceived);
-            _idleClient.ConnectionStatusChanged += new EventDrivenTCPClient.delConnectionStatusChanged(IdleClient_ConnectionStatusChanged);
-
-            // Initialize cmd tcp client.
-            _commandClient = new CommandTCPClient();
+            _asyncClient = new AsynchronousTCPClient();
+            _asyncClient.DataReceived += new AsynchronousTCPClient.delDataReceived(AsynchronousClient_DataReceived);
+            _asyncClient.ConnectionStatusChanged += new AsynchronousTCPClient.delConnectionStatusChanged(AsynchronousClient_ConnectionStatusChanged);
         }
 
         #region MPC METHODS
 
-        public async Task<bool> MpdCmdConnect()
+        public async Task<bool> MpdConnect()
         {
-            bool isDone = await _commandClient.Connect(IPAddress.Parse(this._h), this._p, this._a); 
+            bool isDone = await _asyncClient.Connect(IPAddress.Parse(this._h), this._p, this._a);
+
             if (!isDone)
             {
                 System.Diagnostics.Debug.WriteLine("MpdCmdConnect(): _commandClient.Connect() returned false.");
                 ErrorReturned?.Invoke(this, "Connection Error: (C0)");
-
-                //TODO: better, more detailed error message handling?
             }
             return isDone;
         }
 
-        public bool MpdCmdDisConnect()
+        public void MpdDisConnect()
         {
-            _commandClient.DisConnect();
-            return true;
+            _asyncClient.DisConnect();
         }
 
-        public async Task<bool> MpdQueryStatus()
+        public void MpdSendPassword()
         {
             try
             {
-                string mpdCommand = "status";
+                if (!string.IsNullOrEmpty(this._a))
+                {
+                    string mpdCommand = "password " + this._a.Trim() + "\n";
+
+                    //_asyncClient.Send("noidle" + "\n");
+
+                    _asyncClient.Send(mpdCommand);
+
+                    //_asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdSendPassword(): " + ex.Message);
+            }
+        }
+
+        public void MpdQueryStatus2()
+        {
+            try
+            {
+                string mpdCommand = "status" + "\n";
+
                 if (!string.IsNullOrEmpty(this._a))
                 {
                     mpdCommand = "command_list_begin" + "\n";
-
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-
                     mpdCommand = mpdCommand + "status" + "\n";
-
-                    mpdCommand = mpdCommand + "command_list_end";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
 
-                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
-                await tsResponse;
+                _asyncClient.Send("noidle" + "\n");
 
-                return ParseStatusResponse(tsResponse.Result);
+                _asyncClient.Send(mpdCommand);
+
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MPDQueryStatus(): " + ex.Message);
             }
-            return false;
         }
 
         private bool ParseStatusResponse(List<string> sl)
         {
             if (this.MpdStop) { return false; }
-            if (sl == null) {
+            if (sl == null)
+            {
                 System.Diagnostics.Debug.WriteLine("ParseStatusResponse sl==null");
                 // Fire up error event.
                 ErrorReturned?.Invoke(this, "Connection Error: (@C1)");
-                return false; }
-            if (sl.Count == 0) {
+                return false;
+            }
+            if (sl.Count == 0)
+            {
                 System.Diagnostics.Debug.WriteLine("ParseStatusResponse slCount == 0");
-                return false; } 
+                return false;
+            }
 
             Dictionary<string, string> MpdStatusValues = new Dictionary<string, string>();
 
-            try {
+            try
+            {
 
                 foreach (string value in sl)
                 {
@@ -508,7 +531,7 @@ namespace MPDCtrl
 
                 //TODO: more?
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@ParseStatusResponse:" + ex.Message);
             }
@@ -516,11 +539,11 @@ namespace MPDCtrl
             return true;
         }
 
-        public async Task<bool> MpdQueryCurrentPlaylist()
+        public void MpdQueryCurrentPlaylist2()
         {
             try
             {
-                string mpdCommand = "playlistinfo";
+                string mpdCommand = "playlistinfo" + "\n";
                 if (!string.IsNullOrEmpty(this._a))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -529,54 +552,56 @@ namespace MPDCtrl
 
                     mpdCommand = mpdCommand + "playlistinfo" + "\n";
 
-                    mpdCommand = mpdCommand + "command_list_end";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
 
-                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
-                await tsResponse;
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
 
-                return await ParsePlaylistInfoResponse(tsResponse.Result);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
 
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MPDQueryCurrentPlaylist(): " + ex.Message);
             }
-            return false;
         }
 
         private async Task<bool> ParsePlaylistInfoResponse(List<string> sl)
         {
             if (this.MpdStop) { return false; }
-            if (sl == null) {
+            if (sl == null)
+            {
                 System.Diagnostics.Debug.WriteLine("ConError@ParsePlaylistInfoResponse: null");
                 ErrorReturned?.Invoke(this, "Connection Error: (@C2)");
-                return false; }
+                return false;
+            }
             /*
-file: Creedence Clearwater Revival/Chronicle, Vol. 1/11 Who'll Stop the Rain.mp3
-Last-Modified: 2011-08-03T16:08:06Z
-Artist: Creedence Clearwater Revival
-AlbumArtist: Creedence Clearwater Revival
-Title: Who'll Stop the Rain
-Album: Chronicle, Vol. 1
-Track: 11
-Date: 1976
-Genre: Rock
-Composer: John Fogerty
-Time: 149
-duration: 149.149
-Pos: 5
-Id: 22637
+            file: Creedence Clearwater Revival/Chronicle, Vol. 1/11 Who'll Stop the Rain.mp3
+            Last-Modified: 2011-08-03T16:08:06Z
+            Artist: Creedence Clearwater Revival
+            AlbumArtist: Creedence Clearwater Revival
+            Title: Who'll Stop the Rain
+            Album: Chronicle, Vol. 1
+            Track: 11
+            Date: 1976
+            Genre: Rock
+            Composer: John Fogerty
+            Time: 149
+            duration: 149.149
+            Pos: 5
+            Id: 22637
             */
+            _isBusy = true;
             try
             {
-                /*
+
                 Device.BeginInvokeOnMainThread(
                     () =>
                     {
                         _songs.Clear();
                     });
-                */
+
                 Dictionary<string, string> SongValues = new Dictionary<string, string>();
                 foreach (string value in sl)
                 {
@@ -637,7 +662,7 @@ Id: 22637
                                     sng.Artist = "...";
                                 }
                             }
-                            
+
                             if (sng.ID == _st.MpdSongID)
                             {
                                 this._currentSong = sng;
@@ -648,21 +673,19 @@ Id: 22637
 
                             try
                             {
-                                // https://stackoverflow.com/questions/2091988/how-do-i-update-an-observablecollection-via-a-worker-thread
                                 Device.BeginInvokeOnMainThread(new Action(
                                         () =>
                                         {
                                             _songs.Add(sng);
-                                            
+
                                         }));
 
                                 // This will significantly slows down the load but gives more ui responsiveness.
                                 await Task.Delay(10);
-
-                                //_songs.Add(sng);
                             }
                             catch (Exception ex)
                             {
+                                _isBusy = false;
                                 System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse _songs.Add: " + ex.Message);
                                 return false;
                             }
@@ -671,25 +694,27 @@ Id: 22637
                     }
                     catch (Exception ex)
                     {
+                        _isBusy = false;
                         System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse: " + ex.Message);
                         return false;
                     }
                 }
-
+                _isBusy = false;
                 return true;
             }
             catch (Exception ex)
             {
+                _isBusy = false;
                 System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse: " + ex.Message);
                 return false;
             }
         }
 
-        public async Task<bool> MpdQueryPlaylists()
+        public void MpdQueryPlaylists2()
         {
             try
             {
-                string mpdCommand = "listplaylists";
+                string mpdCommand = "listplaylists" + "\n";
                 if (!string.IsNullOrEmpty(this._a))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -698,40 +723,37 @@ Id: 22637
 
                     mpdCommand = mpdCommand + "listplaylists" + "\n";
 
-                    mpdCommand = mpdCommand + "command_list_end";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
 
-                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
-                await tsResponse;
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
 
-                /*
-                playlist: Blues
-                Last-Modified: 2018-01-26T12:12:10Z
-                playlist: Jazz
-                Last-Modified: 2018-01-26T12:12:37Z
-                OK
-                 */
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
 
-                return ParsePlaylistsResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MPDQueryPlaylists(): " + ex.Message);
             }
-            return false;
         }
 
         private bool ParsePlaylistsResponse(List<string> sl)
         {
             if (this.MpdStop) { return false; }
-            if (sl == null) {
+            if (sl == null)
+            {
                 System.Diagnostics.Debug.WriteLine("Connected response@ParsePlaylistsResponse: null");
                 ErrorReturned?.Invoke(this, "Connection Error: (C3)");
-                return false; }
+                return false;
+            }
 
-            // Don't. Not good when multithreading. Make sure you clear the collection before calling MpdQueryCurrentPlaylist().
-            //_playLists.Clear();
+            Device.BeginInvokeOnMainThread(
+                () =>
+                {
+                    _playLists.Clear();
+                });
 
             // Tmp list for sorting.
             List<string> slTmp = new List<string>();
@@ -747,13 +769,15 @@ Id: 22637
                     return false;
                 }
 
-                if (value.StartsWith("playlist:")) {
-                    if (value.Split(':').Length > 1) {
+                if (value.StartsWith("playlist:"))
+                {
+                    if (value.Split(':').Length > 1)
+                    {
                         //_playLists.Add(value.Split(':')[1].Trim()); // need sort.
                         slTmp.Add(value.Split(':')[1].Trim());
                     }
                 }
-                else if (value.StartsWith("Last-Modified: ") || (value.StartsWith("OK"))) 
+                else if (value.StartsWith("Last-Modified: ") || (value.StartsWith("OK")))
                 {
                     // Ignoring for now.
                 }
@@ -763,13 +787,18 @@ Id: 22637
             slTmp.Sort();
             foreach (string v in slTmp)
             {
-                _playLists.Add(v);
+                //_playLists.Add(v);
+                Device.BeginInvokeOnMainThread(
+                    () =>
+                    {
+                        _playLists.Add(v);
+                    });
             }
 
             return true;
         }
 
-        public async Task<bool> MpdPlaybackPlay(string songID = "")
+        public void MpdPlaybackPlay(string songID = "")
         {
             try
             {
@@ -786,58 +815,36 @@ Id: 22637
                     {
                         mpdCommand = mpdCommand + "play" + "\n";
                     }
-                    mpdCommand = mpdCommand + "command_list_end";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
                 else
                 {
                     if (songID != "")
                     {
-                        mpdCommand = "playid " + songID;
+                        mpdCommand = "playid " + songID + "\n";
                     }
                     else
                     {
-                        mpdCommand = "play";
+                        mpdCommand = "play" + "\n";
                     }
                 }
 
-                /*
-                string mpdCommand = "command_list_begin" + "\n";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                }
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
 
-                if (songID != "")
-                {
-                    mpdCommand = mpdCommand + "playid " + songID + "\n";
-                }
-                else
-                {
-                    mpdCommand = mpdCommand + "play" + "\n";
-                }
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
 
-                //mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-                */
-
-                Task <List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
-                await tsResponse;
-
-                //return ParseStatusResponse(tsResponse.Result);
-                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackPlay: " + ex.Message);
             }
-            return false;
         }
 
-        public async Task<bool> MpdPlaybackSeek(string songID, int seekTime)
+        public void MpdPlaybackSeek(string songID, int seekTime)
         {
-            if ((songID == "") || (seekTime == 0)) { return false; }
+            if ((songID == "") || (seekTime == 0)) { return; }
 
             try
             {
@@ -847,41 +854,26 @@ Id: 22637
                     mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
                     mpdCommand = mpdCommand + "seekid " + songID + " " + seekTime.ToString() + "\n";
-                    mpdCommand = mpdCommand + "command_list_end";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
                 else
                 {
-                    mpdCommand = "seekid " + songID + " " + seekTime.ToString();
-                }
-                /*
-                string mpdCommand = "command_list_begin" + "\n";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = "seekid " + songID + " " + seekTime.ToString() + "\n";
                 }
 
-                mpdCommand = mpdCommand + "seekid " + songID + " " + seekTime.ToString() + "\n";
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
 
-                //mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-                */
-
-                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
-                await tsResponse;
-
-                //return ParseStatusResponse(tsResponse.Result);
-                return ParseVoidResponse(tsResponse.Result);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
 
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MpdPlaybackSeek: " + ex.Message);
             }
-            return false;
         }
 
-        public async Task<bool> MpdPlaybackPause()
+        public void MpdPlaybackPause()
         {
             try
             {
@@ -891,42 +883,25 @@ Id: 22637
                     mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
                     mpdCommand = mpdCommand + "pause 1" + "\n";
-                    mpdCommand = mpdCommand + "command_list_end";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
                 else
                 {
-                    mpdCommand = "pause 1";
-                }
-                /*
-                string mpdCommand = "command_list_begin" + "\n";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = "pause 1" + "\n";
                 }
 
-                mpdCommand = mpdCommand + "pause 1" + "\n";
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
 
-                //mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-                */
-
-                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
-                await tsResponse;
-
-                //return ParseStatusResponse(tsResponse.Result);
-                return ParseVoidResponse(tsResponse.Result);
-
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackPause: " + ex.Message);
             }
-
-            return false;
         }
 
-        public async Task<bool> MpdPlaybackResume()
+        public void MpdPlaybackResume()
         {
             try
             {
@@ -936,42 +911,26 @@ Id: 22637
                     mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
                     mpdCommand = mpdCommand + "pause 0" + "\n";
-                    mpdCommand = mpdCommand + "command_list_end";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
                 else
                 {
-                    mpdCommand = "pause 0";
-                }
-                /*
-                string mpdCommand = "command_list_begin" + "\n";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = "pause 0" + "\n";
                 }
 
-                mpdCommand = mpdCommand + "pause 0" + "\n";
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
 
-                //mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-                */
-
-                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
-                await tsResponse;
-
-                //return ParseStatusResponse(tsResponse.Result);
-                return ParseVoidResponse(tsResponse.Result);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
 
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackResume: " + ex.Message);
             }
-
-            return false;
         }
 
-        public async Task<bool> MpdPlaybackStop()
+        public void MpdPlaybackStop()
         {
             try
             {
@@ -985,38 +944,22 @@ Id: 22637
                 }
                 else
                 {
-                    mpdCommand = "stop";
-                }
-                /*
-                string mpdCommand = "command_list_begin" + "\n";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = "stop" + "\n";
                 }
 
-                mpdCommand = mpdCommand + "stop" + "\n";
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
 
-                //mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-                */
-
-                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
-                await tsResponse;
-
-                //return ParseStatusResponse(tsResponse.Result);
-                return ParseVoidResponse(tsResponse.Result);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
 
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackStop: " + ex.Message);
             }
-
-            return false;
         }
 
-        public async Task<bool> MpdPlaybackNext()
+        public void MpdPlaybackNext()
         {
             try
             {
@@ -1026,47 +969,27 @@ Id: 22637
                     mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
                     mpdCommand = mpdCommand + "next" + "\n";
-                    mpdCommand = mpdCommand + "command_list_end";
+                    mpdCommand = mpdCommand + "command_list_end\n";
                 }
                 else
                 {
-                    mpdCommand = "next";
-                }
-                /*
-                string mpdCommand = "command_list_begin" + "\n";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = "next\n";
                 }
 
-                mpdCommand = mpdCommand + "next" + "\n";
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
 
-                if (_st.MpdState != Status.MpdPlayState.Play)
-                {
-                    mpdCommand = mpdCommand + "play" + "\n";
-                }
-                
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
 
-                //mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-                */
-
-                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
-                await tsResponse;
-
-                //return ParseStatusResponse(tsResponse.Result);
-                return ParseVoidResponse(tsResponse.Result);
 
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackNext: " + ex.Message);
             }
-            return false;
         }
 
-        public async Task<bool> MpdPlaybackPrev()
+        public void MpdPlaybackPrev()
         {
             try
             {
@@ -1076,48 +999,28 @@ Id: 22637
                     mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
                     mpdCommand = mpdCommand + "previous" + "\n";
-                    mpdCommand = mpdCommand + "command_list_end";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
                 else
                 {
-                    mpdCommand = "previous";
-                }
-                /*
-                string mpdCommand = "command_list_begin" + "\n";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = "previous" + "\n";
                 }
 
-                mpdCommand = mpdCommand + "previous" + "\n";
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
 
-                if (_st.MpdState != Status.MpdPlayState.Play)
-                {
-                    mpdCommand = mpdCommand + "play" + "\n";
-                }
-
-                //mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-                */
-
-                Task <List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
-                await tsResponse;
-
-                //return ParseStatusResponse(tsResponse.Result);
-                return ParseVoidResponse(tsResponse.Result);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
 
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackPrev: " + ex.Message);
             }
-            return false;
         }
 
-        public async Task<bool> MpdSetVolume(int v)
+        public void MpdSetVolume(int v)
         {
-            if (v == _st.MpdVolume){return true;}
+            if (v == _st.MpdVolume) { return; }
 
             try
             {
@@ -1127,43 +1030,28 @@ Id: 22637
                     mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
                     mpdCommand = mpdCommand + "setvol " + v.ToString() + "\n";
-                    mpdCommand = mpdCommand + "command_list_end";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
                 else
                 {
-                    mpdCommand = "setvol " + v.ToString();
-                }
-                /*
-                string mpdCommand = "command_list_begin" + "\n";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = "setvol " + v.ToString() + "\n";
                 }
 
-                mpdCommand = mpdCommand + "setvol " + v.ToString() + "\n";
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
 
-                //mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-                */
-
-                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
-                await tsResponse;
-
-                //return ParseStatusResponse(tsResponse.Result);
-                return ParseVoidResponse(tsResponse.Result);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
 
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetVol: " + ex.Message);
             }
-            return false;
         }
 
-        public async Task<bool> MpdSetRepeat(bool on)
+        public void MpdSetRepeat(bool on)
         {
-            if (_st.MpdRepeat == on){ return true;}
+            if (_st.MpdRepeat == on) { return; }
 
             try
             {
@@ -1180,56 +1068,35 @@ Id: 22637
                     {
                         mpdCommand = mpdCommand + "repeat 0" + "\n";
                     }
-                    mpdCommand = mpdCommand + "command_list_end";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
                 else
                 {
                     if (on)
                     {
-                        mpdCommand = "repeat 1";
+                        mpdCommand = "repeat 1" + "\n";
                     }
                     else
                     {
-                        mpdCommand = "repeat 0";
+                        mpdCommand = "repeat 0" + "\n";
                     }
                 }
-                /*
-                string mpdCommand = "command_list_begin" + "\n";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                }
 
-                if (on) {
-                    mpdCommand = mpdCommand + "repeat 1" + "\n";
-                }
-                else
-                {
-                    mpdCommand = mpdCommand + "repeat 0" + "\n";
-                }
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
 
-                //mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-                */
-
-                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
-                await tsResponse;
-
-                //return ParseStatusResponse(tsResponse.Result);
-                return ParseVoidResponse(tsResponse.Result);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
 
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetRepeat: " + ex.Message);
             }
-            return false;
         }
 
-        public async Task<bool> MpdSetRandom(bool on)
+        public void MpdSetRandom(bool on)
         {
-            if (_st.MpdRandom == on){return true;}
+            if (_st.MpdRandom == on) { return; }
 
             try
             {
@@ -1246,55 +1113,33 @@ Id: 22637
                     {
                         mpdCommand = mpdCommand + "random 0" + "\n";
                     }
-                    mpdCommand = mpdCommand + "command_list_end";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
                 else
                 {
                     if (on)
                     {
-                        mpdCommand = "random 1";
+                        mpdCommand = "random 1" + "\n";
                     }
                     else
                     {
-                        mpdCommand = "random 0";
+                        mpdCommand = "random 0" + "\n";
                     }
                 }
-                /*
-                string mpdCommand = "command_list_begin" + "\n";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                }
 
-                if (on)
-                {
-                    mpdCommand = mpdCommand + "random 1" + "\n";
-                }
-                else
-                {
-                    mpdCommand = mpdCommand + "random 0" + "\n";
-                }
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
 
-                //mpdCommand = mpdCommand + "status" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-                */
-
-                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
-                await tsResponse;
-
-                //return ParseStatusResponse(tsResponse.Result);
-                return ParseVoidResponse(tsResponse.Result);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
 
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetRandom: " + ex.Message);
             }
-            return false;
         }
 
-        public async Task<bool> MpdChangePlaylist(string playlistName)
+        public void MpdChangePlaylist(string playlistName)
         {
             if (playlistName.Trim() != "")
             {
@@ -1309,36 +1154,13 @@ Id: 22637
 
                 mpdCommand = mpdCommand + "play" + "\n";
 
-                mpdCommand = mpdCommand + "command_list_end";
-                /*
-                string mpdCommand = "command_list_begin" + "\n";
+                mpdCommand = mpdCommand + "command_list_end" + "\n";
 
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                }
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
 
-                mpdCommand = mpdCommand + "clear" + "\n";
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
 
-                mpdCommand = mpdCommand + "load " + playlistName.Trim() + "\n";
-                
-                mpdCommand = mpdCommand + "play" + "\n";
-
-                //Testing. Trust idle connection will notify us or not.  
-                //mpdCommand = mpdCommand + "playlistinfo" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end";
-                */
-
-                Task<List<string>> tsResponse = _commandClient.SendCommand(mpdCommand);
-                await tsResponse;
-
-                //return ParsePlaylistInfoResponse(tsResponse.Result);
-                return ParseVoidResponse(tsResponse.Result);
-            }
-            else
-            {
-                return false;
             }
         }
 
@@ -1376,113 +1198,197 @@ Id: 22637
             }
         }
 
-        public bool MpdIdleConnect()
+        private void AsynchronousClient_ConnectionStatusChanged(AsynchronousTCPClient sender, AsynchronousTCPClient.ConnectionStatus status)
         {
-            //Idle client connect
-            try
+            System.Diagnostics.Debug.WriteLine("--AsynchronousClient_ConnectionStatusChanged: " + status.ToString());
+
+            if (status == AsynchronousTCPClient.ConnectionStatus.Connected)
             {
-                if (_idleClient.ConnectionState != EventDrivenTCPClient.ConnectionStatus.Connected)
-                {
-                    _idleClient.Connect(); 
-                }
-                return true;
+                //sender.Send("idle player mixer options playlist stored_playlist\n");
             }
-            catch (Exception ex)
+            else if (status == AsynchronousTCPClient.ConnectionStatus.MpdOK)
             {
-                System.Diagnostics.Debug.WriteLine("Error@MpdIdleConnect: " + ex.Message);
-                return false;
+                //Connected?.Invoke(this);
+            }
+            else if (status == AsynchronousTCPClient.ConnectionStatus.MpdAck)
+            {
+                //
             }
 
         }
 
-        public bool MpdIdleDisConnect()
+        private async void AsynchronousClient_DataReceived(AsynchronousTCPClient sender, object data)
         {
-            // Close Idle client connection.
-            try
-            {
-                if (_idleClient.ConnectionState == EventDrivenTCPClient.ConnectionStatus.Connected)
-                {
-                    _idleClient.Disconnect();
-                }
-                return true;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MpdIdleDisConnect(): " + ex.Message);
-                return false;
-            }
-        }
+            //System.Diagnostics.Debug.WriteLine("AsynchronousClient_DataReceived:\n" + (data as string));
+            await Task.Delay(100);
 
-        private void IdleClient_ConnectionStatusChanged(EventDrivenTCPClient sender, EventDrivenTCPClient.ConnectionStatus status)
-        {
-            System.Diagnostics.Debug.WriteLine("--IdleConnection: " + status.ToString());
-
-            if (status == EventDrivenTCPClient.ConnectionStatus.Connected)
-            {
-                /*
-                // Connected to MPD and received OK. Now we are idling and wait.
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    sender.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("--IdleConnection established, Start idle.");
-                    sender.Send("idle player mixer options playlist stored_playlist\n");
-                }
-                */
-            }
-        }
-
-        private void IdleClient_DataReceived(EventDrivenTCPClient sender, object data)
-        {
-            System.Diagnostics.Debug.WriteLine("\n--IdleConnection DataReceived: \n" + (data as string).TrimEnd());
-
-            if (data == null) { return; }
-
-            //Testing. vv Now we handle initial "idle" command at IdleClient_ConnectionStatusChanged. 
             if ((data as string).StartsWith("OK MPD"))
             {
-                
-                // Connected to MPD and received OK. Now we are idling and wait.
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    _idleClient.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("IdleConnection OK MPD, Start idle.\n");
-                    _idleClient.Send("idle player mixer options playlist stored_playlist\n");
-                }
-                
+                // conneted and get ok res from mpd
+                System.Diagnostics.Debug.WriteLine("AsynchronousClient_DataReceived OK MPD: Sending idle \n");
+
+                //TODO: Needs to be tested.
+                MpdSendPassword();
+
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+                //Connected?.Invoke(this);
+                await Task.Run(() => { Connected?.Invoke(this); });
+
+                this.MpdQueryStatus2();
+                this.MpdQueryCurrentPlaylist2();
+                this.MpdQueryPlaylists2();
             }
             else
             {
+                //System.Diagnostics.Debug.WriteLine("AsynchronousClient_DataReceived: Sending idle \n");
+                //sender.Send("idle player mixer options playlist stored_playlist\n");
 
-                // Go idle again and wait.
-                if (!string.IsNullOrEmpty(this._a))
+
+                //System.Diagnostics.Debug.WriteLine("AsynchronousClient_DataReceived:\n" + (data as string));
+
+                /*
+                List<string> reLines = (data as string).Split('\n').ToList();
+                bool c = false;
+                foreach (string value in reLines)
                 {
-                    sender.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
+
+                    if (value.StartsWith("changed:"))
+                    {
+                        c = true;
+                        break;
+                    }
+                }
+
+                if (c)
+                {
+                    if (!string.IsNullOrEmpty(this._a))
+                    {
+                        _asyncClient.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("--IdleConnection Going idle again.");
+
+                        _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+                    }
+                }
+                */
+
+
+                Dispatch((data as string));
+
+
+            }
+        }
+
+        private void Dispatch(string str)
+        {
+            List<string> reLines = str.Split('\n').ToList();
+
+            string d = "";
+            foreach (string value in reLines)
+            {
+                if (value == "OK")
+                {
+                    if (d != "")
+                    {
+                        ParseData(d);
+                        d = "";
+                    }
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("--IdleConnection Going idle again.");
-                    sender.Send("idle player mixer options playlist stored_playlist\n");
+                    d = d + value + "\n";
                 }
+            }
 
-                /*
-                 changed: playlist
-                 changed: player
-                 changed: options
-                 OK
-                */
+
+        }
+
+        private async void ParseData(string str)
+        {
+            await Task.Delay(100);
+
+            if (str.StartsWith("changed:"))
+            {
+
+                System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa changed: " + str);
 
                 // Init List which is later used in StatusChangeEvent.
-                List<string> SubSystems = new List<string>();
-
+                List<string> SubSystems = str.Split('\n').ToList();
                 try
                 {
-                    string[] Lines = Regex.Split((data as string), "\n");
+
+                    /*
+                    Device.BeginInvokeOnMainThread(
+                        () =>
+                        {
+                            StatusChanged?.Invoke(this, str);
+                        });
+                    */
+                    await Task.Run(() => { StatusChanged?.Invoke(this, str); });
+
+                    //await Task.Delay(100);
+
+                    bool isPlayer = false;
+                    bool isPlaylist = false;
+                    bool isStoredPlaylist = false;
+                    foreach (string line in SubSystems)
+                    {
+                        if (line == "changed: playlist")
+                        {
+                            isPlaylist = true;
+                        }
+                        if (line == "changed: player")
+                        {
+                            isPlayer = true;
+                        }
+                        if (line == "changed: options")
+                        {
+                            isPlayer = true;
+                        }
+                        if (line == "changed: mixer")
+                        {
+                            isPlayer = true;
+                        }
+                        if (line == "changed: stored_playlist")
+                        {
+                            isStoredPlaylist = true;
+                        }
+
+                    }
+
+                    if (isPlayer)
+                    {
+                        this.MpdQueryStatus2();
+                    }
+
+                    if (isPlaylist)
+                    {
+                        Device.BeginInvokeOnMainThread(
+                            () =>
+                            {
+                                this.CurrentQueue.Clear();
+                            });
+                        this.MpdQueryCurrentPlaylist2();
+
+                    }
+
+                    if (isStoredPlaylist)
+                    {
+                        Device.BeginInvokeOnMainThread(
+                            () =>
+                            {
+                                this.Playlists.Clear();
+                            });
+                        this.MpdQueryPlaylists2();
+                    }
+
+                    //
+
+                    /*
+                    string[] Lines = Regex.Split(str, "\n");
 
                     foreach (string line in Lines)
                     {
@@ -1502,95 +1408,202 @@ Id: 22637
                     {
                         // Fire up changed event.
                         StatusChanged?.Invoke(this, SubSystems);
+
                     }
+
+                    */
                 }
                 catch
                 {
-                    System.Diagnostics.Debug.WriteLine("--Error@IdleConnection DataReceived: " + (data as string));
+                    System.Diagnostics.Debug.WriteLine("--Error@IdleConnection DataReceived: " + str);
                 }
 
-
+            }
+            else if (str.StartsWith("volume:") ||
+                   str.StartsWith("repeat:") ||
+                   str.StartsWith("random:") ||
+                   str.StartsWith("state:") ||
+                   str.StartsWith("song:") ||
+                   str.StartsWith("songid:") ||
+                   str.StartsWith("time:") ||
+                   str.StartsWith("elapsed:") ||
+                   str.StartsWith("duration:")
+                   )
+            {
+                // "status"
+                //System.Diagnostics.Debug.WriteLine("Got status");
+                //System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa status: " + str);
                 /*
-                // Go idle again and wait.
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    sender.Send("command_list_begin" + "\n" + "password " + this._a.Trim() + "\n" + "idle player mixer options playlist stored_playlist\n" + "command_list_end\n");
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("IdleConnection Going idle again.");
-                    sender.Send("idle player mixer options playlist stored_playlist\n");
-                }
+                volume: 78
+                repeat: 1
+                random: 1
+                single: 0
+                consume: 0
+                playlist: 2708
+                playlistlength: 107
+                mixrampdb: 0.000000
+                state: play
+                song: 6
+                songid: 26569
+                time: 35:138
+                elapsed: 35.038
+                bitrate: 192
+                duration: 137.648
+                audio: 44100:24:2
+                nextsong: 39
+                nextsongid: 26602
+                OK
                 */
 
-            }
-        }
+                List<string> reLines = str.Split('\n').ToList();
+                ParseStatusResponse(reLines);
 
-        public async Task<bool> MpdIdleStart()
-        {
-            // send "idle" command
-            try
+                //Task.Run(() => {  });
+
+                await Task.Run(() => { StatusUpdate?.Invoke(this, "isPlayer"); });
+            }
+            else if (str.StartsWith("file:") ||
+                str.StartsWith("Modified:") ||
+                str.StartsWith("Artist:") ||
+                str.StartsWith("AlbumArtist:") ||
+                str.StartsWith("Title:") ||
+                str.StartsWith("Album:")
+                )
             {
-                if (_idleClient.ConnectionState == EventDrivenTCPClient.ConnectionStatus.Connected)
+
+                // "playlistinfo"
+                //System.Diagnostics.Debug.WriteLine("Got playlistinfo");
+                // System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa playlistinfo: " + str);
+                /*
+
+file: Creedence Clearwater Revival/Chronicle, Vol. 1/11 Who'll Stop the Rain.mp3
+Last-Modified: 2011-08-03T16:08:06Z
+Artist: Creedence Clearwater Revival
+AlbumArtist: Creedence Clearwater Revival
+Title: Who'll Stop the Rain
+Album: Chronicle, Vol. 1
+Track: 11
+Date: 1976
+Genre: Rock
+Composer: John Fogerty
+Time: 149
+duration: 149.149
+Pos: 5
+Id: 22637
+                */
+                int c = 0;
+                while (_isBusy)
                 {
-                    await Task.Run(() => { _idleClient.Send("idle player mixer options playlist stored_playlist\n"); });
-                    return true;
+                    c++;
+                    await Task.Delay(100);
+                    if (c > (100 * 100))
+                    {
+                        System.Diagnostics.Debug.WriteLine("OnStatusChanged: TIME OUT");
+                        //_isBusy = false;
+                    }
                 }
-                else { return false; }
 
+
+                List<string> reLines = str.Split('\n').ToList();
+                await ParsePlaylistInfoResponse(reLines);
+
+                //Task.Run(() => { StatusUpdate?.Invoke(this, "isPlaylist"); });
+                await Task.Run(() => { StatusUpdate?.Invoke(this, "isPlaylist"); });
             }
-            catch (Exception ex)
+            else if (str.StartsWith("playlist:"))
             {
-                System.Diagnostics.Debug.WriteLine("Error@MPDIdleStart(): " + ex.Message);
-                return false;
+                // System.Diagnostics.Debug.WriteLine("Got playlists");
+                //System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa playlists: " + str);
+                /*
+playlist: Blues
+Last-Modified: 2018-01-26T12:12:10Z
+playlist: Jazz
+Last-Modified: 2018-01-26T12:12:37Z
+OK
+*/
+
+                List<string> reLines = str.Split('\n').ToList();
+                ParsePlaylistsResponse(reLines);
+
+                //Task.Run(() => { StatusUpdate?.Invoke(this, "isStoredPlaylist"); });
+                await Task.Run(() => { StatusUpdate?.Invoke(this, "isStoredPlaylist"); });
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa NON: " + str);
+
             }
         }
 
-        public async Task<bool> MpdIdleStop()
-        {
-            //Idle client send "noidle" command
-            try
-            {
-                if (_idleClient.ConnectionState == EventDrivenTCPClient.ConnectionStatus.Connected)
-                {
-                    await Task.Run(() => { _idleClient.Send("noidle\n"); });
-                    return true;
-                }
-                else { return false; }
-
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MPDIdleStop(): " + ex.Message);
-                return false;
-            }
-        }
 
         #endregion END of MPD METHODS
 
         /// END OF MPC Client Class 
     }
 
-    /// <summary>
-    ///  TCP client wrapper
-    /// </summary>
-    public class CommandTCPClient
+
+    // State object for receiving data.  
+    public class StateObject
     {
+        // Client socket.  
+        public Socket workSocket = null;
+        // Size of receive buffer.  
+        public const int BufferSize = 5000;
+        // Receive buffer.  
+        public byte[] buffer = new byte[BufferSize];
+        // Received data string.  
+        public StringBuilder sb = new StringBuilder();
+
+    }
+
+    public class AsynchronousTCPClient
+    {
+        public enum ConnectionStatus
+        {
+            NeverConnected,
+            Connecting,
+            Connected,
+            MpdOK,
+            MpdAck,
+            AutoReconnecting,
+            DisconnectedByUser,
+            DisconnectedByHost,
+            ConnectFail_Timeout,
+            ReceiveFail_Timeout,
+            SendFail_Timeout,
+            SendFail_NotConnected,
+            Error
+        }
         private TcpClient _TCP;
         private IPAddress _ip = IPAddress.None;
         private int _p = 0;
         private string _a = "";
+        private ConnectionStatus _ConStat;
         private int _retryAttempt = 0;
+        private static ManualResetEvent sendDone = new ManualResetEvent(false);
+        public delegate void delDataReceived(AsynchronousTCPClient sender, object data);
+        public event delDataReceived DataReceived;
+        public delegate void delConnectionStatusChanged(AsynchronousTCPClient sender, ConnectionStatus status);
+        public event delConnectionStatusChanged ConnectionStatusChanged;
 
-        public CommandTCPClient()
+        public ConnectionStatus ConnectionState
         {
-            this._TCP = new TcpClient();
-            this._TCP.NoDelay = true;
-            this._TCP.ReceiveTimeout = 1000;
-            this._TCP.SendTimeout = 1000;
+            get
+            {
+                return _ConStat;
+            }
+            private set
+            {
+                bool raiseEvent = value != _ConStat;
+                _ConStat = value;
+                if (raiseEvent)
+                    Task.Run(() => { ConnectionStatusChanged?.Invoke(this, _ConStat); });
+            }
+        }
 
-            // KeepAlive testing.
-            this._TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+        static AsynchronousTCPClient()
+        {
+
         }
 
         public async Task<bool> Connect(IPAddress ip, int port, string auth)
@@ -1599,20 +1612,30 @@ Id: 22637
             _p = port;
             _a = auth;
             _retryAttempt = 0;
-            return await DoConnect(ip, port, auth);
+
+            this._TCP = new TcpClient();
+            //this._TCP.NoDelay = true;
+            this._TCP.ReceiveTimeout = System.Threading.Timeout.Infinite;
+            this._TCP.SendTimeout = 5000;
+            this._TCP.Client.ReceiveTimeout = System.Threading.Timeout.Infinite;
+            // KeepAlive testing.
+            this._TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+
+            return await DoConnect(ip, port);
         }
 
         public async Task<bool> ReConnect()
         {
-            if (_retryAttempt > 0)
+            if (_retryAttempt > 1)
             {
-                System.Diagnostics.Debug.WriteLine("**SendCommand@ReConnect() _retryAttempt > 0");
+                System.Diagnostics.Debug.WriteLine("**SendCommand@ReConnect() _retryAttempt > 1");
                 return false;
             }
 
             _retryAttempt++;
 
-            try {
+            try
+            {
                 this._TCP.Close();
                 //this._TCP.Client.Dispose();
                 //this._TCP.Client.Disconnect(true);
@@ -1622,61 +1645,127 @@ Id: 22637
             await Task.Delay(500);
 
             this._TCP = new TcpClient();
-            this._TCP.NoDelay = true;
-            this._TCP.ReceiveTimeout = 1000;
-            this._TCP.SendTimeout = 1000;
-
+            //this._TCP.NoDelay = true;
+            this._TCP.ReceiveTimeout = System.Threading.Timeout.Infinite;
+            this._TCP.SendTimeout = 5000;
+            this._TCP.Client.ReceiveTimeout = System.Threading.Timeout.Infinite;
             // KeepAlive testing.
             this._TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
-            return await DoConnect( _ip, _p, _a);
+            return await DoConnect(_ip, _p);
         }
 
-        public async Task<bool> DoConnect(IPAddress ip, int port, string auth)
+        public async Task<bool> DoConnect(IPAddress ip, int port)
         {
             try
             {
                 await _TCP.ConnectAsync(ip, port);
-                NetworkStream networkStream = _TCP.GetStream();
-                StreamReader reader = new StreamReader(networkStream);
+                ConnectionState = ConnectionStatus.Connected;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("**Error@DoConnect: " + ex.Message);
+                ConnectionState = ConnectionStatus.ConnectFail_Timeout;
+                return false;
+            }
 
-                // First check MPD's initial response on connect.
-                string responseLine = await reader.ReadLineAsync();
+            Receive(_TCP.Client);
+            return true;
+        }
 
-                if (responseLine == null)
+        private void Receive(Socket client)
+        {
+            try
+            {
+                // Create the state object.  
+                StateObject state = new StateObject();
+                state.workSocket = client;
+
+                // Begin receiving the data.  
+                client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@Receive" + ex.ToString());
+                ConnectionState = ConnectionStatus.Error;
+            }
+        }
+
+        private async void ReceiveCallback(IAsyncResult ar)
+        {
+            try
+            {
+                // Retrieve the state object and the client socket   
+                // from the asynchronous state object.  
+                StateObject state = (StateObject)ar.AsyncState;
+                Socket client = state.workSocket;
+
+                SocketError err = new SocketError();
+                int bytesRead = client.EndReceive(ar, out err);
+
+                if (bytesRead > 0)
                 {
-                    System.Diagnostics.Debug.WriteLine("**DoConnect response: null");
-                    return false;
-                }
+                    string res = Encoding.Default.GetString(state.buffer, 0, bytesRead);
+                    state.sb.Append(res);
 
-                System.Diagnostics.Debug.WriteLine("**DoConnect response: " + responseLine);
+                    if (res.EndsWith("OK\n") || res.StartsWith("OK MPD") || res.StartsWith("ACK"))
+                    //if (client.Available == 0)
+                    {
+                        if (!string.IsNullOrEmpty(state.sb.ToString().Trim()))
+                        {
+                            await Task.Run(() => { DataReceived?.Invoke(this, state.sb.ToString()); });
+                        }
+                        //receiveDone.Set();
 
-                if (responseLine.StartsWith("OK MPD"))
-                {
-                    _retryAttempt = 0;
-                    return true;
+                        state = new StateObject();
+                        state.workSocket = client;
+                    }
+
+                    client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
+
                 }
                 else
                 {
-                    //System.Diagnostics.Debug.WriteLine("**DoConnected MPD Non-OK response: " + responseLine);
-                    return false;
+                    if (err != SocketError.Success)
+                    {
+                        //
+                        System.Diagnostics.Debug.WriteLine("ReceiveCallback res: err != SocketError.Success");
+                        ConnectionState = ConnectionStatus.ReceiveFail_Timeout;
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("ReceiveCallback bytesRead 0");
+                        ConnectionState = ConnectionStatus.ReceiveFail_Timeout;
+
+                        if (!string.IsNullOrEmpty(state.sb.ToString().Trim()))
+                        {
+                            await Task.Run(() => { DataReceived?.Invoke(this, state.sb.ToString()); });
+                        }
+
+                        //receiveDone.Set();
+
+                        state = new StateObject();
+                        state.workSocket = client;
+                        client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
+                    }
+
                 }
 
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("**Error@DoConnect: " + ex.Message);
-                return false;
+                System.Diagnostics.Debug.WriteLine("Error@ReceiveCallback" + ex.ToString());
+                ConnectionState = ConnectionStatus.Error;
             }
-
         }
 
-        public async Task<List<string>> SendCommand(string cmd)
+        public async void Send(string cmd)
         {
-            Task<List<string>> tsResponse =  DoSendCommand(this._TCP, cmd);
+            if (ConnectionState != ConnectionStatus.Connected) { return; }
 
-            try { 
-                await tsResponse;
+            try
+            {
+                DoSend(_TCP.Client, cmd);
             }
             catch (IOException)
             {
@@ -1688,612 +1777,85 @@ Id: 22637
                 // Reconnect.
                 if (await ReConnect())
                 {
-                    return await DoSendCommand(_TCP, cmd);
+                    DoSend(_TCP.Client, cmd);
                 }
                 else
                 {
                     System.Diagnostics.Debug.WriteLine("**Error@SendCommand@Read/WriteLineAsync: IOException - GIVING UP reconnect.");
-                    return null;
+
                 }
 
             }
-            catch (Exception ex)
+            catch (SocketException)
             {
-                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@Read/WriteLineAsync: " + ex.Message);
-                return null;
-            }
-
-            if ((tsResponse.Result.Count == 0)  && (!IsConnected))
-            {
-                System.Diagnostics.Debug.WriteLine("**@SendCommand@responseMultiLines.Count == 0 & !IsConnected - TRYING TO RECONNECT");
+                //System.Net.Sockets.SocketException
+                //An established connection was aborted by the software in your host machine
+                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@Read/WriteLineAsync: SocketException - TRYING TO RECONNECT.");
 
                 // Reconnect.
                 if (await ReConnect())
                 {
-                    return await DoSendCommand(_TCP, cmd);
+                    DoSend(_TCP.Client, cmd);
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("**Error@SendCommand@responseMultiLines.Count == 0: GIVING UP RECONNECT.");
-                    return null;
+                    System.Diagnostics.Debug.WriteLine("**Error@SendCommand@Read/WriteLineAsync: SocketException - GIVING UP reconnect.");
+
                 }
             }
-
-            return tsResponse.Result;
-        }
-
-        public static async Task<List<string>> DoSendCommand(TcpClient tcp, string cmd)
-        {
-            // It's a magic. Everything works..iPhone, and NotifyPropertyChanged("SelectedSong") in UWP works with this...
-            await Task.Delay(100);
-
-            List<string> responseMultiLines = new List<string>();
-
-            NetworkStream networkStream = tcp.GetStream();
-            StreamWriter writer = new StreamWriter(networkStream);
-            StreamReader reader = new StreamReader(networkStream);
-            //writer.AutoFlush = true;
-
-            System.Diagnostics.Debug.WriteLine("**Request: " + cmd);
-
-            await writer.WriteLineAsync(cmd);
-            await writer.FlushAsync();
-
-            System.Diagnostics.Debug.WriteLine("**Waiting Response...");
-
-            string responseLine;
-
-            while (!reader.EndOfStream)
+            catch (Exception ex)
             {
-                if (!String.IsNullOrEmpty(responseLine = await reader.ReadLineAsync()))
-                {
-                    //System.Diagnostics.Debug.WriteLine("**ResponseLine:" + responseLine);
+                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@Read/WriteLineAsync: " + ex.Message);
 
-                    // Read multiple lines untill "OK".
-                    if (!responseLine.StartsWith("OK"))
-                    {
-                        responseMultiLines.Add(responseLine);
-
-                        if (responseLine.StartsWith("ACK"))
-                        {
-                            System.Diagnostics.Debug.WriteLine("**Response ACK: " + responseLine + "\n");
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        responseMultiLines.Add(responseLine);
-
-                        System.Diagnostics.Debug.WriteLine("**Response line(s) received 'tll OK.");
-
-                        break;
-                    }
-                }
-                else
-                {
-                    break;
-                }
             }
 
-            await Task.Delay(100);
-            return responseMultiLines;
+
+            sendDone.WaitOne();
         }
 
-        public bool IsConnected
+        private void DoSend(Socket client, String data)
         {
-            get
-            {
-                try
-                {
-                    //return _tcpClient != null && _tcpClient.Client != null && _tcpClient.Client.Connected;
+            System.Diagnostics.Debug.WriteLine("Sending... :" + data);
 
-                    if (_TCP != null && _TCP.Client != null && _TCP.Client.Connected)
-                    {
+            // Convert the string data to byte data using ASCII encoding.  
+            byte[] byteData = Encoding.Default.GetBytes(data);
 
-                        /* As the documentation:
-                            * When passing SelectMode.SelectRead as a parameter to the Poll method it will return 
-                            * -either- true if Socket.Listen(Int32) has been called and a connection is pending;
-                            * -or- true if data is available for reading; 
-                            * -or- true if the connection has been closed, reset, or terminated; 
-                            * otherwise, returns false
-                            */
-
-                        // Detect if client disconnected
-                        if (_TCP.Client.Poll(0, SelectMode.SelectRead))
-                        {
-                            byte[] buff = new byte[1];
-                            if (_TCP.Client.Receive(buff, SocketFlags.Peek) == 0)
-                            {
-                                // Client disconnected
-                                return false;
-                            }
-                            else
-                            {
-                                return true;
-                            }
-                        }
-
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                catch
-                {
-                    return false;
-                }
-            }
+            // Begin sending the data to the remote device.  
+            client.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), client);
         }
 
-        public bool DisConnect()
+        private void SendCallback(IAsyncResult ar)
         {
-            if (this._TCP != null) {
-                try
-                {
-                    this._TCP.Close();
-                    this._TCP.Client.Dispose();
-                    System.Diagnostics.Debug.WriteLine("**Connection closed.");
-                }
-                catch { }
-            }
-            return true;
-        }
-
-    }
-
-
-    /// <summary>
-    /// Event driven TCP client wrapper
-    /// https://www.daniweb.com/programming/software-development/code/422291/user-friendly-asynchronous-event-driven-tcp-client
-    /// 
-    /// 1. Modified to use Task. 
-    /// 2. Added DisableReceiveTimeout property.
-    /// 
-    /// </summary>
-    public class EventDrivenTCPClient : IDisposable
-    {
-        #region Consts/Default values
-        const int DEFAULTTIMEOUT = 5000; //Default to 5 seconds on all timeouts
-        const int RECONNECTINTERVAL = 2000; //Default to 2 seconds reconnect attempt rate
-        #endregion
-
-        #region Components, Events, Delegates, and CTOR
-        //Timer used to detect receive timeouts
-        private System.Timers.Timer tmrReceiveTimeout = new System.Timers.Timer();
-        private System.Timers.Timer tmrSendTimeout = new System.Timers.Timer();
-        private System.Timers.Timer tmrConnectTimeout = new System.Timers.Timer();
-        public delegate void delDataReceived(EventDrivenTCPClient sender, object data);
-        public event delDataReceived DataReceived;
-        public delegate void delConnectionStatusChanged(EventDrivenTCPClient sender, ConnectionStatus status);
-        public event delConnectionStatusChanged ConnectionStatusChanged;
-        public enum ConnectionStatus
-        {
-            NeverConnected,
-            Connecting,
-            Connected,
-            AutoReconnecting,
-            DisconnectedByUser,
-            DisconnectedByHost,
-            ConnectFail_Timeout,
-            ReceiveFail_Timeout,
-            SendFail_Timeout,
-            SendFail_NotConnected,
-            Error
-        }
-        public EventDrivenTCPClient(IPAddress ip, int port, bool autoreconnect = true)
-        {
-            this._IP = ip;
-            this._Port = port;
-            this._AutoReconnect = autoreconnect;
-            this._client = new TcpClient(AddressFamily.InterNetwork);
-            this._client.NoDelay = true; //Disable the nagel algorithm for simplicity
-            ReceiveTimeout = DEFAULTTIMEOUT;
-            SendTimeout = DEFAULTTIMEOUT;
-            ConnectTimeout = DEFAULTTIMEOUT;
-            ReconnectInterval = RECONNECTINTERVAL;
-            tmrReceiveTimeout.AutoReset = false;
-            tmrReceiveTimeout.Elapsed += new System.Timers.ElapsedEventHandler(tmrReceiveTimeout_Elapsed);
-            tmrConnectTimeout.AutoReset = false;
-            tmrConnectTimeout.Elapsed += new System.Timers.ElapsedEventHandler(tmrConnectTimeout_Elapsed);
-            tmrSendTimeout.AutoReset = false;
-            tmrSendTimeout.Elapsed += new System.Timers.ElapsedEventHandler(tmrSendTimeout_Elapsed);
-
-            ConnectionState = ConnectionStatus.NeverConnected;
-        }
-        #endregion
-
-        #region Private methods/Event Handlers
-        void tmrSendTimeout_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            this.ConnectionState = ConnectionStatus.SendFail_Timeout;
-            DisconnectByHost();
-        }
-        void tmrReceiveTimeout_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            this.ConnectionState = ConnectionStatus.ReceiveFail_Timeout;
-            DisconnectByHost();
-        }
-        void tmrConnectTimeout_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            ConnectionState = ConnectionStatus.ConnectFail_Timeout;
-            DisconnectByHost();
-        }
-        private void DisconnectByHost()
-        {
-            this.ConnectionState = ConnectionStatus.DisconnectedByHost;
-            tmrReceiveTimeout.Stop();
-            System.Diagnostics.Debug.WriteLine("^^DisconnectedByHost, AutoReconnecting...");
-            if (AutoReconnect)
-                Reconnect();
-        }
-        private void Reconnect()
-        {
-            if (this.ConnectionState == ConnectionStatus.Connected)
-                return;
-            this.ConnectionState = ConnectionStatus.AutoReconnecting;
             try
             {
-                this._client.Client.BeginDisconnect(true, new AsyncCallback(cbDisconnectByHostComplete), this._client.Client);
-            }
-            catch { }
-        }
-        #endregion
+                // Retrieve the socket from the state object.  
+                Socket client = (Socket)ar.AsyncState;
 
-        #region Public Methods
-        /// <summary>
-        /// Try connecting to the remote host
-        /// </summary>
-        public void Connect()
-        {
-            if (this.ConnectionState == ConnectionStatus.Connected)
-                return;
-            this.ConnectionState = ConnectionStatus.Connecting;
-            tmrConnectTimeout.Start();
-            this._client.BeginConnect(this._IP, this._Port, new AsyncCallback(cbConnect), this._client.Client);
-        }
-        /// <summary>
-        /// Try disconnecting from the remote host
-        /// </summary>
-        public void Disconnect()
-        {
-            if (this.ConnectionState != ConnectionStatus.Connected)
-                return;
-            this._client.Client.BeginDisconnect(true, new AsyncCallback(cbDisconnectComplete), this._client.Client);
-        }
-        /// <summary>
-        /// Try sending a string to the remote host
-        /// </summary>
-        /// <param name="data">The data to send</param>
-        public void Send(string data)
-        {
-            if (this.ConnectionState != ConnectionStatus.Connected)
-            {
-                this.ConnectionState = ConnectionStatus.SendFail_NotConnected;
-                return;
-            }
-            var bytes = _encode.GetBytes(data);
-            SocketError err = new SocketError();
-            tmrSendTimeout.Start();
-            this._client.Client.BeginSend(bytes, 0, bytes.Length, SocketFlags.None, out err, new AsyncCallback(cbSendComplete), this._client.Client);
-            if (err != SocketError.Success)
-            {
-                Action doDCHost = new Action(DisconnectByHost);
-                doDCHost.Invoke();
-            }
-        }
-        /// <summary>
-        /// Try sending byte data to the remote host
-        /// </summary>
-        /// <param name="data">The data to send</param>
-        public void Send(byte[] data)
-        {
-            if (this.ConnectionState != ConnectionStatus.Connected)
-                throw new InvalidOperationException("Cannot send data, socket is not connected");
-            SocketError err = new SocketError();
-            this._client.Client.BeginSend(data, 0, data.Length, SocketFlags.None, out err, new AsyncCallback(cbSendComplete), this._client.Client);
-            if (err != SocketError.Success)
-            {
-                Action doDCHost = new Action(DisconnectByHost);
-                doDCHost.Invoke();
-            }
-        }
-        public void Dispose()
-        {
-            this._client.Close();
-            this._client.Client.Dispose();
-        }
-        #endregion
+                // Complete sending the data to the remote device.  
+                int bytesSent = client.EndSend(ar);
+                //System.Diagnostics.Debug.WriteLine("Sent {0} bytes to server.", bytesSent);
 
-        #region Callbacks
-        private void cbConnectComplete()
-        {
-            if (_client.Connected == true)
-            {
-                tmrConnectTimeout.Stop();
-                ConnectionState = ConnectionStatus.Connected;
-
-                System.Diagnostics.Debug.WriteLine("^^cbConnectComplete, BeginReceive");
-                this._client.Client.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, new AsyncCallback(cbDataReceived), this._client.Client);
+                // Signal that all bytes have been sent.  
+                sendDone.Set();
 
             }
-            else
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine("Error@SendCallback" + ex.ToString());
                 ConnectionState = ConnectionStatus.Error;
             }
         }
-        private void cbDisconnectByHostComplete(IAsyncResult result)
-        {
-            var r = result.AsyncState as Socket;
-            if (r == null)
-                throw new InvalidOperationException("Invalid IAsyncResult - Could not interpret as a socket object");
-            r.EndDisconnect(result);
-            if (this.AutoReconnect)
-            {
-                Action doConnect = new Action(Connect);
-                doConnect.Invoke();
-                return;
-            }
-        }
-        private void cbDisconnectComplete(IAsyncResult result)
-        {
-            var r = result.AsyncState as Socket;
-            if (r == null)
-                throw new InvalidOperationException("Invalid IAsyncResult - Could not interpret as a socket object");
-            r.EndDisconnect(result);
-            this.ConnectionState = ConnectionStatus.DisconnectedByUser;
 
-        }
-        private void cbConnect(IAsyncResult result)
+        public void DisConnect()
         {
-            var sock = result.AsyncState as Socket;
-            if (result == null)
-                throw new InvalidOperationException("Invalid IAsyncResult - Could not interpret as a socket object");
-            if (!sock.Connected)
+            // Release the socket.  
+            try
             {
-                if (AutoReconnect)
-                {
-                    System.Threading.Thread.Sleep(ReconnectInterval);
-                    Action reconnect = new Action(Connect);
-                    reconnect.Invoke();
-                    return;
-                }
-                else
-                    return;
+                this._TCP.Client.Shutdown(SocketShutdown.Both);
+                this._TCP.Client.Close();
             }
-            sock.EndConnect(result);
-            var callBack = new Action(cbConnectComplete);
-            callBack.Invoke();
+            catch { }
         }
-        private void cbSendComplete(IAsyncResult result)
-        {
-            var r = result.AsyncState as Socket;
-            if (r == null)
-                throw new InvalidOperationException("Invalid IAsyncResult - Could not interpret as a socket object");
-            SocketError err = new SocketError();
-            r.EndSend(result, out err);
-            if (err != SocketError.Success)
-            {
-                Action doDCHost = new Action(DisconnectByHost);
-                doDCHost.Invoke();
-            }
-            else
-            {
-                lock (SyncLock)
-                {
-                    tmrSendTimeout.Stop();
-                }
-            }
-        }
-        /* No longer used.
-        private void cbChangeConnectionStateComplete(IAsyncResult result)
-        {
-            var r = result.AsyncState as EventDrivenTCPClient;
-            if (r == null)
-                throw new InvalidOperationException("Invalid IAsyncResult - Could not interpret as a EDTC object");
-            r.ConnectionStatusChanged.EndInvoke(result);
-        }
-        */
-        private void cbDataReceived(IAsyncResult result)
-        {
-            var sock = result.AsyncState as Socket;
-            if (sock == null)
-                throw new InvalidOperationException("Invalid IASyncResult - Could not interpret as a socket");
-            SocketError err = new SocketError();
-            int bytes = sock.EndReceive(result, out err);  
-            if (bytes == 0 || err != SocketError.Success)
-            {
-                lock (SyncLock)
-                {
-                    if (!_DisableReceiveTimeout)
-                    {
-                        tmrReceiveTimeout.Start();
-                    }
-                    return;
-                }
-            }
-            else
-            {
-                lock (SyncLock)
-                {
-                    tmrReceiveTimeout.Stop();
-                }
-            }
-            if (DataReceived != null)
-            {
-                // Old code.
-                //DataReceived.BeginInvoke(this, _encode.GetString(dataBuffer, 0, bytes), new AsyncCallback(cbDataRecievedCallbackComplete), this);
-
-                // Modified. Substitute for DataReceived.BeginInvoke cbDataRecievedCallbackComplete
-                Task.Run(() => { DataReceived.Invoke(this, _encode.GetString(dataBuffer, 0, bytes)); });
-                System.Diagnostics.Debug.WriteLine("^^cbDataRecieved&CallbackComplete, BeginReceive...");
-                this._client.Client.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, new AsyncCallback(cbDataReceived), this._client.Client);
-            }
-        }
-        /* No longer used.
-        private void cbDataRecievedCallbackComplete(IAsyncResult result)
-        {
-            var r = result.AsyncState as EventDrivenTCPClient;
-            if (r == null)
-                throw new InvalidOperationException("Invalid IAsyncResult - Could not interpret as EDTC object");
-            r.DataReceived.EndInvoke(result);
-            SocketError err = new SocketError();
-            //this._client.Client.BeginReceive(this.dataBuffer, 0, this.dataBuffer.Length, SocketFlags.None, out err, new AsyncCallback(cbDataReceived), this._client.Client);
-            if (err != SocketError.Success)
-            {
-                Action doDCHost = new Action(DisconnectByHost);
-                doDCHost.Invoke();
-            }
-        }
-        */
-        #endregion
-
-        #region Properties and members
-        private IPAddress _IP = IPAddress.None;
-        private ConnectionStatus _ConStat;
-        private TcpClient _client;
-        private byte[] dataBuffer = new byte[5000];
-        private bool _AutoReconnect = false;
-        private bool _DisableReceiveTimeout = true;
-        private int _Port = 0;
-        private Encoding _encode = Encoding.Default;
-        object _SyncLock = new object();
-        /// <summary>
-        /// Syncronizing object for asyncronous operations
-        /// </summary>
-        public object SyncLock
-        {
-            get
-            {
-                return _SyncLock;
-            }
-        }
-        /// <summary>
-        /// Encoding to use for sending and receiving
-        /// </summary>
-        public Encoding DataEncoding
-        {
-            get
-            {
-                return _encode;
-            }
-            set
-            {
-                _encode = value;
-            }
-        }
-        /// <summary>
-        /// Current state that the connection is in
-        /// </summary>
-        public ConnectionStatus ConnectionState
-        {
-            get
-            {
-                return _ConStat;
-            }
-            private set
-            {
-                bool raiseEvent = value != _ConStat;
-                _ConStat = value;
-                if (ConnectionStatusChanged != null && raiseEvent)
-                    //ConnectionStatusChanged.BeginInvoke(this, _ConStat, new AsyncCallback(cbChangeConnectionStateComplete), this);
-                    // Modified.
-                    Task.Run(() => { ConnectionStatusChanged(this, _ConStat); });
-            }
-        }
-        /// <summary>
-        /// True to autoreconnect at the given reconnection interval after a remote host closes the connection
-        /// </summary>
-        public bool AutoReconnect
-        {
-            get
-            {
-                return _AutoReconnect;
-            }
-            set
-            {
-                _AutoReconnect = value;
-            }
-        }
-        public int ReconnectInterval { get; set; }
-        /// <summary>
-        /// IP of the remote host
-        /// </summary>
-        public IPAddress IP
-        {
-            get
-            {
-                return _IP;
-            }
-        }
-        /// <summary>
-        /// Port to connect to on the remote host
-        /// </summary>
-        public int Port
-        {
-            get
-            {
-                return _Port;
-            }
-        }
-        /// <summary>
-        /// Time to wait after a receive operation is attempted before a timeout event occurs
-        /// </summary>
-        public int ReceiveTimeout
-        {
-            get
-            {
-                return (int)tmrReceiveTimeout.Interval;
-            }
-            set
-            {
-                tmrReceiveTimeout.Interval = (double)value;
-            }
-        }
-        /// <summary>
-        /// Time to wait after a send operation is attempted before a timeout event occurs
-        /// </summary>
-        public int SendTimeout
-        {
-            get
-            {
-                return (int)tmrSendTimeout.Interval;
-            }
-            set
-            {
-                tmrSendTimeout.Interval = (double)value;
-            }
-        }
-        /// <summary>
-        /// Time to wait after a connection is attempted before a timeout event occurs
-        /// </summary>
-        public int ConnectTimeout
-        {
-            get
-            {
-                return (int)tmrConnectTimeout.Interval;
-            }
-            set
-            {
-                tmrConnectTimeout.Interval = (double)value;
-            }
-        }
-
-        /// Added.
-        public bool DisableReceiveTimeout
-        {
-            get
-            {
-                return _DisableReceiveTimeout;
-            }
-            set
-            {
-                _DisableReceiveTimeout = value;
-            }
-        }
-
-        #endregion
     }
-
 }
+

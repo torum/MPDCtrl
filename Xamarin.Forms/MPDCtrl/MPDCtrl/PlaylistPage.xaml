@@ -30,7 +30,9 @@
                 <ColumnDefinition Width="4" />
             </Grid.ColumnDefinitions>
             <ListView x:Name="PlaylistsListview" Grid.Row="2"  Grid.Column="0" Grid.ColumnSpan="3"
-                ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist, Path=., Mode=TwoWay}" ItemTapped="PlaylistsListview_ItemTapped">
+                      ItemsSource="{Binding Playlists}" 
+                      SelectedItem="{Binding SelectedPlaylist, Path=., Mode=TwoWay}" 
+                      ItemTapped="PlaylistsListview_ItemTapped">
                 <!-- 
                 <ListView.Header>
                     <StackLayout Padding="10,5,0,15">

@@ -98,6 +98,7 @@
 
             <Button x:Name="InfoButton" Grid.Row="1" Grid.Column="0"
                     Image="{StaticResource TimerButtonImage}"
+                    Scale="0.75"
                     BorderWidth="0"
                     WidthRequest="36"
                     HeightRequest="36"
@@ -111,6 +112,7 @@
             
             <Button x:Name="PickPlaylistButton" Grid.Row="1" Grid.Column="2" 
                     Image="{StaticResource PlaylistButtonImage}"
+                    Scale="0.75"
                     BorderWidth="0"
                     WidthRequest="36"
                     HeightRequest="36"
@@ -150,6 +152,7 @@
             <helper:Checkbox Grid.Column="0"
                     Image="{StaticResource RepeatButtonImage}"
                     Command="{Binding SetRpeatCommand}"
+                             Scale="0.75"
                     BorderWidth="2"
                     WidthRequest="36"
                     HeightRequest="36"
@@ -163,6 +166,7 @@
             <helper:Checkbox Grid.Column="2"
                     Image="{StaticResource ShuffleButtonImage}"
                     Command="{Binding SetRandomCommand}"
+                             Scale="0.75"
                     BorderWidth="2"
                     WidthRequest="36"
                     HeightRequest="36"
@@ -218,6 +222,7 @@
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0"
                     Image="{StaticResource MuteButtonImage}"
+                    Scale="0.75"
                     Command="{Binding VolumeMuteCommand}"
                     BorderWidth="0"
                     WidthRequest="36"

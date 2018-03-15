@@ -16,7 +16,7 @@
 ///  Better error messages for users.
 ///  
 /// -- Goal --
-/// AppX and Microsoft Store. 
+/// Apple Store. 
 ///
 /// Known issues:
 
@@ -56,7 +56,7 @@ namespace MPDCtrl
     {
         #region PRIVATE FIELD declaration
 
-        const string CurrentPlayQueue = "Current Play Queue";
+        const string CurrentPlayQueue = "";//"Current Play Queue";
 
         private MPC _MPC;
         private string _defaultHost;
@@ -491,6 +491,8 @@ namespace MPDCtrl
             // Assign idle event.
             this._MPC.StatusChanged += new MPC.MpdStatusChanged(OnStatusChanged);
             this._MPC.ErrorReturned += new MPC.MpdError(OnError);
+            this._MPC.Connected += new MPC.MpdConnected(OnConnected);
+            this._MPC.StatusUpdate += new MPC.MpdStatusUpdate(OnStatusUpdate);
 
             await Task.Delay(100);
 
@@ -498,36 +500,65 @@ namespace MPDCtrl
             //ErrorMessage = MPDCtrl.Properties.Resources.Connecting; //"Connecting...";
             ErrorMessage = "Connecting...";
 
-            IsWorking = true;
-            if (await _MPC.MpdCmdConnect())
-            {
-                //TODO: i18n
-                ErrorMessage = "Updating...";
-
-                // Connect to MPD server and query status and info.
-                if (await QueryStatus())
-                {
-                    // Connect and start "idle" connection.
-                    if (_MPC.MpdIdleConnect())
-                    {
-                        ErrorMessage = CurrentPlayQueue;
-                        IsWorking = false;
-                        return true;
-                    }
-                }
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("MpdCmdConnect@StartConnection() failed.");
-            }
-
-            IsWorking = false;
-
-            return false;
+            return await _MPC.MpdConnect();
         }
 
-        private async void OnStatusChanged(MPC sender, object data)
+        private void OnConnected(MPC sender)
         {
+            System.Diagnostics.Debug.WriteLine("OnConnected.");
+
+            ErrorMessage = "Loading...";
+
+            IsWorking = true;
+            //sender.MpdQueryStatus2();
+            //sender.MpdQueryCurrentPlaylist2();
+            //sender.MpdQueryPlaylists2();
+
+            /*
+            if (await QueryStatus())
+            {
+                ErrorMessage = CurrentPlayQueue;
+                IsWorking = false;
+            }
+            */
+        }
+
+        private void OnStatusChanged(MPC sender, object data)
+        {
+            //await Task.Delay(10);
+
+            List<string> SubSystems = (data as string).Split('\n').ToList();
+
+            foreach (string line in SubSystems)
+            {
+                if (line == "changed: playlist")
+                {
+                    ErrorMessage = "Loading...";
+                }
+                else if (line == "changed: player")
+                {
+                    //ErrorMessage = "Updating...";
+                }
+                else if (line == "changed: options")
+                {
+                    //ErrorMessage = "Updating...";
+                }
+                else if (line == "changed: mixer")
+                {
+                    //ErrorMessage = "Updating...";
+                }
+                else if (line == "changed: stored_playlist")
+                {
+                    //ErrorMessage = "Updating...";
+                }
+                else
+                {
+
+                }
+
+            }
+
+            /*
             if (data == null) { return; }
 
             // The list of SubSystems we are subscribing.
@@ -567,6 +598,7 @@ namespace MPDCtrl
                 }
             }
 
+
             int c = 0;
             while (_isBusy)
             {
@@ -581,6 +613,7 @@ namespace MPDCtrl
 
             IsBusy = true;
             IsWorking = true;
+
 
             if ((isPlayer && isPlaylist))
             {
@@ -776,7 +809,7 @@ namespace MPDCtrl
                         // "status" command result alone does not set "MpdCurrentSong"
                         try
                         {
-                            
+
                             Device.BeginInvokeOnMainThread(() =>
                             {
                                 var item = _MPC.CurrentQueue.FirstOrDefault(i => i.ID == _MPC.MpdStatus.MpdSongID);
@@ -793,7 +826,7 @@ namespace MPDCtrl
                             });
                             // Update UI
                             this.NotifyPropertyChanged("SelectedSong");
-                            
+
                         }
                         catch (Exception ex)
                         {
@@ -870,95 +903,72 @@ namespace MPDCtrl
                     IsWorking = false;
                 }
             }
-
+            */
         }
 
-        private async Task<bool> QueryStatus()
+        private async void OnStatusUpdate(MPC sender, object data)
         {
-            IsWorking = true;
-            bool isDone = await _MPC.MpdQueryStatus();
+            //System.Diagnostics.Debug.WriteLine("OnStatusUpdate " + data);
             IsWorking = false;
-            if (isDone)
+            await Task.Delay(10);
+
+            if ((data as string) == "isPlayer")
             {
-                System.Diagnostics.Debug.WriteLine("QueryStatus is done.");
+                try
+                {
 
-                UpdateButtonStatus();
-
-                ErrorMessage = "Loading...";
-
-                // Retrieve play queue.
-                return await QueryCurrentPlayQueue();
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("QueryStatus returned with false." + "\n");
-                return false;
-            }
-        }
-
-        private async Task<bool> QueryCurrentPlayQueue()
-        {
-            IsWorking = true;
-            bool isDone = await _MPC.MpdQueryCurrentPlaylist();
-            IsWorking = false;
-            if (isDone)
-            {
-                System.Diagnostics.Debug.WriteLine("QueryCurrentPlaylist is done.");
-
-                // Not good.
-                //if (_MPC.CurrentQueue.Count > 0)
-                //{
-
-                    if (_MPC.MpdCurrentSong != null)
+                    Device.BeginInvokeOnMainThread(() =>
                     {
-                        this._selectedSong = _MPC.MpdCurrentSong;
-                        this.NotifyPropertyChanged("SelectedSong");
-                        System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue SelectedSong is : " + this._selectedSong.Title);
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue MpdCurrentSong is null");
-                    }
+                        var item = _MPC.CurrentQueue.FirstOrDefault(i => i.ID == _MPC.MpdStatus.MpdSongID);
+                        if (item != null)
+                        {
+                            sender.MpdCurrentSong = (item as MPC.Song); // just in case.
+                            this._selectedSong = (item as MPC.Song);
+                            System.Diagnostics.Debug.WriteLine("OnStatusUpdateisPlayer SelectedSong is : " + this._selectedSong.Title);
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine("OnStatusUpdate isPlayer SelectedSong is NULL");
+                        }
+                    });
+                    // Update UI
+                    this.NotifyPropertyChanged("SelectedSong");
 
-                //}
-                //else
-                //{
-                //    System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue NOT CurrentQueue.Count > 0");
-                //}
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("_MPC.CurrentQueue.FirstOrDefault@(isPlayer) failed: " + ex.Message);
+                }
 
-                ErrorMessage = "Retrieving...";
-
-                // Retrieve playlists
-                return await QueryPlaylists();
+                Device.BeginInvokeOnMainThread(() => UpdateButtonStatus());
             }
-            else
+            else if ((data as string) == "isPlaylist")
             {
-                //IsBusy = false;
-                System.Diagnostics.Debug.WriteLine("QueryCurrentPlayQueue returned false." + "\n");
-                return false;
+
+                ErrorMessage = CurrentPlayQueue;
+
+                if (sender.MpdCurrentSong != null)
+                {
+                    this._selectedSong = sender.MpdCurrentSong;
+                    this.NotifyPropertyChanged("SelectedSong");
+                    System.Diagnostics.Debug.WriteLine("OnStatusUpdate isPlaylist SelectedSong is : " + this._selectedSong.Title);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("OnStatusUpdate isPlaylist MpdCurrentSong is : null");
+                }
+                // Update UI
+                this.NotifyPropertyChanged("SelectedSong");
+                Device.BeginInvokeOnMainThread(() => UpdateButtonStatus());
+
+                
             }
-
-        }
-
-        private async Task<bool> QueryPlaylists()
-        {
-            IsWorking = true;
-            bool isDone = await _MPC.MpdQueryPlaylists();
-            IsWorking = false;
-            if (isDone)
+            else if ((data as string) == "isStoredPlaylist")
             {
-                System.Diagnostics.Debug.WriteLine("QueryPlaylists is done.");
-
-                //IsBusy = false;
-
-                return true;
+                //
             }
-            else
-            {
-                //IsBusy = false;
-                System.Diagnostics.Debug.WriteLine("QueryPlaylists returned false." + "\n");
-                return false;
-            }
+
+
         }
 
         private void OnError(MPC sender, object data)
@@ -1063,39 +1073,30 @@ namespace MPDCtrl
             return true;
         }
 
-        public async void PlayCommand_ExecuteAsync()
+        public void PlayCommand_ExecuteAsync()
         {
-            bool isDone = false;
-            IsWorking = true;
-
             switch (_MPC.MpdStatus.MpdState)
             {
                 case MPC.Status.MpdPlayState.Play:
                     {
                         //State>>Play: So, send Pause command
-                        isDone = await _MPC.MpdPlaybackPause();
+                        _MPC.MpdPlaybackPause();
                         break;
                     }
                 case MPC.Status.MpdPlayState.Pause:
                     {
                         //State>>Pause: So, send Resume command
-                        isDone = await _MPC.MpdPlaybackResume();
+                        _MPC.MpdPlaybackResume();
                         break;
                     }
                 case MPC.Status.MpdPlayState.Stop:
                     {
                         //State>>Stop: So, send Play command
-                        isDone = await _MPC.MpdPlaybackPlay();
+                         _MPC.MpdPlaybackPlay();
                         break;
                     }
             }
 
-            IsWorking = false;
-
-            if (!isDone)
-            {
-                System.Diagnostics.Debug.WriteLine("PlayCommand returned false." + "\n");
-            }
         }
 
         public ICommand PlayNextCommand { get { return this._playNextCommand; } }
@@ -1108,16 +1109,9 @@ namespace MPDCtrl
             return true;
         }
 
-        public async void PlayNextCommand_ExecuteAsync()
+        public void PlayNextCommand_ExecuteAsync()
         {
-            IsWorking = true;
-            bool isDone = await _MPC.MpdPlaybackNext();
-            IsWorking = false;
-
-            if (!isDone)
-            {
-                System.Diagnostics.Debug.WriteLine("PlayNextCommand returned false." + "\n");
-            }
+            _MPC.MpdPlaybackNext();
         }
 
         public ICommand PlayPrevCommand { get { return this._playPrevCommand; } }
@@ -1130,16 +1124,9 @@ namespace MPDCtrl
             return true;
         }
 
-        public async void PlayPrevCommand_ExecuteAsync()
+        public void PlayPrevCommand_ExecuteAsync()
         {
-            IsWorking = true;
-            bool isDone = await _MPC.MpdPlaybackPrev();
-            IsWorking = false;
-
-            if (!isDone)
-            {
-                System.Diagnostics.Debug.WriteLine("PlayPrevCommand returned false. " + "\n");
-            }
+            _MPC.MpdPlaybackPrev();
         }
 
         public ICommand SetRpeatCommand { get { return this._setRepeatCommand; } }
@@ -1150,16 +1137,9 @@ namespace MPDCtrl
             return true;
         }
 
-        public async void SetRpeatCommand_ExecuteAsync()
+        public void SetRpeatCommand_ExecuteAsync()
         {
-            IsWorking = true;
-            bool isDone = await _MPC.MpdSetRepeat(this._repeat);
-            IsWorking = false;
-
-            if (!isDone)
-            {
-                System.Diagnostics.Debug.WriteLine("\n\nMpdSetRepeat returned false");
-            }
+            _MPC.MpdSetRepeat(this._repeat);
         }
 
         public ICommand SetRandomCommand { get { return this._setRandomCommand; } }
@@ -1170,16 +1150,9 @@ namespace MPDCtrl
             return true;
         }
 
-        public async void SetRandomCommand_ExecuteAsync()
+        public void SetRandomCommand_ExecuteAsync()
         {
-            IsWorking = true;
-            bool isDone = await _MPC.MpdSetRandom(this._random);
-            IsWorking = false;
-
-            if (!isDone)
-            {
-                System.Diagnostics.Debug.WriteLine("\n\nMpdSetRandom returned false");
-            }
+            _MPC.MpdSetRandom(this._random);
         }
 
         public ICommand SetVolumeCommand { get { return this._setVolumeCommand; } }
@@ -1190,16 +1163,9 @@ namespace MPDCtrl
             return true;
         }
 
-        public async void SetVolumeCommand_ExecuteAsync()
+        public void SetVolumeCommand_ExecuteAsync()
         {
-            IsWorking = true;
-            bool isDone = await _MPC.MpdSetVolume(Convert.ToInt32(this._volume));
-            IsWorking = false;
-
-            if (!isDone)
-            {
-                System.Diagnostics.Debug.WriteLine("\n\nMpdSetVolume returned false");
-            }
+            _MPC.MpdSetVolume(Convert.ToInt32(this._volume));
         }
 
         public ICommand SetSeekCommand { get { return this._setSeekCommand; } }
@@ -1211,17 +1177,9 @@ namespace MPDCtrl
             return true;
         }
 
-        public async void SetSeekCommand_ExecuteAsync()
+        public void SetSeekCommand_ExecuteAsync()
         {
-            IsWorking = true;
-            bool isDone = await _MPC.MpdPlaybackSeek(_MPC.MpdStatus.MpdSongID, Convert.ToInt32(this._elapsed));
-            IsWorking = false;
-
-            if (!isDone)
-            {
-                System.Diagnostics.Debug.WriteLine("\n\nMpdPlaybackSeek returned false");
-            }
-
+            _MPC.MpdPlaybackSeek(_MPC.MpdStatus.MpdSongID, Convert.ToInt32(this._elapsed));
         }
 
         public ICommand ChangeSongCommand { get { return this._changeSongCommand; } }
@@ -1235,16 +1193,9 @@ namespace MPDCtrl
             return true;
         }
 
-        public async void ChangeSongCommand_ExecuteAsync()
+        public void ChangeSongCommand_ExecuteAsync()
         {
-            IsWorking = true;
-            bool isDone = await _MPC.MpdPlaybackPlay(_selectedSong.ID);
-            IsWorking = false;
-
-            if (!isDone)
-            {
-                System.Diagnostics.Debug.WriteLine("\n\nMpdPlaybackPlay returned false");
-            }
+            _MPC.MpdPlaybackPlay(_selectedSong.ID);
         }
 
         public ICommand ChangePlaylistCommand { get { return this._changePlaylistCommand; } }
@@ -1257,35 +1208,11 @@ namespace MPDCtrl
             return true;
         }
 
-        public async void ChangePlaylistCommand_ExecuteAsync()
+        public void ChangePlaylistCommand_ExecuteAsync()
         {
-            // Little dirty, but since our ObservableCollection isn't thread safe...
-            if (_isBusy)
-            {
-                await Task.Delay(1000);
-                if (_isBusy)
-                {
-                    await Task.Delay(1000);
-                    if (_isBusy)
-                    {
-                        //ErrorMessage = "Change playlist time out.";
-                        System.Diagnostics.Debug.WriteLine("ChangePlaylistCommand_ExecuteAsync: TIME OUT");
-                        return;
-                    }
-                }
-            }
-
             if (String.IsNullOrEmpty(this._selecctedPlaylist)) { return; }
 
-            IsWorking = true;
-            // No longer load lists. Just tell it to change.
-            bool isDone = await _MPC.MpdChangePlaylist(this._selecctedPlaylist);
-            IsWorking = false;
-
-            if (!isDone)
-            {
-                System.Diagnostics.Debug.WriteLine("\n\nMpdChangePlaylist returned false");
-            }
+            _MPC.MpdChangePlaylist(this._selecctedPlaylist);
         }
 
         public ICommand WindowClosingCommand { get { return this._windowClosingCommand; } }
@@ -1302,9 +1229,9 @@ namespace MPDCtrl
             // Disconnect connections.
             if (_MPC != null)
             {
-                _MPC.MpdIdleDisConnect();
+                _MPC.MpdDisConnect();
+
                 _MPC.MpdStop = true;
-                _MPC.MpdCmdDisConnect();
             }
         }
 
@@ -1316,8 +1243,10 @@ namespace MPDCtrl
             return true;
         }
 
-        public async void PlayPauseCommand_Execute()
+        public void PlayPauseCommand_Execute()
         {
+            _MPC.MpdPlaybackPause();
+            /*
             IsWorking = true;
             bool isDone = await _MPC.MpdPlaybackPause();
             IsWorking = false;
@@ -1325,6 +1254,7 @@ namespace MPDCtrl
             {
                 System.Diagnostics.Debug.WriteLine("PlayPauseCommand returned false.");
             }
+            */
         }
 
         public ICommand PlayStopCommand { get { return this._playStopCommand; } }
@@ -1335,8 +1265,10 @@ namespace MPDCtrl
             return true;
         }
 
-        public async void PlayStopCommand_Execute()
+        public void PlayStopCommand_Execute()
         {
+            _MPC.MpdPlaybackStop();
+            /*
             IsWorking = true;
             bool isDone = await _MPC.MpdPlaybackStop();
             IsWorking = false;
@@ -1344,6 +1276,7 @@ namespace MPDCtrl
             {
                 System.Diagnostics.Debug.WriteLine("PlayStopCommand returned false.");
             }
+            */
         }
 
         public ICommand VolumeMuteCommand { get { return this._volumeMuteCommand; } }
@@ -1354,8 +1287,10 @@ namespace MPDCtrl
             return true;
         }
 
-        public async void VolumeMuteCommand_Execute()
+        public void VolumeMuteCommand_Execute()
         {
+            _MPC.MpdSetVolume(0);
+            /*
             IsWorking = true;
             bool isDone = await _MPC.MpdSetVolume(0);
             IsWorking = false;
@@ -1363,6 +1298,7 @@ namespace MPDCtrl
             {
                 System.Diagnostics.Debug.WriteLine("\nVolumeMuteCommand returned false.");
             }
+            */
         }
 
         public ICommand VolumeDownCommand { get { return this._volumeDownCommand; } }
@@ -1373,8 +1309,10 @@ namespace MPDCtrl
             return true;
         }
 
-        public async void VolumeDownCommand_Execute()
+        public void VolumeDownCommand_Execute()
         {
+            _MPC.MpdSetVolume(Convert.ToInt32(this._volume - 10));
+            /*
             if (this._volume >= 10)
             {
                 IsWorking = true;
@@ -1385,6 +1323,7 @@ namespace MPDCtrl
                     System.Diagnostics.Debug.WriteLine("\nVolumeDownCommand returned false.");
                 }
             }
+            */
         }
 
         public ICommand VolumeUpCommand { get { return this._volumeUpCommand; } }
@@ -1395,10 +1334,12 @@ namespace MPDCtrl
             return true;
         }
 
-        public async void VolumeUpCommand_Execute()
+        public void VolumeUpCommand_Execute()
         {
             if (this._volume <= 90)
             {
+                _MPC.MpdSetVolume(Convert.ToInt32(this._volume + 10));
+                /*
                 IsWorking = true;
                 bool isDone = await _MPC.MpdSetVolume(Convert.ToInt32(this._volume + 10));
                 IsWorking = false;
@@ -1406,6 +1347,7 @@ namespace MPDCtrl
                 {
                     System.Diagnostics.Debug.WriteLine("\nVolumeUpCommand returned false.");
                 }
+                */
             }
         }
 
@@ -1482,8 +1424,10 @@ namespace MPDCtrl
 
             if (_MPC != null)
             {
-                await this._MPC.MpdIdleStop();
-                this._MPC.MpdIdleDisConnect();
+                //await this._MPC.MpdIdleStop();
+                //this._MPC.MpdIdleDisConnect();
+
+                _MPC.MpdDisConnect();
 
                 _MPC.CurrentQueue.Clear();
                 _MPC.Playlists.Clear();
@@ -1580,18 +1524,11 @@ namespace MPDCtrl
             */
         }
 
-
         #endregion END of COMMANDS
 
         #region == INotifyPropertyChanged ==
         public event PropertyChangedEventHandler PropertyChanged;
 
-        /*
-        protected virtual void NotifyPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        */
         protected virtual void NotifyPropertyChanged(string propertyName)
         {
             Device.BeginInvokeOnMainThread(
@@ -1601,7 +1538,6 @@ namespace MPDCtrl
                           });
         }
         
-
         #endregion
 
         #region == IDataErrorInfo ==

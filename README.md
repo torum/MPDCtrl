@@ -13,13 +13,11 @@ Windows 10 ("Fall Creators Update/.NET Framework 4.7.1" or later) and a host run
   
 - Usage:  
 Enter the host address and port, then hit "Connect".   
+
   
-- Supported languages:  
-English and 日本語.
+![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/WPF/WpfMPD/files/bin/sc3.png?raw=true)  
   
-![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/WPF/WpfMPD/files/bin/MPD-Ctrl_Screenshot1.png?raw=true)  
-  
-![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/WPF/WpfMPD/files/bin/MPD-Ctrl_Screenshot_setting.png?raw=true)  
+![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/WPF/WpfMPD/files/bin/sc2.png?raw=true)  
 
   
  

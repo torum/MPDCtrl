@@ -7,4 +7,4 @@ title: MPDCtrl
   
 * [Project page](https://github.com/torumyax/MPDCtrl)  
 
-* [Apps Privacy Policy page](https://github.com/torumyax/MPDCtrl/app-privacy-policy/)  
+* [Apps Privacy Policy page](https://torumyax.github.io/MPDCtrl/app-privacy-policy/)  

@@ -16,6 +16,8 @@ MPDCtrl is a client app for the [MPD (Music player daemon)](http://www.musicpd.o
   
 There are two flavors; **MPDCtrl for Windows desktop** (WPF) and **MPDCtrl for mobile cross-platform** (Xamarin.Forms).  
 
+---------------------------------------
+
 ### MPDCtrl for Windows desktop
 
 MPDCtrl for Windows desktop is a desktop gadget-like light-weight client app for the MPD. __Currently in the process of submitting to the Microsoft Store...__

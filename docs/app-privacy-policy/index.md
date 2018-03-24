@@ -5,7 +5,7 @@ title: MPDCtrl
 
 * [Top page](https://torumyax.github.io/MPDCtrl/)
   
-* [Project page](https://github.com/torumyax/MPDCtrl)
+* [Github Project page](https://github.com/torumyax/MPDCtrl)
   
 
 

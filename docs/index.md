@@ -18,7 +18,7 @@ There are two flavors; **MPDCtrl for Windows desktop** (WPF) and **MPDCtrl for m
 
 ### MPDCtrl for Windows desktop
 
-MPDCtrl for Windows desktop (WPF) is a desktop gadget-like light-weight client app for the MPD. __Currently in the process of submitting to the Microsoft Store...__
+MPDCtrl for Windows desktop is a desktop gadget-like light-weight client app for the MPD. __Currently in the process of submitting to the Microsoft Store...__
 
 - Requirement:  
 Windows 10 ("Fall Creators Update/.NET Framework 4.7.1" or later) and a host running MPD.  
@@ -37,7 +37,7 @@ Enter the host address and port, then hit "Connect".
    
 ### MPD Ctrl for mobile cross-platform
 
-MPDCtrl for iOS and Windows mobile (Xamarin.Forms) is currently under developement.   
+MPDCtrl for iOS and Windows mobile are currently under developement.   
   
  - Current status: Basic functionalities are implemented. They work fine, but there are lots of work to be done before submitting to the Apple store.  
 

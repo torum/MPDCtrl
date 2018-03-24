@@ -33,7 +33,7 @@ Enter the host address and port, then hit "Connect".
 ![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/WPF/WpfMPD/files/bin/sc2.png?raw=true)  
 
   
- 
+---------------------------------------  
    
 ### MPD Ctrl for mobile cross-platform
 

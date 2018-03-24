@@ -1,8 +1,8 @@
 # MPDCtrl
 
-MPD Ctrl is a client app for the [MPD (Music player daemon)](http://www.musicpd.org/). It should also work with MPD-compatible servers such as [Mopidy](https://www.mopidy.com/) or [forked-daapd](http://ejurgensen.github.io/forked-daapd/). 
+MPDCtrl is a client app for the [MPD (Music player daemon)](http://www.musicpd.org/). It should also work with MPD-compatible servers such as [Mopidy](https://www.mopidy.com/) or [forked-daapd](http://ejurgensen.github.io/forked-daapd/). 
   
-There are two flavors; **MPD Ctrl for Windows desktop** (WPF) and **MPD Ctrl for mobile cross-platform** (Xamarin.Forms).  
+There are two flavors; **MPDCtrl for Windows desktop** (WPF) and **MPDCtrl for mobile cross-platform** (Xamarin.Forms).  
 
 ### MPDCtrl for Windows desktop
 

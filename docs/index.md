@@ -26,7 +26,7 @@ Windows 10 ("Fall Creators Update/.NET Framework 4.7.1" or later) and a host run
 - Usage:  
 Enter the host address and port, then hit "Connect".   
 
- #### Screenshots  
+#### Screenshots:  
  
 ![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/WPF/WpfMPD/files/bin/sc3.png?raw=true)  
   
@@ -41,7 +41,7 @@ MPDCtrl for iOS and Windows mobile are currently under developement.
   
  - Current status: Basic functionalities are implemented. They work fine, but there are lots of work to be done before submitting to the Apple store.  
 
- #### Screenshots  
+#### Screenshots  
  
  Below are screenshots of the Windows mobile and iOS apps. 
 

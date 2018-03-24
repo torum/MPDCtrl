@@ -9,6 +9,7 @@ title: MPDCtrl
 
 * [Apps Privacy Policy page](https://torumyax.github.io/MPDCtrl/app-privacy-policy/)  
 
+---------------------------------------
 
 # MPDCtrl
 

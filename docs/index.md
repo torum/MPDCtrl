@@ -1,9 +1,10 @@
 ---
 layout: default
-title: This is a top page.
+title: MPDCtrl
 ---
 
-# This is a content.
+# Menu
+  
+* [Project page](https://github.com/torumyax/MPDCtrl)  
 
-* hoge
-* huga
+* [Apps Privacy Policy page](https://github.com/torumyax/MPDCtrl/app-privacy-policy/)  

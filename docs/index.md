@@ -1,10 +1,10 @@
 ---
 layout: default
-title: Simple Image Viewer
+title: MPDCtrl
 ---
 
-# Introduction
+# Menu
   
-*  [Project page](https://github.com/torumyax/MPDCtrl)  
+* [Project page](https://github.com/torumyax/MPDCtrl)  
 
 * [Apps Privacy Policy page](https://github.com/torumyax/MPDCtrl/app-privacy-policy/)  

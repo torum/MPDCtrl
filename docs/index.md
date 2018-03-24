@@ -1,9 +1,10 @@
 ---
 layout: default
-title: This is a top page.
+title: Simple Image Viewer
 ---
 
-# This is a content.
+# Introduction
+  
+*  [Project page](https://github.com/torumyax/MPDCtrl)  
 
-* hoge
-* huga
+* [Apps Privacy Policy page](https://github.com/torumyax/MPDCtrl/app-privacy-policy/)  

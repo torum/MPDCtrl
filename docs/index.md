@@ -26,9 +26,8 @@ There are two flavors; **MPDCtrl for Windows desktop** (WPF) and **MPDCtrl for m
 MPDCtrl for Windows desktop is a desktop gadget-like light-weight client app for the MPD.
 
 
-- Download:
-
-__[Avalable at Micorsft Store](https://www.microsoft.com/store/apps/9NV2BBJ82BRX)__
+- Download:  
+__[Avalable at Micorsoft Store](https://www.microsoft.com/store/apps/9NV2BBJ82BRX)__
 
 - Requirement:  
 Windows 10 ("Fall Creators Update/.NET Framework 4.7.1" or later) and a host running MPD.  

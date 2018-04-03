@@ -9,10 +9,10 @@ using System.Windows;
 namespace WpfMPD
 {
     /// <summary>
-    /// App.xaml の相互作用ロジック
+    /// App.xaml
     /// </summary>
     public partial class App : Application
     {
-        
+
     }
 }

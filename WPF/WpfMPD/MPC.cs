@@ -1,11 +1,10 @@
 ﻿/// 
 /// 
-/// MPD Ctrl
-/// https://github.com/torumyax/MPD-Ctrl
+/// MPDCtrl for desktop
+/// https://github.com/torumyax/MPDCtrl
 /// 
 /// TODO:
 ///  More detailed error message for users.
-///  lock object.
 ///
 /// Known issue:
 ///  Mopidy does not accept command_list_begin + password
@@ -150,7 +149,6 @@ namespace WpfMPD
         private ObservableCollection<Song> _songs = new ObservableCollection<Song>();
         private ObservableCollection<String> _playLists = new ObservableCollection<String>();
         private EventDrivenTCPClient _idleClient;
-        //object _objLock = new object();
         private CommandTCPClient _commandClient;
 
         #endregion END of MPC PRIVATE FIELD declaration
@@ -1855,7 +1853,7 @@ namespace WpfMPD
                 lock (SyncLock)
                 {
                     //Tesing.
-                    //tmrReceiveTimeout.Start();
+                    tmrReceiveTimeout.Start();
                     return;
                 }
             }
@@ -1863,7 +1861,7 @@ namespace WpfMPD
             {
                 lock (SyncLock)
                 {
-                    //tmrReceiveTimeout.Stop();
+                    tmrReceiveTimeout.Stop();
                 }
             }
             if (DataReceived != null)

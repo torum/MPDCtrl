@@ -1,18 +1,13 @@
 ﻿/// 
 /// 
-/// MPD Ctrl for WPF
-/// https://github.com/torumyax/MPD-Ctrl
+/// MPDCtrl for desktop
+/// https://github.com/torumyax/MPDCtrl
 /// 
 /// TODO:
 /// -- Priority 1 --
-///  
-///  "isWorking" busy indicater
-///  Stop changing mouse curser
-///  Microsoft Store. 
-///  
+///
 /// -- Priority 2 --
 ///  Better error messages for users.
-///  TrayIcon.
 ///  
 ///  Full "Master-Detail" View! Full fledged client?
 ///
@@ -36,19 +31,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
-using System.Windows.Data;
-using System.Windows.Input;
-using System.Windows.Threading;
-using System.Configuration;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace WpfMPD
 {
@@ -618,7 +610,6 @@ namespace WpfMPD
             this._volumeDownCommand = new WpfMPD.Common.RelayCommand(this.VolumeDownCommand_Execute, this.VolumeDownCommand_CanExecute);
             this._volumeUpCommand = new WpfMPD.Common.RelayCommand(this.VolumeUpCommand_Execute, this.VolumeUpCommand_CanExecute);
             this._showSettingsCommand = new WpfMPD.Common.RelayCommand(this.ShowSettingsCommand_Execute, this.ShowSettingsCommand_CanExecute);
-            //this._newConnectinSettingCommand = new WpfMPD.Common.RelayCommand(, this.NewConnectinSettingCommand_CanExecute);
             this._newConnectinSettingCommand = new WpfMPD.Common.GenericRelayCommand<object>(param => this.NewConnectinSettingCommand_Execute(param), param => this.NewConnectinSettingCommand_CanExecute());
             this._addConnectinSettingCommand = new WpfMPD.Common.RelayCommand(this.AddConnectinSettingCommand_Execute, this.AddConnectinSettingCommand_CanExecute);
             this._deleteConnectinSettingCommand = new WpfMPD.Common.RelayCommand(this.DeleteConnectinSettingCommand_Execute, this.DeleteConnectinSettingCommand_CanExecute);
@@ -842,7 +833,7 @@ namespace WpfMPD
                         }
 
                         Application.Current.Dispatcher.Invoke(() => UpdateButtonStatus());
-                        Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
+                        //Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
                     }
                     else
                     {
@@ -910,9 +901,8 @@ namespace WpfMPD
                         IsWorking = false;
                     }
 
-                    //IsBusy = false;
                     Application.Current.Dispatcher.Invoke(() => UpdateButtonStatus());
-                    Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
+                    //Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
 
                 }
                 else
@@ -1018,9 +1008,10 @@ namespace WpfMPD
                         IsWorking = false;
                     }
 
+                    await Task.Delay(100);
                     // Testing
                     Application.Current.Dispatcher.Invoke(() => UpdateButtonStatus());
-                    Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
+                    //Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
                 }
                 else
                 {
@@ -1200,6 +1191,9 @@ namespace WpfMPD
 
                 this._elapsed = _MPC.MpdStatus.MpdSongElapsed;
                 this.NotifyPropertyChanged("Elapsed");
+
+                //
+                Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
 
                 //start elapsed timer.
                 if (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
@@ -1845,7 +1839,6 @@ namespace WpfMPD
             return true;
         }
 
-        //public async void NewConnectinSettingCommand_Execute()
         public async void NewConnectinSettingCommand_Execute(object param)
         {
             // New connection from Setting.

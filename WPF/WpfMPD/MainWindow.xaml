@@ -9,18 +9,19 @@
         common:EnableDragHelper.EnableDrag="False"
         common:MaximizeDoubleClickHelper.MaximizeDoubleClick="True"
         Background="Transparent"
+        BorderThickness="0"
                   
         xmlns:fw="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
         fw:AcrylicWindow.Enabled="True"
         fw:AcrylicWindow.ShowTitleBar="False"
         fw:AcrylicWindow.ExtendViewIntoTitleBar="True"
-        BorderThickness="0"
+        
         fw:AcrylicWindow.TintOpacity="0.2"
                   fw:AcrylicWindow.TintColor="WhiteSmoke"
                   fw:AcrylicWindow.FallbackColor="Transparent"
                   
         WindowStartupLocation="CenterScreen"
-        Title="MPD Ctrl" 
+        Title="MPDCtrl" 
         Height="520" Width="300"
                   MinHeight="520" MinWidth="300"
         xmlns:properties="clr-namespace:MPDCtrl.Properties"
@@ -857,7 +858,7 @@
 
                     <StackPanel>
                         <Label Content="" TextElement.Foreground="White"/>
-                        <Label Content="MPD Ctrl for Desktop 1.1.2" TextElement.Foreground="White"/>
+                        <Label Content="MPDCtrl for Desktop 1.1.4" TextElement.Foreground="White"/>
                         <Label Content="{x:Static properties:Resources.Developer}" TextElement.Foreground="White"/>
                         <Label Content="{x:Static properties:Resources.Website}" TextElement.Foreground="White"/>
                         <TextBox Text="{x:Static properties:Resources.WebsiteURL}" Margin="4" Background="Transparent" TextElement.Foreground="White" BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Center">

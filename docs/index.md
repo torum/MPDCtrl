@@ -5,9 +5,9 @@ title: MPDCtrl
 
 ## Menu
   
-* [Github Project page](https://github.com/torumyax/MPDCtrl)  
+* [Github Project page](https://github.com/torum/MPDCtrl)  
 
-* [Apps Privacy Policy page](https://torumyax.github.io/MPDCtrl/app-privacy-policy/)  
+* [Apps Privacy Policy page](https://torum.github.io/MPDCtrl/app-privacy-policy/)  
 
 ---------------------------------------
 ### Introduction  
@@ -37,9 +37,9 @@ Enter the host address and port, then hit "Connect".
 
 #### Screenshots:  
  
-![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/WPF/WpfMPD/files/bin/sc3.png?raw=true)  
+![alt text](https://github.com/torum/MPD-Ctrl/blob/master/WPF/WpfMPD/files/bin/sc3.png?raw=true)  
   
-![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/WPF/WpfMPD/files/bin/sc2.png?raw=true)  
+![alt text](https://github.com/torum/MPD-Ctrl/blob/master/WPF/WpfMPD/files/bin/sc2.png?raw=true)  
 
   
 ---------------------------------------  
@@ -54,9 +54,9 @@ MPDCtrl for iOS and Windows mobile are currently under developement.
  
  Below are screenshots of the Windows mobile and iOS apps. 
 
-![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/Xamarin.Forms/MPDCtrl/files/screenshots/uwp-pre-screnshot.png?raw=true)  
+![alt text](https://github.com/torum/MPD-Ctrl/blob/master/Xamarin.Forms/MPDCtrl/files/screenshots/uwp-pre-screnshot.png?raw=true)  
   
-![alt text](https://github.com/torumyax/MPD-Ctrl/blob/master/Xamarin.Forms/MPDCtrl/files/screenshots/iOS-pre-screnshot.png?raw=true)  
+![alt text](https://github.com/torum/MPD-Ctrl/blob/master/Xamarin.Forms/MPDCtrl/files/screenshots/iOS-pre-screnshot.png?raw=true)  
 
   
   

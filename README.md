@@ -15,7 +15,7 @@ Stable.
 __[Avalable at Micorsoft Store](https://www.microsoft.com/store/apps/9NV2BBJ82BRX)__
   
 - More:  
-[Project Page](https://torumyax.github.io/MPDCtrl/)
+[Project Page](https://torum.github.io/MPDCtrl/)
 
    
 ### MPDCtrl for mobile cross-platform
@@ -26,5 +26,5 @@ MPDCtrl for iOS and Windows mobile (Xamarin.Forms) is currently under developeme
 Basic functionalities are implemented, but there are lots of work to be done before releasing or submitting to the Apple store.  
 
 - More:  
-[Project Page](https://torumyax.github.io/MPDCtrl/)
+[Project Page](https://torum.github.io/MPDCtrl/)
 

@@ -8,6 +8,9 @@ There are two flavors; **MPDCtrl for Windows desktop** (WPF) and **MPDCtrl for m
 
 MPDCtrl for Windows desktop is a desktop gadget-like light-weight client app for the MPD.   
 
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/WPF/WpfMPD/files/bin/MPD-Ctrl_Screenshot1.png?raw=true)  
+  
+
 - Status:  
 Stable.
 

@@ -3,9 +3,9 @@ layout: default
 title: MPDCtrl
 ---
 
-* [Top page](https://torumyax.github.io/MPDCtrl/)
+* [Top page](https://torum.github.io/MPDCtrl/)
   
-* [Github Project page](https://github.com/torumyax/MPDCtrl)
+* [Github Project page](https://github.com/torum/MPDCtrl)
   
 
 

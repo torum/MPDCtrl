@@ -44,7 +44,7 @@ Enter the host address and port, then hit "Connect".
   
 ---------------------------------------  
    
-### MPD Ctrl for mobile cross-platform
+### MPDCtrl for mobile cross-platform
 
 MPDCtrl for iOS and Windows mobile are currently under developement.   
   

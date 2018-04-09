@@ -863,7 +863,7 @@
                         <Label Content="{x:Static properties:Resources.Website}" TextElement.Foreground="White"/>
                         <TextBox Text="{x:Static properties:Resources.WebsiteURL}" Margin="4" Background="Transparent" TextElement.Foreground="White" BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Center">
                             <!--
-                            <Hyperlink NavigateUri="https://github.com/torumyax/MPD-Ctrl" Click="Hyperlink_Click">https://github.com/torumyax/MPD-Ctrl</Hyperlink>
+                            <Hyperlink NavigateUri="https://github.com/torum/MPD-Ctrl" Click="Hyperlink_Click">https://github.com/torum/MPD-Ctrl</Hyperlink>
                             -->
                         </TextBox>
                         <TextBox Margin="4 36 4 4" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" Height="200" Text="{x:Static properties:Resources.License}"/>

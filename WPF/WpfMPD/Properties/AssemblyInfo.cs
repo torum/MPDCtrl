@@ -11,7 +11,7 @@ using System.Windows;
 [assembly: AssemblyDescription("MPD Client Application for Windows Desktop")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Witha")]
-[assembly: AssemblyProduct("MPD Ctrl")]
+[assembly: AssemblyProduct("MPDCtrl")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -28,7 +28,7 @@ using System.Windows;
 //下の NeutralResourceLanguage 属性のコメントを解除します。下の行の "en-US" を
 //プロジェクト ファイルの UICulture 設定と一致するよう更新します。
 
-//[assembly: NeutralResourcesLanguage("en-US", UltimateResourceFallbackLocation.Satellite)]
+[assembly: NeutralResourcesLanguage("en-US", UltimateResourceFallbackLocation.Satellite)]
 
 
 [assembly: ThemeInfo(
@@ -51,5 +51,7 @@ using System.Windows;
 // すべての値を指定するか、次を使用してビルド番号とリビジョン番号を既定に設定できます
 // 既定値にすることができます:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.1.0.0")]
-[assembly: AssemblyFileVersion("0.1.0.0")]
+[assembly: AssemblyVersion("1.1.4.0")]
+[assembly: AssemblyFileVersion("1.1.4.0")]
+//[assembly: NeutralResourcesLanguage("en-US")]
+

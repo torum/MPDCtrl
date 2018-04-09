@@ -1,7 +1,7 @@
 ﻿/// 
 /// 
 /// MPDCtrl for desktop
-/// https://github.com/torumyax/MPDCtrl
+/// https://github.com/torum/MPDCtrl
 /// 
 /// TODO:
 /// -- Priority 1 --
@@ -614,11 +614,11 @@ namespace WpfMPD
             this._addConnectinSettingCommand = new WpfMPD.Common.RelayCommand(this.AddConnectinSettingCommand_Execute, this.AddConnectinSettingCommand_CanExecute);
             this._deleteConnectinSettingCommand = new WpfMPD.Common.RelayCommand(this.DeleteConnectinSettingCommand_Execute, this.DeleteConnectinSettingCommand_CanExecute);
 
-            
+
             // Load settings.
 
-            // Upgrade settings. (just in case.)
-            MPDCtrl.Properties.Settings.Default.Upgrade();
+            // Upgrade settings. 
+            //MPDCtrl.Properties.Settings.Default.Upgrade();
 
             // Must be the first time.
             if (MPDCtrl.Properties.Settings.Default.Profiles == null)

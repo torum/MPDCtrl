@@ -1,7 +1,7 @@
 ﻿/// 
 /// 
 /// MPDCtrl for desktop
-/// https://github.com/torumyax/MPDCtrl
+/// https://github.com/torum/MPDCtrl
 /// 
 /// TODO:
 ///  More detailed error message for users.
@@ -17,7 +17,7 @@
 ///  Mopidy issues unnecessary multiple idle subsystem events 
 ///   https://github.com/mopidy/mopidy/issues/1662
 ///  Mopidy has some issue with M3U and UTF-8, Ext M3Us.
-///    https://github.com/mopidy/mopidy/issues/1370
+///   https://github.com/mopidy/mopidy/issues/1370
 ///    
 
 

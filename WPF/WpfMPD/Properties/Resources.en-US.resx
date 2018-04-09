@@ -142,7 +142,7 @@
     <value>Delete</value>
   </data>
   <data name="Developer" xml:space="preserve">
-    <value>Developer: torumyax</value>
+    <value>Developer: torum</value>
   </data>
   <data name="Host" xml:space="preserve">
     <value>Host</value>
@@ -192,6 +192,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OU
     <value>Website:</value>
   </data>
   <data name="WebsiteURL" xml:space="preserve">
-    <value>https://torumyax.github.io/MPDCtrl/</value>
+    <value>https://torum.github.io/MPDCtrl/</value>
   </data>
 </root>

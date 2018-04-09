@@ -142,7 +142,7 @@
     <value>削除</value>
   </data>
   <data name="Developer" xml:space="preserve">
-    <value>開発者：torumyax</value>
+    <value>開発者：torum</value>
   </data>
   <data name="Host" xml:space="preserve">
     <value>ホスト</value>
@@ -188,6 +188,6 @@ Copyright (c) 2018 torumyax
     <value>ウェブサイト：</value>
   </data>
   <data name="WebsiteURL" xml:space="preserve">
-    <value>https://github.com/torumyax/MPD-Ctrl</value>
+    <value>https://torum.github.io/MPDCtrl/</value>
   </data>
 </root>

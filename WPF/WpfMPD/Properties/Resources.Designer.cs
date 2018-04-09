@@ -133,7 +133,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Developer: torumyax に類似しているローカライズされた文字列を検索します。
+        ///   Developer: torum に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Developer {
             get {
@@ -257,7 +257,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   https://github.com/torumyax/MPD-Ctrl に類似しているローカライズされた文字列を検索します。
+        ///   https://torum.github.io/MPDCtrl/ に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string WebsiteURL {
             get {

@@ -858,15 +858,30 @@
 
                     <StackPanel>
                         <Label Content="" TextElement.Foreground="White"/>
-                        <Label Content="MPDCtrl for Desktop 1.1.4" TextElement.Foreground="White"/>
+                        <Label Content="MPDCtrl for Desktop 1.1.6" TextElement.Foreground="White"/>
                         <Label Content="{x:Static properties:Resources.Developer}" TextElement.Foreground="White"/>
                         <Label Content="{x:Static properties:Resources.Website}" TextElement.Foreground="White"/>
+                        <!--
                         <TextBox Text="{x:Static properties:Resources.WebsiteURL}" Margin="4" Background="Transparent" TextElement.Foreground="White" BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Center">
-                            <!--
-                            <Hyperlink NavigateUri="https://github.com/torum/MPD-Ctrl" Click="Hyperlink_Click">https://github.com/torum/MPD-Ctrl</Hyperlink>
-                            -->
+                           
                         </TextBox>
-                        <TextBox Margin="4 36 4 4" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" Height="200" Text="{x:Static properties:Resources.License}"/>
+                         -->
+                        <TextBlock HorizontalAlignment="Right" Margin="4 0 4 4">
+                            <Hyperlink NavigateUri="https://torum.github.io/MPDCtrl/" Click="Hyperlink_Click">https://torum.github.io/MPDCtrl/</Hyperlink>
+                        </TextBlock>
+
+                        <Label Content="Twitter :" TextElement.Foreground="White"/>
+                        <TextBlock HorizontalAlignment="Right" Margin="4 0 4 4">
+                            <Hyperlink NavigateUri="https://twitter.com/torum_apps" RequestNavigate="Hyperlink_RequestNavigate">https://twitter.com/torum_apps</Hyperlink>
+                        </TextBlock>
+
+                        <Border Height="3" Margin="3"></Border>
+
+                        <Label Content="{x:Static properties:Resources.DonateBitcoin}" TextElement.Foreground="White"/>
+                        <TextBox Padding="6" Margin="6" Text="1HQv6ib57So9j8AXxCXwWugVPnTcjvg9cn" IsReadOnly="True" HorizontalAlignment="Stretch"/>
+
+                        <Label Content="{x:Static properties:Resources.LicenseTitle}" TextElement.Foreground="White"/>
+                        <TextBox Margin="4 4 4 4" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible" Height="100" Text="{x:Static properties:Resources.License}"/>
                         <Button Content="{x:Static properties:Resources.OK}" 
                                 Width="100" 
                                 Margin="24"

@@ -8,11 +8,9 @@
 ///
 /// -- Priority 2 --
 ///  Better error messages for users.
-///  
-///  Full "Master-Detail" View! Full fledged client?
 ///
 /// Known issues:
-/// 
+/// MPD server has some issue with UTF8 and M3U's ext.
 /// 
 /// Mopidy related issues:
 ///  Mopidy does not accept command_list_begin + password
@@ -25,9 +23,8 @@
 ///  Mopidy issues unnecessary multiple idle subsystem events 
 ///   https://github.com/mopidy/mopidy/issues/1662
 ///  Mopidy has some issue with M3U and UTF-8, Ext M3Us.
-///    https://github.com/mopidy/mopidy/issues/1370
+///   https://github.com/mopidy/mopidy/issues/1370
 ///    
-
 
 using System;
 using System.Collections.Generic;
@@ -619,6 +616,13 @@ namespace WpfMPD
 
             // Upgrade settings. 
             //MPDCtrl.Properties.Settings.Default.Upgrade();
+            var assemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            if (MPDCtrl.Properties.Settings.Default.AssemblyVersion != assemblyVersion)
+            {
+                MPDCtrl.Properties.Settings.Default.Upgrade();
+                MPDCtrl.Properties.Settings.Default.AssemblyVersion = assemblyVersion;
+                MPDCtrl.Properties.Settings.Default.Save();
+            }
 
             // Must be the first time.
             if (MPDCtrl.Properties.Settings.Default.Profiles == null)
@@ -1971,7 +1975,6 @@ namespace WpfMPD
         }
 
         #endregion END of COMMANDS
-
 
         #region == INotifyPropertyChanged ==
 

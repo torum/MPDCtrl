@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyTitle("MPDCtrl")]
 [assembly: AssemblyDescription("MPD Client Application for Windows Desktop")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Witha")]
+[assembly: AssemblyCompany("torum")]
 [assembly: AssemblyProduct("MPDCtrl")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
@@ -51,7 +51,7 @@ using System.Windows;
 // すべての値を指定するか、次を使用してビルド番号とリビジョン番号を既定に設定できます
 // 既定値にすることができます:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.4.0")]
-[assembly: AssemblyFileVersion("1.1.4.0")]
+//[assembly: AssemblyVersion("1.1.4.0")]
+//[assembly: AssemblyFileVersion("1.1.4.0")]
 //[assembly: NeutralResourcesLanguage("en-US")]
 

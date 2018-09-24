@@ -1,5 +1,7 @@
-﻿using System.Windows;
+﻿using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 
 namespace WpfMPD
 {
@@ -91,8 +93,14 @@ namespace WpfMPD
 
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
-            //APPX packaging test complains about this. So, let's just disable this.
-            //System.Diagnostics.Process.Start("https://github.com/torum/MPDCtrl");
+            //APPX packaging test complains about this. 
+            System.Diagnostics.Process.Start("https://torum.github.io/MPDCtrl/");
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
         }
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)

@@ -18,3 +18,5 @@ WPF/WpfMPD/Icons/data/WpfMPD (2).ico
 WPF/WpfMPD/Icons/data/wpd4.svg
 WPF/WpfMPD/Icons/data/wpd3.svg
 WPF/WpfMPD/Icons/data/wpd2.svg
+*.baml
+*.cache

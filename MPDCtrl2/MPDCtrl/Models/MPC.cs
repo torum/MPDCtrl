@@ -138,37 +138,7 @@ namespace MPDCtrl
 
         #region == Variabes and Properties ==  
 
-        private string _password;
-                
         private AsynchronousTCPClient _asyncClient;
-
-        #region == Events == 
-
-        public delegate void MpdStatusChanged(MPC sender, object data);
-        public event MpdStatusChanged StatusChanged;
-
-        public delegate void MpdError(MPC sender, object data);
-        public event MpdError ErrorReturned;
-
-        public delegate void MpdConnected(MPC sender);
-        public event MpdConnected Connected;
-
-        public delegate void MpdConnectionError(MPC sender, object data);
-        public event MpdConnectionError ErrorConnected;
-
-        public delegate void MpdStatusUpdate(MPC sender, object data);
-        public event MpdStatusUpdate StatusUpdate;
-
-        public delegate void MpdDataReceived(MPC sender, object data);
-        public event MpdDataReceived DataReceived;
-
-        public delegate void MpdDataSent(MPC sender, object data);
-        public event MpdDataSent DataSent;
-
-        public delegate void MpdConnectionStatusChanged(MPC sender, AsynchronousTCPClient.ConnectionStatus status);
-        public event MpdConnectionStatusChanged ConnectionStatusChanged;
-
-        #endregion
 
         private string _host;
         public string MpdHost
@@ -187,6 +157,16 @@ namespace MPDCtrl
             set
             {
                 _port = value;
+            }
+        }
+
+        private string _password;
+        public string MpdPassword
+        {
+            get { return _password; }
+            set
+            {
+                _password = value;
             }
         }
 
@@ -216,22 +196,51 @@ namespace MPDCtrl
         private ObservableCollection<Song> _queue = new ObservableCollection<Song>();
         public ObservableCollection<Song> CurrentQueue
         {
-            get { return this._queue; }
+            get { return _queue; }
         }
 
         private ObservableCollection<String> _playLists = new ObservableCollection<String>();
         public ObservableCollection<String> Playlists
         {
-            get { return this._playLists; }
+            get { return _playLists; }
         }
 
         private ObservableCollection<String> _localFiles = new ObservableCollection<String>();
         public ObservableCollection<String> LoaclFiles
         {
-            get { return this._localFiles; }
+            get { return _localFiles; }
         }
 
-        #endregion 
+        #endregion
+
+        #region == Events == 
+
+        public delegate void MpdStatusChanged(MPC sender, object data);
+        public event MpdStatusChanged StatusChanged;
+
+        public delegate void MpdError(MPC sender, object data);
+        public event MpdError ErrorReturned;
+
+        public delegate void MpdConnected(MPC sender);
+        public event MpdConnected Connected;
+
+        public delegate void MpdConnectionError(MPC sender, object data);
+        public event MpdConnectionError ErrorConnected;
+
+        public delegate void MpdStatusUpdate(MPC sender, object data);
+        public event MpdStatusUpdate StatusUpdate;
+
+        public delegate void MpdDataReceived(MPC sender, object data);
+        public event MpdDataReceived DataReceived;
+
+        public delegate void MpdDataSent(MPC sender, object data);
+        public event MpdDataSent DataSent;
+
+        public delegate void MpdConnectionStatusChanged(MPC sender, AsynchronousTCPClient.ConnectionStatus status);
+        public event MpdConnectionStatusChanged ConnectionStatusChanged;
+
+        #endregion
+
 
         public MPC(string h, int p, string a)
         {
@@ -250,13 +259,28 @@ namespace MPDCtrl
 
         public async Task<ConnectionResult> MpdConnect()
         {
-            ConnectionResult isDone = await _asyncClient.Connect(IPAddress.Parse(_host), _port, _password);
-
-            if (!isDone.isSuccess)
+            try
             {
-                ErrorConnected?.Invoke(this, isDone.errorMessage);
+                ConnectionResult isDone = await _asyncClient.Connect(IPAddress.Parse(_host), _port, _password);
+
+                if (!isDone.isSuccess)
+                {
+                    ErrorConnected?.Invoke(this, isDone.errorMessage);
+                }
+
+                return isDone;
             }
-            return isDone;
+            catch (Exception ex)
+            {
+                ErrorConnected?.Invoke(this, ex.Message);
+
+                ConnectionResult err = new ConnectionResult();
+                err.isSuccess = false;
+                err.errorMessage = ex.Message;
+
+                return err;
+            }
+
         }
 
         public void MpdDisconnect()
@@ -1052,17 +1076,17 @@ namespace MPDCtrl
 
                     if (isPlayer)
                     {
-                        this.MpdQueryStatus();
+                        MpdQueryStatus();
                     }
 
                     if (isCurrentQueue)
                     {
-                        this.MpdQueryCurrentQueue();
+                        MpdQueryCurrentQueue();
                     }
 
                     if (isStoredPlaylist)
                     {
-                        this.MpdQueryPlaylists();
+                        MpdQueryPlaylists();
                     }
                 }
                 catch
@@ -1180,7 +1204,7 @@ namespace MPDCtrl
 
         private bool ParseStatus(List<string> sl)
         {
-            if (this.MpdStop) { return false; }
+            if (MpdStop) { return false; }
             if (sl == null)
             {
                 System.Diagnostics.Debug.WriteLine("ParseStatusResponse sl==null");
@@ -1371,7 +1395,7 @@ namespace MPDCtrl
 
         private bool ParsePlaylistInfo(List<string> sl) 
         {
-            if (this.MpdStop) { return false; }
+            if (MpdStop) { return false; }
             if (sl == null)
             {
                 System.Diagnostics.Debug.WriteLine("ConError@ParsePlaylistInfoResponse: null");
@@ -1402,7 +1426,7 @@ namespace MPDCtrl
                 if (Application.Current == null) { return false; }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    this.CurrentQueue.Clear();
+                    CurrentQueue.Clear();
                 });
 
                 Dictionary<string, string> SongValues = new Dictionary<string, string>();
@@ -1467,7 +1491,7 @@ namespace MPDCtrl
 
                             if (sng.ID == _status.MpdSongID)
                             {
-                                this._currentSong = sng;
+                                _currentSong = sng;
                                 //System.Diagnostics.Debug.WriteLine(sng.ID + ":" + sng.Title + " - is current.");
                             }
 
@@ -1514,7 +1538,7 @@ namespace MPDCtrl
 
         private bool ParsePlaylists(List<string> sl)
         {
-            if (this.MpdStop) { return false; }
+            if (MpdStop) { return false; }
             if (sl == null)
             {
                 System.Diagnostics.Debug.WriteLine("Connected response@ParsePlaylistsResponse: null");
@@ -1698,19 +1722,21 @@ namespace MPDCtrl
 
         public async Task<ConnectionResult> Connect(IPAddress ip, int port, string auth)
         {
+            ConnectionState = ConnectionStatus.Connecting;
+
             _ip = ip;
             _p = port;
             _a = auth;
             _retryAttempt = 0;
 
-            this._TCP = new TcpClient();
+            _TCP = new TcpClient();
             // This will crash on iPhone.
-            //this._TCP.ReceiveTimeout = System.Threading.Timeout.Infinite;
-            this._TCP.ReceiveTimeout = 0;
-            this._TCP.SendTimeout = 5000;
-            this._TCP.Client.ReceiveTimeout = 0;
-            //this._TCP.Client.ReceiveTimeout = System.Threading.Timeout.Infinite;
-            //this._TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+            //_TCP.ReceiveTimeout = System.Threading.Timeout.Infinite;
+            _TCP.ReceiveTimeout = 0;
+            _TCP.SendTimeout = 5000;
+            _TCP.Client.ReceiveTimeout = 0;
+            //_TCP.Client.ReceiveTimeout = System.Threading.Timeout.Infinite;
+            //_TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
             return await DoConnect(ip, port);
         }
@@ -1719,7 +1745,7 @@ namespace MPDCtrl
         {
             System.Diagnostics.Debug.WriteLine("**ReConnecting...");
 
-            this.ConnectionState = ConnectionStatus.AutoReconnecting;
+            ConnectionState = ConnectionStatus.AutoReconnecting;
 
             if (_retryAttempt > 1)
             {
@@ -1734,17 +1760,17 @@ namespace MPDCtrl
 
             try
             {
-                this._TCP.Close();
+                _TCP.Close();
             }
             catch { }
 
             await Task.Delay(500);
 
-            this._TCP = new TcpClient();
-            this._TCP.ReceiveTimeout = 0;//System.Threading.Timeout.Infinite;
-            this._TCP.SendTimeout = 5000;
-            this._TCP.Client.ReceiveTimeout = 0;//System.Threading.Timeout.Infinite;
-            //this._TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+            _TCP = new TcpClient();
+            _TCP.ReceiveTimeout = 0;//System.Threading.Timeout.Infinite;
+            _TCP.SendTimeout = 5000;
+            _TCP.Client.ReceiveTimeout = 0;//System.Threading.Timeout.Infinite;
+            //_TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
             ConnectionResult r = await DoConnect(_ip, _p);
 
@@ -1844,7 +1870,7 @@ namespace MPDCtrl
                     //if (err != SocketError.Success)
                     System.Diagnostics.Debug.WriteLine("ReceiveCallback bytesRead 0");
 
-                    this.ConnectionState = ConnectionStatus.DisconnectedByHost;
+                    ConnectionState = ConnectionStatus.DisconnectedByHost;
                     //https://msdn.microsoft.com/en-us/library/ms145145(v=vs.110).aspx
                     /*
                     if (!string.IsNullOrEmpty(state.sb.ToString().Trim()))
@@ -1970,8 +1996,8 @@ namespace MPDCtrl
             // Release the socket.  
             try
             {
-                this._TCP.Client.Shutdown(SocketShutdown.Both);
-                this._TCP.Client.Close();
+                _TCP.Client.Shutdown(SocketShutdown.Both);
+                _TCP.Client.Close();
             }
             catch { }
         }

@@ -18,23 +18,43 @@ using System.IO;
 using System.ComponentModel;
 using MPDCtrl.Common;
 using System.Windows.Threading;
+using System.Net;
 
 namespace MPDCtrl.ViewModels
 {
     /// <summary>
     /// 
     /// TODO: 
+    /// Current QueueのNowPlayingが欲しい。
+    /// profile を設定ファイルに保存。設定画面。
+    /// queueの項目を増やす
+    /// i19n。
     /// current queueの並べ替えとplaylistとしての保存。
+    /// 
     /// スライダー等のデザイン。＞これのせいで他のが変になった。
-    /// 設定画面。
     /// 
     /// object data > string something
     /// PlayListの削除、作成・保存。
+    /// 
+    /// queueの項目を表示・非表示を項目事に選択・保存できるように。
     /// 
     /// 更新履歴：
     /// 
     /// 
     /// </summary>
+    /// 
+
+
+
+    public class Profile
+    {
+        public string Host { get; set; }
+        public int Port { get; set; }
+        public string Password { get; set; }
+        public string Name { get; set; }
+        public string ID { get; set; }
+    }
+
 
     public class MainViewModel : ViewModelBase
     {
@@ -44,7 +64,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "2.0.0";
+        const string _appVer = "2.0.0.1";
         public string AppVer
         {
             get
@@ -69,14 +89,16 @@ namespace MPDCtrl.ViewModels
         {
             get
             {
-#if DEBUG
-                return true;
-#else
+                #if DEBUG
+                //return true;
+                #else
                 return false; 
-#endif
+                #endif
 
+                return false;
             }
         }
+        
         #endregion
 
         #region == 設定フォルダ ==  
@@ -103,12 +125,82 @@ namespace MPDCtrl.ViewModels
         {
             get
             {
-                return this._isConnected;
+                return _isConnected;
             }
             set
             {
-                this._isConnected = value;
-                this.NotifyPropertyChanged("IsConnected");
+                if (_isConnected == value)
+                    return;
+
+                _isConnected = value;
+                NotifyPropertyChanged("IsConnected");
+
+                if (_isConnected)
+                {
+                    IsMainShow = true;
+                    IsConnectionSettingShow = false;
+                }
+                else
+                {
+                    IsMainShow = false;
+                    IsConnectionSettingShow = true;
+                }
+            }
+        }
+
+        private bool _isConnecting;
+        public bool IsConnecting
+        {
+            get
+            {
+                return _isConnecting;
+            }
+            set
+            {
+                _isConnecting = value;
+                NotifyPropertyChanged("IsConnecting");
+            }
+        }
+        
+        private bool _isMainShow;
+        public bool IsMainShow
+        {
+            get { return _isMainShow; }
+            set
+            {
+                if (_isMainShow == value)
+                    return;
+
+                _isMainShow = value;
+                NotifyPropertyChanged("IsMainShow");
+            }
+        }
+
+        private bool _isSettingsShow;
+        public bool IsSettingsShow
+        {
+            get { return _isSettingsShow; }
+            set
+            {
+                if (_isSettingsShow == value)
+                    return;
+
+                _isSettingsShow = value;
+                NotifyPropertyChanged("IsSettingsShow");
+            }
+        }
+
+        private bool _isConnectionSettingShow;
+        public bool IsConnectionSettingShow
+        {
+            get { return _isConnectionSettingShow; }
+            set
+            {
+                if (_isConnectionSettingShow == value)
+                    return;
+
+                _isConnectionSettingShow = value;
+                NotifyPropertyChanged("IsConnectionSettingShow");
             }
         }
 
@@ -117,12 +209,12 @@ namespace MPDCtrl.ViewModels
         {
             get
             {
-                return this._statusMessage;
+                return _statusMessage;
             }
             set
             {
-                this._statusMessage = value;
-                this.NotifyPropertyChanged("StatusMessage");
+                _statusMessage = value;
+                NotifyPropertyChanged("StatusMessage");
             }
         }
 
@@ -153,9 +245,9 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _currentSong = value;
-                this.NotifyPropertyChanged("CurrentSong");
-                this.NotifyPropertyChanged("CurrentSongTitle");
-                this.NotifyPropertyChanged("CurrentSongArtist");
+                NotifyPropertyChanged("CurrentSong");
+                NotifyPropertyChanged("CurrentSongTitle");
+                NotifyPropertyChanged("CurrentSongArtist");
             }
         }
 
@@ -217,7 +309,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _selectedSong = value;
-                this.NotifyPropertyChanged("SelectedSong");
+                NotifyPropertyChanged("SelectedSong");
             }
         }
 
@@ -248,7 +340,7 @@ namespace MPDCtrl.ViewModels
                 if (_selecctedPlaylist != value)
                 {
                     _selecctedPlaylist = value;
-                    this.NotifyPropertyChanged("SelectedPlaylist");
+                    NotifyPropertyChanged("SelectedPlaylist");
                 }
             }
         }
@@ -280,7 +372,7 @@ namespace MPDCtrl.ViewModels
                 if (_selecctedLocalfile != value)
                 {
                     _selecctedLocalfile = value;
-                    this.NotifyPropertyChanged("SelectedLocalfile");
+                    NotifyPropertyChanged("SelectedLocalfile");
                 }
             }
         }
@@ -309,7 +401,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _statusButton = value;
-                this.NotifyPropertyChanged("StatusButton");
+                NotifyPropertyChanged("StatusButton");
             }
         }
 
@@ -329,7 +421,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _playButton = value;
-                this.NotifyPropertyChanged("PlayButton");
+                NotifyPropertyChanged("PlayButton");
             }
         }
 
@@ -344,8 +436,8 @@ namespace MPDCtrl.ViewModels
             {
                 if (_volume != value)
                 {
-                    this._volume = value;
-                    this.NotifyPropertyChanged("Volume");
+                    _volume = value;
+                    NotifyPropertyChanged("Volume");
 
                     if (_MPC != null)
                     {
@@ -376,7 +468,7 @@ namespace MPDCtrl.ViewModels
         {
             if (_MPC != null)
             {
-                if (Convert.ToDouble(_MPC.MpdStatus.MpdVolume) != this._volume)
+                if (Convert.ToDouble(_MPC.MpdStatus.MpdVolume) != _volume)
                 {
                     if (SetVolumeCommand.CanExecute(null))
                     {
@@ -396,8 +488,8 @@ namespace MPDCtrl.ViewModels
             get { return _repeat; }
             set
             {
-                this._repeat = value;
-                this.NotifyPropertyChanged("Repeat");
+                _repeat = value;
+                NotifyPropertyChanged("Repeat");
 
                 if (_MPC != null)
                 {
@@ -418,8 +510,8 @@ namespace MPDCtrl.ViewModels
             get { return _random; }
             set
             {
-                this._random = value;
-                this.NotifyPropertyChanged("Random");
+                _random = value;
+                NotifyPropertyChanged("Random");
 
                 if (_MPC != null)
                 {
@@ -440,12 +532,12 @@ namespace MPDCtrl.ViewModels
         {
             get
             {
-                return this._time;
+                return _time;
             }
             set
             {
-                this._time = value;
-                this.NotifyPropertyChanged("Time");
+                _time = value;
+                NotifyPropertyChanged("Time");
             }
         }
 
@@ -454,14 +546,14 @@ namespace MPDCtrl.ViewModels
         {
             get
             {
-                return this._elapsed;
+                return _elapsed;
             }
             set
             {
-                if ((value < this._time) && _elapsed != value)
+                if ((value < _time) && _elapsed != value)
                 {
-                    this._elapsed = value;
-                    this.NotifyPropertyChanged("Elapsed");
+                    _elapsed = value;
+                    NotifyPropertyChanged("Elapsed");
                     /*
                     if (SetSeekCommand.CanExecute(null))
                     {
@@ -495,7 +587,7 @@ namespace MPDCtrl.ViewModels
         {
             if (_MPC != null)
             {
-                if ((this._elapsed < this._time))
+                if ((_elapsed < _time))
                 {
                     if (SetSeekCommand.CanExecute(null))
                     {
@@ -513,15 +605,230 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
+        #region == 設定画面 ==
+
+        public ObservableCollection<Profile> Profiles = new ObservableCollection<Profile>();
+
+        private Profile _profile;
+        public Profile SelectedProfile
+        {
+            get
+            {
+                return _profile;
+            }
+            set
+            {
+                _profile = value;
+                ClearErrror("Host");
+                ClearErrror("Port");
+                if (_profile != null)
+                {
+                    // Workaround validation.
+                    _defaultHost = _profile.Host;
+                    NotifyPropertyChanged("Host");
+                    _defaultPort = _profile.Port;
+                    NotifyPropertyChanged("Port");
+                    //_defaultPassword = Decrypt(_profile.Password);
+                    // Set dummy "*"s for PasswordBox.
+                    //Password = DummyPassword(_defaultPassword);
+                }
+                else
+                {
+                    _defaultHost = "";
+                    NotifyPropertyChanged("Host");
+                    _defaultPort = 6600;
+                    NotifyPropertyChanged("Port");
+                    _defaultPassword = "";
+                    NotifyPropertyChanged("Password");
+                }
+
+                NotifyPropertyChanged("SelectedProfile");
+            }
+        }
+
+        private bool _isProfileChanged;
+        public bool IsProfileChanged
+        {
+            get
+            {
+                return _isProfileChanged;
+            }
+            set
+            {
+                _isProfileChanged = value;
+                NotifyPropertyChanged("IsProfileChanged");
+            }
+
+        }
+        public string Host
+        {
+            get { return _defaultHost; }
+            set
+            {
+                ClearErrror("Host");
+                _defaultHost = value;
+
+                // Validate input.
+                if (value == "")
+                {
+                    SetError("Host", "Error: Host must be epecified."); //TODO: translate.
+                }
+                else if (value == "localhost")
+                {
+                    _defaultHost = "127.0.0.1";
+                    IsProfileChanged = true;
+                }
+                else
+                {
+                    IPAddress ipAddress = null;
+                    try
+                    {
+                        ipAddress = IPAddress.Parse(value);
+                        if (ipAddress != null)
+                        {
+                            _defaultHost = value;
+                            IsProfileChanged = true;
+                        }
+                    }
+                    catch
+                    {
+                        //System.FormatException
+                        SetError("Host", "Error: Invalid address format."); //TODO: translate.
+                    }
+                }
+
+                NotifyPropertyChanged("Host");
+            }
+        }
+
+        public string Port
+        {
+            get { return _defaultPort.ToString(); }
+            set
+            {
+                ClearErrror("Port");
+
+                if (value == "")
+                {
+                    SetError("Port", "Error: Port must be epecified."); //TODO: translate.
+                    _defaultPort = 0;
+                }
+                else
+                {
+                    // Validate input. Test with i;
+                    if (Int32.TryParse(value, out int i))
+                    {
+                        //Int32.TryParse(value, out _defaultPort)
+                        // Change the value only when test was successfull.
+                        _defaultPort = i;
+                        ClearErrror("Port");
+                        IsProfileChanged = true;
+                    }
+                    else
+                    {
+                        SetError("Port", "Error: Part number must be consist of numbers."); //TODO: translate.
+                        _defaultPort = 0;
+                    }
+                }
+
+                NotifyPropertyChanged("Port");
+            }
+        }
+
+        // Dummy "*"'s for PasswordBox.
+        public string Password
+        {
+            get
+            {
+                return DummyPassword(_defaultPassword);
+            }
+            set
+            {
+                //ClearErrror("Password");
+                //_defaultPassword = value.Trim();
+                NotifyPropertyChanged("Password");
+            }
+        }
+
+        private string Encrypt(string s)
+        {
+            if (String.IsNullOrEmpty(s)) { return ""; }
+
+            byte[] entropy = new byte[] { 0x72, 0xa2, 0x12, 0x04 };
+
+            try
+            {
+                byte[] userData = System.Text.Encoding.UTF8.GetBytes(s);
+
+                byte[] encryptedData = ProtectedData.Protect(userData, entropy, DataProtectionScope.CurrentUser);
+
+                return System.Convert.ToBase64String(encryptedData);
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        private string Decrypt(string s)
+        {
+            if (String.IsNullOrEmpty(s)) { return ""; }
+
+            byte[] entropy = new byte[] { 0x72, 0xa2, 0x12, 0x04 };
+
+            try
+            {
+                byte[] encryptedData = System.Convert.FromBase64String(s);
+
+                byte[] userData = ProtectedData.Unprotect(encryptedData, entropy, DataProtectionScope.CurrentUser);
+
+                return System.Text.Encoding.UTF8.GetString(userData);
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        private string DummyPassword(string s)
+        {
+            if (String.IsNullOrEmpty(s)) { return ""; }
+            string e = "";
+            for (int i = 1; i <= s.Length; i++)
+            {
+                e = e + "*";
+            }
+            return e;
+        }
+
+        private string _settingsErrorMessage;
+        public string SettingsErrorMessage
+        {
+            get
+            {
+                return _settingsErrorMessage;
+            }
+            set
+            {
+                _settingsErrorMessage = value;
+                NotifyPropertyChanged("SettingsErrorMessage");
+            }
+        }
+
+        #endregion
+
+
         public MainViewModel()
         {
             #region == データ保存フォルダ ==
+
             // データ保存フォルダの取得
             _appDataFolder = _envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
             // 設定ファイルのパス
             _appConfigFilePath = _appDataFolder + System.IO.Path.DirectorySeparatorChar + _appName + ".config";
             // 存在していなかったら作成
             System.IO.Directory.CreateDirectory(_appDataFolder);
+
             #endregion
 
             #region == コマンド初期化 ==
@@ -551,6 +858,11 @@ namespace MPDCtrl.ViewModels
             PlayPauseCommand = new RelayCommand(PlayPauseCommand_Execute, PlayPauseCommand_CanExecute);
             VolumeUpCommand = new RelayCommand(VolumeUpCommand_Execute, VolumeUpCommand_CanExecute);
             VolumeDownCommand = new RelayCommand(VolumeDownCommand_Execute, VolumeDownCommand_CanExecute);
+
+            ShowSettingsCommand = new RelayCommand(ShowSettingsCommand_Execute, ShowSettingsCommand_CanExecute);
+            SettingsOKCommand = new RelayCommand(SettingsOKCommand_Execute, SettingsOKCommand_CanExecute);
+            NewConnectinSettingCommand = new GenericRelayCommand<object>(param => NewConnectinSettingCommand_Execute(param), param => NewConnectinSettingCommand_CanExecute());
+
 
             #endregion
 
@@ -586,8 +898,10 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            // 
-            Start();
+            //
+            //IsConnected = true;
+            //IsConnected = false;
+            IsMainShow = true;
         }
 
         #region == システムイベント ==
@@ -595,6 +909,7 @@ namespace MPDCtrl.ViewModels
         // 起動時の処理
         public void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
+
             #region == アプリ設定のロード  ==
 
             try
@@ -671,6 +986,18 @@ namespace MPDCtrl.ViewModels
             }
 
             #endregion
+
+            if (String.IsNullOrEmpty(_defaultHost))
+            {
+                IsConnectionSettingShow = true;
+            }
+            else
+            {
+                IsConnectionSettingShow = false;
+
+                //
+                Start();
+            }
         }
 
         // 終了時の処理
@@ -808,11 +1135,17 @@ namespace MPDCtrl.ViewModels
                 _MPC.MpdQueryStatus();
 
             }
+            else
+            {
+                IsConnected = false;
+                IsMainShow = false;
+                IsConnectionSettingShow = true;
+            }
         }
 
         private async Task<ConnectionResult> StartConnection()
         {
-            IsConnected = false;
+            
             StatusButton = _pathConnectingButton;
 
             //TODO: i18n
@@ -849,20 +1182,20 @@ namespace MPDCtrl.ViewModels
                 }
 
                 // "quietly" update view.
-                this._volume = Convert.ToDouble(_MPC.MpdStatus.MpdVolume);
-                this.NotifyPropertyChanged("Volume");
+                _volume = Convert.ToDouble(_MPC.MpdStatus.MpdVolume);
+                NotifyPropertyChanged("Volume");
 
-                this._random = _MPC.MpdStatus.MpdRandom;
-                this.NotifyPropertyChanged("Random");
+                _random = _MPC.MpdStatus.MpdRandom;
+                NotifyPropertyChanged("Random");
 
-                this._repeat = _MPC.MpdStatus.MpdRepeat;
-                this.NotifyPropertyChanged("Repeat");
+                _repeat = _MPC.MpdStatus.MpdRepeat;
+                NotifyPropertyChanged("Repeat");
 
                 // no need to care about "double" updates for time.
-                this.Time = _MPC.MpdStatus.MpdSongTime;
+                Time = _MPC.MpdStatus.MpdSongTime;
 
-                this._elapsed = _MPC.MpdStatus.MpdSongElapsed;
-                this.NotifyPropertyChanged("Elapsed");
+                _elapsed = _MPC.MpdStatus.MpdSongElapsed;
+                NotifyPropertyChanged("Elapsed");
 
                 //
                 Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
@@ -884,6 +1217,7 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+
         #endregion
 
         #region == イベント・タイマー ==
@@ -892,8 +1226,8 @@ namespace MPDCtrl.ViewModels
         {
             if ((_elapsed < _time) && (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play))
             {
-                this._elapsed += 1;
-                this.NotifyPropertyChanged("Elapsed");
+                _elapsed += 1;
+                NotifyPropertyChanged("Elapsed");
             }
             else
             {
@@ -904,6 +1238,8 @@ namespace MPDCtrl.ViewModels
         private void OnConnected(MPC sender)
         {
             IsConnected = true;
+            //IsConnectionSettingShow = false;
+
             StatusButton = _pathConnectedButton;
             StatusMessage = "";
         }
@@ -1027,6 +1363,8 @@ namespace MPDCtrl.ViewModels
             string s = (data as string);
 
             IsConnected = false;
+            IsConnectionSettingShow = true;
+
             StatusButton = _pathErrorInfoButton;
 
             StatusMessage = "Connection Error: " + s;
@@ -1042,53 +1380,79 @@ namespace MPDCtrl.ViewModels
             else if (status == AsynchronousTCPClient.ConnectionStatus.Connecting)
             {
                 IsConnected = false;
-                StatusMessage = " - Connecting... ";
+                IsConnecting = true;
+                //IsConnectionSettingShow = true;
+
+                StatusMessage = "Connecting... ";
                 StatusButton = _pathConnectingButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.AutoReconnecting)
             {
                 IsConnected = false;
-                StatusMessage = " - Reconnecting... ";
+                IsConnecting = true;
+                //IsConnectionSettingShow = false;
+
+                StatusMessage = "Reconnecting... ";
                 StatusButton = _pathConnectingButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.ConnectFail_Timeout)
             {
                 IsConnected = false;
-                StatusMessage = " - Connection terminated. (Fail_Timeout) ";
+                IsConnecting = false;
+                IsConnectionSettingShow = true;
+
+                StatusMessage = "Connection terminated. (Fail_Timeout) ";
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.DisconnectedByHost)
             {
                 IsConnected = false;
-                StatusMessage = " - Connection terminated. (DisconnectedByHost) ";
+                IsConnecting = false;
+                IsConnectionSettingShow = true;
+
+                StatusMessage = "Connection terminated. (DisconnectedByHost) ";
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.DisconnectedByUser)
             {
                 IsConnected = false;
-                StatusMessage = " - Connection terminated. (DisconnectedByUser) ";
+                IsConnecting = false;
+                IsConnectionSettingShow = true;
+
+                StatusMessage = "Connection terminated. (DisconnectedByUser) ";
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.Error)
             {
                 //Handled at OnConnectionError
+                IsConnecting = false;
+
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.SendFail_NotConnected)
             {
-                //IsConnected = false;
-                StatusMessage = " - Connection terminated. (SendFail_NotConnected) ";
+                IsConnected = false;
+                IsConnecting = false;
+                IsConnectionSettingShow = true;
+
+                StatusMessage = "Connection terminated. (SendFail_NotConnected) ";
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.SendFail_Timeout)
             {
                 //IsConnected = false;
-                StatusMessage = " - Connection terminated. (SendFail_Timeout) ";
+                IsConnecting = false;
+                //IsConnectionSettingShow = true;
+
+                StatusMessage = "Connection terminated. (SendFail_Timeout) ";
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.NeverConnected)
             {
                 IsConnected = false;
-                StatusMessage = " - Disconnected. (NeverConnected) ";
+                IsConnecting = false;
+                IsConnectionSettingShow = true;
+
+                StatusMessage = "Disconnected. (NeverConnected) ";
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.MpdOK)
@@ -1196,13 +1560,11 @@ namespace MPDCtrl.ViewModels
         public ICommand SetSeekCommand { get; }
         public bool SetSeekCommand_CanExecute()
         {
-            //TODO: if (this.IsBusy) { return false; }  //!
             if (_MPC == null) { return false; }
             return true;
         }
         public void SetSeekCommand_ExecuteAsync()
         {
-            // TODO:
             _MPC.MpdPlaybackSeek(_MPC.MpdStatus.MpdSongID, Convert.ToInt32(_elapsed));
         }
 
@@ -1234,7 +1596,7 @@ namespace MPDCtrl.ViewModels
         public bool ChangePlaylistCommand_CanExecute()
         {
             if (_MPC == null) { return false; }
-            if (this._selecctedPlaylist == "") { return false; }
+            if (_selecctedPlaylist == "") { return false; }
             return true;
         }
         public void ChangePlaylistCommand_ExecuteAsync()
@@ -1255,7 +1617,6 @@ namespace MPDCtrl.ViewModels
         }
         public void SongListViewEnterKeyCommand_ExecuteAsync()
         {
-            //
             _MPC.MpdPlaybackPlay(_selectedSong.ID);
         }
 
@@ -1269,7 +1630,6 @@ namespace MPDCtrl.ViewModels
         }
         public void SongListViewLeftDoubleClickCommand_ExecuteAsync(MPC.Song song)
         {
-            //
             _MPC.MpdPlaybackPlay(song.ID);
         }
 
@@ -1451,7 +1811,7 @@ namespace MPDCtrl.ViewModels
         }
         public void VolumeDownCommand_Execute()
         {
-            if (this._volume >= 10)
+            if (_volume >= 10)
             {
                 _MPC.MpdSetVolume(Convert.ToInt32(_volume - 10));
             }
@@ -1473,7 +1833,131 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        public ICommand ShowSettingsCommand { get; }
+        public bool ShowSettingsCommand_CanExecute()
+        {
+            if (IsConnectionSettingShow) { return false; }
+            return true;
+        }
+
+        public void ShowSettingsCommand_Execute()
+        {
+            if (IsSettingsShow)
+            {
+                IsSettingsShow = false;
+            }
+            else
+            {
+                IsSettingsShow = true;
+            }
+        }
+
+        public ICommand NewConnectinSettingCommand { get; }
+        public bool NewConnectinSettingCommand_CanExecute()
+        {
+            if (Host == "") { return false; }
+            if (Port == "") { return false; }
+            if (IsConnecting) { return false; }
+            return true;
+        }
+        public async void NewConnectinSettingCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            // Validate Host input.
+            if (_defaultHost == "")
+            {
+                SetError("Host", "Error: Host must be epecified."); //TODO: translate
+                NotifyPropertyChanged("Host");
+                return;
+            }
+            else
+            {
+                if (_defaultHost == "localhost")
+                {
+                    _defaultHost = "127.0.0.1";
+                }
+
+                IPAddress ipAddress = null;
+                try
+                {
+                    ipAddress = IPAddress.Parse(_defaultHost);
+                    if (ipAddress != null)
+                    {
+                        ClearErrror("Host");
+                    }
+                }
+                catch
+                {
+                    //System.FormatException
+                    SetError("Host", "Error: Invalid address format."); //TODO: translate
+
+                    return;
+                }
+            }
+
+            if (_defaultPort == 0)
+            {
+                SetError("Port", "Error: Port must be epecified."); //TODO: translate.
+                return;
+            }
+
+            // for Unbindable PasswordBox.
+            var passwordBox = obj as PasswordBox;
+            if (!String.IsNullOrEmpty(passwordBox.Password))
+            {
+                _defaultPassword = passwordBox.Password;
+            }
+
+            _MPC.MpdHost = _defaultHost;
+            _MPC.MpdPort = _defaultPort;
+            _MPC.MpdPassword = _defaultPassword;
+
+            ConnectionResult r = await StartConnection();
+
+            if (r.isSuccess)
+            {
+                IsConnectionSettingShow = false;
+
+
+                // ==== dupe
+
+                // 初回だからUpdateしておく。
+                _MPC.MpdSendUpdate();
+
+                //
+                _MPC.MpdQueryListAll();
+
+                _MPC.MpdQueryCurrentQueue();
+
+                _MPC.MpdQueryPlaylists();
+
+                // Status needs to be the last in order to get "current song" in the queue.
+                _MPC.MpdQueryStatus();
+
+                // ==== dupe
+
+
+                // TODO: create profile.
+
+            }
+
+        }
+
+        public ICommand SettingsOKCommand { get; }
+        public bool SettingsOKCommand_CanExecute()
+        {
+            return true;
+        }
+
+        public void SettingsOKCommand_Execute()
+        {
+            IsSettingsShow = false;
+        }
+
+        
 
         #endregion
+
     }
 }

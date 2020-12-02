@@ -25,6 +25,9 @@ namespace MPDCtrl
     {
         public MainWindow()
         {
+            // For testing only. Don't forget to comment this out if you uncomment.
+            //MPDCtrl.Properties.Resources.Culture = CultureInfo.GetCultureInfo("en-US"); //or ja-JP
+
             InitializeComponent();
 
             Loaded += (this.DataContext as MainViewModel).OnWindowLoaded;
@@ -88,9 +91,30 @@ namespace MPDCtrl
 
             // Listview flickering...
             //SongListView.ScrollToCenterOfView(SongListView.SelectedItem);
-
         }
 
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            (sender as PasswordBox).Tag = "";
+        }
+
+        private void PasswordBoxNew_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            (sender as PasswordBox).Tag = "";
+        }
+
+        private void ProfilesListview_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            PasswordBox.Password = "";
+        }
+
+        private void TextBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (NewHost_TextBox.Visibility == Visibility.Visible)
+            {
+                NewHost_TextBox.Focus();
+            }
+        }
 
         #region == MAXIMIZE時のタスクバー被りのFix ==
         // https://engy.us/blog/2020/01/01/implementing-a-custom-window-title-bar-in-wpf/
@@ -193,6 +217,7 @@ namespace MPDCtrl
         }
 
         #endregion
+
 
     }
 }

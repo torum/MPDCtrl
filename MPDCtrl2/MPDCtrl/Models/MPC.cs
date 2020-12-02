@@ -1,7 +1,11 @@
 ﻿/// 
 /// 
-/// MPD Ctrl
+/// MPDCtrl
 /// https://github.com/torum/MPDCtrl
+/// 
+/// MPD Protocol
+/// https://www.musicpd.org/doc/html/protocol.html
+/// 
 /// 
 /// TODO:
 ///  MPD password test.
@@ -33,21 +37,16 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
+using MPDCtrl.ViewModels;
 
 namespace MPDCtrl
 {
-    public class ConnectionResult
-    {
-        public bool isSuccess;
-        public string errorMessage;
-    }
-
+    /// <summary>
+    /// MPD Client class. 
+    /// </summary>
     public class MPC
     {
-        /// <summary>
-        /// Song Class for ObservableCollection. 
-        /// </summary>
-        public class Song
+        public class Song : ViewModelBase
         {
             public string ID { get; set; }
             public string Title { get; set; }
@@ -56,9 +55,6 @@ namespace MPDCtrl
             public bool IsPlaying { get; set; }
         }
 
-        /// <summary>
-        /// Status Class. It holds current MPD "status" information.
-        /// </summary>
         public class Status
         {
             public enum MpdPlayState
@@ -140,71 +136,13 @@ namespace MPDCtrl
             }
         }
 
-        /// <summary>
-        /// Main MPC (MPD Client) Class. 
-        /// </summary>
-        #region MPC PRIVATE FIELD declaration
+        #region == Variabes and Properties ==  
 
-        private bool _isBusy;
-        private string _h;
-        private int _p;
-        private string _a;
-        private Status _st;
-        private Song _currentSong;
-        private ObservableCollection<Song> _songs = new ObservableCollection<Song>();
-        private ObservableCollection<String> _playLists = new ObservableCollection<String>();
+        private string _password;
+                
         private AsynchronousTCPClient _asyncClient;
 
-        #endregion END of MPC PRIVATE FIELD declaration
-
-        #region MPC PUBLIC PROPERTY and EVENT FIELD
-
-        public string MpdHost
-        {
-            get { return _h; }
-            set
-            {
-                _h = value;
-            }
-        }
-
-        public int MpdPort
-        {
-            get { return _p; }
-            set
-            {
-                _p = value;
-            }
-        }
-
-        public Status MpdStatus
-        {
-            get { return _st; }
-        }
-
-        public Song MpdCurrentSong
-        {
-            // The Song object is currectly set only if
-            // Playlist is received and song id is matched.
-            get
-            {
-                return _currentSong;
-            }
-            set
-            {
-                _currentSong = value;
-            }
-        }
-
-        public ObservableCollection<Song> CurrentQueue
-        {
-            get { return this._songs; }
-        }
-
-        public ObservableCollection<String> Playlists
-        {
-            get { return this._playLists; }
-        }
+        #region == Events == 
 
         public delegate void MpdStatusChanged(MPC sender, object data);
         public event MpdStatusChanged StatusChanged;
@@ -230,28 +168,89 @@ namespace MPDCtrl
         public delegate void MpdConnectionStatusChanged(MPC sender, AsynchronousTCPClient.ConnectionStatus status);
         public event MpdConnectionStatusChanged ConnectionStatusChanged;
 
+        #endregion
+
+        private string _host;
+        public string MpdHost
+        {
+            get { return _host; }
+            set
+            {
+                _host = value;
+            }
+        }
+
+        private int _port;
+        public int MpdPort
+        {
+            get { return _port; }
+            set
+            {
+                _port = value;
+            }
+        }
+
+        private Status _status;
+        public Status MpdStatus
+        {
+            get { return _status; }
+        }
+
         public bool MpdStop { get; set; }
 
-        #endregion END of MPC PUBLIC PROPERTY and EVENT FIELD
+        private Song _currentSong;
+        public Song MpdCurrentSong
+        {
+            // The Song object is currectly set only if
+            // Playlist is received and song id is matched.
+            get
+            {
+                return _currentSong;
+            }
+            set
+            {
+                _currentSong = value;
+            }
+        }
+
+        private ObservableCollection<Song> _queue = new ObservableCollection<Song>();
+        public ObservableCollection<Song> CurrentQueue
+        {
+            get { return this._queue; }
+        }
+
+        private ObservableCollection<String> _playLists = new ObservableCollection<String>();
+        public ObservableCollection<String> Playlists
+        {
+            get { return this._playLists; }
+        }
+
+        private ObservableCollection<String> _localFiles = new ObservableCollection<String>();
+        public ObservableCollection<String> LoaclFiles
+        {
+            get { return this._localFiles; }
+        }
+
+        #endregion 
 
         public MPC(string h, int p, string a)
         {
-            _h = h;
-            _p = p;
-            _a = a;
-            _st = new Status();
+            _host = h;
+            _port = p;
+            _password = a;
+            _status = new Status();
 
             _asyncClient = new AsynchronousTCPClient();
-            _asyncClient.DataReceived += new AsynchronousTCPClient.delDataReceived(AsynchronousClient_DataReceived);
-            _asyncClient.DataSent += new AsynchronousTCPClient.delDataSent(AsynchronousClient_DataSent);
-            _asyncClient.ConnectionStatusChanged += new AsynchronousTCPClient.delConnectionStatusChanged(AsynchronousClient_ConnectionStatusChanged);
+            _asyncClient.DataReceived += new AsynchronousTCPClient.delDataReceived(TCPClient_DataReceived);
+            _asyncClient.DataSent += new AsynchronousTCPClient.delDataSent(TCPClient_DataSent);
+            _asyncClient.ConnectionStatusChanged += new AsynchronousTCPClient.delConnectionStatusChanged(TCPClient_ConnectionStatusChanged);
         }
 
-        #region MPC METHODS
+        #region == MPC Method ==   
 
         public async Task<ConnectionResult> MpdConnect()
         {
-            ConnectionResult isDone = await _asyncClient.Connect(IPAddress.Parse(this._h), this._p, this._a);
+            ConnectionResult isDone = await _asyncClient.Connect(IPAddress.Parse(_host), _port, _password);
 
             if (!isDone.isSuccess)
             {
@@ -269,15 +268,42 @@ namespace MPDCtrl
         {
             try
             {
-                if (!string.IsNullOrEmpty(_a))
+                if (!string.IsNullOrEmpty(_password))
                 {
-                    string mpdCommand = "password " + _a.Trim() + "\n";
+                    string mpdCommand = "password " + _password.Trim() + "\n";
+
+                    _asyncClient.Send("noidle" + "\n");
                     _asyncClient.Send(mpdCommand);
+                    _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MpdSendPassword(): " + ex.Message);
+            }
+        }
+
+        public void MpdSendUpdate()
+        {
+            try
+            {
+                string mpdCommand = "update" + "\n";
+
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "update" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdSendUpdate(): " + ex.Message);
             }
         }
 
@@ -287,10 +313,10 @@ namespace MPDCtrl
             {
                 string mpdCommand = "status" + "\n";
 
-                if (!string.IsNullOrEmpty(this._a))
+                if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
                     mpdCommand = mpdCommand + "status" + "\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
@@ -305,14 +331,859 @@ namespace MPDCtrl
             }
         }
 
-        private bool ParseStatusResponse(List<string> sl)
+        public void MpdQueryCurrentQueue()
+        {
+            try
+            {
+                string mpdCommand = "playlistinfo" + "\n";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+
+                    mpdCommand = mpdCommand + "playlistinfo" + "\n";
+
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MPDQueryCurrentQueue(): " + ex.Message);
+            }
+        }
+
+        public void MpdQueryPlaylists()
+        {
+            try
+            {
+                string mpdCommand = "listplaylists" + "\n";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+
+                    mpdCommand = mpdCommand + "listplaylists" + "\n";
+
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MPDQueryPlaylists(): " + ex.Message);
+            }
+        }
+
+        public void MpdQueryListAll()
+        {
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "listall" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "listall" + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdMpdListAll: " + ex.Message);
+            }
+        }
+
+        public void MpdClear()
+        {
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "clear" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "clear" + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdAdd: " + ex.Message);
+            }
+        }
+
+        public void MpdAdd(string uri)
+        {
+            if (string.IsNullOrEmpty(uri))
+                return;
+
+            uri = Regex.Escape(uri);
+
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "add \"" + uri + "\"\n";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "add \"" + uri + "\"\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdAdd: " + ex.Message);
+            }
+        }
+
+        public void MpdAdd(List<string> uris)
+        {
+            if (uris.Count < 1)
+                return;
+
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    foreach (var uri in uris)
+                    {
+                        var urie = Regex.Escape(uri);
+                        mpdCommand = mpdCommand + "add \"" + urie + "\"\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    foreach (var uri in uris)
+                    {
+                        var urie = Regex.Escape(uri);
+                        mpdCommand = mpdCommand + "add \"" + urie + "\"\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdAdd: " + ex.Message);
+            }
+        }
+
+        public void MpdDeleteId(List<string> ids)
+        {
+            if (ids.Count < 1)
+                return;
+
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    foreach (var id in ids)
+                    {
+                        mpdCommand = mpdCommand + "deleteid " + id + "\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    foreach (var id in ids)
+                    {
+                        mpdCommand = mpdCommand + "deleteid " + id + "\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdDeleteId: " + ex.Message);
+            }
+        }
+
+        public void MpdPlaybackPlay(string songID = "")
+        {
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = mpdCommand + "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    if (songID != "")
+                    {
+                        mpdCommand = mpdCommand + "playid " + songID + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = mpdCommand + "play" + "\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    if (songID != "")
+                    {
+                        mpdCommand = "playid " + songID + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = "play" + "\n";
+                    }
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackPlay: " + ex.Message);
+            }
+        }
+
+        public void MpdPlaybackSeek(string songID, int seekTime)
+        {
+            if ((songID == "") || (seekTime == 0)) { return; }
+
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "seekid " + songID + " " + seekTime.ToString() + "\n";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "seekid " + songID + " " + seekTime.ToString() + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdPlaybackSeek: " + ex.Message);
+            }
+        }
+
+        public void MpdPlaybackPause()
+        {
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "pause 1" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "pause 1" + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackPause: " + ex.Message);
+            }
+        }
+
+        public void MpdPlaybackResume()
+        {
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "pause 0" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "pause 0" + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackResume: " + ex.Message);
+            }
+        }
+
+        public void MpdPlaybackStop()
+        {
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "stop" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end";
+                }
+                else
+                {
+                    mpdCommand = "stop" + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackStop: " + ex.Message);
+            }
+        }
+
+        public void MpdPlaybackNext()
+        {
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "next" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end\n";
+                }
+                else
+                {
+                    mpdCommand = "next\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackNext: " + ex.Message);
+            }
+        }
+
+        public void MpdPlaybackPrev()
+        {
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "previous" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "previous" + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackPrev: " + ex.Message);
+            }
+        }
+
+        public void MpdSetVolume(int v)
+        {
+            if (v == _status.MpdVolume) { return; }
+
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "setvol " + v.ToString() + "\n";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "setvol " + v.ToString() + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetVol: " + ex.Message);
+            }
+        }
+
+        public void MpdSetRepeat(bool on)
+        {
+            if (_status.MpdRepeat == on) { return; }
+
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    if (on)
+                    {
+                        mpdCommand = mpdCommand + "repeat 1" + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = mpdCommand + "repeat 0" + "\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    if (on)
+                    {
+                        mpdCommand = "repeat 1" + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = "repeat 0" + "\n";
+                    }
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetRepeat: " + ex.Message);
+            }
+        }
+
+        public void MpdSetRandom(bool on)
+        {
+            if (_status.MpdRandom == on) { return; }
+
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    if (on)
+                    {
+                        mpdCommand = mpdCommand + "random 1" + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = mpdCommand + "random 0" + "\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    if (on)
+                    {
+                        mpdCommand = "random 1" + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = "random 0" + "\n";
+                    }
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetRandom: " + ex.Message);
+            }
+        }
+
+        public void MpdChangePlaylist(string playlistName)
+        {
+            if (playlistName.Trim() != "")
+            {
+                string mpdCommand = "command_list_begin" + "\n";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                }
+                mpdCommand = mpdCommand + "clear" + "\n";
+
+                mpdCommand = mpdCommand + "load " + playlistName.Trim() + "\n";
+
+                mpdCommand = mpdCommand + "command_list_end" + "\n";
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+            }
+        }
+
+        public void MpdLoadPlaylist(string playlistName)
+        {
+            if (playlistName.Trim() != "")
+            {
+                string mpdCommand = "command_list_begin" + "\n";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "load " + playlistName.Trim() + "\n";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "load " + playlistName.Trim() + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+            }
+        }
+
+        private async void TCPClient_ConnectionStatusChanged(AsynchronousTCPClient sender, AsynchronousTCPClient.ConnectionStatus status)
+        {
+            //System.Diagnostics.Debug.WriteLine("--AsynchronousClient_ConnectionStatusChanged: " + status.ToString());
+
+            await Task.Run(() => { ConnectionStatusChanged?.Invoke(this, status); });
+
+            if (status == AsynchronousTCPClient.ConnectionStatus.Connected)
+            {
+                //sender.Send("idle player mixer options playlist stored_playlist\n");
+            }
+            else if (status == AsynchronousTCPClient.ConnectionStatus.MpdOK)
+            {
+                //Connected?.Invoke(this);
+            }
+            else if (status == AsynchronousTCPClient.ConnectionStatus.MpdAck)
+            {
+                //
+            }
+
+        }
+
+        private async void TCPClient_DataSent(AsynchronousTCPClient sender, object data)
+        {
+            await Task.Run(() => { DataSent?.Invoke(this, (data as string)); });
+        }
+
+        private async void TCPClient_DataReceived(AsynchronousTCPClient sender, object data)
+        {
+            //System.Diagnostics.Debug.WriteLine("AsynchronousClient_DataReceived:\n" + (data as string));
+            await Task.Run(() => { DataReceived?.Invoke(this, (data as string)); });
+
+            if ((data as string).StartsWith("OK MPD"))
+            {
+                // Connected.
+
+                //TODO: Needs to be tested.
+                MpdSendPassword();
+
+                //
+                await Task.Run(() => { Connected?.Invoke(this); });
+
+            }
+            else
+            {
+                DataReceived_Dispatch((data as string));
+            }
+
+        }
+
+        private void DataReceived_Dispatch(string str)
+        {
+            List<string> reLines = str.Split('\n').ToList();
+
+            string d = "";
+            foreach (string value in reLines)
+            {
+                if (value == "OK")
+                {
+                    if (d != "")
+                    {
+                        DataReceived_ParseData(d);
+                        d = "";
+                    }
+                }
+                else
+                {
+                    d = d + value + "\n";
+                }
+            }
+        }
+
+        private async void DataReceived_ParseData(string str)
+        {
+            if (str.StartsWith("changed:"))
+            {
+                await Task.Run(() => { StatusChanged?.Invoke(this, str); });
+
+                List<string> SubSystems = str.Split('\n').ToList();
+
+                try
+                {
+                    bool isPlayer = false;
+                    bool isCurrentQueue = false;
+                    bool isStoredPlaylist = false;
+                    foreach (string line in SubSystems)
+                    {
+                        if (line == "changed: playlist")
+                        {
+                            // playlist: the queue (i.e.the current playlist) has been modified
+                            isCurrentQueue = true;
+                        }
+                        if (line == "changed: player")
+                        {
+                            // player: the player has been started, stopped or seeked
+                            isPlayer = true;
+                        }
+                        if (line == "changed: options")
+                        {
+                            // options: options like repeat, random, crossfade, replay gain
+                            isPlayer = true;
+                        }
+                        if (line == "changed: mixer")
+                        {
+                            // mixer: the volume has been changed
+                            isPlayer = true;
+                        }
+                        if (line == "changed: stored_playlist")
+                        {
+                            // stored_playlist: a stored playlist has been modified, renamed, created or deleted
+                            isStoredPlaylist = true;
+                        }
+                        if (line == "changed: update")
+                        {
+                            // update: a database update has started or finished.If the database was modified during the update, the database event is also emitted.
+                            // TODO:
+                        }
+
+                        /*
+                        output: an audio output has been added, removed or modified(e.g.renamed, enabled or disabled)
+                        partition: a partition was added, removed or changed
+                        sticker: the sticker database has been modified.
+                        subscription: a client has subscribed or unsubscribed to a channel
+                        message: a message was received on a channel this client is subscribed to; this event is only emitted when the queue is empty
+                        neighbor: a neighbor was found or lost
+                        mount: the mount list has changed
+                         */
+                    }
+
+                    if (isPlayer)
+                    {
+                        this.MpdQueryStatus();
+                    }
+
+                    if (isCurrentQueue)
+                    {
+                        this.MpdQueryCurrentQueue();
+                    }
+
+                    if (isStoredPlaylist)
+                    {
+                        this.MpdQueryPlaylists();
+                    }
+                }
+                catch
+                {
+                    System.Diagnostics.Debug.WriteLine("--Error@IdleConnection DataReceived ParseData: " + str);
+                }
+            }
+            else if (str.StartsWith("volume:") ||
+                   str.StartsWith("repeat:") ||
+                   str.StartsWith("random:") ||
+                   str.StartsWith("state:") ||
+                   str.StartsWith("song:") ||
+                   str.StartsWith("songid:") ||
+                   str.StartsWith("time:") ||
+                   str.StartsWith("elapsed:") ||
+                   str.StartsWith("duration:"))
+            {
+                // "status"
+
+                List<string> reLines = str.Split('\n').ToList();
+
+                ParseStatus(reLines);
+
+                await Task.Run(() => { StatusUpdate?.Invoke(this, "isPlayer"); });
+
+            }
+            else if (str.StartsWith("file:") || str.StartsWith("directory:") ||
+                str.StartsWith("Modified:") ||
+                str.StartsWith("Artist:") ||
+                str.StartsWith("AlbumArtist:") ||
+                str.StartsWith("Title:") ||
+                str.StartsWith("Album:"))
+            {
+                // "playlistinfo"
+
+                /*
+                file: Creedence Clearwater Revival/Chronicle, Vol. 1/11 Who'll Stop the Rain.mp3
+                Last-Modified: 2011-08-03T16:08:06Z
+                Artist: Creedence Clearwater Revival
+                AlbumArtist: Creedence Clearwater Revival
+                Title: Who'll Stop the Rain
+                Album: Chronicle, Vol. 1
+                Track: 11
+                Date: 1976
+                Genre: Rock
+                Composer: John Fogerty
+                Time: 149
+                duration: 149.149
+                Pos: 5
+                Id: 22637
+                */
+
+                // listall
+
+                /*
+                directory: 2Pac
+                directory: 2Pac/Better Dayz
+                file: 2Pac/Better Dayz/17 Better Dayz (Feat. Mr. Biggs).mp3
+                file: 2Pac/Better Dayz/1-02 Thugz Mansion.mp3
+                directory: 2Pac/Greatest Hits
+                file: 2Pac/Greatest Hits/California Love.mp3
+                file: 2Pac/Greatest Hits/Changes.mp3
+                file: 2Pac/Greatest Hits/god bless the dead.mp3
+                */
+
+                List<string> reLines = str.Split('\n').ToList();
+
+                bool isPlaylistinfo = false;
+
+                foreach (string line in reLines)
+                {
+                    if (line.StartsWith("Title:") || line.StartsWith("Artist:") || line.StartsWith("Id:") )
+                    {
+                        isPlaylistinfo = true;
+                        break;
+                    }
+                }
+
+                if (isPlaylistinfo)
+                {
+                    ParsePlaylistInfo(reLines);
+
+                    await Task.Run(() => { StatusUpdate?.Invoke(this, "isCurrentQueue"); });
+                }
+                else
+                {
+                    ParseListAll(reLines);
+
+                    await Task.Run(() => { StatusUpdate?.Invoke(this, "isLocalFiles"); });
+                }
+
+            }
+            else if (str.StartsWith("playlist:"))
+            {
+                // listplaylists
+
+                List<string> reLines = str.Split('\n').ToList();
+
+                ParsePlaylists(reLines);
+
+                await Task.Run(() => { StatusUpdate?.Invoke(this, "isStoredPlaylist"); });
+            }
+            else if (str.StartsWith("updating_db:"))
+            {
+                // update
+
+                await Task.Run(() => { StatusUpdate?.Invoke(this, "isUpdating_db"); });
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa ParseData NON: " + str);
+
+            }
+        }
+
+        private bool ParseStatus(List<string> sl)
         {
             if (this.MpdStop) { return false; }
             if (sl == null)
             {
                 System.Diagnostics.Debug.WriteLine("ParseStatusResponse sl==null");
-
-                // TODO:
                 return false;
             }
             if (sl.Count == 0)
@@ -337,6 +1208,7 @@ namespace MPDCtrl
                     }
 
                     string[] StatusValuePair = value.Split(':');
+
                     if (StatusValuePair.Length > 1)
                     {
                         if (MpdStatusValues.ContainsKey(StatusValuePair[0].Trim()))
@@ -372,17 +1244,17 @@ namespace MPDCtrl
                     {
                         case "play":
                             {
-                                _st.MpdState = Status.MpdPlayState.Play;
+                                _status.MpdState = Status.MpdPlayState.Play;
                                 break;
                             }
                         case "pause":
                             {
-                                _st.MpdState = Status.MpdPlayState.Pause;
+                                _status.MpdState = Status.MpdPlayState.Pause;
                                 break;
                             }
                         case "stop":
                             {
-                                _st.MpdState = Status.MpdPlayState.Stop;
+                                _status.MpdState = Status.MpdPlayState.Stop;
                                 break;
                             }
                     }
@@ -393,7 +1265,7 @@ namespace MPDCtrl
                 {
                     try
                     {
-                        _st.MpdVolume = Int32.Parse(MpdStatusValues["volume"]);
+                        _status.MpdVolume = Int32.Parse(MpdStatusValues["volume"]);
                     }
                     catch (FormatException e)
                     {
@@ -402,46 +1274,10 @@ namespace MPDCtrl
                 }
 
                 // songID
-                _st.MpdSongID = "";
+                _status.MpdSongID = "";
                 if (MpdStatusValues.ContainsKey("songid"))
                 {
-                    _st.MpdSongID = MpdStatusValues["songid"];
-                    //System.Diagnostics.Debug.WriteLine("StatusResponse songid:"+ _st.MpdSongID);
-                    /*
-                    if (_st.MpdSongID != "") {
-                        // Not good when multithreading.
-
-                        // Set currentSong.
-                        try
-                        {
-                            lock (_objLock)
-                            {
-                                var item = _songs.FirstOrDefault(i => i.ID == _st.MpdSongID);
-                                if (item != null)
-                                {
-                                    this._currentSong = (item as Song);
-                                }
-                            }
-
-                            //var listItem = _songs.Where(i => i.ID == _st.MpdSongID);
-                            //if (listItem != null)
-                            //{
-                            //    foreach (var item in listItem)
-                            //    {
-                            //        this._currentSong = item as Song;
-                            //        break;
-                            //        //System.Diagnostics.Debug.WriteLine("StatusResponse linq: _songs.Where?="+ _currentSong.Title);
-                            //    }
-                            //}
-
-                        }
-                        catch (Exception ex)
-                        {
-                            // System.NullReferenceException
-                            System.Diagnostics.Debug.WriteLine("Error@StatusResponse linq: _songs.Where?: " + ex.Message);
-                        }
-                    }
-                    */
+                    _status.MpdSongID = MpdStatusValues["songid"];
                 }
 
                 // Repeat opt bool.
@@ -451,11 +1287,11 @@ namespace MPDCtrl
                     {
                         if (MpdStatusValues["repeat"] == "1")
                         {
-                            _st.MpdRepeat = true;
+                            _status.MpdRepeat = true;
                         }
                         else
                         {
-                            _st.MpdRepeat = false;
+                            _status.MpdRepeat = false;
                         }
 
                     }
@@ -472,11 +1308,11 @@ namespace MPDCtrl
                     {
                         if (Int32.Parse(MpdStatusValues["random"]) > 0)
                         {
-                            _st.MpdRandom = true;
+                            _status.MpdRandom = true;
                         }
                         else
                         {
-                            _st.MpdRandom = false;
+                            _status.MpdRandom = false;
                         }
 
                     }
@@ -489,13 +1325,12 @@ namespace MPDCtrl
                 // Song time.
                 if (MpdStatusValues.ContainsKey("time"))
                 {
-                    //System.Diagnostics.Debug.WriteLine(MpdStatusValues["time"]);
                     try
                     {
                         if (MpdStatusValues["time"].Split(':').Length > 1)
                         {
-                            _st.MpdSongTime = Double.Parse(MpdStatusValues["time"].Split(':')[1].Trim());
-                            _st.MpdSongElapsed = Double.Parse(MpdStatusValues["time"].Split(':')[0].Trim());
+                            _status.MpdSongTime = Double.Parse(MpdStatusValues["time"].Split(':')[1].Trim());
+                            _status.MpdSongElapsed = Double.Parse(MpdStatusValues["time"].Split(':')[0].Trim());
                         }
                     }
                     catch (FormatException e)
@@ -509,7 +1344,7 @@ namespace MPDCtrl
                 {
                     try
                     {
-                        _st.MpdSongElapsed = Double.Parse(MpdStatusValues["elapsed"]);
+                        _status.MpdSongElapsed = Double.Parse(MpdStatusValues["elapsed"]);
                     }
                     catch { }
                 }
@@ -519,12 +1354,12 @@ namespace MPDCtrl
                 {
                     try
                     {
-                        _st.MpdSongTime = Double.Parse(MpdStatusValues["duration"]);
+                        _status.MpdSongTime = Double.Parse(MpdStatusValues["duration"]);
                     }
                     catch { }
                 }
 
-                //TODO: more?
+                // TODO: more?
             }
             catch (Exception ex)
             {
@@ -534,44 +1369,16 @@ namespace MPDCtrl
             return true;
         }
 
-        public void MpdQueryCurrentPlaylist()
-        {
-            try
-            {
-                string mpdCommand = "playlistinfo" + "\n";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = "command_list_begin" + "\n";
-
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-
-                    mpdCommand = mpdCommand + "playlistinfo" + "\n";
-
-                    mpdCommand = mpdCommand + "command_list_end" + "\n";
-                }
-
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
-
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MPDQueryCurrentPlaylist(): " + ex.Message);
-            }
-        }
-
-        private async Task<bool> ParsePlaylistInfoResponse(List<string> sl)
+        private bool ParsePlaylistInfo(List<string> sl) 
         {
             if (this.MpdStop) { return false; }
             if (sl == null)
             {
                 System.Diagnostics.Debug.WriteLine("ConError@ParsePlaylistInfoResponse: null");
-
-                // TODO:
-                ErrorReturned?.Invoke(this, "Connection Error: (@C2)");
+                //ErrorReturned?.Invoke(this, "Connection Error: (@C2)");
                 return false;
             }
+            
             /*
             file: Creedence Clearwater Revival/Chronicle, Vol. 1/11 Who'll Stop the Rain.mp3
             Last-Modified: 2011-08-03T16:08:06Z
@@ -588,20 +1395,20 @@ namespace MPDCtrl
             Pos: 5
             Id: 22637
             */
-            _isBusy = true;
+
+            //_isBusy = true;
             try
             {
                 if (Application.Current == null) { return false; }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    //songs.Clear();
+                    this.CurrentQueue.Clear();
                 });
 
                 Dictionary<string, string> SongValues = new Dictionary<string, string>();
+
                 foreach (string value in sl)
                 {
-                    //System.Diagnostics.Debug.WriteLine("@ParsePlaylistInfoResponse() loop: " + value);
-
                     if (value.StartsWith("ACK"))
                     {
                         System.Diagnostics.Debug.WriteLine("ACK@ParsePlaylistInfoResponse: " + value);
@@ -658,7 +1465,7 @@ namespace MPDCtrl
                                 }
                             }
 
-                            if (sng.ID == _st.MpdSongID)
+                            if (sng.ID == _status.MpdSongID)
                             {
                                 this._currentSong = sng;
                                 //System.Diagnostics.Debug.WriteLine(sng.ID + ":" + sng.Title + " - is current.");
@@ -670,15 +1477,15 @@ namespace MPDCtrl
                             {
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
-                                    _songs.Add(sng);
+                                    CurrentQueue.Add(sng);
                                 });
 
                                 // This will significantly slows down the load but gives more ui responsiveness.
-                                await Task.Delay(10);
+                                //await Task.Delay(10);
                             }
                             catch (Exception ex)
                             {
-                                _isBusy = false;
+                                //_isBusy = false;
                                 System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse _songs.Add: " + ex.Message);
                                 return false;
                             }
@@ -687,49 +1494,25 @@ namespace MPDCtrl
                     }
                     catch (Exception ex)
                     {
-                        _isBusy = false;
+                        //_isBusy = false;
                         System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse: " + ex.Message);
                         return false;
                     }
                 }
-                _isBusy = false;
+                
+                //_isBusy = false;
+                
                 return true;
             }
             catch (Exception ex)
             {
-                _isBusy = false;
+                //_isBusy = false;
                 System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse: " + ex.Message);
                 return false;
             }
         }
 
-        public void MpdQueryPlaylists()
-        {
-            try
-            {
-                string mpdCommand = "listplaylists" + "\n";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = "command_list_begin" + "\n";
-
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-
-                    mpdCommand = mpdCommand + "listplaylists" + "\n";
-
-                    mpdCommand = mpdCommand + "command_list_end" + "\n";
-                }
-
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MPDQueryPlaylists(): " + ex.Message);
-            }
-        }
-
-        private bool ParsePlaylistsResponse(List<string> sl)
+        private bool ParsePlaylists(List<string> sl)
         {
             if (this.MpdStop) { return false; }
             if (sl == null)
@@ -739,9 +1522,10 @@ namespace MPDCtrl
                 return false;
             }
 
+            if (Application.Current == null) { return false; }
             Application.Current.Dispatcher.Invoke(() =>
             {
-                _playLists.Clear();
+                Playlists.Clear();
             });
 
             // Tmp list for sorting.
@@ -778,685 +1562,73 @@ namespace MPDCtrl
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    _playLists.Add(v);
+                    Playlists.Add(v);
                 });
             }
 
             return true;
         }
 
-        public void MpdPlaybackPlay(string songID = "")
+        private bool ParseListAll(List<string> sl)
         {
-            try
-            {
-                string mpdCommand = "";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = mpdCommand + "command_list_begin" + "\n";
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                    if (songID != "")
-                    {
-                        mpdCommand = mpdCommand + "playid " + songID + "\n";
-                    }
-                    else
-                    {
-                        mpdCommand = mpdCommand + "play" + "\n";
-                    }
-                    mpdCommand = mpdCommand + "command_list_end" + "\n";
-                }
-                else
-                {
-                    if (songID != "")
-                    {
-                        mpdCommand = "playid " + songID + "\n";
-                    }
-                    else
-                    {
-                        mpdCommand = "play" + "\n";
-                    }
-                }
 
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
-            }
-            catch (Exception ex)
+            if (Application.Current == null) { return false; }
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackPlay: " + ex.Message);
+                LoaclFiles.Clear();
+            });
+
+            // Tmp list for sorting.
+            List<string> slTmp = new List<string>();
+
+            foreach (string value in sl)
+            {
+                //System.Diagnostics.Debug.WriteLine("@ParseListAllloop: " + value + "");
+
+                if (value.StartsWith("directory:"))
+                {
+                    // TODO: Ignoring for now.
+
+
+
+                }
+                else if (value.StartsWith("file:"))
+                {
+                    if (value.Split(':').Length > 1)
+                    {
+                        //_playLists.Add(value.Split(':')[1].Trim()); // need sort.
+                        slTmp.Add(value.Split(':')[1].Trim());
+                    }
+                }
+                else if ((value.StartsWith("OK")))
+                {
+                    // Ignoring.
+                }
             }
+
+            // Sort.
+            slTmp.Sort();
+            foreach (string v in slTmp)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    LoaclFiles.Add(v);
+                });
+            }
+
+            return true;
         }
 
-        public void MpdPlaybackSeek(string songID, int seekTime)
-        {
-            if ((songID == "") || (seekTime == 0)) { return; }
-
-            try
-            {
-                string mpdCommand = "";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = "command_list_begin" + "\n";
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                    mpdCommand = mpdCommand + "seekid " + songID + " " + seekTime.ToString() + "\n";
-                    mpdCommand = mpdCommand + "command_list_end" + "\n";
-                }
-                else
-                {
-                    mpdCommand = "seekid " + songID + " " + seekTime.ToString() + "\n";
-                }
-
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
-
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MpdPlaybackSeek: " + ex.Message);
-            }
-        }
-
-        public void MpdPlaybackPause()
-        {
-            try
-            {
-                string mpdCommand = "";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = "command_list_begin" + "\n";
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                    mpdCommand = mpdCommand + "pause 1" + "\n";
-                    mpdCommand = mpdCommand + "command_list_end" + "\n";
-                }
-                else
-                {
-                    mpdCommand = "pause 1" + "\n";
-                }
-
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackPause: " + ex.Message);
-            }
-        }
-
-        public void MpdPlaybackResume()
-        {
-            try
-            {
-                string mpdCommand = "";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = "command_list_begin" + "\n";
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                    mpdCommand = mpdCommand + "pause 0" + "\n";
-                    mpdCommand = mpdCommand + "command_list_end" + "\n";
-                }
-                else
-                {
-                    mpdCommand = "pause 0" + "\n";
-                }
-
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
-
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackResume: " + ex.Message);
-            }
-        }
-
-        public void MpdPlaybackStop()
-        {
-            try
-            {
-                string mpdCommand = "";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = "command_list_begin" + "\n";
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                    mpdCommand = mpdCommand + "stop" + "\n";
-                    mpdCommand = mpdCommand + "command_list_end";
-                }
-                else
-                {
-                    mpdCommand = "stop" + "\n";
-                }
-
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
-
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackStop: " + ex.Message);
-            }
-        }
-
-        public void MpdPlaybackNext()
-        {
-            try
-            {
-                string mpdCommand = "";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = "command_list_begin" + "\n";
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                    mpdCommand = mpdCommand + "next" + "\n";
-                    mpdCommand = mpdCommand + "command_list_end\n";
-                }
-                else
-                {
-                    mpdCommand = "next\n";
-                }
-
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
-
-
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackNext: " + ex.Message);
-            }
-        }
-
-        public void MpdPlaybackPrev()
-        {
-            try
-            {
-                string mpdCommand = "";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = "command_list_begin" + "\n";
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                    mpdCommand = mpdCommand + "previous" + "\n";
-                    mpdCommand = mpdCommand + "command_list_end" + "\n";
-                }
-                else
-                {
-                    mpdCommand = "previous" + "\n";
-                }
-
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
-
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackPrev: " + ex.Message);
-            }
-        }
-
-        public void MpdSetVolume(int v)
-        {
-            if (v == _st.MpdVolume) { return; }
-
-            try
-            {
-                string mpdCommand = "";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = "command_list_begin" + "\n";
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                    mpdCommand = mpdCommand + "setvol " + v.ToString() + "\n";
-                    mpdCommand = mpdCommand + "command_list_end" + "\n";
-                }
-                else
-                {
-                    mpdCommand = "setvol " + v.ToString() + "\n";
-                }
-
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
-
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetVol: " + ex.Message);
-            }
-        }
-
-        public void MpdSetRepeat(bool on)
-        {
-            if (_st.MpdRepeat == on) { return; }
-
-            try
-            {
-                string mpdCommand = "";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = "command_list_begin" + "\n";
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                    if (on)
-                    {
-                        mpdCommand = mpdCommand + "repeat 1" + "\n";
-                    }
-                    else
-                    {
-                        mpdCommand = mpdCommand + "repeat 0" + "\n";
-                    }
-                    mpdCommand = mpdCommand + "command_list_end" + "\n";
-                }
-                else
-                {
-                    if (on)
-                    {
-                        mpdCommand = "repeat 1" + "\n";
-                    }
-                    else
-                    {
-                        mpdCommand = "repeat 0" + "\n";
-                    }
-                }
-
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
-
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetRepeat: " + ex.Message);
-            }
-        }
-
-        public void MpdSetRandom(bool on)
-        {
-            if (_st.MpdRandom == on) { return; }
-
-            try
-            {
-                string mpdCommand = "";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = "command_list_begin" + "\n";
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                    if (on)
-                    {
-                        mpdCommand = mpdCommand + "random 1" + "\n";
-                    }
-                    else
-                    {
-                        mpdCommand = mpdCommand + "random 0" + "\n";
-                    }
-                    mpdCommand = mpdCommand + "command_list_end" + "\n";
-                }
-                else
-                {
-                    if (on)
-                    {
-                        mpdCommand = "random 1" + "\n";
-                    }
-                    else
-                    {
-                        mpdCommand = "random 0" + "\n";
-                    }
-                }
-
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
-
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetRandom: " + ex.Message);
-            }
-        }
-
-        public void MpdListAll()
-        {
-            try
-            {
-                string mpdCommand = "";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = "command_list_begin" + "\n";
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                    mpdCommand = mpdCommand + "listall" + "\n";
-                    mpdCommand = mpdCommand + "command_list_end" + "\n";
-                }
-                else
-                {
-                    mpdCommand = "listall" + "\n";
-                }
-
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MpdMpdListAll: " + ex.Message);
-            }
-        }
-
-        public void MpdChangePlaylist(string playlistName)
-        {
-            if (playlistName.Trim() != "")
-            {
-                string mpdCommand = "command_list_begin" + "\n";
-                if (!string.IsNullOrEmpty(this._a))
-                {
-                    mpdCommand = mpdCommand + "password " + this._a.Trim() + "\n";
-                }
-                mpdCommand = mpdCommand + "clear" + "\n";
-
-                mpdCommand = mpdCommand + "load " + playlistName.Trim() + "\n";
-
-                //mpdCommand = mpdCommand + "play" + "\n";
-
-                mpdCommand = mpdCommand + "command_list_end" + "\n";
-
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
-
-            }
-        }
-
-        private bool ParseVoidResponse(List<string> sl)
-        {
-            if (this.MpdStop) { return false; }
-            if (sl == null)
-            {
-                System.Diagnostics.Debug.WriteLine("ConError@ParseVoidResponse: null");
-                ErrorReturned?.Invoke(this, "Connection Error: (@C)");
-                return false;
-            }
-
-            try
-            {
-                foreach (string value in sl)
-                {
-                    //System.Diagnostics.Debug.WriteLine("@ParseVoidResponse() loop: " + value);
-
-                    if (value.StartsWith("ACK"))
-                    {
-                        System.Diagnostics.Debug.WriteLine("ACK@ParseVoidResponse: " + value);
-                        ErrorReturned?.Invoke(this, "MPD Error (@C): " + value);
-                        return false;
-                    }
-
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@ParseVoidResponse: " + ex.Message);
-                return false;
-            }
-        }
-
-        private async void AsynchronousClient_ConnectionStatusChanged(AsynchronousTCPClient sender, AsynchronousTCPClient.ConnectionStatus status)
-        {
-            //System.Diagnostics.Debug.WriteLine("--AsynchronousClient_ConnectionStatusChanged: " + status.ToString());
-
-            await Task.Run(() => { ConnectionStatusChanged?.Invoke(this, status); });
-
-            if (status == AsynchronousTCPClient.ConnectionStatus.Connected)
-            {
-                //sender.Send("idle player mixer options playlist stored_playlist\n");
-            }
-            else if (status == AsynchronousTCPClient.ConnectionStatus.MpdOK)
-            {
-                //Connected?.Invoke(this);
-            }
-            else if (status == AsynchronousTCPClient.ConnectionStatus.MpdAck)
-            {
-                //
-            }
-
-        }
-
-        private async void AsynchronousClient_DataSent(AsynchronousTCPClient sender, object data)
-        {
-            await Task.Run(() => { DataSent?.Invoke(this, (data as string)); });
-        }
-
-        private async void AsynchronousClient_DataReceived(AsynchronousTCPClient sender, object data)
-        {
-            //System.Diagnostics.Debug.WriteLine("AsynchronousClient_DataReceived:\n" + (data as string));
-            await Task.Run(() => { DataReceived?.Invoke(this, (data as string)); });
-
-            if ((data as string).StartsWith("OK MPD"))
-            {
-                // Connected.
-
-                //TODO: Needs to be tested.
-                MpdSendPassword();
-
-                //
-                await Task.Run(() => { Connected?.Invoke(this); });
-
-            }
-            else
-            {
-                Dispatch((data as string));
-            }
-
-        }
-
-        private void Dispatch(string str)
-        {
-            List<string> reLines = str.Split('\n').ToList();
-
-            string d = "";
-            foreach (string value in reLines)
-            {
-                if (value == "OK")
-                {
-                    if (d != "")
-                    {
-                        ParseData(d);
-                        d = "";
-                    }
-                }
-                else
-                {
-                    d = d + value + "\n";
-                }
-            }
-        }
-
-        private async void ParseData(string str)
-        {
-            if (str.StartsWith("changed:"))
-            {
-                //System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa ParseData changed: " + str);
-
-                await Task.Run(() => { StatusChanged?.Invoke(this, str); });
-
-                List<string> SubSystems = str.Split('\n').ToList();
-
-                try
-                {
-                    bool isPlayer = false;
-                    bool isPlaylist = false;
-                    bool isStoredPlaylist = false;
-                    foreach (string line in SubSystems)
-                    {
-                        if (line == "changed: playlist")
-                        {
-                            isPlaylist = true;
-                        }
-                        if (line == "changed: player")
-                        {
-                            isPlayer = true;
-                        }
-                        if (line == "changed: options")
-                        {
-                            isPlayer = true;
-                        }
-                        if (line == "changed: mixer")
-                        {
-                            isPlayer = true;
-                        }
-                        if (line == "changed: stored_playlist")
-                        {
-                            isStoredPlaylist = true;
-                        }
-                    }
-
-                    if (isPlayer)
-                    {
-                        this.MpdQueryStatus();
-                    }
-
-                    if (isPlaylist)
-                    {
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            this.CurrentQueue.Clear();
-                        });
-                        this.MpdQueryCurrentPlaylist();
-                    }
-
-                    if (isStoredPlaylist)
-                    {
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            this.Playlists.Clear();
-                        });
-                        this.MpdQueryPlaylists();
-                    }
-                }
-                catch
-                {
-                    System.Diagnostics.Debug.WriteLine("--Error@IdleConnection DataReceived ParseData: " + str);
-                }
-
-            }
-            else if (str.StartsWith("volume:") ||
-                   str.StartsWith("repeat:") ||
-                   str.StartsWith("random:") ||
-                   str.StartsWith("state:") ||
-                   str.StartsWith("song:") ||
-                   str.StartsWith("songid:") ||
-                   str.StartsWith("time:") ||
-                   str.StartsWith("elapsed:") ||
-                   str.StartsWith("duration:"))
-            {
-                // "status"
-
-                /*
-                volume: 78
-                repeat: 1
-                random: 1
-                single: 0
-                consume: 0
-                playlist: 2708
-                playlistlength: 107
-                mixrampdb: 0.000000
-                state: play
-                song: 6
-                songid: 26569
-                time: 35:138
-                elapsed: 35.038
-                bitrate: 192
-                duration: 137.648
-                audio: 44100:24:2
-                nextsong: 39
-                nextsongid: 26602
-                OK
-                */
-
-                List<string> reLines = str.Split('\n').ToList();
-
-                ParseStatusResponse(reLines);
-
-                await Task.Run(() => { StatusUpdate?.Invoke(this, "isPlayer"); });
-
-            }
-            else if (str.StartsWith("file:") ||
-                str.StartsWith("Modified:") ||
-                str.StartsWith("Artist:") ||
-                str.StartsWith("AlbumArtist:") ||
-                str.StartsWith("Title:") ||
-                str.StartsWith("Album:"))
-            {
-
-                // "playlistinfo"
-                //System.Diagnostics.Debug.WriteLine("Got playlistinfo");
-                // System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa playlistinfo: " + str);
-                /*
-
-file: Creedence Clearwater Revival/Chronicle, Vol. 1/11 Who'll Stop the Rain.mp3
-Last-Modified: 2011-08-03T16:08:06Z
-Artist: Creedence Clearwater Revival
-AlbumArtist: Creedence Clearwater Revival
-Title: Who'll Stop the Rain
-Album: Chronicle, Vol. 1
-Track: 11
-Date: 1976
-Genre: Rock
-Composer: John Fogerty
-Time: 149
-duration: 149.149
-Pos: 5
-Id: 22637
-                */
-                int c = 0;
-                while (_isBusy)
-                {
-                    c++;
-                    await Task.Delay(100);
-                    if (c > (100 * 100))
-                    {
-                        System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa ParseData: TIME OUT");
-                        _isBusy = false;
-                    }
-                }
-
-
-                List<string> reLines = str.Split('\n').ToList();
-                await ParsePlaylistInfoResponse(reLines);
-
-                //Task.Run(() => { StatusUpdate?.Invoke(this, "isPlaylist"); });
-                await Task.Run(() => { StatusUpdate?.Invoke(this, "isPlaylist"); });
-            }
-            else if (str.StartsWith("playlist:"))
-            {
-                /*
-                playlist: Blues
-                Last-Modified: 2018-01-26T12:12:10Z
-                playlist: Jazz
-                Last-Modified: 2018-01-26T12:12:37Z
-                OK
-                */
-
-                List<string> reLines = str.Split('\n').ToList();
-                ParsePlaylistsResponse(reLines);
-
-                await Task.Run(() => { StatusUpdate?.Invoke(this, "isStoredPlaylist"); });
-            }
-            else if (str.StartsWith("updating_db:"))
-            {
-                //System.Diagnostics.Debug.WriteLine();
-            }
-             else
-            {
-                System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa ParseData NON: " + str);
-
-            }
-        }
-
-        #endregion END of MPD METHODS
+        #endregion END of MPD Method
 
     }
 
-    // State object for receiving data.  
+    public class ConnectionResult
+    {
+        public bool isSuccess;
+        public string errorMessage;
+    }
+
     public class StateObject
     {
         // Client socket.  

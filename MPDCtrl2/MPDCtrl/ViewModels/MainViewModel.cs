@@ -36,6 +36,7 @@ namespace MPDCtrl.ViewModels
     /// 
     /// 
     /// 更新履歴：
+    /// v2.0.0.5: DebugWindowがオンの時だけテキストを追加するようにした（consumeで激重になる）。
     /// v2.0.0.4: Consumeオプションを追加。
     /// v2.0.0.3: Current Queueの項目を増やしたり、IsPlayingとか。
     /// v2.0.0.2: DebugWindowの追加とかProfile関係とか色々。
@@ -134,7 +135,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "2.0.0.4";
+        const string _appVer = "2.0.0.5";
         public string AppVer
         {
             get
@@ -1836,11 +1837,14 @@ namespace MPDCtrl.ViewModels
                                 {
                                     foreach (var asdf in _MPC.CurrentQueue)
                                     {
-                                        asdf.IsPlaying = false;
+                                        if (asdf.IsPlaying)
+                                        {
+                                            asdf.IsPlaying = false;
+                                            break;
+                                        }   
                                     }
                                 }
                             }
-
 
                             SelectedSong = (item as MPC.Song);
                             CurrentSong = (item as MPC.Song);
@@ -1900,12 +1904,14 @@ namespace MPDCtrl.ViewModels
 
         private void OnDataReceived(MPC sender, object data)
         {
-            OnDebugWindowOutput?.Invoke((data as string));
+            if (IsShowDebugWindow)
+                OnDebugWindowOutput?.Invoke((data as string));
         }
 
         private void OnDataSent(MPC sender, object data)
         {
-            OnDebugWindowOutput?.Invoke((data as string));
+            if (IsShowDebugWindow)
+                OnDebugWindowOutput?.Invoke((data as string));
         }
 
         private void OnError(MPC sender, MPC.MpdErrorTypes errType, object data)

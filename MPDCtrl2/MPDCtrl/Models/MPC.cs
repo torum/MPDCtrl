@@ -48,11 +48,85 @@ namespace MPDCtrl
     {
         public class Song : ViewModelBase
         {
-            public string ID { get; set; }
+            public string Id { get; set; }
+            public string Pos { get; set; }
+            public string file { get; set; }
             public string Title { get; set; }
-            public string Artist { get; set; }
+            public string Track { get; set; }
 
-            public bool IsPlaying { get; set; }
+            private string _timeFormatted;
+            private string _time;
+            public string Time {
+                get
+                {
+                    return _timeFormatted;
+                }
+                set
+                {
+                    if (_time == value)
+                        return;
+
+                    _time = value;
+
+                    try
+                    {
+                        if (!string.IsNullOrEmpty(value))
+                        {
+
+                            int sec, min, hour, s;
+                            sec = Int32.Parse(value);
+
+                            min = sec / 60;
+                            s = sec % 60;
+                            hour = min / 60;
+                            min = min % 60;
+
+                            if ((hour == 0) && min == 0)
+                            {
+                                _timeFormatted = String.Format("{0}", s);
+
+                            }
+                            else if ((hour == 0) && (min != 0))
+                            {
+                                _timeFormatted = String.Format("{0}:{1:00}", min, s);
+                            }
+                            else if ((hour != 0) && (min != 0))
+                            {
+                                _timeFormatted = String.Format("{0}:{1}:{2:00}", hour, min, s);
+                            }
+                        }
+                    }
+                    catch (FormatException e)
+                    {
+                        System.Diagnostics.Debug.WriteLine(e.Message);
+                    }
+                }
+            }
+            public string duration { get; set; }
+            public string Artist { get; set; }
+            public string Album { get; set; }
+            public string AlbumArtist { get; set; }
+            public string Composer { get; set; }
+            public string Date { get; set; }
+            public string Genre { get; set; }
+            public string LastModified { get; set; }
+
+            private bool _isPlaying;
+            public bool IsPlaying
+            {
+                get
+                {
+                    return _isPlaying;
+                }
+                set
+                {
+                    if (_isPlaying == value)
+                        return;
+
+                    _isPlaying = value;
+                    this.NotifyPropertyChanged("IsPlaying");
+                }
+            }
         }
 
         public class Status
@@ -66,6 +140,7 @@ namespace MPDCtrl
             private int _volume;
             private bool _repeat;
             private bool _random;
+            private bool _consume;
             private string _songID = "";
             private double _songTime = 0;
             private double _songElapsed = 0;
@@ -100,6 +175,14 @@ namespace MPDCtrl
                 set
                 {
                     _random = value;
+                }
+            }
+            public bool MpdConsume
+            {
+                get { return _consume; }
+                set
+                {
+                    _consume = value;
                 }
             }
 
@@ -140,7 +223,7 @@ namespace MPDCtrl
         {
             ProtocolError, //Ark...
             StatusError, //[status] error: Failed to open audio output
-            Error
+            ErrorClear, //
         }
 
 
@@ -908,6 +991,50 @@ namespace MPDCtrl
                 System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetRandom: " + ex.Message);
             }
         }
+        
+        public void MpdSetConsume(bool on)
+        {
+            if (_status.MpdConsume == on) { return; }
+
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    if (on)
+                    {
+                        mpdCommand = mpdCommand + "consume 1" + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = mpdCommand + "consume 0" + "\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    if (on)
+                    {
+                        mpdCommand = "consume 1" + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = "consume 0" + "\n";
+                    }
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetRandom: " + ex.Message);
+            }
+        }
 
         public void MpdChangePlaylist(string playlistName)
         {
@@ -1350,6 +1477,27 @@ namespace MPDCtrl
                     }
                 }
 
+                // Consume opt bool.
+                if (MpdStatusValues.ContainsKey("consume"))
+                {
+                    try
+                    {
+                        if (Int32.Parse(MpdStatusValues["consume"]) > 0)
+                        {
+                            _status.MpdConsume = true;
+                        }
+                        else
+                        {
+                            _status.MpdConsume = false;
+                        }
+
+                    }
+                    catch (FormatException e)
+                    {
+                        System.Diagnostics.Debug.WriteLine(e.Message);
+                    }
+                }
+
                 // Song time.
                 if (MpdStatusValues.ContainsKey("time"))
                 {
@@ -1387,10 +1535,14 @@ namespace MPDCtrl
                     catch { }
                 }
 
-                // 
+                // Error
                 if (MpdStatusValues.ContainsKey("error"))
                 {
                     ErrorReturned?.Invoke(this, MpdErrorTypes.StatusError, MpdStatusValues["error"]);
+                }
+                else
+                {
+                    ErrorReturned?.Invoke(this, MpdErrorTypes.ErrorClear, "");
                 }
 
 
@@ -1469,7 +1621,7 @@ namespace MPDCtrl
                         if (SongValues.ContainsKey("Id"))
                         {
                             Song sng = new Song();
-                            sng.ID = SongValues["Id"];
+                            sng.Id = SongValues["Id"];
 
                             if (SongValues.ContainsKey("Title"))
                             {
@@ -1477,7 +1629,7 @@ namespace MPDCtrl
                             }
                             else
                             {
-                                sng.Title = "- no title";
+                                sng.Title = "";
                                 if (SongValues.ContainsKey("file"))
                                 {
                                     sng.Title = Path.GetFileName(SongValues["file"]);
@@ -1496,11 +1648,53 @@ namespace MPDCtrl
                                 }
                                 else
                                 {
-                                    sng.Artist = "...";
+                                    sng.Artist = "";
                                 }
                             }
 
-                            if (sng.ID == _status.MpdSongID)
+                            if (SongValues.ContainsKey("Last-Modified"))
+                            {
+                                sng.LastModified = SongValues["Last-Modified"];
+                            }
+                            if (SongValues.ContainsKey("AlbumArtist"))
+                            {
+                                sng.AlbumArtist = SongValues["AlbumArtist"];
+                            }
+                            if (SongValues.ContainsKey("Album"))
+                            {
+                                sng.Album = SongValues["Album"];
+                            }
+                            if (SongValues.ContainsKey("Track"))
+                            {
+                                sng.Track = SongValues["Track"];
+                            }
+                            if (SongValues.ContainsKey("Date"))
+                            {
+                                sng.Date = SongValues["Date"];
+                            }
+                            if (SongValues.ContainsKey("Genre"))
+                            {
+                                sng.Genre = SongValues["Genre"];
+                            }
+                            if (SongValues.ContainsKey("Composer"))
+                            {
+                                sng.Composer = SongValues["Composer"];
+                            }
+                            if (SongValues.ContainsKey("Time"))
+                            {
+                                sng.Time = SongValues["Time"];
+                            }
+                            if (SongValues.ContainsKey("duration"))
+                            {
+                                sng.duration = SongValues["duration"];
+                            }
+                            if (SongValues.ContainsKey("Pos"))
+                            {
+                                sng.Pos = SongValues["Pos"];
+                            }
+
+
+                            if (sng.Id == _status.MpdSongID)
                             {
                                 _currentSong = sng;
                                 //System.Diagnostics.Debug.WriteLine(sng.ID + ":" + sng.Title + " - is current.");

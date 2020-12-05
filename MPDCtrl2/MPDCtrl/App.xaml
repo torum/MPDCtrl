@@ -1215,26 +1215,56 @@
                         <Style.Triggers>
                             <Trigger Property="ItemsControl.AlternationIndex" Value="0">
                                 <Setter Property="Background" Value="{DynamicResource ListviewAlt0ColorBrush}" />
-                                <Setter Property="BorderBrush" Value="Transparent" />
-                                <Setter Property="BorderThickness" Value="0" />
                             </Trigger>
                             <Trigger Property="ItemsControl.AlternationIndex" Value="1">
                                 <Setter Property="Background" Value="{DynamicResource ListviewAlt1ColorBrush}" />
-                                <Setter Property="BorderBrush" Value="Transparent" />
-                                <Setter Property="BorderThickness" Value="0" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Foreground" Value="{DynamicResource ListviewItemMouseOverForegroundColorBrush}" />
-                                <Setter Property="BorderBrush" Value="WhiteSmoke" />
-                                <Setter Property="BorderThickness" Value="0" />
+                                <!--
+                                <Setter Property="TextElement.FontWeight" Value="SemiBold" />
+                                -->
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter Property="Background" Value="DarkGray" />
                                 <Setter Property="Foreground" Value="{DynamicResource BoardBackgroundColorBrush}" />
                                 <Setter Property="TextElement.FontWeight" Value="Bold"/>
-                                <Setter Property="BorderBrush" Value="WhiteSmoke" />
-                                <!-- Or Gray -->
-                                <Setter Property="BorderThickness" Value="0" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <Style x:Key="ListViewItemNoAlternateStyle" TargetType="ListViewItem">
+                        <Setter Property="Background" Value="{DynamicResource ListviewAlt0ColorBrush}"/>
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="FocusVisualStyle" Value="{StaticResource ListviewFocusVisual}"/>
+                        <!--
+                        <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"/>
+                        -->
+                        <Setter Property="Foreground" Value="{DynamicResource ListviewItemForegroundColorBrush}"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                    <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            ClipToBounds="{TemplateBinding ClipToBounds}"
+                                            CornerRadius="0"
+                                            SnapsToDevicePixels="true">
+                                        <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource ListviewItemMouseOverForegroundColorBrush}" />
+                                <!--
+                                <Setter Property="TextElement.FontWeight" Value="SemiBold" />
+                                -->
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="DarkGray" />
+                                <Setter Property="Foreground" Value="{DynamicResource BoardBackgroundColorBrush}" />
+                                <Setter Property="TextElement.FontWeight" Value="Bold"/>
                             </Trigger>
                         </Style.Triggers>
                     </Style>

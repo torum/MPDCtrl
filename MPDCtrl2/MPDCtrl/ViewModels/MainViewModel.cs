@@ -26,8 +26,6 @@ namespace MPDCtrl.ViewModels
     /// TODO: 
     /// 
     /// 設定画面。
-    /// queueの項目を増やす
-    /// Current QueueのNowPlayingが欲しい。
     /// スライダー等のデザイン。＞これのせいで他のが変になった。
     /// current queueの並べ替えとplaylistとしての保存。
     /// i19n
@@ -38,15 +36,11 @@ namespace MPDCtrl.ViewModels
     /// 
     /// 
     /// 更新履歴：
+    /// v2.0.0.4: Consumeオプションを追加。
+    /// v2.0.0.3: Current Queueの項目を増やしたり、IsPlayingとか。
     /// v2.0.0.2: DebugWindowの追加とかProfile関係とか色々。
     /// 
 
-    /// <summary>
-    /// 
-
-    /// 
-    /// 
-    /// </summary>
 
     public class Profile : ViewModelBase
     {
@@ -140,7 +134,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "2.0.0.2";
+        const string _appVer = "2.0.0.4";
         public string AppVer
         {
             get
@@ -672,6 +666,28 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private bool _consume;
+        public bool Consume
+        {
+            get { return _consume; }
+            set
+            {
+                _consume = value;
+                NotifyPropertyChanged("Consume");
+
+                if (_MPC != null)
+                {
+                    if (_MPC.MpdStatus.MpdConsume != value)
+                    {
+                        if (SetConsumeCommand.CanExecute(null))
+                        {
+                            SetConsumeCommand.Execute(null);
+                        }
+                    }
+                }
+            }
+        }
+
         private double _time;
         public double Time
         {
@@ -1051,6 +1067,7 @@ namespace MPDCtrl.ViewModels
             PlayPrevCommand = new RelayCommand(PlayPrevCommand_ExecuteAsync, PlayPrevCommand_CanExecute);
             SetRpeatCommand = new RelayCommand(SetRpeatCommand_ExecuteAsync, SetRpeatCommand_CanExecute);
             SetRandomCommand = new RelayCommand(SetRandomCommand_ExecuteAsync, SetRandomCommand_CanExecute);
+            SetConsumeCommand = new RelayCommand(SetConsumeCommand_ExecuteAsync, SetConsumeCommand_CanExecute);
             SetVolumeCommand = new RelayCommand(SetVolumeCommand_ExecuteAsync, SetVolumeCommand_CanExecute);
             SetSeekCommand = new RelayCommand(SetSeekCommand_ExecuteAsync, SetSeekCommand_CanExecute);
             ChangeSongCommand = new RelayCommand(ChangeSongCommand_ExecuteAsync, ChangeSongCommand_CanExecute);
@@ -1090,6 +1107,7 @@ namespace MPDCtrl.ViewModels
             #endregion
 
             #region == イベント ==
+
             _MPC.Connected += new MPC.MpdConnected(OnConnected);
             _MPC.StatusChanged += new MPC.MpdStatusChanged(OnStatusChanged);
             _MPC.StatusUpdate += new MPC.MpdStatusUpdate(OnStatusUpdate);
@@ -1098,7 +1116,6 @@ namespace MPDCtrl.ViewModels
             _MPC.ErrorReturned += new MPC.MpdError(OnError);
             _MPC.ErrorConnected += new MPC.MpdConnectionError(OnConnectionError);
             _MPC.ConnectionStatusChanged += new MPC.MpdConnectionStatusChanged(OnConnectionStatusChanged);
-
 
             #endregion
 
@@ -1112,12 +1129,12 @@ namespace MPDCtrl.ViewModels
             #endregion
 
             #if DEBUG
-            IsMainShow = true; // show in XAML design mode.
+            IsMainShow = true; // To show Mainpain in the XAML design mode.
             #else
             IsMainShow = false;
             #endif
 
-            // DebugWindow hack.
+            // Window hack.
             App app = App.Current as App;
             if (app != null) 
             {
@@ -1707,6 +1724,9 @@ namespace MPDCtrl.ViewModels
                 _repeat = _MPC.MpdStatus.MpdRepeat;
                 NotifyPropertyChanged("Repeat");
 
+                _consume = _MPC.MpdStatus.MpdConsume;
+                NotifyPropertyChanged("Consume");
+
                 // no need to care about "double" updates for time.
                 Time = _MPC.MpdStatus.MpdSongTime;
 
@@ -1805,13 +1825,27 @@ namespace MPDCtrl.ViewModels
                 {
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        var item = _MPC.CurrentQueue.FirstOrDefault(i => i.ID == _MPC.MpdStatus.MpdSongID);
+                        var item = _MPC.CurrentQueue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
                         if (item != null)
                         {
                             //sender.MpdCurrentSong = (item as MPC.Song); // just in case.
 
+                            if (CurrentSong != null)
+                            {
+                                if (item != CurrentSong)
+                                {
+                                    foreach (var asdf in _MPC.CurrentQueue)
+                                    {
+                                        asdf.IsPlaying = false;
+                                    }
+                                }
+                            }
+
+
                             SelectedSong = (item as MPC.Song);
                             CurrentSong = (item as MPC.Song);
+
+                            (item as MPC.Song).IsPlaying = true;
                         }
                         else
                         {
@@ -1829,13 +1863,15 @@ namespace MPDCtrl.ViewModels
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    var item = _MPC.CurrentQueue.FirstOrDefault(i => i.ID == _MPC.MpdStatus.MpdSongID);
+                    var item = _MPC.CurrentQueue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
                     if (item != null)
                     {
                         //sender.MpdCurrentSong = (item as MPC.Song); // just in case.
 
                         SelectedSong = (item as MPC.Song);
                         CurrentSong = (item as MPC.Song);
+
+                        (item as MPC.Song).IsPlaying = true;
                     }
                     else
                     {
@@ -1886,17 +1922,23 @@ namespace MPDCtrl.ViewModels
                 s = s.Replace("[] ", string.Empty);
 
                 StatusMessage = "MPD Protocol Error: " + s;
+                StatusButton = _pathErrorInfoButton;
             }
             else if (errType == MPC.MpdErrorTypes.StatusError)
             {
                 StatusMessage = "MPD Status Error: " + (data as string);
+                StatusButton = _pathErrorInfoButton;
+            }
+            else if (errType == MPC.MpdErrorTypes.ErrorClear)
+            {
+                StatusMessage = "";
+                StatusButton = _pathConnectedButton;
             }
             else
             {
                 StatusMessage = (data as string);
+                StatusButton = _pathErrorInfoButton;
             }
-
-            StatusButton = _pathErrorInfoButton;
         }
 
         private void OnConnectionError(MPC sender, object data)
@@ -2088,6 +2130,17 @@ namespace MPDCtrl.ViewModels
             _MPC.MpdSetRepeat(_repeat);
         }
 
+        public ICommand SetConsumeCommand { get; }
+        public bool SetConsumeCommand_CanExecute()
+        {
+            if (_MPC == null) { return false; }
+            return true;
+        }
+        public void SetConsumeCommand_ExecuteAsync()
+        {
+            _MPC.MpdSetConsume(_consume);
+        }
+
         public ICommand SetVolumeCommand { get; }
         public bool SetVolumeCommand_CanExecute()
         {
@@ -2131,7 +2184,7 @@ namespace MPDCtrl.ViewModels
         }
         public void ChangeSongCommand_ExecuteAsync()
         {
-            _MPC.MpdPlaybackPlay(_selectedSong.ID);
+            _MPC.MpdPlaybackPlay(_selectedSong.Id);
         }
 
         public ICommand ChangePlaylistCommand { get; set; }
@@ -2159,7 +2212,7 @@ namespace MPDCtrl.ViewModels
         }
         public void SongListViewEnterKeyCommand_ExecuteAsync()
         {
-            _MPC.MpdPlaybackPlay(_selectedSong.ID);
+            _MPC.MpdPlaybackPlay(_selectedSong.Id);
         }
 
         public ICommand SongListViewLeftDoubleClickCommand { get; set; }
@@ -2172,7 +2225,7 @@ namespace MPDCtrl.ViewModels
         }
         public void SongListViewLeftDoubleClickCommand_ExecuteAsync(MPC.Song song)
         {
-            _MPC.MpdPlaybackPlay(song.ID);
+            _MPC.MpdPlaybackPlay(song.Id);
         }
 
         public ICommand PlaylistListviewLeftDoubleClickCommand { get; set; }
@@ -2305,7 +2358,7 @@ namespace MPDCtrl.ViewModels
 
             foreach (var item in selectedList)
             {
-                deleteIdList.Add(item.ID);
+                deleteIdList.Add(item.Id);
             }
 
             _MPC.MpdDeleteId(deleteIdList);

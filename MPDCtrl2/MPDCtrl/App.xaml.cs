@@ -129,6 +129,7 @@ namespace MPDCtrl
             // for debug.
             //win.Show();
             //win.Topmost = true;
+            win.Topmost = false;
 
             win.Hide();
 
@@ -157,7 +158,7 @@ namespace MPDCtrl
                         (w as DebugWindow).Width = eventArg.Width;
                         (w as DebugWindow).Height = eventArg.Height;
 
-                        (w as DebugWindow).Show();
+                        //(w as DebugWindow).Show();
 
                         //(w as DebugWindow).Activate();
                         //(w as DebugWindow).Topmost = true;

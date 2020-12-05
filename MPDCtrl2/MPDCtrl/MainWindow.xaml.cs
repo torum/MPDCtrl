@@ -14,7 +14,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Interop;
 using System.Runtime.InteropServices;
+using System.ComponentModel;
 using MPDCtrl.ViewModels;
+using MPDCtrl.Views;
 
 namespace MPDCtrl
 {
@@ -115,6 +117,7 @@ namespace MPDCtrl
                 NewHost_TextBox.Focus();
             }
         }
+
 
         #region == MAXIMIZE時のタスクバー被りのFix ==
         // https://engy.us/blog/2020/01/01/implementing-a-custom-window-title-bar-in-wpf/

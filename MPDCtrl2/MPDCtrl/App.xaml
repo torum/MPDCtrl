@@ -12,6 +12,9 @@
 
             <!-- データコンテキスト -->
             <vms:MainViewModel x:Key="MainViewModel" />
+            <vms:DebugViewModel x:Key="DebugViewModel" />
+
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             
             <!-- BooleanToVisibilityConverterの、 Collapsed 版　-->
             <common:BoolToVisibilityCollapsedConverter x:Key="BoolToVisibilityCollapsedConverter" TrueValue="Visible" FalseValue="Collapsed" />
@@ -23,7 +26,7 @@
 
                 <!-- 基本 -->
                 <ResourceDictionary>
-
+                    
                     <Style x:Key="DefaultTextBlockStyle" TargetType="{x:Type TextBlock}">
                         <Setter Property="Foreground" Value="{DynamicResource NormalTextColorBrush}" />
                         <Setter Property="FontSize" Value="12" />
@@ -75,7 +78,7 @@
                     </Style>
 
                     <Style x:Key="DefaultTextBoxStyle" TargetType="{x:Type TextBox}">
-                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="Margin" Value="1"/>
                         <Setter Property="HorizontalAlignment" Value="Left"/>
                         <Setter Property="VerticalAlignment" Value="Center"/>
                         <Setter Property="Background" Value="{DynamicResource NormalTextBoxBackgroundColorBrush}" />
@@ -103,39 +106,10 @@
                     </Style>
 
                     <Style x:Key="DefaultPasswordBoxStyle" TargetType="{x:Type PasswordBox}">
-                        <Setter Property="Background" Value="DarkGray" />
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type PasswordBox}">
-                                    <Border BorderBrush="DimGray" BorderThickness="1">
-                                        <Grid Background="{TemplateBinding Background}">
-
-                                            <ScrollViewer x:Name="PART_ContentHost"/>
-                                            <TextBlock x:Name="UserMessage" Margin="5,0,5,0" Text="{Binding Password}" IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Visible"/>
-
-                                        </Grid>
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <MultiTrigger>
-                                            <MultiTrigger.Conditions>
-                                                <Condition Property="Tag" Value=""/>
-                                            </MultiTrigger.Conditions>
-                                            <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
-                                            <Setter Property="Text" TargetName="UserMessage" Value=""/>
-                                        </MultiTrigger>
-                                        <MultiTrigger>
-                                            <MultiTrigger.Conditions>
-                                                <Condition Property="IsKeyboardFocusWithin" Value="true"/>
-                                            </MultiTrigger.Conditions>
-                                            <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
-                                            <Setter Property="Text" TargetName="UserMessage" Value=""/>
-
-                                            <Setter Property="Background" Value="WhiteSmoke" />
-                                        </MultiTrigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
+                        <Setter Property="Margin" Value="1"/>
+                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="Background" Value="{DynamicResource NormalTextBoxBackgroundColorBrush}" />
                     </Style>
 
 
@@ -934,10 +908,15 @@
                                     </Grid>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsPressed" Value="true">
+                                            <!-- ヘッダークリック可の場合
                                             <Setter TargetName="HeaderContent" Property="Margin" Value="0,1,0,0" />
+                                            -->
+                                            <Setter TargetName="HeaderContent" Property="Margin" Value="0,0,0,4" />
                                         </Trigger>
                                         <Trigger Property="IsMouseOver" Value="true">
+                                            <!--
                                             <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="white" />
+                                            -->
                                         </Trigger>
                                         <Trigger Property="IsEnabled" Value="false">
                                             <Setter TargetName="HeaderBorder" Property="Opacity" Value=".5" />
@@ -1718,7 +1697,6 @@
                     </Style>
 
                 </ResourceDictionary>
-
 
                 <!-- Left Menu TabControl -->
                 <ResourceDictionary>

@@ -136,6 +136,14 @@ namespace MPDCtrl
             }
         }
 
+        public enum MpdErrorTypes
+        {
+            ProtocolError, //Ark...
+            StatusError, //[status] error: Failed to open audio output
+            Error
+        }
+
+
         #region == Variabes and Properties ==  
 
         private AsynchronousTCPClient _asyncClient;
@@ -206,7 +214,7 @@ namespace MPDCtrl
         }
 
         private ObservableCollection<String> _localFiles = new ObservableCollection<String>();
-        public ObservableCollection<String> LoaclFiles
+        public ObservableCollection<String> LocalFiles
         {
             get { return _localFiles; }
         }
@@ -218,7 +226,7 @@ namespace MPDCtrl
         public delegate void MpdStatusChanged(MPC sender, object data);
         public event MpdStatusChanged StatusChanged;
 
-        public delegate void MpdError(MPC sender, object data);
+        public delegate void MpdError(MPC sender, MpdErrorTypes err, object data);
         public event MpdError ErrorReturned;
 
         public delegate void MpdConnected(MPC sender);
@@ -323,7 +331,7 @@ namespace MPDCtrl
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+                _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
             }
             catch (Exception ex)
             {
@@ -347,7 +355,7 @@ namespace MPDCtrl
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+                _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
             }
             catch (Exception ex)
             {
@@ -373,7 +381,7 @@ namespace MPDCtrl
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+                _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
 
             }
             catch (Exception ex)
@@ -400,7 +408,7 @@ namespace MPDCtrl
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+                _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
             }
             catch (Exception ex)
             {
@@ -427,7 +435,7 @@ namespace MPDCtrl
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+                _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
             }
             catch (Exception ex)
             {
@@ -454,7 +462,7 @@ namespace MPDCtrl
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+                _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
             }
             catch (Exception ex)
             {
@@ -486,7 +494,7 @@ namespace MPDCtrl
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+                _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
             }
             catch (Exception ex)
             {
@@ -948,8 +956,6 @@ namespace MPDCtrl
 
         private async void TCPClient_ConnectionStatusChanged(AsynchronousTCPClient sender, AsynchronousTCPClient.ConnectionStatus status)
         {
-            //System.Diagnostics.Debug.WriteLine("--AsynchronousClient_ConnectionStatusChanged: " + status.ToString());
-
             await Task.Run(() => { ConnectionStatusChanged?.Invoke(this, status); });
 
             if (status == AsynchronousTCPClient.ConnectionStatus.Connected)
@@ -974,7 +980,6 @@ namespace MPDCtrl
 
         private async void TCPClient_DataReceived(AsynchronousTCPClient sender, object data)
         {
-            //System.Diagnostics.Debug.WriteLine("AsynchronousClient_DataReceived:\n" + (data as string));
             await Task.Run(() => { DataReceived?.Invoke(this, (data as string)); });
 
             if ((data as string).StartsWith("OK MPD"))
@@ -1074,11 +1079,6 @@ namespace MPDCtrl
                          */
                     }
 
-                    if (isPlayer)
-                    {
-                        MpdQueryStatus();
-                    }
-
                     if (isCurrentQueue)
                     {
                         MpdQueryCurrentQueue();
@@ -1088,6 +1088,12 @@ namespace MPDCtrl
                     {
                         MpdQueryPlaylists();
                     }
+
+                    if (isPlayer)
+                    {
+                        MpdQueryStatus();
+                    }
+
                 }
                 catch
                 {
@@ -1222,12 +1228,10 @@ namespace MPDCtrl
             {
                 foreach (string value in sl)
                 {
-                    //System.Diagnostics.Debug.WriteLine("ParseStatusResponse loop: " + value);
-
                     if (value.StartsWith("ACK"))
                     {
                         System.Diagnostics.Debug.WriteLine("ACK@ParseStatusResponse: " + value);
-                        ErrorReturned?.Invoke(this, "MPD Error (@C1): " + value);
+                        ErrorReturned?.Invoke(this, MpdErrorTypes.ProtocolError, value);
                         return false;
                     }
 
@@ -1383,6 +1387,13 @@ namespace MPDCtrl
                     catch { }
                 }
 
+                // 
+                if (MpdStatusValues.ContainsKey("error"))
+                {
+                    ErrorReturned?.Invoke(this, MpdErrorTypes.StatusError, MpdStatusValues["error"]);
+                }
+
+
                 // TODO: more?
             }
             catch (Exception ex)
@@ -1436,7 +1447,7 @@ namespace MPDCtrl
                     if (value.StartsWith("ACK"))
                     {
                         System.Diagnostics.Debug.WriteLine("ACK@ParsePlaylistInfoResponse: " + value);
-                        ErrorReturned?.Invoke(this, "MPD Error (@C2): " + value);
+                        ErrorReturned?.Invoke(this, MpdErrorTypes.ProtocolError, value);
                         return false;
                     }
 
@@ -1542,7 +1553,7 @@ namespace MPDCtrl
             if (sl == null)
             {
                 System.Diagnostics.Debug.WriteLine("Connected response@ParsePlaylistsResponse: null");
-                ErrorReturned?.Invoke(this, "Connection Error: (C3)");
+                //ErrorReturned?.Invoke(this, "Connection Error: (C3)");
                 return false;
             }
 
@@ -1562,7 +1573,7 @@ namespace MPDCtrl
                 if (value.StartsWith("ACK"))
                 {
                     System.Diagnostics.Debug.WriteLine("ACK@ParsePlaylistsResponse: " + value);
-                    ErrorReturned?.Invoke(this, "MPD Error (@C3): " + value);
+                    ErrorReturned?.Invoke(this, MpdErrorTypes.ProtocolError, value);
                     return false;
                 }
 
@@ -1599,7 +1610,7 @@ namespace MPDCtrl
             if (Application.Current == null) { return false; }
             Application.Current.Dispatcher.Invoke(() =>
             {
-                LoaclFiles.Clear();
+                LocalFiles.Clear();
             });
 
             // Tmp list for sorting.
@@ -1636,7 +1647,7 @@ namespace MPDCtrl
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    LoaclFiles.Add(v);
+                    LocalFiles.Add(v);
                 });
             }
 
@@ -1854,7 +1865,8 @@ namespace MPDCtrl
                     {
                         if (!string.IsNullOrEmpty(state.sb.ToString().Trim()))
                         {
-                            await Task.Run(() => { DataReceived?.Invoke(this, state.sb.ToString()); });
+                            //await Task.Run(() => { DataReceived?.Invoke(this, state.sb.ToString()); }); //??
+                            DataReceived?.Invoke(this, state.sb.ToString().Trim());
                         }
                         //receiveDone.Set();
 
@@ -1950,10 +1962,8 @@ namespace MPDCtrl
 
         private void DoSend(Socket client, String data)
         {
-            //System.Diagnostics.Debug.WriteLine("Sending... :" + data);
-
-            //await Task.Run(() => {  });
-            DataSent?.Invoke(this, Environment.NewLine + "Sending...: " + data + Environment.NewLine);
+            //await Task.Run(() => { DataSent?.Invoke(this, "Sending...: " + data); }); // bad..
+            DataSent?.Invoke(this, ">>" + data);
 
             // Convert the string data to byte data using ASCII encoding.  
             byte[] byteData = Encoding.Default.GetBytes(data);

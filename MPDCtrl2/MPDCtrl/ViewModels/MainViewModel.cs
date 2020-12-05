@@ -16,45 +16,121 @@ using System.Xml.Linq;
 using System.Windows.Input;
 using System.IO;
 using System.ComponentModel;
-using MPDCtrl.Common;
 using System.Windows.Threading;
 using System.Net;
+using MPDCtrl.Common;
+using MPDCtrl.Views;
 
 namespace MPDCtrl.ViewModels
 {
-    /// <summary>
-    /// 
     /// TODO: 
-    /// Current QueueのNowPlayingが欲しい。
-    /// profile を設定ファイルに保存。設定画面。
+    /// 
+    /// 設定画面。
     /// queueの項目を増やす
-    /// i19n。
-    /// current queueの並べ替えとplaylistとしての保存。
-    /// 
+    /// Current QueueのNowPlayingが欲しい。
     /// スライダー等のデザイン。＞これのせいで他のが変になった。
-    /// 
+    /// current queueの並べ替えとplaylistとしての保存。
+    /// i19n
     /// object data > string something
     /// PlayListの削除、作成・保存。
-    /// 
     /// queueの項目を表示・非表示を項目事に選択・保存できるように。
+    /// スライダーの上でスクロールして音量変更。
+    /// 
     /// 
     /// 更新履歴：
+    /// v2.0.0.2: DebugWindowの追加とかProfile関係とか色々。
+    /// 
+
+    /// <summary>
+    /// 
+
     /// 
     /// 
     /// </summary>
-    /// 
 
-
-
-    public class Profile
+    public class Profile : ViewModelBase
     {
-        public string Host { get; set; }
-        public int Port { get; set; }
-        public string Password { get; set; }
-        public string Name { get; set; }
-        public string ID { get; set; }
+        private string _host;
+        public string Host
+        {
+            get { return _host; }
+            set
+            {
+                if (_host == value)
+                    return;
+
+                _host = value;
+                NotifyPropertyChanged("Host");
+            }
+        }
+
+        private int _port;
+        public int Port
+        {
+            get { return _port; }
+            set
+            {
+                if (_port == value)
+                    return;
+
+                _port = value;
+                NotifyPropertyChanged("Port");
+            }
+        }
+
+        private string _password;
+        public string Password 
+        {
+            get { return _password; }
+            set
+            {
+                if (_password == value)
+                    return;
+
+                _password = value;
+                NotifyPropertyChanged("Password");
+            }
+        }
+
+        private string _name;
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                if (_name == value)
+                    return;
+
+                _name = value;
+                NotifyPropertyChanged("Name");
+            }
+        }
+
+        private bool _isDefault;
+        public bool IsDefault
+        {
+            get { return _isDefault; }
+            set
+            {
+                if (_isDefault == value)
+                    return;
+
+                _isDefault = value;
+
+                NotifyPropertyChanged("IsDefault");
+            }
+        }
+
     }
 
+    public class ShowDebugEventArgs : EventArgs
+    {
+        public bool SetVisibility = true;
+        public double Top = 100;
+        public double Left = 100;
+        public double Height = 240;
+        public double Width = 450;
+    }
 
     public class MainViewModel : ViewModelBase
     {
@@ -64,7 +140,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "2.0.0.1";
+        const string _appVer = "2.0.0.2";
         public string AppVer
         {
             get
@@ -90,31 +166,44 @@ namespace MPDCtrl.ViewModels
             get
             {
                 #if DEBUG
-                //return true;
+                return true;
                 #else
                 return false; 
                 #endif
-
-                return false;
             }
         }
         
         #endregion
 
-        #region == 設定フォルダ ==  
+        #region == 設定フォルダ関連 ==  
 
         private string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         private string _appDataFolder;
         private string _appConfigFilePath;
+
+        private bool _isFullyLoaded;
+        public bool IsFullyLoaded
+        {
+            get
+            {
+                return _isFullyLoaded;
+            }
+            set
+            {
+                if (_isFullyLoaded == value)
+                    return;
+
+                _isFullyLoaded = value;
+                this.NotifyPropertyChanged("IsFullyLoaded");
+            }
+        }
 
         #endregion
 
         #region == MPC ==  
 
         private MPC _MPC;
-        private string _defaultHost;
-        private int _defaultPort;
-        private string _defaultPassword;
+
 
         #endregion
 
@@ -139,11 +228,17 @@ namespace MPDCtrl.ViewModels
                 {
                     IsMainShow = true;
                     IsConnectionSettingShow = false;
+                    IsConnecting = false;
+                    IsNotConnectingNorConnected = false;
                 }
                 else
                 {
                     IsMainShow = false;
                     IsConnectionSettingShow = true;
+                    if (!IsConnecting)
+                    {
+                        IsNotConnectingNorConnected = true;
+                    }
                 }
             }
         }
@@ -157,11 +252,52 @@ namespace MPDCtrl.ViewModels
             }
             set
             {
+                if (_isConnecting == value)
+                    return;
+
                 _isConnecting = value;
                 NotifyPropertyChanged("IsConnecting");
+
+                if (_isConnecting)
+                {
+                    IsNotConnectingNorConnected = false;
+                }
+                else
+                {
+                    if (!IsConnected)
+                    {
+                        IsNotConnectingNorConnected = true;
+                    }
+                }
+
             }
         }
-        
+
+        private bool _isNotConnectingNorConnected = true;
+        public bool IsNotConnectingNorConnected
+        {
+            get
+            {
+                return _isNotConnectingNorConnected;
+            }
+            set
+            {
+                if (_isNotConnectingNorConnected == value)
+                    return;
+
+                _isNotConnectingNorConnected = value;
+                NotifyPropertyChanged("IsNotConnectingNorConnected");
+            }
+        }
+
+        public bool IsNotConnecting
+        {
+            get
+            {
+                return !_isConnecting;
+            }
+        }
+
         private bool _isMainShow;
         public bool IsMainShow
         {
@@ -186,7 +322,31 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isSettingsShow = value;
+
+                if (_isSettingsShow)
+                {
+                    if (CurrentProfile == null)
+                    {
+                        IsConnectionSettingShow = false;
+                    }
+                }
+                else
+                {
+                    if (CurrentProfile == null)
+                    {
+                        IsConnectionSettingShow = true;
+                    }
+                    else
+                    {
+                        if (!IsConnected)
+                        {
+                            IsConnectionSettingShow = true;
+                        }
+                    }
+                }
+
                 NotifyPropertyChanged("IsSettingsShow");
+
             }
         }
 
@@ -215,20 +375,6 @@ namespace MPDCtrl.ViewModels
             {
                 _statusMessage = value;
                 NotifyPropertyChanged("StatusMessage");
-            }
-        }
-
-        private string _debugString;
-        public string DebugString
-        {
-            get
-            {
-                return _debugString;
-            }
-            set
-            {
-                _debugString = value;
-                NotifyPropertyChanged("DebugString");
             }
         }
 
@@ -351,7 +497,7 @@ namespace MPDCtrl.ViewModels
             {
                 if (_MPC != null)
                 {
-                    return _MPC.LoaclFiles;
+                    return _MPC.LocalFiles;
                 }
                 else
                 {
@@ -408,7 +554,7 @@ namespace MPDCtrl.ViewModels
         private static string _pathPlayButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         private static string _pathPauseButton = "M15,16H13V8H15M11,16H9V8H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         //private static string _pathStopButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
-        private string _playButton;
+        private string _playButton = _pathPlayButton;
         public string PlayButton
         {
             get
@@ -446,7 +592,7 @@ namespace MPDCtrl.ViewModels
                         if (_volumeDelayTimer != null)
                             _volumeDelayTimer.Stop();
 
-                        System.Diagnostics.Debug.WriteLine("Volume value is still changing. Skipping.");
+                        //System.Diagnostics.Debug.WriteLine("Volume value is still changing. Skipping.");
 
                         // we always create a new instance of DispatcherTimer
                         _volumeDelayTimer = new System.Timers.Timer();
@@ -515,7 +661,6 @@ namespace MPDCtrl.ViewModels
 
                 if (_MPC != null)
                 {
-
                     if (_MPC.MpdStatus.MpdRandom != value)
                     {
                         if (SetRandomCommand.CanExecute(null))
@@ -566,7 +711,7 @@ namespace MPDCtrl.ViewModels
                     if (_elapsedDelayTimer != null)
                         _elapsedDelayTimer.Stop();
 
-                    System.Diagnostics.Debug.WriteLine("Elapsed value is still changing. Skipping.");
+                    //System.Diagnostics.Debug.WriteLine("Elapsed value is still changing. Skipping.");
 
                     // we always create a new instance of DispatcherTimer
                     _elapsedDelayTimer = new System.Timers.Timer();
@@ -601,72 +746,84 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private DispatcherTimer _elapsedTimer;
 
         #endregion
 
         #region == 設定画面 ==
 
-        public ObservableCollection<Profile> Profiles = new ObservableCollection<Profile>();
+        private ObservableCollection<Profile> _profiles = new ObservableCollection<Profile>();
+        public ObservableCollection<Profile> Profiles
+        {
+            get { return _profiles; }
+        }
 
-        private Profile _profile;
+        private Profile _currentProfile;
+        public Profile CurrentProfile
+        {
+            get { return _currentProfile; }
+            set
+            {
+
+                if (_currentProfile == value)
+                    return;
+
+                _currentProfile = value;
+
+                SelectedProfile = _currentProfile;
+
+                NotifyPropertyChanged("CurrentProfile");
+            }
+        }
+
+        private Profile _selectedProfile;
         public Profile SelectedProfile
         {
             get
             {
-                return _profile;
+                return _selectedProfile;
             }
             set
             {
-                _profile = value;
-                ClearErrror("Host");
-                ClearErrror("Port");
-                if (_profile != null)
+                if (_selectedProfile == value)
+                    return;
+
+                _selectedProfile = value;
+
+                if (_selectedProfile != null)
                 {
-                    // Workaround validation.
-                    _defaultHost = _profile.Host;
-                    NotifyPropertyChanged("Host");
-                    _defaultPort = _profile.Port;
-                    NotifyPropertyChanged("Port");
-                    //_defaultPassword = Decrypt(_profile.Password);
-                    // Set dummy "*"s for PasswordBox.
-                    //Password = DummyPassword(_defaultPassword);
+                    ClearErrror("Host");
+                    ClearErrror("Port");
+                    Host = SelectedProfile.Host;
+                    Port = SelectedProfile.Port.ToString();
+                    _password = SelectedProfile.Password;
+                    NotifyPropertyChanged("Password");
+                    SetIsDefault = SelectedProfile.IsDefault;
                 }
                 else
                 {
-                    _defaultHost = "";
-                    NotifyPropertyChanged("Host");
-                    _defaultPort = 6600;
-                    NotifyPropertyChanged("Port");
-                    _defaultPassword = "";
+                    ClearErrror("Host");
+                    ClearErrror("Port");
+                    Host = "";
+                    Port = "6600";
+                    _password = "";
                     NotifyPropertyChanged("Password");
                 }
 
                 NotifyPropertyChanged("SelectedProfile");
+
+                // Clear message. > Don't.
+                //SettingProfileEditMessage = "";
             }
         }
 
-        private bool _isProfileChanged;
-        public bool IsProfileChanged
-        {
-            get
-            {
-                return _isProfileChanged;
-            }
-            set
-            {
-                _isProfileChanged = value;
-                NotifyPropertyChanged("IsProfileChanged");
-            }
-
-        }
+        private string _host = "";
         public string Host
         {
-            get { return _defaultHost; }
+            get { return _host; }
             set
             {
                 ClearErrror("Host");
-                _defaultHost = value;
+                _host = value;
 
                 // Validate input.
                 if (value == "")
@@ -675,8 +832,7 @@ namespace MPDCtrl.ViewModels
                 }
                 else if (value == "localhost")
                 {
-                    _defaultHost = "127.0.0.1";
-                    IsProfileChanged = true;
+                    _host = "127.0.0.1";
                 }
                 else
                 {
@@ -686,8 +842,7 @@ namespace MPDCtrl.ViewModels
                         ipAddress = IPAddress.Parse(value);
                         if (ipAddress != null)
                         {
-                            _defaultHost = value;
-                            IsProfileChanged = true;
+                            _host = value;
                         }
                     }
                     catch
@@ -701,9 +856,10 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private int _port = 6600;
         public string Port
         {
-            get { return _defaultPort.ToString(); }
+            get { return _port.ToString(); }
             set
             {
                 ClearErrror("Port");
@@ -711,7 +867,7 @@ namespace MPDCtrl.ViewModels
                 if (value == "")
                 {
                     SetError("Port", "Error: Port must be epecified."); //TODO: translate.
-                    _defaultPort = 0;
+                    _port = 0;
                 }
                 else
                 {
@@ -720,14 +876,13 @@ namespace MPDCtrl.ViewModels
                     {
                         //Int32.TryParse(value, out _defaultPort)
                         // Change the value only when test was successfull.
-                        _defaultPort = i;
+                        _port = i;
                         ClearErrror("Port");
-                        IsProfileChanged = true;
                     }
                     else
                     {
                         SetError("Port", "Error: Part number must be consist of numbers."); //TODO: translate.
-                        _defaultPort = 0;
+                        _port = 0;
                     }
                 }
 
@@ -735,18 +890,13 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        // Dummy "*"'s for PasswordBox.
+        private string _password = "";
         public string Password
         {
+            // Dummy "*"'s for PasswordBox.
             get
             {
-                return DummyPassword(_defaultPassword);
-            }
-            set
-            {
-                //ClearErrror("Password");
-                //_defaultPassword = value.Trim();
-                NotifyPropertyChanged("Password");
+                return DummyPassword(_password);
             }
         }
 
@@ -801,22 +951,84 @@ namespace MPDCtrl.ViewModels
             return e;
         }
 
-        private string _settingsErrorMessage;
-        public string SettingsErrorMessage
+
+        private bool _setIsDefault = true;
+        public bool SetIsDefault
+        {
+            get { return _setIsDefault; }
+            set
+            {
+                if (_setIsDefault == value)
+                    return;
+
+                if (value == false)
+                {
+                    if (Profiles.Count == 1)
+                    {
+                        return;
+                    }
+                }
+
+                _setIsDefault = value;
+
+                NotifyPropertyChanged("SetIsDefault");
+            }
+        }
+        
+        private bool _isUpdateOnStartup = true;
+        public bool IsUpdateOnStartup
+        {
+            get { return _isUpdateOnStartup; }
+            set
+            {
+                if (_isUpdateOnStartup == value)
+                    return;
+
+                _isUpdateOnStartup = value;
+
+                NotifyPropertyChanged("IsUpdateOnStartup");
+            }
+        }
+
+        private bool _isShowDebugWindow;
+        public bool IsShowDebugWindow
+        {
+            get { return _isShowDebugWindow; }
+            set
+            {
+                if (_isShowDebugWindow == value)
+                    return;
+
+                _isShowDebugWindow = value;
+
+                ShowDebug.SetVisibility = _isShowDebugWindow;
+                ShowDebugView?.Invoke(this, ShowDebug);
+
+                NotifyPropertyChanged("IsShowDebugWindow");
+            }
+        }
+
+        private string _settingProfileEditMessage;
+        public string SettingProfileEditMessage
         {
             get
             {
-                return _settingsErrorMessage;
+                return _settingProfileEditMessage;
             }
             set
             {
-                _settingsErrorMessage = value;
-                NotifyPropertyChanged("SettingsErrorMessage");
+                _settingProfileEditMessage = value;
+                NotifyPropertyChanged("SettingProfileEditMessage");
             }
         }
 
         #endregion
 
+        public delegate void DebugWindowOutput(String data);
+        public event DebugWindowOutput OnDebugWindowOutput;
+
+        public event EventHandler<ShowDebugEventArgs> ShowDebugView;
+        public ShowDebugEventArgs ShowDebug = new ShowDebugEventArgs();
 
         public MainViewModel()
         {
@@ -843,13 +1055,13 @@ namespace MPDCtrl.ViewModels
             SetSeekCommand = new RelayCommand(SetSeekCommand_ExecuteAsync, SetSeekCommand_CanExecute);
             ChangeSongCommand = new RelayCommand(ChangeSongCommand_ExecuteAsync, ChangeSongCommand_CanExecute);
             ChangePlaylistCommand = new RelayCommand(ChangePlaylistCommand_ExecuteAsync, ChangePlaylistCommand_CanExecute);
-            SongListViewEnterKeyCommand = new RelayCommand(SongListViewEnterKeyCommand_ExecuteAsync, SongListViewEnterKeyCommand_CanExecute);
-            SongListViewLeftDoubleClickCommand = new GenericRelayCommand<MPC.Song>(param => SongListViewLeftDoubleClickCommand_ExecuteAsync(param), param => SongListViewLeftDoubleClickCommand_CanExecute());
             PlaylistListviewEnterKeyCommand = new RelayCommand(PlaylistListviewEnterKeyCommand_ExecuteAsync, PlaylistListviewEnterKeyCommand_CanExecute);
             PlaylistListviewLoadPlaylistCommand = new RelayCommand(PlaylistListviewLoadPlaylistCommand_ExecuteAsync, PlaylistListviewLoadPlaylistCommand_CanExecute);
             PlaylistListviewAddPlaylistCommand = new RelayCommand(PlaylistListviewAddPlaylistCommand_ExecuteAsync, PlaylistListviewAddPlaylistCommand_CanExecute);
             PlaylistListviewLeftDoubleClickCommand = new GenericRelayCommand<String>(param => PlaylistListviewLeftDoubleClickCommand_ExecuteAsync(param), param => PlaylistListviewLeftDoubleClickCommand_CanExecute());
             LocalfileListviewAddCommand = new GenericRelayCommand<object>(param => LocalfileListviewAddCommand_Execute(param), param => LocalfileListviewAddCommand_CanExecute());
+            SongListViewEnterKeyCommand = new RelayCommand(SongListViewEnterKeyCommand_ExecuteAsync, SongListViewEnterKeyCommand_CanExecute);
+            SongListViewLeftDoubleClickCommand = new GenericRelayCommand<MPC.Song>(param => SongListViewLeftDoubleClickCommand_ExecuteAsync(param), param => SongListViewLeftDoubleClickCommand_CanExecute());
             SongListviewClearCommand = new RelayCommand(SongListviewClearCommand_ExecuteAsync, SongListviewClearCommand_CanExecute);
             SongListviewDeleteCommand = new GenericRelayCommand<object>(param => SongListviewDeleteCommand_Execute(param), param => SongListviewDeleteCommand_CanExecute());
 
@@ -861,20 +1073,19 @@ namespace MPDCtrl.ViewModels
 
             ShowSettingsCommand = new RelayCommand(ShowSettingsCommand_Execute, ShowSettingsCommand_CanExecute);
             SettingsOKCommand = new RelayCommand(SettingsOKCommand_Execute, SettingsOKCommand_CanExecute);
-            NewConnectinSettingCommand = new GenericRelayCommand<object>(param => NewConnectinSettingCommand_Execute(param), param => NewConnectinSettingCommand_CanExecute());
 
+            NewProfileCommand = new RelayCommand(NewProfileCommand_Execute, NewProfileCommand_CanExecute);
+            DeleteProfileCommand = new RelayCommand(DeleteProfileCommand_Execute, DeleteProfileCommand_CanExecute);
+            SaveProfileCommand = new GenericRelayCommand<object>(param => SaveProfileCommand_Execute(param), param => SaveProfileCommand_CanExecute());
+            UpdateProfileCommand = new RelayCommand(UpdateProfileCommand_Execute, UpdateProfileCommand_CanExecute);
+            ConnectCommand = new GenericRelayCommand<object>(param => ConnectCommand_Execute(param), param => ConnectCommand_CanExecute());
+            ChangeConnectionProfileCommand = new GenericRelayCommand<object> (param => ChangeConnectionProfileCommand_Execute(param), param => ChangeConnectionProfileCommand_CanExecute());
 
             #endregion
 
             #region == MPC ==  
 
-            // Initialize connection setting.
-            _defaultHost = "127.0.0.1";//"127.0.0.1"//"192.168.3.123"
-            _defaultPort = 6600;
-            _defaultPassword = "";
-
-            // Create MPC instance.
-            _MPC = new MPC(_defaultHost, _defaultPort, _defaultPassword);
+            _MPC = new MPC(_host, _port, _password);
 
             #endregion
 
@@ -887,6 +1098,8 @@ namespace MPDCtrl.ViewModels
             _MPC.ErrorReturned += new MPC.MpdError(OnError);
             _MPC.ErrorConnected += new MPC.MpdConnectionError(OnConnectionError);
             _MPC.ConnectionStatusChanged += new MPC.MpdConnectionStatusChanged(OnConnectionStatusChanged);
+
+
             #endregion
 
             #region == タイマー ==  
@@ -898,10 +1111,25 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            //
-            //IsConnected = true;
-            //IsConnected = false;
-            IsMainShow = true;
+            #if DEBUG
+            IsMainShow = true; // show in XAML design mode.
+            #else
+            IsMainShow = false;
+            #endif
+
+            // DebugWindow hack.
+            App app = App.Current as App;
+            if (app != null) 
+            {
+                DebugViewModel dvm = new DebugViewModel();
+
+                OnDebugWindowOutput += new DebugWindowOutput(dvm.OnDebugOutput);
+
+                ShowDebugView += (sender, arg) => { app.ShowDebugWindow(arg); };
+
+                app.CreateDebugWindow(dvm);
+            }
+            
         }
 
         #region == システムイベント ==
@@ -909,6 +1137,9 @@ namespace MPDCtrl.ViewModels
         // 起動時の処理
         public void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
+            #if DEBUG
+            IsMainShow = false;
+            #endif
 
             #region == アプリ設定のロード  ==
 
@@ -967,13 +1198,133 @@ namespace MPDCtrl.ViewModels
                                     (sender as Window).WindowState = WindowState.Normal;
                                 }
                             }
+                        }
+                    }
 
+                    var debugWindow = xdoc.Root.Element("DebugWindow");
+                    if (debugWindow != null)
+                    {
+                        var hoge = debugWindow.Attribute("top");
+                        if (hoge != null)
+                        {
+                            ShowDebug.Top = double.Parse(hoge.Value);
+                        }
+
+                        hoge = debugWindow.Attribute("left");
+                        if (hoge != null)
+                        {
+                            ShowDebug.Left = double.Parse(hoge.Value);
+                        }
+
+                        hoge = debugWindow.Attribute("height");
+                        if (hoge != null)
+                        {
+                            ShowDebug.Height = double.Parse(hoge.Value);
+                        }
+
+                        hoge = debugWindow.Attribute("width");
+                        if (hoge != null)
+                        {
+                            ShowDebug.Width = double.Parse(hoge.Value);
                         }
 
                     }
 
                     #endregion
 
+                    #region == オプション設定 ==
+
+                    var opts = xdoc.Root.Element("Options");
+                    if (opts != null)
+                    {
+                        var hoge = opts.Attribute("UpdateOnStartup");
+                        if (hoge != null)
+                        {
+                            if (hoge.Value == "True")
+                            {
+                                IsUpdateOnStartup = true;
+                            }
+                            else
+                            {
+                                IsUpdateOnStartup = false;
+                            }
+                        }
+
+                        hoge = opts.Attribute("ShowDebugWindow");
+                        if (hoge != null)
+                        {
+                            if (hoge.Value == "True")
+                            {
+                                IsShowDebugWindow = true;
+
+                            }
+                            else
+                            {
+                                IsShowDebugWindow = false;
+                            }
+                        }
+                    }
+
+                    #endregion
+
+                    #region == プロファイル設定  ==
+
+                    var xProfiles = xdoc.Root.Element("Profiles");
+                    if (xProfiles != null)
+                    {
+                        var profileList = xProfiles.Elements("Profile");
+
+                        foreach (var p in profileList)
+                        {
+                            Profile pro = new Profile();
+
+                            if (p.Attribute("Name") != null)
+                            {
+                                if (!string.IsNullOrEmpty(p.Attribute("Name").Value))
+                                    pro.Name = p.Attribute("Name").Value;
+                            }
+                            if (p.Attribute("Host") != null)
+                            {
+                                if (!string.IsNullOrEmpty(p.Attribute("Host").Value))
+                                    pro.Host = p.Attribute("Host").Value;
+                            }
+                            if (p.Attribute("Port") != null)
+                            {
+                                if (!string.IsNullOrEmpty(p.Attribute("Port").Value))
+                                {
+                                    try
+                                    {
+                                        pro.Port = Int32.Parse(p.Attribute("Port").Value);
+                                    }
+                                    catch
+                                    {
+                                        pro.Port = 6600;
+                                    }
+                                }
+                            }
+                            if (p.Attribute("Password") != null)
+                            {
+                                if (!string.IsNullOrEmpty(p.Attribute("Password").Value))
+                                    pro.Password = Decrypt(p.Attribute("Password").Value);
+                            }
+                            if (p.Attribute("IsDefault") != null)
+                            {
+                                if (!string.IsNullOrEmpty(p.Attribute("IsDefault").Value))
+                                {
+                                    if (p.Attribute("IsDefault").Value == "True")
+                                    {
+                                        pro.IsDefault = true;
+
+                                        CurrentProfile = pro;
+                                        SelectedProfile = pro;
+                                    }
+                                }
+                            }
+
+                            Profiles.Add(pro);
+                        }
+                    }
+                    #endregion
                 }
             }
             catch (System.IO.FileNotFoundException)
@@ -987,8 +1338,12 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            if (String.IsNullOrEmpty(_defaultHost))
+            IsFullyLoaded = true;
+
+            if (CurrentProfile == null)
             {
+                StatusMessage = "Welcome";
+
                 IsConnectionSettingShow = true;
             }
             else
@@ -996,6 +1351,10 @@ namespace MPDCtrl.ViewModels
                 IsConnectionSettingShow = false;
 
                 //
+                _MPC.MpdHost = CurrentProfile.Host;
+                _MPC.MpdPort = CurrentProfile.Port;
+                _MPC.MpdPassword = CurrentProfile.Password;
+
                 Start();
             }
         }
@@ -1003,6 +1362,8 @@ namespace MPDCtrl.ViewModels
         // 終了時の処理
         public void OnWindowClosing(object sender, CancelEventArgs e)
         {
+            if (!IsFullyLoaded)
+                return;
 
             #region == アプリ設定の保存 ==
 
@@ -1021,78 +1382,230 @@ namespace MPDCtrl.ViewModels
 
             #region == ウィンドウ関連 ==
 
+            // MainWindow
             if (sender is Window)
             {
                 // Main Window element
                 XmlElement mainWindow = doc.CreateElement(string.Empty, "MainWindow", string.Empty);
 
+                Window w = (sender as Window);
                 // Main Window attributes
                 attrs = doc.CreateAttribute("height");
-                if ((sender as Window).WindowState == WindowState.Maximized)
+                if (w.WindowState == WindowState.Maximized)
                 {
-                    attrs.Value = (sender as Window).RestoreBounds.Height.ToString();
+                    attrs.Value = w.RestoreBounds.Height.ToString();
                 }
                 else
                 {
-                    attrs.Value = (sender as Window).Height.ToString();
+                    attrs.Value = w.Height.ToString();
                 }
                 mainWindow.SetAttributeNode(attrs);
 
                 attrs = doc.CreateAttribute("width");
-                if ((sender as Window).WindowState == WindowState.Maximized)
+                if (w.WindowState == WindowState.Maximized)
                 {
-                    attrs.Value = (sender as Window).RestoreBounds.Width.ToString();
+                    attrs.Value = w.RestoreBounds.Width.ToString();
                 }
                 else
                 {
-                    attrs.Value = (sender as Window).Width.ToString();
+                    attrs.Value = w.Width.ToString();
 
                 }
                 mainWindow.SetAttributeNode(attrs);
 
                 attrs = doc.CreateAttribute("top");
-                if ((sender as Window).WindowState == WindowState.Maximized)
+                if (w.WindowState == WindowState.Maximized)
                 {
-                    attrs.Value = (sender as Window).RestoreBounds.Top.ToString();
+                    attrs.Value = w.RestoreBounds.Top.ToString();
                 }
                 else
                 {
-                    attrs.Value = (sender as Window).Top.ToString();
+                    attrs.Value = w.Top.ToString();
                 }
                 mainWindow.SetAttributeNode(attrs);
 
                 attrs = doc.CreateAttribute("left");
-                if ((sender as Window).WindowState == WindowState.Maximized)
+                if (w.WindowState == WindowState.Maximized)
                 {
-                    attrs.Value = (sender as Window).RestoreBounds.Left.ToString();
+                    attrs.Value = w.RestoreBounds.Left.ToString();
                 }
                 else
                 {
-                    attrs.Value = (sender as Window).Left.ToString();
+                    attrs.Value = w.Left.ToString();
                 }
                 mainWindow.SetAttributeNode(attrs);
 
                 attrs = doc.CreateAttribute("state");
-                if ((sender as Window).WindowState == WindowState.Maximized)
+                if (w.WindowState == WindowState.Maximized)
                 {
                     attrs.Value = "Maximized";
                 }
-                else if ((sender as Window).WindowState == WindowState.Normal)
+                else if (w.WindowState == WindowState.Normal)
                 {
                     attrs.Value = "Normal";
 
                 }
-                else if ((sender as Window).WindowState == WindowState.Minimized)
+                else if (w.WindowState == WindowState.Minimized)
                 {
                     attrs.Value = "Minimized";
                 }
                 mainWindow.SetAttributeNode(attrs);
 
-
-                // set Main Window element to root.
+                // set MainWindow element to root.
                 root.AppendChild(mainWindow);
 
             }
+
+            // DebugWindow
+            App app = App.Current as App;
+            if (app != null)
+            {
+                foreach (var w in app.Windows)
+                {
+                    if (w is DebugWindow)
+                    {
+                        DebugWindow dw = (w as DebugWindow);
+
+                        if ((dw.WindowState == WindowState.Normal || dw.WindowState == WindowState.Maximized))
+                        {
+                            // Main Window element
+                            XmlElement debugWindow = doc.CreateElement(string.Empty, "DebugWindow", string.Empty);
+
+                            // Main Window attributes
+                            attrs = doc.CreateAttribute("height");
+                            if (dw.WindowState == WindowState.Maximized)
+                            {
+                                attrs.Value = dw.RestoreBounds.Height.ToString();
+                            }
+                            else
+                            {
+                                attrs.Value = dw.Height.ToString();
+                            }
+                            debugWindow.SetAttributeNode(attrs);
+
+                            attrs = doc.CreateAttribute("width");
+                            if (dw.WindowState == WindowState.Maximized)
+                            {
+                                attrs.Value = dw.RestoreBounds.Width.ToString();
+                            }
+                            else
+                            {
+                                attrs.Value = dw.Width.ToString();
+
+                            }
+                            debugWindow.SetAttributeNode(attrs);
+
+                            attrs = doc.CreateAttribute("top");
+                            if (dw.WindowState == WindowState.Maximized)
+                            {
+                                attrs.Value = dw.RestoreBounds.Top.ToString();
+                            }
+                            else
+                            {
+                                attrs.Value = dw.Top.ToString();
+                            }
+                            debugWindow.SetAttributeNode(attrs);
+
+                            attrs = doc.CreateAttribute("left");
+                            if (dw.WindowState == WindowState.Maximized)
+                            {
+                                attrs.Value = dw.RestoreBounds.Left.ToString();
+                            }
+                            else
+                            {
+                                attrs.Value = dw.Left.ToString();
+                            }
+                            debugWindow.SetAttributeNode(attrs);
+
+                            // set DebugWindow element to root.
+                            root.AppendChild(debugWindow);
+
+                        }
+
+                        /////
+                        // Tell it to close, don't hide.
+                        dw.SetClose();
+                        // Close it.
+                        dw.Close();
+
+                        break;
+                    }
+                }
+            }
+
+            #endregion
+
+            #region == オプション設定の保存 ==
+
+            XmlElement opts = doc.CreateElement(string.Empty, "Options", string.Empty);
+
+            // 
+            attrs = doc.CreateAttribute("UpdateOnStartup");
+            if (IsUpdateOnStartup)
+            {
+                attrs.Value = "True";
+            }
+            else
+            {
+                attrs.Value = "False";
+            }
+            opts.SetAttributeNode(attrs);
+
+            //
+            attrs = doc.CreateAttribute("ShowDebugWindow");
+            if (IsShowDebugWindow)
+            {
+                attrs.Value = "True";
+            }
+            else
+            {
+                attrs.Value = "False";
+            }
+            opts.SetAttributeNode(attrs);
+
+            // 
+            root.AppendChild(opts);
+
+            #endregion
+
+            #region == プロファイル設定  ==
+
+            XmlElement xProfiles = doc.CreateElement(string.Empty, "Profiles", string.Empty);
+
+            XmlElement xProfile;
+            XmlAttribute xAttrs;
+
+            foreach (var p in Profiles)
+            {
+                xProfile = doc.CreateElement(string.Empty, "Profile", string.Empty);
+
+                xAttrs = doc.CreateAttribute("Name");
+                xAttrs.Value = p.Name;
+                xProfile.SetAttributeNode(xAttrs);
+
+                xAttrs = doc.CreateAttribute("Host");
+                xAttrs.Value = p.Host;
+                xProfile.SetAttributeNode(xAttrs);
+
+                xAttrs = doc.CreateAttribute("Port");
+                xAttrs.Value = p.Port.ToString();
+                xProfile.SetAttributeNode(xAttrs);
+
+                xAttrs = doc.CreateAttribute("Password");
+                xAttrs.Value = Encrypt(p.Password);
+                xProfile.SetAttributeNode(xAttrs);
+
+                if (p.IsDefault)
+                {
+                    xAttrs = doc.CreateAttribute("IsDefault");
+                    xAttrs.Value = "True";
+                    xProfile.SetAttributeNode(xAttrs);
+                }
+
+                xProfiles.AppendChild(xProfile);
+            }
+
+            root.AppendChild(xProfiles);
 
             #endregion
 
@@ -1121,18 +1634,21 @@ namespace MPDCtrl.ViewModels
 
             if (r.isSuccess)
             {
-                // TODO: temp
-                //_MPC.MpdSendUpdate();
+                if (IsUpdateOnStartup)
+                {
+                    _MPC.MpdSendUpdate();
+                }
 
                 //
-                _MPC.MpdQueryListAll();
-
                 _MPC.MpdQueryCurrentQueue();
+
+                // Call Status "after" MpdQueryCurrentQueue() in order to get "current song" in the queue.
+                _MPC.MpdQueryStatus();
 
                 _MPC.MpdQueryPlaylists();
 
-                // Status needs to be the last in order to get "current song" in the queue.
-                _MPC.MpdQueryStatus();
+                // heavy stuff should be the last.
+                _MPC.MpdQueryListAll();
 
             }
             else
@@ -1217,11 +1733,11 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-
         #endregion
 
         #region == イベント・タイマー ==
 
+        private DispatcherTimer _elapsedTimer;
         private void ElapsedTimer(object sender, EventArgs e)
         {
             if ((_elapsed < _time) && (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play))
@@ -1244,6 +1760,7 @@ namespace MPDCtrl.ViewModels
             StatusMessage = "";
         }
 
+        // MPD changed nortifiation
         private void OnStatusChanged(MPC sender, object data)
         {
             //System.Diagnostics.Debug.WriteLine("OnStatusChanged " + data);
@@ -1277,6 +1794,7 @@ namespace MPDCtrl.ViewModels
             UpdateButtonStatus();
         }
 
+        // MPD updated information
         private void OnStatusUpdate(MPC sender, object data)
         {
             //System.Diagnostics.Debug.WriteLine("OnStatusUpdate " + data);
@@ -1294,6 +1812,11 @@ namespace MPDCtrl.ViewModels
 
                             SelectedSong = (item as MPC.Song);
                             CurrentSong = (item as MPC.Song);
+                        }
+                        else
+                        {
+                            SelectedSong = null;
+                            CurrentSong = null;
                         }
                     });
                 }
@@ -1314,6 +1837,11 @@ namespace MPDCtrl.ViewModels
                         SelectedSong = (item as MPC.Song);
                         CurrentSong = (item as MPC.Song);
                     }
+                    else
+                    {
+                        SelectedSong = null;
+                        CurrentSong = null;
+                    }
                 });
 
             }
@@ -1327,7 +1855,7 @@ namespace MPDCtrl.ViewModels
             }
             else if ((data as string) == "isUpdating_db")
             {
-                // TODO: DBが更新されたので、listall 読み込みし直す。
+                // TODO:
             }
 
             UpdateButtonStatus();
@@ -1336,25 +1864,39 @@ namespace MPDCtrl.ViewModels
 
         private void OnDataReceived(MPC sender, object data)
         {
-            DebugString += (data as string);
+            OnDebugWindowOutput?.Invoke((data as string));
         }
 
         private void OnDataSent(MPC sender, object data)
         {
-            DebugString += (data as string);
+            OnDebugWindowOutput?.Invoke((data as string));
         }
 
-        private void OnError(MPC sender, object data)
+        private void OnError(MPC sender, MPC.MpdErrorTypes errType, object data)
         {
             if (data == null) { return; }
-            string s = (data as string);
-            string patternStr = @"[{\[].+?[}\]]";//@"[.*?]";
-            s = System.Text.RegularExpressions.Regex.Replace(s, patternStr, string.Empty);
-            s = s.Replace("ACK ", string.Empty);
-            s = s.Replace("{} ", string.Empty);
-            s = s.Replace("[] ", string.Empty);
 
-            StatusMessage = s;
+            if (errType == MPC.MpdErrorTypes.ProtocolError)
+            {
+                string s = (data as string);
+                string patternStr = @"[{\[].+?[}\]]";//@"[.*?]";
+                s = System.Text.RegularExpressions.Regex.Replace(s, patternStr, string.Empty);
+                s = s.Replace("ACK ", string.Empty);
+                s = s.Replace("{} ", string.Empty);
+                s = s.Replace("[] ", string.Empty);
+
+                StatusMessage = "MPD Protocol Error: " + s;
+            }
+            else if (errType == MPC.MpdErrorTypes.StatusError)
+            {
+                StatusMessage = "MPD Status Error: " + (data as string);
+            }
+            else
+            {
+                StatusMessage = (data as string);
+            }
+
+            StatusButton = _pathErrorInfoButton;
         }
 
         private void OnConnectionError(MPC sender, object data)
@@ -1818,13 +2360,11 @@ namespace MPDCtrl.ViewModels
         }
 
         public ICommand VolumeUpCommand { get;}
-
         public bool VolumeUpCommand_CanExecute()
         {
             if (_MPC == null) { return false; }
             return true;
         }
-
         public void VolumeUpCommand_Execute()
         {
             if (_volume <= 90)
@@ -1836,12 +2376,15 @@ namespace MPDCtrl.ViewModels
         public ICommand ShowSettingsCommand { get; }
         public bool ShowSettingsCommand_CanExecute()
         {
-            if (IsConnectionSettingShow) { return false; }
+            if (IsConnecting) return false;
             return true;
         }
-
         public void ShowSettingsCommand_Execute()
         {
+            if (IsConnecting) return;
+
+            StatusMessage = "";
+
             if (IsSettingsShow)
             {
                 IsSettingsShow = false;
@@ -1852,20 +2395,160 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        public ICommand NewConnectinSettingCommand { get; }
-        public bool NewConnectinSettingCommand_CanExecute()
+        public ICommand SettingsOKCommand { get; }
+        public bool SettingsOKCommand_CanExecute()
         {
-            if (Host == "") { return false; }
-            if (Port == "") { return false; }
-            if (IsConnecting) { return false; }
             return true;
         }
-        public async void NewConnectinSettingCommand_Execute(object obj)
+        public void SettingsOKCommand_Execute()
+        {
+            IsSettingsShow = false;
+        }
+        
+        public ICommand NewProfileCommand { get; }
+        public bool NewProfileCommand_CanExecute()
+        {
+            if (SelectedProfile == null) return false;
+            return true;
+        }
+        public void NewProfileCommand_Execute()
+        {
+            SelectedProfile = null;
+        }
+
+        public ICommand DeleteProfileCommand { get; }
+        public bool DeleteProfileCommand_CanExecute()
+        {
+            if (Profiles.Count < 2) return false;
+            if (SelectedProfile == null) return false;
+            return true;
+        }
+        public void DeleteProfileCommand_Execute()
+        {
+            if (SelectedProfile == null) return;
+            if (Profiles.Count < 2) return;
+
+            var tmpNama = SelectedProfile.Name;
+            var tmpIsDefault = SelectedProfile.IsDefault;
+
+            if (Profiles.Remove(SelectedProfile))
+            {
+                SettingProfileEditMessage = tmpNama + " has been deleted.";
+
+                SelectedProfile = Profiles[0];
+
+                if (tmpIsDefault)
+                    Profiles[0].IsDefault = tmpIsDefault;
+            }
+        }
+
+        public ICommand SaveProfileCommand { get; }
+        public bool SaveProfileCommand_CanExecute()
+        {
+            if (SelectedProfile != null) return false;
+            if (String.IsNullOrEmpty(Host)) return false;
+            if (_port == 0) return false;
+            return true;
+        }
+        public void SaveProfileCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+            if (SelectedProfile != null) return;
+            if (String.IsNullOrEmpty(Host)) return;
+            if (_port == 0) return;
+
+            Profile pro = new Profile();
+            pro.Host = _host;
+            pro.Port = _port;
+
+            // for Unbindable PasswordBox.
+            var passwordBox = obj as PasswordBox;
+            if (!String.IsNullOrEmpty(passwordBox.Password))
+            {
+                _password = passwordBox.Password;
+            }
+
+            if (SetIsDefault)
+            {
+                foreach (var p in Profiles)
+                {
+                    p.IsDefault = false;
+                }
+                pro.IsDefault = true;
+            }
+            else
+            {
+                pro.IsDefault = false;
+            }
+
+            pro.Name = Host + ":" + _port.ToString();
+
+            Profiles.Add(pro);
+
+            SelectedProfile = pro;
+
+            SettingProfileEditMessage = "Saved.";
+
+            if (CurrentProfile == null)
+            {
+                SetIsDefault = true;
+                pro.IsDefault = true;
+                CurrentProfile = pro;
+            }
+                
+        }
+
+        public ICommand UpdateProfileCommand { get; }
+        public bool UpdateProfileCommand_CanExecute()
+        {
+            if (SelectedProfile == null) return false;
+            return true;
+        }
+        public void UpdateProfileCommand_Execute()
+        {
+            if (SelectedProfile == null) return;
+
+            SelectedProfile.Host = _host;
+            SelectedProfile.Port = _port;
+            SelectedProfile.Password = _password;
+
+            if (SetIsDefault)
+            {
+                foreach (var p in Profiles)
+                {
+                    p.IsDefault = false;
+                }
+                SelectedProfile.IsDefault = true;
+            }
+            else
+            {
+                if (SelectedProfile.IsDefault)
+                {
+                    SelectedProfile.IsDefault = false;
+                    Profiles[0].IsDefault = true;
+                }
+                else
+                {
+                    SelectedProfile.IsDefault = false;
+                }
+            }
+
+            SelectedProfile.Name = Host + ":" + _port.ToString();
+
+            SettingProfileEditMessage = "Updated.";
+        }
+
+        public ICommand ConnectCommand { get; }
+        public bool ConnectCommand_CanExecute()
+        {
+            return true;
+        }
+        public async void ConnectCommand_Execute(object obj)
         {
             if (obj == null) return;
 
             // Validate Host input.
-            if (_defaultHost == "")
+            if (Host == "")
             {
                 SetError("Host", "Error: Host must be epecified."); //TODO: translate
                 NotifyPropertyChanged("Host");
@@ -1873,15 +2556,15 @@ namespace MPDCtrl.ViewModels
             }
             else
             {
-                if (_defaultHost == "localhost")
+                if (Host == "localhost")
                 {
-                    _defaultHost = "127.0.0.1";
+                    Host = "127.0.0.1";
                 }
 
                 IPAddress ipAddress = null;
                 try
                 {
-                    ipAddress = IPAddress.Parse(_defaultHost);
+                    ipAddress = IPAddress.Parse(Host);
                     if (ipAddress != null)
                     {
                         ClearErrror("Host");
@@ -1896,7 +2579,7 @@ namespace MPDCtrl.ViewModels
                 }
             }
 
-            if (_defaultPort == 0)
+            if (_port == 0)
             {
                 SetError("Port", "Error: Port must be epecified."); //TODO: translate.
                 return;
@@ -1906,56 +2589,128 @@ namespace MPDCtrl.ViewModels
             var passwordBox = obj as PasswordBox;
             if (!String.IsNullOrEmpty(passwordBox.Password))
             {
-                _defaultPassword = passwordBox.Password;
+                _password = passwordBox.Password;
             }
 
-            _MPC.MpdHost = _defaultHost;
-            _MPC.MpdPort = _defaultPort;
-            _MPC.MpdPassword = _defaultPassword;
+
+            //
+            _MPC.MpdHost = _host;
+            _MPC.MpdPort = _port;
+            _MPC.MpdPassword = _password;
+
+
+            //
+            ConnectionResult r = await StartConnection();
+
+            if (r.isSuccess)
+            {
+                IsConnectionSettingShow = false;
+                IsSettingsShow = false;
+
+
+                if (CurrentProfile == null)
+                {
+                    //
+                    Profile prof = new Profile();
+                    prof.Name = _host + ":" + _port.ToString();
+                    prof.Host = _host;
+                    prof.Port = _port;
+                    prof.Password = _password;
+                    prof.IsDefault = true;
+
+                    CurrentProfile = prof;
+                    SelectedProfile = prof;
+
+                    Profiles.Add(prof);
+
+                    // 初回だからUpdateしておく。
+                    _MPC.MpdSendUpdate();
+                }
+                else
+                {
+                    CurrentProfile.Name = _host + ":" + _port.ToString();
+                    CurrentProfile.Host = _host;
+                    CurrentProfile.Port = _port;
+                    CurrentProfile.Password = _password;
+                }
+
+                //
+                _MPC.MpdQueryCurrentQueue();
+                _MPC.MpdQueryStatus();
+                _MPC.MpdQueryPlaylists();
+                _MPC.MpdQueryListAll();
+                //
+            }
+        }
+
+        public ICommand ChangeConnectionProfileCommand { get; }
+        public bool ChangeConnectionProfileCommand_CanExecute()
+        {
+            if (SelectedProfile == null) return false;
+            return true;
+        }
+        public async void ChangeConnectionProfileCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+            if (SelectedProfile == null) return;
+            if (String.IsNullOrEmpty(Host)) return;
+            if (_port == 0) return;
+            if (IsConnecting) return;
+
+            if (IsConnected)
+            {
+                //_MPC.MpdDisconnect();
+            }
+
+
+            SelectedProfile.Host = _host;
+            SelectedProfile.Port = _port;
+
+            // for Unbindable PasswordBox.
+            var passwordBox = obj as PasswordBox;
+            if (!String.IsNullOrEmpty(passwordBox.Password))
+            {
+                SelectedProfile.Password = passwordBox.Password;
+            }
+
+            if (SetIsDefault)
+            {
+                foreach (var p in Profiles)
+                {
+                    p.IsDefault = false;
+                }
+                SelectedProfile.IsDefault = true;
+            }
+            else
+            {
+                SelectedProfile.IsDefault = false;
+            }
+
+            SelectedProfile.Name = Host + ":" + _port.ToString();
+
+            CurrentProfile = SelectedProfile;
+
+
+            _MPC.MpdHost = CurrentProfile.Host;
+            _MPC.MpdPort = CurrentProfile.Port;
+            _MPC.MpdPassword = CurrentProfile.Password;
 
             ConnectionResult r = await StartConnection();
 
             if (r.isSuccess)
             {
                 IsConnectionSettingShow = false;
-
-
-                // ==== dupe
-
-                // 初回だからUpdateしておく。
-                _MPC.MpdSendUpdate();
+                IsSettingsShow = false;
 
                 //
-                _MPC.MpdQueryListAll();
-
                 _MPC.MpdQueryCurrentQueue();
-
-                _MPC.MpdQueryPlaylists();
-
-                // Status needs to be the last in order to get "current song" in the queue.
                 _MPC.MpdQueryStatus();
-
-                // ==== dupe
-
-
-                // TODO: create profile.
-
+                _MPC.MpdQueryPlaylists();
+                _MPC.MpdQueryListAll();
+                //
             }
 
         }
-
-        public ICommand SettingsOKCommand { get; }
-        public bool SettingsOKCommand_CanExecute()
-        {
-            return true;
-        }
-
-        public void SettingsOKCommand_Execute()
-        {
-            IsSettingsShow = false;
-        }
-
-        
 
         #endregion
 

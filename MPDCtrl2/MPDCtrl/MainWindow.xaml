@@ -11,7 +11,7 @@
         StateChanged="Window_StateChanged"
         DataContext="{StaticResource MainViewModel}"
         Title="{Binding AppTitle}"
-        Height="450" Width="800"
+        Height="480" Width="800"
         MinWidth="300">
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="30" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"/>
@@ -36,6 +36,14 @@
     </Window.InputBindings>
     <Border Style="{StaticResource WindowMainPanelStyle}">
         <Grid Background="{DynamicResource BoardBackgroundColorBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="27"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
             <!-- アプリタイトルバー -->
             <Grid>
                 <Grid.RowDefinitions>
@@ -47,16 +55,75 @@
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- アプリアイコン -->
+                <!-- App icon -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button ToolTip="{Binding AppTitle}" IsHitTestVisible="True" WindowChrome.IsHitTestVisibleInChrome="True">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="OverridesDefaultStyle" Value="true" />
+                                <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
+                                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Margin" Value="0" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="Border" CornerRadius="0" BorderThickness="0">
+                                                <Viewbox Width="16" Height="16" Margin="6 0 6 0" IsHitTestVisible="True">
+                                                    <Canvas Width="101.52757" Height="101.52314">
+                                                        <Canvas.RenderTransform>
+                                                            <TranslateTransform X="0" Y="0"/>
+                                                        </Canvas.RenderTransform>
+                                                        <Canvas Name="layer1">
+                                                            <Canvas.RenderTransform>
+                                                                <TranslateTransform X="-2.8648005" Y="-194.52514"/>
+                                                            </Canvas.RenderTransform>
+                                                            <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="M 53.823864 196.04415 C 21.886528 194.83142 -3.7832653 229.72314 6.7745021 259.84651 15.060196 290.6957 55.964235 304.96229 81.631867 285.93948 108.66537 268.90685 110.19826 225.61676 84.437146 206.71473 75.820617 199.84108 64.844621 196.0167 53.823864 196.04415 Z m 0 9.84942 c 18.184368 -0.34132 35.234253 13.61727 38.596795 31.47035 3.761965 16.86267 -5.208339 35.37926 -20.678288 43.01021 -15.289342 8.1535 -35.646071 4.41591 -47.068046 -8.60652 -12.118898 -12.84888 -13.65815 -34.02695 -3.509928 -48.48554 7.159606 -10.73064 19.738995 -17.49358 32.659467 -17.3885 z m -9.850044 17.2371 c 0 14.77475 0 29.5495 0 44.32425 9.849834 -7.38748 19.699667 -14.77496 29.549501 -22.16244 -9.849834 -7.38727 -19.699667 -14.77454 -29.549501 -22.16181 z"/>
+                                                        </Canvas>
+                                                    </Canvas>
+                                                </Viewbox>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
 
                 </StackPanel>
 
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Label Content="{Binding AppTitle}" Style="{DynamicResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="6 0 0 0" Visibility="Hidden"></Label>
+                <!-- Now Playing -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="80 0 0 0" Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
+                    <TextBlock Style="{StaticResource DefaultTextBlockStyle}">
+                        <TextBlock.Triggers>
+                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.1" To="1.0" Duration="0:0:2">
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </TextBlock.Triggers>
+                            <Run x:Name="CurrentSongTitle" Foreground="{DynamicResource ControlLightColorBrush}" FontWeight="DemiBold" Text="{Binding CurrentSongTitle, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}"/>
+                            <Run Text=" - ">
+                                 <Run.Style>
+                                     <Style>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=CurrentSongArtist}" Value="">
+                                                <Setter Property="Control.Foreground" Value="Transparent" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Run.Style>
+                            </Run>
+                            <Run x:Name="CurrentSongArtist" Foreground="{DynamicResource ControlMediumColorBrush}" Text="{Binding CurrentSongArtist, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}" />
+                    </TextBlock>
                 </StackPanel>
 
-                <!-- メニュー＆システムアイコン -->
+                <!-- Sys icons -->
                 <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right" Margin="0">
 
                     <Button x:Name="SettingsButton" Style="{DynamicResource PathButton}" Width="27" Height="27" Margin="0" Opacity="0.7" Command="{Binding ShowSettingsCommand}" ToolTip="(Ctrl+S)" WindowChrome.IsHitTestVisibleInChrome="True"
@@ -92,14 +159,32 @@
 
             </Grid>
 
+            <!-- 接続中画面の背景（起動時に、設定されているホストに接続を試行している時に一瞬表示される。） -->
+            <Grid Grid.Row="1">
+                <Viewbox Grid.Row="0" Grid.Column="0" Margin="0 0 6 0" Width="32" Height="32" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Canvas Width="24" Height="24">
+                        <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding StatusButton, NotifyOnTargetUpdated=True}" >
+                            <Path.Triggers>
+                                <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:2" AutoReverse="True" RepeatBehavior="Forever">
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Path.Triggers>
+                        </Path>
+                    </Canvas>
+                </Viewbox>
+            </Grid>
+
             <!-- メイン画面 -->
-            <Grid Visibility="{Binding IsMainShow, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
+            <Grid Grid.Row="1" Visibility="{Binding IsMainShow, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="27"/>
+                    <RowDefinition Height="0"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -121,13 +206,14 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Current Song -->
-                    <Grid Grid.Row="1" Grid.Column="0" >
+                    <!-- Album cover TODO: -->
+                    <Grid Grid.Row="1" Grid.Column="0" Visibility="Collapsed">
                         <StackPanel Margin="18 3 3 3">
                             <TextBlock Text="{Binding CurrentSongArtist}" Style="{StaticResource DefaultTextBlockStyle}"></TextBlock>
                             <Label Content="{Binding CurrentSongTitle}" Style="{StaticResource SectionTitle}"></Label>
                         </StackPanel>
                     </Grid>
+
 
                     <!-- Playback Controls -->
                     <Grid Grid.Row="1" Grid.Column="1">
@@ -210,11 +296,11 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Local Libraries -->
+                    <!-- Libraries -->
                     <Grid Grid.Row="0" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}">
 
                         <TabControl Style="{StaticResource NoChromeTabControl}" Margin="0 1 0 0" Background="{DynamicResource BoardBackgroundColorBrush}">
-
+                            <!-- Playlists -->
                             <TabItem Header="Playlists" Width="120" Style="{StaticResource NoChromeTabHeader}">
 
                                 <ListView x:Name="PlaylistListview" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}" SelectionMode="Single" Background="Transparent" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
@@ -224,15 +310,15 @@
                                     </ListView.InputBindings>
                                     <ListView.Resources>
                                         <ContextMenu x:Key="PlaylistItemContextMenu">
-                                            <MenuItem Header="Selected Item">
-                                                <MenuItem Header="Load this playlist to the queue" 
+                                            <!--
+                                                <MenuItem Header="Load" 
                                                         Command="{Binding Path=DataContext.PlaylistListviewLoadPlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
                                                         CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                                 </MenuItem>
-                                                <MenuItem Header="Add this playlist to the queue" 
+                                                -->
+                                            <MenuItem Header="Add to queue" 
                                                         Command="{Binding Path=DataContext.PlaylistListviewAddPlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
                                                         CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
-                                                </MenuItem>
                                             </MenuItem>
                                             <Separator />
                                         </ContextMenu>
@@ -255,7 +341,7 @@
                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                 </Style>
                                             </GridView.ColumnHeaderContainerStyle>
-                                            <GridViewColumn Header="ID">
+                                            <GridViewColumn Header="Playlists">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
                                                         <StackPanel HorizontalAlignment="Left">
@@ -291,6 +377,7 @@
 
                             </TabItem>
 
+                            <!-- Local files -->
                             <TabItem Header="Local Files" Width="120" Style="{StaticResource NoChromeTabHeader}">
 
                                 <ListView x:Name="LocalfileListview" ItemsSource="{Binding Localfiles}" SelectedItem="{Binding SelectedLocalfile}" Background="Transparent" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
@@ -340,7 +427,7 @@
                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                 </Style>
                                             </GridView.ColumnHeaderContainerStyle>
-                                            <GridViewColumn Header="ID">
+                                            <GridViewColumn Header="Files">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
                                                         <StackPanel HorizontalAlignment="Left">
@@ -377,9 +464,7 @@
                     </Grid>
 
                     <!-- GridSplitter -->
-                    <GridSplitter Grid.Row="0" Grid.Column="1"
-                          ResizeDirection="Columns"
-                      Style="{StaticResource GridSplitterStyle}">
+                    <GridSplitter Grid.Row="0" Grid.Column="1" ResizeDirection="Columns" Style="{StaticResource GridSplitterStyle}">
                     </GridSplitter>
 
                     <!-- Queue -->
@@ -502,14 +587,6 @@
 
                 </Grid>
 
-                <!-- GridSplitter -->
-                <GridSplitter Grid.Row="3" ResizeDirection="Rows" Style="{StaticResource GridSplitterStyle}" Visibility="{Binding DebugMode, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
-                </GridSplitter>
-
-                <!-- Debug -->
-                <Grid Grid.Row="4" Grid.Column="0" Visibility="{Binding DebugMode, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
-                    <TextBox TextWrapping="WrapWithOverflow" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding DebugString}" Style="{DynamicResource DefaultTextBoxStyle}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"></TextBox>
-                </Grid>
 
                 <!-- Status -->
                 <StatusBar Grid.Row="5" Background="Transparent" VerticalAlignment="Center">
@@ -523,10 +600,157 @@
 
             </Grid>
 
-            <!-- 設定画面 -->
-            <Grid Visibility="{Binding IsSettingsShow, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
+            <!-- 初期設定画面 -->
+            <Grid Grid.Row="1" Background="{DynamicResource BoardBackgroundColorBrush}" Visibility="{Binding IsConnectionSettingShow, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="27"/>
+                    <RowDefinition Height="0"/>
+                    <RowDefinition Height="35*"/>
+                    <RowDefinition Height="65*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Row="1" Margin="48 0 48 32" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Viewbox Grid.Row="0" Grid.Column="0" Margin="0 0 6 36" Width="32" Height="32" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Canvas Width="24" Height="24">
+                            <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding StatusButton, NotifyOnTargetUpdated=True}" >
+                                <Path.Triggers>
+                                    <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:5" AutoReverse="True" RepeatBehavior="Forever">
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Path.Triggers>
+                            </Path>
+                        </Canvas>
+                    </Viewbox>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding StatusMessage, NotifyOnTargetUpdated=True}" TextElement.Foreground="WhiteSmoke" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextElement.FontWeight="Bold" TextWrapping="WrapWithOverflow">
+                        <TextBlock.Triggers>
+                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
+                                            <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                            <EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="1"/>
+                                        </DoubleAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </TextBlock.Triggers>
+                    </TextBlock>
+
+                </Grid>
+
+                <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="top">
+
+                    <ComboBox Style="{StaticResource ComboBoxFlatStyle}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding CurrentProfile}" Tag="New Profile">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Viewbox Width="10" Height="10" Margin="0 0 6 0">
+                                        <Canvas Width="18" Height="18">
+                                            <Path Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" Fill="DimGray" Visibility="{Binding Path=IsDefault, Converter={StaticResource BoolToVisibilityCollapsedConverter}}"/>
+                                        </Canvas>
+                                    </Viewbox>
+                                    <TextBlock Text="{Binding Path=Name}"></TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+
+                    <TextBlock Text="{x:Static properties:Resources.Host}" TextElement.Foreground="White"></TextBlock>
+                    <TextBox x:Name="NewHost_TextBox" Text="{Binding Host, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240" IsVisibleChanged="TextBox_IsVisibleChanged">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Style.Triggers>
+                                    <Trigger Property="Validation.HasError" Value="true">
+                                        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)/ErrorContent}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+
+                    <TextBlock Text="{x:Static properties:Resources.Port}" TextElement.Foreground="White" Margin="0 12 0 0"></TextBlock>
+                    <TextBox Text="{Binding Port, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Style.Triggers>
+                                    <Trigger Property="Validation.HasError" Value="true">
+                                        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)/ErrorContent}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+
+
+                    <TextBlock Text="{x:Static properties:Resources.Password}" TextElement.Foreground="White" Margin="0 12 0 0"></TextBlock>
+                    <PasswordBox x:Name="PasswordBoxNew" PasswordChar="*" Tag="{Binding Password}" Width="240" ToolTip="{x:Static properties:Resources.Optional}" PasswordChanged="PasswordBoxNew_PasswordChanged">
+                        <PasswordBox.Style>
+                            <Style TargetType="{x:Type PasswordBox}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type PasswordBox}">
+                                            <Grid Background="{TemplateBinding Background}">
+                                                <ScrollViewer x:Name="PART_ContentHost"/>
+                                                <TextBlock x:Name="UserMessage"
+                                                                   Margin="5,0,5,0"
+                                                                   Text="{Binding Password}" 
+                                                                   IsHitTestVisible="False"
+                                                                   HorizontalAlignment="Left"
+                                                                   VerticalAlignment="Center"
+                                                                   Visibility="Visible"/>
+                                            </Grid>
+                                            <ControlTemplate.Triggers>
+                                                <MultiTrigger>
+                                                    <MultiTrigger.Conditions>
+                                                        <Condition Property="Tag" Value=""/>
+                                                    </MultiTrigger.Conditions>
+                                                    <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
+                                                    <Setter Property="Text" TargetName="UserMessage" Value=""/>
+                                                </MultiTrigger>
+                                                <MultiTrigger>
+                                                    <MultiTrigger.Conditions>
+                                                        <Condition Property="IsKeyboardFocusWithin" Value="true"/>
+                                                    </MultiTrigger.Conditions>
+                                                    <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
+                                                    <Setter Property="Text" TargetName="UserMessage" Value=""/>
+                                                </MultiTrigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </PasswordBox.Style>
+                    </PasswordBox>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 24 0 0">
+                        <Button Content="{x:Static properties:Resources.Connect}" IsDefault="True" IsEnabled="{Binding Path=IsNotConnectingNorConnected}" Command="{Binding ConnectCommand}" CommandParameter="{Binding ElementName=PasswordBoxNew}" Padding="4" Width="100"></Button>
+                    </StackPanel>
+
+                </StackPanel>
+
+            </Grid>
+
+            <!-- 設定画面 -->
+            <Grid Grid.Row="1" Visibility="{Binding IsSettingsShow, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
@@ -536,141 +760,210 @@
 
                 <TabControl Grid.Row="1" TabStripPlacement="Left" Background="{DynamicResource WindowBackgroundColorBrush}" BorderThickness="0" Margin="0" Style="{DynamicResource SettingsTabControlStyle}">
 
-                    <!-- 全般 -->
+                    <!-- 設定 -->
                     <TabItem Width="100" Height="48" Style="{DynamicResource SettingsTabItemStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TabItem.Header>
                             <Label Content="{x:Static properties:Resources.Settings}" Foreground="{Binding RelativeSource={RelativeSource AncestorType=TabItem}, Path=Foreground}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Label>
                         </TabItem.Header>
 
                         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" VerticalAlignment="Top" Padding="12" Style="{DynamicResource CustomScrollViewerStyle}">
-                            <Grid>
+                            <Grid Margin="10">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="24"/>
-                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
 
-                                <StackPanel Grid.Row="1" HorizontalAlignment="Left">
+                                <Border Grid.Row="0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                    <Label Style="{DynamicResource SectionTitle}" Content="コネクションの設定" HorizontalAlignment="Left"/>
+                                </Border>
 
-                                    <TextBlock Text="{x:Static properties:Resources.Host}" TextElement.Foreground="White"></TextBlock>
-                                    <TextBox Text="{Binding Host, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="240">
-                                        <TextBox.Style>
-                                            <Style TargetType="TextBox">
-                                                <Style.Triggers>
-                                                    <Trigger Property="Validation.HasError" Value="true">
-                                                        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)/ErrorContent}" />
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBox.Style>
-                                    </TextBox>
+                                <!-- Profiles -->
+                                <Grid Grid.Row="1" HorizontalAlignment="Left" Width="500" Margin="0 32 0 0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
 
-                                    <TextBlock Text="{x:Static properties:Resources.Port}" TextElement.Foreground="White"></TextBlock>
-                                    <TextBox Text="{Binding Port, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="240">
-                                        <TextBox.Style>
-                                            <Style TargetType="TextBox">
-                                                <Style.Triggers>
-                                                    <Trigger Property="Validation.HasError" Value="true">
-                                                        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)/ErrorContent}" />
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBox.Style>
-                                    </TextBox>
+                                    <StackPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left">
+
+                                        <ComboBox Style="{StaticResource ComboBoxFlatStyle}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Tag="New Profile">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Viewbox Width="10" Height="10" Margin="0 0 6 0">
+                                                            <Canvas Width="18" Height="18">
+                                                                <Path Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" Fill="DimGray" Visibility="{Binding Path=IsDefault, Converter={StaticResource BoolToVisibilityCollapsedConverter}}"/>
+                                                            </Canvas>
+                                                        </Viewbox>
+                                                        <TextBlock Text="{Binding Path=Name}"></TextBlock>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+
+                                        <TextBlock Text="{x:Static properties:Resources.Host}" TextElement.Foreground="White" Margin="0 12 0 0"></TextBlock>
+                                        <TextBox Text="{Binding Host, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240">
+                                            <TextBox.Style>
+                                                <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="Validation.HasError" Value="true">
+                                                            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)/ErrorContent}" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBox.Style>
+                                        </TextBox>
+
+                                        <TextBlock Text="{x:Static properties:Resources.Port}" TextElement.Foreground="White" Margin="0 12 0 0"></TextBlock>
+                                        <TextBox Text="{Binding Port, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240">
+                                            <TextBox.Style>
+                                                <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="Validation.HasError" Value="true">
+                                                            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)/ErrorContent}" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBox.Style>
+                                        </TextBox>
 
 
-                                    <TextBlock Text="{x:Static properties:Resources.Password}" TextElement.Foreground="White"></TextBlock>
-                                    <PasswordBox x:Name="PasswordBox" PasswordChar="*" Tag="{Binding Password}" Width="240" ToolTip="{x:Static properties:Resources.Optional}" PasswordChanged="PasswordBox_PasswordChanged">
-                                        <PasswordBox.Style>
-                                            <Style TargetType="{x:Type PasswordBox}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="{x:Type PasswordBox}">
-                                                            <Grid Background="{TemplateBinding Background}">
-                                                                <ScrollViewer x:Name="PART_ContentHost"/>
-                                                                <TextBlock x:Name="UserMessage"
-                                                                   Margin="5,0,5,0"
-                                                                   Text="{Binding Password}" 
-                                                                   IsHitTestVisible="False"
-                                                                   HorizontalAlignment="Left"
-                                                                   VerticalAlignment="Center"
-                                                                   Visibility="Visible"/>
-                                                            </Grid>
-                                                            <ControlTemplate.Triggers>
-                                                                <MultiTrigger>
-                                                                    <MultiTrigger.Conditions>
-                                                                        <Condition Property="Tag" Value=""/>
-                                                                    </MultiTrigger.Conditions>
-                                                                    <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
-                                                                    <Setter Property="Text" TargetName="UserMessage" Value=""/>
-                                                                </MultiTrigger>
-                                                                <MultiTrigger>
-                                                                    <MultiTrigger.Conditions>
-                                                                        <Condition Property="IsKeyboardFocusWithin" Value="true"/>
-                                                                    </MultiTrigger.Conditions>
-                                                                    <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
-                                                                    <Setter Property="Text" TargetName="UserMessage" Value=""/>
-                                                                </MultiTrigger>
-                                                            </ControlTemplate.Triggers>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Style>
-                                        </PasswordBox.Style>
-                                    </PasswordBox>
+                                        <TextBlock Text="{x:Static properties:Resources.Password}" TextElement.Foreground="White" Margin="0 12 0 0"></TextBlock>
+                                        <PasswordBox x:Name="PasswordBox" PasswordChar="*" Tag="{Binding Password}" Width="240" ToolTip="{x:Static properties:Resources.Optional}" PasswordChanged="PasswordBox_PasswordChanged">
+                                            <PasswordBox.Style>
+                                                <Style TargetType="{x:Type PasswordBox}" BasedOn="{StaticResource DefaultPasswordBoxStyle}">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="{x:Type PasswordBox}">
+                                                                <Border BorderBrush="DimGray" Background="DarkGray" BorderThickness="1" Margin="0">
+                                                                    <Grid Background="{TemplateBinding Background}">
+                                                                        <ScrollViewer x:Name="PART_ContentHost"/>
+                                                                        <TextBlock x:Name="UserMessage" Margin="5,0,5,0" Text="{Binding Password}" IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Visible"/>
+                                                                    </Grid>
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <MultiTrigger>
+                                                                        <MultiTrigger.Conditions>
+                                                                            <Condition Property="Tag" Value=""/>
+                                                                        </MultiTrigger.Conditions>
+                                                                        <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
+                                                                        <Setter Property="Text" TargetName="UserMessage" Value=""/>
+                                                                    </MultiTrigger>
+                                                                    <MultiTrigger>
+                                                                        <MultiTrigger.Conditions>
+                                                                            <Condition Property="IsKeyboardFocusWithin" Value="true"/>
+                                                                        </MultiTrigger.Conditions>
+                                                                        <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
+                                                                        <Setter Property="Text" TargetName="UserMessage" Value=""/>
+                                                                    </MultiTrigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </PasswordBox.Style>
+                                        </PasswordBox>
 
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
-                                        <Button Content="{x:Static properties:Resources.Connect}" Command="{Binding NewConnectinSettingCommand}" CommandParameter="{Binding ElementName=PasswordBox}" Padding="4" Width="100" IsDefault="False"></Button>
+                                        <CheckBox Content="Default" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding SetIsDefault}" Margin="0 12 0 0"></CheckBox>
+
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
+                                            <TextBlock Style="{DynamicResource DefaultTextBlockStyle}" Text="{Binding SettingProfileEditMessage}"></TextBlock>
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
+                                            <Button Content="新規" Command="{Binding NewProfileCommand}" Padding="4" Margin="0 0 0 0" Width="100" IsDefault="False"></Button>
+                                            <Button Content="保存" Command="{Binding SaveProfileCommand}" CommandParameter="{Binding ElementName=PasswordBox}" Padding="4" Margin="12 0 0 0" Width="100" IsDefault="False"></Button>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
+                                            <Button Content="更新" Command="{Binding UpdateProfileCommand}" Padding="4" Margin="0 0 0 0" Width="100" IsDefault="False"></Button>
+                                            <Button Content="{x:Static properties:Resources.Delete}" Command="{Binding DeleteProfileCommand}" Padding="4" Margin="12 0 0 0" Width="100" IsDefault="False"></Button>
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Horizontal" Margin="0 12 0 0" HorizontalAlignment="Center">
+                                            <TextBlock Width="240" Text="{Binding StatusMessage, NotifyOnTargetUpdated=True}" TextElement.Foreground="WhiteSmoke" TextAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextElement.FontWeight="Bold" TextWrapping="WrapWithOverflow">
+                                                <TextBlock.Triggers>
+                                                    <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
+                                                                    <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="1"/>
+                                                                </DoubleAnimationUsingKeyFrames>
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger>
+                                                </TextBlock.Triggers>
+                                            </TextBlock>
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
+
+                                            <Button Content="接続" IsEnabled="{Binding Path=IsNotConnecting}" Command="{Binding ChangeConnectionProfileCommand}" CommandParameter="{Binding ElementName=PasswordBox}" Padding="4" Width="100" IsDefault="False"></Button>
+
+                                        </StackPanel>
+
                                     </StackPanel>
 
-                                    <TextBlock Grid.Row="0" Text="{x:Static properties:Resources.SavedProfiles}" TextElement.Foreground="White" Margin="0 0 0 0"></TextBlock>
 
-                                    <ListView x:Name="ProfilesListview" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Margin="0 4 0 0" MinHeight="74" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" SelectionChanged="ProfilesListview_SelectionChanged">
-                                        <ListView.View>
-                                            <GridView>
-                                                <GridView.ColumnHeaderContainerStyle>
-                                                    <Style TargetType="GridViewColumnHeader">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                        <Setter Property="HorizontalContentAlignment" Value="Left" />
-                                                        <Setter Property="Padding" Value="6 2 6 2" />
-                                                    </Style>
-                                                </GridView.ColumnHeaderContainerStyle>
+                                </Grid>
 
-                                                <GridViewColumn Header="{x:Static properties:Resources.Profile}" Width="180">
-                                                    <GridViewColumn.CellTemplate>
-                                                        <DataTemplate>
-                                                            <StackPanel HorizontalAlignment="Left">
-                                                                <TextBlock Text="{Binding Path=Name}" Padding="3" />
-                                                            </StackPanel>
-                                                        </DataTemplate>
-                                                    </GridViewColumn.CellTemplate>
-                                                </GridViewColumn>
+                                <!-- Options -->
+                                <Border Grid.Row="2" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                    <Label Style="{DynamicResource SectionTitle}" Content="オプションの設定" HorizontalAlignment="Left"/>
+                                </Border>
 
-                                                <GridViewColumn Header="" Width="24">
-                                                    <GridViewColumn.CellTemplate>
-                                                        <DataTemplate>
-                                                            <Viewbox Width="12" Height="12" x:Name="DefaultCheck">
-                                                                <Canvas Width="18" Height="18">
-                                                                    <Path Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}}}" Visibility="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}},Converter={StaticResource BoolToVisibilityCollapsedConverter}}"/>
-                                                                </Canvas>
-                                                            </Viewbox>
-                                                        </DataTemplate>
-                                                    </GridViewColumn.CellTemplate>
-                                                </GridViewColumn>
-                                            </GridView>
-                                        </ListView.View>
-                                    </ListView>
+                                <Grid Grid.Row="3" HorizontalAlignment="Left" Width="500" Margin="0 12 0 0">
+                                    <CheckBox Content="Update database on startup" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsUpdateOnStartup}" Margin="0 12 0 0"></CheckBox>
+                                </Grid>
 
-                                </StackPanel>
+                                <Border Grid.Row="4" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                    <Label Style="{DynamicResource SectionTitle}" Content="デベロッパーモード" HorizontalAlignment="Left"/>
+                                </Border>
+                                <Grid Grid.Row="5" HorizontalAlignment="Left" Width="500" Margin="0 12 0 0">
+                                    <CheckBox Content="Show debug widow" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsShowDebugWindow}" Margin="0 12 0 0"></CheckBox>
+                                </Grid>
 
-                                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
-                                    <Button Content="{x:Static properties:Resources.Add}" Command="{Binding AddConnectinSettingCommand}" Padding="4" Width="100"></Button>
-                                    <Button Content="{x:Static properties:Resources.Delete}" Command="{Binding DeleteConnectinSettingCommand}" Padding="4" Width="100" Margin="24 0 0 0"></Button>
-                                </StackPanel>
 
                             </Grid>
                         </ScrollViewer>
 
+                    </TabItem>
+
+                    <!-- About -->
+                    <TabItem Width="100" Height="48" Style="{DynamicResource SettingsTabItemStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TabItem.Header>
+                            <Label Content="About" Foreground="{Binding RelativeSource={RelativeSource AncestorType=TabItem}, Path=Foreground}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Label>
+                        </TabItem.Header>
+
+                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" VerticalAlignment="Top" Padding="12" Style="{DynamicResource CustomScrollViewerStyle}">
+                            <Grid Margin="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <Border HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                    <Label Style="{DynamicResource SectionTitle}" Content="About this application" HorizontalAlignment="Left"/>
+                                </Border>
+
+                                <!--  -->
+                                <Grid Grid.Row="1" HorizontalAlignment="Left" Margin="0 32 0 0">
+
+
+
+
+                                </Grid>
+
+
+                            </Grid>
+                        </ScrollViewer>
                     </TabItem>
 
                     <!-- ライセンス -->
@@ -888,148 +1181,17 @@ SOFTWARE.
 
                 </TabControl>
 
-                <Border Grid.Row="2" Height="62" Margin="-1 0 -1 0" Background="{DynamicResource BoardBackgroundColorBrush}">
+                <Border Grid.Row="2" Height="62" Margin="-1 -1 -1 0" Background="{DynamicResource BoardBackgroundColorBrush}">
+                    <Border  BorderThickness="0 0.5 0 0" BorderBrush="{DynamicResource ControlMediumColorBrush}">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 12 0 0">
+                            <Button Width="80" Content="{x:Static properties:Resources.Close}" Margin="0 0 32 0" Padding="3" IsDefault="True" Command="{Binding SettingsOKCommand}"></Button>
+                        </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 12 0 0">
-                        <Button Width="80" Content="{x:Static properties:Resources.Close}" Margin="0 0 32 0" Padding="3" IsDefault="True" Command="{Binding SettingsOKCommand}"></Button>
-                    </StackPanel>
-
+                    </Border>
                 </Border>
 
             </Grid>
 
-            <!-- 初期設定画面 -->
-            <Grid Visibility="{Binding IsConnectionSettingShow, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="27"/>
-                    <RowDefinition Height="40*"/>
-                    <RowDefinition Height="60*"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <Grid Grid.Row="1" Height="63" Margin="12 0 12 0" VerticalAlignment="Bottom" HorizontalAlignment="Center">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="22"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Viewbox Grid.Row="0" Grid.Column="0" Margin="0 0 6 0" Width="16" Height="16" VerticalAlignment="Top" HorizontalAlignment="Left">
-                        <Canvas Width="24" Height="24">
-                            <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding StatusButton, NotifyOnTargetUpdated=True}" >
-                                <Path.Triggers>
-                                    <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1.0" To="0.0" Duration="0:0:5" AutoReverse="True" RepeatBehavior="Forever">
-                                                </DoubleAnimation>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                </Path.Triggers>
-                            </Path>
-                        </Canvas>
-                    </Viewbox>
-
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding StatusMessage, NotifyOnTargetUpdated=True}" TextElement.Foreground="WhiteSmoke" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextElement.FontWeight="Bold" TextWrapping="WrapWithOverflow">
-                        <TextBlock.Triggers>
-                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
-                                            <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                                            <EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="1"/>
-                                        </DoubleAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                        </TextBlock.Triggers>
-                    </TextBlock>
-
-                </Grid>
-
-                <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="top">
-
-                    <TextBlock Text="{x:Static properties:Resources.Host}" TextElement.Foreground="White"></TextBlock>
-                    <TextBox x:Name="NewHost_TextBox" Text="{Binding Host, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240" IsVisibleChanged="TextBox_IsVisibleChanged">
-                        <TextBox.Style>
-                            <Style TargetType="TextBox">
-                                <Style.Triggers>
-                                    <Trigger Property="Validation.HasError" Value="true">
-                                        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)/ErrorContent}" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBox.Style>
-                    </TextBox>
-
-                    <TextBlock Text="{x:Static properties:Resources.Port}" TextElement.Foreground="White" Margin="0 12 0 0"></TextBlock>
-                    <TextBox Text="{Binding Port, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240">
-                        <TextBox.Style>
-                            <Style TargetType="TextBox">
-                                <Style.Triggers>
-                                    <Trigger Property="Validation.HasError" Value="true">
-                                        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)/ErrorContent}" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBox.Style>
-                    </TextBox>
-
-
-                    <TextBlock Text="{x:Static properties:Resources.Password}" TextElement.Foreground="White" Margin="0 12 0 0"></TextBlock>
-                    <PasswordBox x:Name="PasswordBoxNew" PasswordChar="*" Tag="{Binding Password}" Width="240" ToolTip="{x:Static properties:Resources.Optional}" PasswordChanged="PasswordBoxNew_PasswordChanged">
-                        <PasswordBox.Style>
-                            <Style TargetType="{x:Type PasswordBox}">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="{x:Type PasswordBox}">
-                                            <Grid Background="{TemplateBinding Background}">
-                                                <ScrollViewer x:Name="PART_ContentHost"/>
-                                                <TextBlock x:Name="UserMessage"
-                                                                   Margin="5,0,5,0"
-                                                                   Text="{Binding Password}" 
-                                                                   IsHitTestVisible="False"
-                                                                   HorizontalAlignment="Left"
-                                                                   VerticalAlignment="Center"
-                                                                   Visibility="Visible"/>
-                                            </Grid>
-                                            <ControlTemplate.Triggers>
-                                                <MultiTrigger>
-                                                    <MultiTrigger.Conditions>
-                                                        <Condition Property="Tag" Value=""/>
-                                                    </MultiTrigger.Conditions>
-                                                    <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
-                                                    <Setter Property="Text" TargetName="UserMessage" Value=""/>
-                                                </MultiTrigger>
-                                                <MultiTrigger>
-                                                    <MultiTrigger.Conditions>
-                                                        <Condition Property="IsKeyboardFocusWithin" Value="true"/>
-                                                    </MultiTrigger.Conditions>
-                                                    <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
-                                                    <Setter Property="Text" TargetName="UserMessage" Value=""/>
-                                                </MultiTrigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </PasswordBox.Style>
-                    </PasswordBox>
-
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 24 0 0">
-                        <Button Content="{x:Static properties:Resources.Connect}" IsDefault="True" Command="{Binding NewConnectinSettingCommand}" CommandParameter="{Binding ElementName=PasswordBoxNew}" Padding="4" Width="100"></Button>
-                    </StackPanel>
-
-                </StackPanel>
-
-            </Grid>
-
         </Grid>
-        
     </Border>
 </Window>

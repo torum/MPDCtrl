@@ -5,6 +5,8 @@ using System.Threading;
 using System.Linq;
 using System.Text;
 using System.IO;
+using MPDCtrl.ViewModels;
+using MPDCtrl.Views;
 
 namespace MPDCtrl
 {
@@ -94,6 +96,82 @@ namespace MPDCtrl
             // テーマをリソース・ディクショナリのソースに指定
             string themeUri = String.Format("pack://application:,,,/Themes/{0}.xaml", themeName);
             _themeDict.Source = new Uri(themeUri);
+
+        }
+
+        public void CreateDebugWindow(DebugViewModel DebugVM)
+        {
+            if (DebugVM == null)
+                return;
+
+            App app = App.Current as App;
+            if (app == null) return;
+
+            foreach (var w in app.Windows)
+            {
+                if (w is DebugWindow)
+                {
+                    if ((w as DebugWindow).WindowState == WindowState.Minimized || (w as Window).Visibility == Visibility.Hidden)
+                    {
+                        (w as DebugWindow).Visibility = Visibility.Visible;
+                        (w as DebugWindow).WindowState = WindowState.Normal;
+                    }
+
+                    (w as DebugWindow).Show();
+
+                    return;
+                }
+            }
+
+            var win = new DebugWindow();
+            win.DataContext = DebugVM;
+
+            // for debug.
+            //win.Show();
+            //win.Topmost = true;
+
+            win.Hide();
+
+        }
+
+        public void ShowDebugWindow(ShowDebugEventArgs eventArg)
+        {
+            App app = App.Current as App;
+            if (app == null) return;
+
+            foreach (var w in app.Windows)
+            {
+                if (w is DebugWindow)
+                {
+                    if (eventArg.SetVisibility)
+                    {
+                        if ((w as DebugWindow).WindowState == WindowState.Minimized || (w as Window).Visibility == Visibility.Hidden)
+                        {
+                            //w.Show();
+                            (w as DebugWindow).Visibility = Visibility.Visible;
+                            (w as DebugWindow).WindowState = WindowState.Normal;
+                        }
+
+                        (w as DebugWindow).Top = eventArg.Top;
+                        (w as DebugWindow).Left = eventArg.Left;
+                        (w as DebugWindow).Width = eventArg.Width;
+                        (w as DebugWindow).Height = eventArg.Height;
+
+                        (w as DebugWindow).Show();
+
+                        //(w as DebugWindow).Activate();
+                        //(w as DebugWindow).Topmost = true;
+                        //(w as DebugWindow).Topmost = false;
+                        //(w as DebugWindow).Focus();
+                    }
+                    else
+                    {
+                        (w as DebugWindow).Hide();
+                    }
+
+                    return;
+                }
+            }
 
         }
     }

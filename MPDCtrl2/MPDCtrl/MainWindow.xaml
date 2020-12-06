@@ -13,7 +13,7 @@
         DataContext="{StaticResource MainViewModel}"
         Title="{Binding AppTitle}"
         Height="480" Width="800"
-        MinWidth="300">
+        MinWidth="780" MinHeight="250">
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="30" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"/>
     </WindowChrome.WindowChrome>
@@ -124,7 +124,7 @@
                     </TextBlock>
                 </StackPanel>
 
-                <!-- Sys icons -->
+                <!-- System icons -->
                 <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right" Margin="0">
 
                     <Button x:Name="SettingsButton" Style="{DynamicResource PathButton}" Width="27" Height="27" Margin="0" Opacity="0.7" Command="{Binding ShowSettingsCommand}" ToolTip="(Ctrl+S)" WindowChrome.IsHitTestVisibleInChrome="True"
@@ -215,7 +215,6 @@
                         </StackPanel>
                     </Grid>
 
-
                     <!-- Playback Controls -->
                     <Grid Grid.Row="1" Grid.Column="1">
                         <Grid.RowDefinitions>
@@ -240,11 +239,11 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <Button x:Name="BackButton" Grid.Column="0" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8H10V16H8M16,8V16L11,12" Style="{StaticResource PathButton}" Command="{Binding PlayPrevCommand}" >
+                            <Button x:Name="BackButton" ToolTip="{x:Static properties:Resources.Playback_BackButton}" Grid.Column="0" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8H10V16H8M16,8V16L11,12" Style="{StaticResource PathButton}" Command="{Binding PlayPrevCommand}" >
                             </Button>
-                            <Button x:Name="PlayButton" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="62" Width="62" Background="Transparent" Foreground="White" Style="{StaticResource PathButton}" Command="{Binding PlayCommand}" Content="{Binding PlayButton}">
+                            <Button x:Name="PlayButton" ToolTip="{x:Static properties:Resources.Playback_PlayPauseButton}" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="62" Width="62" Background="Transparent" Foreground="White" Style="{StaticResource PathButton}" Command="{Binding PlayCommand}" Content="{Binding PlayButton}">
                             </Button>
-                            <Button x:Name="NextButton" Grid.Column="2" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8L13,12L8,16M14,8H16V16H14" Style="{StaticResource PathButton}" Command="{Binding PlayNextCommand}" >
+                            <Button x:Name="NextButton" ToolTip="{x:Static properties:Resources.Playback_NextButton}" Grid.Column="2" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8L13,12L8,16M14,8H16V16H14" Style="{StaticResource PathButton}" Command="{Binding PlayNextCommand}" >
                             </Button>
 
                         </Grid>
@@ -257,7 +256,7 @@
                                 <ColumnDefinition Width="24"/>
                             </Grid.ColumnDefinitions>
 
-                            <Slider x:Name="SliderSeek" Grid.Column="1" VerticalAlignment="Center" Margin="6 0 6 0" Foreground="Gray" Background="Transparent" IsMoveToPointEnabled="True" Minimum="1" Maximum="{Binding Mode=TwoWay,Path=Time}" Value="{Binding Mode=TwoWay,Path=Elapsed}">
+                            <Slider x:Name="SliderSeek" ToolTip="{x:Static properties:Resources.Playback_SliderSeek}" Grid.Column="1" VerticalAlignment="Center" Margin="6 0 6 0" Foreground="Gray" Background="Transparent" IsMoveToPointEnabled="True" Minimum="1" Maximum="{Binding Mode=TwoWay,Path=Time}" Value="{Binding Mode=TwoWay,Path=Elapsed}">
                             </Slider>
 
                         </Grid>
@@ -272,18 +271,18 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Bottom">
-                            <ToggleButton x:Name="RepeatButton" ToolTip="Repeat" IsChecked="{Binding Mode=TwoWay,Path=Repeat}" Template="{StaticResource PathToggleButton}" Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
+                            <ToggleButton x:Name="RepeatButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Repeat}" IsChecked="{Binding Mode=TwoWay,Path=Repeat}" Template="{StaticResource PathToggleButton}" Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
                                   Content="M17,17H7V14L3,18L7,22V19H19V13H17M7,7H17V10L21,6L17,2V5H5V11H7V7Z">
                             </ToggleButton>
-                            <ToggleButton x:Name="ShuffleButton" ToolTip="Shuffle" IsChecked="{Binding Mode=TwoWay,Path=Random}" Template="{StaticResource PathToggleButton}" Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
+                            <ToggleButton x:Name="ShuffleButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Shuffle}" IsChecked="{Binding Mode=TwoWay,Path=Random}" Template="{StaticResource PathToggleButton}" Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
                                   Content="M17,3L22.25,7.5L17,12L22.25,16.5L17,21V18H14.26L11.44,15.18L13.56,13.06L15.5,15H17V12L17,9H15.5L6.5,18H2V15H5.26L14.26,6H17V3M2,6H6.5L9.32,8.82L7.2,10.94L5.26,9H2V6Z">
                             </ToggleButton>
-                            <ToggleButton x:Name="ConsumeButton" ToolTip="Consume" IsChecked="{Binding Mode=TwoWay,Path=Consume}" Template="{StaticResource PathToggleButton}" Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
+                            <ToggleButton x:Name="ConsumeButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Consume}" IsChecked="{Binding Mode=TwoWay,Path=Consume}" Template="{StaticResource PathToggleButton}" Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
                                   Content="M2,16H10V14H2M12,14V16H22V14M14,6H2V8H14M14,10H2V12H14V10Z">
                             </ToggleButton>
                         </StackPanel>
 
-                        <Slider x:Name="SliderVol" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" IsMoveToPointEnabled="True" Margin="0 0 18 0" Foreground="Gainsboro" Maximum="100" Value="{Binding Volume}">
+                        <Slider x:Name="SliderVol" ToolTip="{x:Static properties:Resources.Playback_SliderVolume}" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" IsMoveToPointEnabled="True" Margin="0 0 18 0" Foreground="Gainsboro" Maximum="100" Value="{Binding Volume}">
                         </Slider>
                     </Grid>
 
@@ -305,96 +304,111 @@
                         <TabControl Style="{StaticResource NoChromeTabControl}" Margin="0 1 0 0" Background="{DynamicResource BoardBackgroundColorBrush}">
                             
                             <!-- Playlists -->
-                            <TabItem Header="Playlists" Width="120" Style="{StaticResource NoChromeTabHeader}">
+                            <TabItem Header="{x:Static properties:Resources.PlaylistListviewTabitemHeader_Playlists}" Width="120" Style="{StaticResource NoChromeTabHeader}">
+                                <StackPanel>
+                                    
+                                    <Grid x:Name="LVPLDummy" Grid.Row="0" Grid.Column="2" Visibility="Hidden" Margin="0 0 20 0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="0" />
+                                            <ColumnDefinition Width="1*"/>
+                                        </Grid.ColumnDefinitions>
 
-                                <ListView x:Name="PlaylistListview" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}" SelectionMode="Single" Background="Transparent" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
-                                    <ListView.InputBindings>
-                                        <KeyBinding Key="Return" Command="{Binding Path=DataContext.PlaylistListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"
+                                        <!--  This is the hidden helper Field which is used to bind to, using the "Fill" column of the helper grid  -->
+                                        <Grid x:Name="LVPLDummy0" Grid.Column="0" />
+                                        <Grid x:Name="LVPLDummy1" Grid.Column="1" />
+                                    </Grid>
+
+                                    <ListView x:Name="PlaylistListview" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}" SelectionMode="Single" Background="Transparent" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                        <ListView.InputBindings>
+                                            <KeyBinding Key="Return" Command="{Binding Path=DataContext.PlaylistListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"
                                                                  CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
-                                    </ListView.InputBindings>
-                                    <ListView.Resources>
-                                        <ContextMenu x:Key="PlaylistItemContextMenu">
-                                            <!--
-                                                <MenuItem Header="Load" 
+                                        </ListView.InputBindings>
+                                        <ListView.Resources>
+                                            <ContextMenu x:Key="PlaylistItemContextMenu">
+
+                                                <MenuItem Header="{x:Static properties:Resources.PlaylistItemContextMenu_Load}" 
                                                         Command="{Binding Path=DataContext.PlaylistListviewLoadPlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
                                                         CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                                 </MenuItem>
-                                                -->
-                                            <MenuItem Header="Add to queue" 
-                                                        Command="{Binding Path=DataContext.PlaylistListviewAddPlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
+                                                <MenuItem Header="{x:Static properties:Resources.PlaylistItemContextMenu_ClearAndLoad}" 
+                                                        Command="{Binding Path=DataContext.PlaylistListviewClearLoadPlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
                                                         CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
-                                            </MenuItem>
-                                            <Separator />
-                                        </ContextMenu>
-                                        <Style TargetType="{x:Type ScrollBar}">
-                                            <Setter Property="Margin" Value="0,0,0,0" />
-                                            <Setter Property="BorderThickness" Value="0" />
-                                            <Style.Triggers>
-                                                <Trigger Property="Orientation" Value="Vertical">
-                                                    <Setter Property="Width" Value="18"/>
-                                                    <Setter Property="Height" Value="Auto" />
-                                                    <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ListView.Resources>
-                                    <ListView.View>
-                                        <GridView>
-                                            <GridView.ColumnHeaderContainerStyle>
-                                                <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource GridViewColumnHeaderStyle}">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                </Style>
-                                            </GridView.ColumnHeaderContainerStyle>
-                                            <GridViewColumn Header="Playlists">
-                                                <GridViewColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <StackPanel HorizontalAlignment="Left">
-                                                            <TextBlock Text="{Binding }" Padding="3" />
-                                                        </StackPanel>
-                                                    </DataTemplate>
-                                                </GridViewColumn.CellTemplate>
-                                            </GridViewColumn>
-                                        </GridView>
-                                    </ListView.View>
-                                    <ListView.ItemContainerStyle>
-                                        <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemNoAlternateStyle}">
-                                            <Setter Property="ContextMenu" Value="{StaticResource PlaylistItemContextMenu}" />
-                                            <Setter Property="Margin" Value="0 0 0 0"/>
-                                            <Setter Property="Padding" Value="0 1 0 1"/>
-                                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                                        <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
-                                                            <Border.InputBindings>
-                                                                <MouseBinding Command="{Binding Path=DataContext.PlaylistListviewLeftDoubleClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Gesture="LeftDoubleClick" />
-                                                            </Border.InputBindings>
+                                                </MenuItem>
+                                                <!--
+                                                <Separator />
+                                                <MenuItem Header="Playlist">
+                                                </MenuItem>
+                                                -->
+                                            </ContextMenu>
+                                            <Style TargetType="{x:Type ScrollBar}">
+                                                <Setter Property="Margin" Value="0,0,0,0" />
+                                                <Setter Property="BorderThickness" Value="0" />
+                                                <Style.Triggers>
+                                                    <Trigger Property="Orientation" Value="Vertical">
+                                                        <Setter Property="Width" Value="18"/>
+                                                        <Setter Property="Height" Value="Auto" />
+                                                        <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ListView.Resources>
+                                        <ListView.View>
+                                            <GridView>
+                                                <GridView.ColumnHeaderContainerStyle>
+                                                    <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource GridViewColumnHeaderStyle}">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </Style>
+                                                </GridView.ColumnHeaderContainerStyle>
+                                                <GridViewColumn Header="Playlists" Width="{Binding ElementName=LVPLDummy1, Path=ActualWidth}">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel HorizontalAlignment="Stretch">
+                                                                <TextBlock Text="{Binding }" Padding="3" />
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+                                            </GridView>
+                                        </ListView.View>
+                                        <ListView.ItemContainerStyle>
+                                            <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemNoAlternateStyle}">
+                                                <Setter Property="ContextMenu" Value="{StaticResource PlaylistItemContextMenu}" />
+                                                <Setter Property="Margin" Value="0 0 0 0"/>
+                                                <Setter Property="Padding" Value="0 1 0 1"/>
+                                                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                                            <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
+                                                                <Border.InputBindings>
+                                                                    <MouseBinding Command="{Binding Path=DataContext.PlaylistListviewLeftDoubleClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Gesture="LeftDoubleClick" />
+                                                                </Border.InputBindings>
 
-                                                            <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                                                        </Border>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </ListView.ItemContainerStyle>
-                                </ListView>
+                                                                <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </ListView.ItemContainerStyle>
+                                    </ListView>
 
+                                </StackPanel>
                             </TabItem>
 
                             <!-- Local files -->
-                            <TabItem Header="Local Files" Width="120" Style="{StaticResource NoChromeTabHeader}">
+                            <TabItem Header="{x:Static properties:Resources.LocalfileListviewTabitemHeader_LocalFiles}" Width="120" Style="{StaticResource NoChromeTabHeader}">
 
                                 <ListView x:Name="LocalfileListview" ItemsSource="{Binding Localfiles}" SelectedItem="{Binding SelectedLocalfile}" Background="Transparent" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                                     <ListView.Resources>
                                         <ContextMenu x:Key="LocalfileItemContextMenu">
-                                            <MenuItem Header="Selected Items">
-                                                <MenuItem Header="Add to the queue" 
+                                            <MenuItem Header="{x:Static properties:Resources.LocalfileItemContextMenu_Add}" 
                                                         Command="{Binding Path=DataContext.LocalfileListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
                                                         CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
-                                                </MenuItem>
                                             </MenuItem>
-                                            <Separator />
                                             <!--
+                                            <Separator />
+                                            <MenuItem Header="Local Files">
                                             <MenuItem Header="Reload" 
                                                         Command="{Binding Path=DataContext.AutoTradeDeleteItemListviewCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"
                                                         CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
@@ -408,7 +422,7 @@
                                                 <MenuItem.Icon>
                                                     <ContentControl Template="{StaticResource CancelIcon}" />
                                                 </MenuItem.Icon>
-                                                
+                                            </MenuItem>
                                             </MenuItem>
                                             -->
                                         </ContextMenu>
@@ -472,6 +486,7 @@
 
                     <!-- Queue -->
                     <Grid Grid.Row="0" Grid.Column="2">
+                        
                         <Grid x:Name="AT2Dummy" Grid.Row="0" Grid.Column="2" Visibility="Hidden" Margin="0 0 20 0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="0" />
@@ -499,12 +514,12 @@
                             </ListView.InputBindings>
                             <ListView.Resources>
                                 <ContextMenu x:Key="SongItemContextMenu">
-                                    <MenuItem Header="Selected Items">
-                                        <MenuItem Header="Delete from queue" Command="{Binding Path=DataContext.SongListviewDeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
-                                        </MenuItem>
+                                    <MenuItem Header="{x:Static properties:Resources.SongItemContextMenuRemove}" Command="{Binding Path=DataContext.SongListviewDeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                     </MenuItem>
                                     <Separator />
-                                    <MenuItem Header="Clear queue" Command="{Binding Path=DataContext.SongListviewClearCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                    <MenuItem Header="{x:Static properties:Resources.SongItemContextMenuQueue}">
+                                        <MenuItem Header="{x:Static properties:Resources.SongItemContextMenuQueueClear}" Command="{Binding Path=DataContext.SongListviewClearCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                        </MenuItem>
                                     </MenuItem>
                                     <!--
                                             <MenuItem Header="Reload" 
@@ -575,7 +590,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="Song" Width="{Binding ElementName=AT2Width2, Path=ActualWidth}">
+                                    <GridViewColumn Header="{x:Static properties:Resources.SongListViewColumnHeader_Song}" Width="{Binding ElementName=AT2Width2, Path=ActualWidth}">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel HorizontalAlignment="Left">
@@ -593,7 +608,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="Time" Width="{Binding ElementName=AT2Width3, Path=ActualWidth}">
+                                    <GridViewColumn Header="{x:Static properties:Resources.SongListViewColumnHeader_Time}" Width="{Binding ElementName=AT2Width3, Path=ActualWidth}">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel HorizontalAlignment="Left">
@@ -611,7 +626,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="Artist" Width="{Binding ElementName=AT2Width4, Path=ActualWidth}">
+                                    <GridViewColumn Header="{x:Static properties:Resources.SongListViewColumnHeader_Artist}" Width="{Binding ElementName=AT2Width4, Path=ActualWidth}">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel HorizontalAlignment="Left">
@@ -629,7 +644,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="Album" Width="{Binding ElementName=AT2Width5, Path=ActualWidth}">
+                                    <GridViewColumn Header="{x:Static properties:Resources.SongListViewColumnHeader_Album}" Width="{Binding ElementName=AT2Width5, Path=ActualWidth}">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel HorizontalAlignment="Left">
@@ -647,7 +662,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="Genre" Width="{Binding ElementName=AT2Width6, Path=ActualWidth}">
+                                    <GridViewColumn Header="{x:Static properties:Resources.SongListViewColumnHeader_Genre}" Width="{Binding ElementName=AT2Width6, Path=ActualWidth}">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel HorizontalAlignment="Left">
@@ -871,212 +886,6 @@
                             <Label Content="{x:Static properties:Resources.Settings}" Foreground="{Binding RelativeSource={RelativeSource AncestorType=TabItem}, Path=Foreground}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Label>
                         </TabItem.Header>
 
-                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" VerticalAlignment="Top" Padding="12" Style="{DynamicResource CustomScrollViewerStyle}">
-                            <Grid Margin="10">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-
-                                <Border Grid.Row="0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
-                                    <Label Style="{DynamicResource SectionTitle}" Content="コネクションの設定" HorizontalAlignment="Left"/>
-                                </Border>
-
-                                <!-- Profiles -->
-                                <Grid Grid.Row="1" HorizontalAlignment="Left" Width="500" Margin="0 32 0 0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-
-                                    <StackPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left">
-
-                                        <ComboBox Style="{StaticResource ComboBoxFlatStyle}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Tag="New Profile">
-                                            <ComboBox.ItemTemplate>
-                                                <DataTemplate>
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <Viewbox Width="10" Height="10" Margin="0 0 6 0">
-                                                            <Canvas Width="18" Height="18">
-                                                                <Path Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" Fill="DimGray" Visibility="{Binding Path=IsDefault, Converter={StaticResource BoolToVisibilityCollapsedConverter}}"/>
-                                                            </Canvas>
-                                                        </Viewbox>
-                                                        <TextBlock Text="{Binding Path=Name}"></TextBlock>
-                                                    </StackPanel>
-                                                </DataTemplate>
-                                            </ComboBox.ItemTemplate>
-                                        </ComboBox>
-
-                                        <TextBlock Text="{x:Static properties:Resources.Host}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
-                                        <TextBox Text="{Binding Host, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240">
-                                            <TextBox.Style>
-                                                <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
-                                                    <Style.Triggers>
-                                                        <Trigger Property="Validation.HasError" Value="true">
-                                                            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)/ErrorContent}" />
-                                                        </Trigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBox.Style>
-                                        </TextBox>
-
-                                        <TextBlock Text="{x:Static properties:Resources.Port}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
-                                        <TextBox Text="{Binding Port, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240">
-                                            <TextBox.Style>
-                                                <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
-                                                    <Style.Triggers>
-                                                        <Trigger Property="Validation.HasError" Value="true">
-                                                            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)/ErrorContent}" />
-                                                        </Trigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBox.Style>
-                                        </TextBox>
-
-
-                                        <TextBlock Text="{x:Static properties:Resources.Password}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
-                                        <PasswordBox x:Name="PasswordBox" PasswordChar="*" Tag="{Binding Password}" Width="240" ToolTip="{x:Static properties:Resources.Optional}" PasswordChanged="PasswordBox_PasswordChanged">
-                                            <PasswordBox.Style>
-                                                <Style TargetType="{x:Type PasswordBox}" BasedOn="{StaticResource DefaultPasswordBoxStyle}">
-                                                    <Setter Property="Template">
-                                                        <Setter.Value>
-                                                            <ControlTemplate TargetType="{x:Type PasswordBox}">
-                                                                <Border BorderBrush="DimGray" Background="DarkGray" BorderThickness="1" Margin="0">
-                                                                    <Grid Background="{TemplateBinding Background}">
-                                                                        <ScrollViewer x:Name="PART_ContentHost"/>
-                                                                        <TextBlock x:Name="UserMessage" Margin="5,0,5,0" Text="{Binding Password}" IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Visible"/>
-                                                                    </Grid>
-                                                                </Border>
-                                                                <ControlTemplate.Triggers>
-                                                                    <MultiTrigger>
-                                                                        <MultiTrigger.Conditions>
-                                                                            <Condition Property="Tag" Value=""/>
-                                                                        </MultiTrigger.Conditions>
-                                                                        <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
-                                                                        <Setter Property="Text" TargetName="UserMessage" Value=""/>
-                                                                    </MultiTrigger>
-                                                                    <MultiTrigger>
-                                                                        <MultiTrigger.Conditions>
-                                                                            <Condition Property="IsKeyboardFocusWithin" Value="true"/>
-                                                                        </MultiTrigger.Conditions>
-                                                                        <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
-                                                                        <Setter Property="Text" TargetName="UserMessage" Value=""/>
-                                                                    </MultiTrigger>
-                                                                </ControlTemplate.Triggers>
-                                                            </ControlTemplate>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Style>
-                                            </PasswordBox.Style>
-                                        </PasswordBox>
-
-                                        <CheckBox Content="Default" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding SetIsDefault}" Margin="0 12 0 0"></CheckBox>
-
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
-                                            <TextBlock Style="{DynamicResource DefaultTextBlockStyle}" Text="{Binding SettingProfileEditMessage}"></TextBlock>
-                                        </StackPanel>
-
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
-                                            <Button Content="新規" Command="{Binding NewProfileCommand}" Padding="4" Margin="0 0 0 0" Width="100" IsDefault="False"></Button>
-                                            <Button Content="保存" Command="{Binding SaveProfileCommand}" CommandParameter="{Binding ElementName=PasswordBox}" Padding="4" Margin="12 0 0 0" Width="100" IsDefault="False"></Button>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
-                                            <Button Content="更新" Command="{Binding UpdateProfileCommand}" Padding="4" Margin="0 0 0 0" Width="100" IsDefault="False"></Button>
-                                            <Button Content="{x:Static properties:Resources.Delete}" Command="{Binding DeleteProfileCommand}" Padding="4" Margin="12 0 0 0" Width="100" IsDefault="False"></Button>
-                                        </StackPanel>
-
-                                        <StackPanel Orientation="Horizontal" Margin="0 12 0 0" HorizontalAlignment="Center">
-                                            <TextBlock Width="240" Text="{Binding StatusMessage, NotifyOnTargetUpdated=True}" TextElement.Foreground="WhiteSmoke" TextAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextElement.FontWeight="Bold" TextWrapping="WrapWithOverflow">
-                                                <TextBlock.Triggers>
-                                                    <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                                                        <BeginStoryboard>
-                                                            <Storyboard>
-                                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
-                                                                    <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="1"/>
-                                                                </DoubleAnimationUsingKeyFrames>
-                                                            </Storyboard>
-                                                        </BeginStoryboard>
-                                                    </EventTrigger>
-                                                </TextBlock.Triggers>
-                                            </TextBlock>
-                                        </StackPanel>
-
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
-
-                                            <Button Content="接続" IsEnabled="{Binding Path=IsNotConnecting}" Command="{Binding ChangeConnectionProfileCommand}" CommandParameter="{Binding ElementName=PasswordBox}" Padding="4" Width="100" IsDefault="False"></Button>
-
-                                        </StackPanel>
-
-                                    </StackPanel>
-
-
-                                </Grid>
-
-                                <!-- Options -->
-                                <Border Grid.Row="2" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
-                                    <Label Style="{DynamicResource SectionTitle}" Content="オプションの設定" HorizontalAlignment="Left"/>
-                                </Border>
-
-                                <Grid Grid.Row="3" HorizontalAlignment="Left" Width="500" Margin="0 12 0 0">
-                                    <CheckBox Content="Update database on startup" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsUpdateOnStartup}" Margin="0 12 0 0"></CheckBox>
-                                </Grid>
-
-                                <Border Grid.Row="4" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
-                                    <Label Style="{DynamicResource SectionTitle}" Content="デベロッパーモード" HorizontalAlignment="Left"/>
-                                </Border>
-                                <Grid Grid.Row="5" HorizontalAlignment="Left" Width="500" Margin="0 12 0 0">
-                                    <CheckBox Content="Show debug widow" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsShowDebugWindow}" Margin="0 12 0 0"></CheckBox>
-                                </Grid>
-
-
-                            </Grid>
-                        </ScrollViewer>
-
-                    </TabItem>
-
-                    <!-- About -->
-                    <TabItem Width="100" Height="48" Style="{DynamicResource SettingsTabItemStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TabItem.Header>
-                            <Label Content="About" Foreground="{Binding RelativeSource={RelativeSource AncestorType=TabItem}, Path=Foreground}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Label>
-                        </TabItem.Header>
-
-                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" VerticalAlignment="Top" Padding="12" Style="{DynamicResource CustomScrollViewerStyle}">
-                            <Grid Margin="10">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-
-                                <Border HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
-                                    <Label Style="{DynamicResource SectionTitle}" Content="About this application" HorizontalAlignment="Left"/>
-                                </Border>
-
-                                <!--  -->
-                                <Grid Grid.Row="1" HorizontalAlignment="Left" Margin="0 32 0 0">
-
-
-
-
-                                </Grid>
-
-
-                            </Grid>
-                        </ScrollViewer>
-                    </TabItem>
-
-                    <!-- ライセンス -->
-                    <TabItem Width="100" Height="48" Style="{DynamicResource SettingsTabItemStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TabItem.Header>
-                            <Label Content="ライセンス" Foreground="{Binding RelativeSource={RelativeSource AncestorType=TabItem}, Path=Foreground}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Label>
-                        </TabItem.Header>
-
                         <TabControl Margin="12">
                             <TabControl.Resources>
                                 <Style x:Key="LicenseTabFocusVisualStyle">
@@ -1137,149 +946,350 @@
 
                             <TabItem Style="{DynamicResource LicenseTabItemStyle}">
                                 <TabItem.Header>
-                                    <Label Content="使用許諾契約書 (EULA)" Style="{DynamicResource SectionTitle}" Padding="6" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Label>
+                                    <Label Content="{x:Static properties:Resources.Connection}" Style="{DynamicResource SectionTitle}" Padding="6" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Label>
                                 </TabItem.Header>
 
                                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" VerticalAlignment="Top" Padding="6" Style="{DynamicResource CustomScrollViewerStyle}">
+                                    <Grid Margin="10">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
 
-                                    <TextBlock TextWrapping="Wrap" Padding="6" Style="{DynamicResource DefaultTextBlockStyle}">
-ソフトウェアの使用許諾書
-    <LineBreak/>
-    <LineBreak/>                            
-第１条 （本契約の成立）<LineBreak/>
-ご利用者（甲）が、本ソフトウェアの使用もしくはインストールを行った時点で、本契約書記載の内容に同意いただいたものとみなし、本ソフトウェアの開発者（以下開発者、乙）もしくは開発者が再使用許諾権を付与した者（以下あわせて「開発者」といいます）
-との間で、本契約が有効に成立するものといたします。
-                                <LineBreak/><LineBreak/>
-第２条 （使用許諾）<LineBreak/>
-1. ご利用者は、無償で本ソフトウェアを、日本国内において、個人としての使用に限定して、無料で使用することができま
-す。
-                                <LineBreak/>
-2. ご利用者は、本ソフトウェアを改変したり、再発布することはできません。
-                                <LineBreak/>
-3. ご利用者は、本条項に基づき本ソフトウェアの使用権のみを取得し、本ソフトウェアの著作権、所有権その他のいかなる権利も取得しません。
-                                <LineBreak/>
-4. 本契約はご利用者に対し、本ソフトウェアの改訂版(アドオンパック)、変更、機能強化、サービスパック、またはその他のサポートサービスを受ける権利を付与するものではありません。
-                                <LineBreak/>
-5. ご利用者は、本ソフトウェアを、直接的、間接的を問わず、日本国、米国およびその他の国の全ての法律・規則に違反して輸出してはいけません。
-                                <LineBreak/><LineBreak/>
-第３条 （保証責任）<LineBreak/>
-1. 開発者は、別途記載するライブラリを除き、本ソフトウェアの著作権を有し、または著作権者から再使用許諾する権利を受けていることを保証します。
-                                    <LineBreak/>
-2. 開発者は、本ソフトウェアのご利用者の使用目的への適合性および法律上の瑕疵担保責任を含め一切の保証を行いません。
-                                <LineBreak/><LineBreak/>
-第４条 （責任の範囲）<LineBreak/>
-1. 前条に関わらず、ご利用者が本ソフトウェアを使用したことによりご利用者に直接的結果として発生した損害に対し開発者は責任を負いません。
-                                <LineBreak/>
-3. 開発者は、開発者の判断により第三者に本契約記載の業務を委託することができるものとします。ただし、委託にあたっての責任は、全て開発者の責任においてなされるものとします。
-                                <LineBreak/><LineBreak/>
-第５条 （権利の譲渡）<LineBreak/>
-ご利用者は、当社の書面による事前の承諾なく下記の行為を行ってはいけません。<LineBreak/>
-①． 本ソフトウェアの複製物を第三者に譲渡、貸与、占有移転すること<LineBreak/>
-②． 本契約上の地位または本契約に基づく権利義務を第三者に移転、譲渡、担保の用に供すること
-                                <LineBreak/><LineBreak/>
-第６条 （本契約の終了）<LineBreak/>
-ご利用者が本契約の条項に違反し、開発者が違反の是正を催告した後、２週間以内に是正されなかった場合、当社は本契約を解約し、ご利用者の本ソフトウェアの使用を終了させることができます。
-                                <LineBreak/><LineBreak/>
-第７条 （契約の変更）<LineBreak/>
-本契約の変更は、開発者の判断で、変更できるものとします。
-                                <LineBreak/><LineBreak/>
-第８条 （協議）<LineBreak/>
-本契約に規定されていない事項または本契約の解釈に疑義が生じた場合は、甲および乙は、誠意をもって協議するものとします。
-                                <LineBreak/><LineBreak/>
-以上
-                                
-                                <LineBreak/>
+                                        <Border Grid.Row="0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                            <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.Profiles}" HorizontalAlignment="Left"/>
+                                        </Border>
+
+                                        <!-- Profiles -->
+                                        <Grid Grid.Row="1" HorizontalAlignment="Left" Margin="0 32 0 0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <StackPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left">
+
+                                                <ComboBox Style="{StaticResource ComboBoxFlatStyle}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Tag="New Profile">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <Viewbox Width="10" Height="10" Margin="0 0 6 0">
+                                                                    <Canvas Width="18" Height="18">
+                                                                        <Path Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" Fill="DimGray" Visibility="{Binding Path=IsDefault, Converter={StaticResource BoolToVisibilityCollapsedConverter}}"/>
+                                                                    </Canvas>
+                                                                </Viewbox>
+                                                                <TextBlock Text="{Binding Path=Name}"></TextBlock>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+
+                                                <TextBlock Text="{x:Static properties:Resources.Host}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
+                                                <TextBox Text="{Binding Host, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240">
+                                                    <TextBox.Style>
+                                                        <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
+                                                            <Style.Triggers>
+                                                                <Trigger Property="Validation.HasError" Value="true">
+                                                                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)/ErrorContent}" />
+                                                                </Trigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBox.Style>
+                                                </TextBox>
+
+                                                <TextBlock Text="{x:Static properties:Resources.Port}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
+                                                <TextBox Text="{Binding Port, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240">
+                                                    <TextBox.Style>
+                                                        <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
+                                                            <Style.Triggers>
+                                                                <Trigger Property="Validation.HasError" Value="true">
+                                                                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)/ErrorContent}" />
+                                                                </Trigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBox.Style>
+                                                </TextBox>
 
 
-                                    </TextBlock>
+                                                <TextBlock Text="{x:Static properties:Resources.Password}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
+                                                <PasswordBox x:Name="PasswordBox" PasswordChar="*" Tag="{Binding Password}" Width="240" ToolTip="{x:Static properties:Resources.Optional}" PasswordChanged="PasswordBox_PasswordChanged">
+                                                    <PasswordBox.Style>
+                                                        <Style TargetType="{x:Type PasswordBox}" BasedOn="{StaticResource DefaultPasswordBoxStyle}">
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="{x:Type PasswordBox}">
+                                                                        <Border BorderBrush="DimGray" Background="DarkGray" BorderThickness="1" Margin="0">
+                                                                            <Grid Background="{TemplateBinding Background}">
+                                                                                <ScrollViewer x:Name="PART_ContentHost"/>
+                                                                                <TextBlock x:Name="UserMessage" Margin="5,0,5,0" Text="{Binding Password}" IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Visible"/>
+                                                                            </Grid>
+                                                                        </Border>
+                                                                        <ControlTemplate.Triggers>
+                                                                            <MultiTrigger>
+                                                                                <MultiTrigger.Conditions>
+                                                                                    <Condition Property="Tag" Value=""/>
+                                                                                </MultiTrigger.Conditions>
+                                                                                <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
+                                                                                <Setter Property="Text" TargetName="UserMessage" Value=""/>
+                                                                            </MultiTrigger>
+                                                                            <MultiTrigger>
+                                                                                <MultiTrigger.Conditions>
+                                                                                    <Condition Property="IsKeyboardFocusWithin" Value="true"/>
+                                                                                </MultiTrigger.Conditions>
+                                                                                <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
+                                                                                <Setter Property="Text" TargetName="UserMessage" Value=""/>
+                                                                            </MultiTrigger>
+                                                                        </ControlTemplate.Triggers>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Style>
+                                                    </PasswordBox.Style>
+                                                </PasswordBox>
 
+                                                <CheckBox Content="{x:Static properties:Resources.Default}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding SetIsDefault}" Margin="0 12 0 0"></CheckBox>
+
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
+                                                    <TextBlock Style="{DynamicResource DefaultTextBlockStyle}" Text="{Binding SettingProfileEditMessage}"></TextBlock>
+                                                </StackPanel>
+
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
+                                                    <Button Content="{x:Static properties:Resources.Update}" Command="{Binding UpdateProfileCommand}" Padding="4" Margin="0 0 0 0" Width="100" IsDefault="False"></Button>
+                                                    <Button Content="{x:Static properties:Resources.Save}" Command="{Binding SaveProfileCommand}" CommandParameter="{Binding ElementName=PasswordBox}" Padding="4" Margin="12 0 0 0" Width="100" IsDefault="False"></Button>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
+                                                    <Button Content="{x:Static properties:Resources.New}" Command="{Binding NewProfileCommand}" Padding="4" Margin="0 0 0 0" Width="100" IsDefault="False"></Button>
+                                                    <Button Content="{x:Static properties:Resources.Delete}" Command="{Binding DeleteProfileCommand}" Padding="4" Margin="12 0 0 0" Width="100" IsDefault="False"></Button>
+                                                </StackPanel>
+
+                                                <StackPanel Orientation="Horizontal" Margin="0 12 0 0" HorizontalAlignment="Center">
+                                                    <TextBlock Width="240" Text="{Binding StatusMessage, NotifyOnTargetUpdated=True}" TextElement.Foreground="WhiteSmoke" TextAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextElement.FontWeight="Bold" TextWrapping="WrapWithOverflow">
+                                                        <TextBlock.Triggers>
+                                                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                                                <BeginStoryboard>
+                                                                    <Storyboard>
+                                                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
+                                                                            <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                                                            <EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="1"/>
+                                                                        </DoubleAnimationUsingKeyFrames>
+                                                                    </Storyboard>
+                                                                </BeginStoryboard>
+                                                            </EventTrigger>
+                                                        </TextBlock.Triggers>
+                                                    </TextBlock>
+                                                </StackPanel>
+
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
+
+                                                    <Button Content="{x:Static properties:Resources.Connect}" IsEnabled="{Binding Path=IsNotConnecting}" Command="{Binding ChangeConnectionProfileCommand}" CommandParameter="{Binding ElementName=PasswordBox}" Padding="4" Width="100" IsDefault="False"></Button>
+
+                                                </StackPanel>
+
+                                            </StackPanel>
+
+
+                                        </Grid>
+
+                                    </Grid>
                                 </ScrollViewer>
 
                             </TabItem>
-
+                            
+                            <!-- Options -->
                             <TabItem Style="{DynamicResource LicenseTabItemStyle}">
                                 <TabItem.Header>
-                                    <Label Content="使用ライブラリ等" Style="{DynamicResource SectionTitle}" Padding="6" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Label>
+                                    <Label Content="{x:Static properties:Resources.Options}" Style="{DynamicResource SectionTitle}" Padding="6" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Label>
                                 </TabItem.Header>
 
                                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" VerticalAlignment="Top" Padding="6" Style="{DynamicResource CustomScrollViewerStyle}">
+                                    <Grid Margin="10">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
 
-                                    <StackPanel Margin="6 6 50 6">
+                                        <!-- MPD Server -->
+                                        <Border Grid.Row="0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                            <Label Style="{DynamicResource SectionTitle}" Content="MPD Server" HorizontalAlignment="Left"/>
+                                        </Border>
 
-                                        <StackPanel Margin="0 0 0 0">
+                                        <Grid Grid.Row="1" HorizontalAlignment="Left" Width="500" Margin="0 12 0 0">
+                                            <CheckBox Content="{x:Static properties:Resources.UpdateDatabaseOnStartup}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsUpdateOnStartup}" Margin="0 12 0 0"></CheckBox>
+                                        </Grid>
 
-                                            <TextBlock TextWrapping="Wrap" Style="{DynamicResource DefaultTextBlockStyle}">
-                                        本ソフトウェアは下記のライブラリを使用しています。
-                                        <LineBreak/>
-                                            </TextBlock>
-
-                                            <TextBlock TextWrapping="Wrap" FontWeight="Bold" Style="{DynamicResource DefaultTextBlockStyle}">
-                                    Live Chart for WPF<LineBreak/>
-                                            </TextBlock>
-
-                                            <TextBlock TextWrapping="Wrap" Padding="6" Style="{DynamicResource DefaultTextBlockStyle}">
-The MIT License (MIT)<LineBreak/>
-<LineBreak/>
-Copyright (c) 2016 Alberto Rodriguez and LiveCharts contributors<LineBreak/>
-<LineBreak/>
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-<LineBreak/><LineBreak/>
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-<LineBreak/><LineBreak/>
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-                                            </TextBlock>
-                                        </StackPanel>
-
-
-                                        <StackPanel Margin="0 24 0 0">
-                                            <TextBlock TextWrapping="Wrap" FontWeight="Bold" Style="{DynamicResource DefaultTextBlockStyle}">
-                                    Json.NET<LineBreak/>
-                                            </TextBlock>
-                                        </StackPanel>
-
-                                        <TextBlock TextWrapping="Wrap" Padding="6" Style="{DynamicResource DefaultTextBlockStyle}">
-                                        MIT License
-<LineBreak/><LineBreak/>
-Copyright (c) 2007 James Newton-King
-<LineBreak/><LineBreak/>
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-<LineBreak/><LineBreak/>
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-<LineBreak/><LineBreak/>
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-                                        </TextBlock>
-
-                                    </StackPanel>
-
+                                        <!-- Developer Mode -->
+                                        <Border Grid.Row="2" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                            <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.DeveloperMode}" HorizontalAlignment="Left"/>
+                                        </Border>
+                                        <Grid Grid.Row="3" HorizontalAlignment="Left" Width="500" Margin="0 12 0 0">
+                                            <CheckBox Content="{x:Static properties:Resources.ShowDebugWidow}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsShowDebugWindow}" Margin="0 12 0 0"></CheckBox>
+                                        </Grid>
+                                        
+                                    </Grid>
                                 </ScrollViewer>
 
                             </TabItem>
 
+                        </TabControl>
+
+                    </TabItem>
+
+                    <!-- About -->
+                    <TabItem Width="100" Height="48" Style="{DynamicResource SettingsTabItemStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TabItem.Header>
+                            <Label Content="{x:Static properties:Resources.About}" Foreground="{Binding RelativeSource={RelativeSource AncestorType=TabItem}, Path=Foreground}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Label>
+                        </TabItem.Header>
+
+                        <TabControl Margin="12">
+                            <TabControl.Resources>
+                                <Style x:Key="LicenseTabFocusVisualStyle">
+                                    <Setter Property="Control.Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <Rectangle Margin="1" StrokeThickness="1" StrokeDashArray="1 2" Stroke="{DynamicResource ControlMediumColorBrush}"/>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+
+                                <Style TargetType="{x:Type TabControl}">
+                                    <Setter Property="OverridesDefaultStyle" Value="False" />
+                                    <Setter Property="Foreground" Value="{DynamicResource NormalTextColorBrush}" />
+                                    <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                </Style>
+                                <Style x:Key="LicenseTabItemStyle" TargetType="{x:Type TabItem}">
+                                    <Setter Property="OverridesDefaultStyle" Value="False" />
+                                    <Setter Property="FocusVisualStyle" Value="{StaticResource LicenseTabFocusVisualStyle}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource ControlDarkColorBrush}" />
+                                    <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}"/>
+                                    <Setter Property="BorderThickness" Value="0 0 0 2"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type TabItem}">
+
+                                                <Border Name="HeaderBorder" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" Padding="{TemplateBinding Padding}" HorizontalAlignment="Center" CornerRadius="0">
+                                                    <ContentPresenter x:Name="ContentSite" HorizontalAlignment="Center" VerticalAlignment="Center" ContentSource="Header" RecognizesAccessKey="True" />
+                                                </Border>
+
+                                                <ControlTemplate.Triggers>
+
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter Property="Foreground" Value="{DynamicResource TitleTextColorBrush}" />
+                                                        <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="{DynamicResource ControlLightColorBrush}" />
+                                                        <Setter TargetName="HeaderBorder" Property="BorderThickness" Value="0 0 0 2"/>
+                                                    </Trigger>
+
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Foreground" Value="{DynamicResource TitleTextColorBrush}" />
+                                                        <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="{DynamicResource ControlDarkColorBrush}" />
+                                                        <Setter TargetName="HeaderBorder" Property="BorderThickness" Value="0 0 0 2"/>
+                                                    </Trigger>
+
+                                                    <Trigger Property="IsEnabled" Value="False">
+                                                        <Setter Property="Background" Value="gray" />
+                                                        <Setter Property="BorderBrush" Value="#FFC9C7BA" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </TabControl.Resources>
+                            
+                            <!-- Application -->
+                            <TabItem Style="{DynamicResource LicenseTabItemStyle}">
+                                <TabItem.Header>
+                                    <Label Content="{x:Static properties:Resources.Application}" Style="{DynamicResource SectionTitle}" Padding="6" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Label>
+                                </TabItem.Header>
+
+                                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" VerticalAlignment="Top" Padding="6" Style="{DynamicResource CustomScrollViewerStyle}">
+
+                                    <Grid Margin="10">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!--  -->
+                                        <Border Grid.Row="0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                            <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.Version}" HorizontalAlignment="Left"/>
+                                        </Border>
+
+                                        <Grid Grid.Row="1" HorizontalAlignment="Left" Margin="12">
+                                            <TextBlock Style="{DynamicResource DefaultTextBlockStyle}" Text="{Binding AppTitleVer}"></TextBlock>
+                                        </Grid>
+
+                                        <!--  -->
+                                        <Border Grid.Row="2" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                            <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.Website}" HorizontalAlignment="Left"/>
+                                        </Border>
+
+                                        <Grid Grid.Row="3" HorizontalAlignment="Left" Margin="12">
+                                            <TextBlock Style="{DynamicResource DefaultTextBlockStyle}" Text="https://torum.github.io/MPDCtrl"></TextBlock>
+                                        </Grid>
+
+                                        <!--  -->
+                                        <Border Grid.Row="4" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                            <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.PrivacyPolicy}" HorizontalAlignment="Left"/>
+                                        </Border>
+
+                                        <Grid Grid.Row="5" HorizontalAlignment="Left" Margin="12">
+                                            <TextBlock Style="{DynamicResource DefaultTextBlockStyle}" TextWrapping="Wrap" Text="{x:Static properties:Resources.PrivacyPolicyText}"></TextBlock>
+                                        </Grid>
+
+                                    </Grid>
+
+                                </ScrollViewer>
+
+                            </TabItem>
+                            
+                            <!-- License -->
+                            <TabItem Style="{DynamicResource LicenseTabItemStyle}">
+                                
+                                <TabItem.Header>
+                                    <Label Content="{x:Static properties:Resources.License}" Style="{DynamicResource SectionTitle}" Padding="6" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Label>
+                                </TabItem.Header>
+
+                                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" VerticalAlignment="Top" Padding="6" Style="{DynamicResource CustomScrollViewerStyle}">
+
+                                    <Grid Margin="10">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- License -->
+                                        <Border Grid.Row="0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                            <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.LicenseTitle}" HorizontalAlignment="Left"/>
+                                        </Border>
+
+                                        <Grid Grid.Row="1" HorizontalAlignment="Left" Margin="12">
+                                            <StackPanel >
+                                                <TextBlock Text="{x:Static properties:Resources.LicenseText}" TextWrapping="Wrap" Padding="6 0 6 6" Style="{DynamicResource DefaultTextBlockStyle}"></TextBlock>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Grid>
+                                    
+                                </ScrollViewer>
+
+                            </TabItem>
+                            
                         </TabControl>
 
                     </TabItem>

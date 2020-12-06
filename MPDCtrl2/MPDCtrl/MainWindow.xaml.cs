@@ -17,18 +17,16 @@ using System.Runtime.InteropServices;
 using System.ComponentModel;
 using MPDCtrl.ViewModels;
 using MPDCtrl.Views;
+using System.Globalization;
 
 namespace MPDCtrl
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             // For testing only. Don't forget to comment this out if you uncomment.
-            //MPDCtrl.Properties.Resources.Culture = CultureInfo.GetCultureInfo("en-US"); //or ja-JP
+            //MPDCtrl.Properties.Resources.Culture = CultureInfo.GetCultureInfo("en-US"); //or ja-JP etc
 
             InitializeComponent();
 
@@ -89,7 +87,7 @@ namespace MPDCtrl
         private void SongListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            SongListView.ScrollIntoView(SongListView.SelectedItem);
+            //SongListView.ScrollIntoView(SongListView.SelectedItem);
 
             // Listview flickering...
             //SongListView.ScrollToCenterOfView(SongListView.SelectedItem);

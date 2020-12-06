@@ -42,7 +42,7 @@ using MPDCtrl.ViewModels;
 namespace MPDCtrl
 {
     /// <summary>
-    /// MPD Client class. 
+    /// MPD client class. 
     /// </summary>
     public class MPC
     {
@@ -226,12 +226,7 @@ namespace MPDCtrl
             ErrorClear, //
         }
 
-
-        #region == Variabes and Properties ==  
-
-        private AsynchronousTCPClient _asyncClient;
-
-        private string _host;
+         private string _host;
         public string MpdHost
         {
             get { return _host; }
@@ -302,7 +297,7 @@ namespace MPDCtrl
             get { return _localFiles; }
         }
 
-        #endregion
+        private AsynchronousTCPClient _asyncClient;
 
         #region == Events == 
 
@@ -332,12 +327,12 @@ namespace MPDCtrl
 
         #endregion
 
-
         public MPC(string h, int p, string a)
         {
             _host = h;
             _port = p;
             _password = a;
+
             _status = new Status();
 
             _asyncClient = new AsynchronousTCPClient();
@@ -1084,20 +1079,6 @@ namespace MPDCtrl
         private async void TCPClient_ConnectionStatusChanged(AsynchronousTCPClient sender, AsynchronousTCPClient.ConnectionStatus status)
         {
             await Task.Run(() => { ConnectionStatusChanged?.Invoke(this, status); });
-
-            if (status == AsynchronousTCPClient.ConnectionStatus.Connected)
-            {
-                //sender.Send("idle player mixer options playlist stored_playlist\n");
-            }
-            else if (status == AsynchronousTCPClient.ConnectionStatus.MpdOK)
-            {
-                //Connected?.Invoke(this);
-            }
-            else if (status == AsynchronousTCPClient.ConnectionStatus.MpdAck)
-            {
-                //
-            }
-
         }
 
         private async void TCPClient_DataSent(AsynchronousTCPClient sender, object data)
@@ -2039,14 +2020,13 @@ namespace MPDCtrl
 
         private async void ReceiveCallback(IAsyncResult ar)
         {
+            // Retrieve the state object and the client socket from the asynchronous state object.  
+            StateObject state = (StateObject)ar.AsyncState;
+            Socket client = state.workSocket;
+            SocketError err = new SocketError();
+
             try
             {
-                // Retrieve the state object and the client socket   
-                // from the asynchronous state object.  
-                StateObject state = (StateObject)ar.AsyncState;
-                Socket client = state.workSocket;
-
-                SocketError err = new SocketError();
                 int bytesRead = client.EndReceive(ar, out err);
 
                 if (bytesRead > 0)
@@ -2059,43 +2039,31 @@ namespace MPDCtrl
                     {
                         if (!string.IsNullOrEmpty(state.sb.ToString().Trim()))
                         {
-                            //await Task.Run(() => { DataReceived?.Invoke(this, state.sb.ToString()); }); //??
                             DataReceived?.Invoke(this, state.sb.ToString().Trim());
                         }
-                        //receiveDone.Set();
-
                         state = new StateObject();
                         state.workSocket = client;
                     }
 
                     client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
-
                 }
                 else
                 {
-                    //if (err != SocketError.Success)
-                    System.Diagnostics.Debug.WriteLine("ReceiveCallback bytesRead 0");
+                    System.Diagnostics.Debug.WriteLine("ReceiveCallback bytesRead 0. Disconnected By Host.");
 
-                    ConnectionState = ConnectionStatus.DisconnectedByHost;
                     //https://msdn.microsoft.com/en-us/library/ms145145(v=vs.110).aspx
-                    /*
-                    if (!string.IsNullOrEmpty(state.sb.ToString().Trim()))
-                    {
-                        await Task.Run(() => { DataReceived?.Invoke(this, state.sb.ToString()); });
-                    }
-                    */
+                    ConnectionState = ConnectionStatus.DisconnectedByHost;
+
                     if (!await ReConnect())
                     {
                         System.Diagnostics.Debug.WriteLine("**ReceiveCallback: bytesRead 0 - GIVING UP reconnect.");
-                        ConnectionState = ConnectionStatus.DisconnectedByHost;
                     }
-                    
                 }
 
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("Error@ReceiveCallback" + ex.ToString());
+                System.Diagnostics.Debug.WriteLine("Error@ReceiveCallback: " + err.ToString() + ". " + ex.ToString() + ". ");
                 ConnectionState = ConnectionStatus.Error;
             }
         }
@@ -2156,7 +2124,6 @@ namespace MPDCtrl
 
         private void DoSend(Socket client, String data)
         {
-            //await Task.Run(() => { DataSent?.Invoke(this, "Sending...: " + data); }); // bad..
             DataSent?.Invoke(this, ">>" + data);
 
             // Convert the string data to byte data using ASCII encoding.  

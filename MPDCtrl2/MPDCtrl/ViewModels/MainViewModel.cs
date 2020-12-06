@@ -25,17 +25,27 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// 設定画面。
-    /// スライダー等のデザイン。＞これのせいで他のが変になった。
-    /// current queueの並べ替えとplaylistとしての保存。
-    /// i19n
-    /// object data > string something
-    /// PlayListの削除、作成・保存。
-    /// queueの項目を表示・非表示を項目事に選択・保存できるように。
+    /// v2.0.0
+    /// スライダー等のデザイン。
+    /// 
+    /// v2.0.1
+    /// queueの項目を表示・非表示を項目毎に選択・保存できるように。
+    /// queueのplaylistとしての保存。
+    /// playListの削除、作成・保存。
+    /// queueの曲順並べ替え
+    /// 
+    /// v2.0.2
+    /// アルバムカバー対応。
+    /// Local Files の TreeView化
+    /// 
+    /// [enhancement]
     /// スライダーの上でスクロールして音量変更。
     /// 
-    /// 
+
+
     /// 更新履歴：
+    /// 
+    /// v2.0.0.6: 設定画面とりあえず完成。i19nとりあえず完了。
     /// v2.0.0.5: DebugWindowがオンの時だけテキストを追加するようにした（consumeで激重になる）。
     /// v2.0.0.4: Consumeオプションを追加。
     /// v2.0.0.3: Current Queueの項目を増やしたり、IsPlayingとか。
@@ -120,7 +130,7 @@ namespace MPDCtrl.ViewModels
 
     public class ShowDebugEventArgs : EventArgs
     {
-        public bool SetVisibility = true;
+        public bool WindowVisibility = true;
         public double Top = 100;
         public double Left = 100;
         public double Height = 240;
@@ -135,7 +145,8 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "2.0.0.5";
+        const string _appVer = "2.0.0.6";
+
         public string AppVer
         {
             get
@@ -144,11 +155,16 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        // Application config file folder
-        const string _appDeveloper = "torum";
-
         // Application Window Title
         public string AppTitle
+        {
+            get
+            {
+                return _appName;
+            }
+        }
+
+        public string AppTitleVer
         {
             get
             {
@@ -156,18 +172,9 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        public bool DebugMode
-        {
-            get
-            {
-                #if DEBUG
-                return true;
-                #else
-                return false; 
-                #endif
-            }
-        }
-        
+        // For the application config file folder
+        const string _appDeveloper = "torum";
+
         #endregion
 
         #region == 設定フォルダ関連 ==  
@@ -252,6 +259,8 @@ namespace MPDCtrl.ViewModels
 
                 _isConnecting = value;
                 NotifyPropertyChanged("IsConnecting");
+                NotifyPropertyChanged("IsNotConnecting");
+                
 
                 if (_isConnecting)
                 {
@@ -264,7 +273,6 @@ namespace MPDCtrl.ViewModels
                         IsNotConnectingNorConnected = true;
                     }
                 }
-
             }
         }
 
@@ -324,6 +332,10 @@ namespace MPDCtrl.ViewModels
                     {
                         IsConnectionSettingShow = false;
                     }
+                    else
+                    {
+                        IsConnectionSettingShow = false;
+                    }
                 }
                 else
                 {
@@ -358,6 +370,10 @@ namespace MPDCtrl.ViewModels
                 NotifyPropertyChanged("IsConnectionSettingShow");
             }
         }
+
+        #endregion
+
+        #region == コントロール関連 ==  
 
         private string _statusMessage;
         public string StatusMessage
@@ -517,10 +533,6 @@ namespace MPDCtrl.ViewModels
                 }
             }
         }
-
-        #endregion
-
-        #region == コントロール関連 ==  
 
         private static string _pathConnectingButton = "M11 14H9C9 9.03 13.03 5 18 5V7C14.13 7 11 10.13 11 14M18 11V9C15.24 9 13 11.24 13 14H15C15 12.34 16.34 11 18 11M7 4C7 2.89 6.11 2 5 2S3 2.89 3 4 3.89 6 5 6 7 5.11 7 4M11.45 4.5H9.45C9.21 5.92 8 7 6.5 7H3.5C2.67 7 2 7.67 2 8.5V11H8V8.74C9.86 8.15 11.25 6.5 11.45 4.5M19 17C20.11 17 21 16.11 21 15S20.11 13 19 13 17 13.89 17 15 17.89 17 19 17M20.5 18H17.5C16 18 14.79 16.92 14.55 15.5H12.55C12.75 17.5 14.14 19.15 16 19.74V22H22V19.5C22 18.67 21.33 18 20.5 18Z";
         //private static string _pathConnectedButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
@@ -763,7 +775,6 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-
         #endregion
 
         #region == 設定画面 ==
@@ -845,7 +856,8 @@ namespace MPDCtrl.ViewModels
                 // Validate input.
                 if (value == "")
                 {
-                    SetError("Host", "Error: Host must be epecified."); //TODO: translate.
+                    SetError("Host", MPDCtrl.Properties.Resources.Settings_ErrorHostMustBeSpecified); 
+                    
                 }
                 else if (value == "localhost")
                 {
@@ -865,7 +877,7 @@ namespace MPDCtrl.ViewModels
                     catch
                     {
                         //System.FormatException
-                        SetError("Host", "Error: Invalid address format."); //TODO: translate.
+                        SetError("Host", MPDCtrl.Properties.Resources.Settings_ErrorHostInvalidAddressFormat);
                     }
                 }
 
@@ -883,7 +895,7 @@ namespace MPDCtrl.ViewModels
 
                 if (value == "")
                 {
-                    SetError("Port", "Error: Port must be epecified."); //TODO: translate.
+                    SetError("Port", MPDCtrl.Properties.Resources.Settings_ErrorPortMustBeSpecified); 
                     _port = 0;
                 }
                 else
@@ -898,7 +910,7 @@ namespace MPDCtrl.ViewModels
                     }
                     else
                     {
-                        SetError("Port", "Error: Part number must be consist of numbers."); //TODO: translate.
+                        SetError("Port", MPDCtrl.Properties.Resources.Settings_ErrorInvalidPortNaN);
                         _port = 0;
                     }
                 }
@@ -1018,7 +1030,7 @@ namespace MPDCtrl.ViewModels
 
                 _isShowDebugWindow = value;
 
-                ShowDebug.SetVisibility = _isShowDebugWindow;
+                ShowDebug.WindowVisibility = _isShowDebugWindow;
                 ShowDebugView?.Invoke(this, ShowDebug);
 
                 NotifyPropertyChanged("IsShowDebugWindow");
@@ -1041,11 +1053,15 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
+        #region == イベント ==
+
         public delegate void DebugWindowOutput(String data);
         public event DebugWindowOutput OnDebugWindowOutput;
 
         public event EventHandler<ShowDebugEventArgs> ShowDebugView;
         public ShowDebugEventArgs ShowDebug = new ShowDebugEventArgs();
+
+        #endregion
 
         public MainViewModel()
         {
@@ -1075,7 +1091,7 @@ namespace MPDCtrl.ViewModels
             ChangePlaylistCommand = new RelayCommand(ChangePlaylistCommand_ExecuteAsync, ChangePlaylistCommand_CanExecute);
             PlaylistListviewEnterKeyCommand = new RelayCommand(PlaylistListviewEnterKeyCommand_ExecuteAsync, PlaylistListviewEnterKeyCommand_CanExecute);
             PlaylistListviewLoadPlaylistCommand = new RelayCommand(PlaylistListviewLoadPlaylistCommand_ExecuteAsync, PlaylistListviewLoadPlaylistCommand_CanExecute);
-            PlaylistListviewAddPlaylistCommand = new RelayCommand(PlaylistListviewAddPlaylistCommand_ExecuteAsync, PlaylistListviewAddPlaylistCommand_CanExecute);
+            PlaylistListviewClearLoadPlaylistCommand = new RelayCommand(PlaylistListviewClearLoadPlaylistCommand_ExecuteAsync, PlaylistListviewClearLoadPlaylistCommand_CanExecute);
             PlaylistListviewLeftDoubleClickCommand = new GenericRelayCommand<String>(param => PlaylistListviewLeftDoubleClickCommand_ExecuteAsync(param), param => PlaylistListviewLeftDoubleClickCommand_CanExecute());
             LocalfileListviewAddCommand = new GenericRelayCommand<object>(param => LocalfileListviewAddCommand_Execute(param), param => LocalfileListviewAddCommand_CanExecute());
             SongListViewEnterKeyCommand = new RelayCommand(SongListViewEnterKeyCommand_ExecuteAsync, SongListViewEnterKeyCommand_CanExecute);
@@ -1129,13 +1145,9 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            #if DEBUG
-            IsMainShow = true; // To show Mainpain in the XAML design mode.
-            #else
-            IsMainShow = false;
-            #endif
+            #region == DebugWindow ==  
 
-            // Window hack.
+            // Window hack for the DebugWindow.
             App app = App.Current as App;
             if (app != null) 
             {
@@ -1147,7 +1159,16 @@ namespace MPDCtrl.ViewModels
 
                 app.CreateDebugWindow(dvm);
             }
-            
+
+            #endregion
+
+
+#if DEBUG
+            IsMainShow = true; // To show Main pain in the XAML designer.
+            //IsSettingsShow = true;
+#else
+            IsMainShow = false;
+#endif
         }
 
         #region == システムイベント ==
@@ -1155,9 +1176,10 @@ namespace MPDCtrl.ViewModels
         // 起動時の処理
         public void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
-            #if DEBUG
+
+#if DEBUG
             IsMainShow = false;
-            #endif
+#endif
 
             #region == アプリ設定のロード  ==
 
@@ -1682,9 +1704,7 @@ namespace MPDCtrl.ViewModels
             
             StatusButton = _pathConnectingButton;
 
-            //TODO: i18n
-            //StatusMessage = MPDCtrl.Properties.Resources.Connecting; //"Connecting...";
-            StatusMessage = "Connecting...";
+            StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connecting;
 
             return await _MPC.MpdConnect();
         }
@@ -1775,7 +1795,6 @@ namespace MPDCtrl.ViewModels
         private void OnConnected(MPC sender)
         {
             IsConnected = true;
-            //IsConnectionSettingShow = false;
 
             StatusButton = _pathConnectedButton;
             StatusMessage = "";
@@ -1822,46 +1841,33 @@ namespace MPDCtrl.ViewModels
 
             if ((data as string) == "isPlayer")
             {
-                try
+
+                // Clear IsPlaying icon
+                if (CurrentSong != null)
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    if (CurrentSong.Id != _MPC.MpdStatus.MpdSongID)
                     {
-                        var item = _MPC.CurrentQueue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
-                        if (item != null)
-                        {
-                            //sender.MpdCurrentSong = (item as MPC.Song); // just in case.
-
-                            if (CurrentSong != null)
-                            {
-                                if (item != CurrentSong)
-                                {
-                                    foreach (var asdf in _MPC.CurrentQueue)
-                                    {
-                                        if (asdf.IsPlaying)
-                                        {
-                                            asdf.IsPlaying = false;
-                                            break;
-                                        }   
-                                    }
-                                }
-                            }
-
-                            SelectedSong = (item as MPC.Song);
-                            CurrentSong = (item as MPC.Song);
-
-                            (item as MPC.Song).IsPlaying = true;
-                        }
-                        else
-                        {
-                            SelectedSong = null;
-                            CurrentSong = null;
-                        }
-                    });
+                        CurrentSong.IsPlaying = false;
+                    }
                 }
-                catch (Exception ex)
+                Application.Current.Dispatcher.Invoke(() =>
                 {
-                    System.Diagnostics.Debug.WriteLine("_MPC.CurrentQueue.FirstOrDefault@(isPlayer) failed: " + ex.Message);
-                }
+                    // Sets Current Song
+                    var item = _MPC.CurrentQueue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
+                    if (item != null)
+                    {
+                        //SelectedSong = (item as MPC.Song);
+                        CurrentSong = (item as MPC.Song);
+
+                        (item as MPC.Song).IsPlaying = true;
+                    }
+                    else
+                    {
+                        //SelectedSong = null;
+                        CurrentSong = null;
+                    }
+                });
+
             }
             else if ((data as string) == "isCurrentQueue")
             {
@@ -1872,14 +1878,14 @@ namespace MPDCtrl.ViewModels
                     {
                         //sender.MpdCurrentSong = (item as MPC.Song); // just in case.
 
-                        SelectedSong = (item as MPC.Song);
+                        //SelectedSong = (item as MPC.Song);
                         CurrentSong = (item as MPC.Song);
 
                         (item as MPC.Song).IsPlaying = true;
                     }
                     else
                     {
-                        SelectedSong = null;
+                        //SelectedSong = null;
                         CurrentSong = null;
                     }
                 });
@@ -1927,12 +1933,12 @@ namespace MPDCtrl.ViewModels
                 s = s.Replace("{} ", string.Empty);
                 s = s.Replace("[] ", string.Empty);
 
-                StatusMessage = "MPD Protocol Error: " + s;
-                StatusButton = _pathErrorInfoButton;
+                StatusMessage = MPDCtrl.Properties.Resources.MPD_ProtocolError + ": " + s; 
+                 StatusButton = _pathErrorInfoButton;
             }
             else if (errType == MPC.MpdErrorTypes.StatusError)
             {
-                StatusMessage = "MPD Status Error: " + (data as string);
+                StatusMessage = MPDCtrl.Properties.Resources.MPD_StatusError + ": " + (data as string);
                 StatusButton = _pathErrorInfoButton;
             }
             else if (errType == MPC.MpdErrorTypes.ErrorClear)
@@ -1950,14 +1956,13 @@ namespace MPDCtrl.ViewModels
         private void OnConnectionError(MPC sender, object data)
         {
             if (data == null) { return; }
-            string s = (data as string);
 
             IsConnected = false;
             IsConnectionSettingShow = true;
 
             StatusButton = _pathErrorInfoButton;
 
-            StatusMessage = "Connection Error: " + s;
+            StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectionError + ": " + (data as string);
         }
 
         private void OnConnectionStatusChanged(MPC sender, AsynchronousTCPClient.ConnectionStatus status)
@@ -1973,7 +1978,7 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = true;
                 //IsConnectionSettingShow = true;
 
-                StatusMessage = "Connecting... ";
+                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connecting;
                 StatusButton = _pathConnectingButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.AutoReconnecting)
@@ -1982,7 +1987,7 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = true;
                 //IsConnectionSettingShow = false;
 
-                StatusMessage = "Reconnecting... ";
+                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Reconnecting;
                 StatusButton = _pathConnectingButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.ConnectFail_Timeout)
@@ -1991,7 +1996,7 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = false;
                 IsConnectionSettingShow = true;
 
-                StatusMessage = "Connection terminated. (Fail_Timeout) ";
+                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Reconnecting;
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.DisconnectedByHost)
@@ -2000,7 +2005,7 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = false;
                 IsConnectionSettingShow = true;
 
-                StatusMessage = "Connection terminated. (DisconnectedByHost) ";
+                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_DisconnectedByHost;
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.DisconnectedByUser)
@@ -2009,12 +2014,13 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = false;
                 IsConnectionSettingShow = true;
 
-                StatusMessage = "Connection terminated. (DisconnectedByUser) ";
+                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_DisconnectedByUser;
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.Error)
             {
                 //Handled at OnConnectionError
+
                 IsConnecting = false;
 
             }
@@ -2024,7 +2030,7 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = false;
                 IsConnectionSettingShow = true;
 
-                StatusMessage = "Connection terminated. (SendFail_NotConnected) ";
+                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_SendFail_NotConnected;
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.SendFail_Timeout)
@@ -2033,7 +2039,7 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = false;
                 //IsConnectionSettingShow = true;
 
-                StatusMessage = "Connection terminated. (SendFail_Timeout) ";
+                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_SendFail_Timeout;
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.NeverConnected)
@@ -2042,7 +2048,7 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = false;
                 IsConnectionSettingShow = true;
 
-                StatusMessage = "Disconnected. (NeverConnected) ";
+                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_NeverConnected;
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.MpdOK)
@@ -2270,21 +2276,21 @@ namespace MPDCtrl.ViewModels
             if (_selecctedPlaylist == "")
                 return;
 
-            _MPC.MpdChangePlaylist(_selecctedPlaylist);
+            _MPC.MpdLoadPlaylist(_selecctedPlaylist);
         }
 
-        public ICommand PlaylistListviewAddPlaylistCommand { get; set; }
-        public bool PlaylistListviewAddPlaylistCommand_CanExecute()
+        public ICommand PlaylistListviewClearLoadPlaylistCommand { get; set; }
+        public bool PlaylistListviewClearLoadPlaylistCommand_CanExecute()
         {
             if (_MPC == null) { return false; }
             return true;
         }
-        public void PlaylistListviewAddPlaylistCommand_ExecuteAsync()
+        public void PlaylistListviewClearLoadPlaylistCommand_ExecuteAsync()
         {
             if (_selecctedPlaylist == "")
                 return;
 
-            _MPC.MpdLoadPlaylist(_selecctedPlaylist);
+            _MPC.MpdChangePlaylist(_selecctedPlaylist);
         }
 
         public ICommand LocalfileListviewAddCommand { get; }
@@ -2492,7 +2498,7 @@ namespace MPDCtrl.ViewModels
 
             if (Profiles.Remove(SelectedProfile))
             {
-                SettingProfileEditMessage = tmpNama + " has been deleted.";
+                SettingProfileEditMessage = MPDCtrl.Properties.Resources.Settings_ProfileDeleted + " ("+ tmpNama+")" ;
 
                 SelectedProfile = Profiles[0];
 
@@ -2546,7 +2552,7 @@ namespace MPDCtrl.ViewModels
 
             SelectedProfile = pro;
 
-            SettingProfileEditMessage = "Saved.";
+            SettingProfileEditMessage = MPDCtrl.Properties.Resources.Settings_ProfileSaved;
 
             if (CurrentProfile == null)
             {
@@ -2594,7 +2600,7 @@ namespace MPDCtrl.ViewModels
 
             SelectedProfile.Name = Host + ":" + _port.ToString();
 
-            SettingProfileEditMessage = "Updated.";
+            SettingProfileEditMessage = MPDCtrl.Properties.Resources.Settings_ProfileUpdated;
         }
 
         public ICommand ConnectCommand { get; }
@@ -2721,7 +2727,6 @@ namespace MPDCtrl.ViewModels
                 //_MPC.MpdDisconnect();
             }
 
-
             SelectedProfile.Host = _host;
             SelectedProfile.Port = _port;
 
@@ -2774,4 +2779,5 @@ namespace MPDCtrl.ViewModels
         #endregion
 
     }
+
 }

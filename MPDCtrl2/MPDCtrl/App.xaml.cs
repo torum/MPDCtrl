@@ -144,7 +144,7 @@ namespace MPDCtrl
             {
                 if (w is DebugWindow)
                 {
-                    if (eventArg.SetVisibility)
+                    if (eventArg.WindowVisibility)
                     {
                         if ((w as DebugWindow).WindowState == WindowState.Minimized || (w as Window).Visibility == Visibility.Hidden)
                         {

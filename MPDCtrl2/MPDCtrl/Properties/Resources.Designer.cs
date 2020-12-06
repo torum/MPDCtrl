@@ -79,6 +79,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Application に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Application {
+            get {
+                return ResourceManager.GetString("Application", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cancel に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Cancel {
@@ -106,20 +115,110 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Connecting... に類似しているローカライズされた文字列を検索します。
+        ///   Connection に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string Connecting {
+        public static string Connection {
             get {
-                return ResourceManager.GetString("Connecting", resourceCulture);
+                return ResourceManager.GetString("Connection", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Default MPD server に類似しているローカライズされた文字列を検索します。
+        ///   Connection terminated. (ConnectFail_Timeout) に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string DefaultMPDServer {
+        public static string ConnectionStatus_ConnectFail_Timeout {
             get {
-                return ResourceManager.GetString("DefaultMPDServer", resourceCulture);
+                return ResourceManager.GetString("ConnectionStatus_ConnectFail_Timeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Connecting... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConnectionStatus_Connecting {
+            get {
+                return ResourceManager.GetString("ConnectionStatus_Connecting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Connection Error に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConnectionStatus_ConnectionError {
+            get {
+                return ResourceManager.GetString("ConnectionStatus_ConnectionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Unable to connect to specified MPD server. Please check your connection settings or MPD server. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConnectionStatus_ConnectionErrorDetails {
+            get {
+                return ResourceManager.GetString("ConnectionStatus_ConnectionErrorDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Connection terminated. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConnectionStatus_DisconnectedByHost {
+            get {
+                return ResourceManager.GetString("ConnectionStatus_DisconnectedByHost", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Connection terminated. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConnectionStatus_DisconnectedByUser {
+            get {
+                return ResourceManager.GetString("ConnectionStatus_DisconnectedByUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Connection terminated. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConnectionStatus_NeverConnected {
+            get {
+                return ResourceManager.GetString("ConnectionStatus_NeverConnected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Connection terminated. Reconnecting... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConnectionStatus_Reconnecting {
+            get {
+                return ResourceManager.GetString("ConnectionStatus_Reconnecting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Connection terminated. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConnectionStatus_SendFail_NotConnected {
+            get {
+                return ResourceManager.GetString("ConnectionStatus_SendFail_NotConnected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Connection terminated. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConnectionStatus_SendFail_Timeout {
+            get {
+                return ResourceManager.GetString("ConnectionStatus_SendFail_Timeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Default に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Default {
+            get {
+                return ResourceManager.GetString("Default", resourceCulture);
             }
         }
         
@@ -133,11 +232,11 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Developer: torum に類似しているローカライズされた文字列を検索します。
+        ///   Developer Mode に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string Developer {
+        public static string DeveloperMode {
             get {
-                return ResourceManager.GetString("Developer", resourceCulture);
+                return ResourceManager.GetString("DeveloperMode", resourceCulture);
             }
         }
         
@@ -151,12 +250,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   The MIT License
-        ///Copyright (c) 2018 torum
-        ///
-        ///Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &quot;Software&quot;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-        ///
-        ///The above copyright notice and  [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        ///   License に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string License {
             get {
@@ -165,7 +259,25 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   License: に類似しているローカライズされた文字列を検索します。
+        ///   Copyright (c) 2020 torum
+        ///
+        ///Permission is hereby granted, free of charge, to any person obtaining a copy
+        ///of this software and associated documentation files (the &quot;Software&quot;), to deal
+        ///in the Software without restriction, including without limitation the rights
+        ///to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        ///copies of the Software, and to permit persons to whom the Software is
+        ///furnished to do so, subject to the following conditions:
+        ///
+        ///The above copyright notice and this permiss [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string LicenseText {
+            get {
+                return ResourceManager.GetString("LicenseText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   The MIT License に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string LicenseTitle {
             get {
@@ -174,11 +286,47 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Unable to connect to specified MPD server. Please go back and check your connection settings or the permission settings on your MPD server. に類似しているローカライズされた文字列を検索します。
+        ///   Add に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MPDConnectionError {
+        public static string LocalfileItemContextMenu_Add {
             get {
-                return ResourceManager.GetString("MPDConnectionError", resourceCulture);
+                return ResourceManager.GetString("LocalfileItemContextMenu_Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Local Files に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string LocalfileListviewTabitemHeader_LocalFiles {
+            get {
+                return ResourceManager.GetString("LocalfileListviewTabitemHeader_LocalFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   MPD Protocol Error に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MPD_ProtocolError {
+            get {
+                return ResourceManager.GetString("MPD_ProtocolError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   MPD Status Error に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MPD_StatusError {
+            get {
+                return ResourceManager.GetString("MPD_StatusError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   New に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string New {
+            get {
+                return ResourceManager.GetString("New", resourceCulture);
             }
         }
         
@@ -201,11 +349,119 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Options に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Options {
+            get {
+                return ResourceManager.GetString("Options", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Password に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Password {
             get {
                 return ResourceManager.GetString("Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Back に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Playback_BackButton {
+            get {
+                return ResourceManager.GetString("Playback_BackButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Next に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Playback_NextButton {
+            get {
+                return ResourceManager.GetString("Playback_NextButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Play/Pause に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Playback_PlayPauseButton {
+            get {
+                return ResourceManager.GetString("Playback_PlayPauseButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Seek に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Playback_SliderSeek {
+            get {
+                return ResourceManager.GetString("Playback_SliderSeek", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Volume に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Playback_SliderVolume {
+            get {
+                return ResourceManager.GetString("Playback_SliderVolume", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consume に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PlaybackOptions_Consume {
+            get {
+                return ResourceManager.GetString("PlaybackOptions_Consume", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Repeat に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PlaybackOptions_Repeat {
+            get {
+                return ResourceManager.GetString("PlaybackOptions_Repeat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Shuffle に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PlaybackOptions_Shuffle {
+            get {
+                return ResourceManager.GetString("PlaybackOptions_Shuffle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Clear Queue and Load に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PlaylistItemContextMenu_ClearAndLoad {
+            get {
+                return ResourceManager.GetString("PlaylistItemContextMenu_ClearAndLoad", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Load に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PlaylistItemContextMenu_Load {
+            get {
+                return ResourceManager.GetString("PlaylistItemContextMenu_Load", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Playlists に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PlaylistListviewTabitemHeader_Playlists {
+            get {
+                return ResourceManager.GetString("PlaylistListviewTabitemHeader_Playlists", resourceCulture);
             }
         }
         
@@ -219,6 +475,24 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   App Privacy Policy に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PrivacyPolicy {
+            get {
+                return ResourceManager.GetString("PrivacyPolicy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   MPDCtrl app allows you to access your music player via IP address and optionaly user credentials. None of this data is transmitted anywhere besides your specified music player and your settings are stored on your device only. Optional user credentials are encrypted with a platform provided shceme. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PrivacyPolicyText {
+            get {
+                return ResourceManager.GetString("PrivacyPolicyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Profile に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Profile {
@@ -228,11 +502,20 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Saved profiles に類似しているローカライズされた文字列を検索します。
+        ///   Profiles に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string SavedProfiles {
+        public static string Profiles {
             get {
-                return ResourceManager.GetString("SavedProfiles", resourceCulture);
+                return ResourceManager.GetString("Profiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Save に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
             }
         }
         
@@ -246,29 +529,182 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Stay on top に類似しているローカライズされた文字列を検索します。
+        ///   Invalid address format. に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string StayOnTop {
+        public static string Settings_ErrorHostInvalidAddressFormat {
             get {
-                return ResourceManager.GetString("StayOnTop", resourceCulture);
+                return ResourceManager.GetString("Settings_ErrorHostInvalidAddressFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Website: に類似しているローカライズされた文字列を検索します。
+        ///   Host address is required. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_ErrorHostMustBeSpecified {
+            get {
+                return ResourceManager.GetString("Settings_ErrorHostMustBeSpecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Invalid Port number. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_ErrorInvalidPortNaN {
+            get {
+                return ResourceManager.GetString("Settings_ErrorInvalidPortNaN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Port number is required. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_ErrorPortMustBeSpecified {
+            get {
+                return ResourceManager.GetString("Settings_ErrorPortMustBeSpecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Profile Deleted に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_ProfileDeleted {
+            get {
+                return ResourceManager.GetString("Settings_ProfileDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Profile saved. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_ProfileSaved {
+            get {
+                return ResourceManager.GetString("Settings_ProfileSaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Profile updated. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_ProfileUpdated {
+            get {
+                return ResourceManager.GetString("Settings_ProfileUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Show Debug Widow に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ShowDebugWidow {
+            get {
+                return ResourceManager.GetString("ShowDebugWidow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Queue に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongItemContextMenuQueue {
+            get {
+                return ResourceManager.GetString("SongItemContextMenuQueue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Clear に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongItemContextMenuQueueClear {
+            get {
+                return ResourceManager.GetString("SongItemContextMenuQueueClear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Remove に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongItemContextMenuRemove {
+            get {
+                return ResourceManager.GetString("SongItemContextMenuRemove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Album に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongListViewColumnHeader_Album {
+            get {
+                return ResourceManager.GetString("SongListViewColumnHeader_Album", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Artist に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongListViewColumnHeader_Artist {
+            get {
+                return ResourceManager.GetString("SongListViewColumnHeader_Artist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Genre に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongListViewColumnHeader_Genre {
+            get {
+                return ResourceManager.GetString("SongListViewColumnHeader_Genre", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Song に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongListViewColumnHeader_Song {
+            get {
+                return ResourceManager.GetString("SongListViewColumnHeader_Song", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Time に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongListViewColumnHeader_Time {
+            get {
+                return ResourceManager.GetString("SongListViewColumnHeader_Time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Update に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Update {
+            get {
+                return ResourceManager.GetString("Update", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Update MPD Music Database on Startup に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string UpdateDatabaseOnStartup {
+            get {
+                return ResourceManager.GetString("UpdateDatabaseOnStartup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Version に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Version {
+            get {
+                return ResourceManager.GetString("Version", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Website に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Website {
             get {
                 return ResourceManager.GetString("Website", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   https://torum.github.io/MPDCtrl/ に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string WebsiteURL {
-            get {
-                return ResourceManager.GetString("WebsiteURL", resourceCulture);
             }
         }
     }

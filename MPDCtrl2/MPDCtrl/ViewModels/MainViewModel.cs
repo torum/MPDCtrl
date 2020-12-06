@@ -25,9 +25,6 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// v2.0.0
-    /// スライダー等のデザイン。
-    /// 
     /// v2.0.1
     /// queueの項目を表示・非表示を項目毎に選択・保存できるように。
     /// queueのplaylistとしての保存。
@@ -45,6 +42,7 @@ namespace MPDCtrl.ViewModels
 
     /// 更新履歴：
     /// 
+    /// v2.0.0.7: スライダー等のデザインとりあえず完成。timerの変更（systemに）。
     /// v2.0.0.6: 設定画面とりあえず完成。i19nとりあえず完了。
     /// v2.0.0.5: DebugWindowがオンの時だけテキストを追加するようにした（consumeで激重になる）。
     /// v2.0.0.4: Consumeオプションを追加。
@@ -145,7 +143,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "2.0.0.6";
+        const string _appVer = "2.0.0.7";
 
         public string AppVer
         {
@@ -728,12 +726,6 @@ namespace MPDCtrl.ViewModels
                 {
                     _elapsed = value;
                     NotifyPropertyChanged("Elapsed");
-                    /*
-                    if (SetSeekCommand.CanExecute(null))
-                    {
-                        SetSeekCommand.Execute(null);
-                    }
-                    */
 
                     // If we have a timer and we are in this event handler, a user is still interact with the slider
                     // we stop the timer
@@ -770,7 +762,7 @@ namespace MPDCtrl.ViewModels
                 }
                 else
                 {
-                    //System.Diagnostics.Debug.WriteLine("Volume value is the same. Skipping.");
+                    //System.Diagnostics.Debug.WriteLine("Seek value is the same. Skipping.");
                 }
             }
         }
@@ -1139,10 +1131,8 @@ namespace MPDCtrl.ViewModels
             #region == タイマー ==  
 
             // Init Song's time elapsed timer.
-            _elapsedTimer = new DispatcherTimer();
-            _elapsedTimer.Interval = TimeSpan.FromMilliseconds(1000);
-            _elapsedTimer.Tick += new EventHandler(ElapsedTimer);
-
+            _elapsedTimer = new System.Timers.Timer(500);
+            _elapsedTimer.Elapsed += new System.Timers.ElapsedEventHandler(ElapsedTimer);
             #endregion
 
             #region == DebugWindow ==  
@@ -1711,6 +1701,16 @@ namespace MPDCtrl.ViewModels
 
         private void UpdateButtonStatus()
         {
+            //start elapsed timer.
+            if (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
+            {
+                _elapsedTimer.Start();
+            }
+            else
+            {
+                _elapsedTimer.Stop();
+            }
+
             try
             {
                 //Play button
@@ -1757,15 +1757,6 @@ namespace MPDCtrl.ViewModels
                 //
                 Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
 
-                //start elapsed timer.
-                if (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
-                {
-                    _elapsedTimer.Start();
-                }
-                else
-                {
-                    _elapsedTimer.Stop();
-                }
 
             }
             catch
@@ -1778,12 +1769,12 @@ namespace MPDCtrl.ViewModels
 
         #region == イベント・タイマー ==
 
-        private DispatcherTimer _elapsedTimer;
-        private void ElapsedTimer(object sender, EventArgs e)
+        private System.Timers.Timer _elapsedTimer;
+        private void ElapsedTimer(object sender, System.Timers.ElapsedEventArgs e)
         {
             if ((_elapsed < _time) && (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play))
             {
-                _elapsed += 1;
+                _elapsed += 0.5;
                 NotifyPropertyChanged("Elapsed");
             }
             else
@@ -1804,6 +1795,8 @@ namespace MPDCtrl.ViewModels
         private void OnStatusChanged(MPC sender, object data)
         {
             //System.Diagnostics.Debug.WriteLine("OnStatusChanged " + data);
+
+            UpdateButtonStatus();
 
             List<string> SubSystems = (data as string).Split('\n').ToList();
 
@@ -1831,13 +1824,14 @@ namespace MPDCtrl.ViewModels
                 }
             }
 
-            UpdateButtonStatus();
         }
 
         // MPD updated information
         private void OnStatusUpdate(MPC sender, object data)
         {
             //System.Diagnostics.Debug.WriteLine("OnStatusUpdate " + data);
+
+            UpdateButtonStatus();
 
             if ((data as string) == "isPlayer")
             {
@@ -1903,8 +1897,6 @@ namespace MPDCtrl.ViewModels
             {
                 // TODO:
             }
-
-            UpdateButtonStatus();
 
         }
 

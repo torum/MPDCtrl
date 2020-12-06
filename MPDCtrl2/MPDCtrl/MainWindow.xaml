@@ -14,6 +14,8 @@
         Title="{Binding AppTitle}"
         Height="480" Width="800"
         MinWidth="780" MinHeight="250">
+    <Window.Resources>
+    </Window.Resources>
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="30" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"/>
     </WindowChrome.WindowChrome>
@@ -64,15 +66,17 @@
                                 <Setter Property="OverridesDefaultStyle" Value="true" />
                                 <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
                                 <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
+                                <!--
                                 <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                -->
                                 <Setter Property="BorderThickness" Value="0" />
                                 <Setter Property="Margin" Value="0" />
                                 <Setter Property="Padding" Value="0" />
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="Button">
-                                            <Border x:Name="Border" CornerRadius="0" BorderThickness="0">
-                                                <Viewbox Width="16" Height="16" Margin="6 0 6 0" IsHitTestVisible="True">
+                                            <Border x:Name="Border" CornerRadius="0" BorderThickness="0" Background="{TemplateBinding Background}">
+                                                <Viewbox Width="16" Height="16" Margin="6 0 6 0">
                                                     <Canvas Width="101.52757" Height="101.52314">
                                                         <Canvas.RenderTransform>
                                                             <TranslateTransform X="0" Y="0"/>
@@ -92,7 +96,6 @@
                             </Style>
                         </Button.Style>
                     </Button>
-
                 </StackPanel>
 
                 <!-- Now Playing -->
@@ -193,7 +196,7 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Header grid -->
-                <Grid Grid.Row="1" Background="{DynamicResource BoardBackgroundColorBrush}" helpers:EnableDragHelper.EnableDrag="False" helpers:MaximizeDoubleClickHelper.MaximizeDoubleClick="True">
+                <Grid Grid.Row="1" Background="{DynamicResource BoardBackgroundColorBrush}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="8"/>
                         <RowDefinition Height="Auto"/>
@@ -228,7 +231,7 @@
                         </Grid.ColumnDefinitions>
 
                         <!-- Playback Buttons -->
-                        <Grid Grid.Row="0" Grid.Column="1" Width="280">
+                        <Grid Grid.Row="0" Grid.Column="1" Width="280" helpers:EnableDragHelper.EnableDrag="False" helpers:MaximizeDoubleClickHelper.MaximizeDoubleClick="False">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
@@ -249,14 +252,15 @@
                         </Grid>
 
                         <!-- Slider Seek -->
-                        <Grid Grid.Row="1" Grid.ColumnSpan="3" Width="450">
+                        <Grid Grid.Row="1" Grid.ColumnSpan="3" Width="450" helpers:EnableDragHelper.EnableDrag="False" helpers:MaximizeDoubleClickHelper.MaximizeDoubleClick="False">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="24"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="24"/>
                             </Grid.ColumnDefinitions>
 
-                            <Slider x:Name="SliderSeek" ToolTip="{x:Static properties:Resources.Playback_SliderSeek}" Grid.Column="1" VerticalAlignment="Center" Margin="6 0 6 0" Foreground="Gray" Background="Transparent" IsMoveToPointEnabled="True" Minimum="1" Maximum="{Binding Mode=TwoWay,Path=Time}" Value="{Binding Mode=TwoWay,Path=Elapsed}">
+                            <Slider x:Name="SliderSeek" ToolTip="{x:Static properties:Resources.Playback_SliderSeek}" Style="{DynamicResource SliderHorizontalStyle}" Grid.Column="1" VerticalAlignment="Center" Margin="6 6 6 0" IsMoveToPointEnabled="True" Minimum="0" Maximum="{Binding Mode=TwoWay,Path=Time}" Value="{Binding Mode=TwoWay,Path=Elapsed}">
+
                             </Slider>
 
                         </Grid>
@@ -264,26 +268,28 @@
                     </Grid>
 
                     <!-- Playback Options and Volume -->
-                    <Grid Grid.Row="1" Grid.Column="2">
+                    <Grid Grid.Row="1" Grid.Column="2" helpers:EnableDragHelper.EnableDrag="False" helpers:MaximizeDoubleClickHelper.MaximizeDoubleClick="False">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Bottom">
-                            <ToggleButton x:Name="RepeatButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Repeat}" IsChecked="{Binding Mode=TwoWay,Path=Repeat}" Template="{StaticResource PathToggleButton}" Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
+                        <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Bottom" helpers:EnableDragHelper.EnableDrag="False" helpers:MaximizeDoubleClickHelper.MaximizeDoubleClick="False">
+                            <ToggleButton x:Name="RepeatButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Repeat}" IsChecked="{Binding Mode=TwoWay,Path=Repeat}" Style="{DynamicResource PathToggleButton}"  Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
                                   Content="M17,17H7V14L3,18L7,22V19H19V13H17M7,7H17V10L21,6L17,2V5H5V11H7V7Z">
                             </ToggleButton>
-                            <ToggleButton x:Name="ShuffleButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Shuffle}" IsChecked="{Binding Mode=TwoWay,Path=Random}" Template="{StaticResource PathToggleButton}" Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
+                            <ToggleButton x:Name="ShuffleButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Shuffle}" IsChecked="{Binding Mode=TwoWay,Path=Random}" Style="{DynamicResource PathToggleButton}" Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
                                   Content="M17,3L22.25,7.5L17,12L22.25,16.5L17,21V18H14.26L11.44,15.18L13.56,13.06L15.5,15H17V12L17,9H15.5L6.5,18H2V15H5.26L14.26,6H17V3M2,6H6.5L9.32,8.82L7.2,10.94L5.26,9H2V6Z">
                             </ToggleButton>
-                            <ToggleButton x:Name="ConsumeButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Consume}" IsChecked="{Binding Mode=TwoWay,Path=Consume}" Template="{StaticResource PathToggleButton}" Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
+                            <ToggleButton x:Name="ConsumeButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Consume}" IsChecked="{Binding Mode=TwoWay,Path=Consume}" Style="{DynamicResource PathToggleButton}" Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
                                   Content="M2,16H10V14H2M12,14V16H22V14M14,6H2V8H14M14,10H2V12H14V10Z">
                             </ToggleButton>
                         </StackPanel>
 
-                        <Slider x:Name="SliderVol" ToolTip="{x:Static properties:Resources.Playback_SliderVolume}" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" IsMoveToPointEnabled="True" Margin="0 0 18 0" Foreground="Gainsboro" Maximum="100" Value="{Binding Volume}">
-                        </Slider>
+                        <Grid Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0 0 18 0" Width="30" helpers:EnableDragHelper.EnableDrag="False" helpers:MaximizeDoubleClickHelper.MaximizeDoubleClick="False">
+                            <Slider x:Name="SliderVol" ToolTip="{x:Static properties:Resources.Playback_SliderVolume}" Style="{DynamicResource CustomSliderStyle}" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Stretch" IsMoveToPointEnabled="True" Maximum="100" Value="{Binding Volume}">
+                            </Slider>
+                        </Grid>
                     </Grid>
 
                 </Grid>
@@ -325,7 +331,6 @@
                                         </ListView.InputBindings>
                                         <ListView.Resources>
                                             <ContextMenu x:Key="PlaylistItemContextMenu">
-
                                                 <MenuItem Header="{x:Static properties:Resources.PlaylistItemContextMenu_Load}" 
                                                         Command="{Binding Path=DataContext.PlaylistListviewLoadPlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
                                                         CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
@@ -981,7 +986,7 @@
                                                             <StackPanel Orientation="Horizontal">
                                                                 <Viewbox Width="10" Height="10" Margin="0 0 6 0">
                                                                     <Canvas Width="18" Height="18">
-                                                                        <Path Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" Fill="DimGray" Visibility="{Binding Path=IsDefault, Converter={StaticResource BoolToVisibilityCollapsedConverter}}"/>
+                                                                        <Path Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" Fill="{DynamicResource NormalTextColorBrush}" Visibility="{Binding Path=IsDefault, Converter={StaticResource BoolToVisibilityCollapsedConverter}}"/>
                                                                     </Canvas>
                                                                 </Viewbox>
                                                                 <TextBlock Text="{Binding Path=Name}"></TextBlock>

@@ -241,6 +241,60 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Comfirmation に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Dialog_Comfirmation {
+            get {
+                return ResourceManager.GetString("Dialog_Comfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Information に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Dialog_Information {
+            get {
+                return ResourceManager.GetString("Dialog_Information", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Input に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Dialog_Input {
+            get {
+                return ResourceManager.GetString("Dialog_Input", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   New Playlist Name: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Dialog_NewPlaylistName {
+            get {
+                return ResourceManager.GetString("Dialog_NewPlaylistName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Playlist name already exists. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Dialog_PlaylistNameAlreadyExists {
+            get {
+                return ResourceManager.GetString("Dialog_PlaylistNameAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Remove selected playlist? に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Dialog_RemovePlaylistQ {
+            get {
+                return ResourceManager.GetString("Dialog_RemovePlaylistQ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Host に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Host {
@@ -304,11 +358,11 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   MPD Protocol Error に類似しているローカライズされた文字列を検索します。
+        ///   MPD Command Error に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MPD_ProtocolError {
+        public static string MPD_CommandError {
             get {
-                return ResourceManager.GetString("MPD_ProtocolError", resourceCulture);
+                return ResourceManager.GetString("MPD_CommandError", resourceCulture);
             }
         }
         
@@ -439,7 +493,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Clear Queue and Load に類似しているローカライズされた文字列を検索します。
+        ///   Clear current queue and Load に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string PlaylistItemContextMenu_ClearAndLoad {
             get {
@@ -453,6 +507,24 @@ namespace MPDCtrl.Properties {
         public static string PlaylistItemContextMenu_Load {
             get {
                 return ResourceManager.GetString("PlaylistItemContextMenu_Load", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Remove に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PlaylistItemContextMenu_Remove {
+            get {
+                return ResourceManager.GetString("PlaylistItemContextMenu_Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Rename に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PlaylistItemContextMenu_Rename {
+            get {
+                return ResourceManager.GetString("PlaylistItemContextMenu_Rename", resourceCulture);
             }
         }
         
@@ -601,29 +673,38 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Queue に類似しているローカライズされた文字列を検索します。
+        ///   Current Queue に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string SongItemContextMenuQueue {
+        public static string SongItemContextMenu_Queue {
             get {
-                return ResourceManager.GetString("SongItemContextMenuQueue", resourceCulture);
+                return ResourceManager.GetString("SongItemContextMenu_Queue", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Clear に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string SongItemContextMenuQueueClear {
+        public static string SongItemContextMenu_QueueClear {
             get {
-                return ResourceManager.GetString("SongItemContextMenuQueueClear", resourceCulture);
+                return ResourceManager.GetString("SongItemContextMenu_QueueClear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Save as playlist に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongItemContextMenu_QueueSaveAsPlaylist {
+            get {
+                return ResourceManager.GetString("SongItemContextMenu_QueueSaveAsPlaylist", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Remove に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string SongItemContextMenuRemove {
+        public static string SongItemContextMenu_Remove {
             get {
-                return ResourceManager.GetString("SongItemContextMenuRemove", resourceCulture);
+                return ResourceManager.GetString("SongItemContextMenu_Remove", resourceCulture);
             }
         }
         

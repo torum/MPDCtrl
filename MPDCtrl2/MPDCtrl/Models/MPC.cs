@@ -221,7 +221,7 @@ namespace MPDCtrl
 
         public enum MpdErrorTypes
         {
-            ProtocolError, //Ark...
+            CommandError, //ACK
             StatusError, //[status] error: Failed to open audio output
             ErrorClear, //
         }
@@ -341,7 +341,9 @@ namespace MPDCtrl
             _asyncClient.ConnectionStatusChanged += new AsynchronousTCPClient.delConnectionStatusChanged(TCPClient_ConnectionStatusChanged);
         }
 
-        #region == MPC Method ==   
+        #region == Method ==   
+
+        #region == MPC Commands ==   
 
         public async Task<ConnectionResult> MpdConnect()
         {
@@ -544,8 +546,41 @@ namespace MPDCtrl
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("Error@MpdAdd: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("Error@MpdClear: " + ex.Message);
             }
+        }
+
+        public void MpdSave(string playlistName)
+        {
+            if (playlistName.Trim() != "")
+            {
+                playlistName = Regex.Escape(playlistName);
+
+                try
+                {
+                    string mpdCommand = "";
+                    if (!string.IsNullOrEmpty(_password))
+                    {
+                        mpdCommand = "command_list_begin" + "\n";
+                        mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                        mpdCommand = mpdCommand + "save \"" + playlistName + "\"\n";
+                        mpdCommand = mpdCommand + "command_list_end" + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = "save \"" + playlistName + "\"\n";
+                    }
+
+                    _asyncClient.Send("noidle" + "\n");
+                    _asyncClient.Send(mpdCommand);
+                    _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error@MpdSave: " + ex.Message);
+                }
+            }
+
         }
 
         public void MpdAdd(string uri)
@@ -1035,6 +1070,8 @@ namespace MPDCtrl
         {
             if (playlistName.Trim() != "")
             {
+                playlistName = Regex.Escape(playlistName.Trim());
+
                 string mpdCommand = "command_list_begin" + "\n";
                 if (!string.IsNullOrEmpty(_password))
                 {
@@ -1042,7 +1079,7 @@ namespace MPDCtrl
                 }
                 mpdCommand = mpdCommand + "clear" + "\n";
 
-                mpdCommand = mpdCommand + "load " + playlistName.Trim() + "\n";
+                mpdCommand = mpdCommand + "load \"" + playlistName + "\"\n";
 
                 mpdCommand = mpdCommand + "command_list_end" + "\n";
 
@@ -1057,16 +1094,18 @@ namespace MPDCtrl
         {
             if (playlistName.Trim() != "")
             {
+                playlistName = Regex.Escape(playlistName.Trim());
+
                 string mpdCommand = "command_list_begin" + "\n";
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
-                    mpdCommand = mpdCommand + "load " + playlistName.Trim() + "\n";
+                    mpdCommand = mpdCommand + "load \"" + playlistName + "\"\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
                 else
                 {
-                    mpdCommand = "load " + playlistName.Trim() + "\n";
+                    mpdCommand = "load \"" + playlistName + "\"\n";
                 }
 
                 _asyncClient.Send("noidle" + "\n");
@@ -1075,6 +1114,61 @@ namespace MPDCtrl
 
             }
         }
+
+        public void MpdRenamePlaylist(string playlistName, string newPlaylistName)
+        {
+            if ((playlistName.Trim() != "") && (newPlaylistName.Trim() != ""))
+            {
+                playlistName = Regex.Escape(playlistName.Trim());
+                newPlaylistName = Regex.Escape(newPlaylistName.Trim());
+
+                string mpdCommand = "command_list_begin" + "\n";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "rename \"" + playlistName + "\" \"" + newPlaylistName + "\"\n";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "rename \"" + playlistName + "\" \"" + newPlaylistName + "\"\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+            }
+        }
+
+        public void MpdRemovePlaylist(string playlistName)
+        {
+            if (playlistName.Trim() != "")
+            {
+                playlistName = Regex.Escape(playlistName.Trim());
+
+                string mpdCommand = "command_list_begin" + "\n";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "rm \"" + playlistName + "\"\n";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "rm \"" + playlistName + "\"\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+            }
+        }
+
+        #endregion
+
+        #region == TCPClient ==   
 
         private async void TCPClient_ConnectionStatusChanged(AsynchronousTCPClient sender, AsynchronousTCPClient.ConnectionStatus status)
         {
@@ -1100,6 +1194,12 @@ namespace MPDCtrl
                 //
                 await Task.Run(() => { Connected?.Invoke(this); });
 
+            }
+            else if ((data as string).StartsWith("ACK"))
+            {
+                System.Diagnostics.Debug.WriteLine("ACK@TCPClient_DataReceived: " + (data as string));
+                ErrorReturned?.Invoke(this, MpdErrorTypes.CommandError, (data as string));
+                return;
             }
             else
             {
@@ -1339,7 +1439,7 @@ namespace MPDCtrl
                     if (value.StartsWith("ACK"))
                     {
                         System.Diagnostics.Debug.WriteLine("ACK@ParseStatusResponse: " + value);
-                        ErrorReturned?.Invoke(this, MpdErrorTypes.ProtocolError, value);
+                        ErrorReturned?.Invoke(this, MpdErrorTypes.CommandError, value);
                         return false;
                     }
 
@@ -1580,7 +1680,7 @@ namespace MPDCtrl
                     if (value.StartsWith("ACK"))
                     {
                         System.Diagnostics.Debug.WriteLine("ACK@ParsePlaylistInfoResponse: " + value);
-                        ErrorReturned?.Invoke(this, MpdErrorTypes.ProtocolError, value);
+                        ErrorReturned?.Invoke(this, MpdErrorTypes.CommandError, value);
                         return false;
                     }
 
@@ -1748,7 +1848,7 @@ namespace MPDCtrl
                 if (value.StartsWith("ACK"))
                 {
                     System.Diagnostics.Debug.WriteLine("ACK@ParsePlaylistsResponse: " + value);
-                    ErrorReturned?.Invoke(this, MpdErrorTypes.ProtocolError, value);
+                    ErrorReturned?.Invoke(this, MpdErrorTypes.CommandError, value);
                     return false;
                 }
 
@@ -1829,8 +1929,9 @@ namespace MPDCtrl
             return true;
         }
 
-        #endregion END of MPD Method
+        #endregion TCPClient
 
+        #endregion END of Method
     }
 
     public class ConnectionResult
@@ -2049,13 +2150,17 @@ namespace MPDCtrl
                 }
                 else
                 {
+                    //https://msdn.microsoft.com/en-us/library/ms145145(v=vs.110).aspx
                     System.Diagnostics.Debug.WriteLine("ReceiveCallback bytesRead 0. Disconnected By Host.");
 
-                    //https://msdn.microsoft.com/en-us/library/ms145145(v=vs.110).aspx
                     ConnectionState = ConnectionStatus.DisconnectedByHost;
+
+                    ConnectionState = ConnectionStatus.AutoReconnecting;
 
                     if (!await ReConnect())
                     {
+                        ConnectionState = ConnectionStatus.DisconnectedByHost;
+
                         System.Diagnostics.Debug.WriteLine("**ReceiveCallback: bytesRead 0 - GIVING UP reconnect.");
                     }
                 }

@@ -177,6 +177,24 @@
   <data name="DeveloperMode" xml:space="preserve">
     <value>デベロッパーモード</value>
   </data>
+  <data name="Dialog_Comfirmation" xml:space="preserve">
+    <value>確認</value>
+  </data>
+  <data name="Dialog_Information" xml:space="preserve">
+    <value>情報</value>
+  </data>
+  <data name="Dialog_Input" xml:space="preserve">
+    <value>入力</value>
+  </data>
+  <data name="Dialog_NewPlaylistName" xml:space="preserve">
+    <value>新規プレイリスト名：</value>
+  </data>
+  <data name="Dialog_PlaylistNameAlreadyExists" xml:space="preserve">
+    <value>プレイリストに既に同じ名前が存在します。</value>
+  </data>
+  <data name="Dialog_RemovePlaylistQ" xml:space="preserve">
+    <value>選択されたプレイリストを削除しますか？</value>
+  </data>
   <data name="Host" xml:space="preserve">
     <value>ホスト</value>
   </data>
@@ -213,11 +231,11 @@ SOFTWARE.</value>
   <data name="LocalfileListviewTabitemHeader_LocalFiles" xml:space="preserve">
     <value>ローカルファイル</value>
   </data>
-  <data name="MPD_ProtocolError" xml:space="preserve">
-    <value>MPD Protocol Error</value>
+  <data name="MPD_CommandError" xml:space="preserve">
+    <value>MPD コマンドエラー</value>
   </data>
   <data name="MPD_StatusError" xml:space="preserve">
-    <value>MPD Status Error</value>
+    <value>MPD ステータスエラー</value>
   </data>
   <data name="New" xml:space="preserve">
     <value>新規</value>
@@ -263,6 +281,12 @@ SOFTWARE.</value>
   </data>
   <data name="PlaylistItemContextMenu_Load" xml:space="preserve">
     <value>キューに追加する</value>
+  </data>
+  <data name="PlaylistItemContextMenu_Remove" xml:space="preserve">
+    <value>プレイリストを削除する</value>
+  </data>
+  <data name="PlaylistItemContextMenu_Rename" xml:space="preserve">
+    <value>プレイリストの名前を変更する</value>
   </data>
   <data name="PlaylistListviewTabitemHeader_Playlists" xml:space="preserve">
     <value>プレイリスト</value>
@@ -315,13 +339,16 @@ SOFTWARE.</value>
   <data name="ShowDebugWidow" xml:space="preserve">
     <value>デバッグウィンドウの表示</value>
   </data>
-  <data name="SongItemContextMenuQueue" xml:space="preserve">
-    <value>キュー</value>
+  <data name="SongItemContextMenu_Queue" xml:space="preserve">
+    <value>現在のキュー</value>
   </data>
-  <data name="SongItemContextMenuQueueClear" xml:space="preserve">
+  <data name="SongItemContextMenu_QueueClear" xml:space="preserve">
     <value>キューをクリアする</value>
   </data>
-  <data name="SongItemContextMenuRemove" xml:space="preserve">
+  <data name="SongItemContextMenu_QueueSaveAsPlaylist" xml:space="preserve">
+    <value>キューをプレイリストとして保存する</value>
+  </data>
+  <data name="SongItemContextMenu_Remove" xml:space="preserve">
     <value>キューから削除</value>
   </data>
   <data name="SongListViewColumnHeader_Album" xml:space="preserve">

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Globalization;
 using MPDCtrl.ViewModels;
 using MPDCtrl.Views;
 
@@ -36,6 +37,13 @@ namespace MPDCtrl
             // テスト用
             //ChangeTheme("DefaultTheme");
             //ChangeTheme("LightTheme");
+
+            // For testing only. Don't forget to comment this out if you uncomment.
+            //MPDCtrl.Properties.Resources.Culture = CultureInfo.GetCultureInfo("en-US"); //or ja-JP etc
+
+
+            // https://docs.microsoft.com/dotnet/api/system.diagnostics.processstartinfo.useshellexecute#property-value
+
 
             if (_mutexOn)
             {

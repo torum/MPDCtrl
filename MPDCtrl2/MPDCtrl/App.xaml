@@ -68,6 +68,16 @@
                     </Style>
                     <Style TargetType="{x:Type Hyperlink}">
                         <Setter Property="FocusVisualStyle" Value="{StaticResource HyperlinkFocusVisual}"/>
+                        <Setter Property="TextBlock.TextDecorations" Value="" />
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="TextBlock.TextDecorations" Value="Underline" />
+                                <Setter Property="Foreground" Value="LightBlue" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="False">
+                                <Setter Property="TextBlock.TextDecorations" Value="" />
+                            </Trigger>
+                        </Style.Triggers>
                     </Style>
 
                     <Style x:Key="DefaultRadioButtonStyle" TargetType="{x:Type RadioButton}">
@@ -83,24 +93,14 @@
                         <Setter Property="VerticalAlignment" Value="Center"/>
                         <Setter Property="Background" Value="{DynamicResource NormalTextBoxBackgroundColorBrush}" />
                         <Style.Triggers>
-
-                            <!--
                             <Trigger Property="IsKeyboardFocusWithin" Value="true">
                                 <Setter Property="Background" Value="WhiteSmoke" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="true">
                                 <Setter Property="Background" Value="White" />
                             </Trigger>
-                            
-                            <Trigger Property="Text" Value="0">
-                                <Setter Property="Text" Value="" />
-                            </Trigger>
-                            -->
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Foreground" Value="{DynamicResource NormalTextBoxBackgroundColorBrush}" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="true">
-                                <Setter Property="Text" Value="Black" />
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -111,7 +111,6 @@
                         <Setter Property="VerticalAlignment" Value="Center"/>
                         <Setter Property="Background" Value="{DynamicResource NormalTextBoxBackgroundColorBrush}" />
                     </Style>
-
 
                     <Style x:Key="WindowMainPanelStyle" TargetType="{x:Type Border}">
                         <Setter Property="BorderBrush" Value="{DynamicResource WindowBorderBrush}" />
@@ -124,6 +123,16 @@
                                 <Setter Property="BorderBrush" Value="{DynamicResource WindowBorderInactiveBrush}" />
                             </DataTrigger>
                         </Style.Triggers>
+                    </Style>
+
+                    <!-- ボード・タイルのスタイル -->
+                    <Style x:Key="BoardStyle" TargetType="Border">
+                        <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}"/>
+                        <Setter Property="Effect">
+                            <Setter.Value>
+                                <DropShadowEffect Color="{DynamicResource ShadowBoardColor}" Opacity="1" ShadowDepth="0.8" BlurRadius="3" Direction="315"/>
+                            </Setter.Value>
+                        </Setter>
                     </Style>
 
                 </ResourceDictionary>
@@ -799,10 +808,8 @@
                         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
                         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
                         <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
-                        <!--
-                        <Setter Property="TextElement.Foreground" Value="Black"/>
-                        <Setter Property="FrameworkElement.FocusVisualStyle" Value="{x:Null}"/>
-                        -->
+                        <Setter Property="TextElement.Foreground" Value="{DynamicResource NormalTextColorBrush}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource ControlLightColorBrush}"/>
                         <Setter Property="Control.Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="ComboBox">

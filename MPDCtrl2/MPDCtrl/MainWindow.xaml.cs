@@ -15,9 +15,10 @@ using System.Windows.Shapes;
 using System.Windows.Interop;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
+using System.Globalization;
+using System.Diagnostics;
 using MPDCtrl.ViewModels;
 using MPDCtrl.Views;
-using System.Globalization;
 
 namespace MPDCtrl
 {
@@ -25,8 +26,7 @@ namespace MPDCtrl
     {
         public MainWindow()
         {
-            // For testing only. Don't forget to comment this out if you uncomment.
-            //MPDCtrl.Properties.Resources.Culture = CultureInfo.GetCultureInfo("en-US"); //or ja-JP etc
+
 
             InitializeComponent();
 
@@ -113,8 +113,43 @@ namespace MPDCtrl
             if (NewHost_TextBox.Visibility == Visibility.Visible)
             {
                 NewHost_TextBox.Focus();
+                Keyboard.Focus(NewHost_TextBox);
             }
         }
+
+        private void DialogInputTextBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (DialogInputTextBox.Visibility == Visibility.Visible)
+            {
+                DialogInputTextBox.Focus();
+                Keyboard.Focus(DialogInputTextBox);
+            }
+        }
+
+        private void DialogButton_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (sender != null)
+            {
+                if (sender is Button)
+                {
+                    if ((sender as Button).Visibility == Visibility.Visible)
+                    {
+                        (sender as Button).Focus();
+                        Keyboard.Focus((sender as Button));
+                    }
+                }
+            }
+        }
+
+        // リンクをクリックして、ブラウザ起動して表示
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            ProcessStartInfo psi = new ProcessStartInfo(e.Uri.AbsoluteUri);
+            psi.UseShellExecute = true;
+            Process.Start(psi);
+            e.Handled = true;
+        }
+
 
 
         #region == MAXIMIZE時のタスクバー被りのFix ==
@@ -217,8 +252,8 @@ namespace MPDCtrl
             public POINT ptMaxTrackSize;
         }
 
-        #endregion
 
+        #endregion
 
     }
 }

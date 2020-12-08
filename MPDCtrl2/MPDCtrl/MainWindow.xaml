@@ -23,6 +23,8 @@
         <KeyBinding Command="{Binding PlayCommand}"
                             Key="Play" />
         <KeyBinding Command="{Binding PlayCommand}"
+                            Key="Space" />
+        <KeyBinding Command="{Binding PlayCommand}"
                             Key="MediaPlayPause" />
         <KeyBinding Command="{Binding PlayNextCommand}"
                             Key="MediaNextTrack" />
@@ -36,6 +38,8 @@
                             Key="VolumeDown" />
         <KeyBinding Command="{Binding VolumeUpCommand}"
                             Key="VolumeUp" />
+        <KeyBinding Command="{Binding EscapeCommand}"
+                            Key="Esc" />
     </Window.InputBindings>
     <Border Style="{StaticResource WindowMainPanelStyle}">
         <Grid Background="{DynamicResource BoardBackgroundColorBrush}">
@@ -111,19 +115,53 @@
                                 </BeginStoryboard>
                             </EventTrigger>
                         </TextBlock.Triggers>
-                            <Run x:Name="CurrentSongTitle" Foreground="{DynamicResource ControlLightColorBrush}" FontWeight="DemiBold" Text="{Binding CurrentSongTitle, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}"/>
-                            <Run Text=" - ">
-                                 <Run.Style>
-                                     <Style>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Path=CurrentSongArtist}" Value="">
-                                                <Setter Property="Control.Foreground" Value="Transparent" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Run.Style>
-                            </Run>
-                            <Run x:Name="CurrentSongArtist" Foreground="{DynamicResource ControlMediumColorBrush}" Text="{Binding CurrentSongArtist, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}" />
+                        <Run x:Name="CurrentSongTitle" Foreground="{DynamicResource ControlLightColorBrush}" FontWeight="DemiBold" Text="{Binding CurrentSongTitle, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}"/>
+                    </TextBlock>
+                    <TextBlock Foreground="{DynamicResource ControlDarkColorBrush}">
+                        <TextBlock.Triggers>
+                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.1" To="1.0" Duration="0:0:2">
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </TextBlock.Triggers>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource DefaultTextBlockStyle}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=CurrentSongArtist, Path=Text}" Value="">
+                                        <Setter Property="Control.Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        <Run Text="  by "/>
+                        <Run x:Name="CurrentSongArtist" Foreground="{DynamicResource ControlMediumColorBrush}" Text="{Binding CurrentSongArtist, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}" />
+                    </TextBlock>
+                    <TextBlock  Foreground="{DynamicResource ControlDarkColorBrush}">
+                        <TextBlock.Triggers>
+                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.1" To="1.0" Duration="0:0:2">
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </TextBlock.Triggers>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource DefaultTextBlockStyle}">
+                                <Style.Triggers>
+                                     <DataTrigger Binding="{Binding ElementName=CurrentSongAlbum, Path=Text}" Value="">
+                                           <Setter Property="Control.Visibility" Value="Collapsed" />
+                                     </DataTrigger>
+                                 </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        <Run Text="  from "/>
+                        <Run x:Name="CurrentSongAlbum" Foreground="{DynamicResource ControlMediumColorBrush}" Text="{Binding CurrentSongAlbum, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}" />
                     </TextBlock>
                 </StackPanel>
 
@@ -310,7 +348,7 @@
                         <TabControl Style="{StaticResource NoChromeTabControl}" Margin="0 1 0 0" Background="{DynamicResource BoardBackgroundColorBrush}">
                             
                             <!-- Playlists -->
-                            <TabItem Header="{x:Static properties:Resources.PlaylistListviewTabitemHeader_Playlists}" Width="120" Style="{StaticResource NoChromeTabHeader}">
+                            <TabItem Header="{x:Static properties:Resources.PlaylistListviewTabitemHeader_Playlists}" ToolTip="(P)" Width="120" Style="{StaticResource NoChromeTabHeader}">
                                 <StackPanel>
                                     
                                     <Grid x:Name="LVPLDummy" Grid.Row="0" Grid.Column="2" Visibility="Hidden" Margin="0 0 20 0">
@@ -446,9 +484,9 @@
                             </TabItem>
 
                             <!-- Local files -->
-                            <TabItem Header="{x:Static properties:Resources.LocalfileListviewTabitemHeader_LocalFiles}" Width="120" Style="{StaticResource NoChromeTabHeader}">
+                            <TabItem Header="{x:Static properties:Resources.LocalfileListviewTabitemHeader_LocalFiles}" ToolTip="(L)" Width="120" Style="{StaticResource NoChromeTabHeader}">
 
-                                <ListView x:Name="LocalfileListview" ItemsSource="{Binding Localfiles}" SelectedItem="{Binding SelectedLocalfile}" Background="Transparent" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                <ListView x:Name="LocalfileListview" ItemsSource="{Binding Localfiles}" SelectedItem="{Binding SelectedLocalfile}" SelectionMode="Extended" Background="Transparent" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                                     <ListView.InputBindings>
                                         <KeyBinding Key="Return" Command="{Binding Path=DataContext.LocalfileListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"
                                                                  CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
@@ -552,25 +590,23 @@
                             <Grid x:Name="AT2Width6" Grid.Column="6" />
                         </Grid>
 
-                        <ListView x:Name="SongListView" ItemsSource="{Binding Queue}" SelectedItem="{Binding Path=SelectedSong, Mode=TwoWay}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" SelectionChanged="SongListView_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListView x:Name="SongListView" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedSong, Mode=TwoWay}" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" SelectionChanged="SongListView_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListView.InputBindings>
                                 <KeyBinding Key="Return" Command="{Binding Path=DataContext.SongListViewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
+                                <KeyBinding Gesture="Ctrl+U" Command="{Binding Path=DataContext.SongListviewMoveUpCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
+                                <KeyBinding Gesture="Ctrl+D" Command="{Binding Path=DataContext.SongListviewMoveDownCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
+                                <KeyBinding Gesture="Ctrl+Delete" Command="{Binding Path=DataContext.SongListviewDeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
+
                             </ListView.InputBindings>
                             <ListView.Resources>
-                                <ContextMenu x:Key="SongItemContextMenu">
-                                    <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_Remove}" Command="{Binding Path=DataContext.SongListviewDeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
-                                        <MenuItem.Resources>
-                                            <ControlTemplate x:Key="MinusIcon">
-                                                <Canvas Background="Transparent" >
-                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M19,13H5V11H19V13Z" />
-                                                </Canvas>
-                                            </ControlTemplate>
-                                        </MenuItem.Resources>
-                                        <MenuItem.Icon>
-                                            <ContentControl Template="{StaticResource MinusIcon}" />
-                                        </MenuItem.Icon>
+                                <!--
+                                <ContextMenu x:Key="SongListViewHeaderContextMenu">
+                                    <MenuItem Header="test">
+ 
                                     </MenuItem>
-                                    <Separator />
+                                </ContextMenu>
+                                -->
+                                <ContextMenu x:Key="SongItemContextMenu">
                                     <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_Queue}">
                                         <MenuItem.Resources>
                                             <ControlTemplate x:Key="PlaylistMusicOutline">
@@ -608,6 +644,56 @@
                                             </MenuItem.Icon>
                                         </MenuItem>
                                     </MenuItem>
+                                    <Separator />
+                                    <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_Move}">
+                                        <MenuItem.Resources>
+                                            <ControlTemplate x:Key="SwapVerticalIcon">
+                                                <Canvas Background="Transparent" >
+                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M9,3L5,7H8V14H10V7H13M16,17V10H14V17H11L15,21L19,17H16Z" />
+                                                </Canvas>
+                                            </ControlTemplate>
+                                        </MenuItem.Resources>
+                                        <MenuItem.Icon>
+                                            <ContentControl Template="{StaticResource SwapVerticalIcon}" />
+                                        </MenuItem.Icon>
+                                        <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_MoveUp}" Command="{Binding Path=DataContext.SongListviewMoveUpCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                            <MenuItem.Resources>
+                                                <ControlTemplate x:Key="ArrowUpIcon">
+                                                    <Canvas Background="Transparent" >
+                                                        <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z" />
+                                                    </Canvas>
+                                                </ControlTemplate>
+                                            </MenuItem.Resources>
+                                            <MenuItem.Icon>
+                                                <ContentControl Template="{StaticResource ArrowUpIcon}" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_MoveDown}" Command="{Binding Path=DataContext.SongListviewMoveDownCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                            <MenuItem.Resources>
+                                                <ControlTemplate x:Key="ArrowDownIcon">
+                                                    <Canvas Background="Transparent" >
+                                                        <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z" />
+                                                    </Canvas>
+                                                </ControlTemplate>
+                                            </MenuItem.Resources>
+                                            <MenuItem.Icon>
+                                                <ContentControl Template="{StaticResource ArrowDownIcon}" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                    </MenuItem>
+                                    <Separator />
+                                    <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_Remove}" Command="{Binding Path=DataContext.SongListviewDeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                        <MenuItem.Resources>
+                                            <ControlTemplate x:Key="MinusIcon">
+                                                <Canvas Background="Transparent" >
+                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M19,13H5V11H19V13Z" />
+                                                </Canvas>
+                                            </ControlTemplate>
+                                        </MenuItem.Resources>
+                                        <MenuItem.Icon>
+                                            <ContentControl Template="{StaticResource MinusIcon}" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
                                 </ContextMenu>
                                 <Style TargetType="{x:Type ScrollBar}">
                                     <Setter Property="Margin" Value="0,0,0,0" />
@@ -626,13 +712,16 @@
                                     <GridView.ColumnHeaderContainerStyle>
                                         <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource GridViewColumnHeaderStyle}">
                                             <Setter Property="Visibility" Value="Visible" />
+                                            <!--
+                                            <Setter Property="ContextMenu" Value="{StaticResource SongListViewHeaderContextMenu}" />
+                                            -->
                                         </Style>
                                     </GridView.ColumnHeaderContainerStyle>
-                                    <GridViewColumn Header="ID" Width="{Binding ElementName=AT2Width0, Path=ActualWidth}">
+                                    <GridViewColumn Header="Pos" Width="{Binding ElementName=AT2Width0, Path=ActualWidth}">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel HorizontalAlignment="Left">
-                                                    <TextBlock Text="{Binding Path=Id}" Padding="3" />
+                                                    <TextBlock Text="{Binding Path=Pos}" Padding="3" />
                                                 </StackPanel>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
@@ -790,7 +879,7 @@
 
             </Grid>
 
-            <!-- 初期設定画面 -->
+            <!-- 初期設定兼再接続画面 -->
             <Grid Grid.Row="1" Background="{DynamicResource BoardBackgroundColorBrush}" Visibility="{Binding IsConnectionSettingShow, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="0"/>
@@ -846,7 +935,7 @@
 
                 <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="top">
 
-                    <ComboBox Style="{StaticResource ComboBoxFlatStyle}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding CurrentProfile}" Tag="New Profile">
+                    <ComboBox Style="{StaticResource ComboBoxFlatStyle}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding CurrentProfile}" Tag="New Profile"  Visibility="{Binding IsCurrentProfileSet, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -890,43 +979,7 @@
 
 
                     <TextBlock Text="{x:Static properties:Resources.Password}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
-                    <PasswordBox x:Name="PasswordBoxNew" PasswordChar="*" Tag="{Binding Password}" Width="240" ToolTip="{x:Static properties:Resources.Optional}" PasswordChanged="PasswordBoxNew_PasswordChanged">
-                        <PasswordBox.Style>
-                            <Style TargetType="{x:Type PasswordBox}">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="{x:Type PasswordBox}">
-                                            <Grid Background="{TemplateBinding Background}">
-                                                <ScrollViewer x:Name="PART_ContentHost"/>
-                                                <TextBlock x:Name="UserMessage"
-                                                                   Margin="5,0,5,0"
-                                                                   Text="{Binding Password}" 
-                                                                   IsHitTestVisible="False"
-                                                                   HorizontalAlignment="Left"
-                                                                   VerticalAlignment="Center"
-                                                                   Visibility="Visible"/>
-                                            </Grid>
-                                            <ControlTemplate.Triggers>
-                                                <MultiTrigger>
-                                                    <MultiTrigger.Conditions>
-                                                        <Condition Property="Tag" Value=""/>
-                                                    </MultiTrigger.Conditions>
-                                                    <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
-                                                    <Setter Property="Text" TargetName="UserMessage" Value=""/>
-                                                </MultiTrigger>
-                                                <MultiTrigger>
-                                                    <MultiTrigger.Conditions>
-                                                        <Condition Property="IsKeyboardFocusWithin" Value="true"/>
-                                                    </MultiTrigger.Conditions>
-                                                    <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
-                                                    <Setter Property="Text" TargetName="UserMessage" Value=""/>
-                                                </MultiTrigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </PasswordBox.Style>
+                    <PasswordBox x:Name="PasswordBoxNew" PasswordChar="*" Style="{DynamicResource DefaultPasswordBoxStyle}" Width="240">
                     </PasswordBox>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 24 0 0">
@@ -1036,7 +1089,7 @@
                                         </Border>
 
                                         <!-- Profiles -->
-                                        <Grid Grid.Row="1" HorizontalAlignment="Left" Margin="0 32 0 0">
+                                        <Grid Grid.Row="1" HorizontalAlignment="Left" Margin="0 0 0 0">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto"/>
                                                 <RowDefinition Height="Auto"/>
@@ -1045,20 +1098,43 @@
 
                                             <StackPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left">
 
-                                                <ComboBox Style="{StaticResource ComboBoxFlatStyle}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Tag="New Profile">
-                                                    <ComboBox.ItemTemplate>
-                                                        <DataTemplate>
-                                                            <StackPanel Orientation="Horizontal">
-                                                                <Viewbox Width="10" Height="10" Margin="0 0 6 0">
-                                                                    <Canvas Width="18" Height="18">
-                                                                        <Path Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" Fill="{DynamicResource NormalTextColorBrush}" Visibility="{Binding Path=IsDefault, Converter={StaticResource BoolToVisibilityCollapsedConverter}}"/>
-                                                                    </Canvas>
-                                                                </Viewbox>
-                                                                <TextBlock Text="{Binding Path=Name}"></TextBlock>
-                                                            </StackPanel>
-                                                        </DataTemplate>
-                                                    </ComboBox.ItemTemplate>
-                                                </ComboBox>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0 12 0 0">
+                                                    <TextBlock Style="{DynamicResource DefaultTextBlockStyle}" Text="{Binding SettingProfileEditMessage, NotifyOnTargetUpdated=True}">
+                                                        <TextBlock.Triggers>
+                                                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                                                <BeginStoryboard>
+                                                                    <Storyboard>
+                                                                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
+                                                                            <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                                                            <EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="1"/>
+                                                                        </DoubleAnimationUsingKeyFrames>
+                                                                    </Storyboard>
+                                                                </BeginStoryboard>
+                                                            </EventTrigger>
+                                                        </TextBlock.Triggers>
+                                                    </TextBlock>
+                                                </StackPanel>
+
+                                                <StackPanel Orientation="Horizontal" Margin="0 12 0 0">
+                                                    <ComboBox Style="{StaticResource ComboBoxFlatStyle}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Tag="New Profile" Width="240">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <Viewbox Width="10" Height="10" Margin="0 0 6 0">
+                                                                        <Canvas Width="18" Height="18">
+                                                                            <Path Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" Fill="{DynamicResource NormalTextColorBrush}" Visibility="{Binding Path=IsDefault, Converter={StaticResource BoolToVisibilityCollapsedConverter}}"/>
+                                                                        </Canvas>
+                                                                    </Viewbox>
+                                                                    <TextBlock Text="{Binding Path=Name}"></TextBlock>
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+
+                                                    <Button Margin="12 0 0 0" Width="30" Height="30" Style="{DynamicResource PathButton}" Content="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M13,7H11V11H7V13H11V17H13V13H17V11H13V7Z" ToolTip="{x:Static properties:Resources.New}" Command="{Binding NewProfileCommand}"></Button>
+                                                    <Button Margin="6 0 0 0" Width="30" Height="30" Style="{DynamicResource PathButton}" Content="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" ToolTip="{x:Static properties:Resources.Delete}" Command="{Binding DeleteProfileCommand}"></Button>
+
+                                                </StackPanel>
 
                                                 <TextBlock Text="{x:Static properties:Resources.Host}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
                                                 <TextBox Text="{Binding Host, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240">
@@ -1086,59 +1162,24 @@
                                                     </TextBox.Style>
                                                 </TextBox>
 
-
                                                 <TextBlock Text="{x:Static properties:Resources.Password}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
-                                                <PasswordBox x:Name="PasswordBox" PasswordChar="*" Tag="{Binding Password}" Width="240" ToolTip="{x:Static properties:Resources.Optional}" PasswordChanged="PasswordBox_PasswordChanged">
-                                                    <PasswordBox.Style>
-                                                        <Style TargetType="{x:Type PasswordBox}" BasedOn="{StaticResource DefaultPasswordBoxStyle}">
-                                                            <Setter Property="Template">
-                                                                <Setter.Value>
-                                                                    <ControlTemplate TargetType="{x:Type PasswordBox}">
-                                                                        <Border BorderBrush="DimGray" Background="DarkGray" BorderThickness="1" Margin="0">
-                                                                            <Grid Background="{TemplateBinding Background}">
-                                                                                <ScrollViewer x:Name="PART_ContentHost"/>
-                                                                                <TextBlock x:Name="UserMessage" Margin="5,0,5,0" Text="{Binding Password}" IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Visible"/>
-                                                                            </Grid>
-                                                                        </Border>
-                                                                        <ControlTemplate.Triggers>
-                                                                            <MultiTrigger>
-                                                                                <MultiTrigger.Conditions>
-                                                                                    <Condition Property="Tag" Value=""/>
-                                                                                </MultiTrigger.Conditions>
-                                                                                <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
-                                                                                <Setter Property="Text" TargetName="UserMessage" Value=""/>
-                                                                            </MultiTrigger>
-                                                                            <MultiTrigger>
-                                                                                <MultiTrigger.Conditions>
-                                                                                    <Condition Property="IsKeyboardFocusWithin" Value="true"/>
-                                                                                </MultiTrigger.Conditions>
-                                                                                <Setter Property="Visibility" TargetName="UserMessage" Value="Hidden"/>
-                                                                                <Setter Property="Text" TargetName="UserMessage" Value=""/>
-                                                                            </MultiTrigger>
-                                                                        </ControlTemplate.Triggers>
-                                                                    </ControlTemplate>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </Style>
-                                                    </PasswordBox.Style>
-                                                </PasswordBox>
-
+                                                
+                                                <StackPanel Visibility="{Binding IsNotPasswordSet, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
+                                                    <PasswordBox x:Name="PasswordBox" Style="{StaticResource DefaultPasswordBoxStyle}" PasswordChar="*" Width="240"></PasswordBox>
+                                                </StackPanel>
+                                                <StackPanel Visibility="{Binding IsPasswordSet, Converter={StaticResource BoolToVisibilityCollapsedConverter}}" Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Password}" Width="198" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBlock>
+                                                    <Button Margin="12 -14 0 0" Width="30" Height="30" Style="{DynamicResource PathButton}" Command="{Binding ShowChangePasswordDialogCommand}" CommandParameter="{Binding ElementName=PasswordBox}" ToolTip="{x:Static properties:Resources.Settings_UnlockAndChangePassword}" Content="M12,17C10.89,17 10,16.1 10,15C10,13.89 10.89,13 12,13A2,2 0 0,1 14,15A2,2 0 0,1 12,17M18,20V10H6V20H18M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10C4,8.89 4.89,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"></Button>
+                                                </StackPanel>
+                                                
                                                 <CheckBox Content="{x:Static properties:Resources.Default}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding SetIsDefault}" Margin="0 12 0 0"></CheckBox>
 
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
-                                                    <TextBlock Style="{DynamicResource DefaultTextBlockStyle}" Text="{Binding SettingProfileEditMessage}"></TextBlock>
-                                                </StackPanel>
-
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
-                                                    <Button Content="{x:Static properties:Resources.Update}" Command="{Binding UpdateProfileCommand}" Padding="4" Margin="0 0 0 0" Width="100" IsDefault="False"></Button>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0 12 0 0">
+                                                    <Button Content="{x:Static properties:Resources.Update}" Command="{Binding UpdateProfileCommand}" CommandParameter="{Binding ElementName=PasswordBox}" Padding="4" Margin="0 0 0 0" Width="100" IsDefault="False"></Button>
                                                     <Button Content="{x:Static properties:Resources.Save}" Command="{Binding SaveProfileCommand}" CommandParameter="{Binding ElementName=PasswordBox}" Padding="4" Margin="12 0 0 0" Width="100" IsDefault="False"></Button>
                                                 </StackPanel>
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
-                                                    <Button Content="{x:Static properties:Resources.New}" Command="{Binding NewProfileCommand}" Padding="4" Margin="0 0 0 0" Width="100" IsDefault="False"></Button>
-                                                    <Button Content="{x:Static properties:Resources.Delete}" Command="{Binding DeleteProfileCommand}" Padding="4" Margin="12 0 0 0" Width="100" IsDefault="False"></Button>
-                                                </StackPanel>
 
-                                                <StackPanel Orientation="Horizontal" Margin="0 12 0 0" HorizontalAlignment="Center">
+                                                <StackPanel Orientation="Horizontal" Margin="0 12 0 0" HorizontalAlignment="Left">
                                                     <TextBlock Width="240" Text="{Binding StatusMessage, NotifyOnTargetUpdated=True}" TextElement.Foreground="WhiteSmoke" TextAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextElement.FontWeight="Bold" TextWrapping="WrapWithOverflow">
                                                         <TextBlock.Triggers>
                                                             <EventTrigger RoutedEvent="Binding.TargetUpdated">
@@ -1155,7 +1196,7 @@
                                                     </TextBlock>
                                                 </StackPanel>
 
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 12 0 0">
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0 12 0 0">
 
                                                     <Button Content="{x:Static properties:Resources.Connect}" IsEnabled="{Binding Path=IsNotConnecting}" Command="{Binding ChangeConnectionProfileCommand}" CommandParameter="{Binding ElementName=PasswordBox}" Padding="4" Width="100" IsDefault="False"></Button>
 
@@ -1193,7 +1234,7 @@
                                         </Border>
 
                                         <Grid Grid.Row="1" HorizontalAlignment="Left" Width="500" Margin="0 12 0 0">
-                                            <CheckBox Content="{x:Static properties:Resources.UpdateDatabaseOnStartup}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsUpdateOnStartup}" Margin="0 12 0 0"></CheckBox>
+                                            <CheckBox Content="{x:Static properties:Resources.Settings_Opts_UpdateDatabaseOnStartup}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsUpdateOnStartup}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
 
                                         <!-- Developer Mode -->
@@ -1201,7 +1242,7 @@
                                             <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.DeveloperMode}" HorizontalAlignment="Left"/>
                                         </Border>
                                         <Grid Grid.Row="3" HorizontalAlignment="Left" Width="500" Margin="0 12 0 0">
-                                            <CheckBox Content="{x:Static properties:Resources.ShowDebugWidow}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsShowDebugWindow}" Margin="0 12 0 0"></CheckBox>
+                                            <CheckBox Content="{x:Static properties:Resources.Settings_Opts_ShowDebugWidow}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsShowDebugWindow}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
                                         
                                     </Grid>
@@ -1371,13 +1412,12 @@
                 <Border Grid.Row="2" Height="62" Margin="-1 -1 -1 0" Background="{DynamicResource BoardBackgroundColorBrush}">
                     <Border  BorderThickness="0 0.5 0 0" BorderBrush="{DynamicResource ControlMediumColorBrush}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 12 0 0">
-                            <Button Width="80" Content="{x:Static properties:Resources.Close}" Margin="0 0 32 0" Padding="3" IsDefault="True" Command="{Binding SettingsOKCommand}"></Button>
+                            <Button Width="80" Content="{x:Static properties:Resources.Close}" Margin="0 0 32 0" Padding="3" IsDefault="False" Command="{Binding SettingsOKCommand}"></Button>
                         </StackPanel>
                     </Border>
                 </Border>
 
             </Grid>
-
 
             <!-- Comfirmation screen -->
             <Grid Grid.Row="0" Grid.RowSpan="2" Visibility="{Binding IsComfirmationDialogShow, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
@@ -1503,7 +1543,75 @@
 
                 </Border>
             </Grid>
-            
+
+            <!-- Change Password screen -->
+            <Grid Grid.Row="0" Grid.RowSpan="2" Visibility="{Binding IsChangePasswordDialogShow, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="{DynamicResource WindowBackgroundBaseColorBrush}" Opacity="0.8"></Rectangle>
+
+                <Border Background="{DynamicResource BoardBackgroundColorBrush}" Style="{DynamicResource BoardStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                    <Grid Width="300" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Row="0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                            <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.ChangePasswordDialog_ChangePassword}" HorizontalAlignment="Left"/>
+                        </Border>
+                        <StackPanel Grid.Row="1" Margin="12">
+                            <TextBlock Text="{Binding DialogMessage, NotifyOnTargetUpdated=True}" TextWrapping="Wrap" Style="{DynamicResource DefaultTextBlockStyle}" Margin="25 0 0 0">
+                                <TextBlock.Triggers>
+                                    <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
+                                                    <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="1"/>
+                                                </DoubleAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </TextBlock.Triggers>
+                            </TextBlock>
+
+                            <TextBlock Text="{x:Static properties:Resources.ChangePasswordDialog_CurrentPassword}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="25 12 0 0"></TextBlock>
+                            <PasswordBox x:Name="ChangeOldPasswordBox" Width="200" IsVisibleChanged="PasswordBox_IsVisibleChanged"></PasswordBox>
+
+                            <TextBlock Text="{x:Static properties:Resources.ChangePasswordDialog_NewPassword}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="25 12 0 0"></TextBlock>
+                            <PasswordBox x:Name="ChangeNewPasswordBox" Width="200"></PasswordBox>
+
+                        </StackPanel>
+                        <StackPanel Grid.Row="2" Margin="12">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 12 0 0">
+                                <Button Width="80" Content="{x:Static properties:Resources.OK}" Margin="15 0 15 0" Padding="3" IsDefault="True" Command="{Binding ChangePasswordDialogOKCommand}">
+                                    <Button.CommandParameter>
+                                        <MultiBinding Converter="{StaticResource MultipleCommandParameterConverter}">
+                                            <Binding ElementName="ChangeOldPasswordBox" />
+                                            <Binding ElementName="ChangeNewPasswordBox" />
+                                        </MultiBinding>
+                                    </Button.CommandParameter>
+                                </Button>
+                                <Button Width="80" Content="{x:Static properties:Resources.Cancel}" Margin="15 0 15 0" Padding="3" IsDefault="False" Command="{Binding ChangePasswordDialogCancelCommand}"></Button>
+                            </StackPanel>
+                        </StackPanel>
+
+                    </Grid>
+
+                </Border>
+            </Grid>
+
         </Grid>
     </Border>
 </Window>

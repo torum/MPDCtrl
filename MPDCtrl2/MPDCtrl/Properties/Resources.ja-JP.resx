@@ -129,6 +129,21 @@
   <data name="Cancel" xml:space="preserve">
     <value>キャンセル</value>
   </data>
+  <data name="ChangePasswordDialog_ChangePassword" xml:space="preserve">
+    <value>パスワード変更</value>
+  </data>
+  <data name="ChangePasswordDialog_CurrentPassword" xml:space="preserve">
+    <value>現在のパスワード</value>
+  </data>
+  <data name="ChangePasswordDialog_CurrentPasswordMismatch" xml:space="preserve">
+    <value>現在のパスワードが間違っています</value>
+  </data>
+  <data name="ChangePasswordDialog_NewPassword" xml:space="preserve">
+    <value>新しいパスワード</value>
+  </data>
+  <data name="ChangePasswordDialog_PasswordUpdated" xml:space="preserve">
+    <value>パスワードが更新されました。</value>
+  </data>
   <data name="Close" xml:space="preserve">
     <value>閉じる</value>
   </data>
@@ -198,6 +213,9 @@
   <data name="Host" xml:space="preserve">
     <value>ホスト</value>
   </data>
+  <data name="Init_NewConnectionSetting" xml:space="preserve">
+    <value>新規のコネクション設定</value>
+  </data>
   <data name="License" xml:space="preserve">
     <value>ライセンス</value>
   </data>
@@ -226,7 +244,7 @@ SOFTWARE.</value>
     <value>The MIT License</value>
   </data>
   <data name="LocalfileItemContextMenu_Add" xml:space="preserve">
-    <value>キューに追加する</value>
+    <value>キューに追加する (Enter)</value>
   </data>
   <data name="LocalfileListviewTabitemHeader_LocalFiles" xml:space="preserve">
     <value>ローカルファイル</value>
@@ -242,9 +260,6 @@ SOFTWARE.</value>
   </data>
   <data name="OK" xml:space="preserve">
     <value>OK</value>
-  </data>
-  <data name="Optional" xml:space="preserve">
-    <value>任意</value>
   </data>
   <data name="Options" xml:space="preserve">
     <value>オプション</value>
@@ -280,7 +295,7 @@ SOFTWARE.</value>
     <value>キューをクリアして追加する</value>
   </data>
   <data name="PlaylistItemContextMenu_Load" xml:space="preserve">
-    <value>キューに追加する</value>
+    <value>キューに追加する (Enter)</value>
   </data>
   <data name="PlaylistItemContextMenu_Remove" xml:space="preserve">
     <value>プレイリストを削除する</value>
@@ -327,6 +342,12 @@ SOFTWARE.</value>
   <data name="Settings_ErrorPortMustBeSpecified" xml:space="preserve">
     <value>ポート番号を入力してください。</value>
   </data>
+  <data name="Settings_Opts_ShowDebugWidow" xml:space="preserve">
+    <value>デバッグウィンドウの表示</value>
+  </data>
+  <data name="Settings_Opts_UpdateDatabaseOnStartup" xml:space="preserve">
+    <value>起動時にMPDサーバーの楽曲データベースを最新の状態に更新する</value>
+  </data>
   <data name="Settings_ProfileDeleted" xml:space="preserve">
     <value>プロファイルが削除されました。</value>
   </data>
@@ -336,8 +357,17 @@ SOFTWARE.</value>
   <data name="Settings_ProfileUpdated" xml:space="preserve">
     <value>プロファイルが更新されました。</value>
   </data>
-  <data name="ShowDebugWidow" xml:space="preserve">
-    <value>デバッグウィンドウの表示</value>
+  <data name="Settings_UnlockAndChangePassword" xml:space="preserve">
+    <value>アンロックしてパスワードを変更する</value>
+  </data>
+  <data name="SongItemContextMenu_Move" xml:space="preserve">
+    <value>移動</value>
+  </data>
+  <data name="SongItemContextMenu_MoveDown" xml:space="preserve">
+    <value>下へ (CTRL+D)</value>
+  </data>
+  <data name="SongItemContextMenu_MoveUp" xml:space="preserve">
+    <value>上へ (CTRL+U)</value>
   </data>
   <data name="SongItemContextMenu_Queue" xml:space="preserve">
     <value>現在のキュー</value>
@@ -349,7 +379,7 @@ SOFTWARE.</value>
     <value>キューをプレイリストとして保存する</value>
   </data>
   <data name="SongItemContextMenu_Remove" xml:space="preserve">
-    <value>キューから削除</value>
+    <value>キューから削除 (CTRL+Delete)</value>
   </data>
   <data name="SongListViewColumnHeader_Album" xml:space="preserve">
     <value>アルバム</value>
@@ -368,9 +398,6 @@ SOFTWARE.</value>
   </data>
   <data name="Update" xml:space="preserve">
     <value>更新</value>
-  </data>
-  <data name="UpdateDatabaseOnStartup" xml:space="preserve">
-    <value>起動時にMPDサーバーの楽曲データベースを最新の状態に更新する</value>
   </data>
   <data name="Version" xml:space="preserve">
     <value>バージョン</value>

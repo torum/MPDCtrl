@@ -18,6 +18,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Windows.Threading;
 using System.Net;
+using System.Text.RegularExpressions;
 using MPDCtrl.Common;
 using MPDCtrl.Views;
 
@@ -26,16 +27,21 @@ namespace MPDCtrl.ViewModels
     /// TODO: 
     /// 
     /// v2.0.0
-    /// パスワードのテスト。
-    /// queueの曲順並べ替えやソート
     /// 
     /// v2.0.1
-    /// タグの追加
-    /// queueの項目を表示・非表示を項目毎に選択・保存できるように。
+    /// Ctrl+Fで検索。
+    /// Current Queue: 表示項目（タグ）の追加
+    /// Current Queue: キュー一覧の更新で、差分を取って追加削除する。でないと選択項目が一々クリアされてしまう。
+    /// Current Queue: カラムヘッダーのソートや項目の表示・非表示・サイズ指定などを項目毎に選択・保存できるように。
+    /// Current Queue: ScrollIntoView to NowPlaying (not selected item).
+    /// Local Files: "Save Selected to:" context menu.
+    /// Settings: profileの保存を見直し（新規と削除はプルダウンの横にアイコン、更新保存ボタンは不要）
+    /// TitleBar: "SongTitle, by Artist from Album".
+    /// 
     /// 
     /// v2.0.2
-    /// アルバムカバー対応。
-    /// Local Files の TreeView化
+    /// アルバムカバー対応。Last.fm?
+    /// Local Files の TreeViewまたは階層化
     /// 
     /// v2.0.3
     /// テーマの切り替え
@@ -47,6 +53,8 @@ namespace MPDCtrl.ViewModels
 
     /// 更新履歴：
     /// 
+    /// v2.0.0.10: パスワード周りオーバーホール。タイトルバーのNowPlayingを修正。
+    /// v2.0.0.9: Queueの上下移動。KeyGestureを幾つか追加。
     /// v2.0.0.8: プレイリストの（新規作成）保存、削除、リネーム。ダイアログの作成。
     /// v2.0.0.7: スライダー等のデザインとりあえず完成。elasedTimerの変更（正確なsystem.timerに）。
     /// v2.0.0.6: 設定画面とりあえず完成。i19nとりあえず完了。
@@ -55,6 +63,12 @@ namespace MPDCtrl.ViewModels
     /// v2.0.0.3: Current Queueの項目を増やしたり、IsPlayingとか。
     /// v2.0.0.2: DebugWindowの追加とかProfile関係とか色々。
     /// 
+
+    /// Key Gestures:
+    /// Ctrl+S Show Settings
+    /// Ctrl+U SongListview Queue Move Up
+    /// Ctrl+D SongListview Queue Move Down
+    /// Ctrl+Delete SongListview Remove from Queue
 
 
     public class Profile : ViewModelBase
@@ -149,7 +163,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "2.0.0.8";
+        const string _appVer = "v2.0.0.10";
 
         public string AppVer
         {
@@ -426,6 +440,34 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private bool _isChangePasswordDialogShow;
+        public bool IsChangePasswordDialogShow
+        {
+            get
+            {
+                return _isChangePasswordDialogShow;
+            }
+            set
+            {
+                if (_isChangePasswordDialogShow == value)
+                    return;
+
+                _isChangePasswordDialogShow = value;
+                NotifyPropertyChanged("IsChangePasswordDialogShow");
+            }
+        }
+
+        public bool IsCurrentProfileSet
+        {
+            get
+            {
+                if (CurrentProfile != null)
+                    return true;
+                else
+                    return false;
+            }
+        }
+
 
         #endregion
 
@@ -461,6 +503,7 @@ namespace MPDCtrl.ViewModels
                 NotifyPropertyChanged("CurrentSong");
                 NotifyPropertyChanged("CurrentSongTitle");
                 NotifyPropertyChanged("CurrentSongArtist");
+                NotifyPropertyChanged("CurrentSongAlbum"); 
             }
         }
 
@@ -485,11 +528,32 @@ namespace MPDCtrl.ViewModels
             {
                 if (_currentSong != null)
                 {
-                    return _currentSong.Artist;
+                    if (!string.IsNullOrEmpty(_currentSong.Artist))
+                        return _currentSong.Artist.Trim();
+                    else
+                        return "";
                 }
                 else
                 {
                     return string.Empty;
+                }
+            }
+        }
+
+        public string CurrentSongAlbum
+        {
+            get
+            {
+                if (_currentSong != null)
+                {
+                    if (!string.IsNullOrEmpty(_currentSong.Album))
+                        return _currentSong.Album.Trim();
+                    else
+                        return "";
+                }
+                else
+                {
+                    return String.Empty;
                 }
             }
         }
@@ -594,6 +658,7 @@ namespace MPDCtrl.ViewModels
         //private static string _pathConnectedButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
         private static string _pathConnectedButton = "";
         private static string _pathDisconnectedButton = "";
+        private static string _pathNewConnectionButton = "M20,4C21.11,4 22,4.89 22,6V18C22,19.11 21.11,20 20,20H4C2.89,20 2,19.11 2,18V6C2,4.89 2.89,4 4,4H20M8.5,15V9H7.25V12.5L4.75,9H3.5V15H4.75V11.5L7.3,15H8.5M13.5,10.26V9H9.5V15H13.5V13.75H11V12.64H13.5V11.38H11V10.26H13.5M20.5,14V9H19.25V13.5H18.13V10H16.88V13.5H15.75V9H14.5V14A1,1 0 0,0 15.5,15H19.5A1,1 0 0,0 20.5,14Z";
         //private static string _pathErrorInfoButton = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z";
         private static string _pathErrorInfoButton = "M23,12L20.56,14.78L20.9,18.46L17.29,19.28L15.4,22.46L12,21L8.6,22.47L6.71,19.29L3.1,18.47L3.44,14.78L1,12L3.44,9.21L3.1,5.53L6.71,4.72L8.6,1.54L12,3L15.4,1.54L17.29,4.72L20.9,5.54L20.56,9.22L23,12M20.33,12L18.5,9.89L18.74,7.1L16,6.5L14.58,4.07L12,5.18L9.42,4.07L8,6.5L5.26,7.09L5.5,9.88L3.67,12L5.5,14.1L5.26,16.9L8,17.5L9.42,19.93L12,18.81L14.58,19.92L16,17.5L18.74,16.89L18.5,14.1L20.33,12M11,15H13V17H11V15M11,7H13V13H11V7";
 
@@ -850,7 +915,9 @@ namespace MPDCtrl.ViewModels
                 SelectedProfile = _currentProfile;
 
                 NotifyPropertyChanged("CurrentProfile");
-            }
+
+                NotifyPropertyChanged("IsCurrentProfileNull");
+                            }
         }
 
         private Profile _selectedProfile;
@@ -873,8 +940,7 @@ namespace MPDCtrl.ViewModels
                     ClearErrror("Port");
                     Host = SelectedProfile.Host;
                     Port = SelectedProfile.Port.ToString();
-                    _password = SelectedProfile.Password;
-                    NotifyPropertyChanged("Password");
+                    Password = SelectedProfile.Password;
                     SetIsDefault = SelectedProfile.IsDefault;
                 }
                 else
@@ -883,14 +949,10 @@ namespace MPDCtrl.ViewModels
                     ClearErrror("Port");
                     Host = "";
                     Port = "6600";
-                    _password = "";
-                    NotifyPropertyChanged("Password");
+                    Password = "";
                 }
 
                 NotifyPropertyChanged("SelectedProfile");
-
-                // Clear message. > Don't.
-                //SettingProfileEditMessage = "";
             }
         }
 
@@ -972,10 +1034,19 @@ namespace MPDCtrl.ViewModels
         private string _password = "";
         public string Password
         {
-            // Dummy "*"'s for PasswordBox.
             get
             {
                 return DummyPassword(_password);
+            }
+            set
+            {
+                // Don't. if (_password == value) ...
+
+                _password = value;
+
+                NotifyPropertyChanged("Password");
+                NotifyPropertyChanged("IsPasswordSet");
+                NotifyPropertyChanged("IsNotPasswordSet");
             }
         }
 
@@ -1030,6 +1101,38 @@ namespace MPDCtrl.ViewModels
             return e;
         }
 
+        public bool IsPasswordSet
+        {
+            get
+            {
+                if (SelectedProfile != null)
+                {
+                    if (!string.IsNullOrEmpty(SelectedProfile.Password))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        public bool IsNotPasswordSet
+        {
+            get
+            {
+                if (IsPasswordSet)
+                    return false;
+                else
+                    return true;
+            }
+        }
 
         private bool _setIsDefault = true;
         public bool SetIsDefault
@@ -1223,6 +1326,8 @@ namespace MPDCtrl.ViewModels
             SongListviewDeleteCommand = new GenericRelayCommand<object>(param => SongListviewDeleteCommand_Execute(param), param => SongListviewDeleteCommand_CanExecute());
             SongListviewClearCommand = new RelayCommand(SongListviewClearCommand_ExecuteAsync, SongListviewClearCommand_CanExecute);
             SongListviewSaveCommand = new RelayCommand(SongListviewSaveCommand_ExecuteAsync, SongListviewSaveCommand_CanExecute);
+            SongListviewMoveUpCommand = new GenericRelayCommand<object>(param => SongListviewMoveUpCommand_Execute(param), param => SongListviewMoveUpCommand_CanExecute());
+            SongListviewMoveDownCommand = new GenericRelayCommand<object>(param => SongListviewMoveDownCommand_Execute(param), param => SongListviewMoveDownCommand_CanExecute());
 
             ShowSettingsCommand = new RelayCommand(ShowSettingsCommand_Execute, ShowSettingsCommand_CanExecute);
             SettingsOKCommand = new RelayCommand(SettingsOKCommand_Execute, SettingsOKCommand_CanExecute);
@@ -1230,7 +1335,7 @@ namespace MPDCtrl.ViewModels
             NewProfileCommand = new RelayCommand(NewProfileCommand_Execute, NewProfileCommand_CanExecute);
             DeleteProfileCommand = new RelayCommand(DeleteProfileCommand_Execute, DeleteProfileCommand_CanExecute);
             SaveProfileCommand = new GenericRelayCommand<object>(param => SaveProfileCommand_Execute(param), param => SaveProfileCommand_CanExecute());
-            UpdateProfileCommand = new RelayCommand(UpdateProfileCommand_Execute, UpdateProfileCommand_CanExecute);
+            UpdateProfileCommand = new GenericRelayCommand<object>(param => UpdateProfileCommand_Execute(param), param => UpdateProfileCommand_CanExecute());
             ChangeConnectionProfileCommand = new GenericRelayCommand<object>(param => ChangeConnectionProfileCommand_Execute(param), param => ChangeConnectionProfileCommand_CanExecute());
 
             ConnectCommand = new GenericRelayCommand<object>(param => ConnectCommand_Execute(param), param => ConnectCommand_CanExecute());
@@ -1243,6 +1348,13 @@ namespace MPDCtrl.ViewModels
 
             InputDialogOKCommand = new RelayCommand(InputDialogOKCommand_Execute, InputDialogOKCommand_CanExecute);
             InputDialogCancelCommand = new RelayCommand(InputDialogCancelCommand_Execute, InputDialogCancelCommand_CanExecute);
+
+            ShowChangePasswordDialogCommand = new GenericRelayCommand<object>(param => ShowChangePasswordDialogCommand_Execute(param), param => ShowChangePasswordDialogCommand_CanExecute());
+            ChangePasswordDialogOKCommand = new GenericRelayCommand<object>(param => ChangePasswordDialogOKCommand_Execute(param), param => ChangePasswordDialogOKCommand_CanExecute());
+            ChangePasswordDialogCancelCommand = new RelayCommand(ChangePasswordDialogCancelCommand_Execute, ChangePasswordDialogCancelCommand_CanExecute);
+
+
+            EscapeCommand = new RelayCommand(EscapeCommand_ExecuteAsync, EscapeCommand_CanExecute);
 
             #endregion
 
@@ -1290,7 +1402,7 @@ namespace MPDCtrl.ViewModels
             #endregion
 
 #if DEBUG
-            IsMainShow = true; // To show Main pain in the XAML designer.
+            //IsMainShow = true; // To show Main pain in the XAML designer.
             //IsSettingsShow = true;
 #else
             IsMainShow = false;
@@ -1305,7 +1417,7 @@ namespace MPDCtrl.ViewModels
         {
 
 #if DEBUG
-            IsMainShow = false;
+            //IsMainShow = false;
 #endif
 
             #region == アプリ設定のロード  ==
@@ -1509,8 +1621,8 @@ namespace MPDCtrl.ViewModels
 
             if (CurrentProfile == null)
             {
-                StatusMessage = "Welcome";
-
+                StatusMessage = MPDCtrl.Properties.Resources.Init_NewConnectionSetting;
+                StatusButton = _pathNewConnectionButton;
                 IsConnectionSettingShow = true;
             }
             else
@@ -1669,7 +1781,10 @@ namespace MPDCtrl.ViewModels
                             }
                             else
                             {
-                                attrs.Value = dw.Top.ToString();
+                                if (dw.Top > 0)
+                                    attrs.Value = dw.Top.ToString();
+                                else
+                                    attrs.Value = "0";
                             }
                             debugWindow.SetAttributeNode(attrs);
 
@@ -1680,7 +1795,10 @@ namespace MPDCtrl.ViewModels
                             }
                             else
                             {
-                                attrs.Value = dw.Left.ToString();
+                                if (dw.Left > 0)
+                                    attrs.Value = dw.Left.ToString();
+                                else
+                                    attrs.Value = "0";
                             }
                             debugWindow.SetAttributeNode(attrs);
 
@@ -1795,8 +1913,8 @@ namespace MPDCtrl.ViewModels
         {
             IsConnected = true;
 
-            StatusButton = _pathConnectedButton;
-            StatusMessage = "";
+            //StatusButton = _pathConnectedButton;
+            //StatusMessage = "";
         }
 
         // MPD changed nortifiation
@@ -1917,7 +2035,12 @@ namespace MPDCtrl.ViewModels
         private void OnDataSent(MPC sender, object data)
         {
             if (IsShowDebugWindow)
-                OnDebugWindowOutput?.Invoke((data as string));
+            {
+                var s = (data as string);
+                s = Regex.Replace(s, @"password .*?\n", "password *******\n");
+
+                OnDebugWindowOutput?.Invoke(s);
+            }
         }
 
         private void OnError(MPC sender, MPC.MpdErrorTypes errType, object data)
@@ -2754,6 +2877,106 @@ namespace MPDCtrl.ViewModels
 
         }
 
+        public ICommand SongListviewMoveUpCommand { get; }
+        public bool SongListviewMoveUpCommand_CanExecute()
+        {
+            return true;
+        }
+        public void SongListviewMoveUpCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            // 選択アイテム保持用
+            List<MPC.Song> selectedList = new List<MPC.Song>();
+
+            // 念のため、UIスレッドで。
+            if (Application.Current == null) { return; }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                System.Collections.IList items = (System.Collections.IList)obj;
+
+                var collection = items.Cast<MPC.Song>();
+
+                foreach (var item in collection)
+                {
+                    selectedList.Add(item as MPC.Song);
+                }
+            });
+
+            Dictionary<string, string> IdToNewPos = new Dictionary<string, string>();
+
+            foreach (var item in selectedList)
+            {
+                int i = 0;
+                try
+                {
+                    i = Int32.Parse(item.Pos);
+
+                    if (i == 0) return;
+
+                    i -= 1;
+
+                    IdToNewPos.Add(item.Id, i.ToString());
+                }
+                catch
+                {
+                    return;
+                }
+            }
+
+            _MPC.MpdMoveId(IdToNewPos);
+        }
+
+        public ICommand SongListviewMoveDownCommand { get; }
+        public bool SongListviewMoveDownCommand_CanExecute()
+        {
+            return true;
+        }
+        public void SongListviewMoveDownCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            // 選択アイテム保持用
+            List<MPC.Song> selectedList = new List<MPC.Song>();
+
+            // 念のため、UIスレッドで。
+            if (Application.Current == null) { return; }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                System.Collections.IList items = (System.Collections.IList)obj;
+
+                var collection = items.Cast<MPC.Song>();
+
+                foreach (var item in collection)
+                {
+                    selectedList.Add(item as MPC.Song);
+                }
+            });
+
+            Dictionary<string, string> IdToNewPos = new Dictionary<string, string>();
+
+            foreach (var item in selectedList)
+            {
+                int i = 0;
+                try
+                {
+                    i = Int32.Parse(item.Pos);
+
+                    if (i >= Queue.Count-1) return;
+
+                    i += 1;
+
+                    IdToNewPos.Add(item.Id, i.ToString());
+                }
+                catch
+                {
+                    return;
+                }
+            }
+
+            _MPC.MpdMoveId(IdToNewPos);
+        }
+
         #endregion
 
         #region == Settings ==
@@ -2850,7 +3073,7 @@ namespace MPDCtrl.ViewModels
             var passwordBox = obj as PasswordBox;
             if (!String.IsNullOrEmpty(passwordBox.Password))
             {
-                _password = passwordBox.Password;
+                Password = passwordBox.Password;
             }
 
             if (SetIsDefault)
@@ -2889,13 +3112,27 @@ namespace MPDCtrl.ViewModels
             if (SelectedProfile == null) return false;
             return true;
         }
-        public void UpdateProfileCommand_Execute()
+        public void UpdateProfileCommand_Execute(object obj)
         {
+            if (obj == null) return;
             if (SelectedProfile == null) return;
+            if (String.IsNullOrEmpty(Host)) return;
+            if (_port == 0) return;
 
             SelectedProfile.Host = _host;
             SelectedProfile.Port = _port;
-            SelectedProfile.Password = _password;
+            // for Unbindable PasswordBox.
+            var passwordBox = obj as PasswordBox;
+            if (!String.IsNullOrEmpty(passwordBox.Password))
+            {
+                SelectedProfile.Password = passwordBox.Password;
+                Password = passwordBox.Password;
+
+                if (SelectedProfile == CurrentProfile)
+                {
+                    _MPC.MpdPassword = passwordBox.Password;
+                }
+            }
 
             if (SetIsDefault)
             {
@@ -2974,7 +3211,7 @@ namespace MPDCtrl.ViewModels
             var passwordBox = obj as PasswordBox;
             if (!String.IsNullOrEmpty(passwordBox.Password))
             {
-                _password = passwordBox.Password;
+                Password = passwordBox.Password;
             }
 
 
@@ -3162,9 +3399,106 @@ namespace MPDCtrl.ViewModels
             IsInputDialogShow = false;
         }
 
+        public ICommand ShowChangePasswordDialogCommand { get; }
+        public bool ShowChangePasswordDialogCommand_CanExecute()
+        {
+            if (SelectedProfile == null) return false;
+            if (String.IsNullOrEmpty(Host)) return false;
+            if (_port == 0) return false;
+            return true;
+        }
+        public void ShowChangePasswordDialogCommand_Execute(object obj)
+        {
+            if (IsChangePasswordDialogShow)
+            {
+                IsChangePasswordDialogShow = false;
+            }
+            else
+            {
+                if (obj == null) return;
+                // for Unbindable PasswordBox.
+                var passwordBox = obj as PasswordBox;
+                passwordBox.Password = "";
+
+                ResetDialog();
+                IsChangePasswordDialogShow = true;
+            }
+        }
+
+        public ICommand ChangePasswordDialogOKCommand { get; }
+        public bool ChangePasswordDialogOKCommand_CanExecute()
+        {
+            if (SelectedProfile == null) return false;
+            if (String.IsNullOrEmpty(Host)) return false;
+            if (_port == 0) return false;
+            return true;
+        }
+        public void ChangePasswordDialogOKCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            // MultipleCommandParameterConverter で複数のパラメータを可能にしている。
+            var values = (object[])obj;
+
+            if ((values[0] is PasswordBox) && (values[1] is PasswordBox))
+            {
+                if ((values[0] as PasswordBox).Password == _password)
+                {
+                    SelectedProfile.Password = (values[1] as PasswordBox).Password; //allow empty string.
+
+                    Password = SelectedProfile.Password;
+                    NotifyPropertyChanged("IsPasswordSet");
+                    NotifyPropertyChanged("IsNotPasswordSet");
+
+                    (values[0] as PasswordBox).Password = "";
+                    (values[1] as PasswordBox).Password = "";
+
+                    if (SelectedProfile == CurrentProfile)
+                    {
+                        _MPC.MpdPassword = SelectedProfile.Password;
+                    }
+
+                    SettingProfileEditMessage = MPDCtrl.Properties.Resources.ChangePasswordDialog_PasswordUpdated;
+
+                }
+                else
+                {
+                    DialogMessage = MPDCtrl.Properties.Resources.ChangePasswordDialog_CurrentPasswordMismatch;
+                    return;
+                }
+
+                IsChangePasswordDialogShow = false;
+            }
+        }
+
+        public ICommand ChangePasswordDialogCancelCommand { get; }
+        public bool ChangePasswordDialogCancelCommand_CanExecute()
+        {
+            return true;
+        }
+        public void ChangePasswordDialogCancelCommand_Execute()
+        {
+            IsChangePasswordDialogShow = false;
+        }
+
+
         #endregion
 
+        
+        public ICommand EscapeCommand { get; }
+        public bool EscapeCommand_CanExecute()
+        {
+            return true;
+        }
+        public void EscapeCommand_ExecuteAsync()
+        {
+            IsSettingsShow = false;
+            IsComfirmationDialogShow = false;
+            IsInformationDialogShow = false;
+            IsInputDialogShow = false;
+            IsChangePasswordDialogShow = false;
 
+        }
 
         #endregion
 

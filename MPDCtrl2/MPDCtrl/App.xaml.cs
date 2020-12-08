@@ -11,9 +11,6 @@ using MPDCtrl.Views;
 
 namespace MPDCtrl
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
         // 二重起動防止 on/offフラグ
@@ -40,10 +37,6 @@ namespace MPDCtrl
 
             // For testing only. Don't forget to comment this out if you uncomment.
             //MPDCtrl.Properties.Resources.Culture = CultureInfo.GetCultureInfo("en-US"); //or ja-JP etc
-
-
-            // https://docs.microsoft.com/dotnet/api/system.diagnostics.processstartinfo.useshellexecute#property-value
-
 
             if (_mutexOn)
             {
@@ -78,10 +71,7 @@ namespace MPDCtrl
 
                 // Terminate this instance.
                 this.Shutdown();
-
             }
-
-
         }
 
         // テーマ切替メソッド
@@ -104,7 +94,6 @@ namespace MPDCtrl
             // テーマをリソース・ディクショナリのソースに指定
             string themeUri = String.Format("pack://application:,,,/Themes/{0}.xaml", themeName);
             _themeDict.Source = new Uri(themeUri);
-
         }
 
         public void CreateDebugWindow(DebugViewModel DebugVM)
@@ -140,7 +129,6 @@ namespace MPDCtrl
             win.Topmost = false;
 
             win.Hide();
-
         }
 
         public void ShowDebugWindow(ShowDebugEventArgs eventArg)
@@ -181,7 +169,6 @@ namespace MPDCtrl
                     return;
                 }
             }
-
         }
     }
 }

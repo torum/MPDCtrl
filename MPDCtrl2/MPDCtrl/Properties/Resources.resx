@@ -129,6 +129,21 @@
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="ChangePasswordDialog_ChangePassword" xml:space="preserve">
+    <value>Change Password</value>
+  </data>
+  <data name="ChangePasswordDialog_CurrentPassword" xml:space="preserve">
+    <value>Current Password</value>
+  </data>
+  <data name="ChangePasswordDialog_CurrentPasswordMismatch" xml:space="preserve">
+    <value>Current Password did not match.</value>
+  </data>
+  <data name="ChangePasswordDialog_NewPassword" xml:space="preserve">
+    <value>New Password</value>
+  </data>
+  <data name="ChangePasswordDialog_PasswordUpdated" xml:space="preserve">
+    <value>Password Updated.</value>
+  </data>
   <data name="Close" xml:space="preserve">
     <value>Close</value>
   </data>
@@ -198,6 +213,9 @@
   <data name="Host" xml:space="preserve">
     <value>Host</value>
   </data>
+  <data name="Init_NewConnectionSetting" xml:space="preserve">
+    <value>New Connection Setting</value>
+  </data>
   <data name="License" xml:space="preserve">
     <value>License</value>
   </data>
@@ -226,10 +244,10 @@ SOFTWARE.</value>
     <value>The MIT License</value>
   </data>
   <data name="LocalfileItemContextMenu_Add" xml:space="preserve">
-    <value>Add</value>
+    <value>Add (Enter)</value>
   </data>
   <data name="LocalfileListviewTabitemHeader_LocalFiles" xml:space="preserve">
-    <value>Local Files</value>
+    <value>_Local Files</value>
   </data>
   <data name="MPD_CommandError" xml:space="preserve">
     <value>MPD Command Error</value>
@@ -242,9 +260,6 @@ SOFTWARE.</value>
   </data>
   <data name="OK" xml:space="preserve">
     <value>OK</value>
-  </data>
-  <data name="Optional" xml:space="preserve">
-    <value>Optional</value>
   </data>
   <data name="Options" xml:space="preserve">
     <value>Options</value>
@@ -280,7 +295,7 @@ SOFTWARE.</value>
     <value>Clear current queue and Load</value>
   </data>
   <data name="PlaylistItemContextMenu_Load" xml:space="preserve">
-    <value>Load</value>
+    <value>Load (Enter)</value>
   </data>
   <data name="PlaylistItemContextMenu_Remove" xml:space="preserve">
     <value>Remove</value>
@@ -289,7 +304,7 @@ SOFTWARE.</value>
     <value>Rename</value>
   </data>
   <data name="PlaylistListviewTabitemHeader_Playlists" xml:space="preserve">
-    <value>Playlists</value>
+    <value>_Playlists</value>
   </data>
   <data name="Port" xml:space="preserve">
     <value>Port</value>
@@ -324,17 +339,32 @@ SOFTWARE.</value>
   <data name="Settings_ErrorPortMustBeSpecified" xml:space="preserve">
     <value>Port number is required.</value>
   </data>
+  <data name="Settings_Opts_ShowDebugWidow" xml:space="preserve">
+    <value>Show Debug Widow</value>
+  </data>
+  <data name="Settings_Opts_UpdateDatabaseOnStartup" xml:space="preserve">
+    <value>Update MPD Music Database on Startup</value>
+  </data>
   <data name="Settings_ProfileDeleted" xml:space="preserve">
     <value>Profile Deleted</value>
   </data>
   <data name="Settings_ProfileSaved" xml:space="preserve">
-    <value>Profile saved.</value>
+    <value>Profile Saved.</value>
   </data>
   <data name="Settings_ProfileUpdated" xml:space="preserve">
-    <value>Profile updated.</value>
+    <value>Profile Updated.</value>
   </data>
-  <data name="ShowDebugWidow" xml:space="preserve">
-    <value>Show Debug Widow</value>
+  <data name="Settings_UnlockAndChangePassword" xml:space="preserve">
+    <value>Unlock and Change Password</value>
+  </data>
+  <data name="SongItemContextMenu_Move" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="SongItemContextMenu_MoveDown" xml:space="preserve">
+    <value>Down (CTRL+D)</value>
+  </data>
+  <data name="SongItemContextMenu_MoveUp" xml:space="preserve">
+    <value>Up (CTRL+U)</value>
   </data>
   <data name="SongItemContextMenu_Queue" xml:space="preserve">
     <value>Current Queue</value>
@@ -346,7 +376,7 @@ SOFTWARE.</value>
     <value>Save as playlist</value>
   </data>
   <data name="SongItemContextMenu_Remove" xml:space="preserve">
-    <value>Remove</value>
+    <value>Remove (CTRL+Delete)</value>
   </data>
   <data name="SongListViewColumnHeader_Album" xml:space="preserve">
     <value>Album</value>
@@ -365,9 +395,6 @@ SOFTWARE.</value>
   </data>
   <data name="Update" xml:space="preserve">
     <value>Update</value>
-  </data>
-  <data name="UpdateDatabaseOnStartup" xml:space="preserve">
-    <value>Update MPD Music Database on Startup</value>
   </data>
   <data name="Version" xml:space="preserve">
     <value>Version</value>

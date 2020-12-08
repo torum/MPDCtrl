@@ -693,6 +693,45 @@ namespace MPDCtrl
             }
         }
 
+        public void MpdMoveId(Dictionary<string, string> IdToNewPosPair)
+        {
+            if (IdToNewPosPair == null) return;
+            if (IdToNewPosPair.Count < 1) return;
+
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    foreach (KeyValuePair<string, string> pair in IdToNewPosPair)
+                    {
+                        mpdCommand = mpdCommand + "moveid " + pair.Key + " " + pair.Value+ "\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    foreach (KeyValuePair<string, string> pair in IdToNewPosPair)
+                    {
+                        mpdCommand = mpdCommand + "moveid " + pair.Key + " " + pair.Value + "\n";
+                    }
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdMoveId: " + ex.Message);
+            }
+        }
+
+
         public void MpdPlaybackPlay(string songID = "")
         {
             try
@@ -1725,6 +1764,7 @@ namespace MPDCtrl
                             {
                                 if (SongValues.ContainsKey("AlbumArtist"))
                                 {
+                                    // TODO: Should I?
                                     sng.Artist = SongValues["AlbumArtist"];
                                 }
                                 else

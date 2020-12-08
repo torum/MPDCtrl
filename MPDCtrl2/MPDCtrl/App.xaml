@@ -19,6 +19,8 @@
             <!-- BooleanToVisibilityConverterの、 Collapsed 版　-->
             <common:BoolToVisibilityCollapsedConverter x:Key="BoolToVisibilityCollapsedConverter" TrueValue="Visible" FalseValue="Collapsed" />
 
+            <common:MultipleCommandParameterConverter x:Key="MultipleCommandParameterConverter"/>
+
             <ResourceDictionary.MergedDictionaries>
 
                 <!-- デフォルトテーマ 差し替え用 -->

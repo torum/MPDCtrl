@@ -97,6 +97,51 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Change Password に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ChangePasswordDialog_ChangePassword {
+            get {
+                return ResourceManager.GetString("ChangePasswordDialog_ChangePassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Current Password に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ChangePasswordDialog_CurrentPassword {
+            get {
+                return ResourceManager.GetString("ChangePasswordDialog_CurrentPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Current Password did not match. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ChangePasswordDialog_CurrentPasswordMismatch {
+            get {
+                return ResourceManager.GetString("ChangePasswordDialog_CurrentPasswordMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   New Password に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ChangePasswordDialog_NewPassword {
+            get {
+                return ResourceManager.GetString("ChangePasswordDialog_NewPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Password Updated. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ChangePasswordDialog_PasswordUpdated {
+            get {
+                return ResourceManager.GetString("ChangePasswordDialog_PasswordUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Close に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Close {
@@ -304,6 +349,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   New Connection Setting に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Init_NewConnectionSetting {
+            get {
+                return ResourceManager.GetString("Init_NewConnectionSetting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   License に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string License {
@@ -340,7 +394,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Add に類似しているローカライズされた文字列を検索します。
+        ///   Add (Enter) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string LocalfileItemContextMenu_Add {
             get {
@@ -349,7 +403,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Local Files に類似しているローカライズされた文字列を検索します。
+        ///   _Local Files に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string LocalfileListviewTabitemHeader_LocalFiles {
             get {
@@ -390,15 +444,6 @@ namespace MPDCtrl.Properties {
         public static string OK {
             get {
                 return ResourceManager.GetString("OK", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Optional に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string Optional {
-            get {
-                return ResourceManager.GetString("Optional", resourceCulture);
             }
         }
         
@@ -502,7 +547,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Load に類似しているローカライズされた文字列を検索します。
+        ///   Load (Enter) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string PlaylistItemContextMenu_Load {
             get {
@@ -529,7 +574,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Playlists に類似しているローカライズされた文字列を検索します。
+        ///   _Playlists に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string PlaylistListviewTabitemHeader_Playlists {
             get {
@@ -637,6 +682,24 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Show Debug Widow に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_Opts_ShowDebugWidow {
+            get {
+                return ResourceManager.GetString("Settings_Opts_ShowDebugWidow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Update MPD Music Database on Startup に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_Opts_UpdateDatabaseOnStartup {
+            get {
+                return ResourceManager.GetString("Settings_Opts_UpdateDatabaseOnStartup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Profile Deleted に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_ProfileDeleted {
@@ -646,7 +709,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Profile saved. に類似しているローカライズされた文字列を検索します。
+        ///   Profile Saved. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_ProfileSaved {
             get {
@@ -655,7 +718,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Profile updated. に類似しているローカライズされた文字列を検索します。
+        ///   Profile Updated. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_ProfileUpdated {
             get {
@@ -664,11 +727,38 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Show Debug Widow に類似しているローカライズされた文字列を検索します。
+        ///   Unlock and Change Password に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string ShowDebugWidow {
+        public static string Settings_UnlockAndChangePassword {
             get {
-                return ResourceManager.GetString("ShowDebugWidow", resourceCulture);
+                return ResourceManager.GetString("Settings_UnlockAndChangePassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Move に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongItemContextMenu_Move {
+            get {
+                return ResourceManager.GetString("SongItemContextMenu_Move", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Down (CTRL+D) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongItemContextMenu_MoveDown {
+            get {
+                return ResourceManager.GetString("SongItemContextMenu_MoveDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Up (CTRL+U) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongItemContextMenu_MoveUp {
+            get {
+                return ResourceManager.GetString("SongItemContextMenu_MoveUp", resourceCulture);
             }
         }
         
@@ -700,7 +790,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Remove に類似しているローカライズされた文字列を検索します。
+        ///   Remove (CTRL+Delete) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string SongItemContextMenu_Remove {
             get {
@@ -759,15 +849,6 @@ namespace MPDCtrl.Properties {
         public static string Update {
             get {
                 return ResourceManager.GetString("Update", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Update MPD Music Database on Startup に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string UpdateDatabaseOnStartup {
-            get {
-                return ResourceManager.GetString("UpdateDatabaseOnStartup", resourceCulture);
             }
         }
         

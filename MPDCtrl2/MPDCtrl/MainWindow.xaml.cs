@@ -93,20 +93,6 @@ namespace MPDCtrl
             //SongListView.ScrollToCenterOfView(SongListView.SelectedItem);
         }
 
-        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
-        {
-            (sender as PasswordBox).Tag = "";
-        }
-
-        private void PasswordBoxNew_PasswordChanged(object sender, RoutedEventArgs e)
-        {
-            (sender as PasswordBox).Tag = "";
-        }
-
-        private void ProfilesListview_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            PasswordBox.Password = "";
-        }
 
         private void TextBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
@@ -119,6 +105,31 @@ namespace MPDCtrl
 
         private void DialogInputTextBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            if (DialogInputTextBox.Visibility == Visibility.Visible)
+            {
+                DialogInputTextBox.Focus();
+                Keyboard.Focus(DialogInputTextBox);
+            }
+        }
+
+        private void PasswordBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (sender != null)
+            {
+                if (sender is PasswordBox)
+                {
+                    var pb = (sender as PasswordBox);
+                    if (pb.Visibility == Visibility.Visible)
+                    {
+                        if (pb.Focusable)
+                        {
+                            Keyboard.Focus(pb);
+                            pb.Focus();
+                        }
+                    }
+                }
+            }
+
             if (DialogInputTextBox.Visibility == Visibility.Visible)
             {
                 DialogInputTextBox.Focus();

@@ -899,7 +899,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Viewbox Grid.Row="0" Grid.Column="0" Margin="0 0 6 36" Width="32" Height="32" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Viewbox Grid.Row="0" Grid.Column="0" Margin="0 0 6 36" Width="24" Height="24" VerticalAlignment="Center" HorizontalAlignment="Center">
                         <Canvas Width="24" Height="24">
                             <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding StatusButton, NotifyOnTargetUpdated=True}" >
                                 <Path.Triggers>

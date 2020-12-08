@@ -53,6 +53,7 @@ namespace MPDCtrl.ViewModels
 
     /// 更新履歴：
     /// 
+    /// v2.0.0.11: 細かい表示周りのバグ修正。 
     /// v2.0.0.10: パスワード周りオーバーホール。タイトルバーのNowPlayingを修正。
     /// v2.0.0.9: Queueの上下移動。KeyGestureを幾つか追加。
     /// v2.0.0.8: プレイリストの（新規作成）保存、削除、リネーム。ダイアログの作成。
@@ -163,7 +164,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.0.10";
+        const string _appVer = "v2.0.0.11";
 
         public string AppVer
         {
@@ -461,7 +462,8 @@ namespace MPDCtrl.ViewModels
         {
             get
             {
-                if (CurrentProfile != null)
+                if (Profiles.Count > 1)
+                //if (CurrentProfile != null)
                     return true;
                 else
                     return false;
@@ -1619,6 +1621,7 @@ namespace MPDCtrl.ViewModels
 
             IsFullyLoaded = true;
 
+            NotifyPropertyChanged("IsCurrentProfileSet");
             if (CurrentProfile == null)
             {
                 StatusMessage = MPDCtrl.Properties.Resources.Init_NewConnectionSetting;
@@ -1913,8 +1916,8 @@ namespace MPDCtrl.ViewModels
         {
             IsConnected = true;
 
-            //StatusButton = _pathConnectedButton;
-            //StatusMessage = "";
+            StatusMessage = "";
+            StatusButton = _pathConnectedButton;
         }
 
         // MPD changed nortifiation
@@ -2083,9 +2086,8 @@ namespace MPDCtrl.ViewModels
             IsConnected = false;
             IsConnectionSettingShow = true;
 
-            StatusButton = _pathErrorInfoButton;
-
             StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectionError + ": " + (data as string);
+            StatusButton = _pathErrorInfoButton;
         }
 
         private void OnConnectionStatusChanged(MPC sender, AsynchronousTCPClient.ConnectionStatus status)
@@ -2141,10 +2143,14 @@ namespace MPDCtrl.ViewModels
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.Error)
             {
-                //Handled at OnConnectionError
+                // TODO: OnConnectionErrorと被る。
 
+                IsConnected = false;
                 IsConnecting = false;
+                //IsConnectionSettingShow = true;
 
+                //StatusMessage = "Error..";
+                StatusButton = _pathErrorInfoButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.SendFail_NotConnected)
             {
@@ -2157,9 +2163,9 @@ namespace MPDCtrl.ViewModels
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.SendFail_Timeout)
             {
-                //IsConnected = false;
+                IsConnected = false;
                 IsConnecting = false;
-                //IsConnectionSettingShow = true;
+                IsConnectionSettingShow = true;
 
                 StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_SendFail_Timeout;
                 StatusButton = _pathErrorInfoButton;

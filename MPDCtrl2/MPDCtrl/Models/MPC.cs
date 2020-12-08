@@ -8,7 +8,7 @@
 /// 
 /// 
 /// TODO:
-///  MPD password test.
+///  Socket exception > log.
 ///
 /// Known issue:
 /// 
@@ -349,7 +349,7 @@ namespace MPDCtrl
         {
             try
             {
-                ConnectionResult isDone = await _asyncClient.Connect(IPAddress.Parse(_host), _port, _password);
+                ConnectionResult isDone = await _asyncClient.Connect(IPAddress.Parse(_host), _port);
 
                 if (!isDone.isSuccess)
                 {
@@ -2015,10 +2015,8 @@ namespace MPDCtrl
         private TcpClient _TCP;
         private IPAddress _ip = IPAddress.None;
         private int _p = 0;
-        private string _a = "";
         private ConnectionStatus _ConStat;
         private int _retryAttempt = 0;
-        private static ManualResetEvent sendDone = new ManualResetEvent(false);
         public delegate void delDataReceived(AsynchronousTCPClient sender, object data);
         public event delDataReceived DataReceived;
         public delegate void delConnectionStatusChanged(AsynchronousTCPClient sender, ConnectionStatus status);
@@ -2042,27 +2040,18 @@ namespace MPDCtrl
             }
         }
 
-        static AsynchronousTCPClient()
-        {
-
-        }
-
-        public async Task<ConnectionResult> Connect(IPAddress ip, int port, string auth)
+        public async Task<ConnectionResult> Connect(IPAddress ip, int port)
         {
             ConnectionState = ConnectionStatus.Connecting;
 
             _ip = ip;
             _p = port;
-            _a = auth;
             _retryAttempt = 0;
 
             _TCP = new TcpClient();
-            // This will crash on iPhone.
-            //_TCP.ReceiveTimeout = System.Threading.Timeout.Infinite;
-            _TCP.ReceiveTimeout = 0;
+            _TCP.ReceiveTimeout = System.Threading.Timeout.Infinite; // or 0
             _TCP.SendTimeout = 5000;
-            _TCP.Client.ReceiveTimeout = 0;
-            //_TCP.Client.ReceiveTimeout = System.Threading.Timeout.Infinite;
+            _TCP.Client.ReceiveTimeout = System.Threading.Timeout.Infinite;// 0;
             //_TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
             return await DoConnect(ip, port);
@@ -2091,12 +2080,10 @@ namespace MPDCtrl
             }
             catch { }
 
-            await Task.Delay(500);
-
             _TCP = new TcpClient();
-            _TCP.ReceiveTimeout = 0;//System.Threading.Timeout.Infinite;
+            _TCP.ReceiveTimeout = System.Threading.Timeout.Infinite;
             _TCP.SendTimeout = 5000;
-            _TCP.Client.ReceiveTimeout = 0;//System.Threading.Timeout.Infinite;
+            _TCP.Client.ReceiveTimeout = System.Threading.Timeout.Infinite;
             //_TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
             ConnectionResult r = await DoConnect(_ip, _p);
@@ -2195,8 +2182,6 @@ namespace MPDCtrl
 
                     ConnectionState = ConnectionStatus.DisconnectedByHost;
 
-                    ConnectionState = ConnectionStatus.AutoReconnecting;
-
                     if (!await ReConnect())
                     {
                         ConnectionState = ConnectionStatus.DisconnectedByHost;
@@ -2204,7 +2189,6 @@ namespace MPDCtrl
                         System.Diagnostics.Debug.WriteLine("**ReceiveCallback: bytesRead 0 - GIVING UP reconnect.");
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -2226,7 +2210,7 @@ namespace MPDCtrl
                 //System.IO.IOException
                 //Unable to transfer data on the transport connection: An established connection was aborted by the software in your host machine.
 
-                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@Read/WriteLineAsync: IOException - TRYING TO RECONNECT.");
+                System.Diagnostics.Debug.WriteLine("**Error@Send: IOException - TRYING TO RECONNECT.");
 
                 // Reconnect.
                 if (await ReConnect())
@@ -2235,7 +2219,7 @@ namespace MPDCtrl
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("**Error@SendCommand@Read/WriteLineAsync: IOException - GIVING UP reconnect.");
+                    System.Diagnostics.Debug.WriteLine("**Error@Send: IOException - GIVING UP reconnect.");
 
                 }
 
@@ -2244,7 +2228,7 @@ namespace MPDCtrl
             {
                 //System.Net.Sockets.SocketException
                 //An established connection was aborted by the software in your host machine
-                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@Read/WriteLineAsync: SocketException - TRYING TO RECONNECT.");
+                System.Diagnostics.Debug.WriteLine("**Error@Send: SocketException - TRYING TO RECONNECT.");
 
                 // Reconnect.
                 if (await ReConnect())
@@ -2253,18 +2237,15 @@ namespace MPDCtrl
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("**Error@SendCommand@Read/WriteLineAsync: SocketException - GIVING UP reconnect.");
+                    System.Diagnostics.Debug.WriteLine("**Error@Send: SocketException - GIVING UP reconnect.");
 
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("**Error@SendCommand@Read/WriteLineAsync: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("**Error@Send: " + ex.Message);
 
             }
-
-
-            sendDone.WaitOne();
         }
 
         private void DoSend(Socket client, String data)
@@ -2294,11 +2275,6 @@ namespace MPDCtrl
 
                 // Complete sending the data to the remote device.  
                 int bytesSent = client.EndSend(ar);
-                //System.Diagnostics.Debug.WriteLine("Sent {0} bytes to server.", bytesSent);
-
-                // Signal that all bytes have been sent.  
-                sendDone.Set();
-
             }
             catch (Exception ex)
             {

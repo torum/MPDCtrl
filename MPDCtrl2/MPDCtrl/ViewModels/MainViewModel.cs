@@ -53,7 +53,8 @@ namespace MPDCtrl.ViewModels
 
     /// 更新履歴：
     /// 
-    /// v2.0.0.11: 細かい表示周りのバグ修正。 
+    /// v2.0.0.12 > v2.0.0として公開。
+    /// v2.0.0.11,12: 細かい表示周りのバグ修正。 
     /// v2.0.0.10: パスワード周りオーバーホール。タイトルバーのNowPlayingを修正。
     /// v2.0.0.9: Queueの上下移動。KeyGestureを幾つか追加。
     /// v2.0.0.8: プレイリストの（新規作成）保存、削除、リネーム。ダイアログの作成。
@@ -164,7 +165,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.0.11";
+        const string _appVer = "v2.0.0.12";
 
         public string AppVer
         {

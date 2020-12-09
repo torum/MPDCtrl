@@ -127,6 +127,9 @@ namespace MPDCtrl
                     this.NotifyPropertyChanged("IsPlaying");
                 }
             }
+
+            // for sorting.
+            public int Index { get; set; }
         }
 
         public class Status
@@ -1703,7 +1706,6 @@ namespace MPDCtrl
             Id: 22637
             */
 
-            //_isBusy = true;
             try
             {
                 if (Application.Current == null) { return false; }
@@ -1714,6 +1716,8 @@ namespace MPDCtrl
 
                 Dictionary<string, string> SongValues = new Dictionary<string, string>();
 
+                int i = 0;
+
                 foreach (string value in sl)
                 {
                     if (value.StartsWith("ACK"))
@@ -1723,143 +1727,126 @@ namespace MPDCtrl
                         return false;
                     }
 
-                    try
+                    string[] StatusValuePair = value.Split(':');
+                    if (StatusValuePair.Length > 1)
                     {
-                        string[] StatusValuePair = value.Split(':');
-                        if (StatusValuePair.Length > 1)
+                        if (SongValues.ContainsKey(StatusValuePair[0].Trim()))
                         {
-                            if (SongValues.ContainsKey(StatusValuePair[0].Trim()))
+                            SongValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim();
+                        }
+                        else
+                        {
+                            SongValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
+                        }
+                    }
+
+                    if (SongValues.ContainsKey("Id"))
+                    {
+                        Song sng = new Song();
+                        sng.Id = SongValues["Id"];
+
+                        if (SongValues.ContainsKey("Title"))
+                        {
+                            sng.Title = SongValues["Title"];
+                        }
+                        else
+                        {
+                            sng.Title = "";
+                            if (SongValues.ContainsKey("file"))
                             {
-                                SongValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim();
-                            }
-                            else
-                            {
-                                SongValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
+                                sng.Title = Path.GetFileName(SongValues["file"]);
                             }
                         }
 
-                        if (SongValues.ContainsKey("Id"))
+                        if (SongValues.ContainsKey("Artist"))
                         {
-                            Song sng = new Song();
-                            sng.Id = SongValues["Id"];
-
-                            if (SongValues.ContainsKey("Title"))
-                            {
-                                sng.Title = SongValues["Title"];
-                            }
-                            else
-                            {
-                                sng.Title = "";
-                                if (SongValues.ContainsKey("file"))
-                                {
-                                    sng.Title = Path.GetFileName(SongValues["file"]);
-                                }
-                            }
-
-                            if (SongValues.ContainsKey("Artist"))
-                            {
-                                sng.Artist = SongValues["Artist"];
-                            }
-                            else
-                            {
-                                if (SongValues.ContainsKey("AlbumArtist"))
-                                {
-                                    // TODO: Should I?
-                                    sng.Artist = SongValues["AlbumArtist"];
-                                }
-                                else
-                                {
-                                    sng.Artist = "";
-                                }
-                            }
-
-                            if (SongValues.ContainsKey("Last-Modified"))
-                            {
-                                sng.LastModified = SongValues["Last-Modified"];
-                            }
+                            sng.Artist = SongValues["Artist"];
+                        }
+                        else
+                        {
                             if (SongValues.ContainsKey("AlbumArtist"))
                             {
-                                sng.AlbumArtist = SongValues["AlbumArtist"];
+                                // TODO: Should I?
+                                sng.Artist = SongValues["AlbumArtist"];
                             }
-                            if (SongValues.ContainsKey("Album"))
+                            else
                             {
-                                sng.Album = SongValues["Album"];
-                            }
-                            if (SongValues.ContainsKey("Track"))
-                            {
-                                sng.Track = SongValues["Track"];
-                            }
-                            if (SongValues.ContainsKey("Date"))
-                            {
-                                sng.Date = SongValues["Date"];
-                            }
-                            if (SongValues.ContainsKey("Genre"))
-                            {
-                                sng.Genre = SongValues["Genre"];
-                            }
-                            if (SongValues.ContainsKey("Composer"))
-                            {
-                                sng.Composer = SongValues["Composer"];
-                            }
-                            if (SongValues.ContainsKey("Time"))
-                            {
-                                sng.Time = SongValues["Time"];
-                            }
-                            if (SongValues.ContainsKey("duration"))
-                            {
-                                sng.duration = SongValues["duration"];
-                            }
-                            if (SongValues.ContainsKey("Pos"))
-                            {
-                                sng.Pos = SongValues["Pos"];
-                            }
-
-
-                            if (sng.Id == _status.MpdSongID)
-                            {
-                                _currentSong = sng;
-                                //System.Diagnostics.Debug.WriteLine(sng.ID + ":" + sng.Title + " - is current.");
-                            }
-
-                            SongValues.Clear();
-
-                            try
-                            {
-                                Application.Current.Dispatcher.Invoke(() =>
-                                {
-                                    CurrentQueue.Add(sng);
-                                });
-
-                                // This will significantly slows down the load but gives more ui responsiveness.
-                                //await Task.Delay(10);
-                            }
-                            catch (Exception ex)
-                            {
-                                //_isBusy = false;
-                                System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse _songs.Add: " + ex.Message);
-                                return false;
+                                sng.Artist = "";
                             }
                         }
 
-                    }
-                    catch (Exception ex)
-                    {
-                        //_isBusy = false;
-                        System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse: " + ex.Message);
-                        return false;
+                        if (SongValues.ContainsKey("Last-Modified"))
+                        {
+                            sng.LastModified = SongValues["Last-Modified"];
+                        }
+                        if (SongValues.ContainsKey("AlbumArtist"))
+                        {
+                            sng.AlbumArtist = SongValues["AlbumArtist"];
+                        }
+                        if (SongValues.ContainsKey("Album"))
+                        {
+                            sng.Album = SongValues["Album"];
+                        }
+                        if (SongValues.ContainsKey("Track"))
+                        {
+                            sng.Track = SongValues["Track"];
+                        }
+                        if (SongValues.ContainsKey("Date"))
+                        {
+                            sng.Date = SongValues["Date"];
+                        }
+                        if (SongValues.ContainsKey("Genre"))
+                        {
+                            sng.Genre = SongValues["Genre"];
+                        }
+                        if (SongValues.ContainsKey("Composer"))
+                        {
+                            sng.Composer = SongValues["Composer"];
+                        }
+                        if (SongValues.ContainsKey("Time"))
+                        {
+                            sng.Time = SongValues["Time"];
+                        }
+                        if (SongValues.ContainsKey("duration"))
+                        {
+                            sng.duration = SongValues["duration"];
+                        }
+                        if (SongValues.ContainsKey("Pos"))
+                        {
+                            sng.Pos = SongValues["Pos"];
+                        }
+
+                        //
+                        if (sng.Id == _status.MpdSongID)
+                        {
+                            _currentSong = sng;
+                        }
+
+                        // for sorting.
+                        sng.Index = i;
+                        i++;
+
+                        //
+                        SongValues.Clear();
+
+                        //
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            CurrentQueue.Add(sng);
+                        });
+
+                        // This will significantly slows down the load but gives more ui responsiveness.
+                        //await Task.Delay(10);
                     }
                 }
-                
-                //_isBusy = false;
-                
-                return true;
             }
             catch (Exception ex)
             {
-                //_isBusy = false;
                 System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse: " + ex.Message);
                 return false;
             }
+
+            return true;
         }
 
         private bool ParsePlaylists(List<string> sl)

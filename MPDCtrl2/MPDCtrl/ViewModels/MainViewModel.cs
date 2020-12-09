@@ -21,27 +21,23 @@ using System.Net;
 using System.Text.RegularExpressions;
 using MPDCtrl.Common;
 using MPDCtrl.Views;
+using System.Globalization;
 
 namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// v2.0.0
-    /// 
     /// v2.0.1
-    /// Ctrl+Fで検索。
+    /// Current Queue: ScrollIntoView to NowPlaying (not selected item).「現在の曲へ」のコンテキストメニューを追加。
     /// Current Queue: 表示項目（タグ）の追加
-    /// Current Queue: キュー一覧の更新で、差分を取って追加削除する。でないと選択項目が一々クリアされてしまう。
     /// Current Queue: カラムヘッダーのソートや項目の表示・非表示・サイズ指定などを項目毎に選択・保存できるように。
-    /// Current Queue: ScrollIntoView to NowPlaying (not selected item).
     /// Local Files: "Save Selected to:" context menu.
-    /// Settings: profileの保存を見直し（新規と削除はプルダウンの横にアイコン、更新保存ボタンは不要）
-    /// TitleBar: "SongTitle, by Artist from Album".
     /// 
     /// 
     /// v2.0.2
-    /// アルバムカバー対応。Last.fm?
+    /// Ctrl+Fで検索。ダイアログでListviewにして、選択してQueueに追加できるように。
     /// Local Files の TreeViewまたは階層化
+    /// アルバムカバー対応。Last.fm?
     /// 
     /// v2.0.3
     /// テーマの切り替え
@@ -52,8 +48,8 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
-    /// 
-    /// v2.0.0.12 > v2.0.0として公開。
+    /// v2.0.0.13 Current Queue: キュー一覧の更新で、差分を取って追加削除するようにした。でないと選択項目が一々クリアされてしまう。
+    /// v2.0.0としてstore公開。
     /// v2.0.0.11,12: 細かい表示周りのバグ修正。 
     /// v2.0.0.10: パスワード周りオーバーホール。タイトルバーのNowPlayingを修正。
     /// v2.0.0.9: Queueの上下移動。KeyGestureを幾つか追加。
@@ -71,6 +67,8 @@ namespace MPDCtrl.ViewModels
     /// Ctrl+U SongListview Queue Move Up
     /// Ctrl+D SongListview Queue Move Down
     /// Ctrl+Delete SongListview Remove from Queue
+    /// Space Play
+    /// Esc close dialogs.
 
 
     public class Profile : ViewModelBase
@@ -165,7 +163,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.0.12";
+        const string _appVer = "v2.0.0.13";
 
         public string AppVer
         {
@@ -561,18 +559,28 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private ObservableCollection<MPC.Song> _queue = new ObservableCollection<MPC.Song>();
         public ObservableCollection<MPC.Song> Queue
         {
             get
             {
                 if (_MPC != null)
                 {
-                    return _MPC.CurrentQueue;
+                    return _queue;
+                    //return _MPC.CurrentQueue;
                 }
                 else
                 {
                     return null;
                 }
+            }
+            set
+            {
+                if (_queue == value)
+                    return;
+
+                _queue = value;
+                NotifyPropertyChanged("Queue");
             }
         }
 
@@ -1965,7 +1973,6 @@ namespace MPDCtrl.ViewModels
 
             if ((data as string) == "isPlayer")
             {
-
                 // Clear IsPlaying icon
                 if (CurrentSong != null)
                 {
@@ -1977,7 +1984,7 @@ namespace MPDCtrl.ViewModels
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     // Sets Current Song
-                    var item = _MPC.CurrentQueue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
+                    var item = Queue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
                     if (item != null)
                     {
                         //SelectedSong = (item as MPC.Song);
@@ -1995,23 +2002,74 @@ namespace MPDCtrl.ViewModels
             }
             else if ((data as string) == "isCurrentQueue")
             {
+                // 削除する曲の一時リスト
+                List<MPC.Song> _tmpQueue = new List<MPC.Song>();
+
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    var item = _MPC.CurrentQueue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
-                    if (item != null)
+                    // 既存のリストの中で新しいリストにないものを削除
+                    foreach (var sng in Queue)
                     {
-                        //sender.MpdCurrentSong = (item as MPC.Song); // just in case.
+                        var queitem = _MPC.CurrentQueue.FirstOrDefault(i => i.Id == sng.Id);
+                        if (queitem == null)
+                        {
+                            // 削除リストに追加
+                            _tmpQueue.Add(sng);
+                        }
+                    }
 
-                        //SelectedSong = (item as MPC.Song);
-                        CurrentSong = (item as MPC.Song);
+                    // 削除リストをループ
+                    foreach (var hoge in _tmpQueue)
+                    {
+                        Queue.Remove(hoge);
+                    }
 
-                        (item as MPC.Song).IsPlaying = true;
+                    // 新しいリストの中から既存のリストにないものを追加
+                    foreach (var sng in _MPC.CurrentQueue)
+                    {
+                        var fuga = Queue.FirstOrDefault(i => i.Id == sng.Id);
+                        if (fuga != null)
+                        {
+                            // TODO:
+                            fuga.Pos = sng.Pos;
+                            fuga.Index = sng.Index;
+                            //fuga.Id = sng.Id;
+                            fuga.LastModified = sng.LastModified;
+                            fuga.Time = sng.Time;
+                            fuga.Title = sng.Title;
+                            fuga.Artist = sng.Artist;
+                            fuga.Album = sng.Album;
+                            fuga.AlbumArtist = sng.AlbumArtist;
+                            fuga.Composer = sng.Composer;
+                            fuga.Date = sng.Date;
+                            fuga.duration = sng.duration;
+                            fuga.file = sng.file;
+                            fuga.Genre = sng.Genre;
+                            fuga.Track = sng.Track;
+
+                            //fuga = sng;
+                        }
+                        else
+                        {
+                            Queue.Add(sng);
+                        }
+                    }
+
+                    // Set Current and NowPlaying.
+                    var curitem = Queue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
+                    if (curitem != null)
+                    {
+                        CurrentSong = (curitem as MPC.Song);
+                        (curitem as MPC.Song).IsPlaying = true;
                     }
                     else
                     {
-                        //SelectedSong = null;
                         CurrentSong = null;
                     }
+
+                    // 移動したりするとPosが変更されても順番が反映されないので、
+                    var collectionView = CollectionViewSource.GetDefaultView(Queue);
+                    collectionView.SortDescriptions.Add(new SortDescription("Index", ListSortDirection.Ascending));
                 });
 
             }
@@ -2380,7 +2438,7 @@ namespace MPDCtrl.ViewModels
         public bool PlayNextCommand_CanExecute()
         {
             if (_MPC == null) { return false; }
-            //if (_MPC.CurrentQueue.Count < 1) { return false; }
+            //if (Queue.Count < 1) { return false; }
             return true;
         }
         public void PlayNextCommand_ExecuteAsync()
@@ -2392,7 +2450,7 @@ namespace MPDCtrl.ViewModels
         public bool PlayPrevCommand_CanExecute()
         {
             if (_MPC == null) { return false; }
-            //if (_MPC.CurrentQueue.Count < 1) { return false; }
+            //if (Queue.Count < 1) { return false; }
             return true;
         }
         public void PlayPrevCommand_ExecuteAsync()
@@ -2404,7 +2462,7 @@ namespace MPDCtrl.ViewModels
         public bool ChangeSongCommand_CanExecute()
         {
             if (_MPC == null) { return false; }
-            if (_MPC.CurrentQueue.Count < 1) { return false; }
+            if (Queue.Count < 1) { return false; }
             if (_selectedSong == null) { return false; }
             return true;
         }
@@ -2759,7 +2817,7 @@ namespace MPDCtrl.ViewModels
         public bool SongListviewSaveCommand_CanExecute()
         {
             if (_MPC == null) return false;
-            if (_MPC.CurrentQueue.Count == 0) return false;
+            if (Queue.Count == 0) return false;
             return true;
         }
         public void SongListviewSaveCommand_ExecuteAsync()
@@ -2794,7 +2852,7 @@ namespace MPDCtrl.ViewModels
         public bool SongListViewEnterKeyCommand_CanExecute()
         {
             if (_MPC == null) { return false; }
-            if (_MPC.CurrentQueue.Count < 1) { return false; }
+            if (Queue.Count < 1) { return false; }
             if (_selectedSong == null) { return false; }
             return true;
         }
@@ -2807,7 +2865,7 @@ namespace MPDCtrl.ViewModels
         public bool SongListViewLeftDoubleClickCommand_CanExecute()
         {
             if (_MPC == null) { return false; }
-            if (_MPC.CurrentQueue.Count < 1) { return false; }
+            if (Queue.Count < 1) { return false; }
             if (_selectedSong == null) { return false; }
             return true;
         }
@@ -2930,7 +2988,7 @@ namespace MPDCtrl.ViewModels
                     return;
                 }
             }
-
+            
             _MPC.MpdMoveId(IdToNewPos);
         }
 

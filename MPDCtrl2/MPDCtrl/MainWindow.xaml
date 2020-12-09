@@ -571,7 +571,7 @@
                         
                         <Grid x:Name="AT2Dummy" Grid.Row="0" Grid.Column="2" Visibility="Hidden" Margin="0 0 20 0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="0" />
+                                <ColumnDefinition Width="30" />
                                 <ColumnDefinition Width="32" />
                                 <ColumnDefinition Width="3*" MinWidth="100"/>
                                 <ColumnDefinition Width="1*"/>

@@ -87,7 +87,7 @@ namespace MPDCtrl
         private void SongListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            //SongListView.ScrollIntoView(SongListView.SelectedItem);
+            SongListView.ScrollIntoView(SongListView.SelectedItem);
 
             // Listview flickering...
             //SongListView.ScrollToCenterOfView(SongListView.SelectedItem);

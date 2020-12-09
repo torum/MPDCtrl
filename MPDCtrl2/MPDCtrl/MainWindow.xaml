@@ -12,7 +12,7 @@
         StateChanged="Window_StateChanged"
         DataContext="{StaticResource MainViewModel}"
         Title="{Binding AppTitle}"
-        Height="480" Width="800"
+        Width="780" Height="480"
         MinWidth="780" MinHeight="250">
     <Window.Resources>
     </Window.Resources>
@@ -568,27 +568,6 @@
 
                     <!-- Current Queue -->
                     <Grid Grid.Row="0" Grid.Column="2">
-                        
-                        <Grid x:Name="AT2Dummy" Grid.Row="0" Grid.Column="2" Visibility="Hidden" Margin="0 0 20 0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="30" />
-                                <ColumnDefinition Width="32" />
-                                <ColumnDefinition Width="3*" MinWidth="100"/>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="1*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <!--  This is the hidden helper Field which is used to bind to, using the "Fill" column of the helper grid  -->
-                            <Grid x:Name="AT2Width0" Grid.Column="0" />
-                            <Grid x:Name="AT2Width1" Grid.Column="1" />
-                            <Grid x:Name="AT2Width2" Grid.Column="2" />
-                            <Grid x:Name="AT2Width3" Grid.Column="3" />
-                            <Grid x:Name="AT2Width4" Grid.Column="4" />
-                            <Grid x:Name="AT2Width5" Grid.Column="5" />
-                            <Grid x:Name="AT2Width6" Grid.Column="6" />
-                        </Grid>
 
                         <ListView x:Name="SongListView" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedSong, Mode=TwoWay}" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" SelectionChanged="SongListView_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListView.InputBindings>
@@ -596,16 +575,34 @@
                                 <KeyBinding Gesture="Ctrl+U" Command="{Binding Path=DataContext.SongListviewMoveUpCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                                 <KeyBinding Gesture="Ctrl+D" Command="{Binding Path=DataContext.SongListviewMoveDownCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                                 <KeyBinding Gesture="Ctrl+Delete" Command="{Binding Path=DataContext.SongListviewDeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
-
                             </ListView.InputBindings>
-                            <ListView.Resources>
-                                <!--
-                                <ContextMenu x:Key="SongListViewHeaderContextMenu">
-                                    <MenuItem Header="test">
- 
+                            <ListView.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Add new song">
+
                                     </MenuItem>
                                 </ContextMenu>
-                                -->
+                            </ListView.ContextMenu>
+                            <ListView.Resources>
+                                <ContextMenu x:Key="SongListViewHeaderContextMenu">
+                                    <MenuItem Header="Position" IsChecked="{Binding Path=DataContext.QueueColumnHeaderPositionVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderPositionShowHideCommand}">
+                                    </MenuItem>
+                                    <MenuItem Header="Now Playing" IsChecked="{Binding Path=DataContext.QueueColumnHeaderNowPlayingVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderNowPlayingShowHideCommand}">
+                                    </MenuItem>
+                                    <MenuItem Header="Title" IsChecked="True" IsEnabled="False">
+                                    </MenuItem>
+                                    <MenuItem Header="Time" IsChecked="{Binding Path=DataContext.QueueColumnHeaderTimeVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderTimeShowHideCommand}">
+                                    </MenuItem>
+                                    <MenuItem Header="Artist" IsChecked="{Binding Path=DataContext.QueueColumnHeaderArtistVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderArtistShowHideCommand}">
+                                    </MenuItem>
+                                    <MenuItem Header="Album" IsChecked="{Binding Path=DataContext.QueueColumnHeaderAlbumVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderAlbumShowHideCommand}">
+                                    </MenuItem>
+                                    <MenuItem Header="Genre" IsChecked="{Binding Path=DataContext.QueueColumnHeaderGenreVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderGenreShowHideCommand}">
+                                    </MenuItem>
+                                    <MenuItem Header="Last Modified" IsChecked="{Binding Path=DataContext.QueueColumnHeaderLastModifiedVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderLastModifiedShowHideCommand}">
+
+                                    </MenuItem>
+                                </ContextMenu>
                                 <ContextMenu x:Key="SongItemContextMenu">
                                     <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_Remove}" Command="{Binding Path=DataContext.SongListviewDeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                         <MenuItem.Resources>
@@ -713,28 +710,29 @@
                                     <GridView.ColumnHeaderContainerStyle>
                                         <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource GridViewColumnHeaderStyle}">
                                             <Setter Property="Visibility" Value="Visible" />
-                                            <!--
                                             <Setter Property="ContextMenu" Value="{StaticResource SongListViewHeaderContextMenu}" />
-                                            -->
                                         </Style>
                                     </GridView.ColumnHeaderContainerStyle>
-                                    <GridViewColumn Header="Pos" Width="{Binding ElementName=AT2Width0, Path=ActualWidth}">
+
+                                    <GridViewColumn Width="53">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Position}" Tag="53" MinWidth="32" Visibility="{Binding QueueColumnHeaderPositionVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <StackPanel HorizontalAlignment="Left">
+                                                <StackPanel>
                                                     <TextBlock Text="{Binding Path=Pos}" Padding="3" />
                                                 </StackPanel>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Width="{Binding ElementName=AT2Width1, Path=ActualWidth}">
-                                        <GridViewColumn.Header>
+
+                                    <GridViewColumn Width="32">
+                                        <GridViewColumnHeader Tag="32" MinWidth="32" Visibility="{Binding QueueColumnHeaderNowPlayingVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True">
                                             <Viewbox Width="16" Height="16" Margin="-2 0 0 -2">
                                                 <Canvas Width="24" Height="24">
                                                     <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="M8.5,8.64L13.77,12L8.5,15.36V8.64M6.5,5V19L17.5,12"/>
                                                 </Canvas>
                                             </Viewbox>
-                                        </GridViewColumn.Header>
+                                        </GridViewColumnHeader>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <Viewbox Width="16" Height="16">
@@ -750,10 +748,12 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="{x:Static properties:Resources.SongListViewColumnHeader_Song}" Width="{Binding ElementName=AT2Width2, Path=ActualWidth}">
+
+                                    <GridViewColumn Width="180">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Song}" Tag="180" MinWidth="120" />
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <StackPanel HorizontalAlignment="Left">
+                                                <StackPanel>
                                                     <TextBlock x:Name="SongTitleListItemTextBlock" Text="{Binding Path=Title}" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
@@ -768,11 +768,13 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="{x:Static properties:Resources.SongListViewColumnHeader_Time}" Width="{Binding ElementName=AT2Width3, Path=ActualWidth}">
+                                    
+                                    <GridViewColumn Width="62">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Time}" Tag="62" MinWidth="62" Visibility="{Binding QueueColumnHeaderTimeVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <StackPanel HorizontalAlignment="Left">
-                                                    <TextBlock x:Name="TimeListItemTextBlock" Text="{Binding Path=Time}" Padding="3" />
+                                                <StackPanel>
+                                                    <TextBlock x:Name="TimeListItemTextBlock" Text="{Binding Path=TimeFormated}" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
@@ -786,10 +788,12 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="{x:Static properties:Resources.SongListViewColumnHeader_Artist}" Width="{Binding ElementName=AT2Width4, Path=ActualWidth}">
+
+                                    <GridViewColumn Width="120">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Artist}" Tag="120" MinWidth="62" Visibility="{Binding QueueColumnHeaderArtistVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <StackPanel HorizontalAlignment="Left">
+                                                <StackPanel>
                                                     <TextBlock x:Name="ArtistListItemTextBlock" Text="{Binding Path=Artist}" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
@@ -804,10 +808,12 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="{x:Static properties:Resources.SongListViewColumnHeader_Album}" Width="{Binding ElementName=AT2Width5, Path=ActualWidth}">
+
+                                    <GridViewColumn Width="120">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Album}" Tag="120" MinWidth="62" Visibility="{Binding QueueColumnHeaderAlbumVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <StackPanel HorizontalAlignment="Left">
+                                                <StackPanel>
                                                     <TextBlock x:Name="AlbumListItemTextBlock" Text="{Binding Path=Album}" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
@@ -822,10 +828,12 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="{x:Static properties:Resources.SongListViewColumnHeader_Genre}" Width="{Binding ElementName=AT2Width6, Path=ActualWidth}">
+
+                                    <GridViewColumn Width="100">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Genre}" Tag="100" MinWidth="62" Visibility="{Binding QueueColumnHeaderGenreVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <StackPanel HorizontalAlignment="Left">
+                                                <StackPanel>
                                                     <TextBlock x:Name="GenreListItemTextBlock" Text="{Binding Path=Genre}" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
@@ -835,6 +843,26 @@
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
                                                         <Setter TargetName="GenreListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Width="180">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_LastModified}" Tag="180" MinWidth="62" Visibility="{Binding QueueColumnHeaderLastModifiedVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock x:Name="LastModifiedListItemTextBlock" Text="{Binding Path=LastModifiedFormated}" Padding="3" />
+                                                </StackPanel>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                                        <Setter TargetName="LastModifiedListItemTextBlock" Property="TextBlock.Foreground" Value="White" />
+                                                        <Setter TargetName="LastModifiedListItemTextBlock" Property="TextBlock.FontWeight" Value="ExtraBold" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="LastModifiedListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>

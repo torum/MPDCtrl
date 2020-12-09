@@ -9,7 +9,9 @@ using System.Windows.Input;
 
 namespace MPDCtrl.Common
 {
-
+    /// <summary>
+    /// GenericRelayCommand
+    /// </summary>
     public class GenericRelayCommand<T> : ICommand
     {
         private readonly Action<T> execute;
@@ -58,6 +60,9 @@ namespace MPDCtrl.Common
         }
     }
 
+    /// <summary>
+    /// RelayCommandWithParam
+    /// </summary>
     public class RelayCommandWithParam<T> : ICommand
     {
         #region Fields
@@ -130,6 +135,9 @@ namespace MPDCtrl.Common
         #endregion
     }
 
+    /// <summary>
+    /// RelayCommand
+    /// </summary>
     public class RelayCommand : ICommand
     {
         private Action methodToExecute;

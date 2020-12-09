@@ -53,29 +53,23 @@ namespace MPDCtrl
             public string file { get; set; }
             public string Title { get; set; }
             public string Track { get; set; }
+            public string Disc { get; set; }
 
-            private string _timeFormatted;
-            private string _time;
-            public string Time {
+            public string TimeFormated
+            {
                 get
                 {
-                    return _timeFormatted;
-                }
-                set
-                {
-                    if (_time == value)
-                        return;
-
-                    _time = value;
-
+                    string _timeFormatted = "";
                     try
                     {
-                        if (!string.IsNullOrEmpty(value))
+                        if (!string.IsNullOrEmpty(_time))
                         {
-
                             int sec, min, hour, s;
-                            sec = Int32.Parse(value);
 
+                            double dtime = double.Parse(_time);
+                            sec = Convert.ToInt32(dtime);
+
+                            //sec = Int32.Parse(_time);
                             min = sec / 60;
                             s = sec % 60;
                             hour = min / 60;
@@ -84,7 +78,6 @@ namespace MPDCtrl
                             if ((hour == 0) && min == 0)
                             {
                                 _timeFormatted = String.Format("{0}", s);
-
                             }
                             else if ((hour == 0) && (min != 0))
                             {
@@ -98,8 +91,27 @@ namespace MPDCtrl
                     }
                     catch (FormatException e)
                     {
-                        System.Diagnostics.Debug.WriteLine(e.Message);
+                        // Ignore.
+                        // System.Diagnostics.Debug.WriteLine(e.Message);
+                        System.Diagnostics.Debug.WriteLine("Wrong Time format. " + _time + " "+ e.Message) ;
                     }
+
+                    return _timeFormatted;
+                }
+            
+            }
+            private string _time;
+            public string Time {
+                get
+                {
+                    return _time;
+                }
+                set
+                {
+                    if (_time == value)
+                        return;
+
+                    _time = value;
                 }
             }
             public string duration { get; set; }
@@ -109,7 +121,45 @@ namespace MPDCtrl
             public string Composer { get; set; }
             public string Date { get; set; }
             public string Genre { get; set; }
-            public string LastModified { get; set; }
+
+            private string _lastModified;
+            public string LastModified
+            {
+                get
+                {
+                    return _lastModified;
+                }
+                set
+                {
+                    if (_lastModified == value)
+                        return;
+
+                    _lastModified = value;
+                }
+            }
+
+            public string LastModifiedFormated
+            {
+                get
+                {
+                    DateTime _lastModifiedDateTime = default(DateTime); //new DateTime(1998,04,30)
+
+                    if (!string.IsNullOrEmpty(_lastModified))
+                    {
+                        try
+                        {
+                            _lastModifiedDateTime = DateTime.Parse(_lastModified, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                        }
+                        catch
+                        {
+                            System.Diagnostics.Debug.WriteLine("Wrong LastModified timestamp format. " + _lastModified);
+                        }
+                    }
+
+                    var culture = System.Globalization.CultureInfo.CurrentCulture;
+                    return _lastModifiedDateTime.ToString(culture);
+                }
+            }
 
             private bool _isPlaying;
             public bool IsPlaying
@@ -656,6 +706,7 @@ namespace MPDCtrl
             {
                 System.Diagnostics.Debug.WriteLine("Error@MpdAdd: " + ex.Message);
             }
+
         }
 
         public void MpdDeleteId(List<string> ids)
@@ -1621,7 +1672,7 @@ namespace MPDCtrl
                     }
                 }
 
-                // Song time.
+                // Song time. deprecated. 
                 if (MpdStatusValues.ContainsKey("time"))
                 {
                     try
@@ -1720,23 +1771,27 @@ namespace MPDCtrl
 
                 foreach (string value in sl)
                 {
+                    /*
                     if (value.StartsWith("ACK"))
                     {
                         System.Diagnostics.Debug.WriteLine("ACK@ParsePlaylistInfoResponse: " + value);
                         ErrorReturned?.Invoke(this, MpdErrorTypes.CommandError, value);
                         return false;
                     }
+                    */
 
                     string[] StatusValuePair = value.Split(':');
                     if (StatusValuePair.Length > 1)
                     {
                         if (SongValues.ContainsKey(StatusValuePair[0].Trim()))
                         {
-                            SongValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim();
+                            //SongValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim();
+                            SongValues[StatusValuePair[0].Trim()] = value.Replace(StatusValuePair[0].Trim() + ": ", ""); 
                         }
                         else
                         {
-                            SongValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
+                            //SongValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
+                            SongValues.Add(StatusValuePair[0].Trim(), value.Replace(StatusValuePair[0].Trim() + ": ", ""));
                         }
                     }
 
@@ -1791,6 +1846,10 @@ namespace MPDCtrl
                         {
                             sng.Track = SongValues["Track"];
                         }
+                        if (SongValues.ContainsKey("Disc"))
+                        {
+                            sng.Disc = SongValues["Disc"];
+                        }
                         if (SongValues.ContainsKey("Date"))
                         {
                             sng.Date = SongValues["Date"];
@@ -1809,6 +1868,7 @@ namespace MPDCtrl
                         }
                         if (SongValues.ContainsKey("duration"))
                         {
+                            sng.Time = SongValues["duration"];
                             sng.duration = SongValues["duration"];
                         }
                         if (SongValues.ContainsKey("Pos"))

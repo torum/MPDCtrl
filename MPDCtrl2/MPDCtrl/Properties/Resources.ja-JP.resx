@@ -390,6 +390,12 @@ SOFTWARE.</value>
   <data name="SongListViewColumnHeader_Genre" xml:space="preserve">
     <value>ジャンル</value>
   </data>
+  <data name="SongListViewColumnHeader_LastModified" xml:space="preserve">
+    <value>最終更新</value>
+  </data>
+  <data name="SongListViewColumnHeader_Position" xml:space="preserve">
+    <value>曲順</value>
+  </data>
   <data name="SongListViewColumnHeader_Song" xml:space="preserve">
     <value>曲名</value>
   </data>

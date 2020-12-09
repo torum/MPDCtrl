@@ -826,7 +826,25 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Song に類似しているローカライズされた文字列を検索します。
+        ///   Last Modified に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongListViewColumnHeader_LastModified {
+            get {
+                return ResourceManager.GetString("SongListViewColumnHeader_LastModified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Position に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongListViewColumnHeader_Position {
+            get {
+                return ResourceManager.GetString("SongListViewColumnHeader_Position", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Title に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string SongListViewColumnHeader_Song {
             get {

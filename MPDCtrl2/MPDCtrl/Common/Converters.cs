@@ -13,7 +13,9 @@ using System.Globalization;
 
 namespace MPDCtrl.Common
 {
-
+    /// <summary>
+    /// 
+    /// </summary>
     public class MultipleCommandParameterConverter : IMultiValueConverter 
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -59,6 +61,10 @@ namespace MPDCtrl.Common
         #endregion
     }
     */
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class EnumToBoolConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
@@ -96,7 +102,9 @@ namespace MPDCtrl.Common
     }
     */
 
-    // BooleanToVisibilityConverterの、 Collapsed 版
+    /// <summary>
+    /// BooleanToVisibilityConverterの、 Collapsed 版
+    /// </summary>
     [ValueConversion(typeof(bool), typeof(Visibility))]
     public class BoolToVisibilityCollapsedConverter : IValueConverter
     {
@@ -129,6 +137,9 @@ namespace MPDCtrl.Common
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class BooleanToVisibilityConverter : IValueConverter
     {
         public Visibility TrueValue { get; set; }

@@ -387,8 +387,14 @@ SOFTWARE.</value>
   <data name="SongListViewColumnHeader_Genre" xml:space="preserve">
     <value>Genre</value>
   </data>
+  <data name="SongListViewColumnHeader_LastModified" xml:space="preserve">
+    <value>Last Modified</value>
+  </data>
+  <data name="SongListViewColumnHeader_Position" xml:space="preserve">
+    <value>Position</value>
+  </data>
   <data name="SongListViewColumnHeader_Song" xml:space="preserve">
-    <value>Song</value>
+    <value>Title</value>
   </data>
   <data name="SongListViewColumnHeader_Time" xml:space="preserve">
     <value>Time</value>

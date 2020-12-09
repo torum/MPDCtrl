@@ -28,27 +28,33 @@ namespace MPDCtrl.ViewModels
     /// TODO: 
     /// 
     /// v2.0.1
-    /// Current Queue: ScrollIntoView to NowPlaying (not selected item).「現在の曲へ」のコンテキストメニューを追加。
-    /// Current Queue: 表示項目（タグ）の追加
-    /// Current Queue: カラムヘッダーのソートや項目の表示・非表示・サイズ指定などを項目毎に選択・保存できるように。
-    /// Local Files: "Save Selected to:" context menu.
     /// 
+    /// Queue: カラムヘッダーの項目の表示・非表示とサイズを覚える
     /// 
     /// v2.0.2
-    /// Ctrl+Fで検索。ダイアログでListviewにして、選択してQueueに追加できるように。
-    /// Local Files の TreeViewまたは階層化
-    /// アルバムカバー対応。Last.fm?
+    /// 
+    /// Ctrl+Fで検索。「追加」のコンテキストメニューを追加。ダイアログで2pain Treeview + Listviewにして、検索＆選択してQueueに追加できるように。
+    /// Queue: ScrollIntoView to NowPlaying (not selected item).「現在の曲へ」のコンテキストメニューを追加。
+    /// 
+    /// Queue: カラムヘッダークリックでソート
     /// 
     /// v2.0.3
-    /// テーマの切り替え
+    /// アルバムカバー対応。Last.fm?
     /// 
-    /// [enhancement]
+    /// v2.0.4 
+    /// Local Files の TreeViewまたは階層化
+    /// Local Files: "Save Selected to" context menu.
+    /// Local Files: "再読み込み" context menu.
+    /// 
+    /// [未定]
     /// スライダーの上でスクロールして音量変更。
+    /// テーマの切り替え
     /// 
 
 
     /// 更新履歴：
-    /// v2.0.0.13 Current Queue: キュー一覧の更新で、差分を取って追加削除するようにした。でないと選択項目が一々クリアされてしまう。
+    /// v2.0.0.14 Queue(playlistinfo)のパース方法を修正。ヘッダーカラムの項目(LastModified)を追加し、表示・非表示できるようにした。
+    /// v2.0.0.13 Queue: キュー一覧の更新で、差分を取って追加削除するようにした。でないと選択項目が一々クリアされてしまう。
     /// v2.0.0としてstore公開。
     /// v2.0.0.11,12: 細かい表示周りのバグ修正。 
     /// v2.0.0.10: パスワード周りオーバーホール。タイトルバーのNowPlayingを修正。
@@ -58,7 +64,7 @@ namespace MPDCtrl.ViewModels
     /// v2.0.0.6: 設定画面とりあえず完成。i19nとりあえず完了。
     /// v2.0.0.5: DebugWindowがオンの時だけテキストを追加するようにした（consumeで激重になる）。
     /// v2.0.0.4: Consumeオプションを追加。
-    /// v2.0.0.3: Current Queueの項目を増やしたり、IsPlayingとか。
+    /// v2.0.0.3: Queueの項目を増やしたり、IsPlayingとか。
     /// v2.0.0.2: DebugWindowの追加とかProfile関係とか色々。
     /// 
 
@@ -163,7 +169,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.0.13";
+        const string _appVer = "v2.0.0.14";
 
         public string AppVer
         {
@@ -1288,6 +1294,137 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
+        #region == Queueカラムヘッダー ==
+
+        private bool _queueColumnHeaderPositionVisibility = false;
+        public bool QueueColumnHeaderPositionVisibility
+        {
+            get
+            {
+                return _queueColumnHeaderPositionVisibility;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderPositionVisibility)
+                    return;
+
+                _queueColumnHeaderPositionVisibility = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderPositionVisibility");
+            }
+        }
+
+        private bool _queueColumnHeaderNowPlayingVisibility = true;
+        public bool QueueColumnHeaderNowPlayingVisibility
+        {
+            get
+            {
+                return _queueColumnHeaderNowPlayingVisibility;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderNowPlayingVisibility)
+                    return;
+
+                _queueColumnHeaderNowPlayingVisibility = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderNowPlayingVisibility");
+            }
+        }
+
+        private bool _queueColumnHeaderTimeVisibility = true;
+        public bool QueueColumnHeaderTimeVisibility
+        {
+            get
+            {
+                return _queueColumnHeaderTimeVisibility;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderTimeVisibility)
+                    return;
+
+                _queueColumnHeaderTimeVisibility = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderTimeVisibility");
+            }
+        }
+
+        private bool _queueColumnHeaderArtistVisibility = true;
+        public bool QueueColumnHeaderArtistVisibility
+        {
+            get
+            {
+                return _queueColumnHeaderArtistVisibility;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderArtistVisibility)
+                    return;
+
+                _queueColumnHeaderArtistVisibility = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderArtistVisibility");
+            }
+        }
+        
+        private bool _queueColumnHeaderAlbumVisibility = true;
+        public bool QueueColumnHeaderAlbumVisibility
+        {
+            get
+            {
+                return _queueColumnHeaderAlbumVisibility;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderAlbumVisibility)
+                    return;
+
+                _queueColumnHeaderAlbumVisibility = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderAlbumVisibility");
+            }
+        }
+
+        private bool _queueColumnHeaderGenreVisibility = false;
+        public bool QueueColumnHeaderGenreVisibility
+        {
+            get
+            {
+                return _queueColumnHeaderGenreVisibility;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderGenreVisibility)
+                    return;
+
+                _queueColumnHeaderGenreVisibility = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderGenreVisibility");
+            }
+        }
+
+        private bool _queueColumnHeaderLastModifiedVisibility = false;
+        public bool QueueColumnHeaderLastModifiedVisibility
+        {
+            get
+            {
+                return _queueColumnHeaderLastModifiedVisibility;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderLastModifiedVisibility)
+                    return;
+
+                _queueColumnHeaderLastModifiedVisibility = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderLastModifiedVisibility");
+            }
+        }
+
+
+        #endregion
+
         public MainViewModel()
         {
             #region == データ保存フォルダ ==
@@ -1366,6 +1503,14 @@ namespace MPDCtrl.ViewModels
 
 
             EscapeCommand = new RelayCommand(EscapeCommand_ExecuteAsync, EscapeCommand_CanExecute);
+
+            QueueColumnHeaderPositionShowHideCommand = new RelayCommand(QueueColumnHeaderPositionShowHideCommand_Execute, QueueColumnHeaderPositionShowHideCommand_CanExecute);
+            QueueColumnHeaderNowPlayingShowHideCommand = new RelayCommand(QueueColumnHeaderNowPlayingShowHideCommand_Execute, QueueColumnHeaderNowPlayingShowHideCommand_CanExecute);
+            QueueColumnHeaderTimeShowHideCommand = new RelayCommand(QueueColumnHeaderTimeShowHideCommand_Execute, QueueColumnHeaderTimeShowHideCommand_CanExecute);
+            QueueColumnHeaderArtistShowHideCommand = new RelayCommand(QueueColumnHeaderArtistShowHideCommand_Execute, QueueColumnHeaderArtistShowHideCommand_CanExecute);
+            QueueColumnHeaderAlbumShowHideCommand = new RelayCommand(QueueColumnHeaderAlbumShowHideCommand_Execute, QueueColumnHeaderAlbumShowHideCommand_CanExecute);
+            QueueColumnHeaderGenreShowHideCommand = new RelayCommand(QueueColumnHeaderGenreShowHideCommand_Execute, QueueColumnHeaderGenreShowHideCommand_CanExecute);
+            QueueColumnHeaderLastModifiedShowHideCommand = new RelayCommand(QueueColumnHeaderLastModifiedShowHideCommand_Execute, QueueColumnHeaderLastModifiedShowHideCommand_CanExecute);
 
             #endregion
 
@@ -1614,6 +1759,12 @@ namespace MPDCtrl.ViewModels
                             Profiles.Add(pro);
                         }
                     }
+                    #endregion
+
+                    #region == ヘッダーカラム設定 ==
+
+
+
                     #endregion
                 }
             }
@@ -1906,6 +2057,12 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
+            #region == ヘッダーカラム設定の保存 ==
+
+
+
+            #endregion
+
             try
             {
                 // 設定ファイルの保存
@@ -2033,9 +2190,9 @@ namespace MPDCtrl.ViewModels
                             // TODO:
                             fuga.Pos = sng.Pos;
                             fuga.Index = sng.Index;
-                            //fuga.Id = sng.Id;
+                            //fuga.Id = sng.Id; // 流石にIDは変わらないだろう。
                             fuga.LastModified = sng.LastModified;
-                            fuga.Time = sng.Time;
+                            //fuga.Time = sng.Time; // format exception が煩い。
                             fuga.Title = sng.Title;
                             fuga.Artist = sng.Artist;
                             fuga.Album = sng.Album;
@@ -2046,8 +2203,6 @@ namespace MPDCtrl.ViewModels
                             fuga.file = sng.file;
                             fuga.Genre = sng.Genre;
                             fuga.Track = sng.Track;
-
-                            //fuga = sng;
                         }
                         else
                         {
@@ -2622,7 +2777,7 @@ namespace MPDCtrl.ViewModels
 
             System.Collections.IList items = (System.Collections.IList)obj;
 
-            if (items.Count > 1)
+            if (items.Count > 0)
             {
                 var collection = items.Cast<String>();
 
@@ -2630,14 +2785,10 @@ namespace MPDCtrl.ViewModels
 
                 foreach (var item in collection)
                 {
-                    uriList.Add(item);
+                    uriList.Add(item.ToString());
                 }
 
                 _MPC.MpdAdd(uriList);
-            }
-            else
-            {
-                _MPC.MpdAdd(items[0] as string);
             }
         }
 
@@ -3564,6 +3715,102 @@ namespace MPDCtrl.ViewModels
             IsChangePasswordDialogShow = false;
 
         }
+
+        #region == QueueカラムヘッダーShow Hide ==
+
+        public ICommand QueueColumnHeaderPositionShowHideCommand { get; }
+        public bool QueueColumnHeaderPositionShowHideCommand_CanExecute()
+        {
+            return true;
+        }
+        public void QueueColumnHeaderPositionShowHideCommand_Execute()
+        {
+            if (QueueColumnHeaderPositionVisibility)
+                QueueColumnHeaderPositionVisibility = false;
+            else
+                QueueColumnHeaderPositionVisibility = true;
+        }
+
+        public ICommand QueueColumnHeaderNowPlayingShowHideCommand { get; }
+        public bool QueueColumnHeaderNowPlayingShowHideCommand_CanExecute()
+        {
+            return true;
+        }
+        public void QueueColumnHeaderNowPlayingShowHideCommand_Execute()
+        {
+            if (QueueColumnHeaderNowPlayingVisibility)
+                QueueColumnHeaderNowPlayingVisibility = false;
+            else
+                QueueColumnHeaderNowPlayingVisibility = true;
+        }
+
+        public ICommand QueueColumnHeaderTimeShowHideCommand { get; }
+        public bool QueueColumnHeaderTimeShowHideCommand_CanExecute()
+        {
+            return true;
+        }
+        public void QueueColumnHeaderTimeShowHideCommand_Execute()
+        {
+            if (QueueColumnHeaderTimeVisibility)
+                QueueColumnHeaderTimeVisibility = false;
+            else
+                QueueColumnHeaderTimeVisibility = true;
+        }
+
+        public ICommand QueueColumnHeaderArtistShowHideCommand { get; }
+        public bool QueueColumnHeaderArtistShowHideCommand_CanExecute()
+        {
+            return true;
+        }
+        public void QueueColumnHeaderArtistShowHideCommand_Execute()
+        {
+            if (QueueColumnHeaderArtistVisibility)
+                QueueColumnHeaderArtistVisibility = false;
+            else
+                QueueColumnHeaderArtistVisibility = true;
+        }
+
+        public ICommand QueueColumnHeaderAlbumShowHideCommand { get; }
+        public bool QueueColumnHeaderAlbumShowHideCommand_CanExecute()
+        {
+            return true;
+        }
+        public void QueueColumnHeaderAlbumShowHideCommand_Execute()
+        {
+            if (QueueColumnHeaderAlbumVisibility)
+                QueueColumnHeaderAlbumVisibility = false;
+            else
+                QueueColumnHeaderAlbumVisibility = true;
+        }
+
+        public ICommand QueueColumnHeaderGenreShowHideCommand { get; }
+        public bool QueueColumnHeaderGenreShowHideCommand_CanExecute()
+        {
+            return true;
+        }
+        public void QueueColumnHeaderGenreShowHideCommand_Execute()
+        {
+            if (QueueColumnHeaderGenreVisibility)
+                QueueColumnHeaderGenreVisibility = false;
+            else
+                QueueColumnHeaderGenreVisibility = true;
+        }
+
+        public ICommand QueueColumnHeaderLastModifiedShowHideCommand { get; }
+        public bool QueueColumnHeaderLastModifiedShowHideCommand_CanExecute()
+        {
+            return true;
+        }
+        public void QueueColumnHeaderLastModifiedShowHideCommand_Execute()
+        {
+            if (QueueColumnHeaderLastModifiedVisibility)
+                QueueColumnHeaderLastModifiedVisibility = false;
+            else
+                QueueColumnHeaderLastModifiedVisibility = true;
+        }
+
+
+        #endregion
 
         #endregion
 

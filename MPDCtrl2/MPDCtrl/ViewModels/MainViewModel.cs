@@ -28,31 +28,26 @@ namespace MPDCtrl.ViewModels
     /// TODO: 
     /// 
     /// v2.0.1
-    /// 
-    /// Queue: カラムヘッダーの項目の表示・非表示とサイズを覚える
+    /// Queue: カラムヘッダーのサイズを覚える。
     /// 
     /// v2.0.2
-    /// 
     /// Ctrl+Fで検索。「追加」のコンテキストメニューを追加。ダイアログで2pain Treeview + Listviewにして、検索＆選択してQueueに追加できるように。
     /// Queue: ScrollIntoView to NowPlaying (not selected item).「現在の曲へ」のコンテキストメニューを追加。
     /// 
-    /// Queue: カラムヘッダークリックでソート
-    /// 
     /// v2.0.3
-    /// アルバムカバー対応。Last.fm?
-    /// 
-    /// v2.0.4 
     /// Local Files の TreeViewまたは階層化
     /// Local Files: "Save Selected to" context menu.
     /// Local Files: "再読み込み" context menu.
     /// 
     /// [未定]
+    /// アルバムカバー対応。Last.fm?
     /// スライダーの上でスクロールして音量変更。
     /// テーマの切り替え
-    /// 
+    /// Queue: カラムヘッダークリックでソート
 
 
     /// 更新履歴：
+    /// v2.0.0.15 ヘッダーカラムの項目の表示・非表示を覚えるようにした。
     /// v2.0.0.14 Queue(playlistinfo)のパース方法を修正。ヘッダーカラムの項目(LastModified)を追加し、表示・非表示できるようにした。
     /// v2.0.0.13 Queue: キュー一覧の更新で、差分を取って追加削除するようにした。でないと選択項目が一々クリアされてしまう。
     /// v2.0.0としてstore公開。
@@ -169,7 +164,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.0.14";
+        const string _appVer = "v2.0.0.15";
 
         public string AppVer
         {
@@ -1763,7 +1758,112 @@ namespace MPDCtrl.ViewModels
 
                     #region == ヘッダーカラム設定 ==
 
-
+                    var Headers = xdoc.Root.Element("Headers");///Queue/Position
+                    if (Headers != null)
+                    {
+                        var Que = Headers.Element("Queue");
+                        if (Que != null)
+                        {
+                            var column = Que.Element("Position");
+                            if (column != null)
+                            {
+                                if (column.Attribute("Visible") != null)
+                                {
+                                    if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
+                                    {
+                                        if (column.Attribute("Visible").Value.ToString() == "True")
+                                            QueueColumnHeaderPositionVisibility = true;
+                                        else
+                                            QueueColumnHeaderPositionVisibility = false;
+                                    }
+                                }
+                            }
+                            column = Que.Element("NowPlaying");
+                            if (column != null)
+                            {
+                                if (column.Attribute("Visible") != null)
+                                {
+                                    if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
+                                    {
+                                        if (column.Attribute("Visible").Value.ToString() == "True")
+                                            QueueColumnHeaderNowPlayingVisibility = true;
+                                        else
+                                            QueueColumnHeaderNowPlayingVisibility = false;
+                                    }
+                                }
+                            }
+                            column = Que.Element("Time");
+                            if (column != null)
+                            {
+                                if (column.Attribute("Visible") != null)
+                                {
+                                    if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
+                                    {
+                                        if (column.Attribute("Visible").Value.ToString() == "True")
+                                            QueueColumnHeaderTimeVisibility = true;
+                                        else
+                                            QueueColumnHeaderTimeVisibility = false;
+                                    }
+                                }
+                            }
+                            column = Que.Element("Artist");
+                            if (column != null)
+                            {
+                                if (column.Attribute("Visible") != null)
+                                {
+                                    if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
+                                    {
+                                        if (column.Attribute("Visible").Value.ToString() == "True")
+                                            QueueColumnHeaderArtistVisibility = true;
+                                        else
+                                            QueueColumnHeaderArtistVisibility = false;
+                                    }
+                                }
+                            }
+                            column = Que.Element("Album");
+                            if (column != null)
+                            {
+                                if (column.Attribute("Visible") != null)
+                                {
+                                    if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
+                                    {
+                                        if (column.Attribute("Visible").Value.ToString() == "True")
+                                            QueueColumnHeaderAlbumVisibility = true;
+                                        else
+                                            QueueColumnHeaderAlbumVisibility = false;
+                                    }
+                                }
+                            }
+                            column = Que.Element("Genre");
+                            if (column != null)
+                            {
+                                if (column.Attribute("Visible") != null)
+                                {
+                                    if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
+                                    {
+                                        if (column.Attribute("Visible").Value.ToString() == "True")
+                                            QueueColumnHeaderGenreVisibility = true;
+                                        else
+                                            QueueColumnHeaderGenreVisibility = false;
+                                    }
+                                }
+                            }
+                            column = Que.Element("LastModified");
+                            if (column != null)
+                            {
+                                if (column.Attribute("Visible") != null)
+                                {
+                                    if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
+                                    {
+                                        if (column.Attribute("Visible").Value.ToString() == "True")
+                                            QueueColumnHeaderLastModifiedVisibility = true;
+                                        else
+                                            QueueColumnHeaderLastModifiedVisibility = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     #endregion
                 }
@@ -2059,7 +2159,88 @@ namespace MPDCtrl.ViewModels
 
             #region == ヘッダーカラム設定の保存 ==
 
+            XmlElement headers = doc.CreateElement(string.Empty, "Headers", string.Empty);
 
+            XmlElement queueHeader;
+            XmlElement queueHeaderColumn;
+
+            XmlAttribute qAttrs;
+
+            queueHeader = doc.CreateElement(string.Empty, "Queue", string.Empty);
+
+
+            // Position
+            queueHeaderColumn = doc.CreateElement(string.Empty, "Position", string.Empty);
+
+            qAttrs = doc.CreateAttribute("Visible");
+            qAttrs.Value = QueueColumnHeaderPositionVisibility.ToString();
+            queueHeaderColumn.SetAttributeNode(qAttrs);
+
+            queueHeader.AppendChild(queueHeaderColumn);
+
+            // Now Playing
+            queueHeaderColumn = doc.CreateElement(string.Empty, "NowPlaying", string.Empty);
+
+            qAttrs = doc.CreateAttribute("Visible");
+            qAttrs.Value = QueueColumnHeaderNowPlayingVisibility.ToString();
+            queueHeaderColumn.SetAttributeNode(qAttrs);
+
+            queueHeader.AppendChild(queueHeaderColumn);
+
+            // Title skip
+
+            // Time
+            queueHeaderColumn = doc.CreateElement(string.Empty, "Time", string.Empty);
+
+            qAttrs = doc.CreateAttribute("Visible");
+            qAttrs.Value = QueueColumnHeaderTimeVisibility.ToString();
+            queueHeaderColumn.SetAttributeNode(qAttrs);
+
+            queueHeader.AppendChild(queueHeaderColumn);
+
+            // Artist
+            queueHeaderColumn = doc.CreateElement(string.Empty, "Artist", string.Empty);
+
+            qAttrs = doc.CreateAttribute("Visible");
+            qAttrs.Value = QueueColumnHeaderArtistVisibility.ToString();
+            queueHeaderColumn.SetAttributeNode(qAttrs);
+
+            queueHeader.AppendChild(queueHeaderColumn);
+
+            // Album
+            queueHeaderColumn = doc.CreateElement(string.Empty, "Album", string.Empty);
+
+            qAttrs = doc.CreateAttribute("Visible");
+            qAttrs.Value = QueueColumnHeaderAlbumVisibility.ToString();
+            queueHeaderColumn.SetAttributeNode(qAttrs);
+
+            queueHeader.AppendChild(queueHeaderColumn);
+
+            // Genre
+            queueHeaderColumn = doc.CreateElement(string.Empty, "Genre", string.Empty);
+
+            qAttrs = doc.CreateAttribute("Visible");
+            qAttrs.Value = QueueColumnHeaderGenreVisibility.ToString();
+            queueHeaderColumn.SetAttributeNode(qAttrs);
+
+            queueHeader.AppendChild(queueHeaderColumn);
+
+            // Last Modified
+            queueHeaderColumn = doc.CreateElement(string.Empty, "LastModified", string.Empty);
+
+            qAttrs = doc.CreateAttribute("Visible");
+            qAttrs.Value = QueueColumnHeaderLastModifiedVisibility.ToString();
+            queueHeaderColumn.SetAttributeNode(qAttrs);
+
+            queueHeader.AppendChild(queueHeaderColumn);
+
+
+
+
+            //
+            headers.AppendChild(queueHeader);
+            ////
+            root.AppendChild(headers);
 
             #endregion
 

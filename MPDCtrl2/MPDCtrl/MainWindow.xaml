@@ -577,29 +577,26 @@
                                 <KeyBinding Gesture="Ctrl+Delete" Command="{Binding Path=DataContext.SongListviewDeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                             </ListView.InputBindings>
                             <ListView.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="Add new song">
-
-                                    </MenuItem>
+                                <ContextMenu Visibility="Collapsed">
                                 </ContextMenu>
                             </ListView.ContextMenu>
                             <ListView.Resources>
                                 <ContextMenu x:Key="SongListViewHeaderContextMenu">
-                                    <MenuItem Header="Position" IsChecked="{Binding Path=DataContext.QueueColumnHeaderPositionVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderPositionShowHideCommand}">
+                                    <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_Position}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderPositionVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderPositionShowHideCommand}">
                                     </MenuItem>
                                     <MenuItem Header="Now Playing" IsChecked="{Binding Path=DataContext.QueueColumnHeaderNowPlayingVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderNowPlayingShowHideCommand}">
                                     </MenuItem>
-                                    <MenuItem Header="Title" IsChecked="True" IsEnabled="False">
+                                    <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_Song}" IsChecked="True" IsEnabled="False">
                                     </MenuItem>
-                                    <MenuItem Header="Time" IsChecked="{Binding Path=DataContext.QueueColumnHeaderTimeVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderTimeShowHideCommand}">
+                                    <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_Time}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderTimeVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderTimeShowHideCommand}">
                                     </MenuItem>
-                                    <MenuItem Header="Artist" IsChecked="{Binding Path=DataContext.QueueColumnHeaderArtistVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderArtistShowHideCommand}">
+                                    <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_Artist}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderArtistVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderArtistShowHideCommand}">
                                     </MenuItem>
-                                    <MenuItem Header="Album" IsChecked="{Binding Path=DataContext.QueueColumnHeaderAlbumVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderAlbumShowHideCommand}">
+                                    <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_Album}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderAlbumVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderAlbumShowHideCommand}">
                                     </MenuItem>
-                                    <MenuItem Header="Genre" IsChecked="{Binding Path=DataContext.QueueColumnHeaderGenreVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderGenreShowHideCommand}">
+                                    <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_Genre}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderGenreVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderGenreShowHideCommand}">
                                     </MenuItem>
-                                    <MenuItem Header="Last Modified" IsChecked="{Binding Path=DataContext.QueueColumnHeaderLastModifiedVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderLastModifiedShowHideCommand}">
+                                    <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_LastModified}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderLastModifiedVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderLastModifiedShowHideCommand}">
 
                                     </MenuItem>
                                 </ContextMenu>

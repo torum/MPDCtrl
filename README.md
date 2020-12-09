@@ -1,18 +1,16 @@
 # MPDCtrl
 
-MPDCtrl is a client app for the [MPD (Music player daemon)](http://www.musicpd.org/). It should also work with MPD-compatible servers such as [Mopidy](https://www.mopidy.com/) or [forked-daapd](http://ejurgensen.github.io/forked-daapd/). 
-  
-There are two flavors; **MPDCtrl for Windows desktop** (WPF) and **MPDCtrl for mobile cross-platform** (Xamarin.Forms).  
-
-### MPDCtrl for Windows desktop
-
-MPDCtrl for Windows desktop is a desktop gadget-like light-weight client app for the MPD.   
-
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/WPF/WpfMPD/files/bin/MPD-Ctrl_Screenshot1.png?raw=true)  
+MPDCtrl is a Windows desktop client app for the [MPD (Music player daemon)](http://www.musicpd.org/). It should also work with MPD-compatible servers such as [Mopidy](https://www.mopidy.com/) or [forked-daapd](http://ejurgensen.github.io/forked-daapd/). 
   
 
-- Status:  
-Stable.
+### MPDCtrl version 2.x
+
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v2/Main_En.png?raw=true) 
+
+### MPDCtrl version 1.x
+
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v1/MPD-Ctrl_Screenshot1.png?raw=true)  
+  
 
 - Download:  
 __[Avalable at Micorsoft Store](https://www.microsoft.com/store/apps/9NV2BBJ82BRX)__
@@ -21,13 +19,5 @@ __[Avalable at Micorsoft Store](https://www.microsoft.com/store/apps/9NV2BBJ82BR
 [Project Page](https://torum.github.io/MPDCtrl/)
 
    
-### MPDCtrl for mobile cross-platform
 
-MPDCtrl for iOS and Windows mobile (Xamarin.Forms) is currently under developement.   
-  
-- Status:  
-Basic functionalities are implemented, but there are lots of work to be done before releasing or submitting to the Apple store.  
-
-- More:  
-[Project Page](https://torum.github.io/MPDCtrl/)
 

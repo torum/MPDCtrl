@@ -378,6 +378,9 @@ SOFTWARE.</value>
   <data name="SongItemContextMenu_Remove" xml:space="preserve">
     <value>Remove (CTRL+Delete)</value>
   </data>
+  <data name="SongItemContextMenu_SelectedItems" xml:space="preserve">
+    <value>Selected Items</value>
+  </data>
   <data name="SongListViewColumnHeader_Album" xml:space="preserve">
     <value>Album</value>
   </data>

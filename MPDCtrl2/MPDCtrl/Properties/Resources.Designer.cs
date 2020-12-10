@@ -799,6 +799,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Selected Items に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongItemContextMenu_SelectedItems {
+            get {
+                return ResourceManager.GetString("SongItemContextMenu_SelectedItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Album に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string SongListViewColumnHeader_Album {

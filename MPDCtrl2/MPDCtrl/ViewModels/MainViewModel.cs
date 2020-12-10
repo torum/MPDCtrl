@@ -27,9 +27,6 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// v2.0.1
-    /// Queue: カラムヘッダーのサイズを覚える。
-    /// 
     /// v2.0.2
     /// Ctrl+Fで検索。「追加」のコンテキストメニューを追加。ダイアログで2pain Treeview + Listviewにして、検索＆選択してQueueに追加できるように。
     /// Queue: ScrollIntoView to NowPlaying (not selected item).「現在の曲へ」のコンテキストメニューを追加。
@@ -47,10 +44,12 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v2.0.1    store公開。
+    /// v2.0.0.16 カラムヘッダーのサイズを覚えるようにした（色々とやっかい）
     /// v2.0.0.15 ヘッダーカラムの項目の表示・非表示を覚えるようにした。
     /// v2.0.0.14 Queue(playlistinfo)のパース方法を修正。ヘッダーカラムの項目(LastModified)を追加し、表示・非表示できるようにした。
     /// v2.0.0.13 Queue: キュー一覧の更新で、差分を取って追加削除するようにした。でないと選択項目が一々クリアされてしまう。
-    /// v2.0.0としてstore公開。
+    /// v2.0.0    store公開。
     /// v2.0.0.11,12: 細かい表示周りのバグ修正。 
     /// v2.0.0.10: パスワード周りオーバーホール。タイトルバーのNowPlayingを修正。
     /// v2.0.0.9: Queueの上下移動。KeyGestureを幾つか追加。
@@ -164,7 +163,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.0.15";
+        const string _appVer = "v2.0.1";
 
         public string AppVer
         {
@@ -1309,6 +1308,24 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private double _queueColumnHeaderPositionWidth = 53;
+        private double _queueColumnHeaderPositionWidthUser = 53;
+        public double QueueColumnHeaderPositionWidth
+        {
+            get
+            {
+                return _queueColumnHeaderPositionWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderPositionWidth) return;
+
+                _queueColumnHeaderPositionWidth = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderPositionWidth");
+            }
+        }
+
         private bool _queueColumnHeaderNowPlayingVisibility = true;
         public bool QueueColumnHeaderNowPlayingVisibility
         {
@@ -1324,6 +1341,42 @@ namespace MPDCtrl.ViewModels
                 _queueColumnHeaderNowPlayingVisibility = value;
 
                 NotifyPropertyChanged("QueueColumnHeaderNowPlayingVisibility");
+            }
+        }
+
+        private double _queueColumnHeaderNowPlayingWidth = 32;
+        private double _queueColumnHeaderNowPlayingWidthUser = 32;
+        public double QueueColumnHeaderNowPlayingWidth
+        {
+            get
+            {
+                return _queueColumnHeaderNowPlayingWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderNowPlayingWidth) return;
+
+                _queueColumnHeaderNowPlayingWidth = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderNowPlayingWidth");
+            }
+        }
+
+        private double _queueColumnHeaderTitleWidth = 180;
+        private double _queueColumnHeaderTitleWidthUser = 180;
+        public double QueueColumnHeaderTitleWidth
+        {
+            get
+            {
+                return _queueColumnHeaderTitleWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderTitleWidth) return;
+
+                _queueColumnHeaderTitleWidth = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderTitleWidth");
             }
         }
 
@@ -1345,6 +1398,24 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private double _queueColumnHeaderTimeWidth = 62;
+        private double _queueColumnHeaderTimeWidthUser = 62;
+        public double QueueColumnHeaderTimeWidth
+        {
+            get
+            {
+                return _queueColumnHeaderTimeWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderTimeWidth) return;
+
+                _queueColumnHeaderTimeWidth = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderTimeWidth");
+            }
+        }
+
         private bool _queueColumnHeaderArtistVisibility = true;
         public bool QueueColumnHeaderArtistVisibility
         {
@@ -1362,7 +1433,25 @@ namespace MPDCtrl.ViewModels
                 NotifyPropertyChanged("QueueColumnHeaderArtistVisibility");
             }
         }
-        
+
+        private double _queueColumnHeaderArtistWidth = 120;
+        private double _queueColumnHeaderArtistWidthUser = 120;
+        public double QueueColumnHeaderArtistWidth
+        {
+            get
+            {
+                return _queueColumnHeaderArtistWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderArtistWidth) return;
+
+                _queueColumnHeaderArtistWidth = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderArtistWidth");
+            }
+        }
+
         private bool _queueColumnHeaderAlbumVisibility = true;
         public bool QueueColumnHeaderAlbumVisibility
         {
@@ -1378,6 +1467,24 @@ namespace MPDCtrl.ViewModels
                 _queueColumnHeaderAlbumVisibility = value;
 
                 NotifyPropertyChanged("QueueColumnHeaderAlbumVisibility");
+            }
+        }
+
+        private double _queueColumnHeaderAlbumWidth = 120;
+        private double _queueColumnHeaderAlbumWidthUser = 120;
+        public double QueueColumnHeaderAlbumWidth
+        {
+            get
+            {
+                return _queueColumnHeaderAlbumWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderAlbumWidth) return;
+
+                _queueColumnHeaderAlbumWidth = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderAlbumWidth");
             }
         }
 
@@ -1399,6 +1506,24 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private double _queueColumnHeaderGenreWidth = 100;
+        private double _queueColumnHeaderGenreWidthUser = 100;
+        public double QueueColumnHeaderGenreWidth
+        {
+            get
+            {
+                return _queueColumnHeaderGenreWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderGenreWidth) return;
+
+                _queueColumnHeaderGenreWidth = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderGenreWidth");
+            }
+        }
+
         private bool _queueColumnHeaderLastModifiedVisibility = false;
         public bool QueueColumnHeaderLastModifiedVisibility
         {
@@ -1417,6 +1542,23 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private double _queueColumnHeaderLastModifiedWidth = 180;
+        private double _queueColumnHeaderLastModifiedWidthUser = 180;
+        public double QueueColumnHeaderLastModifiedWidth
+        {
+            get
+            {
+                return _queueColumnHeaderLastModifiedWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderLastModifiedWidth) return;
+
+                _queueColumnHeaderLastModifiedWidth = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderLastModifiedWidth");
+            }
+        }
 
         #endregion
 
@@ -1771,10 +1913,30 @@ namespace MPDCtrl.ViewModels
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
                                     {
+
                                         if (column.Attribute("Visible").Value.ToString() == "True")
+                                        {
                                             QueueColumnHeaderPositionVisibility = true;
+                                        }
                                         else
+                                        {
                                             QueueColumnHeaderPositionVisibility = false;
+                                        }
+                                    }
+                                }
+                                if (column.Attribute("Width") != null)
+                                {
+                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    {
+                                        // Needs some hack.
+                                        try
+                                        {
+                                            _queueColumnHeaderPositionWidthUser = Double.Parse(column.Attribute("Width").Value.ToString());
+                                        }
+                                        catch
+                                        {
+                                            _queueColumnHeaderPositionWidthUser = 53;
+                                        }
                                     }
                                 }
                             }
@@ -1791,6 +1953,40 @@ namespace MPDCtrl.ViewModels
                                             QueueColumnHeaderNowPlayingVisibility = false;
                                     }
                                 }
+                                if (column.Attribute("Width") != null)
+                                {
+                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    {
+                                        // Needs some hack.
+                                        try
+                                        {
+                                            _queueColumnHeaderNowPlayingWidthUser = Double.Parse(column.Attribute("Width").Value.ToString());
+                                        }
+                                        catch
+                                        {
+                                            _queueColumnHeaderNowPlayingWidthUser = 53;
+                                        }
+                                    }
+                                }
+                            }
+                            column = Que.Element("Title");
+                            if (column != null)
+                            {
+                                if (column.Attribute("Width") != null)
+                                {
+                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    {
+                                        // Needs some hack.
+                                        try
+                                        {
+                                            _queueColumnHeaderTitleWidthUser = Double.Parse(column.Attribute("Width").Value.ToString());
+                                        }
+                                        catch
+                                        {
+                                            _queueColumnHeaderTitleWidthUser = 53;
+                                        }
+                                    }
+                                }
                             }
                             column = Que.Element("Time");
                             if (column != null)
@@ -1803,6 +1999,21 @@ namespace MPDCtrl.ViewModels
                                             QueueColumnHeaderTimeVisibility = true;
                                         else
                                             QueueColumnHeaderTimeVisibility = false;
+                                    }
+                                }
+                                if (column.Attribute("Width") != null)
+                                {
+                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    {
+                                        // Needs some hack.
+                                        try
+                                        {
+                                            _queueColumnHeaderTimeWidthUser = Double.Parse(column.Attribute("Width").Value.ToString());
+                                        }
+                                        catch
+                                        {
+                                            _queueColumnHeaderTimeWidthUser = 53;
+                                        }
                                     }
                                 }
                             }
@@ -1819,6 +2030,21 @@ namespace MPDCtrl.ViewModels
                                             QueueColumnHeaderArtistVisibility = false;
                                     }
                                 }
+                                if (column.Attribute("Width") != null)
+                                {
+                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    {
+                                        // Needs some hack.
+                                        try
+                                        {
+                                            _queueColumnHeaderArtistWidthUser = Double.Parse(column.Attribute("Width").Value.ToString());
+                                        }
+                                        catch
+                                        {
+                                            _queueColumnHeaderArtistWidthUser = 53;
+                                        }
+                                    }
+                                }
                             }
                             column = Que.Element("Album");
                             if (column != null)
@@ -1831,6 +2057,21 @@ namespace MPDCtrl.ViewModels
                                             QueueColumnHeaderAlbumVisibility = true;
                                         else
                                             QueueColumnHeaderAlbumVisibility = false;
+                                    }
+                                }
+                                if (column.Attribute("Width") != null)
+                                {
+                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    {
+                                        // Needs some hack.
+                                        try
+                                        {
+                                            _queueColumnHeaderAlbumWidthUser = Double.Parse(column.Attribute("Width").Value.ToString());
+                                        }
+                                        catch
+                                        {
+                                            _queueColumnHeaderAlbumWidthUser = 53;
+                                        }
                                     }
                                 }
                             }
@@ -1847,6 +2088,21 @@ namespace MPDCtrl.ViewModels
                                             QueueColumnHeaderGenreVisibility = false;
                                     }
                                 }
+                                if (column.Attribute("Width") != null)
+                                {
+                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    {
+                                        // Needs some hack.
+                                        try
+                                        {
+                                            _queueColumnHeaderGenreWidthUser = Double.Parse(column.Attribute("Width").Value.ToString());
+                                        }
+                                        catch
+                                        {
+                                            _queueColumnHeaderGenreWidthUser = 53;
+                                        }
+                                    }
+                                }
                             }
                             column = Que.Element("LastModified");
                             if (column != null)
@@ -1859,6 +2115,21 @@ namespace MPDCtrl.ViewModels
                                             QueueColumnHeaderLastModifiedVisibility = true;
                                         else
                                             QueueColumnHeaderLastModifiedVisibility = false;
+                                    }
+                                }
+                                if (column.Attribute("Width") != null)
+                                {
+                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    {
+                                        // Needs some hack.
+                                        try
+                                        {
+                                            _queueColumnHeaderLastModifiedWidthUser = Double.Parse(column.Attribute("Width").Value.ToString());
+                                        }
+                                        catch
+                                        {
+                                            _queueColumnHeaderLastModifiedWidthUser = 53;
+                                        }
                                     }
                                 }
                             }
@@ -1899,6 +2170,18 @@ namespace MPDCtrl.ViewModels
 
                 Start();
             }
+        }
+
+        public void OnContentRendered(object sender, EventArgs e)
+        {
+            if (QueueColumnHeaderPositionVisibility) QueueColumnHeaderPositionWidth = _queueColumnHeaderPositionWidthUser;
+            QueueColumnHeaderTitleWidth = _queueColumnHeaderTitleWidthUser;
+            if (QueueColumnHeaderNowPlayingVisibility) QueueColumnHeaderNowPlayingWidth = _queueColumnHeaderNowPlayingWidthUser;
+            if (QueueColumnHeaderTimeVisibility) QueueColumnHeaderTimeWidth = _queueColumnHeaderTimeWidthUser;
+            if (QueueColumnHeaderArtistVisibility) QueueColumnHeaderArtistWidth = _queueColumnHeaderArtistWidthUser;
+            if (QueueColumnHeaderAlbumVisibility) QueueColumnHeaderAlbumWidth = _queueColumnHeaderAlbumWidthUser;
+            if (QueueColumnHeaderGenreVisibility) QueueColumnHeaderGenreWidth = _queueColumnHeaderGenreWidthUser;
+            if (QueueColumnHeaderLastModifiedVisibility) QueueColumnHeaderLastModifiedWidth = _queueColumnHeaderLastModifiedWidthUser;
         }
 
         // 終了時の処理
@@ -2176,6 +2459,10 @@ namespace MPDCtrl.ViewModels
             qAttrs.Value = QueueColumnHeaderPositionVisibility.ToString();
             queueHeaderColumn.SetAttributeNode(qAttrs);
 
+            qAttrs = doc.CreateAttribute("Width");
+            qAttrs.Value = QueueColumnHeaderPositionWidth.ToString();
+            queueHeaderColumn.SetAttributeNode(qAttrs);
+
             queueHeader.AppendChild(queueHeaderColumn);
 
             // Now Playing
@@ -2185,15 +2472,30 @@ namespace MPDCtrl.ViewModels
             qAttrs.Value = QueueColumnHeaderNowPlayingVisibility.ToString();
             queueHeaderColumn.SetAttributeNode(qAttrs);
 
+            qAttrs = doc.CreateAttribute("Width");
+            qAttrs.Value = QueueColumnHeaderNowPlayingWidth.ToString();
+            queueHeaderColumn.SetAttributeNode(qAttrs);
+
             queueHeader.AppendChild(queueHeaderColumn);
 
-            // Title skip
+            // Title skip visibility
+            queueHeaderColumn = doc.CreateElement(string.Empty, "Title", string.Empty);
+
+            qAttrs = doc.CreateAttribute("Width");
+            qAttrs.Value = QueueColumnHeaderTitleWidth.ToString();
+            queueHeaderColumn.SetAttributeNode(qAttrs);
+
+            queueHeader.AppendChild(queueHeaderColumn);
 
             // Time
             queueHeaderColumn = doc.CreateElement(string.Empty, "Time", string.Empty);
 
             qAttrs = doc.CreateAttribute("Visible");
             qAttrs.Value = QueueColumnHeaderTimeVisibility.ToString();
+            queueHeaderColumn.SetAttributeNode(qAttrs);
+
+            qAttrs = doc.CreateAttribute("Width");
+            qAttrs.Value = QueueColumnHeaderTimeWidth.ToString();
             queueHeaderColumn.SetAttributeNode(qAttrs);
 
             queueHeader.AppendChild(queueHeaderColumn);
@@ -2205,6 +2507,10 @@ namespace MPDCtrl.ViewModels
             qAttrs.Value = QueueColumnHeaderArtistVisibility.ToString();
             queueHeaderColumn.SetAttributeNode(qAttrs);
 
+            qAttrs = doc.CreateAttribute("Width");
+            qAttrs.Value = QueueColumnHeaderArtistWidth.ToString();
+            queueHeaderColumn.SetAttributeNode(qAttrs);
+
             queueHeader.AppendChild(queueHeaderColumn);
 
             // Album
@@ -2212,6 +2518,10 @@ namespace MPDCtrl.ViewModels
 
             qAttrs = doc.CreateAttribute("Visible");
             qAttrs.Value = QueueColumnHeaderAlbumVisibility.ToString();
+            queueHeaderColumn.SetAttributeNode(qAttrs);
+
+            qAttrs = doc.CreateAttribute("Width");
+            qAttrs.Value = QueueColumnHeaderAlbumWidth.ToString();
             queueHeaderColumn.SetAttributeNode(qAttrs);
 
             queueHeader.AppendChild(queueHeaderColumn);
@@ -2223,6 +2533,10 @@ namespace MPDCtrl.ViewModels
             qAttrs.Value = QueueColumnHeaderGenreVisibility.ToString();
             queueHeaderColumn.SetAttributeNode(qAttrs);
 
+            qAttrs = doc.CreateAttribute("Width");
+            qAttrs.Value = QueueColumnHeaderGenreWidth.ToString();
+            queueHeaderColumn.SetAttributeNode(qAttrs);
+
             queueHeader.AppendChild(queueHeaderColumn);
 
             // Last Modified
@@ -2232,10 +2546,11 @@ namespace MPDCtrl.ViewModels
             qAttrs.Value = QueueColumnHeaderLastModifiedVisibility.ToString();
             queueHeaderColumn.SetAttributeNode(qAttrs);
 
+            qAttrs = doc.CreateAttribute("Width");
+            qAttrs.Value = QueueColumnHeaderLastModifiedWidth.ToString();
+            queueHeaderColumn.SetAttributeNode(qAttrs);
+
             queueHeader.AppendChild(queueHeaderColumn);
-
-
-
 
             //
             headers.AppendChild(queueHeader);
@@ -2263,8 +2578,9 @@ namespace MPDCtrl.ViewModels
         {
             IsConnected = true;
 
-            StatusMessage = "";
-            StatusButton = _pathConnectedButton;
+            // Should be done at OnConnectionStatusChanged
+            //StatusMessage = "";
+            //StatusButton = _pathConnectedButton;
         }
 
         // MPD changed nortifiation
@@ -2490,13 +2806,18 @@ namespace MPDCtrl.ViewModels
 
             if (status == AsynchronousTCPClient.ConnectionStatus.Connected)
             {
-                //Handled at elsewhare.
+                // handle other things at OnConnected
+
+                IsConnected = true;
+                IsConnecting = false;
+
+                StatusMessage = "";
+                StatusButton = _pathConnectedButton;
             }
             else if (status == AsynchronousTCPClient.ConnectionStatus.Connecting)
             {
                 IsConnected = false;
                 IsConnecting = true;
-                //IsConnectionSettingShow = true;
 
                 StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connecting;
                 StatusButton = _pathConnectingButton;
@@ -3031,7 +3352,7 @@ namespace MPDCtrl.ViewModels
         }
         public void PlaylistListviewLeftDoubleClickCommand_ExecuteAsync(String playlist)
         {
-            _MPC.MpdChangePlaylist(playlist);
+            _MPC.MpdLoadPlaylist(playlist);
         }
 
         public ICommand PlaylistListviewEnterKeyCommand { get; set; }
@@ -3878,10 +4199,6 @@ namespace MPDCtrl.ViewModels
             IsChangePasswordDialogShow = false;
         }
 
-
-        #endregion
-
-        
         public ICommand EscapeCommand { get; }
         public bool EscapeCommand_CanExecute()
         {
@@ -3894,8 +4211,9 @@ namespace MPDCtrl.ViewModels
             IsInformationDialogShow = false;
             IsInputDialogShow = false;
             IsChangePasswordDialogShow = false;
-
         }
+
+        #endregion
 
         #region == QueueカラムヘッダーShow Hide ==
 

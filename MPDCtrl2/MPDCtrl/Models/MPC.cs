@@ -2165,9 +2165,10 @@ namespace MPDCtrl
                 return r;
             }
 
+            ConnectionState = ConnectionStatus.Connected;
+
             Receive(_TCP.Client);
 
-            ConnectionState = ConnectionStatus.Connected;
             _retryAttempt = 0;
 
             r.isSuccess = true;

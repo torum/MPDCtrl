@@ -14,8 +14,6 @@
         Title="{Binding AppTitle}"
         Width="780" Height="480"
         MinWidth="780" MinHeight="250">
-    <Window.Resources>
-    </Window.Resources>
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="30" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"/>
     </WindowChrome.WindowChrome>
@@ -578,6 +576,8 @@
                             </ListView.InputBindings>
                             <ListView.ContextMenu>
                                 <ContextMenu Visibility="Collapsed">
+                                    <MenuItem Header="Add">
+                                    </MenuItem>
                                 </ContextMenu>
                             </ListView.ContextMenu>
                             <ListView.Resources>
@@ -597,59 +597,72 @@
                                     <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_Genre}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderGenreVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderGenreShowHideCommand}">
                                     </MenuItem>
                                     <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_LastModified}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderLastModifiedVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderLastModifiedShowHideCommand}">
-
                                     </MenuItem>
                                 </ContextMenu>
                                 <ContextMenu x:Key="SongItemContextMenu">
-                                    <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_Remove}" Command="{Binding Path=DataContext.SongListviewDeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+
+                                    <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_SelectedItems}">
                                         <MenuItem.Resources>
-                                            <ControlTemplate x:Key="MinusIcon">
+                                            <ControlTemplate x:Key="CheckUnderlineIcon">
                                                 <Canvas Background="Transparent" >
-                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M19,13H5V11H19V13Z" />
+                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M21,5L9,17L3.5,11.5L4.91,10.09L9,14.17L19.59,3.59L21,5M3,21V19H21V21H3Z" />
                                                 </Canvas>
                                             </ControlTemplate>
                                         </MenuItem.Resources>
-                                        <MenuItem.Icon>
-                                            <ContentControl Template="{StaticResource MinusIcon}" />
-                                        </MenuItem.Icon>
-                                    </MenuItem>
-                                    <Separator />
-                                    <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_Move}">
-                                        <MenuItem.Resources>
-                                            <ControlTemplate x:Key="SwapVerticalIcon">
-                                                <Canvas Background="Transparent" >
-                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M9,3L5,7H8V14H10V7H13M16,17V10H14V17H11L15,21L19,17H16Z" />
-                                                </Canvas>
-                                            </ControlTemplate>
-                                        </MenuItem.Resources>
-                                        <MenuItem.Icon>
-                                            <ContentControl Template="{StaticResource SwapVerticalIcon}" />
-                                        </MenuItem.Icon>
-                                        <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_MoveUp}" Command="{Binding Path=DataContext.SongListviewMoveUpCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                            <MenuItem.Icon>
+                                                <ContentControl Template="{StaticResource CheckUnderlineIcon}" />
+                                            </MenuItem.Icon>
+                                        <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_Move}">
                                             <MenuItem.Resources>
-                                                <ControlTemplate x:Key="ArrowUpIcon">
+                                                <ControlTemplate x:Key="SwapVerticalIcon">
                                                     <Canvas Background="Transparent" >
-                                                        <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z" />
+                                                        <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M9,3L5,7H8V14H10V7H13M16,17V10H14V17H11L15,21L19,17H16Z" />
                                                     </Canvas>
                                                 </ControlTemplate>
                                             </MenuItem.Resources>
                                             <MenuItem.Icon>
-                                                <ContentControl Template="{StaticResource ArrowUpIcon}" />
+                                                <ContentControl Template="{StaticResource SwapVerticalIcon}" />
                                             </MenuItem.Icon>
+                                            <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_MoveUp}" Command="{Binding Path=DataContext.SongListviewMoveUpCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                                <MenuItem.Resources>
+                                                    <ControlTemplate x:Key="ArrowUpIcon">
+                                                        <Canvas Background="Transparent" >
+                                                            <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z" />
+                                                        </Canvas>
+                                                    </ControlTemplate>
+                                                </MenuItem.Resources>
+                                                <MenuItem.Icon>
+                                                    <ContentControl Template="{StaticResource ArrowUpIcon}" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_MoveDown}" Command="{Binding Path=DataContext.SongListviewMoveDownCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                                <MenuItem.Resources>
+                                                    <ControlTemplate x:Key="ArrowDownIcon">
+                                                        <Canvas Background="Transparent" >
+                                                            <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z" />
+                                                        </Canvas>
+                                                    </ControlTemplate>
+                                                </MenuItem.Resources>
+                                                <MenuItem.Icon>
+                                                    <ContentControl Template="{StaticResource ArrowDownIcon}" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
                                         </MenuItem>
-                                        <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_MoveDown}" Command="{Binding Path=DataContext.SongListviewMoveDownCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                        <Separator />
+                                        <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_Remove}" Command="{Binding Path=DataContext.SongListviewDeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                             <MenuItem.Resources>
-                                                <ControlTemplate x:Key="ArrowDownIcon">
+                                                <ControlTemplate x:Key="MinusIcon">
                                                     <Canvas Background="Transparent" >
-                                                        <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z" />
+                                                        <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M19,13H5V11H19V13Z" />
                                                     </Canvas>
                                                 </ControlTemplate>
                                             </MenuItem.Resources>
                                             <MenuItem.Icon>
-                                                <ContentControl Template="{StaticResource ArrowDownIcon}" />
+                                                <ContentControl Template="{StaticResource MinusIcon}" />
                                             </MenuItem.Icon>
                                         </MenuItem>
                                     </MenuItem>
+
                                     <Separator />
                                     <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_Queue}">
                                         <MenuItem.Resources>
@@ -711,8 +724,8 @@
                                         </Style>
                                     </GridView.ColumnHeaderContainerStyle>
 
-                                    <GridViewColumn Width="53">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Position}" Tag="53" MinWidth="32" Visibility="{Binding QueueColumnHeaderPositionVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
+                                    <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderPositionWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Position}" Tag="53" MinWidth="32" Visibility="{Binding Path=DataContext.QueueColumnHeaderPositionVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Converter={StaticResource BoolToVisibilityCollapsedConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -722,7 +735,7 @@
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
-                                    <GridViewColumn Width="32">
+                                    <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderNowPlayingWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
                                         <GridViewColumnHeader Tag="32" MinWidth="32" Visibility="{Binding QueueColumnHeaderNowPlayingVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True">
                                             <Viewbox Width="16" Height="16" Margin="-2 0 0 -2">
                                                 <Canvas Width="24" Height="24">
@@ -746,7 +759,7 @@
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
-                                    <GridViewColumn Width="180">
+                                    <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderTitleWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Song}" Tag="180" MinWidth="120" />
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
@@ -765,8 +778,8 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    
-                                    <GridViewColumn Width="62">
+
+                                    <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderTimeWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Time}" Tag="62" MinWidth="62" Visibility="{Binding QueueColumnHeaderTimeVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
@@ -786,7 +799,7 @@
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
-                                    <GridViewColumn Width="120">
+                                    <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderArtistWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Artist}" Tag="120" MinWidth="62" Visibility="{Binding QueueColumnHeaderArtistVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
@@ -806,7 +819,7 @@
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
-                                    <GridViewColumn Width="120">
+                                    <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderAlbumWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Album}" Tag="120" MinWidth="62" Visibility="{Binding QueueColumnHeaderAlbumVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
@@ -826,7 +839,7 @@
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
-                                    <GridViewColumn Width="100">
+                                    <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderGenreWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Genre}" Tag="100" MinWidth="62" Visibility="{Binding QueueColumnHeaderGenreVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
@@ -846,7 +859,7 @@
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
-                                    <GridViewColumn Width="180">
+                                    <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderLastModifiedWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_LastModified}" Tag="180" MinWidth="62" Visibility="{Binding QueueColumnHeaderLastModifiedVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>

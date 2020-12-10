@@ -31,6 +31,7 @@ namespace MPDCtrl
             InitializeComponent();
 
             Loaded += (this.DataContext as MainViewModel).OnWindowLoaded;
+            ContentRendered += (this.DataContext as MainViewModel).OnContentRendered;
 
             Closing += (this.DataContext as MainViewModel).OnWindowClosing;
 

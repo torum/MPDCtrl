@@ -381,6 +381,9 @@ SOFTWARE.</value>
   <data name="SongItemContextMenu_Remove" xml:space="preserve">
     <value>キューから削除 (CTRL+Delete)</value>
   </data>
+  <data name="SongItemContextMenu_SelectedItems" xml:space="preserve">
+    <value>選択項目</value>
+  </data>
   <data name="SongListViewColumnHeader_Album" xml:space="preserve">
     <value>アルバム</value>
   </data>
@@ -391,7 +394,7 @@ SOFTWARE.</value>
     <value>ジャンル</value>
   </data>
   <data name="SongListViewColumnHeader_LastModified" xml:space="preserve">
-    <value>最終更新</value>
+    <value>最終更新日時</value>
   </data>
   <data name="SongListViewColumnHeader_Position" xml:space="preserve">
     <value>曲順</value>

@@ -44,9 +44,9 @@ Global
 		{DA98EE48-EFF6-420F-85F4-F0EBCE56576D}.Release|x64.ActiveCfg = Release|x64
 		{DA98EE48-EFF6-420F-85F4-F0EBCE56576D}.Release|x64.Build.0 = Release|x64
 		{DA98EE48-EFF6-420F-85F4-F0EBCE56576D}.Release|x64.Deploy.0 = Release|x64
-		{DA98EE48-EFF6-420F-85F4-F0EBCE56576D}.Release|x86.ActiveCfg = Release|Any CPU
-		{DA98EE48-EFF6-420F-85F4-F0EBCE56576D}.Release|x86.Build.0 = Release|Any CPU
-		{DA98EE48-EFF6-420F-85F4-F0EBCE56576D}.Release|x86.Deploy.0 = Release|Any CPU
+		{DA98EE48-EFF6-420F-85F4-F0EBCE56576D}.Release|x86.ActiveCfg = Release|x86
+		{DA98EE48-EFF6-420F-85F4-F0EBCE56576D}.Release|x86.Build.0 = Release|x86
+		{DA98EE48-EFF6-420F-85F4-F0EBCE56576D}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

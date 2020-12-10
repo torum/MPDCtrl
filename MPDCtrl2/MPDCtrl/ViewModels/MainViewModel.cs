@@ -27,11 +27,11 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// v2.0.2
+    /// v2.0.3
     /// exception trap
     /// Ctrl+Fで検索。「追加」のコンテキストメニューを追加。ダイアログで2pain Treeview + Listviewにして、検索＆選択してQueueに追加できるように。
     /// 
-    /// v2.0.3
+    /// v2.0.4
     /// Local Files の TreeViewまたは階層化
     /// Local Files: "Save Selected to" context menu.
     /// Local Files: "再読み込み" context menu.
@@ -49,6 +49,7 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v2.0.2    store公開。
     /// v2.0.1.2 Playlistの削除で残り一つの時クリアされないバグ。大量の曲がキューにある時重たい処理は砂時計を出すようにした。 Local Files のダブルクリックとWidth修正と覚える。アイコン追加。
     /// v2.0.1.1 TimeFormatedが一部表示されないバグ。
     /// v2.0.1    store公開。
@@ -170,7 +171,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.1.2";
+        const string _appVer = "v2.0.2";
 
         public string AppVer
         {

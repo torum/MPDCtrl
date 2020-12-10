@@ -208,26 +208,6 @@
 
             </Grid>
 
-            <!-- 接続中画面の背景（起動時に、設定されているホストに接続を試行している時に一瞬表示される。） -->
-            <Grid Grid.Row="1">
-                <Viewbox Grid.Row="0" Grid.Column="0" Margin="0 0 6 0" Width="32" Height="32" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Canvas Width="24" Height="24">
-                        <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding StatusButton, NotifyOnTargetUpdated=True}" >
-                            <Path.Triggers>
-                                <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:2" AutoReverse="True" RepeatBehavior="Forever">
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </Path.Triggers>
-                        </Path>
-                    </Canvas>
-                </Viewbox>
-            </Grid>
-
             <!-- メイン画面 -->
             <Grid Grid.Row="1" Visibility="{Binding IsMainShow, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
                 <Grid.RowDefinitions>
@@ -344,13 +324,14 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="241"/>
+                        <ColumnDefinition Width="{Binding MainLeftPainWidth}" MinWidth="0"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="0" MinWidth="0"/>
                     </Grid.ColumnDefinitions>
 
                     <!-- Libraries -->
-                    <Grid Grid.Row="0" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}">
+                    <Grid Grid.Row="0" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:SizeChange.IsEnabled="True" helpers:SizeChange.ActualWidth="{Binding MainLeftPainActualWidth, Mode=OneWayToSource}">
                         <TabControl Style="{StaticResource NoChromeTabControl}" Margin="0 1 0 0" Background="{DynamicResource BoardBackgroundColorBrush}">
                             
                             <!-- Playlists -->
@@ -609,7 +590,7 @@
                     </Grid>
 
                     <!-- GridSplitter -->
-                    <GridSplitter Grid.Row="0" Grid.Column="1" ResizeDirection="Columns" Style="{StaticResource GridSplitterStyle}">
+                    <GridSplitter Grid.Row="0" Grid.Column="1" ResizeDirection="Columns"  Style="{StaticResource GridSplitterStyle}">
                     </GridSplitter>
 
                     <!-- Current Queue -->
@@ -951,6 +932,8 @@
 
                     </Grid>
 
+                    <Grid Grid.Column="3"></Grid>
+
                 </Grid>
 
                 <!-- StatusBar -->
@@ -964,6 +947,27 @@
                 </StatusBar>
 
             </Grid>
+
+            <!-- 接続中画面の背景（起動時に、設定されているホストに接続を試行している時に一瞬表示される。） -->
+            <Grid Grid.Row="1">
+                <Viewbox Grid.Row="0" Grid.Column="0" Margin="0 0 6 0" Width="32" Height="32" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Canvas Width="24" Height="24">
+                        <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding StatusButton, NotifyOnTargetUpdated=True}" >
+                            <Path.Triggers>
+                                <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:2" AutoReverse="True" RepeatBehavior="Forever">
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Path.Triggers>
+                        </Path>
+                    </Canvas>
+                </Viewbox>
+            </Grid>
+
 
             <!-- 初期設定兼再接続画面 -->
             <Grid Grid.Row="1" Background="{DynamicResource BoardBackgroundColorBrush}" Visibility="{Binding IsConnectionSettingShow, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">

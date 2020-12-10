@@ -44,10 +44,12 @@ namespace MPDCtrl.ViewModels
     /// テーマの切り替え
     /// Queue: カラムヘッダークリックでソート
     /// Queue: ScrollIntoView to NowPlaying (not selected item).「現在の曲へ」のコンテキストメニューを追加。イベントでitemを渡す？
+    /// Listview の水平スクロールバーのデザイン。
+    /// GridSplitterが右に行き過ぎる問題。
 
 
     /// 更新履歴：
-    /// v2.0.1.2 Playlistの削除で残り一つの時クリアされないバグ。大量の曲がキューにある時重たい処理は砂時計を出すようにした。 Local Files のダブルクリックとWidth修正。アイコン追加。
+    /// v2.0.1.2 Playlistの削除で残り一つの時クリアされないバグ。大量の曲がキューにある時重たい処理は砂時計を出すようにした。 Local Files のダブルクリックとWidth修正と覚える。アイコン追加。
     /// v2.0.1.1 TimeFormatedが一部表示されないバグ。
     /// v2.0.1    store公開。
     /// v2.0.0.16 カラムヘッダーのサイズを覚えるようにした（色々とやっかい）
@@ -1309,6 +1311,42 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
+        #region == レイアウト関連 ==
+
+        private double _mainLeftPainActualWidth = 241;
+        public double MainLeftPainActualWidth
+        {
+            get
+            {
+                return _mainLeftPainActualWidth;
+            }
+            set
+            {
+                if (value == _mainLeftPainActualWidth) return;
+
+                _mainLeftPainActualWidth = value;
+
+                NotifyPropertyChanged("MainLeftPainActualWidth");
+            }
+        }
+
+        private double _mainLeftPainWidth = 241;
+        public double MainLeftPainWidth
+        {
+            get
+            {
+                return _mainLeftPainWidth;
+            }
+            set
+            {
+                if (value == _mainLeftPainWidth) return;
+
+                _mainLeftPainWidth = value;
+
+                NotifyPropertyChanged("MainLeftPainWidth");
+            }
+        }
+
         #region == Queueカラムヘッダー ==
 
         private bool _queueColumnHeaderPositionVisibility = false;
@@ -1580,6 +1618,8 @@ namespace MPDCtrl.ViewModels
                 NotifyPropertyChanged("QueueColumnHeaderLastModifiedWidth");
             }
         }
+
+        #endregion
 
         #endregion
 
@@ -2160,6 +2200,31 @@ namespace MPDCtrl.ViewModels
                     }
 
                     #endregion
+
+                    var lay = xdoc.Root.Element("Layout");
+                    if (lay != null)
+                    {
+                        var leftpain = lay.Element("LeftPain");
+                        if (leftpain != null)
+                        {
+                            if (leftpain.Attribute("Width") != null)
+                            {
+                                if (!string.IsNullOrEmpty(leftpain.Attribute("Width").Value))
+                                {
+                                    try
+                                    {
+                                        MainLeftPainWidth = Double.Parse(leftpain.Attribute("Width").Value.ToString());
+                                    }
+                                    catch
+                                    {
+                                        MainLeftPainWidth = 241;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
                 }
             }
             catch (System.IO.FileNotFoundException)
@@ -2206,6 +2271,9 @@ namespace MPDCtrl.ViewModels
             if (QueueColumnHeaderAlbumVisibility) QueueColumnHeaderAlbumWidth = _queueColumnHeaderAlbumWidthUser;
             if (QueueColumnHeaderGenreVisibility) QueueColumnHeaderGenreWidth = _queueColumnHeaderGenreWidthUser;
             if (QueueColumnHeaderLastModifiedVisibility) QueueColumnHeaderLastModifiedWidth = _queueColumnHeaderLastModifiedWidthUser;
+
+            //_mainLeftPainWidth = MainLeftPainWidth;
+            NotifyPropertyChanged("MainLeftPainWidth");
         }
 
         // 終了時の処理
@@ -2213,6 +2281,8 @@ namespace MPDCtrl.ViewModels
         {
             if (!IsFullyLoaded)
                 return;
+
+            double windowWidth = 780;
 
             #region == アプリ設定の保存 ==
 
@@ -2254,10 +2324,12 @@ namespace MPDCtrl.ViewModels
                 if (w.WindowState == WindowState.Maximized)
                 {
                     attrs.Value = w.RestoreBounds.Width.ToString();
+                    windowWidth = w.RestoreBounds.Width;
                 }
                 else
                 {
                     attrs.Value = w.Width.ToString();
+                    windowWidth = w.Width;
 
                 }
                 mainWindow.SetAttributeNode(attrs);
@@ -2580,6 +2652,33 @@ namespace MPDCtrl.ViewModels
             headers.AppendChild(queueHeader);
             ////
             root.AppendChild(headers);
+
+            #endregion
+
+            #region == レイアウトの保存 ==
+
+            XmlElement lay = doc.CreateElement(string.Empty, "Layout", string.Empty);
+
+            XmlElement leftpain;
+            XmlAttribute lAttrs;
+
+            // LeftPain
+            leftpain = doc.CreateElement(string.Empty, "LeftPain", string.Empty);
+            lAttrs = doc.CreateAttribute("Width");
+            if (windowWidth > (MainLeftPainActualWidth-24))
+            {
+                lAttrs.Value = MainLeftPainActualWidth.ToString();
+            }
+            else
+            {
+                lAttrs.Value = "241";
+            }
+            leftpain.SetAttributeNode(lAttrs);
+
+            //
+            lay.AppendChild(leftpain);
+            ////
+            root.AppendChild(lay);
 
             #endregion
 

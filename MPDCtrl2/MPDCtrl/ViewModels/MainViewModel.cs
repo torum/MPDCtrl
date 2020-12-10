@@ -17,33 +17,38 @@ using System.Windows.Input;
 using System.IO;
 using System.ComponentModel;
 using System.Windows.Threading;
+using System.Globalization;
 using System.Net;
 using System.Text.RegularExpressions;
 using MPDCtrl.Common;
 using MPDCtrl.Views;
-using System.Globalization;
 
 namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
     /// v2.0.2
+    /// exception trap
     /// Ctrl+Fで検索。「追加」のコンテキストメニューを追加。ダイアログで2pain Treeview + Listviewにして、検索＆選択してQueueに追加できるように。
-    /// Queue: ScrollIntoView to NowPlaying (not selected item).「現在の曲へ」のコンテキストメニューを追加。
     /// 
     /// v2.0.3
     /// Local Files の TreeViewまたは階層化
     /// Local Files: "Save Selected to" context menu.
     /// Local Files: "再読み込み" context menu.
+    /// Local Files: ファイルアイコン（出来ればMP3とかの形式毎に）
     /// 
     /// [未定]
-    /// アルバムカバー対応。Last.fm?
+    /// キューかStatusが更新される度にタイマーというかシークがオカシイ。
     /// スライダーの上でスクロールして音量変更。
+    /// アルバムカバー対応。Last.fm?
     /// テーマの切り替え
     /// Queue: カラムヘッダークリックでソート
+    /// Queue: ScrollIntoView to NowPlaying (not selected item).「現在の曲へ」のコンテキストメニューを追加。イベントでitemを渡す？
 
 
     /// 更新履歴：
+    /// v2.0.1.2 Playlistの削除で残り一つの時クリアされないバグ。大量の曲がキューにある時重たい処理は砂時計を出すようにした。 Local Files のダブルクリックとWidth修正。アイコン追加。
+    /// v2.0.1.1 TimeFormatedが一部表示されないバグ。
     /// v2.0.1    store公開。
     /// v2.0.0.16 カラムヘッダーのサイズを覚えるようにした（色々とやっかい）
     /// v2.0.0.15 ヘッダーカラムの項目の表示・非表示を覚えるようにした。
@@ -163,7 +168,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.1";
+        const string _appVer = "v2.0.1.2";
 
         public string AppVer
         {
@@ -469,6 +474,22 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private bool _isBusy;
+        public bool IsBusy
+        {
+            get
+            {
+                return _isBusy;
+            }
+            set
+            {
+                if (_isBusy == value)
+                    return;
+
+                _isBusy = value;
+                NotifyPropertyChanged("IsBusy");
+            }
+        }
 
         #endregion
 
@@ -1605,7 +1626,8 @@ namespace MPDCtrl.ViewModels
 
             LocalfileListviewEnterKeyCommand = new GenericRelayCommand<object>(param => LocalfileListviewEnterKeyCommand_Execute(param), param => LocalfileListviewEnterKeyCommand_CanExecute());
             LocalfileListviewAddCommand = new GenericRelayCommand<object>(param => LocalfileListviewAddCommand_Execute(param), param => LocalfileListviewAddCommand_CanExecute());
-            
+            LocalfileListviewLeftDoubleClickCommand = new GenericRelayCommand<object>(param => LocalfileListviewLeftDoubleClickCommand_Execute(param), param => LocalfileListviewLeftDoubleClickCommand_CanExecute());
+
             SongListViewEnterKeyCommand = new RelayCommand(SongListViewEnterKeyCommand_ExecuteAsync, SongListViewEnterKeyCommand_CanExecute);
             SongListViewLeftDoubleClickCommand = new GenericRelayCommand<MPC.Song>(param => SongListViewLeftDoubleClickCommand_ExecuteAsync(param), param => SongListViewLeftDoubleClickCommand_CanExecute());
             SongListviewDeleteCommand = new GenericRelayCommand<object>(param => SongListviewDeleteCommand_Execute(param), param => SongListviewDeleteCommand_CanExecute());
@@ -1667,7 +1689,8 @@ namespace MPDCtrl.ViewModels
             _MPC.ErrorReturned += new MPC.MpdError(OnError);
             _MPC.ErrorConnected += new MPC.MpdConnectionError(OnConnectionError);
             _MPC.ConnectionStatusChanged += new MPC.MpdConnectionStatusChanged(OnConnectionStatusChanged);
-
+            _MPC.IsBusy += new MPC.MpdIsBusy(OnClientIsBusy);
+            
             #endregion
 
             #region == タイマー ==  
@@ -2172,6 +2195,7 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        // 起動後画面が描画された時の処理
         public void OnContentRendered(object sender, EventArgs e)
         {
             if (QueueColumnHeaderPositionVisibility) QueueColumnHeaderPositionWidth = _queueColumnHeaderPositionWidthUser;
@@ -2635,6 +2659,9 @@ namespace MPDCtrl.ViewModels
                         CurrentSong.IsPlaying = false;
                     }
                 }
+
+                IsBusy = true;
+
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     // Sets Current Song
@@ -2653,14 +2680,18 @@ namespace MPDCtrl.ViewModels
                     }
                 });
 
+                IsBusy = false;
             }
             else if ((data as string) == "isCurrentQueue")
             {
+                IsBusy = true;
+
                 // 削除する曲の一時リスト
                 List<MPC.Song> _tmpQueue = new List<MPC.Song>();
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
+                    IsBusy = true;
                     // 既存のリストの中で新しいリストにないものを削除
                     foreach (var sng in Queue)
                     {
@@ -2724,6 +2755,7 @@ namespace MPDCtrl.ViewModels
                     collectionView.SortDescriptions.Add(new SortDescription("Index", ListSortDirection.Ascending));
                 });
 
+                IsBusy = false;
             }
             else if ((data as string) == "isStoredPlaylist")
             {
@@ -2905,6 +2937,11 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private void OnClientIsBusy(MPC sender, bool on)
+        {
+            this.IsBusy = on;
+        }
+
         #endregion
 
         #region == タイマー ==
@@ -2970,16 +3007,6 @@ namespace MPDCtrl.ViewModels
 
         private void UpdateButtonStatus()
         {
-            //start elapsed timer.
-            if (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
-            {
-                _elapsedTimer.Start();
-            }
-            else
-            {
-                _elapsedTimer.Stop();
-            }
-
             try
             {
                 //Play button
@@ -3023,9 +3050,18 @@ namespace MPDCtrl.ViewModels
                 _elapsed = _MPC.MpdStatus.MpdSongElapsed;
                 NotifyPropertyChanged("Elapsed");
 
+                //start elapsed timer.
+                if (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
+                {
+                    _elapsedTimer.Start();
+                }
+                else
+                {
+                    _elapsedTimer.Stop();
+                }
+
                 //
                 Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
-
 
             }
             catch
@@ -3325,6 +3361,39 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        public ICommand LocalfileListviewLeftDoubleClickCommand { get; set; }
+        public bool LocalfileListviewLeftDoubleClickCommand_CanExecute()
+        {
+            if (_MPC == null) { return false; }
+            return true;
+        }
+        public void LocalfileListviewLeftDoubleClickCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            System.Collections.IList items = (System.Collections.IList)obj;
+
+            if (items.Count > 1)
+            {
+                var collection = items.Cast<String>();
+
+                List<string> uriList = new List<string>();
+
+                foreach (var item in collection)
+                {
+                    uriList.Add(item);
+                }
+
+                _MPC.MpdAdd(uriList);
+            }
+            else
+            {
+                _MPC.MpdAdd(items[0] as string);
+            }
+        }
+
+        
+
         #endregion
 
         #region == Playlists ==
@@ -3457,6 +3526,15 @@ namespace MPDCtrl.ViewModels
 
         public bool DoRemovePlaylist(String playlist) 
         {
+            if (Playlists.Count == 1)
+            {
+                if (Application.Current == null) { return false; }
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Playlists.Clear();
+                });
+            }
+
             _MPC.MpdRemovePlaylist(playlist);
 
             return true;

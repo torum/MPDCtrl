@@ -20,7 +20,7 @@ using System.Diagnostics;
 using MPDCtrl.ViewModels;
 using MPDCtrl.Views;
 
-namespace MPDCtrl
+namespace MPDCtrl.Views
 {
     public partial class MainWindow : Window
     {

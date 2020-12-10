@@ -5,7 +5,7 @@
              xmlns:vms="clr-namespace:MPDCtrl.ViewModels"
              xmlns:common="clr-namespace:MPDCtrl.Common"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             StartupUri="MainWindow.xaml"
+             StartupUri="Views\MainWindow.xaml"
              Startup="AppOnStartup">
     <Application.Resources>
         <ResourceDictionary>

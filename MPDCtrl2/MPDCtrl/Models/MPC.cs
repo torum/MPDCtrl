@@ -54,7 +54,6 @@ namespace MPDCtrl
             public string Title { get; set; }
             public string Track { get; set; }
             public string Disc { get; set; }
-
             public string TimeFormated
             {
                 get
@@ -85,7 +84,15 @@ namespace MPDCtrl
                             }
                             else if ((hour != 0) && (min != 0))
                             {
-                                _timeFormatted = String.Format("{0}:{1}:{2:00}", hour, min, s);
+                                _timeFormatted = String.Format("{0}:{1:00}:{2:00}", hour, min, s);
+                            }
+                            else if (hour != 0)
+                            {
+                                _timeFormatted = String.Format("{0}:{1:00}:{2:00}", hour, min, s);
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine("Oops@TimeFormated: " + _time + " : " + hour.ToString() +" " + min.ToString() + " " + s.ToString());
                             }
                         }
                     }
@@ -377,6 +384,9 @@ namespace MPDCtrl
 
         public delegate void MpdConnectionStatusChanged(MPC sender, AsynchronousTCPClient.ConnectionStatus status);
         public event MpdConnectionStatusChanged ConnectionStatusChanged;
+
+        public delegate void MpdIsBusy(MPC sender, bool on);
+        public event MpdIsBusy IsBusy;
 
         #endregion
 
@@ -1296,9 +1306,12 @@ namespace MPDCtrl
             }
             else
             {
-                DataReceived_Dispatch((data as string));
-            }
+                await Task.Run(() => { IsBusy?.Invoke(this, true); });
 
+                DataReceived_Dispatch((data as string));
+
+                await Task.Run(() => { IsBusy?.Invoke(this, false); });
+            }
         }
 
         private void DataReceived_Dispatch(string str)
@@ -1507,6 +1520,7 @@ namespace MPDCtrl
                 System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa ParseData NON: " + str);
 
             }
+
         }
 
         private bool ParseStatus(List<string> sl)
@@ -1725,6 +1739,8 @@ namespace MPDCtrl
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@ParseStatusResponse:" + ex.Message);
+
+                IsBusy?.Invoke(this, false);
             }
 
             return true;
@@ -1739,7 +1755,7 @@ namespace MPDCtrl
                 //ErrorReturned?.Invoke(this, "Connection Error: (@C2)");
                 return false;
             }
-            
+
             /*
             file: Creedence Clearwater Revival/Chronicle, Vol. 1/11 Who'll Stop the Rain.mp3
             Last-Modified: 2011-08-03T16:08:06Z
@@ -1903,9 +1919,11 @@ namespace MPDCtrl
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse: " + ex.Message);
+
+                //IsBusy?.Invoke(this, false);
                 return false;
             }
-
+            
             return true;
         }
 
@@ -1968,7 +1986,6 @@ namespace MPDCtrl
 
         private bool ParseListAll(List<string> sl)
         {
-
             if (Application.Current == null) { return false; }
             Application.Current.Dispatcher.Invoke(() =>
             {

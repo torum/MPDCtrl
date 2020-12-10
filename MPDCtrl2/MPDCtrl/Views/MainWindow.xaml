@@ -1,4 +1,4 @@
-﻿<Window x:Class="MPDCtrl.MainWindow"
+﻿<Window x:Class="MPDCtrl.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -14,6 +14,15 @@
         Title="{Binding AppTitle}"
         Width="780" Height="480"
         MinWidth="780" MinHeight="250">
+    <Window.Style>
+        <Style TargetType="Window">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                    <Setter Property="Cursor" Value="Wait" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Style>
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="30" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"/>
     </WindowChrome.WindowChrome>
@@ -296,7 +305,6 @@
                             </Grid.ColumnDefinitions>
 
                             <Slider x:Name="SliderSeek" ToolTip="{x:Static properties:Resources.Playback_SliderSeek}" Style="{DynamicResource SliderHorizontalStyle}" Grid.Column="1" VerticalAlignment="Center" Margin="6 6 6 0" IsMoveToPointEnabled="True" Minimum="0" Maximum="{Binding Mode=TwoWay,Path=Time}" Value="{Binding Mode=TwoWay,Path=Elapsed}">
-
                             </Slider>
 
                         </Grid>
@@ -346,12 +354,12 @@
                         <TabControl Style="{StaticResource NoChromeTabControl}" Margin="0 1 0 0" Background="{DynamicResource BoardBackgroundColorBrush}">
                             
                             <!-- Playlists -->
-                            <TabItem Header="{x:Static properties:Resources.PlaylistListviewTabitemHeader_Playlists}" ToolTip="(P)" Width="120" Style="{StaticResource NoChromeTabHeader}">
-                                <StackPanel>
+                            <TabItem Header="{x:Static properties:Resources.PlaylistListviewTabitemHeader_Playlists}" Width="120" Style="{StaticResource NoChromeTabHeader}">
+                                <Grid>
                                     
-                                    <Grid x:Name="LVPLDummy" Grid.Row="0" Grid.Column="2" Visibility="Hidden" Margin="0 0 20 0">
+                                    <Grid x:Name="LVPLDummy" Visibility="Hidden" Margin="0 0 20 0">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="0" />
+                                            <ColumnDefinition Width="26" />
                                             <ColumnDefinition Width="1*"/>
                                         </Grid.ColumnDefinitions>
 
@@ -362,14 +370,11 @@
 
                                     <ListView x:Name="PlaylistListview" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}" SelectionMode="Single" Background="Transparent" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                                         <ListView.InputBindings>
-                                            <KeyBinding Key="Return" Command="{Binding Path=DataContext.PlaylistListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"
-                                                                 CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
+                                            <KeyBinding Key="Return" Command="{Binding Path=DataContext.PlaylistListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                                         </ListView.InputBindings>
                                         <ListView.Resources>
                                             <ContextMenu x:Key="PlaylistItemContextMenu">
-                                                <MenuItem Header="{x:Static properties:Resources.PlaylistItemContextMenu_Load}" 
-                                                        Command="{Binding Path=DataContext.PlaylistListviewLoadPlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
-                                                        CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                                <MenuItem Header="{x:Static properties:Resources.PlaylistItemContextMenu_Load}" Command="{Binding Path=DataContext.PlaylistListviewLoadPlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                                     <MenuItem.Resources>
                                                         <ControlTemplate x:Key="PlusIcon">
                                                             <Canvas Background="Transparent" >
@@ -381,9 +386,7 @@
                                                         <ContentControl Template="{StaticResource PlusIcon}" />
                                                     </MenuItem.Icon>
                                                 </MenuItem>
-                                                <MenuItem Header="{x:Static properties:Resources.PlaylistItemContextMenu_ClearAndLoad}" 
-                                                        Command="{Binding Path=DataContext.PlaylistListviewClearLoadPlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
-                                                        CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                                <MenuItem Header="{x:Static properties:Resources.PlaylistItemContextMenu_ClearAndLoad}" Command="{Binding Path=DataContext.PlaylistListviewClearLoadPlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                                     <MenuItem.Resources>
                                                         <ControlTemplate x:Key="PlusThickIcon">
                                                             <Canvas Background="Transparent" >
@@ -396,9 +399,7 @@
                                                     </MenuItem.Icon>
                                                 </MenuItem>
                                                 <Separator/>
-                                                <MenuItem Header="{x:Static properties:Resources.PlaylistItemContextMenu_Rename}" 
-                                                        Command="{Binding Path=DataContext.PlaylistListviewRenamePlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
-                                                        CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                                <MenuItem Header="{x:Static properties:Resources.PlaylistItemContextMenu_Rename}" Command="{Binding Path=DataContext.PlaylistListviewRenamePlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                                     <MenuItem.Resources>
                                                         <ControlTemplate x:Key="PlaylistEditIcon">
                                                             <Canvas Background="Transparent" >
@@ -410,9 +411,7 @@
                                                         <ContentControl Template="{StaticResource PlaylistEditIcon}" />
                                                     </MenuItem.Icon>
                                                 </MenuItem>
-                                                <MenuItem Header="{x:Static properties:Resources.PlaylistItemContextMenu_Remove}" 
-                                                        Command="{Binding Path=DataContext.PlaylistListviewRemovePlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
-                                                        CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                                <MenuItem Header="{x:Static properties:Resources.PlaylistItemContextMenu_Remove}" Command="{Binding Path=DataContext.PlaylistListviewRemovePlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                                     <MenuItem.Resources>
                                                         <ControlTemplate x:Key="PlaylistRemoveIcon">
                                                             <Canvas Background="Transparent" >
@@ -444,6 +443,24 @@
                                                         <Setter Property="Visibility" Value="Collapsed" />
                                                     </Style>
                                                 </GridView.ColumnHeaderContainerStyle>
+                                                <GridViewColumn Header="" Width="{Binding ElementName=LVPLDummy0, Path=ActualWidth}">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                                                <Viewbox Width="18" Height="18">
+                                                                    <Canvas Width="24" Height="24">
+                                                                        <Path x:Name="PlaylistIcon" Fill="{DynamicResource ControlMediumColorBrush}" Canvas.Top="6.5" Stretch="Uniform" Data="M15,6H3V8H15V6M15,10H3V12H15V10M3,16H11V14H3V16M17,6V14.18C16.69,14.07 16.35,14 16,14A3,3 0 0,0 13,17A3,3 0 0,0 16,20A3,3 0 0,0 19,17V8H22V6H17Z" />
+                                                                    </Canvas>
+                                                                </Viewbox>
+                                                            </StackPanel>
+                                                            <DataTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                                    <Setter TargetName="PlaylistIcon" Property="Fill" Value="#111111" />
+                                                                </DataTrigger>
+                                                            </DataTemplate.Triggers>
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
                                                 <GridViewColumn Header="Playlists" Width="{Binding ElementName=LVPLDummy1, Path=ActualWidth}">
                                                     <GridViewColumn.CellTemplate>
                                                         <DataTemplate>
@@ -478,83 +495,114 @@
                                         </ListView.ItemContainerStyle>
                                     </ListView>
 
-                                </StackPanel>
+                                </Grid>
                             </TabItem>
 
                             <!-- Local files -->
-                            <TabItem Header="{x:Static properties:Resources.LocalfileListviewTabitemHeader_LocalFiles}" ToolTip="(L)" Width="120" Style="{StaticResource NoChromeTabHeader}">
+                            <TabItem Header="{x:Static properties:Resources.LocalfileListviewTabitemHeader_LocalFiles}" Width="120" Style="{StaticResource NoChromeTabHeader}">
+                                <Grid>
 
-                                <ListView x:Name="LocalfileListview" ItemsSource="{Binding Localfiles}" SelectedItem="{Binding SelectedLocalfile}" SelectionMode="Extended" Background="Transparent" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
-                                    <ListView.InputBindings>
-                                        <KeyBinding Key="Return" Command="{Binding Path=DataContext.LocalfileListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"
-                                                                 CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
-                                    </ListView.InputBindings>
-                                    <ListView.Resources>
-                                        <ContextMenu x:Key="LocalfileItemContextMenu">
-                                            <MenuItem Header="{x:Static properties:Resources.LocalfileItemContextMenu_Add}" 
-                                                        Command="{Binding Path=DataContext.LocalfileListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
-                                                        CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
-                                                <MenuItem.Resources>
-                                                    <ControlTemplate x:Key="PlusIcon">
-                                                        <Canvas Background="Transparent" >
-                                                            <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
-                                                        </Canvas>
-                                                    </ControlTemplate>
-                                                </MenuItem.Resources>
-                                                <MenuItem.Icon>
-                                                    <ContentControl Template="{StaticResource PlusIcon}" />
-                                                </MenuItem.Icon>
-                                            </MenuItem>
-                                        </ContextMenu>
-                                        <Style TargetType="{x:Type ScrollBar}">
-                                            <Setter Property="Margin" Value="0,0,0,0" />
-                                            <Setter Property="BorderThickness" Value="0" />
-                                            <Style.Triggers>
-                                                <Trigger Property="Orientation" Value="Vertical">
-                                                    <Setter Property="Width" Value="18"/>
-                                                    <Setter Property="Height" Value="Auto" />
-                                                    <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ListView.Resources>
-                                    <ListView.View>
-                                        <GridView>
-                                            <GridView.ColumnHeaderContainerStyle>
-                                                <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource GridViewColumnHeaderStyle}">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                </Style>
-                                            </GridView.ColumnHeaderContainerStyle>
-                                            <GridViewColumn Header="Files">
-                                                <GridViewColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <StackPanel HorizontalAlignment="Left">
-                                                            <TextBlock Text="{Binding }" Padding="3" />
-                                                        </StackPanel>
-                                                    </DataTemplate>
-                                                </GridViewColumn.CellTemplate>
-                                            </GridViewColumn>
-                                        </GridView>
-                                    </ListView.View>
-                                    <ListView.ItemContainerStyle>
-                                        <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemNoAlternateStyle}">
-                                            <Setter Property="ContextMenu" Value="{StaticResource LocalfileItemContextMenu}" />
-                                            <Setter Property="Margin" Value="0 0 0 0"/>
-                                            <Setter Property="Padding" Value="0 1 0 1"/>
-                                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                                        <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
-                                                            <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                                                        </Border>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </ListView.ItemContainerStyle>
-                                </ListView>
+                                    <Grid x:Name="LVLFDummy" Visibility="Hidden" Margin="0 0 20 0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="26" />
+                                            <ColumnDefinition Width="1*"/>
+                                        </Grid.ColumnDefinitions>
 
+                                        <!--  This is the hidden helper Field which is used to bind to, using the "Fill" column of the helper grid  -->
+                                        <Grid x:Name="LVLFDummy0" Grid.Column="0" />
+                                        <Grid x:Name="LVLFDummy1" Grid.Column="1" />
+                                    </Grid>
+
+                                    <ListView x:Name="LocalfileListview" ItemsSource="{Binding Localfiles}" SelectedItem="{Binding SelectedLocalfile}" SelectionMode="Extended" Background="Transparent" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                        <ListView.InputBindings>
+                                            <KeyBinding Key="Return" Command="{Binding Path=DataContext.LocalfileListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
+                                        </ListView.InputBindings>
+                                        <ListView.Resources>
+                                            <ContextMenu x:Key="LocalfileItemContextMenu">
+                                                <MenuItem Header="{x:Static properties:Resources.LocalfileItemContextMenu_Add}" Command="{Binding Path=DataContext.LocalfileListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                                    <MenuItem.Resources>
+                                                        <ControlTemplate x:Key="PlusIcon">
+                                                            <Canvas Background="Transparent" >
+                                                                <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                                                            </Canvas>
+                                                        </ControlTemplate>
+                                                    </MenuItem.Resources>
+                                                    <MenuItem.Icon>
+                                                        <ContentControl Template="{StaticResource PlusIcon}" />
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                            </ContextMenu>
+                                            <Style TargetType="{x:Type ScrollBar}">
+                                                <Setter Property="Margin" Value="0,0,0,0" />
+                                                <Setter Property="BorderThickness" Value="0" />
+                                                <Style.Triggers>
+                                                    <Trigger Property="Orientation" Value="Vertical">
+                                                        <Setter Property="Width" Value="18"/>
+                                                        <Setter Property="Height" Value="Auto" />
+                                                        <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ListView.Resources>
+                                        <ListView.View>
+                                            <GridView>
+                                                <GridView.ColumnHeaderContainerStyle>
+                                                    <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource GridViewColumnHeaderStyle}">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </Style>
+                                                </GridView.ColumnHeaderContainerStyle>
+                                                <GridViewColumn Header="" Width="{Binding ElementName=LVLFDummy0, Path=ActualWidth}">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                                                <Viewbox Width="18" Height="18">
+                                                                    <Canvas Width="24" Height="24">
+                                                                        <Path x:Name="MusicFileIcon" Fill="{DynamicResource ControlMediumColorBrush}" Canvas.Top="0" Stretch="Uniform" Data="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,13H11V18A2,2 0 0,1 9,20A2,2 0 0,1 7,18A2,2 0 0,1 9,16C9.4,16 9.7,16.1 10,16.3V11H13V13M13,9V3.5L18.5,9H13Z" />
+                                                                    </Canvas>
+                                                                </Viewbox>
+                                                            </StackPanel>
+                                                            <DataTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                                    <Setter TargetName="MusicFileIcon" Property="Fill" Value="#111111" />
+                                                                </DataTrigger>
+                                                            </DataTemplate.Triggers>
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+                                                <GridViewColumn Header="Files" Width="{Binding ElementName=LVLFDummy1, Path=ActualWidth}">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel HorizontalAlignment="Left">
+                                                                <TextBlock Text="{Binding }" Padding="3" />
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+                                            </GridView>
+                                        </ListView.View>
+                                        <ListView.ItemContainerStyle>
+                                            <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemNoAlternateStyle}">
+                                                <Setter Property="ContextMenu" Value="{StaticResource LocalfileItemContextMenu}" />
+                                                <Setter Property="Margin" Value="0 0 0 0"/>
+                                                <Setter Property="Padding" Value="0 1 0 1"/>
+                                                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                                            <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
+                                                                <Border.InputBindings>
+                                                                    <MouseBinding Command="{Binding Path=DataContext.LocalfileListviewLeftDoubleClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Gesture="LeftDoubleClick" />
+                                                                </Border.InputBindings>
+                                                                <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </ListView.ItemContainerStyle>
+                                    </ListView>
+
+                                </Grid>
                             </TabItem>
 
                         </TabControl>
@@ -662,18 +710,17 @@
                                             </MenuItem.Icon>
                                         </MenuItem>
                                     </MenuItem>
-
                                     <Separator />
                                     <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_Queue}">
                                         <MenuItem.Resources>
-                                            <ControlTemplate x:Key="PlaylistMusicOutline">
+                                            <ControlTemplate x:Key="PlaylistPlay">
                                                 <Canvas Background="Transparent" >
-                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M15,6V8H3V6H15M15,10V12H3V10H15M3,16V14H11V16H3M17,6H22V8H19V17A3,3 0 0,1 16,20A3,3 0 0,1 13,17A3,3 0 0,1 16,14C16.35,14 16.69,14.07 17,14.18V6M16,16A1,1 0 0,0 15,17A1,1 0 0,0 16,18A1,1 0 0,0 17,17A1,1 0 0,0 16,16Z" />
+                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M19,9H2V11H19V9M19,5H2V7H19V5M2,15H15V13H2V15M17,13V19L22,16L17,13Z" />
                                                 </Canvas>
                                             </ControlTemplate>
                                         </MenuItem.Resources>
                                         <MenuItem.Icon>
-                                            <ContentControl Template="{StaticResource PlaylistMusicOutline}" />
+                                            <ContentControl Template="{StaticResource PlaylistPlay}" />
                                         </MenuItem.Icon>
                                         <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_QueueSaveAsPlaylist}" Command="{Binding Path=DataContext.SongListviewSaveCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                             <MenuItem.Resources>

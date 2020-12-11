@@ -331,6 +331,33 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   New Playlist に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Dialog_PlaylistSelect_NewPlaylistName {
+            get {
+                return ResourceManager.GetString("Dialog_PlaylistSelect_NewPlaylistName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Save Selected to に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Dialog_PlaylistSelect_SaveSelectedTo {
+            get {
+                return ResourceManager.GetString("Dialog_PlaylistSelect_SaveSelectedTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Select Playlist に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Dialog_PlaylistSelect_SelectPlaylist {
+            get {
+                return ResourceManager.GetString("Dialog_PlaylistSelect_SelectPlaylist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Remove selected playlist? に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Dialog_RemovePlaylistQ {
@@ -628,6 +655,150 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Move に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueItemContextMenu_Move {
+            get {
+                return ResourceManager.GetString("QueueItemContextMenu_Move", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Down (CTRL+D) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueItemContextMenu_MoveDown {
+            get {
+                return ResourceManager.GetString("QueueItemContextMenu_MoveDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Up (CTRL+U) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueItemContextMenu_MoveUp {
+            get {
+                return ResourceManager.GetString("QueueItemContextMenu_MoveUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Current Queue に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueItemContextMenu_Queue {
+            get {
+                return ResourceManager.GetString("QueueItemContextMenu_Queue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Clear に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueItemContextMenu_QueueClear {
+            get {
+                return ResourceManager.GetString("QueueItemContextMenu_QueueClear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Save as playlist に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueItemContextMenu_QueueSaveAsPlaylist {
+            get {
+                return ResourceManager.GetString("QueueItemContextMenu_QueueSaveAsPlaylist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Remove (CTRL+Delete) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueItemContextMenu_Remove {
+            get {
+                return ResourceManager.GetString("QueueItemContextMenu_Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Save to に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueItemContextMenu_SaveToPlaylist {
+            get {
+                return ResourceManager.GetString("QueueItemContextMenu_SaveToPlaylist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Selected Items に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueItemContextMenu_SelectedItems {
+            get {
+                return ResourceManager.GetString("QueueItemContextMenu_SelectedItems", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Album に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueListviewColumnHeader_Album {
+            get {
+                return ResourceManager.GetString("QueueListviewColumnHeader_Album", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Artist に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueListviewColumnHeader_Artist {
+            get {
+                return ResourceManager.GetString("QueueListviewColumnHeader_Artist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Genre に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueListviewColumnHeader_Genre {
+            get {
+                return ResourceManager.GetString("QueueListviewColumnHeader_Genre", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Last Modified に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueListviewColumnHeader_LastModified {
+            get {
+                return ResourceManager.GetString("QueueListviewColumnHeader_LastModified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Position に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueListviewColumnHeader_Position {
+            get {
+                return ResourceManager.GetString("QueueListviewColumnHeader_Position", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Title に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueListviewColumnHeader_Song {
+            get {
+                return ResourceManager.GetString("QueueListviewColumnHeader_Song", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Time に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueListviewColumnHeader_Time {
+            get {
+                return ResourceManager.GetString("QueueListviewColumnHeader_Time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Save に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Save {
@@ -732,141 +903,6 @@ namespace MPDCtrl.Properties {
         public static string Settings_UnlockAndChangePassword {
             get {
                 return ResourceManager.GetString("Settings_UnlockAndChangePassword", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Move に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string SongItemContextMenu_Move {
-            get {
-                return ResourceManager.GetString("SongItemContextMenu_Move", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Down (CTRL+D) に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string SongItemContextMenu_MoveDown {
-            get {
-                return ResourceManager.GetString("SongItemContextMenu_MoveDown", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Up (CTRL+U) に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string SongItemContextMenu_MoveUp {
-            get {
-                return ResourceManager.GetString("SongItemContextMenu_MoveUp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Current Queue に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string SongItemContextMenu_Queue {
-            get {
-                return ResourceManager.GetString("SongItemContextMenu_Queue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Clear に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string SongItemContextMenu_QueueClear {
-            get {
-                return ResourceManager.GetString("SongItemContextMenu_QueueClear", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Save as playlist に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string SongItemContextMenu_QueueSaveAsPlaylist {
-            get {
-                return ResourceManager.GetString("SongItemContextMenu_QueueSaveAsPlaylist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Remove (CTRL+Delete) に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string SongItemContextMenu_Remove {
-            get {
-                return ResourceManager.GetString("SongItemContextMenu_Remove", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Selected Items に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string SongItemContextMenu_SelectedItems {
-            get {
-                return ResourceManager.GetString("SongItemContextMenu_SelectedItems", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Album に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string SongListViewColumnHeader_Album {
-            get {
-                return ResourceManager.GetString("SongListViewColumnHeader_Album", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Artist に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string SongListViewColumnHeader_Artist {
-            get {
-                return ResourceManager.GetString("SongListViewColumnHeader_Artist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Genre に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string SongListViewColumnHeader_Genre {
-            get {
-                return ResourceManager.GetString("SongListViewColumnHeader_Genre", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Last Modified に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string SongListViewColumnHeader_LastModified {
-            get {
-                return ResourceManager.GetString("SongListViewColumnHeader_LastModified", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Position に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string SongListViewColumnHeader_Position {
-            get {
-                return ResourceManager.GetString("SongListViewColumnHeader_Position", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Title に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string SongListViewColumnHeader_Song {
-            get {
-                return ResourceManager.GetString("SongListViewColumnHeader_Song", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Time に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string SongListViewColumnHeader_Time {
-            get {
-                return ResourceManager.GetString("SongListViewColumnHeader_Time", resourceCulture);
             }
         }
         

@@ -28,27 +28,28 @@ namespace MPDCtrl.ViewModels
     /// TODO: 
     /// 
     /// v2.0.3
-    /// exception trap
+    /// 
     /// Ctrl+Fで検索。「追加」のコンテキストメニューを追加。ダイアログで2pain Treeview + Listviewにして、検索＆選択してQueueに追加できるように。
     /// 
     /// v2.0.4
     /// Local Files の TreeViewまたは階層化
     /// Local Files: "Save Selected to" context menu.
     /// Local Files: "再読み込み" context menu.
-    /// Local Files: ファイルアイコン（出来ればMP3とかの形式毎に）
     /// 
     /// [未定]
-    /// キューかStatusが更新される度にタイマーというかシークがオカシイ。
-    /// スライダーの上でスクロールして音量変更。
     /// アルバムカバー対応。Last.fm?
     /// テーマの切り替え
     /// Queue: カラムヘッダークリックでソート
-    /// Queue: ScrollIntoView to NowPlaying (not selected item).「現在の曲へ」のコンテキストメニューを追加。イベントでitemを渡す？
     /// Listview の水平スクロールバーのデザイン。
-    /// GridSplitterが右に行き過ぎる問題。
+    /// スライダーの上でスクロールして音量変更。
+    /// exception trap and logging
+    /// レイアウト見直し（スプリッターのせい）GridSplitterが右に行き過ぎる問題。
+    /// Queue: ScrollIntoView to NowPlaying (not selected item).「現在の曲へ」のコンテキストメニューを追加。イベントでitemを渡す？
 
 
     /// 更新履歴：
+    /// v2.0.2.2 色々リネーム。Ctrl+S が効いていなかった。選択アイテムを「プレイリストに保存」を追加した。
+    /// v2.0.2.1 キューかStatusが更新される度にタイマーというかシークがオカシイのを直した。
     /// v2.0.2    store公開。
     /// v2.0.1.2 Playlistの削除で残り一つの時クリアされないバグ。大量の曲がキューにある時重たい処理は砂時計を出すようにした。 Local Files のダブルクリックとWidth修正と覚える。アイコン追加。
     /// v2.0.1.1 TimeFormatedが一部表示されないバグ。
@@ -72,10 +73,11 @@ namespace MPDCtrl.ViewModels
 
     /// Key Gestures:
     /// Ctrl+S Show Settings
-    /// Ctrl+U SongListview Queue Move Up
-    /// Ctrl+D SongListview Queue Move Down
-    /// Ctrl+Delete SongListview Remove from Queue
-    /// Space Play
+    /// Ctrl+U QueueListview Queue Move Up
+    /// Ctrl+D QueueListview Queue Move Down
+    /// Ctrl+Delete QueueListview Queue Selected Item delete.
+    /// Space Play > reserved for listview..
+    /// Ctrl+Delete QueueListview Remove from Queue
     /// Esc close dialogs.
 
 
@@ -171,7 +173,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.2";
+        const string _appVer = "v2.0.2.2";
 
         public string AppVer
         {
@@ -464,6 +466,24 @@ namespace MPDCtrl.ViewModels
                 NotifyPropertyChanged("IsChangePasswordDialogShow");
             }
         }
+
+        private bool _isPlaylistSelectDialogShow;
+        public bool IsPlaylistSelectDialogShow
+        {
+            get
+            {
+                return _isPlaylistSelectDialogShow;
+            }
+            set
+            {
+                if (_isPlaylistSelectDialogShow == value)
+                    return;
+
+                _isPlaylistSelectDialogShow = value;
+                NotifyPropertyChanged("IsPlaylistSelectDialogShow");
+            }
+        }
+
 
         public bool IsCurrentProfileSet
         {
@@ -1295,10 +1315,14 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        //public Func<string, string, string> FunctTest { get; set; }
+        public ObservableCollection<String> PlaylistNamesWithNew { get; set; } = new ObservableCollection<String>();
+
+        // Not smart...
         public Func<string, bool> DialogResultFunction { get; set; }
         public Func<string, string, bool> DialogResultFunctionWith2Params { get; set; }
-        public string DialogResultFunctionParam { get; set; }
+        public Func<string, List<string>, bool> DialogResultFunctionWith2ParamsWithObject { get; set; }
+        public string DialogResultFunctionParamString { get; set; }
+        public List<string> DialogResultFunctionParamObject { get; set; }
 
         public void ResetDialog()
         {
@@ -1307,7 +1331,9 @@ namespace MPDCtrl.ViewModels
             DialogInputText = "";
             DialogResultFunction = null;
             DialogResultFunctionWith2Params = null;
-            DialogResultFunctionParam = "";
+            DialogResultFunctionWith2ParamsWithObject = null;
+            DialogResultFunctionParamString = "";
+            DialogResultFunctionParamObject = null;
         }
 
         #endregion
@@ -1669,13 +1695,14 @@ namespace MPDCtrl.ViewModels
             LocalfileListviewAddCommand = new GenericRelayCommand<object>(param => LocalfileListviewAddCommand_Execute(param), param => LocalfileListviewAddCommand_CanExecute());
             LocalfileListviewLeftDoubleClickCommand = new GenericRelayCommand<object>(param => LocalfileListviewLeftDoubleClickCommand_Execute(param), param => LocalfileListviewLeftDoubleClickCommand_CanExecute());
 
-            SongListViewEnterKeyCommand = new RelayCommand(SongListViewEnterKeyCommand_ExecuteAsync, SongListViewEnterKeyCommand_CanExecute);
-            SongListViewLeftDoubleClickCommand = new GenericRelayCommand<MPC.Song>(param => SongListViewLeftDoubleClickCommand_ExecuteAsync(param), param => SongListViewLeftDoubleClickCommand_CanExecute());
-            SongListviewDeleteCommand = new GenericRelayCommand<object>(param => SongListviewDeleteCommand_Execute(param), param => SongListviewDeleteCommand_CanExecute());
-            SongListviewClearCommand = new RelayCommand(SongListviewClearCommand_ExecuteAsync, SongListviewClearCommand_CanExecute);
-            SongListviewSaveCommand = new RelayCommand(SongListviewSaveCommand_ExecuteAsync, SongListviewSaveCommand_CanExecute);
-            SongListviewMoveUpCommand = new GenericRelayCommand<object>(param => SongListviewMoveUpCommand_Execute(param), param => SongListviewMoveUpCommand_CanExecute());
-            SongListviewMoveDownCommand = new GenericRelayCommand<object>(param => SongListviewMoveDownCommand_Execute(param), param => SongListviewMoveDownCommand_CanExecute());
+            QueueListviewEnterKeyCommand = new RelayCommand(QueueListviewEnterKeyCommand_ExecuteAsync, QueueListviewEnterKeyCommand_CanExecute);
+            QueueListviewLeftDoubleClickCommand = new GenericRelayCommand<MPC.Song>(param => QueueListviewLeftDoubleClickCommand_ExecuteAsync(param), param => QueueListviewLeftDoubleClickCommand_CanExecute());
+            QueueListviewDeleteCommand = new GenericRelayCommand<object>(param => QueueListviewDeleteCommand_Execute(param), param => QueueListviewDeleteCommand_CanExecute());
+            QueueListviewClearCommand = new RelayCommand(QueueListviewClearCommand_ExecuteAsync, QueueListviewClearCommand_CanExecute);
+            QueueListviewSaveCommand = new RelayCommand(QueueListviewSaveCommand_ExecuteAsync, QueueListviewSaveCommand_CanExecute);
+            QueueListviewMoveUpCommand = new GenericRelayCommand<object>(param => QueueListviewMoveUpCommand_Execute(param), param => QueueListviewMoveUpCommand_CanExecute());
+            QueueListviewMoveDownCommand = new GenericRelayCommand<object>(param => QueueListviewMoveDownCommand_Execute(param), param => QueueListviewMoveDownCommand_CanExecute());
+            QueueListviewPlaylistAddCommand = new GenericRelayCommand<object>(param => QueueListviewPlaylistAddCommand_Execute(param), param => QueueListviewPlaylistAddCommand_CanExecute());
 
             ShowSettingsCommand = new RelayCommand(ShowSettingsCommand_Execute, ShowSettingsCommand_CanExecute);
             SettingsOKCommand = new RelayCommand(SettingsOKCommand_Execute, SettingsOKCommand_CanExecute);
@@ -1701,6 +1728,8 @@ namespace MPDCtrl.ViewModels
             ChangePasswordDialogOKCommand = new GenericRelayCommand<object>(param => ChangePasswordDialogOKCommand_Execute(param), param => ChangePasswordDialogOKCommand_CanExecute());
             ChangePasswordDialogCancelCommand = new RelayCommand(ChangePasswordDialogCancelCommand_Execute, ChangePasswordDialogCancelCommand_CanExecute);
 
+            PlaylistSelectDialogOKCommand = new GenericRelayCommand<string>(param => PlaylistSelectDialogOKCommand_Execute(param), param => PlaylistSelectDialogOKCommand_CanExecute());
+            PlaylistSelectDialogCancelCommand = new RelayCommand(PlaylistSelectDialogCancelCommand_Execute, PlaylistSelectDialogCancelCommand_CanExecute);
 
             EscapeCommand = new RelayCommand(EscapeCommand_ExecuteAsync, EscapeCommand_CanExecute);
 
@@ -1758,13 +1787,6 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-#if DEBUG
-            //IsMainShow = true; // To show Main pain in the XAML designer.
-            //IsSettingsShow = true;
-#else
-            IsMainShow = false;
-#endif
-
         }
 
         #region == イベント ==
@@ -1772,11 +1794,6 @@ namespace MPDCtrl.ViewModels
         // 起動時の処理
         public void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
-
-#if DEBUG
-            //IsMainShow = false;
-#endif
-
             #region == アプリ設定のロード  ==
 
             try
@@ -2273,8 +2290,6 @@ namespace MPDCtrl.ViewModels
             if (QueueColumnHeaderGenreVisibility) QueueColumnHeaderGenreWidth = _queueColumnHeaderGenreWidthUser;
             if (QueueColumnHeaderLastModifiedVisibility) QueueColumnHeaderLastModifiedWidth = _queueColumnHeaderLastModifiedWidthUser;
 
-            //_mainLeftPainWidth = MainLeftPainWidth;
-            NotifyPropertyChanged("MainLeftPainWidth");
         }
 
         // 終了時の処理
@@ -3144,16 +3159,31 @@ namespace MPDCtrl.ViewModels
                 _consume = _MPC.MpdStatus.MpdConsume;
                 NotifyPropertyChanged("Consume");
 
-                // no need to care about "double" updates for time.
-                Time = _MPC.MpdStatus.MpdSongTime;
+                if (CurrentSong != null)
+                {
+                    if (CurrentSong.Id != _MPC.MpdStatus.MpdSongID)
+                    {
+                        // no need to care about "double" updates for time.
+                        Time = _MPC.MpdStatus.MpdSongTime;
 
-                _elapsed = _MPC.MpdStatus.MpdSongElapsed;
-                NotifyPropertyChanged("Elapsed");
+                        _elapsed = _MPC.MpdStatus.MpdSongElapsed;
+                        NotifyPropertyChanged("Elapsed");
+                    }
+                }
+                else
+                {
+                    // no need to care about "double" updates for time.
+                    Time = _MPC.MpdStatus.MpdSongTime;
+
+                    _elapsed = _MPC.MpdStatus.MpdSongElapsed;
+                    NotifyPropertyChanged("Elapsed");
+                }
 
                 //start elapsed timer.
                 if (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
                 {
-                    _elapsedTimer.Start();
+                    if (!_elapsedTimer.Enabled)
+                        _elapsedTimer.Start();
                 }
                 else
                 {
@@ -3582,8 +3612,9 @@ namespace MPDCtrl.ViewModels
             DialogMessage = MPDCtrl.Properties.Resources.Dialog_NewPlaylistName;
             IsInputDialogShow = true;
 
+            DialogResultFunction = null;
             DialogResultFunctionWith2Params = DoRenamePlaylist;
-            DialogResultFunctionParam = _selecctedPlaylist;
+            DialogResultFunctionParamString = _selecctedPlaylist;
             //_MPC.MpdRenamePlaylist(_selecctedPlaylist, "Hogehoge hoge");
         }
         public bool DoRenamePlaylist(String oldPlaylistName, String newPlaylistName)
@@ -3620,7 +3651,7 @@ namespace MPDCtrl.ViewModels
             IsComfirmationDialogShow = true;
 
             DialogResultFunction = DoRemovePlaylist;
-            DialogResultFunctionParam = _selecctedPlaylist;
+            DialogResultFunctionParamString = _selecctedPlaylist;
             //_MPC.MpdRemovePlaylist(_selecctedPlaylist);
         }
 
@@ -3642,16 +3673,16 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == Current Queue ==
+        #region == Queue ==
 
-        public ICommand SongListviewSaveCommand { get; }
-        public bool SongListviewSaveCommand_CanExecute()
+        public ICommand QueueListviewSaveCommand { get; }
+        public bool QueueListviewSaveCommand_CanExecute()
         {
             if (_MPC == null) return false;
             if (Queue.Count == 0) return false;
             return true;
         }
-        public void SongListviewSaveCommand_ExecuteAsync()
+        public void QueueListviewSaveCommand_ExecuteAsync()
         {
             ResetDialog();
             DialogTitle = MPDCtrl.Properties.Resources.Dialog_Input;
@@ -3659,7 +3690,7 @@ namespace MPDCtrl.ViewModels
             IsInputDialogShow = true;
 
             DialogResultFunction = DoSave;
-            DialogResultFunctionParam = "";
+            DialogResultFunctionParamString = "";
             //_MPC.MpdSave("New Playlist");
         }
 
@@ -3679,39 +3710,39 @@ namespace MPDCtrl.ViewModels
             return true;
         }
 
-        public ICommand SongListViewEnterKeyCommand { get; set; }
-        public bool SongListViewEnterKeyCommand_CanExecute()
+        public ICommand QueueListviewEnterKeyCommand { get; set; }
+        public bool QueueListviewEnterKeyCommand_CanExecute()
         {
             if (_MPC == null) { return false; }
             if (Queue.Count < 1) { return false; }
             if (_selectedSong == null) { return false; }
             return true;
         }
-        public void SongListViewEnterKeyCommand_ExecuteAsync()
+        public void QueueListviewEnterKeyCommand_ExecuteAsync()
         {
             _MPC.MpdPlaybackPlay(_selectedSong.Id);
         }
 
-        public ICommand SongListViewLeftDoubleClickCommand { get; set; }
-        public bool SongListViewLeftDoubleClickCommand_CanExecute()
+        public ICommand QueueListviewLeftDoubleClickCommand { get; set; }
+        public bool QueueListviewLeftDoubleClickCommand_CanExecute()
         {
             if (_MPC == null) { return false; }
             if (Queue.Count < 1) { return false; }
             if (_selectedSong == null) { return false; }
             return true;
         }
-        public void SongListViewLeftDoubleClickCommand_ExecuteAsync(MPC.Song song)
+        public void QueueListviewLeftDoubleClickCommand_ExecuteAsync(MPC.Song song)
         {
             _MPC.MpdPlaybackPlay(song.Id);
         }
 
-        public ICommand SongListviewClearCommand { get; }
-        public bool SongListviewClearCommand_CanExecute()
+        public ICommand QueueListviewClearCommand { get; }
+        public bool QueueListviewClearCommand_CanExecute()
         {
             if (_MPC == null) { return false; }
             return true;
         }
-        public void SongListviewClearCommand_ExecuteAsync()
+        public void QueueListviewClearCommand_ExecuteAsync()
         {
             // Clear queue here because "playlistinfo" ASYNC request returns nothing.
             Application.Current.Dispatcher.Invoke(() =>
@@ -3722,12 +3753,12 @@ namespace MPDCtrl.ViewModels
             _MPC.MpdClear();
         }
 
-        public ICommand SongListviewDeleteCommand { get; }
-        public bool SongListviewDeleteCommand_CanExecute()
+        public ICommand QueueListviewDeleteCommand { get; }
+        public bool QueueListviewDeleteCommand_CanExecute()
         {
             return true;
         }
-        public void SongListviewDeleteCommand_Execute(object obj)
+        public void QueueListviewDeleteCommand_Execute(object obj)
         {
             if (obj == null) return;
 
@@ -3773,12 +3804,12 @@ namespace MPDCtrl.ViewModels
 
         }
 
-        public ICommand SongListviewMoveUpCommand { get; }
-        public bool SongListviewMoveUpCommand_CanExecute()
+        public ICommand QueueListviewMoveUpCommand { get; }
+        public bool QueueListviewMoveUpCommand_CanExecute()
         {
             return true;
         }
-        public void SongListviewMoveUpCommand_Execute(object obj)
+        public void QueueListviewMoveUpCommand_Execute(object obj)
         {
             if (obj == null) return;
 
@@ -3823,12 +3854,12 @@ namespace MPDCtrl.ViewModels
             _MPC.MpdMoveId(IdToNewPos);
         }
 
-        public ICommand SongListviewMoveDownCommand { get; }
-        public bool SongListviewMoveDownCommand_CanExecute()
+        public ICommand QueueListviewMoveDownCommand { get; }
+        public bool QueueListviewMoveDownCommand_CanExecute()
         {
             return true;
         }
-        public void SongListviewMoveDownCommand_Execute(object obj)
+        public void QueueListviewMoveDownCommand_Execute(object obj)
         {
             if (obj == null) return;
 
@@ -3871,6 +3902,70 @@ namespace MPDCtrl.ViewModels
             }
 
             _MPC.MpdMoveId(IdToNewPos);
+        }
+
+
+        public ICommand QueueListviewPlaylistAddCommand { get; }
+        public bool QueueListviewPlaylistAddCommand_CanExecute()
+        {
+            return true;
+        }
+        public void QueueListviewPlaylistAddCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            // 選択アイテム保持用
+            List<MPC.Song> selectedList = new List<MPC.Song>();
+
+            // 念のため、UIスレッドで。
+            if (Application.Current == null) { return; }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                System.Collections.IList items = (System.Collections.IList)obj;
+
+                var collection = items.Cast<MPC.Song>();
+
+                foreach (var item in collection)
+                {
+                    selectedList.Add(item as MPC.Song);
+                }
+            });
+
+            List<string> fileUrisToAddList = new List<string>();
+
+            foreach (var item in selectedList)
+            {
+                if (!string.IsNullOrEmpty(item.file))
+                    fileUrisToAddList.Add(item.file);
+            }
+
+            if (fileUrisToAddList.Count == 0)
+                return;
+
+            ResetDialog();
+            DialogTitle = MPDCtrl.Properties.Resources.Dialog_PlaylistSelect_SaveSelectedTo;
+            DialogMessage = MPDCtrl.Properties.Resources.Dialog_PlaylistSelect_SelectPlaylist;
+
+            DialogResultFunctionWith2ParamsWithObject = DoPlaylistAdd;
+            DialogResultFunctionParamObject = fileUrisToAddList;
+
+            PlaylistNamesWithNew.Clear();
+            PlaylistNamesWithNew.Add("["+ MPDCtrl.Properties.Resources.Dialog_PlaylistSelect_NewPlaylistName + "]");//MPDCtrl.Properties.Resources.
+
+            foreach (var s in Playlists)
+            {
+                PlaylistNamesWithNew.Add(s);
+            }
+
+            IsPlaylistSelectDialogShow = true;
+            //_MPC.MpdPlaylistAdd(playlistName, fileUrisToAddList);
+        }
+
+        public bool DoPlaylistAdd(String playlistName, List<string> fileUrisToAddList)
+        {
+            _MPC.MpdPlaylistAdd(playlistName, fileUrisToAddList);
+
+            return true;
         }
 
         #endregion
@@ -4241,7 +4336,7 @@ namespace MPDCtrl.ViewModels
         }
         public void ComfirmationDialogOKCommand_Execute()
         {
-            DialogResultFunction(DialogResultFunctionParam);
+            DialogResultFunction(DialogResultFunctionParamString);
 
             IsComfirmationDialogShow = false;
         }
@@ -4273,9 +4368,9 @@ namespace MPDCtrl.ViewModels
         }
         public void InputDialogOKCommand_Execute()
         {
-            if (DialogResultFunctionParam != "")
+            if (DialogResultFunctionParamString != "")
             {
-                DialogResultFunctionWith2Params(DialogResultFunctionParam, DialogInputText);
+                DialogResultFunctionWith2Params(DialogResultFunctionParamString, DialogInputText);
             }
             else
             {
@@ -4377,6 +4472,32 @@ namespace MPDCtrl.ViewModels
             IsChangePasswordDialogShow = false;
         }
 
+        public ICommand PlaylistSelectDialogOKCommand { get; }
+        public bool PlaylistSelectDialogOKCommand_CanExecute()
+        {
+            return true;
+        }
+        public void PlaylistSelectDialogOKCommand_Execute(string playlistname)
+        {
+            if (string.IsNullOrEmpty(playlistname)) return;
+
+            // PlaylistAdd
+            DialogResultFunctionWith2ParamsWithObject(playlistname, DialogResultFunctionParamObject);
+
+            IsPlaylistSelectDialogShow = false;
+        }
+
+        public ICommand PlaylistSelectDialogCancelCommand { get; }
+        public bool PlaylistSelectDialogCancelCommand_CanExecute()
+        {
+            return true;
+        }
+        public void PlaylistSelectDialogCancelCommand_Execute()
+        {
+            IsPlaylistSelectDialogShow = false;
+        }
+
+
         public ICommand EscapeCommand { get; }
         public bool EscapeCommand_CanExecute()
         {
@@ -4389,6 +4510,7 @@ namespace MPDCtrl.ViewModels
             IsInformationDialogShow = false;
             IsInputDialogShow = false;
             IsChangePasswordDialogShow = false;
+            IsPlaylistSelectDialogShow = false;
         }
 
         #endregion

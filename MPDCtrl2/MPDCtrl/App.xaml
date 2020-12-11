@@ -815,7 +815,7 @@
                         <Setter Property="Control.Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="ComboBox">
-                                    <Grid>
+                                    <Grid Background="{TemplateBinding Background}">
                                         <ToggleButton Name="ToggleButton" Grid.Column="2" ClickMode="Press" Focusable="False" IsChecked="{Binding Path=IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" Template="{StaticResource ComboBoxToggleButtonTemplate}" />
 
                                         <ContentPresenter Name="ContentSite" Margin="5, 3, 23, 3" IsHitTestVisible="False" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" VerticalAlignment="Center" Content="{TemplateBinding ComboBox.SelectionBoxItem}" ContentTemplate="{TemplateBinding ComboBox.SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"/>

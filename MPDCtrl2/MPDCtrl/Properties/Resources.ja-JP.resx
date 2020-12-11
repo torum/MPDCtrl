@@ -207,6 +207,15 @@
   <data name="Dialog_PlaylistNameAlreadyExists" xml:space="preserve">
     <value>プレイリストに既に同じ名前が存在します。</value>
   </data>
+  <data name="Dialog_PlaylistSelect_NewPlaylistName" xml:space="preserve">
+    <value>新規プレイリスト</value>
+  </data>
+  <data name="Dialog_PlaylistSelect_SaveSelectedTo" xml:space="preserve">
+    <value>選択項目を以下のプレイリストに保存</value>
+  </data>
+  <data name="Dialog_PlaylistSelect_SelectPlaylist" xml:space="preserve">
+    <value>プレイリストを選択</value>
+  </data>
   <data name="Dialog_RemovePlaylistQ" xml:space="preserve">
     <value>選択されたプレイリストを削除しますか？</value>
   </data>
@@ -321,6 +330,54 @@ SOFTWARE.</value>
   <data name="Profiles" xml:space="preserve">
     <value>プロファイル</value>
   </data>
+  <data name="QueueItemContextMenu_Move" xml:space="preserve">
+    <value>移動</value>
+  </data>
+  <data name="QueueItemContextMenu_MoveDown" xml:space="preserve">
+    <value>下へ (CTRL+D)</value>
+  </data>
+  <data name="QueueItemContextMenu_MoveUp" xml:space="preserve">
+    <value>上へ (CTRL+U)</value>
+  </data>
+  <data name="QueueItemContextMenu_Queue" xml:space="preserve">
+    <value>現在のキュー</value>
+  </data>
+  <data name="QueueItemContextMenu_QueueClear" xml:space="preserve">
+    <value>キューをクリアする</value>
+  </data>
+  <data name="QueueItemContextMenu_QueueSaveAsPlaylist" xml:space="preserve">
+    <value>キューをプレイリストとして保存する</value>
+  </data>
+  <data name="QueueItemContextMenu_Remove" xml:space="preserve">
+    <value>キューから削除 (CTRL+Delete)</value>
+  </data>
+  <data name="QueueItemContextMenu_SaveToPlaylist" xml:space="preserve">
+    <value>プレイリストに保存</value>
+  </data>
+  <data name="QueueItemContextMenu_SelectedItems" xml:space="preserve">
+    <value>選択項目</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Album" xml:space="preserve">
+    <value>アルバム</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Artist" xml:space="preserve">
+    <value>アーティスト</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Genre" xml:space="preserve">
+    <value>ジャンル</value>
+  </data>
+  <data name="QueueListviewColumnHeader_LastModified" xml:space="preserve">
+    <value>最終更新日時</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Position" xml:space="preserve">
+    <value>曲順</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Song" xml:space="preserve">
+    <value>曲名</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Time" xml:space="preserve">
+    <value>時間</value>
+  </data>
   <data name="Save" xml:space="preserve">
     <value>保存</value>
   </data>
@@ -359,51 +416,6 @@ SOFTWARE.</value>
   </data>
   <data name="Settings_UnlockAndChangePassword" xml:space="preserve">
     <value>アンロックしてパスワードを変更する</value>
-  </data>
-  <data name="SongItemContextMenu_Move" xml:space="preserve">
-    <value>移動</value>
-  </data>
-  <data name="SongItemContextMenu_MoveDown" xml:space="preserve">
-    <value>下へ (CTRL+D)</value>
-  </data>
-  <data name="SongItemContextMenu_MoveUp" xml:space="preserve">
-    <value>上へ (CTRL+U)</value>
-  </data>
-  <data name="SongItemContextMenu_Queue" xml:space="preserve">
-    <value>現在のキュー</value>
-  </data>
-  <data name="SongItemContextMenu_QueueClear" xml:space="preserve">
-    <value>キューをクリアする</value>
-  </data>
-  <data name="SongItemContextMenu_QueueSaveAsPlaylist" xml:space="preserve">
-    <value>キューをプレイリストとして保存する</value>
-  </data>
-  <data name="SongItemContextMenu_Remove" xml:space="preserve">
-    <value>キューから削除 (CTRL+Delete)</value>
-  </data>
-  <data name="SongItemContextMenu_SelectedItems" xml:space="preserve">
-    <value>選択項目</value>
-  </data>
-  <data name="SongListViewColumnHeader_Album" xml:space="preserve">
-    <value>アルバム</value>
-  </data>
-  <data name="SongListViewColumnHeader_Artist" xml:space="preserve">
-    <value>アーティスト</value>
-  </data>
-  <data name="SongListViewColumnHeader_Genre" xml:space="preserve">
-    <value>ジャンル</value>
-  </data>
-  <data name="SongListViewColumnHeader_LastModified" xml:space="preserve">
-    <value>最終更新日時</value>
-  </data>
-  <data name="SongListViewColumnHeader_Position" xml:space="preserve">
-    <value>曲順</value>
-  </data>
-  <data name="SongListViewColumnHeader_Song" xml:space="preserve">
-    <value>曲名</value>
-  </data>
-  <data name="SongListViewColumnHeader_Time" xml:space="preserve">
-    <value>時間</value>
   </data>
   <data name="Update" xml:space="preserve">
     <value>更新</value>

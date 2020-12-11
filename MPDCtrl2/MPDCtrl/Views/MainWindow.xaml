@@ -27,26 +27,16 @@
         <WindowChrome CaptionHeight="30" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"/>
     </WindowChrome.WindowChrome>
     <Window.InputBindings>
-        <KeyBinding Command="{Binding PlayCommand}"
-                            Key="Play" />
-        <KeyBinding Command="{Binding PlayCommand}"
-                            Key="Space" />
-        <KeyBinding Command="{Binding PlayCommand}"
-                            Key="MediaPlayPause" />
-        <KeyBinding Command="{Binding PlayNextCommand}"
-                            Key="MediaNextTrack" />
-        <KeyBinding Command="{Binding PlayPrevCommand}"
-                            Key="MediaPreviousTrack" />
-        <KeyBinding Command="{Binding PlayCommand}"
-                            Key="MediaStop" />
-        <KeyBinding Command="{Binding VolumeMuteCommand}"
-                            Key="VolumeMute" />
-        <KeyBinding Command="{Binding VolumeDownCommand}"
-                            Key="VolumeDown" />
-        <KeyBinding Command="{Binding VolumeUpCommand}"
-                            Key="VolumeUp" />
-        <KeyBinding Command="{Binding EscapeCommand}"
-                            Key="Esc" />
+        <KeyBinding Command="{Binding PlayCommand}" Key="Play" />
+        <KeyBinding Command="{Binding PlayCommand}" Key="MediaPlayPause" />
+        <KeyBinding Command="{Binding PlayNextCommand}" Key="MediaNextTrack" />
+        <KeyBinding Command="{Binding PlayPrevCommand}" Key="MediaPreviousTrack" />
+        <KeyBinding Command="{Binding PlayCommand}" Key="MediaStop" />
+        <KeyBinding Command="{Binding VolumeMuteCommand}" Key="VolumeMute" />
+        <KeyBinding Command="{Binding VolumeDownCommand}" Key="VolumeDown" />
+        <KeyBinding Command="{Binding VolumeUpCommand}" Key="VolumeUp" />
+        <KeyBinding Command="{Binding EscapeCommand}" Key="Esc" />
+        <KeyBinding Command="{Binding ShowSettingsCommand}" Modifiers="Ctrl" Key="S"/>
     </Window.InputBindings>
     <Border Style="{StaticResource WindowMainPanelStyle}">
         <Grid Background="{DynamicResource BoardBackgroundColorBrush}">
@@ -59,7 +49,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- アプリタイトルバー -->
-            <Grid>
+            <Grid x:Name="AppTitleBar">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="27"/>
                 </Grid.RowDefinitions>
@@ -208,6 +198,26 @@
 
             </Grid>
 
+            <!-- 接続中画面の背景（起動時に、設定されているホストに接続を試行している時に一瞬表示される。） -->
+            <Grid Grid.Row="1">
+                <Viewbox Grid.Row="0" Grid.Column="0" Margin="0 0 6 0" Width="32" Height="32" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Canvas Width="24" Height="24">
+                        <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding StatusButton, NotifyOnTargetUpdated=True}" >
+                            <Path.Triggers>
+                                <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:2" AutoReverse="True" RepeatBehavior="Forever">
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Path.Triggers>
+                        </Path>
+                    </Canvas>
+                </Viewbox>
+            </Grid>
+
             <!-- メイン画面 -->
             <Grid Grid.Row="1" Visibility="{Binding IsMainShow, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
                 <Grid.RowDefinitions>
@@ -327,7 +337,6 @@
                         <ColumnDefinition Width="{Binding MainLeftPainWidth}" MinWidth="0"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="0" MinWidth="0"/>
                     </Grid.ColumnDefinitions>
 
                     <!-- Libraries -->
@@ -596,12 +605,12 @@
                     <!-- Current Queue -->
                     <Grid Grid.Row="0" Grid.Column="2">
 
-                        <ListView x:Name="SongListView" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedSong, Mode=TwoWay}" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" SelectionChanged="SongListView_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListView x:Name="QueueListview" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedSong, Mode=TwoWay}" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" SelectionChanged="QueueListview_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListView.InputBindings>
-                                <KeyBinding Key="Return" Command="{Binding Path=DataContext.SongListViewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
-                                <KeyBinding Gesture="Ctrl+U" Command="{Binding Path=DataContext.SongListviewMoveUpCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
-                                <KeyBinding Gesture="Ctrl+D" Command="{Binding Path=DataContext.SongListviewMoveDownCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
-                                <KeyBinding Gesture="Ctrl+Delete" Command="{Binding Path=DataContext.SongListviewDeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
+                                <KeyBinding Key="Return" Command="{Binding Path=DataContext.QueueListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
+                                <KeyBinding Gesture="Ctrl+U" Command="{Binding Path=DataContext.QueueListviewMoveUpCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
+                                <KeyBinding Gesture="Ctrl+D" Command="{Binding Path=DataContext.QueueListviewMoveDownCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
+                                <KeyBinding Gesture="Ctrl+Delete" Command="{Binding Path=DataContext.QueueListviewDeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                             </ListView.InputBindings>
                             <ListView.ContextMenu>
                                 <ContextMenu Visibility="Collapsed">
@@ -610,27 +619,27 @@
                                 </ContextMenu>
                             </ListView.ContextMenu>
                             <ListView.Resources>
-                                <ContextMenu x:Key="SongListViewHeaderContextMenu">
-                                    <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_Position}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderPositionVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderPositionShowHideCommand}">
+                                <ContextMenu x:Key="QueueListviewHeaderContextMenu">
+                                    <MenuItem Header="{x:Static properties:Resources.QueueListviewColumnHeader_Position}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderPositionVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderPositionShowHideCommand}">
                                     </MenuItem>
                                     <MenuItem Header="Now Playing" IsChecked="{Binding Path=DataContext.QueueColumnHeaderNowPlayingVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderNowPlayingShowHideCommand}">
                                     </MenuItem>
-                                    <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_Song}" IsChecked="True" IsEnabled="False">
+                                    <MenuItem Header="{x:Static properties:Resources.QueueListviewColumnHeader_Song}" IsChecked="True" IsEnabled="False">
                                     </MenuItem>
-                                    <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_Time}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderTimeVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderTimeShowHideCommand}">
+                                    <MenuItem Header="{x:Static properties:Resources.QueueListviewColumnHeader_Time}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderTimeVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderTimeShowHideCommand}">
                                     </MenuItem>
-                                    <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_Artist}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderArtistVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderArtistShowHideCommand}">
+                                    <MenuItem Header="{x:Static properties:Resources.QueueListviewColumnHeader_Artist}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderArtistVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderArtistShowHideCommand}">
                                     </MenuItem>
-                                    <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_Album}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderAlbumVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderAlbumShowHideCommand}">
+                                    <MenuItem Header="{x:Static properties:Resources.QueueListviewColumnHeader_Album}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderAlbumVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderAlbumShowHideCommand}">
                                     </MenuItem>
-                                    <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_Genre}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderGenreVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderGenreShowHideCommand}">
+                                    <MenuItem Header="{x:Static properties:Resources.QueueListviewColumnHeader_Genre}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderGenreVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderGenreShowHideCommand}">
                                     </MenuItem>
-                                    <MenuItem Header="{x:Static properties:Resources.SongListViewColumnHeader_LastModified}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderLastModifiedVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderLastModifiedShowHideCommand}">
+                                    <MenuItem Header="{x:Static properties:Resources.QueueListviewColumnHeader_LastModified}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderLastModifiedVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderLastModifiedShowHideCommand}">
                                     </MenuItem>
                                 </ContextMenu>
-                                <ContextMenu x:Key="SongItemContextMenu">
+                                <ContextMenu x:Key="QueueItemContextMenu">
 
-                                    <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_SelectedItems}">
+                                    <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_SelectedItems}">
                                         <MenuItem.Resources>
                                             <ControlTemplate x:Key="CheckUnderlineIcon">
                                                 <Canvas Background="Transparent" >
@@ -641,7 +650,8 @@
                                             <MenuItem.Icon>
                                                 <ContentControl Template="{StaticResource CheckUnderlineIcon}" />
                                             </MenuItem.Icon>
-                                        <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_Move}">
+
+                                        <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_Move}">
                                             <MenuItem.Resources>
                                                 <ControlTemplate x:Key="SwapVerticalIcon">
                                                     <Canvas Background="Transparent" >
@@ -652,7 +662,7 @@
                                             <MenuItem.Icon>
                                                 <ContentControl Template="{StaticResource SwapVerticalIcon}" />
                                             </MenuItem.Icon>
-                                            <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_MoveUp}" Command="{Binding Path=DataContext.SongListviewMoveUpCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                            <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_MoveUp}" Command="{Binding Path=DataContext.QueueListviewMoveUpCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                                 <MenuItem.Resources>
                                                     <ControlTemplate x:Key="ArrowUpIcon">
                                                         <Canvas Background="Transparent" >
@@ -664,7 +674,7 @@
                                                     <ContentControl Template="{StaticResource ArrowUpIcon}" />
                                                 </MenuItem.Icon>
                                             </MenuItem>
-                                            <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_MoveDown}" Command="{Binding Path=DataContext.SongListviewMoveDownCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                            <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_MoveDown}" Command="{Binding Path=DataContext.QueueListviewMoveDownCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                                 <MenuItem.Resources>
                                                     <ControlTemplate x:Key="ArrowDownIcon">
                                                         <Canvas Background="Transparent" >
@@ -678,7 +688,20 @@
                                             </MenuItem>
                                         </MenuItem>
                                         <Separator />
-                                        <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_Remove}" Command="{Binding Path=DataContext.SongListviewDeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                        <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_SaveToPlaylist}" Command="{Binding Path=DataContext.QueueListviewPlaylistAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                            <MenuItem.Resources>
+                                                <ControlTemplate x:Key="PlaylistCheckIcon">
+                                                    <Canvas Background="Transparent" >
+                                                        <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M14,10H2V12H14V10M14,6H2V8H14V6M2,16H10V14H2V16M21.5,11.5L23,13L16,20L11.5,15.5L13,14L16,17L21.5,11.5Z" />
+                                                    </Canvas>
+                                                </ControlTemplate>
+                                            </MenuItem.Resources>
+                                            <MenuItem.Icon>
+                                                <ContentControl Template="{StaticResource PlaylistCheckIcon}" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <Separator />
+                                        <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_Remove}" Command="{Binding Path=DataContext.QueueListviewDeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                             <MenuItem.Resources>
                                                 <ControlTemplate x:Key="MinusIcon">
                                                     <Canvas Background="Transparent" >
@@ -692,7 +715,7 @@
                                         </MenuItem>
                                     </MenuItem>
                                     <Separator />
-                                    <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_Queue}">
+                                    <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_Queue}">
                                         <MenuItem.Resources>
                                             <ControlTemplate x:Key="PlaylistPlay">
                                                 <Canvas Background="Transparent" >
@@ -703,7 +726,7 @@
                                         <MenuItem.Icon>
                                             <ContentControl Template="{StaticResource PlaylistPlay}" />
                                         </MenuItem.Icon>
-                                        <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_QueueSaveAsPlaylist}" Command="{Binding Path=DataContext.SongListviewSaveCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                        <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_QueueSaveAsPlaylist}" Command="{Binding Path=DataContext.QueueListviewSaveCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                             <MenuItem.Resources>
                                                 <ControlTemplate x:Key="PlaylistPlusIcon">
                                                     <Canvas Background="Transparent" >
@@ -716,7 +739,7 @@
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <Separator/>
-                                        <MenuItem Header="{x:Static properties:Resources.SongItemContextMenu_QueueClear}" Command="{Binding Path=DataContext.SongListviewClearCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                        <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_QueueClear}" Command="{Binding Path=DataContext.QueueListviewClearCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                             <MenuItem.Resources>
                                                 <ControlTemplate x:Key="DeleteEmptyOutline">
                                                     <Canvas Background="Transparent" >
@@ -748,12 +771,12 @@
                                     <GridView.ColumnHeaderContainerStyle>
                                         <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource GridViewColumnHeaderStyle}">
                                             <Setter Property="Visibility" Value="Visible" />
-                                            <Setter Property="ContextMenu" Value="{StaticResource SongListViewHeaderContextMenu}" />
+                                            <Setter Property="ContextMenu" Value="{StaticResource QueueListviewHeaderContextMenu}" />
                                         </Style>
                                     </GridView.ColumnHeaderContainerStyle>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderPositionWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Position}" Tag="53" MinWidth="32" Visibility="{Binding Path=DataContext.QueueColumnHeaderPositionVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Converter={StaticResource BoolToVisibilityCollapsedConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Position}" Tag="53" MinWidth="32" Visibility="{Binding Path=DataContext.QueueColumnHeaderPositionVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Converter={StaticResource BoolToVisibilityCollapsedConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -788,7 +811,7 @@
                                     </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderTitleWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Song}" Tag="180" MinWidth="120" />
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Song}" Tag="180" MinWidth="120" />
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -808,7 +831,7 @@
                                     </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderTimeWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Time}" Tag="62" MinWidth="62" Visibility="{Binding QueueColumnHeaderTimeVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Time}" Tag="62" MinWidth="62" Visibility="{Binding QueueColumnHeaderTimeVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -828,7 +851,7 @@
                                     </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderArtistWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Artist}" Tag="120" MinWidth="62" Visibility="{Binding QueueColumnHeaderArtistVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Artist}" Tag="120" MinWidth="62" Visibility="{Binding QueueColumnHeaderArtistVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -848,7 +871,7 @@
                                     </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderAlbumWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Album}" Tag="120" MinWidth="62" Visibility="{Binding QueueColumnHeaderAlbumVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Album}" Tag="120" MinWidth="62" Visibility="{Binding QueueColumnHeaderAlbumVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -868,7 +891,7 @@
                                     </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderGenreWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_Genre}" Tag="100" MinWidth="62" Visibility="{Binding QueueColumnHeaderGenreVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Genre}" Tag="100" MinWidth="62" Visibility="{Binding QueueColumnHeaderGenreVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -888,7 +911,7 @@
                                     </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderLastModifiedWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.SongListViewColumnHeader_LastModified}" Tag="180" MinWidth="62" Visibility="{Binding QueueColumnHeaderLastModifiedVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_LastModified}" Tag="180" MinWidth="62" Visibility="{Binding QueueColumnHeaderLastModifiedVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -910,7 +933,7 @@
                             </ListView.View>
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
-                                    <Setter Property="ContextMenu" Value="{StaticResource SongItemContextMenu}" />
+                                    <Setter Property="ContextMenu" Value="{StaticResource QueueItemContextMenu}" />
                                     <Setter Property="Margin" Value="0 0 0 0"/>
                                     <Setter Property="Padding" Value="0 1 0 1"/>
                                     <Setter Property="HorizontalContentAlignment" Value="Left"/>
@@ -919,7 +942,7 @@
                                             <ControlTemplate TargetType="{x:Type ListViewItem}">
                                                 <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
                                                     <Border.InputBindings>
-                                                        <MouseBinding Command="{Binding Path=DataContext.SongListViewLeftDoubleClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Gesture="LeftDoubleClick" />
+                                                        <MouseBinding Command="{Binding Path=DataContext.QueueListviewLeftDoubleClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Gesture="LeftDoubleClick" />
                                                     </Border.InputBindings>
                                                     <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                                 </Border>
@@ -931,8 +954,6 @@
                         </ListView>
 
                     </Grid>
-
-                    <Grid Grid.Column="3"></Grid>
 
                 </Grid>
 
@@ -947,27 +968,6 @@
                 </StatusBar>
 
             </Grid>
-
-            <!-- 接続中画面の背景（起動時に、設定されているホストに接続を試行している時に一瞬表示される。） -->
-            <Grid Grid.Row="1">
-                <Viewbox Grid.Row="0" Grid.Column="0" Margin="0 0 6 0" Width="32" Height="32" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Canvas Width="24" Height="24">
-                        <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding StatusButton, NotifyOnTargetUpdated=True}" >
-                            <Path.Triggers>
-                                <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:2" AutoReverse="True" RepeatBehavior="Forever">
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </Path.Triggers>
-                        </Path>
-                    </Canvas>
-                </Viewbox>
-            </Grid>
-
 
             <!-- 初期設定兼再接続画面 -->
             <Grid Grid.Row="1" Background="{DynamicResource BoardBackgroundColorBrush}" Visibility="{Binding IsConnectionSettingShow, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
@@ -1136,7 +1136,7 @@
                                                     <Trigger Property="IsSelected" Value="True">
                                                         <Setter Property="Foreground" Value="{DynamicResource TitleTextColorBrush}" />
                                                         <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="{DynamicResource ControlLightColorBrush}" />
-                                                        <Setter TargetName="HeaderBorder" Property="BorderThickness" Value="0 0 0 2"/>
+                                                 <Setter TargetName="HeaderBorder" Property="BorderThickness" Value="0 0 0 2"/>
                                                     </Trigger>
 
                                                     <Trigger Property="IsMouseOver" Value="True">
@@ -1538,7 +1538,7 @@
                         <StackPanel Grid.Row="1" Margin="12">
                             <TextBlock Text="{Binding DialogMessage}" TextWrapping="Wrap" Style="{DynamicResource DefaultTextBlockStyle}"></TextBlock>
                         </StackPanel>
-                        <StackPanel Grid.Row="2" Margin="12">
+                        <StackPanel Grid.Row="2" Margin="12 12 12 24">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 12 0 0">
                                 <Button IsVisibleChanged="DialogButton_IsVisibleChanged" Width="80" Content="{x:Static properties:Resources.OK}" Margin="15 0 15 0" Padding="3" IsDefault="True" Command="{Binding ComfirmationDialogOKCommand}"></Button>
                                 <Button Width="80" Content="{x:Static properties:Resources.Cancel}" Margin="15 0 15 0" Padding="3" IsDefault="False" Command="{Binding ComfirmationDialogCancelCommand}"></Button>
@@ -1579,7 +1579,7 @@
                         <StackPanel Grid.Row="1" Margin="12">
                             <TextBlock Text="{Binding DialogMessage}" TextWrapping="Wrap" Style="{DynamicResource DefaultTextBlockStyle}"></TextBlock>
                         </StackPanel>
-                        <StackPanel Grid.Row="2" Margin="12">
+                        <StackPanel Grid.Row="2" Margin="12 12 12 24">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 12 0 0">
                                 <Button IsVisibleChanged="DialogButton_IsVisibleChanged" Width="80" Content="{x:Static properties:Resources.OK}" Margin="15 0 15 0" Padding="3" IsDefault="True" Command="{Binding InformationDialogOKCommand}"></Button>
                             </StackPanel>
@@ -1622,7 +1622,7 @@
                             <TextBox x:Name="DialogInputTextBox" IsVisibleChanged="DialogInputTextBox_IsVisibleChanged" Style="{DynamicResource DefaultTextBoxStyle}" Text="{Binding DialogInputText,UpdateSourceTrigger=PropertyChanged}" Width="150" Margin="25 12 12 0"></TextBox>
                             
                         </StackPanel>
-                        <StackPanel Grid.Row="2" Margin="12">
+                        <StackPanel Grid.Row="2" Margin="12 12 12 24">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 12 0 0">
                                 <Button Width="80" Content="{x:Static properties:Resources.OK}" Margin="15 0 15 0" Padding="3" IsDefault="True" Command="{Binding InputDialogOKCommand}"></Button>
                                 <Button Width="80" Content="{x:Static properties:Resources.Cancel}" Margin="15 0 15 0" Padding="3" IsDefault="False" Command="{Binding InputDialogCancelCommand}"></Button>
@@ -1677,13 +1677,13 @@
                             </TextBlock>
 
                             <TextBlock Text="{x:Static properties:Resources.ChangePasswordDialog_CurrentPassword}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="25 12 0 0"></TextBlock>
-                            <PasswordBox x:Name="ChangeOldPasswordBox" Width="200" IsVisibleChanged="PasswordBox_IsVisibleChanged"></PasswordBox>
+                            <PasswordBox x:Name="ChangeOldPasswordBox" Width="200" IsVisibleChanged="PasswordBox_IsVisibleChanged" Style="{DynamicResource DefaultPasswordBoxStyle}"></PasswordBox>
 
                             <TextBlock Text="{x:Static properties:Resources.ChangePasswordDialog_NewPassword}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="25 12 0 0"></TextBlock>
-                            <PasswordBox x:Name="ChangeNewPasswordBox" Width="200"></PasswordBox>
+                            <PasswordBox x:Name="ChangeNewPasswordBox" Width="200" Style="{DynamicResource DefaultPasswordBoxStyle}"></PasswordBox>
 
                         </StackPanel>
-                        <StackPanel Grid.Row="2" Margin="12">
+                        <StackPanel Grid.Row="2" Margin="12 12 12 24">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 12 0 0">
                                 <Button Width="80" Content="{x:Static properties:Resources.OK}" Margin="15 0 15 0" Padding="3" IsDefault="True" Command="{Binding ChangePasswordDialogOKCommand}">
                                     <Button.CommandParameter>
@@ -1701,6 +1701,78 @@
 
                 </Border>
             </Grid>
+
+            <!-- Playlist Select screen -->
+            <Grid Grid.Row="0" Grid.RowSpan="2" Visibility="{Binding IsPlaylistSelectDialogShow, Converter={StaticResource BoolToVisibilityCollapsedConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="{DynamicResource WindowBackgroundBaseColorBrush}" Opacity="0.8"></Rectangle>
+
+                <Border Background="{DynamicResource BoardBackgroundColorBrush}" Style="{DynamicResource BoardStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                    <Grid Width="300" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Row="0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                            <Label Style="{DynamicResource SectionTitle}" Content="{Binding DialogTitle}" HorizontalAlignment="Left"/>
+                        </Border>
+                        <StackPanel Grid.Row="1" Margin="12">
+                            
+                            <ComboBox x:Name="PlaylistNameWithNewComboBox" Style="{StaticResource ComboBoxFlatStyle}" HorizontalAlignment="Left" ItemsSource="{Binding PlaylistNamesWithNew, Mode=OneWay}" Tag="{Binding DialogMessage}"  IsVisibleChanged="PlaylistNameWithNewComboBox_IsVisibleChanged"  SelectedValuePath="." IsEditable="False" Width="150" Margin="25 4 12 0">
+                            </ComboBox>
+
+                            <Label Content="{x:Static properties:Resources.Dialog_NewPlaylistName}">
+                                <Label.Style>
+                                    <Style TargetType="{x:Type Label}" BasedOn="{StaticResource DefaultLabelStyle}">
+                                        <Setter Property="Margin" Value="25 12 0 0" />
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=PlaylistNameWithNewComboBox, Path=SelectedIndex, Mode=OneWay}" Value="0">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Label.Style>
+                            </Label>
+                            <TextBox x:Name="PlaylistNameTextBox" Text="{Binding ElementName=PlaylistNameWithNewComboBox, Path=SelectedValue, Mode=OneWay}" Width="150">
+                                <TextBox.Style>
+                                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource DefaultTextBoxStyle}">
+                                        <Setter Property="Margin" Value="25 4 12 0" />
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=PlaylistNameWithNewComboBox, Path=SelectedIndex, Mode=OneWay}" Value="0">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+
+                        </StackPanel>
+                        <StackPanel Grid.Row="2" Margin="12 12 12 24">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 12 0 0">
+                                <Button Width="80" Content="{x:Static properties:Resources.OK}" Margin="15 0 15 0" Padding="3" IsDefault="True" Command="{Binding PlaylistSelectDialogOKCommand}" CommandParameter="{Binding ElementName=PlaylistNameTextBox, Path=Text, Mode=OneWay}"></Button>
+                                <Button Width="80" Content="{x:Static properties:Resources.Cancel}" Margin="15 0 15 0" Padding="3" IsDefault="False" Command="{Binding PlaylistSelectDialogCancelCommand}"></Button>
+                            </StackPanel>
+                        </StackPanel>
+
+                    </Grid>
+
+                </Border>
+            </Grid>
+
 
         </Grid>
     </Border>

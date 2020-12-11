@@ -1269,6 +1269,53 @@ namespace MPDCtrl
             }
         }
 
+        public void MpdPlaylistAdd(string playlistName, List<string> uris)
+        {
+            if (uris.Count < 1)
+                return;
+
+            if (playlistName.Trim() != "")
+            {
+                playlistName = Regex.Escape(playlistName);
+                try
+                {
+                    string mpdCommand = "";
+                    if (!string.IsNullOrEmpty(_password))
+                    {
+                        mpdCommand = "command_list_begin" + "\n";
+                        mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                        foreach (var uri in uris)
+                        {
+                            var urie = Regex.Escape(uri);
+                            mpdCommand = mpdCommand + "playlistadd " + "\"" + playlistName + "\"" + " "+ "\"" + urie + "\"\n";
+                        }
+                        mpdCommand = mpdCommand + "command_list_end" + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = "command_list_begin" + "\n";
+                        foreach (var uri in uris)
+                        {
+                            var urie = Regex.Escape(uri);
+                            mpdCommand = mpdCommand + "playlistadd " + "\"" + playlistName + "\"" + " " + "\"" + urie + "\"\n";
+                        }
+                        mpdCommand = mpdCommand + "command_list_end" + "\n";
+                    }
+
+                    _asyncClient.Send("noidle" + "\n");
+                    _asyncClient.Send(mpdCommand);
+                    _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error@MpdPlaylistAdd: " + ex.Message);
+                }
+            }
+
+
+
+        }
+
         #endregion
 
         #region == TCPClient ==   
@@ -1891,6 +1938,10 @@ namespace MPDCtrl
                         {
                             sng.Pos = SongValues["Pos"];
                         }
+                        if (SongValues.ContainsKey("file"))
+                        {
+                            sng.file = SongValues["file"];
+                        }
 
                         //
                         if (sng.Id == _status.MpdSongID)
@@ -1911,16 +1962,13 @@ namespace MPDCtrl
                             CurrentQueue.Add(sng);
                         });
 
-                        // This will significantly slows down the load but gives more ui responsiveness.
-                        //await Task.Delay(10);
                     }
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse: " + ex.Message);
-
-                //IsBusy?.Invoke(this, false);
+                
                 return false;
             }
             

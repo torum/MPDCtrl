@@ -85,13 +85,13 @@ namespace MPDCtrl.Views
             this.WindowState = WindowState.Minimized;
         }
 
-        private void SongListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void QueueListview_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            SongListView.ScrollIntoView(SongListView.SelectedItem);
+            QueueListview.ScrollIntoView(QueueListview.SelectedItem);
 
             // Listview flickering...
-            //SongListView.ScrollToCenterOfView(SongListView.SelectedItem);
+            //QueueListview.ScrollToCenterOfView(QueueListview.SelectedItem);
         }
 
 
@@ -148,6 +148,21 @@ namespace MPDCtrl.Views
                     {
                         (sender as Button).Focus();
                         Keyboard.Focus((sender as Button));
+                    }
+                }
+            }
+        }
+
+        private void PlaylistNameWithNewComboBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (sender != null)
+            {
+                if (sender is ComboBox)
+                {
+                    if ((sender as ComboBox).Visibility == Visibility.Visible)
+                    {
+                        (sender as ComboBox).Focus();
+                        Keyboard.Focus((sender as ComboBox));
                     }
                 }
             }

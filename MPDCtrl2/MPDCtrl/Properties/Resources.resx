@@ -207,6 +207,15 @@
   <data name="Dialog_PlaylistNameAlreadyExists" xml:space="preserve">
     <value>Playlist name already exists.</value>
   </data>
+  <data name="Dialog_PlaylistSelect_NewPlaylistName" xml:space="preserve">
+    <value>New Playlist</value>
+  </data>
+  <data name="Dialog_PlaylistSelect_SaveSelectedTo" xml:space="preserve">
+    <value>Save Selected to</value>
+  </data>
+  <data name="Dialog_PlaylistSelect_SelectPlaylist" xml:space="preserve">
+    <value>Select Playlist</value>
+  </data>
   <data name="Dialog_RemovePlaylistQ" xml:space="preserve">
     <value>Remove selected playlist?</value>
   </data>
@@ -321,6 +330,54 @@ SOFTWARE.</value>
   <data name="Profiles" xml:space="preserve">
     <value>Profiles</value>
   </data>
+  <data name="QueueItemContextMenu_Move" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="QueueItemContextMenu_MoveDown" xml:space="preserve">
+    <value>Down (CTRL+D)</value>
+  </data>
+  <data name="QueueItemContextMenu_MoveUp" xml:space="preserve">
+    <value>Up (CTRL+U)</value>
+  </data>
+  <data name="QueueItemContextMenu_Queue" xml:space="preserve">
+    <value>Current Queue</value>
+  </data>
+  <data name="QueueItemContextMenu_QueueClear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="QueueItemContextMenu_QueueSaveAsPlaylist" xml:space="preserve">
+    <value>Save as playlist</value>
+  </data>
+  <data name="QueueItemContextMenu_Remove" xml:space="preserve">
+    <value>Remove (CTRL+Delete)</value>
+  </data>
+  <data name="QueueItemContextMenu_SaveToPlaylist" xml:space="preserve">
+    <value>Save to</value>
+  </data>
+  <data name="QueueItemContextMenu_SelectedItems" xml:space="preserve">
+    <value>Selected Items</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Album" xml:space="preserve">
+    <value>Album</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Artist" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Genre" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+  <data name="QueueListviewColumnHeader_LastModified" xml:space="preserve">
+    <value>Last Modified</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Position" xml:space="preserve">
+    <value>Position</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Song" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Time" xml:space="preserve">
+    <value>Time</value>
+  </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
@@ -356,51 +413,6 @@ SOFTWARE.</value>
   </data>
   <data name="Settings_UnlockAndChangePassword" xml:space="preserve">
     <value>Unlock and Change Password</value>
-  </data>
-  <data name="SongItemContextMenu_Move" xml:space="preserve">
-    <value>Move</value>
-  </data>
-  <data name="SongItemContextMenu_MoveDown" xml:space="preserve">
-    <value>Down (CTRL+D)</value>
-  </data>
-  <data name="SongItemContextMenu_MoveUp" xml:space="preserve">
-    <value>Up (CTRL+U)</value>
-  </data>
-  <data name="SongItemContextMenu_Queue" xml:space="preserve">
-    <value>Current Queue</value>
-  </data>
-  <data name="SongItemContextMenu_QueueClear" xml:space="preserve">
-    <value>Clear</value>
-  </data>
-  <data name="SongItemContextMenu_QueueSaveAsPlaylist" xml:space="preserve">
-    <value>Save as playlist</value>
-  </data>
-  <data name="SongItemContextMenu_Remove" xml:space="preserve">
-    <value>Remove (CTRL+Delete)</value>
-  </data>
-  <data name="SongItemContextMenu_SelectedItems" xml:space="preserve">
-    <value>Selected Items</value>
-  </data>
-  <data name="SongListViewColumnHeader_Album" xml:space="preserve">
-    <value>Album</value>
-  </data>
-  <data name="SongListViewColumnHeader_Artist" xml:space="preserve">
-    <value>Artist</value>
-  </data>
-  <data name="SongListViewColumnHeader_Genre" xml:space="preserve">
-    <value>Genre</value>
-  </data>
-  <data name="SongListViewColumnHeader_LastModified" xml:space="preserve">
-    <value>Last Modified</value>
-  </data>
-  <data name="SongListViewColumnHeader_Position" xml:space="preserve">
-    <value>Position</value>
-  </data>
-  <data name="SongListViewColumnHeader_Song" xml:space="preserve">
-    <value>Title</value>
-  </data>
-  <data name="SongListViewColumnHeader_Time" xml:space="preserve">
-    <value>Time</value>
   </data>
   <data name="Update" xml:space="preserve">
     <value>Update</value>

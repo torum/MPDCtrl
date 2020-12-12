@@ -14,7 +14,7 @@ using System.Globalization;
 namespace MPDCtrl.Common
 {
     /// <summary>
-    /// 
+    /// MultipleCommandParameterConverter
     /// </summary>
     public class MultipleCommandParameterConverter : IMultiValueConverter 
     {
@@ -31,39 +31,8 @@ namespace MPDCtrl.Common
 
     }
 
-    // https://stackoverflow.com/questions/397556/how-to-bind-radiobuttons-to-an-enum/2908885
-    /*
-    public class EnumBooleanConverter : IValueConverter
-    {
-        #region IValueConverter Members
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            string parameterString = parameter as string;
-            if (parameterString == null)
-                return DependencyProperty.UnsetValue;
-
-            if (Enum.IsDefined(value.GetType(), value) == false)
-                return DependencyProperty.UnsetValue;
-
-            object parameterValue = Enum.Parse(value.GetType(), parameterString);
-
-            return parameterValue.Equals(value);
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            string parameterString = parameter as string;
-            if (parameterString == null)
-                return DependencyProperty.UnsetValue;
-
-            return Enum.Parse(targetType, parameterString);
-        }
-        #endregion
-    }
-    */
-
     /// <summary>
-    /// 
+    /// EnumToBoolConverter
     /// </summary>
     public class EnumToBoolConverter : IValueConverter
     {
@@ -77,41 +46,17 @@ namespace MPDCtrl.Common
             return value.Equals(true) ? parameter : Binding.DoNothing;
         }
     }
-    /*
-    public class EnumToBoolConverter : IValueConverter
-    {
-        #region IValueConverter Members
-
-        public object Convert(object value,
-            Type targetType, object parameter,
-            System.Globalization.CultureInfo culture)
-        {
-            if (parameter.Equals(value))
-                return true;
-            else
-                return false;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return parameter;
-
-        }
-        #endregion
-
-    }
-    */
 
     /// <summary>
     /// BooleanToVisibilityConverterの、 Collapsed 版
     /// </summary>
     [ValueConversion(typeof(bool), typeof(Visibility))]
-    public class BoolToVisibilityCollapsedConverter : IValueConverter
+    public class BooleanToVisibilityCollapsedConverter : IValueConverter
     {
         public Visibility TrueValue { get; set; }
         public Visibility FalseValue { get; set; }
 
-        public BoolToVisibilityCollapsedConverter()
+        public BooleanToVisibilityCollapsedConverter()
         {
             // set defaults
             TrueValue = Visibility.Visible;
@@ -137,37 +82,5 @@ namespace MPDCtrl.Common
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public class BooleanToVisibilityConverter : IValueConverter
-    {
-        public Visibility TrueValue { get; set; }
-        public Visibility FalseValue { get; set; }
 
-        public BooleanToVisibilityConverter()
-        {
-            // set defaults
-            TrueValue = Visibility.Visible;
-            FalseValue = Visibility.Hidden;
-        }
-
-        public object Convert(object value, Type targetType,
-            object parameter, CultureInfo culture)
-        {
-            if (!(value is bool))
-                return null;
-            return (bool)value ? TrueValue : FalseValue;
-        }
-
-        public object ConvertBack(object value, Type targetType,
-            object parameter, CultureInfo culture)
-        {
-            if (Equals(value, TrueValue))
-                return true;
-            if (Equals(value, FalseValue))
-                return false;
-            return null;
-        }
-    }
 }

@@ -22,16 +22,28 @@ using System.Net;
 using System.Text.RegularExpressions;
 using MPDCtrl.Common;
 using MPDCtrl.Views;
+using MPDCtrl.Models;
+using MPDCtrl.Models.Classes;
+using MPDCtrl.ViewModels.Classes;
 
 namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// v2.0.3
-    /// 
+    /// v2.0.4
+    /// 検索ボックスの中にプルダウンでTagを選択できるように。
+    /// キーボードのタブ移動制御。検索画面を表示した時に、メインをIsEnabled = falseにしたい。アブドナーが表示されてしまったりするから。
+    /// ルートディレクトリにファイルがある時のテスト。というか色々テスト。
+    /// 検索は古いMPDでも大丈夫かテスト。
+    /// Files はファイル名だけにして、フィルター欄を作る。
     /// Ctrl+Fで検索。「追加」のコンテキストメニューを追加。ダイアログで2pain Treeview + Listviewにして、検索＆選択してQueueに追加できるように。
     /// 
-    /// v2.0.4
+    /// x64に変更して公開する。
+    /// 
+    /// 
+    /// 
+    /// v2.0.5
+    /// パスワード、多分毎回送る必要は無いと思う。
     /// Local Files の TreeViewまたは階層化
     /// Local Files: "Save Selected to" context menu.
     /// Local Files: "再読み込み" context menu.
@@ -39,16 +51,18 @@ namespace MPDCtrl.ViewModels
     /// [未定]
     /// アルバムカバー対応。Last.fm?
     /// テーマの切り替え
-    /// Queue: カラムヘッダークリックでソート
     /// Listview の水平スクロールバーのデザイン。
     /// スライダーの上でスクロールして音量変更。
     /// exception trap and logging
     /// レイアウト見直し（スプリッターのせい）GridSplitterが右に行き過ぎる問題。
     /// Queue: ScrollIntoView to NowPlaying (not selected item).「現在の曲へ」のコンテキストメニューを追加。イベントでitemを渡す？
-
+    /// レイアウト大改造？ ３ペイン（上キューと下に２ペイン) + (Treeviewでプレイリストとディレクトリ纏める？？）
 
     /// 更新履歴：
-    /// v2.0.2.2 色々リネーム。Ctrl+S が効いていなかった。選択アイテムを「プレイリストに保存」を追加した。
+    /// v2.0.3.1 検索とブラウズ途中。
+    /// v2.0.3    store公開。(v2.0.2.3の表示を更新し忘れた)　検索画面は無効にしてある。
+    /// v2.0.2.3 コードをリファクタリングと移動。検索画面は途中。
+    /// v2.0.2.2 色々リネーム。Ctrl+S が効いていなかった。選択アイテムを「プレイリストに保存」を追加した。ScrollIntoView止めた。コードをリファクタリング。
     /// v2.0.2.1 キューかStatusが更新される度にタイマーというかシークがオカシイのを直した。
     /// v2.0.2    store公開。
     /// v2.0.1.2 Playlistの削除で残り一つの時クリアされないバグ。大量の曲がキューにある時重たい処理は砂時計を出すようにした。 Local Files のダブルクリックとWidth修正と覚える。アイコン追加。
@@ -73,97 +87,15 @@ namespace MPDCtrl.ViewModels
 
     /// Key Gestures:
     /// Ctrl+S Show Settings
+    /// Ctrl+S Show Find 
+    /// Ctrl+S Playback Play
     /// Ctrl+U QueueListview Queue Move Up
     /// Ctrl+D QueueListview Queue Move Down
     /// Ctrl+Delete QueueListview Queue Selected Item delete.
     /// Space Play > reserved for listview..
     /// Ctrl+Delete QueueListview Remove from Queue
-    /// Esc close dialogs.
+    /// Esc Close dialogs.
 
-
-    public class Profile : ViewModelBase
-    {
-        private string _host;
-        public string Host
-        {
-            get { return _host; }
-            set
-            {
-                if (_host == value)
-                    return;
-
-                _host = value;
-                NotifyPropertyChanged("Host");
-            }
-        }
-
-        private int _port;
-        public int Port
-        {
-            get { return _port; }
-            set
-            {
-                if (_port == value)
-                    return;
-
-                _port = value;
-                NotifyPropertyChanged("Port");
-            }
-        }
-
-        private string _password;
-        public string Password 
-        {
-            get { return _password; }
-            set
-            {
-                if (_password == value)
-                    return;
-
-                _password = value;
-                NotifyPropertyChanged("Password");
-            }
-        }
-
-        private string _name;
-        public string Name
-        {
-            get { return _name; }
-            set
-            {
-                if (_name == value)
-                    return;
-
-                _name = value;
-                NotifyPropertyChanged("Name");
-            }
-        }
-
-        private bool _isDefault;
-        public bool IsDefault
-        {
-            get { return _isDefault; }
-            set
-            {
-                if (_isDefault == value)
-                    return;
-
-                _isDefault = value;
-
-                NotifyPropertyChanged("IsDefault");
-            }
-        }
-
-    }
-
-    public class ShowDebugEventArgs : EventArgs
-    {
-        public bool WindowVisibility = true;
-        public double Top = 100;
-        public double Left = 100;
-        public double Height = 240;
-        public double Width = 450;
-    }
 
     public class MainViewModel : ViewModelBase
     {
@@ -173,7 +105,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.2.2";
+        const string _appVer = "v2.0.3.1";
 
         public string AppVer
         {
@@ -237,7 +169,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == 画面表示周り ==  
+        #region == 画面表示切り替え ==  
 
         private bool _isConnected;
         public bool IsConnected
@@ -484,6 +416,22 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private bool _isFindDialogShow;
+        public bool IsFindDialogShow
+        {
+            get
+            {
+                return _isFindDialogShow;
+            }
+            set
+            {
+                if (_isFindDialogShow == value)
+                    return;
+
+                _isFindDialogShow = value;
+                NotifyPropertyChanged("IsFindDialogShow");
+            }
+        }
 
         public bool IsCurrentProfileSet
         {
@@ -532,8 +480,8 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private MPC.Song _currentSong;
-        public MPC.Song CurrentSong
+        private MPC.SongInfo _currentSong;
+        public MPC.SongInfo CurrentSong
         {
             get
             {
@@ -603,8 +551,8 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private ObservableCollection<MPC.Song> _queue = new ObservableCollection<MPC.Song>();
-        public ObservableCollection<MPC.Song> Queue
+        private ObservableCollection<MPC.SongInfo> _queue = new ObservableCollection<MPC.SongInfo>();
+        public ObservableCollection<MPC.SongInfo> Queue
         {
             get
             {
@@ -628,8 +576,8 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private MPC.Song _selectedSong;
-        public MPC.Song SelectedSong
+        private MPC.SongInfo _selectedSong;
+        public MPC.SongInfo SelectedSong
         {
             get
             {
@@ -1650,6 +1598,122 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
+        #region == 検索画面 ==
+
+        private DirectoryTreeBuilder _musicDirectories = new DirectoryTreeBuilder();
+        public ObservableCollection<NodeDirectory> MusicDirectories
+        {
+            get { return _musicDirectories.Children; }
+            set
+            {
+                _musicDirectories.Children = value;
+                NotifyPropertyChanged(nameof(MusicDirectories));
+            }
+        }
+
+        private NodeDirectory _selectedNode = new NodeDirectory(".",new Uri(@"file:///./"));
+        public NodeDirectory SelectedNode
+        {
+            get { return _selectedNode; }
+            set
+            {
+                if (_selectedNode == value)
+                    return;
+
+                _selectedNode = value;
+                NotifyPropertyChanged(nameof(SelectedNode));
+
+                // Treeview で選択ノードが変更されたのでListview でフィルターを掛ける。
+                var collectionView = CollectionViewSource.GetDefaultView(MusicEntries);
+                collectionView.Filter = x =>
+                {
+                    var entry = (NodeEntry)x;
+
+                    string path = entry.FileUri.LocalPath; //person.FileUri.AbsoluteUri;
+                    string filename = System.IO.Path.GetFileName(path);//System.IO.Path.GetFileName(uri.LocalPath);
+                    path = path.Replace(("/"+ filename), "");
+
+                    // マッチしたフォルダ内だけ
+                    //return  (path == _selectedNode.DireUri.LocalPath );
+
+                    // 絞り込みモード
+                    return (path.StartsWith(_selectedNode.DireUri.LocalPath));
+                };
+                collectionView.Refresh();
+                
+            }
+        }
+
+        private ObservableCollection<NodeEntry> _musicEntries = new ObservableCollection<NodeEntry>();
+        public ObservableCollection<NodeEntry> MusicEntries
+        {
+            get
+            {
+                return _musicEntries; 
+            }
+            set
+            {
+                if (value == _musicEntries)
+                    return;
+
+                _musicEntries = value;
+                NotifyPropertyChanged(nameof(MusicEntries));
+
+            }
+        }
+
+        public ObservableCollection<MPC.Song> SearchResult
+        {
+            get
+            {
+                if (_MPC != null)
+                {
+                    return _MPC.SearchResult;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+
+        private SearchTags _selectedSearchTags = SearchTags.Title;
+        public SearchTags SelectedSearchTags
+        {
+            get
+            {
+                return _selectedSearchTags;
+            }
+            set
+            {
+                if (_selectedSearchTags == value)
+                    return;
+
+                _selectedSearchTags = value;
+                NotifyPropertyChanged("SelectedSearchTags");
+            }
+        }
+
+        private string _searchQuery;
+        public string SearchQuery
+        {
+            get
+            {
+                return _searchQuery;
+            }
+            set
+            {
+                if (_searchQuery == value)
+                    return;
+
+                _searchQuery = value;
+                NotifyPropertyChanged("SearchQuery");
+            }
+        }
+
+        #endregion
+
         public MainViewModel()
         {
             #region == データ保存フォルダ ==
@@ -1696,7 +1760,7 @@ namespace MPDCtrl.ViewModels
             LocalfileListviewLeftDoubleClickCommand = new GenericRelayCommand<object>(param => LocalfileListviewLeftDoubleClickCommand_Execute(param), param => LocalfileListviewLeftDoubleClickCommand_CanExecute());
 
             QueueListviewEnterKeyCommand = new RelayCommand(QueueListviewEnterKeyCommand_ExecuteAsync, QueueListviewEnterKeyCommand_CanExecute);
-            QueueListviewLeftDoubleClickCommand = new GenericRelayCommand<MPC.Song>(param => QueueListviewLeftDoubleClickCommand_ExecuteAsync(param), param => QueueListviewLeftDoubleClickCommand_CanExecute());
+            QueueListviewLeftDoubleClickCommand = new GenericRelayCommand<MPC.SongInfo>(param => QueueListviewLeftDoubleClickCommand_ExecuteAsync(param), param => QueueListviewLeftDoubleClickCommand_CanExecute());
             QueueListviewDeleteCommand = new GenericRelayCommand<object>(param => QueueListviewDeleteCommand_Execute(param), param => QueueListviewDeleteCommand_CanExecute());
             QueueListviewClearCommand = new RelayCommand(QueueListviewClearCommand_ExecuteAsync, QueueListviewClearCommand_CanExecute);
             QueueListviewSaveCommand = new RelayCommand(QueueListviewSaveCommand_ExecuteAsync, QueueListviewSaveCommand_CanExecute);
@@ -1740,6 +1804,11 @@ namespace MPDCtrl.ViewModels
             QueueColumnHeaderAlbumShowHideCommand = new RelayCommand(QueueColumnHeaderAlbumShowHideCommand_Execute, QueueColumnHeaderAlbumShowHideCommand_CanExecute);
             QueueColumnHeaderGenreShowHideCommand = new RelayCommand(QueueColumnHeaderGenreShowHideCommand_Execute, QueueColumnHeaderGenreShowHideCommand_CanExecute);
             QueueColumnHeaderLastModifiedShowHideCommand = new RelayCommand(QueueColumnHeaderLastModifiedShowHideCommand_Execute, QueueColumnHeaderLastModifiedShowHideCommand_CanExecute);
+
+            ShowFindCommand = new RelayCommand(ShowFindCommand_Execute, ShowFindCommand_CanExecute);
+            ShowFindCancelCommand = new RelayCommand(ShowFindCancelCommand_Execute, ShowFindCancelCommand_CanExecute);
+
+            SearchExecCommand = new RelayCommand(SearchExecCommand_Execute, SearchExecCommand_CanExecute);
 
             #endregion
 
@@ -2760,8 +2829,6 @@ namespace MPDCtrl.ViewModels
         // MPD updated information
         private void OnStatusUpdate(MPC sender, object data)
         {
-            //System.Diagnostics.Debug.WriteLine("OnStatusUpdate " + data);
-
             UpdateButtonStatus();
 
             if ((data as string) == "isPlayer")
@@ -2783,10 +2850,10 @@ namespace MPDCtrl.ViewModels
                     var item = Queue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
                     if (item != null)
                     {
-                        //SelectedSong = (item as MPC.Song);
-                        CurrentSong = (item as MPC.Song);
+                        //SelectedSong = (item as MPC.SongInfo);
+                        CurrentSong = (item as MPC.SongInfo);
 
-                        (item as MPC.Song).IsPlaying = true;
+                        (item as MPC.SongInfo).IsPlaying = true;
                     }
                     else
                     {
@@ -2802,7 +2869,7 @@ namespace MPDCtrl.ViewModels
                 IsBusy = true;
 
                 // 削除する曲の一時リスト
-                List<MPC.Song> _tmpQueue = new List<MPC.Song>();
+                List<MPC.SongInfo> _tmpQueue = new List<MPC.SongInfo>();
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -2857,8 +2924,8 @@ namespace MPDCtrl.ViewModels
                     var curitem = Queue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
                     if (curitem != null)
                     {
-                        CurrentSong = (curitem as MPC.Song);
-                        (curitem as MPC.Song).IsPlaying = true;
+                        CurrentSong = (curitem as MPC.SongInfo);
+                        (curitem as MPC.SongInfo).IsPlaying = true;
                     }
                     else
                     {
@@ -2872,19 +2939,60 @@ namespace MPDCtrl.ViewModels
 
                 IsBusy = false;
             }
+            else if((data as string) == "isSongs")
+            {
+                // Find の結果か playlistinfoの結果
+            }
             else if ((data as string) == "isStoredPlaylist")
             {
                 // TODO: 
             }
             else if ((data as string) == "isLocalFiles")
             {
-                // TODO: 
+                IsBusy = true;
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    MusicDirectories.Clear();
+                    
+                    _musicDirectories.Load(_MPC.LocalDirectories.ToList<String>());
+
+                    if (MusicDirectories.Count > 0)
+                    {
+                        SelectedNode = _musicDirectories.Children[0];
+                    }
+
+                });
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    MusicEntries.Clear();
+
+                    foreach (var songfile in _MPC.LocalFiles)
+                    {
+                        try
+                        {
+                            Uri uri = new Uri(@"file:///" + songfile);
+                            if (uri.IsFile)
+                            {
+                                string filename = System.IO.Path.GetFileName(songfile);//System.IO.Path.GetFileName(uri.LocalPath);
+                                NodeEntry hoge = new NodeEntry(filename, uri);
+
+                                MusicEntries.Add(hoge);
+                            }
+
+                        }
+                        catch { }
+                    }
+                });
+
+                IsBusy = false;
+
             }
             else if ((data as string) == "isUpdating_db")
             {
                 // TODO:
             }
-
         }
 
         private void OnDataReceived(MPC sender, object data)
@@ -2948,10 +3056,10 @@ namespace MPDCtrl.ViewModels
             StatusButton = _pathErrorInfoButton;
         }
 
-        private void OnConnectionStatusChanged(MPC sender, AsynchronousTCPClient.ConnectionStatus status)
+        private void OnConnectionStatusChanged(MPC sender, TCPC.ConnectionStatus status)
         {
 
-            if (status == AsynchronousTCPClient.ConnectionStatus.Connected)
+            if (status == TCPC.ConnectionStatus.Connected)
             {
                 // handle other things at OnConnected
 
@@ -2961,7 +3069,7 @@ namespace MPDCtrl.ViewModels
                 StatusMessage = "";
                 StatusButton = _pathConnectedButton;
             }
-            else if (status == AsynchronousTCPClient.ConnectionStatus.Connecting)
+            else if (status == TCPC.ConnectionStatus.Connecting)
             {
                 IsConnected = false;
                 IsConnecting = true;
@@ -2969,7 +3077,7 @@ namespace MPDCtrl.ViewModels
                 StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connecting;
                 StatusButton = _pathConnectingButton;
             }
-            else if (status == AsynchronousTCPClient.ConnectionStatus.AutoReconnecting)
+            else if (status == TCPC.ConnectionStatus.AutoReconnecting)
             {
                 IsConnected = false;
                 IsConnecting = true;
@@ -2977,7 +3085,7 @@ namespace MPDCtrl.ViewModels
                 StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Reconnecting;
                 StatusButton = _pathConnectingButton;
             }
-            else if (status == AsynchronousTCPClient.ConnectionStatus.ConnectFail_Timeout)
+            else if (status == TCPC.ConnectionStatus.ConnectFail_Timeout)
             {
                 IsConnected = false;
                 IsConnecting = false;
@@ -2986,7 +3094,7 @@ namespace MPDCtrl.ViewModels
                 StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectFail_Timeout;
                 StatusButton = _pathErrorInfoButton;
             }
-            else if (status == AsynchronousTCPClient.ConnectionStatus.DisconnectedByHost)
+            else if (status == TCPC.ConnectionStatus.DisconnectedByHost)
             {
                 IsConnected = false;
                 IsConnecting = false;
@@ -2995,7 +3103,7 @@ namespace MPDCtrl.ViewModels
                 StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_DisconnectedByHost;
                 StatusButton = _pathErrorInfoButton;
             }
-            else if (status == AsynchronousTCPClient.ConnectionStatus.DisconnectedByUser)
+            else if (status == TCPC.ConnectionStatus.DisconnectedByUser)
             {
                 IsConnected = false;
                 IsConnecting = false;
@@ -3004,7 +3112,7 @@ namespace MPDCtrl.ViewModels
                 StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_DisconnectedByUser;
                 StatusButton = _pathErrorInfoButton;
             }
-            else if (status == AsynchronousTCPClient.ConnectionStatus.Error)
+            else if (status == TCPC.ConnectionStatus.Error)
             {
                 // TODO: OnConnectionErrorと被る。
 
@@ -3015,7 +3123,7 @@ namespace MPDCtrl.ViewModels
                 //StatusMessage = "Error..";
                 StatusButton = _pathErrorInfoButton;
             }
-            else if (status == AsynchronousTCPClient.ConnectionStatus.SendFail_NotConnected)
+            else if (status == TCPC.ConnectionStatus.SendFail_NotConnected)
             {
                 IsConnected = false;
                 IsConnecting = false;
@@ -3024,7 +3132,7 @@ namespace MPDCtrl.ViewModels
                 StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_SendFail_NotConnected;
                 StatusButton = _pathErrorInfoButton;
             }
-            else if (status == AsynchronousTCPClient.ConnectionStatus.SendFail_Timeout)
+            else if (status == TCPC.ConnectionStatus.SendFail_Timeout)
             {
                 IsConnected = false;
                 IsConnecting = false;
@@ -3033,7 +3141,7 @@ namespace MPDCtrl.ViewModels
                 StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_SendFail_Timeout;
                 StatusButton = _pathErrorInfoButton;
             }
-            else if (status == AsynchronousTCPClient.ConnectionStatus.NeverConnected)
+            else if (status == TCPC.ConnectionStatus.NeverConnected)
             {
                 IsConnected = false;
                 IsConnecting = false;
@@ -3042,11 +3150,11 @@ namespace MPDCtrl.ViewModels
                 StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_NeverConnected;
                 StatusButton = _pathErrorInfoButton;
             }
-            else if (status == AsynchronousTCPClient.ConnectionStatus.MpdOK)
+            else if (status == TCPC.ConnectionStatus.MpdOK)
             {
                 //
             }
-            else if (status == AsynchronousTCPClient.ConnectionStatus.MpdAck)
+            else if (status == TCPC.ConnectionStatus.MpdAck)
             {
                 //
             }
@@ -3731,7 +3839,7 @@ namespace MPDCtrl.ViewModels
             if (_selectedSong == null) { return false; }
             return true;
         }
-        public void QueueListviewLeftDoubleClickCommand_ExecuteAsync(MPC.Song song)
+        public void QueueListviewLeftDoubleClickCommand_ExecuteAsync(MPC.SongInfo song)
         {
             _MPC.MpdPlaybackPlay(song.Id);
         }
@@ -3763,7 +3871,7 @@ namespace MPDCtrl.ViewModels
             if (obj == null) return;
 
             // 選択アイテム保持用
-            List<MPC.Song> selectedList = new List<MPC.Song>();
+            List<MPC.SongInfo> selectedList = new List<MPC.SongInfo>();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -3771,11 +3879,11 @@ namespace MPDCtrl.ViewModels
             {
                 System.Collections.IList items = (System.Collections.IList)obj;
 
-                var collection = items.Cast<MPC.Song>();
+                var collection = items.Cast<MPC.SongInfo>();
 
                 foreach (var item in collection)
                 {
-                    selectedList.Add(item as MPC.Song);
+                    selectedList.Add(item as MPC.SongInfo);
                 }
             });
 
@@ -3814,7 +3922,7 @@ namespace MPDCtrl.ViewModels
             if (obj == null) return;
 
             // 選択アイテム保持用
-            List<MPC.Song> selectedList = new List<MPC.Song>();
+            List<MPC.SongInfo> selectedList = new List<MPC.SongInfo>();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -3822,11 +3930,11 @@ namespace MPDCtrl.ViewModels
             {
                 System.Collections.IList items = (System.Collections.IList)obj;
 
-                var collection = items.Cast<MPC.Song>();
+                var collection = items.Cast<MPC.SongInfo>();
 
                 foreach (var item in collection)
                 {
-                    selectedList.Add(item as MPC.Song);
+                    selectedList.Add(item as MPC.SongInfo);
                 }
             });
 
@@ -3864,7 +3972,7 @@ namespace MPDCtrl.ViewModels
             if (obj == null) return;
 
             // 選択アイテム保持用
-            List<MPC.Song> selectedList = new List<MPC.Song>();
+            List<MPC.SongInfo> selectedList = new List<MPC.SongInfo>();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -3872,11 +3980,11 @@ namespace MPDCtrl.ViewModels
             {
                 System.Collections.IList items = (System.Collections.IList)obj;
 
-                var collection = items.Cast<MPC.Song>();
+                var collection = items.Cast<MPC.SongInfo>();
 
                 foreach (var item in collection)
                 {
-                    selectedList.Add(item as MPC.Song);
+                    selectedList.Add(item as MPC.SongInfo);
                 }
             });
 
@@ -3904,7 +4012,6 @@ namespace MPDCtrl.ViewModels
             _MPC.MpdMoveId(IdToNewPos);
         }
 
-
         public ICommand QueueListviewPlaylistAddCommand { get; }
         public bool QueueListviewPlaylistAddCommand_CanExecute()
         {
@@ -3915,7 +4022,7 @@ namespace MPDCtrl.ViewModels
             if (obj == null) return;
 
             // 選択アイテム保持用
-            List<MPC.Song> selectedList = new List<MPC.Song>();
+            List<MPC.SongInfo> selectedList = new List<MPC.SongInfo>();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -3923,11 +4030,11 @@ namespace MPDCtrl.ViewModels
             {
                 System.Collections.IList items = (System.Collections.IList)obj;
 
-                var collection = items.Cast<MPC.Song>();
+                var collection = items.Cast<MPC.SongInfo>();
 
                 foreach (var item in collection)
                 {
-                    selectedList.Add(item as MPC.Song);
+                    selectedList.Add(item as MPC.SongInfo);
                 }
             });
 
@@ -3950,7 +4057,7 @@ namespace MPDCtrl.ViewModels
             DialogResultFunctionParamObject = fileUrisToAddList;
 
             PlaylistNamesWithNew.Clear();
-            PlaylistNamesWithNew.Add("["+ MPDCtrl.Properties.Resources.Dialog_PlaylistSelect_NewPlaylistName + "]");//MPDCtrl.Properties.Resources.
+            PlaylistNamesWithNew.Add("["+ MPDCtrl.Properties.Resources.Dialog_PlaylistSelect_NewPlaylistName + "]");
 
             foreach (var s in Playlists)
             {
@@ -4497,6 +4604,47 @@ namespace MPDCtrl.ViewModels
             IsPlaylistSelectDialogShow = false;
         }
 
+        public ICommand ShowFindCommand { get; }
+        public bool ShowFindCommand_CanExecute()
+        {
+            if (IsConnecting) return false;
+            if (!IsConnected) return false;
+            if (!IsMainShow) return false;
+            return true;
+        }
+        public void ShowFindCommand_Execute()
+        {
+            if (IsConnecting) return;
+            if (!IsConnected) return;
+            if (!IsMainShow) return;
+
+            if (IsSettingsShow) return;
+            if (IsComfirmationDialogShow) return;
+            if (IsInformationDialogShow) return;
+            if (IsInputDialogShow) return;
+            if (IsChangePasswordDialogShow) return;
+            if (IsPlaylistSelectDialogShow) return;
+
+
+            if (IsFindDialogShow)
+            {
+                IsFindDialogShow = false;
+            }
+            else
+            {
+                IsFindDialogShow = true;
+            }
+        }
+
+        public ICommand ShowFindCancelCommand { get; }
+        public bool ShowFindCancelCommand_CanExecute()
+        {
+            return true;
+        }
+        public void ShowFindCancelCommand_Execute()
+        {
+            IsFindDialogShow = false;
+        }
 
         public ICommand EscapeCommand { get; }
         public bool EscapeCommand_CanExecute()
@@ -4505,12 +4653,23 @@ namespace MPDCtrl.ViewModels
         }
         public void EscapeCommand_ExecuteAsync()
         {
+            // 検索画面の上に他のダイアログが被る事があるので、Esc一発で全部閉じないように。
+            if (IsFindDialogShow)
+            {
+                if ((!IsComfirmationDialogShow) && (!IsInformationDialogShow) && (!IsInputDialogShow) && (!IsPlaylistSelectDialogShow))
+                {
+                    IsFindDialogShow = false;
+                }
+            }
+
             IsSettingsShow = false;
             IsComfirmationDialogShow = false;
             IsInformationDialogShow = false;
             IsInputDialogShow = false;
             IsChangePasswordDialogShow = false;
             IsPlaylistSelectDialogShow = false;
+
+
         }
 
         #endregion
@@ -4611,8 +4770,32 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
+        #region == 検索画面 ==
+
+        public ICommand SearchExecCommand { get; }
+        public bool SearchExecCommand_CanExecute()
+        {
+            if (string.IsNullOrEmpty(SearchQuery)) return false;
+            return true;
+        }
+        public void SearchExecCommand_Execute()
+        {
+            if (string.IsNullOrEmpty(SearchQuery)) return;
+            string queryShiki = "contains";//"==";
+
+            _MPC.MpdSearch(SelectedSearchTags.ToString(), queryShiki, SearchQuery);
+
+        }
+
+        #endregion
+
         #endregion
 
     }
 
+
+    public enum SearchTags
+    {
+        Title, Artist, Album, Genre
+    }
 }

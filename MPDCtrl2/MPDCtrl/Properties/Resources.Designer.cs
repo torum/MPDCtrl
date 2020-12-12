@@ -88,6 +88,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Browse に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Browse {
+            get {
+                return ResourceManager.GetString("Browse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cancel に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Cancel {
@@ -430,7 +439,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   _Local Files に類似しているローカライズされた文字列を検索します。
+        ///   _Files に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string LocalfileListviewTabitemHeader_LocalFiles {
             get {
@@ -781,15 +790,6 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Title に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string QueueListviewColumnHeader_Song {
-            get {
-                return ResourceManager.GetString("QueueListviewColumnHeader_Song", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Time に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string QueueListviewColumnHeader_Time {
@@ -799,11 +799,38 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Title に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueListviewColumnHeader_Title {
+            get {
+                return ResourceManager.GetString("QueueListviewColumnHeader_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Save に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Save {
             get {
                 return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Search に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Search {
+            get {
+                return ResourceManager.GetString("Search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Search (Ctrl+F) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Search_ToolTip {
+            get {
+                return ResourceManager.GetString("Search_ToolTip", resourceCulture);
             }
         }
         
@@ -894,6 +921,15 @@ namespace MPDCtrl.Properties {
         public static string Settings_ProfileUpdated {
             get {
                 return ResourceManager.GetString("Settings_ProfileUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Settings (Ctrl+S) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_ToolTip {
+            get {
+                return ResourceManager.GetString("Settings_ToolTip", resourceCulture);
             }
         }
         

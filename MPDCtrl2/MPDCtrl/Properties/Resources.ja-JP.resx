@@ -126,6 +126,9 @@
   <data name="Application" xml:space="preserve">
     <value>アプリケーション</value>
   </data>
+  <data name="Browse" xml:space="preserve">
+    <value>ブラウズ</value>
+  </data>
   <data name="Cancel" xml:space="preserve">
     <value>キャンセル</value>
   </data>
@@ -256,7 +259,7 @@ SOFTWARE.</value>
     <value>キューに追加する (Enter)</value>
   </data>
   <data name="LocalfileListviewTabitemHeader_LocalFiles" xml:space="preserve">
-    <value>ローカルファイル</value>
+    <value>ファイル</value>
   </data>
   <data name="MPD_CommandError" xml:space="preserve">
     <value>MPD コマンドエラー</value>
@@ -372,17 +375,23 @@ SOFTWARE.</value>
   <data name="QueueListviewColumnHeader_Position" xml:space="preserve">
     <value>曲順</value>
   </data>
-  <data name="QueueListviewColumnHeader_Song" xml:space="preserve">
-    <value>曲名</value>
-  </data>
   <data name="QueueListviewColumnHeader_Time" xml:space="preserve">
     <value>時間</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Title" xml:space="preserve">
+    <value>曲名</value>
   </data>
   <data name="Save" xml:space="preserve">
     <value>保存</value>
   </data>
   <data name="SavedProfiles" xml:space="preserve">
     <value>保存済みプロファイル</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>検索</value>
+  </data>
+  <data name="Search_ToolTip" xml:space="preserve">
+    <value>検索 (Ctrl+F)</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>設定</value>
@@ -413,6 +422,9 @@ SOFTWARE.</value>
   </data>
   <data name="Settings_ProfileUpdated" xml:space="preserve">
     <value>プロファイルが更新されました。</value>
+  </data>
+  <data name="Settings_ToolTip" xml:space="preserve">
+    <value>設定 (Ctrl+S)</value>
   </data>
   <data name="Settings_UnlockAndChangePassword" xml:space="preserve">
     <value>アンロックしてパスワードを変更する</value>

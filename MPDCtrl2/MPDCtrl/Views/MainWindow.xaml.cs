@@ -26,13 +26,10 @@ namespace MPDCtrl.Views
     {
         public MainWindow()
         {
-
-
             InitializeComponent();
 
             Loaded += (this.DataContext as MainViewModel).OnWindowLoaded;
             ContentRendered += (this.DataContext as MainViewModel).OnContentRendered;
-
             Closing += (this.DataContext as MainViewModel).OnWindowClosing;
 
             RestoreButton.Visibility = Visibility.Collapsed;
@@ -87,20 +84,25 @@ namespace MPDCtrl.Views
 
         private void QueueListview_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
-            QueueListview.ScrollIntoView(QueueListview.SelectedItem);
+            // Not really good when multiple items are selected
+            //QueueListview.ScrollIntoView(QueueListview.SelectedItem);
 
             // Listview flickering...
             //QueueListview.ScrollToCenterOfView(QueueListview.SelectedItem);
         }
 
-
         private void TextBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (NewHost_TextBox.Visibility == Visibility.Visible)
+            if (sender != null)
             {
-                NewHost_TextBox.Focus();
-                Keyboard.Focus(NewHost_TextBox);
+                if (sender is TextBox)
+                {
+                    if ((sender as TextBox).Visibility == Visibility.Visible)
+                    {
+                        (sender as TextBox).Focus();
+                        Keyboard.Focus((sender as TextBox));
+                    }
+                }
             }
         }
 

@@ -37,9 +37,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
-using MPDCtrl.ViewModels;
+using MPDCtrl.Common;
+using MPDCtrl.Models.Classes;
+using MPDCtrl.ViewModels.Classes;
 
-namespace MPDCtrl
+namespace MPDCtrl.Models
 {
     /// <summary>
     /// MPD client class. 
@@ -48,12 +50,11 @@ namespace MPDCtrl
     {
         public class Song : ViewModelBase
         {
-            public string Id { get; set; }
-            public string Pos { get; set; }
             public string file { get; set; }
             public string Title { get; set; }
             public string Track { get; set; }
             public string Disc { get; set; }
+            public string Time {get; set;}
             public string TimeFormated
             {
                 get
@@ -61,11 +62,11 @@ namespace MPDCtrl
                     string _timeFormatted = "";
                     try
                     {
-                        if (!string.IsNullOrEmpty(_time))
+                        if (!string.IsNullOrEmpty(Time))
                         {
                             int sec, min, hour, s;
 
-                            double dtime = double.Parse(_time);
+                            double dtime = double.Parse(Time);
                             sec = Convert.ToInt32(dtime);
 
                             //sec = Int32.Parse(_time);
@@ -92,7 +93,7 @@ namespace MPDCtrl
                             }
                             else
                             {
-                                System.Diagnostics.Debug.WriteLine("Oops@TimeFormated: " + _time + " : " + hour.ToString() +" " + min.ToString() + " " + s.ToString());
+                                System.Diagnostics.Debug.WriteLine("Oops@TimeFormated: " + Time + " : " + hour.ToString() + " " + min.ToString() + " " + s.ToString());
                             }
                         }
                     }
@@ -100,25 +101,24 @@ namespace MPDCtrl
                     {
                         // Ignore.
                         // System.Diagnostics.Debug.WriteLine(e.Message);
-                        System.Diagnostics.Debug.WriteLine("Wrong Time format. " + _time + " "+ e.Message) ;
+                        System.Diagnostics.Debug.WriteLine("Wrong Time format. " + Time + " " + e.Message);
                     }
 
                     return _timeFormatted;
                 }
-            
+
             }
-            private string _time;
-            public string Time {
+            public double TimeSort
+            {
                 get
                 {
-                    return _time;
-                }
-                set
-                {
-                    if (_time == value)
-                        return;
-
-                    _time = value;
+                    double dtime = double.NaN;
+                    try
+                    {
+                        dtime = double.Parse(Time);
+                    }
+                    catch { }
+                    return dtime;
                 }
             }
             public string duration { get; set; }
@@ -168,6 +168,17 @@ namespace MPDCtrl
                 }
             }
 
+            // for sorting.
+            public int Index { get; set; }
+        }
+
+        public class SongInfo: Song
+        {
+            // Queue specific
+
+            public string Id { get; set; }
+            public string Pos { get; set; }
+
             private bool _isPlaying;
             public bool IsPlaying
             {
@@ -184,10 +195,8 @@ namespace MPDCtrl
                     this.NotifyPropertyChanged("IsPlaying");
                 }
             }
-
-            // for sorting.
-            public int Index { get; set; }
         }
+
 
         public class Status
         {
@@ -273,20 +282,18 @@ namespace MPDCtrl
                 }
             }
 
-            public Status()
-            {
-                //constructor
-            }
         }
+
+        #region == Consts and Properties == 
 
         public enum MpdErrorTypes
         {
             CommandError, //ACK
-            StatusError, //[status] error: Failed to open audio output
+            StatusError, //[status] eg. "error: Failed to open audio output"
             ErrorClear, //
         }
 
-         private string _host;
+        private string _host;
         public string MpdHost
         {
             get { return _host; }
@@ -339,8 +346,8 @@ namespace MPDCtrl
             }
         }
 
-        private ObservableCollection<Song> _queue = new ObservableCollection<Song>();
-        public ObservableCollection<Song> CurrentQueue
+        private ObservableCollection<SongInfo> _queue = new ObservableCollection<SongInfo>();
+        public ObservableCollection<SongInfo> CurrentQueue
         {
             get { return _queue; }
         }
@@ -357,7 +364,19 @@ namespace MPDCtrl
             get { return _localFiles; }
         }
 
-        private AsynchronousTCPClient _asyncClient;
+        private ObservableCollection<String> _localDirectories = new ObservableCollection<String>();
+        public ObservableCollection<String> LocalDirectories
+        {
+            get { return _localDirectories; }
+        }
+
+        private ObservableCollection<Song> _searchResult = new ObservableCollection<Song>();
+        public ObservableCollection<Song> SearchResult
+        {
+            get { return _searchResult; }
+        }
+
+        #endregion
 
         #region == Events == 
 
@@ -382,13 +401,15 @@ namespace MPDCtrl
         public delegate void MpdDataSent(MPC sender, object data);
         public event MpdDataSent DataSent;
 
-        public delegate void MpdConnectionStatusChanged(MPC sender, AsynchronousTCPClient.ConnectionStatus status);
+        public delegate void MpdConnectionStatusChanged(MPC sender, TCPC.ConnectionStatus status);
         public event MpdConnectionStatusChanged ConnectionStatusChanged;
 
         public delegate void MpdIsBusy(MPC sender, bool on);
         public event MpdIsBusy IsBusy;
 
         #endregion
+
+        private TCPC _asyncClient;
 
         public MPC(string h, int p, string a)
         {
@@ -398,13 +419,12 @@ namespace MPDCtrl
 
             _status = new Status();
 
-            _asyncClient = new AsynchronousTCPClient();
-            _asyncClient.DataReceived += new AsynchronousTCPClient.delDataReceived(TCPClient_DataReceived);
-            _asyncClient.DataSent += new AsynchronousTCPClient.delDataSent(TCPClient_DataSent);
-            _asyncClient.ConnectionStatusChanged += new AsynchronousTCPClient.delConnectionStatusChanged(TCPClient_ConnectionStatusChanged);
+            _asyncClient = new TCPC();
+            _asyncClient.DataReceived += new TCPC.delDataReceived(TCPClient_DataReceived);
+            _asyncClient.DataSent += new TCPC.delDataSent(TCPClient_DataSent);
+            _asyncClient.ConnectionStatusChanged += new TCPC.delConnectionStatusChanged(TCPClient_ConnectionStatusChanged);
         }
 
-        #region == Method ==   
 
         #region == MPC Commands ==   
 
@@ -586,6 +606,42 @@ namespace MPDCtrl
             }
         }
 
+        public void MpdQueryistPlaylistinfo(string playlistName)
+        {
+            // Don't use this. The reply cannot be differenciated with "find" result.
+
+
+            if (playlistName.Trim() != "")
+            {
+                playlistName = Regex.Escape(playlistName);
+
+                try
+                {
+                    string mpdCommand = "";
+                    if (!string.IsNullOrEmpty(_password))
+                    {
+                        mpdCommand = "command_list_begin" + "\n";
+                        mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                        mpdCommand = mpdCommand + "listplaylistinfo \"" + playlistName + "\"\n";
+                        mpdCommand = mpdCommand + "command_list_end" + "\n";
+                    }
+                    else
+                    {
+                        mpdCommand = "listplaylistinfo" + "\n";
+                    }
+
+                    _asyncClient.Send("noidle" + "\n");
+                    _asyncClient.Send(mpdCommand);
+                    _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error@MpdMpdlistplaylistinfo: " + ex.Message);
+                }
+
+            }
+        }
+        
         public void MpdClear()
         {
             try
@@ -795,8 +851,7 @@ namespace MPDCtrl
             }
         }
 
-
-        public void MpdPlaybackPlay(string songID = "")
+        public void MpdPlaybackPlay(string songId = "")
         {
             try
             {
@@ -805,9 +860,9 @@ namespace MPDCtrl
                 {
                     mpdCommand = mpdCommand + "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
-                    if (songID != "")
+                    if (songId != "")
                     {
-                        mpdCommand = mpdCommand + "playid " + songID + "\n";
+                        mpdCommand = mpdCommand + "playid " + songId + "\n";
                     }
                     else
                     {
@@ -817,9 +872,9 @@ namespace MPDCtrl
                 }
                 else
                 {
-                    if (songID != "")
+                    if (songId != "")
                     {
-                        mpdCommand = "playid " + songID + "\n";
+                        mpdCommand = "playid " + songId + "\n";
                     }
                     else
                     {
@@ -837,9 +892,9 @@ namespace MPDCtrl
             }
         }
 
-        public void MpdPlaybackSeek(string songID, int seekTime)
+        public void MpdPlaybackSeek(string songId, int seekTime)
         {
-            if ((songID == "") || (seekTime == 0)) { return; }
+            if ((songId == "") || (seekTime == 0)) { return; }
 
             try
             {
@@ -848,12 +903,12 @@ namespace MPDCtrl
                 {
                     mpdCommand = "command_list_begin" + "\n";
                     mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
-                    mpdCommand = mpdCommand + "seekid " + songID + " " + seekTime.ToString() + "\n";
+                    mpdCommand = mpdCommand + "seekid " + songId + " " + seekTime.ToString() + "\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
                 else
                 {
-                    mpdCommand = "seekid " + songID + " " + seekTime.ToString() + "\n";
+                    mpdCommand = "seekid " + songId + " " + seekTime.ToString() + "\n";
                 }
 
                 _asyncClient.Send("noidle" + "\n");
@@ -1316,21 +1371,63 @@ namespace MPDCtrl
 
         }
 
+        public void MpdSearch(string queryTag, string queryShiki, string queryValue)
+        {
+            
+            if (Application.Current == null) { return; }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                SearchResult.Clear();
+            });
+
+            if (string.IsNullOrEmpty(queryTag)) return;
+            if (string.IsNullOrEmpty(queryValue)) return;
+            if (string.IsNullOrEmpty(queryShiki)) return;
+
+            //find "(Artist == \"foo\\'bar\\\"\")"
+
+            var expression = queryTag + " " + queryShiki + " \'" + Regex.Escape(queryValue) + "\'";
+
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "search \"(" + expression + ")\"\n";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "search \"" + expression + "\"\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdFind: " + ex.Message);
+            }
+        }
+
         #endregion
 
-        #region == TCPClient ==   
+        #region == Other Method == 
 
-        private async void TCPClient_ConnectionStatusChanged(AsynchronousTCPClient sender, AsynchronousTCPClient.ConnectionStatus status)
+        private async void TCPClient_ConnectionStatusChanged(TCPC sender, TCPC.ConnectionStatus status)
         {
             await Task.Run(() => { ConnectionStatusChanged?.Invoke(this, status); });
         }
 
-        private async void TCPClient_DataSent(AsynchronousTCPClient sender, object data)
+        private async void TCPClient_DataSent(TCPC sender, object data)
         {
             await Task.Run(() => { DataSent?.Invoke(this, (data as string)); });
         }
 
-        private async void TCPClient_DataReceived(AsynchronousTCPClient sender, object data)
+        private async void TCPClient_DataReceived(TCPC sender, object data)
         {
             await Task.Run(() => { DataReceived?.Invoke(this, (data as string)); });
 
@@ -1461,15 +1558,7 @@ namespace MPDCtrl
                     System.Diagnostics.Debug.WriteLine("--Error@IdleConnection DataReceived ParseData: " + str);
                 }
             }
-            else if (str.StartsWith("volume:") ||
-                   str.StartsWith("repeat:") ||
-                   str.StartsWith("random:") ||
-                   str.StartsWith("state:") ||
-                   str.StartsWith("song:") ||
-                   str.StartsWith("songid:") ||
-                   str.StartsWith("time:") ||
-                   str.StartsWith("elapsed:") ||
-                   str.StartsWith("duration:"))
+            else if (str.StartsWith("volume:") || str.StartsWith("repeat:") || str.StartsWith("random:") || str.StartsWith("state:") || str.StartsWith("song:") || str.StartsWith("songid:") || str.StartsWith("time:") || str.StartsWith("elapsed:") || str.StartsWith("duration:"))
             {
                 // "status"
 
@@ -1480,71 +1569,112 @@ namespace MPDCtrl
                 await Task.Run(() => { StatusUpdate?.Invoke(this, "isPlayer"); });
 
             }
-            else if (str.StartsWith("file:") || str.StartsWith("directory:") ||
-                str.StartsWith("Modified:") ||
-                str.StartsWith("Artist:") ||
-                str.StartsWith("AlbumArtist:") ||
-                str.StartsWith("Title:") ||
-                str.StartsWith("Album:"))
+            else if (str.StartsWith("file:") || str.StartsWith("directory:") || str.StartsWith("Modified:") || str.StartsWith("Artist:") || str.StartsWith("AlbumArtist:") || str.StartsWith("Title:") || str.StartsWith("Album:"))
             {
-                // "playlistinfo"
-
+                // "playlistinfo" aka Queue,
                 /*
-                file: Creedence Clearwater Revival/Chronicle, Vol. 1/11 Who'll Stop the Rain.mp3
-                Last-Modified: 2011-08-03T16:08:06Z
-                Artist: Creedence Clearwater Revival
-                AlbumArtist: Creedence Clearwater Revival
-                Title: Who'll Stop the Rain
-                Album: Chronicle, Vol. 1
-                Track: 11
-                Date: 1976
-                Genre: Rock
-                Composer: John Fogerty
-                Time: 149
-                duration: 149.149
-                Pos: 5
-                Id: 22637
+                 file: Creedence Clearwater Revival/Chronicle, Vol. 1/11 Who'll Stop the Rain.mp3
+                 Last-Modified: 2011-08-03T16:08:06Z
+                 Artist: Creedence Clearwater Revival
+                 AlbumArtist: Creedence Clearwater Revival
+                 Title: Who'll Stop the Rain
+                 Album: Chronicle, Vol. 1
+                 Track: 11
+                 Date: 1976
+                 Genre: Rock
+                 Composer: John Fogerty
+                 Time: 149
+                 duration: 149.149
+                 Pos: 5
+                 Id: 22637
                 */
 
-                // listall
-
+                // "listplaylist" .. songs containd in a playlist.
                 /*
-                directory: 2Pac
-                directory: 2Pac/Better Dayz
-                file: 2Pac/Better Dayz/17 Better Dayz (Feat. Mr. Biggs).mp3
-                file: 2Pac/Better Dayz/1-02 Thugz Mansion.mp3
-                directory: 2Pac/Greatest Hits
-                file: 2Pac/Greatest Hits/California Love.mp3
-                file: 2Pac/Greatest Hits/Changes.mp3
-                file: 2Pac/Greatest Hits/god bless the dead.mp3
+                 file: Nina Simone/Cellular Soundtrack/Sinnerman (remix).mp3
+                 Last-Modified: 2020-09-07T22:56:19Z
+                 Artist: Nina Simone 
+                 Album: Cellular Soundtrack
+                 Title: Sinnerman (remix)
+                 Genre: Soundtrack
+                 Time: 274
+                 duration: 274.364
+                */
+
+                // "find" search result
+                /*
+                 file: 2Pac/Better Dayz/17 Better Dayz (Feat. Mr. Biggs).mp3
+                 Last-Modified: 2011-02-27T14:20:18Z
+                 Format: 44100:f:2
+                 Time: 258
+                 duration: 257.677
+                 Artist: 2Pac
+                 Album: Better Dayz
+                 Title: Better Dayz (Feat. Mr. Biggs)
+                 Track: 17
+                 Genre: Rap
+                 Date: 2002
+                 */
+
+                // "listall" aka LocalFiles
+                /*
+                 directory: 2Pac
+                 directory: 2Pac/Better Dayz
+                 file: 2Pac/Better Dayz/17 Better Dayz (Feat. Mr. Biggs).mp3
+                 file: 2Pac/Better Dayz/1-02 Thugz Mansion.mp3
+                 directory: 2Pac/Greatest Hits
+                 file: 2Pac/Greatest Hits/California Love.mp3
+                 file: 2Pac/Greatest Hits/Changes.mp3
+                 file: 2Pac/Greatest Hits/god bless the dead.mp3
                 */
 
                 List<string> reLines = str.Split('\n').ToList();
+                Dictionary<string, string> Values = new Dictionary<string, string>();
 
-                bool isPlaylistinfo = false;
-
+                int i = 0;
                 foreach (string line in reLines)
                 {
-                    if (line.StartsWith("Title:") || line.StartsWith("Artist:") || line.StartsWith("Id:") )
+                    if (i > 15) break;
+
+                    string[] ValuePair = line.Split(':');
+                    if (ValuePair.Length > 1)
                     {
-                        isPlaylistinfo = true;
-                        break;
+                        if (!Values.ContainsKey(ValuePair[0].Trim()))
+                        Values.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
                     }
+
+                    i++;
                 }
 
-                if (isPlaylistinfo)
+                if ((Values.ContainsKey("Id")) && Values.ContainsKey("Pos") && Values.ContainsKey("Title") && Values.ContainsKey("Artist"))
                 {
+                    // Queue = true;
                     ParsePlaylistInfo(reLines);
 
                     await Task.Run(() => { StatusUpdate?.Invoke(this, "isCurrentQueue"); });
                 }
-                else
+                else if (Values.ContainsKey("Title") && Values.ContainsKey("Artist"))
                 {
+                    // listplaylistinfo or find result.... can't differenciate.
+                    //System.Diagnostics.Debug.WriteLine("Opps. DataReceived_ParseData : Not implemented. " + str);
+
+                    // TODO:
+                    ParseSongResult(reLines);
+                    await Task.Run(() => { StatusUpdate?.Invoke(this, "isSongs"); });
+
+                }
+                else if (Values.ContainsKey("file") || Values.ContainsKey("directory"))
+                {
+                    // LocalFies = true;
                     ParseListAll(reLines);
 
                     await Task.Run(() => { StatusUpdate?.Invoke(this, "isLocalFiles"); });
                 }
-
+                else
+                {
+                    // TODO:
+                    System.Diagnostics.Debug.WriteLine("Opps. DataReceived_ParseData : " + str);
+                }
             }
             else if (str.StartsWith("playlist:"))
             {
@@ -1559,15 +1689,12 @@ namespace MPDCtrl
             else if (str.StartsWith("updating_db:"))
             {
                 // update
-
                 await Task.Run(() => { StatusUpdate?.Invoke(this, "isUpdating_db"); });
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("IdleConnection DataReceived Dispa ParseData NON: " + str);
-
+                System.Diagnostics.Debug.WriteLine("Opps. DataReceived_ParseData NON: " + str);
             }
-
         }
 
         private bool ParseStatus(List<string> sl)
@@ -1588,17 +1715,23 @@ namespace MPDCtrl
 
             try
             {
-                foreach (string value in sl)
+                foreach (string line in sl)
                 {
-                    if (value.StartsWith("ACK"))
+                    string[] StatusValuePair = line.Split(':');
+                    if (StatusValuePair.Length > 1)
                     {
-                        System.Diagnostics.Debug.WriteLine("ACK@ParseStatusResponse: " + value);
-                        ErrorReturned?.Invoke(this, MpdErrorTypes.CommandError, value);
-                        return false;
+                        if (MpdStatusValues.ContainsKey(StatusValuePair[0].Trim()))
+                        {
+                            // new
+
+                            MpdStatusValues[StatusValuePair[0].Trim()] = line.Replace(StatusValuePair[0].Trim() + ": ", "");
+                        }
+                        else
+                        {
+                            MpdStatusValues.Add(StatusValuePair[0].Trim(), line.Replace(StatusValuePair[0].Trim() + ": ", ""));
+                        }
                     }
-
-                    string[] StatusValuePair = value.Split(':');
-
+                    /*
                     if (StatusValuePair.Length > 1)
                     {
                         if (MpdStatusValues.ContainsKey(StatusValuePair[0].Trim()))
@@ -1625,6 +1758,7 @@ namespace MPDCtrl
                             }
                         }
                     }
+                    */
                 }
 
                 // Play state
@@ -1795,13 +1929,10 @@ namespace MPDCtrl
 
         private bool ParsePlaylistInfo(List<string> sl) 
         {
-            if (MpdStop) { return false; }
-            if (sl == null)
-            {
-                System.Diagnostics.Debug.WriteLine("ConError@ParsePlaylistInfoResponse: null");
-                //ErrorReturned?.Invoke(this, "Connection Error: (@C2)");
-                return false;
-            }
+            if (MpdStop) return false;
+            if (sl == null) return false;
+
+            // aka Queue
 
             /*
             file: Creedence Clearwater Revival/Chronicle, Vol. 1/11 Who'll Stop the Rain.mp3
@@ -1834,20 +1965,117 @@ namespace MPDCtrl
 
                 foreach (string value in sl)
                 {
-                    /*
-                    if (value.StartsWith("ACK"))
-                    {
-                        System.Diagnostics.Debug.WriteLine("ACK@ParsePlaylistInfoResponse: " + value);
-                        ErrorReturned?.Invoke(this, MpdErrorTypes.CommandError, value);
-                        return false;
-                    }
-                    */
-
                     string[] StatusValuePair = value.Split(':');
                     if (StatusValuePair.Length > 1)
                     {
                         if (SongValues.ContainsKey(StatusValuePair[0].Trim()))
                         {
+                            if (SongValues.ContainsKey("Id"))
+                            {
+                                SongInfo sng = new SongInfo();
+                                sng.Id = SongValues["Id"];
+
+                                if (SongValues.ContainsKey("Title"))
+                                {
+                                    sng.Title = SongValues["Title"];
+                                }
+                                else
+                                {
+                                    sng.Title = "";
+                                    if (SongValues.ContainsKey("file"))
+                                    {
+                                        sng.Title = Path.GetFileName(SongValues["file"]);
+                                    }
+                                }
+
+                                if (SongValues.ContainsKey("Artist"))
+                                {
+                                    sng.Artist = SongValues["Artist"];
+                                }
+                                else
+                                {
+                                    if (SongValues.ContainsKey("AlbumArtist"))
+                                    {
+                                        // TODO: Should I?
+                                        sng.Artist = SongValues["AlbumArtist"];
+                                    }
+                                    else
+                                    {
+                                        sng.Artist = "";
+                                    }
+                                }
+
+                                if (SongValues.ContainsKey("Last-Modified"))
+                                {
+                                    sng.LastModified = SongValues["Last-Modified"];
+                                }
+                                if (SongValues.ContainsKey("AlbumArtist"))
+                                {
+                                    sng.AlbumArtist = SongValues["AlbumArtist"];
+                                }
+                                if (SongValues.ContainsKey("Album"))
+                                {
+                                    sng.Album = SongValues["Album"];
+                                }
+                                if (SongValues.ContainsKey("Track"))
+                                {
+                                    sng.Track = SongValues["Track"];
+                                }
+                                if (SongValues.ContainsKey("Disc"))
+                                {
+                                    sng.Disc = SongValues["Disc"];
+                                }
+                                if (SongValues.ContainsKey("Date"))
+                                {
+                                    sng.Date = SongValues["Date"];
+                                }
+                                if (SongValues.ContainsKey("Genre"))
+                                {
+                                    sng.Genre = SongValues["Genre"];
+                                }
+                                if (SongValues.ContainsKey("Composer"))
+                                {
+                                    sng.Composer = SongValues["Composer"];
+                                }
+                                if (SongValues.ContainsKey("Time"))
+                                {
+                                    sng.Time = SongValues["Time"];
+                                }
+                                if (SongValues.ContainsKey("duration"))
+                                {
+                                    sng.Time = SongValues["duration"];
+                                    sng.duration = SongValues["duration"];
+                                }
+                                if (SongValues.ContainsKey("Pos"))
+                                {
+                                    sng.Pos = SongValues["Pos"];
+                                }
+                                if (SongValues.ContainsKey("file"))
+                                {
+                                    sng.file = SongValues["file"];
+                                }
+
+                                //
+                                if (sng.Id == _status.MpdSongID)
+                                {
+                                    _currentSong = sng;
+                                }
+
+                                // for sorting.
+                                sng.Index = i;
+                                i++;
+
+                                //
+                                SongValues.Clear();
+
+                                //
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    CurrentQueue.Add(sng);
+                                });
+
+                            }
+
                             //SongValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim();
                             SongValues[StatusValuePair[0].Trim()] = value.Replace(StatusValuePair[0].Trim() + ": ", ""); 
                         }
@@ -1858,111 +2086,6 @@ namespace MPDCtrl
                         }
                     }
 
-                    if (SongValues.ContainsKey("Id"))
-                    {
-                        Song sng = new Song();
-                        sng.Id = SongValues["Id"];
-
-                        if (SongValues.ContainsKey("Title"))
-                        {
-                            sng.Title = SongValues["Title"];
-                        }
-                        else
-                        {
-                            sng.Title = "";
-                            if (SongValues.ContainsKey("file"))
-                            {
-                                sng.Title = Path.GetFileName(SongValues["file"]);
-                            }
-                        }
-
-                        if (SongValues.ContainsKey("Artist"))
-                        {
-                            sng.Artist = SongValues["Artist"];
-                        }
-                        else
-                        {
-                            if (SongValues.ContainsKey("AlbumArtist"))
-                            {
-                                // TODO: Should I?
-                                sng.Artist = SongValues["AlbumArtist"];
-                            }
-                            else
-                            {
-                                sng.Artist = "";
-                            }
-                        }
-
-                        if (SongValues.ContainsKey("Last-Modified"))
-                        {
-                            sng.LastModified = SongValues["Last-Modified"];
-                        }
-                        if (SongValues.ContainsKey("AlbumArtist"))
-                        {
-                            sng.AlbumArtist = SongValues["AlbumArtist"];
-                        }
-                        if (SongValues.ContainsKey("Album"))
-                        {
-                            sng.Album = SongValues["Album"];
-                        }
-                        if (SongValues.ContainsKey("Track"))
-                        {
-                            sng.Track = SongValues["Track"];
-                        }
-                        if (SongValues.ContainsKey("Disc"))
-                        {
-                            sng.Disc = SongValues["Disc"];
-                        }
-                        if (SongValues.ContainsKey("Date"))
-                        {
-                            sng.Date = SongValues["Date"];
-                        }
-                        if (SongValues.ContainsKey("Genre"))
-                        {
-                            sng.Genre = SongValues["Genre"];
-                        }
-                        if (SongValues.ContainsKey("Composer"))
-                        {
-                            sng.Composer = SongValues["Composer"];
-                        }
-                        if (SongValues.ContainsKey("Time"))
-                        {
-                            sng.Time = SongValues["Time"];
-                        }
-                        if (SongValues.ContainsKey("duration"))
-                        {
-                            sng.Time = SongValues["duration"];
-                            sng.duration = SongValues["duration"];
-                        }
-                        if (SongValues.ContainsKey("Pos"))
-                        {
-                            sng.Pos = SongValues["Pos"];
-                        }
-                        if (SongValues.ContainsKey("file"))
-                        {
-                            sng.file = SongValues["file"];
-                        }
-
-                        //
-                        if (sng.Id == _status.MpdSongID)
-                        {
-                            _currentSong = sng;
-                        }
-
-                        // for sorting.
-                        sng.Index = i;
-                        i++;
-
-                        //
-                        SongValues.Clear();
-
-                        //
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            CurrentQueue.Add(sng);
-                        });
-
-                    }
                 }
             }
             catch (Exception ex)
@@ -1980,8 +2103,6 @@ namespace MPDCtrl
             if (MpdStop) { return false; }
             if (sl == null)
             {
-                System.Diagnostics.Debug.WriteLine("Connected response@ParsePlaylistsResponse: null");
-                //ErrorReturned?.Invoke(this, "Connection Error: (C3)");
                 return false;
             }
 
@@ -1996,21 +2117,12 @@ namespace MPDCtrl
 
             foreach (string value in sl)
             {
-                //System.Diagnostics.Debug.WriteLine("@ParsePlaylistsResponse() loop: " + value + "");
-
-                if (value.StartsWith("ACK"))
-                {
-                    System.Diagnostics.Debug.WriteLine("ACK@ParsePlaylistsResponse: " + value);
-                    ErrorReturned?.Invoke(this, MpdErrorTypes.CommandError, value);
-                    return false;
-                }
-
                 if (value.StartsWith("playlist:"))
                 {
                     if (value.Split(':').Length > 1)
                     {
-                        //_playLists.Add(value.Split(':')[1].Trim()); // need sort.
-                        slTmp.Add(value.Split(':')[1].Trim());
+                        //slTmp.Add(value.Split(':')[1].Trim());
+                        slTmp.Add(value.Replace(value.Split(':')[0] + ": ", "")); 
                     }
                 }
                 else if (value.StartsWith("Last-Modified: ") || (value.StartsWith("OK")))
@@ -2038,29 +2150,24 @@ namespace MPDCtrl
             Application.Current.Dispatcher.Invoke(() =>
             {
                 LocalFiles.Clear();
+                LocalDirectories.Clear();
             });
-
-            // Tmp list for sorting.
-            List<string> slTmp = new List<string>();
 
             foreach (string value in sl)
             {
-                //System.Diagnostics.Debug.WriteLine("@ParseListAllloop: " + value + "");
-
                 if (value.StartsWith("directory:"))
                 {
-                    // TODO: Ignoring for now.
-
-
-
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        LocalDirectories.Add(value.Replace("directory: ", ""));
+                    });
                 }
                 else if (value.StartsWith("file:"))
                 {
-                    if (value.Split(':').Length > 1)
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
-                        //_playLists.Add(value.Split(':')[1].Trim()); // need sort.
-                        slTmp.Add(value.Split(':')[1].Trim());
-                    }
+                        LocalFiles.Add(value.Replace("file: ", ""));
+                    });
                 }
                 else if ((value.StartsWith("OK")))
                 {
@@ -2068,345 +2175,184 @@ namespace MPDCtrl
                 }
             }
 
-            // Sort.
-            slTmp.Sort();
-            foreach (string v in slTmp)
+            return true;
+        }
+
+        private bool ParseSongResult(List<string> sl)
+        {
+            if (MpdStop) return false;
+            if (sl == null) return false;
+
+
+            // "listplaylist" .. songs containd in a playlist.
+            /*
+             file: Nina Simone/Cellular Soundtrack/Sinnerman (remix).mp3
+             Last-Modified: 2020-09-07T22:56:19Z
+             Artist: Nina Simone 
+             Album: Cellular Soundtrack
+             Title: Sinnerman (remix)
+             Genre: Soundtrack
+             Time: 274
+             duration: 274.364
+            */
+
+            // "find" search result
+            /*
+             file: 2Pac/Better Dayz/17 Better Dayz (Feat. Mr. Biggs).mp3
+             Last-Modified: 2011-02-27T14:20:18Z
+             Format: 44100:f:2
+             Time: 258
+             duration: 257.677
+             Artist: 2Pac
+             Album: Better Dayz
+             Title: Better Dayz (Feat. Mr. Biggs)
+             Track: 17
+             Genre: Rap
+             Date: 2002
+             */
+
+            try
             {
+                if (Application.Current == null) { return false; }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    LocalFiles.Add(v);
+                    SearchResult.Clear();
                 });
+
+                Dictionary<string, string> SongValues = new Dictionary<string, string>();
+
+                int i = 0;
+
+                foreach (string line in sl)
+                {
+                    string[] ValuePair = line.Split(':');
+                    if (ValuePair.Length > 1)
+                    {
+                        if (SongValues.ContainsKey(ValuePair[0].Trim()))
+                        {
+                            // new
+                            if (SongValues.ContainsKey("file"))
+                            {
+                                Song sng = new Song();
+
+                                if (SongValues.ContainsKey("Title"))
+                                {
+                                    sng.Title = SongValues["Title"];
+                                }
+                                else
+                                {
+                                    sng.Title = "";
+                                    if (SongValues.ContainsKey("file"))
+                                    {
+                                        sng.Title = Path.GetFileName(SongValues["file"]);
+                                    }
+                                }
+
+                                if (SongValues.ContainsKey("Artist"))
+                                {
+                                    sng.Artist = SongValues["Artist"];
+                                }
+                                else
+                                {
+                                    if (SongValues.ContainsKey("AlbumArtist"))
+                                    {
+                                        // TODO: Should I?
+                                        sng.Artist = SongValues["AlbumArtist"];
+                                    }
+                                    else
+                                    {
+                                        sng.Artist = "";
+                                    }
+                                }
+
+                                if (SongValues.ContainsKey("Last-Modified"))
+                                {
+                                    sng.LastModified = SongValues["Last-Modified"];
+                                }
+                                if (SongValues.ContainsKey("AlbumArtist"))
+                                {
+                                    sng.AlbumArtist = SongValues["AlbumArtist"];
+                                }
+                                if (SongValues.ContainsKey("Album"))
+                                {
+                                    sng.Album = SongValues["Album"];
+                                }
+                                if (SongValues.ContainsKey("Track"))
+                                {
+                                    sng.Track = SongValues["Track"];
+                                }
+                                if (SongValues.ContainsKey("Disc"))
+                                {
+                                    sng.Disc = SongValues["Disc"];
+                                }
+                                if (SongValues.ContainsKey("Date"))
+                                {
+                                    sng.Date = SongValues["Date"];
+                                }
+                                if (SongValues.ContainsKey("Genre"))
+                                {
+                                    sng.Genre = SongValues["Genre"];
+                                }
+                                if (SongValues.ContainsKey("Composer"))
+                                {
+                                    sng.Composer = SongValues["Composer"];
+                                }
+                                if (SongValues.ContainsKey("Time"))
+                                {
+                                    sng.Time = SongValues["Time"];
+                                }
+                                if (SongValues.ContainsKey("duration"))
+                                {
+                                    sng.Time = SongValues["duration"];
+                                    sng.duration = SongValues["duration"];
+                                }
+                                if (SongValues.ContainsKey("file"))
+                                {
+                                    sng.file = SongValues["file"];
+                                }
+
+
+                                // for sorting.
+                                sng.Index = i;
+                                i++;
+
+                                //
+                                SongValues.Clear();
+
+                                //
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    SearchResult.Add(sng);
+                                });
+
+                            }
+
+                            SongValues[ValuePair[0].Trim()] = line.Replace(ValuePair[0].Trim() + ": ", "");
+                        }
+                        else
+                        {
+                            SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
+                        }
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@ParseSongResult: " + ex.Message);
+
+                return false;
             }
 
             return true;
         }
 
-        #endregion TCPClient
 
-        #endregion END of Method
-    }
-
-    public class ConnectionResult
-    {
-        public bool isSuccess;
-        public string errorMessage;
-    }
-
-    public class StateObject
-    {
-        // Client socket.  
-        public Socket workSocket = null;
-        // Size of receive buffer.  
-        public const int BufferSize = 5000;
-        // Receive buffer.  
-        public byte[] buffer = new byte[BufferSize];
-        // Received data string.  
-        public StringBuilder sb = new StringBuilder();
+        #endregion
 
     }
 
-    public class AsynchronousTCPClient
-    {
-        public enum ConnectionStatus
-        {
-            NeverConnected,
-            Connecting,
-            Connected,
-            MpdOK,
-            MpdAck,
-            AutoReconnecting,
-            DisconnectedByUser,
-            DisconnectedByHost,
-            ConnectFail_Timeout,
-            ReceiveFail_Timeout,
-            SendFail_Timeout,
-            SendFail_NotConnected,
-            Error
-        }
 
-        private TcpClient _TCP;
-        private IPAddress _ip = IPAddress.None;
-        private int _p = 0;
-        private ConnectionStatus _ConStat;
-        private int _retryAttempt = 0;
-        public delegate void delDataReceived(AsynchronousTCPClient sender, object data);
-        public event delDataReceived DataReceived;
-        public delegate void delConnectionStatusChanged(AsynchronousTCPClient sender, ConnectionStatus status);
-        public event delConnectionStatusChanged ConnectionStatusChanged;
-        public delegate void delDataSent(AsynchronousTCPClient sender, object data);
-        public event delDataSent DataSent;
-
-        public ConnectionStatus ConnectionState
-        {
-            get
-            {
-                return _ConStat;
-            }
-            private set
-            {
-                bool raiseEvent = value != _ConStat;
-                _ConStat = value;
-
-                if (raiseEvent)
-                    Task.Run(() => { ConnectionStatusChanged?.Invoke(this, _ConStat); });
-            }
-        }
-
-        public async Task<ConnectionResult> Connect(IPAddress ip, int port)
-        {
-            ConnectionState = ConnectionStatus.Connecting;
-
-            _ip = ip;
-            _p = port;
-            _retryAttempt = 0;
-
-            _TCP = new TcpClient();
-            _TCP.ReceiveTimeout = System.Threading.Timeout.Infinite; // or 0
-            _TCP.SendTimeout = 5000;
-            _TCP.Client.ReceiveTimeout = System.Threading.Timeout.Infinite;// 0;
-            //_TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-
-            return await DoConnect(ip, port);
-        }
-
-        public async Task<bool> ReConnect()
-        {
-            System.Diagnostics.Debug.WriteLine("**ReConnecting...");
-
-            ConnectionState = ConnectionStatus.AutoReconnecting;
-
-            if (_retryAttempt > 1)
-            {
-                System.Diagnostics.Debug.WriteLine("**SendCommand@ReConnect() _retryAttempt > 1");
-                
-                ConnectionState = ConnectionStatus.DisconnectedByHost;
-
-                return false;
-            }
-
-            _retryAttempt++;
-
-            try
-            {
-                _TCP.Close();
-            }
-            catch { }
-
-            _TCP = new TcpClient();
-            _TCP.ReceiveTimeout = System.Threading.Timeout.Infinite;
-            _TCP.SendTimeout = 5000;
-            _TCP.Client.ReceiveTimeout = System.Threading.Timeout.Infinite;
-            //_TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-
-            ConnectionResult r = await DoConnect(_ip, _p);
-
-            return r.isSuccess;
-        }
-
-        public async Task<ConnectionResult> DoConnect(IPAddress ip, int port)
-        {
-            ConnectionResult r = new ConnectionResult();
-
-            try
-            {
-                await _TCP.ConnectAsync(ip, port);
-            }
-            catch (SocketException ex)
-            {
-                System.Diagnostics.Debug.WriteLine("**Error@DoConnect: SocketException " + ex.Message);
-                ConnectionState = ConnectionStatus.Error;
-
-                r.isSuccess = false;
-                r.errorMessage = ex.Message + " (SocketException)";
-                return r;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("**Error@DoConnect: Exception " + ex.Message);
-                ConnectionState = ConnectionStatus.Error;
-
-                r.isSuccess = false;
-                r.errorMessage = ex.Message + " (Exception)";
-                return r;
-            }
-
-            ConnectionState = ConnectionStatus.Connected;
-
-            Receive(_TCP.Client);
-
-            _retryAttempt = 0;
-
-            r.isSuccess = true;
-            r.errorMessage = "";
-            return r;
-        }
-
-        private void Receive(Socket client)
-        {
-            try
-            {
-                // Create the state object.  
-                StateObject state = new StateObject();
-                state.workSocket = client;
-
-                // Begin receiving the data.  
-                client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@Receive" + ex.ToString());
-                ConnectionState = ConnectionStatus.Error;
-            }
-        }
-
-        private async void ReceiveCallback(IAsyncResult ar)
-        {
-            // Retrieve the state object and the client socket from the asynchronous state object.  
-            StateObject state = (StateObject)ar.AsyncState;
-            Socket client = state.workSocket;
-            SocketError err = new SocketError();
-
-            try
-            {
-                int bytesRead = client.EndReceive(ar, out err);
-
-                if (bytesRead > 0)
-                {
-                    string res = Encoding.Default.GetString(state.buffer, 0, bytesRead);
-                    state.sb.Append(res);
-
-                    if (res.EndsWith("OK\n") || res.StartsWith("OK MPD") || res.StartsWith("ACK"))
-                    //if (client.Available == 0)
-                    {
-                        if (!string.IsNullOrEmpty(state.sb.ToString().Trim()))
-                        {
-                            DataReceived?.Invoke(this, state.sb.ToString().Trim());
-                        }
-                        state = new StateObject();
-                        state.workSocket = client;
-                    }
-
-                    client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
-                }
-                else
-                {
-                    //https://msdn.microsoft.com/en-us/library/ms145145(v=vs.110).aspx
-                    System.Diagnostics.Debug.WriteLine("ReceiveCallback bytesRead 0. Disconnected By Host.");
-
-                    ConnectionState = ConnectionStatus.DisconnectedByHost;
-
-                    if (!await ReConnect())
-                    {
-                        ConnectionState = ConnectionStatus.DisconnectedByHost;
-
-                        System.Diagnostics.Debug.WriteLine("**ReceiveCallback: bytesRead 0 - GIVING UP reconnect.");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@ReceiveCallback: " + err.ToString() + ". " + ex.ToString() + ". ");
-                ConnectionState = ConnectionStatus.Error;
-            }
-        }
-
-        public async void Send(string cmd)
-        {
-            if (ConnectionState != ConnectionStatus.Connected) { return; }
-            
-            try
-            {
-                DoSend(_TCP.Client, cmd);
-            }
-            catch (IOException)
-            {
-                //System.IO.IOException
-                //Unable to transfer data on the transport connection: An established connection was aborted by the software in your host machine.
-
-                System.Diagnostics.Debug.WriteLine("**Error@Send: IOException - TRYING TO RECONNECT.");
-
-                // Reconnect.
-                if (await ReConnect())
-                {
-                    DoSend(_TCP.Client, cmd);
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("**Error@Send: IOException - GIVING UP reconnect.");
-
-                }
-
-            }
-            catch (SocketException)
-            {
-                //System.Net.Sockets.SocketException
-                //An established connection was aborted by the software in your host machine
-                System.Diagnostics.Debug.WriteLine("**Error@Send: SocketException - TRYING TO RECONNECT.");
-
-                // Reconnect.
-                if (await ReConnect())
-                {
-                    DoSend(_TCP.Client, cmd);
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("**Error@Send: SocketException - GIVING UP reconnect.");
-
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("**Error@Send: " + ex.Message);
-
-            }
-        }
-
-        private void DoSend(Socket client, String data)
-        {
-            DataSent?.Invoke(this, ">>" + data);
-
-            // Convert the string data to byte data using ASCII encoding.  
-            byte[] byteData = Encoding.Default.GetBytes(data);
-            try
-            {
-                // Begin sending the data to the remote device.  
-                client.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), client);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@DoSend" + ex.ToString());
-                ConnectionState = ConnectionStatus.Error;
-            }
-        }
-
-        private void SendCallback(IAsyncResult ar)
-        {
-            try
-            {
-                // Retrieve the socket from the state object.  
-                Socket client = (Socket)ar.AsyncState;
-
-                // Complete sending the data to the remote device.  
-                int bytesSent = client.EndSend(ar);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@SendCallback" + ex.ToString());
-                ConnectionState = ConnectionStatus.Error;
-            }
-        }
-
-        public void DisConnect()
-        {
-            // Release the socket.  
-            try
-            {
-                _TCP.Client.Shutdown(SocketShutdown.Both);
-                _TCP.Client.Close();
-            }
-            catch { }
-        }
-    }
 
 }
 

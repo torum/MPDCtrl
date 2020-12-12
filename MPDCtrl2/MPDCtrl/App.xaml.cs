@@ -7,6 +7,7 @@ using System.Text;
 using System.IO;
 using System.Globalization;
 using MPDCtrl.ViewModels;
+using MPDCtrl.ViewModels.Classes;
 using MPDCtrl.Views;
 
 namespace MPDCtrl
@@ -77,8 +78,6 @@ namespace MPDCtrl
         // テーマ切替メソッド
         public void ChangeTheme(string themeName)
         {
-            //System.Diagnostics.Debug.WriteLine(themeName);
-
             ResourceDictionary _themeDict = Application.Current.Resources.MergedDictionaries.FirstOrDefault(x => x.Source == new Uri("pack://application:,,,/Themes/DefaultTheme.xaml"));
             if (_themeDict != null)
             {

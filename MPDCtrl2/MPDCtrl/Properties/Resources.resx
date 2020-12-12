@@ -126,6 +126,9 @@
   <data name="Application" xml:space="preserve">
     <value>Application</value>
   </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Browse</value>
+  </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
@@ -256,7 +259,7 @@ SOFTWARE.</value>
     <value>Add (Enter)</value>
   </data>
   <data name="LocalfileListviewTabitemHeader_LocalFiles" xml:space="preserve">
-    <value>_Local Files</value>
+    <value>_Files</value>
   </data>
   <data name="MPD_CommandError" xml:space="preserve">
     <value>MPD Command Error</value>
@@ -372,14 +375,20 @@ SOFTWARE.</value>
   <data name="QueueListviewColumnHeader_Position" xml:space="preserve">
     <value>Position</value>
   </data>
-  <data name="QueueListviewColumnHeader_Song" xml:space="preserve">
-    <value>Title</value>
-  </data>
   <data name="QueueListviewColumnHeader_Time" xml:space="preserve">
     <value>Time</value>
   </data>
+  <data name="QueueListviewColumnHeader_Title" xml:space="preserve">
+    <value>Title</value>
+  </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Search_ToolTip" xml:space="preserve">
+    <value>Search (Ctrl+F)</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>
@@ -410,6 +419,9 @@ SOFTWARE.</value>
   </data>
   <data name="Settings_ProfileUpdated" xml:space="preserve">
     <value>Profile Updated.</value>
+  </data>
+  <data name="Settings_ToolTip" xml:space="preserve">
+    <value>Settings (Ctrl+S)</value>
   </data>
   <data name="Settings_UnlockAndChangePassword" xml:space="preserve">
     <value>Unlock and Change Password</value>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using MPDCtrl.ViewModels;
+using MPDCtrl.ViewModels.Classes;
 
 namespace MPDCtrl.ViewModels
 {

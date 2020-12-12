@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Text;
 using System.Windows;
 
-namespace MPDCtrl.ViewModels
+namespace MPDCtrl.ViewModels.Classes
 {
     /// <summary>
     /// A base class for bindable ViewModels.

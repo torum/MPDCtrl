@@ -31,7 +31,6 @@ namespace MPDCtrl.Views
         private void DebugWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // Load window possition.
-
         }
 
         private void DebugTextBox_TextChanged(object sender, TextChangedEventArgs e)

@@ -20,7 +20,7 @@ MPDCtrl is a Windows desktop client app for [MPD (Music player daemon)](http://w
 
 ### MPDCtrl version 2.x
 
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v2/Main_En.png?raw=true) 
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v2/Main.png?raw=true) 
 
 ### MPDCtrl version 1.x
 

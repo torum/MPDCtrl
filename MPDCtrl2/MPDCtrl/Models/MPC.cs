@@ -1400,7 +1400,7 @@ namespace MPDCtrl.Models
                 }
                 else
                 {
-                    mpdCommand = "search \"" + expression + "\"\n";
+                    mpdCommand = "search \"(" + expression + ")\"\n";
                 }
 
                 _asyncClient.Send("noidle" + "\n");

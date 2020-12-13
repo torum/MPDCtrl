@@ -30,9 +30,8 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// ルートディレクトリにファイルがある時のテスト。というか色々テスト。検索は古いMPDでも大丈夫かテスト。
     /// 
-    /// v2.0.4
+    /// v2.0.5
     /// 
     /// Ctrl+F検索とFilesでプレイリストに追加できるように。"Save Selected to" context menu.
     /// 「プレイリストに追加」をコンテキストメニューで。
@@ -54,6 +53,8 @@ namespace MPDCtrl.ViewModels
     /// レイアウト大改造？ ３ペイン（上キューと下に２ペイン) + (Treeviewでプレイリストとディレクトリ纏める？？）
 
     /// 更新履歴：
+    /// v2.0.4  store公開。
+    /// v2.0.3.4 ルートディレクトリにファイルがある時のテスト。
     /// v2.0.3.3 Search and filter is done.
     /// v2.0.3.2 Clearコマンドを送る前にQueueをクリアしておくようにして高速化。プレイリストとFilesはダブルクリック無効にした（なんか混乱するから）。 KeyboardNavigation.TabNavigation="Cycle"の設定。
     /// v2.0.3.1 検索とブラウズ途中。
@@ -102,7 +103,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.3.3";
+        const string _appVer = "v2.0.4";
 
         public string AppVer
         {
@@ -1674,6 +1675,9 @@ namespace MPDCtrl.ViewModels
                 _selectedNode = value;
                 NotifyPropertyChanged(nameof(SelectedNode));
 
+                // TODO: 絞り込みモードか、マッチしたフォルダ内だけかの切り替え
+                bool filteringMode = true;
+
                 // Treeview で選択ノードが変更されたのでListview でフィルターを掛ける。
                 var collectionView = CollectionViewSource.GetDefaultView(MusicEntries);
                 collectionView.Filter = x =>
@@ -1682,13 +1686,38 @@ namespace MPDCtrl.ViewModels
 
                     string path = entry.FileUri.LocalPath; //person.FileUri.AbsoluteUri;
                     string filename = System.IO.Path.GetFileName(path);//System.IO.Path.GetFileName(uri.LocalPath);
-                    path = path.Replace(("/"+ filename), "");
 
-                    // マッチしたフォルダ内だけ
-                    //return  (path == _selectedNode.DireUri.LocalPath );
+                    if (_selectedNode.DireUri.LocalPath == "/")
+                    {
+                        if (filteringMode)
+                        {
+                            // 絞り込みモード
+                            return true;
+                        }
+                        else
+                        {
+                            // マッチしたフォルダ内だけ
+                            path = path.Replace("/", "");
+                            return (path == filename);
+                        }
+                    }
+                    else
+                    {
+                        path = path.Replace(("/" + filename), "");
 
-                    // 絞り込みモード
-                    return (path.StartsWith(_selectedNode.DireUri.LocalPath));
+                        if (filteringMode)
+                        {
+                            // 絞り込みモード
+                            return (path.StartsWith(_selectedNode.DireUri.LocalPath));
+                        }
+                        else
+                        {
+                            // マッチしたフォルダ内だけ
+                            return (path == _selectedNode.DireUri.LocalPath);
+                        }
+                    }
+
+
                 };
 
                 collectionView.Refresh();

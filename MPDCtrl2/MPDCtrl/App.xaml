@@ -10,18 +10,15 @@
     <Application.Resources>
         <ResourceDictionary>
 
-            <!-- データコンテキスト -->
             <vms:MainViewModel x:Key="MainViewModel" />
+            
             <vms:DebugViewModel x:Key="DebugViewModel" />
 
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 
-            <!-- BooleanToVisibilityConverterの、 Collapsed 版　-->
             <common:BooleanToVisibilityCollapsedConverter x:Key="BooleanToVisibilityCollapsedConverter" TrueValue="Visible" FalseValue="Collapsed" />
             
-            <!-- EnumToBoolConverter ラジオボタンとEnumのバインディング用 -->
             <common:EnumToBoolConverter x:Key="EnumBooleanConverter"/>
-
 
             <common:MultipleCommandParameterConverter x:Key="MultipleCommandParameterConverter"/>
 
@@ -95,6 +92,7 @@
 
                     <Style x:Key="DefaultTextBoxStyle" TargetType="{x:Type TextBox}">
                         <Setter Property="Margin" Value="1"/>
+                        <Setter Property="Padding" Value="2"/>
                         <Setter Property="HorizontalAlignment" Value="Left"/>
                         <Setter Property="VerticalAlignment" Value="Center"/>
                         <Setter Property="Background" Value="{DynamicResource NormalTextBoxBackgroundColorBrush}" />
@@ -331,7 +329,7 @@
                 <ResourceDictionary>
                     
                     <!-- FocusVisual -->
-                    <Style x:Key="ButtonFocusVisual">
+                    <Style x:Key="ToggleButtonFocusVisual">
                         <Setter Property="Control.Template">
                             <Setter.Value>
                                 <ControlTemplate>
@@ -346,7 +344,7 @@
                     <Style x:Key="PathToggleButton" TargetType="{x:Type ToggleButton}">
                         <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}"/>
                         <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
-                        <Setter Property="FocusVisualStyle" Value="{DynamicResource ButtonFocusVisual}" />
+                        <Setter Property="FocusVisualStyle" Value="{DynamicResource ToggleButtonFocusVisual}" />
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="ToggleButton">
@@ -436,6 +434,18 @@
                         </Setter>
                     </Style>
 
+                    <Style x:Key="SliderFocusVisual">
+                        <Setter Property="Control.Template">
+                            <Setter.Value>
+                                <ControlTemplate>
+                                    <Border>
+                                        <Rectangle Margin="0" StrokeThickness="1" Stroke="{DynamicResource ControlMediumColorBrush}" StrokeDashArray="1 2" />
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+
                     <ControlTemplate x:Key="SliderThumbHorizontalDefault" TargetType="{x:Type Thumb}">
                         <Grid HorizontalAlignment="Center" UseLayoutRounding="True" VerticalAlignment="Center">
                             <!--<Path x:Name="grip" Data="M 0,0 C0,0 11,0 11,0 11,0 11,18 11,18 11,18 0,18 0,18 0,18 0,0 0,0 z" Fill="{StaticResource SliderThumb.Static.Background}" Stretch="Fill" SnapsToDevicePixels="True" Stroke="{StaticResource SliderThumb.Static.Border}" StrokeThickness="1" UseLayoutRounding="True" VerticalAlignment="Center"/>-->
@@ -503,6 +513,7 @@
                     <!-- スライダー本体 -->
                     <Style x:Key="SliderHorizontalStyle" TargetType="{x:Type Slider}">
                         <Setter Property="Stylus.IsPressAndHoldEnabled" Value="false"/>
+                        <Setter Property="FocusVisualStyle" Value="{DynamicResource SliderFocusVisual}" />
                         <Setter Property="Background" Value="Transparent"/>
                         <Setter Property="BorderBrush" Value="Transparent"/>
                         <Setter Property="Foreground" Value="{StaticResource SliderThumb.Static.Foreground}"/>
@@ -522,6 +533,18 @@
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type RepeatButton}">
                                     <Rectangle Fill="{TemplateBinding Background}" Height="{TemplateBinding Height}" Width="{TemplateBinding Width}"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    
+                    <Style x:Key="SliderFocusVisual">
+                        <Setter Property="Control.Template">
+                            <Setter.Value>
+                                <ControlTemplate>
+                                    <Border>
+                                        <Rectangle Margin="0" StrokeThickness="1" Stroke="{DynamicResource ControlMediumColorBrush}" StrokeDashArray="1 2" />
+                                    </Border>
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
@@ -757,6 +780,7 @@
                     </ControlTemplate>
                     <Style x:Key="CustomSliderStyle" TargetType="{x:Type Slider}">
                         <Setter Property="Stylus.IsPressAndHoldEnabled" Value="false"/>
+                        <Setter Property="FocusVisualStyle" Value="{DynamicResource SliderFocusVisual}" />
                         <Setter Property="Background" Value="Transparent"/>
                         <Setter Property="BorderBrush" Value="Transparent"/>
                         <Setter Property="Foreground" Value="{StaticResource SliderThumb.Static.Foreground}"/>
@@ -1076,14 +1100,14 @@
 
                     <Style x:Key="SelectionRadioButtonStyle" TargetType="{x:Type RadioButton}">
                         <Setter Property="FocusVisualStyle" Value="{StaticResource RadioButtonFocusVisual}"/>
-                        <Setter Property="Background" Value="{DynamicResource ControlLightColorBrush}"/>
+                        <Setter Property="Background" Value="Transparent"/>
                         <Setter Property="BorderBrush" Value="{StaticResource RadioButton.Static.UncheckedBorder}"/>
                         <Setter Property="Foreground" Value="{StaticResource ControlForegroundColorBrush}"/>
                         <Setter Property="BorderThickness" Value="0"/>
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type RadioButton}">
-                                    <Grid x:Name="templateRoot" Background="{DynamicResource DynamicResource RadioButtonUnCheckedBackgroundColor}" SnapsToDevicePixels="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="3 0 0 0">
+                                    <Grid x:Name="templateRoot" Background="{TemplateBinding Background}" SnapsToDevicePixels="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0 0 0 0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
@@ -1097,17 +1121,17 @@
                                         -->
 
                                         <Grid x:Name="radioButtonUncheckedState" Grid.Column="1" Margin="1">
-                                            <Border BorderBrush="#49FFFFFF" BorderThickness="0.1,0.1,0,0"/>
-                                            <Border BorderBrush="#49000000" BorderThickness="0,0,1,1"/>
+                                            <Border BorderBrush="#49FFFFFF" BorderThickness="0.1,0.1,0,0" CornerRadius="2"/>
+                                            <Border BorderBrush="#49000000" BorderThickness="0,0,1,1" CornerRadius="2"/>
                                         </Grid>
 
                                         <Grid x:Name="radioButtonCheckedState" Grid.Column="1" Margin="1" Visibility="Collapsed">
-                                            <Border BorderBrush="#49000000" BorderThickness="1,1,0,0"/>
-                                            <Border BorderBrush="#49FFFFFF" BorderThickness="0,0,1,1"/>
+                                            <Border BorderBrush="#49000000" BorderThickness="1,1,0,0" CornerRadius="2"/>
+                                            <Border BorderBrush="#49FFFFFF" BorderThickness="0,0,1,1" CornerRadius="2"/>
                                         </Grid>
 
-                                        <Border x:Name="radioButtonContentBorder" Grid.Column="1" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="3">
-                                            <ContentPresenter x:Name="contentPresenter" Focusable="False" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                        <Border x:Name="radioButtonContentBorder" Grid.Column="1" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="3" CornerRadius="2">
+                                            <ContentPresenter x:Name="contentPresenter" Focusable="False" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
                                         </Border>
 
                                     </Grid>
@@ -1149,18 +1173,19 @@
                                             <Setter Property="Fill" TargetName="optionMark" Value="{StaticResource RadioButton.MouseOver.Glyph}"/>
                                             -->
 
+                                            <Setter Property="Background" TargetName="radioButtonContentBorder" Value="{DynamicResource RadioButtonCheckedBackgroundColorBrush}"/>
+
                                             <Setter Property="BorderBrush" Value="#212121"/>
                                             <Setter Property="Foreground" Value="{DynamicResource NormalTextColorBrush}"/>
                                             <Setter Property="TextElement.FontWeight" Value="Bold"/>
-
-                                            <Setter Property="Background" TargetName="templateRoot" Value="{DynamicResource RadioButtonCheckedBackgroundColorBrush}"/>
 
                                             <Setter TargetName="radioButtonCheckedState" Property="Visibility" Value="Visible" />
                                             <Setter TargetName="radioButtonUncheckedState" Property="Visibility" Value="Collapsed" />
 
                                         </Trigger>
                                         <Trigger Property="IsChecked" Value="false">
-                                            <Setter Property="Background" TargetName="templateRoot" Value="{DynamicResource RadioButtonUnCheckedBackgroundColorBrush}"/>
+                                            <Setter Property="Background" TargetName="radioButtonContentBorder" Value="{DynamicResource RadioButtonUnCheckedBackgroundColorBrush}"/>
+                                            
                                             <Setter TargetName="radioButtonCheckedState" Property="Visibility" Value="Collapsed" />
                                             <Setter TargetName="radioButtonUncheckedState" Property="Visibility" Value="Visible" />
                                         </Trigger>
@@ -1168,7 +1193,8 @@
                                             <!--
                                             <Setter Property="Opacity" TargetName="optionMark" Value="0.56"/>
                                             -->
-                                            <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource RadioButton.Static.Background}"/>
+                                            <Setter Property="Background" TargetName="radioButtonContentBorder" Value="{StaticResource RadioButton.Static.Background}"/>
+                                            
                                             <Setter Property="BorderBrush" Value="{StaticResource RadioButton.Static.UncheckedBorder}"/>
                                             <Setter Property="Foreground" Value="#CCC"/>
                                         </Trigger>
@@ -1358,6 +1384,7 @@
                     </Style>
 
                 </ResourceDictionary>
+                
                 <!-- ListView -->
                 <ResourceDictionary>
                     <!--
@@ -2745,6 +2772,7 @@
                 </ResourceDictionary>
 
             </ResourceDictionary.MergedDictionaries>
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

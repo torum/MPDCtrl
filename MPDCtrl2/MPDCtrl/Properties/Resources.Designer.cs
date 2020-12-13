@@ -295,6 +295,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Close (Esc) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Dialog_CancelClose {
+            get {
+                return ResourceManager.GetString("Dialog_CancelClose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Comfirmation に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Dialog_Comfirmation {
@@ -376,6 +385,24 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Filter に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Filter {
+            get {
+                return ResourceManager.GetString("Filter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Clear Filter に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string FilterClear {
+            get {
+                return ResourceManager.GetString("FilterClear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Host に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Host {
@@ -435,6 +462,15 @@ namespace MPDCtrl.Properties {
         public static string LocalfileItemContextMenu_Add {
             get {
                 return ResourceManager.GetString("LocalfileItemContextMenu_Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   File Name に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string LocalfileListviewColumnHeader_FileName {
+            get {
+                return ResourceManager.GetString("LocalfileListviewColumnHeader_FileName", resourceCulture);
             }
         }
         
@@ -939,6 +975,24 @@ namespace MPDCtrl.Properties {
         public static string Settings_UnlockAndChangePassword {
             get {
                 return ResourceManager.GetString("Settings_UnlockAndChangePassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Add to Current Queue に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongFilesItemContextMenu_Add {
+            get {
+                return ResourceManager.GetString("SongFilesItemContextMenu_Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Add to Current Queue に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongsItemContextMenu_Add {
+            get {
+                return ResourceManager.GetString("SongsItemContextMenu_Add", resourceCulture);
             }
         }
         

@@ -30,27 +30,22 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
+    /// ルートディレクトリにファイルがある時のテスト。というか色々テスト。検索は古いMPDでも大丈夫かテスト。
+    /// 
     /// v2.0.4
-    /// 検索ボックスの中にプルダウンでTagを選択できるように。
-    /// キーボードのタブ移動制御。検索画面を表示した時に、メインをIsEnabled = falseにしたい。アブドナーが表示されてしまったりするから。
-    /// ルートディレクトリにファイルがある時のテスト。というか色々テスト。
-    /// 検索は古いMPDでも大丈夫かテスト。
-    /// Files はファイル名だけにして、フィルター欄を作る。
-    /// Ctrl+Fで検索。「追加」のコンテキストメニューを追加。ダイアログで2pain Treeview + Listviewにして、検索＆選択してQueueに追加できるように。
     /// 
-    /// x64に変更して公開する。
+    /// Ctrl+F検索とFilesでプレイリストに追加できるように。"Save Selected to" context menu.
+    /// 「プレイリストに追加」をコンテキストメニューで。
     /// 
+    /// 「プレイリストの名前変更」をインラインで。
+    /// "今すぐ再生"メニューを追加。
+    /// Files: "再読み込み" context menu.
     /// 
-    /// 
-    /// v2.0.5
-    /// パスワード、多分毎回送る必要は無いと思う。
-    /// Local Files の TreeViewまたは階層化
-    /// Local Files: "Save Selected to" context menu.
-    /// Local Files: "再読み込み" context menu.
     /// 
     /// [未定]
-    /// アルバムカバー対応。Last.fm?
+    /// アルバムカバー対応。Last.fm? Bing? Local file?
     /// テーマの切り替え
+    /// パスワード、多分毎回送る必要は無いと思う。
     /// Listview の水平スクロールバーのデザイン。
     /// スライダーの上でスクロールして音量変更。
     /// exception trap and logging
@@ -59,6 +54,8 @@ namespace MPDCtrl.ViewModels
     /// レイアウト大改造？ ３ペイン（上キューと下に２ペイン) + (Treeviewでプレイリストとディレクトリ纏める？？）
 
     /// 更新履歴：
+    /// v2.0.3.3 Search and filter is done.
+    /// v2.0.3.2 Clearコマンドを送る前にQueueをクリアしておくようにして高速化。プレイリストとFilesはダブルクリック無効にした（なんか混乱するから）。 KeyboardNavigation.TabNavigation="Cycle"の設定。
     /// v2.0.3.1 検索とブラウズ途中。
     /// v2.0.3    store公開。(v2.0.2.3の表示を更新し忘れた)　検索画面は無効にしてある。
     /// v2.0.2.3 コードをリファクタリングと移動。検索画面は途中。
@@ -105,7 +102,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.3.1";
+        const string _appVer = "v2.0.3.3";
 
         public string AppVer
         {
@@ -169,7 +166,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == 画面表示切り替え ==  
+        #region == 画面表示切り替え系 ==  
 
         private bool _isConnected;
         public bool IsConnected
@@ -438,7 +435,6 @@ namespace MPDCtrl.ViewModels
             get
             {
                 if (Profiles.Count > 1)
-                //if (CurrentProfile != null)
                     return true;
                 else
                     return false;
@@ -466,221 +462,7 @@ namespace MPDCtrl.ViewModels
 
         #region == コントロール関連 ==  
 
-        private string _statusMessage;
-        public string StatusMessage
-        {
-            get
-            {
-                return _statusMessage;
-            }
-            set
-            {
-                _statusMessage = value;
-                NotifyPropertyChanged("StatusMessage");
-            }
-        }
-
-        private MPC.SongInfo _currentSong;
-        public MPC.SongInfo CurrentSong
-        {
-            get
-            {
-                return _currentSong;
-            }
-            set
-            {
-                if (_currentSong == value)
-                    return;
-
-                _currentSong = value;
-                NotifyPropertyChanged("CurrentSong");
-                NotifyPropertyChanged("CurrentSongTitle");
-                NotifyPropertyChanged("CurrentSongArtist");
-                NotifyPropertyChanged("CurrentSongAlbum"); 
-            }
-        }
-
-        public string CurrentSongTitle
-        {
-            get
-            {
-                if (_currentSong != null)
-                {
-                    return _currentSong.Title;
-                }
-                else
-                {
-                    return string.Empty;
-                }
-            }
-        }
-
-        public string CurrentSongArtist
-        {
-            get
-            {
-                if (_currentSong != null)
-                {
-                    if (!string.IsNullOrEmpty(_currentSong.Artist))
-                        return _currentSong.Artist.Trim();
-                    else
-                        return "";
-                }
-                else
-                {
-                    return string.Empty;
-                }
-            }
-        }
-
-        public string CurrentSongAlbum
-        {
-            get
-            {
-                if (_currentSong != null)
-                {
-                    if (!string.IsNullOrEmpty(_currentSong.Album))
-                        return _currentSong.Album.Trim();
-                    else
-                        return "";
-                }
-                else
-                {
-                    return String.Empty;
-                }
-            }
-        }
-
-        private ObservableCollection<MPC.SongInfo> _queue = new ObservableCollection<MPC.SongInfo>();
-        public ObservableCollection<MPC.SongInfo> Queue
-        {
-            get
-            {
-                if (_MPC != null)
-                {
-                    return _queue;
-                    //return _MPC.CurrentQueue;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            set
-            {
-                if (_queue == value)
-                    return;
-
-                _queue = value;
-                NotifyPropertyChanged("Queue");
-            }
-        }
-
-        private MPC.SongInfo _selectedSong;
-        public MPC.SongInfo SelectedSong
-        {
-            get
-            {
-                return _selectedSong;
-            }
-            set
-            {
-                if (_selectedSong == value)
-                    return;
-
-                _selectedSong = value;
-                NotifyPropertyChanged("SelectedSong");
-            }
-        }
-
-        public ObservableCollection<string> Playlists
-        {
-            get
-            {
-                if (_MPC != null)
-                {
-                    return _MPC.Playlists;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
-        private string _selecctedPlaylist;
-        public string SelectedPlaylist
-        {
-            get
-            {
-                return _selecctedPlaylist;
-            }
-            set
-            {
-                if (_selecctedPlaylist != value)
-                {
-                    _selecctedPlaylist = value;
-                    NotifyPropertyChanged("SelectedPlaylist");
-                }
-            }
-        }
-
-        public ObservableCollection<string> Localfiles
-        {
-            get
-            {
-                if (_MPC != null)
-                {
-                    return _MPC.LocalFiles;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
-        private string _selecctedLocalfile;
-        public string SelectedLocalfile
-        {
-            get
-            {
-                return _selecctedLocalfile;
-            }
-            set
-            {
-                if (_selecctedLocalfile != value)
-                {
-                    _selecctedLocalfile = value;
-                    NotifyPropertyChanged("SelectedLocalfile");
-                }
-            }
-        }
-
-        private static string _pathConnectingButton = "M11 14H9C9 9.03 13.03 5 18 5V7C14.13 7 11 10.13 11 14M18 11V9C15.24 9 13 11.24 13 14H15C15 12.34 16.34 11 18 11M7 4C7 2.89 6.11 2 5 2S3 2.89 3 4 3.89 6 5 6 7 5.11 7 4M11.45 4.5H9.45C9.21 5.92 8 7 6.5 7H3.5C2.67 7 2 7.67 2 8.5V11H8V8.74C9.86 8.15 11.25 6.5 11.45 4.5M19 17C20.11 17 21 16.11 21 15S20.11 13 19 13 17 13.89 17 15 17.89 17 19 17M20.5 18H17.5C16 18 14.79 16.92 14.55 15.5H12.55C12.75 17.5 14.14 19.15 16 19.74V22H22V19.5C22 18.67 21.33 18 20.5 18Z";
-        //private static string _pathConnectedButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
-        private static string _pathConnectedButton = "";
-        private static string _pathDisconnectedButton = "";
-        private static string _pathNewConnectionButton = "M20,4C21.11,4 22,4.89 22,6V18C22,19.11 21.11,20 20,20H4C2.89,20 2,19.11 2,18V6C2,4.89 2.89,4 4,4H20M8.5,15V9H7.25V12.5L4.75,9H3.5V15H4.75V11.5L7.3,15H8.5M13.5,10.26V9H9.5V15H13.5V13.75H11V12.64H13.5V11.38H11V10.26H13.5M20.5,14V9H19.25V13.5H18.13V10H16.88V13.5H15.75V9H14.5V14A1,1 0 0,0 15.5,15H19.5A1,1 0 0,0 20.5,14Z";
-        //private static string _pathErrorInfoButton = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z";
-        private static string _pathErrorInfoButton = "M23,12L20.56,14.78L20.9,18.46L17.29,19.28L15.4,22.46L12,21L8.6,22.47L6.71,19.29L3.1,18.47L3.44,14.78L1,12L3.44,9.21L3.1,5.53L6.71,4.72L8.6,1.54L12,3L15.4,1.54L17.29,4.72L20.9,5.54L20.56,9.22L23,12M20.33,12L18.5,9.89L18.74,7.1L16,6.5L14.58,4.07L12,5.18L9.42,4.07L8,6.5L5.26,7.09L5.5,9.88L3.67,12L5.5,14.1L5.26,16.9L8,17.5L9.42,19.93L12,18.81L14.58,19.92L16,17.5L18.74,16.89L18.5,14.1L20.33,12M11,15H13V17H11V15M11,7H13V13H11V7";
-
-        private string _statusButton = _pathDisconnectedButton;
-        public string StatusButton
-        {
-            get
-            {
-                return _statusButton;
-            }
-            set
-            {
-                if (_statusButton == value)
-                    return;
-
-                _statusButton = value;
-                NotifyPropertyChanged("StatusButton");
-            }
-        }
+        #region == Playback ==  
 
         private static string _pathPlayButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         private static string _pathPauseButton = "M15,16H13V8H15M11,16H9V8H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
@@ -892,6 +674,275 @@ namespace MPDCtrl.ViewModels
                 }
             }
         }
+
+
+
+        #endregion
+
+        #region == Playlists ==  
+
+        public ObservableCollection<string> Playlists
+        {
+            get
+            {
+                if (_MPC != null)
+                {
+                    return _MPC.Playlists;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        private string _selecctedPlaylist;
+        public string SelectedPlaylist
+        {
+            get
+            {
+                return _selecctedPlaylist;
+            }
+            set
+            {
+                if (_selecctedPlaylist != value)
+                {
+                    _selecctedPlaylist = value;
+                    NotifyPropertyChanged("SelectedPlaylist");
+                }
+            }
+        }
+
+        #endregion
+
+        #region == Local Files ==
+
+        private ObservableCollection<NodeEntry> _localFiles = new ObservableCollection<NodeEntry>();
+        public ObservableCollection<NodeEntry> LocalFiles
+        {
+            get
+            {
+                return _localFiles;
+            }
+            set
+            {
+                if (_localFiles != value)
+                {
+                    _localFiles = value;
+                    NotifyPropertyChanged("LocalFiles");
+                }
+            }
+        }
+
+        private NodeEntry _selecctedLocalfile;
+        public NodeEntry SelectedLocalfile
+        {
+            get
+            {
+                return _selecctedLocalfile;
+            }
+            set
+            {
+                if (_selecctedLocalfile != value)
+                {
+                    _selecctedLocalfile = value;
+                    NotifyPropertyChanged("SelectedLocalfile");
+                }
+            }
+        }
+
+        private string _filterQuery;
+        public string FilterQuery
+        {
+            get
+            {
+                return _filterQuery;
+            }
+            set
+            {
+                if (_filterQuery == value)
+                    return;
+
+                _filterQuery = value;
+                NotifyPropertyChanged("FilterQuery");
+
+                var collectionView = CollectionViewSource.GetDefaultView(LocalFiles);
+
+                collectionView.Filter = x =>
+                {
+                    var entry = (NodeEntry)x;
+
+                    string test = entry.FilePath + entry.Name;
+
+                    // 絞り込み
+                    return (test.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                };
+                collectionView.Refresh();
+
+            }
+        }
+
+        #endregion
+
+        #region == Queue ==  
+
+        private ObservableCollection<MPC.SongInfo> _queue = new ObservableCollection<MPC.SongInfo>();
+        public ObservableCollection<MPC.SongInfo> Queue
+        {
+            get
+            {
+                if (_MPC != null)
+                {
+                    return _queue;
+                    //return _MPC.CurrentQueue;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            set
+            {
+                if (_queue == value)
+                    return;
+
+                _queue = value;
+                NotifyPropertyChanged("Queue");
+            }
+        }
+
+        private MPC.SongInfo _selectedSong;
+        public MPC.SongInfo SelectedSong
+        {
+            get
+            {
+                return _selectedSong;
+            }
+            set
+            {
+                if (_selectedSong == value)
+                    return;
+
+                _selectedSong = value;
+                NotifyPropertyChanged("SelectedSong");
+            }
+        }
+
+        #endregion
+
+        #region == ステータス系 == 
+
+        private string _statusMessage;
+        public string StatusMessage
+        {
+            get
+            {
+                return _statusMessage;
+            }
+            set
+            {
+                _statusMessage = value;
+                NotifyPropertyChanged("StatusMessage");
+            }
+        }
+
+        private MPC.SongInfo _currentSong;
+        public MPC.SongInfo CurrentSong
+        {
+            get
+            {
+                return _currentSong;
+            }
+            set
+            {
+                if (_currentSong == value)
+                    return;
+
+                _currentSong = value;
+                NotifyPropertyChanged("CurrentSong");
+                NotifyPropertyChanged("CurrentSongTitle");
+                NotifyPropertyChanged("CurrentSongArtist");
+                NotifyPropertyChanged("CurrentSongAlbum");
+            }
+        }
+
+        public string CurrentSongTitle
+        {
+            get
+            {
+                if (_currentSong != null)
+                {
+                    return _currentSong.Title;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+        }
+
+        public string CurrentSongArtist
+        {
+            get
+            {
+                if (_currentSong != null)
+                {
+                    if (!string.IsNullOrEmpty(_currentSong.Artist))
+                        return _currentSong.Artist.Trim();
+                    else
+                        return "";
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+        }
+
+        public string CurrentSongAlbum
+        {
+            get
+            {
+                if (_currentSong != null)
+                {
+                    if (!string.IsNullOrEmpty(_currentSong.Album))
+                        return _currentSong.Album.Trim();
+                    else
+                        return "";
+                }
+                else
+                {
+                    return String.Empty;
+                }
+            }
+        }
+
+        private static string _pathConnectingButton = "M11 14H9C9 9.03 13.03 5 18 5V7C14.13 7 11 10.13 11 14M18 11V9C15.24 9 13 11.24 13 14H15C15 12.34 16.34 11 18 11M7 4C7 2.89 6.11 2 5 2S3 2.89 3 4 3.89 6 5 6 7 5.11 7 4M11.45 4.5H9.45C9.21 5.92 8 7 6.5 7H3.5C2.67 7 2 7.67 2 8.5V11H8V8.74C9.86 8.15 11.25 6.5 11.45 4.5M19 17C20.11 17 21 16.11 21 15S20.11 13 19 13 17 13.89 17 15 17.89 17 19 17M20.5 18H17.5C16 18 14.79 16.92 14.55 15.5H12.55C12.75 17.5 14.14 19.15 16 19.74V22H22V19.5C22 18.67 21.33 18 20.5 18Z";
+        //private static string _pathConnectedButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
+        private static string _pathConnectedButton = "";
+        private static string _pathDisconnectedButton = "";
+        private static string _pathNewConnectionButton = "M20,4C21.11,4 22,4.89 22,6V18C22,19.11 21.11,20 20,20H4C2.89,20 2,19.11 2,18V6C2,4.89 2.89,4 4,4H20M8.5,15V9H7.25V12.5L4.75,9H3.5V15H4.75V11.5L7.3,15H8.5M13.5,10.26V9H9.5V15H13.5V13.75H11V12.64H13.5V11.38H11V10.26H13.5M20.5,14V9H19.25V13.5H18.13V10H16.88V13.5H15.75V9H14.5V14A1,1 0 0,0 15.5,15H19.5A1,1 0 0,0 20.5,14Z";
+        //private static string _pathErrorInfoButton = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z";
+        private static string _pathErrorInfoButton = "M23,12L20.56,14.78L20.9,18.46L17.29,19.28L15.4,22.46L12,21L8.6,22.47L6.71,19.29L3.1,18.47L3.44,14.78L1,12L3.44,9.21L3.1,5.53L6.71,4.72L8.6,1.54L12,3L15.4,1.54L17.29,4.72L20.9,5.54L20.56,9.22L23,12M20.33,12L18.5,9.89L18.74,7.1L16,6.5L14.58,4.07L12,5.18L9.42,4.07L8,6.5L5.26,7.09L5.5,9.88L3.67,12L5.5,14.1L5.26,16.9L8,17.5L9.42,19.93L12,18.81L14.58,19.92L16,17.5L18.74,16.89L18.5,14.1L20.33,12M11,15H13V17H11V15M11,7H13V13H11V7";
+
+        private string _statusButton = _pathDisconnectedButton;
+        public string StatusButton
+        {
+            get
+            {
+                return _statusButton;
+            }
+            set
+            {
+                if (_statusButton == value)
+                    return;
+
+                _statusButton = value;
+                NotifyPropertyChanged("StatusButton");
+            }
+        }
+
+        #endregion
 
         #endregion
 
@@ -1639,8 +1690,8 @@ namespace MPDCtrl.ViewModels
                     // 絞り込みモード
                     return (path.StartsWith(_selectedNode.DireUri.LocalPath));
                 };
+
                 collectionView.Refresh();
-                
             }
         }
 
@@ -1676,7 +1727,6 @@ namespace MPDCtrl.ViewModels
                 }
             }
         }
-
 
         private SearchTags _selectedSearchTags = SearchTags.Title;
         public SearchTags SelectedSearchTags
@@ -1809,6 +1859,11 @@ namespace MPDCtrl.ViewModels
             ShowFindCancelCommand = new RelayCommand(ShowFindCancelCommand_Execute, ShowFindCancelCommand_CanExecute);
 
             SearchExecCommand = new RelayCommand(SearchExecCommand_Execute, SearchExecCommand_CanExecute);
+            FilterClearCommand = new RelayCommand(FilterClearCommand_Execute, FilterClearCommand_CanExecute);
+
+            SongsListviewAddCommand = new GenericRelayCommand<object>(param => SongsListviewAddCommand_Execute(param), param => SongsListviewAddCommand_CanExecute());
+            SongFilesListviewAddCommand = new GenericRelayCommand<object>(param => SongFilesListviewAddCommand_Execute(param), param => SongFilesListviewAddCommand_CanExecute());
+
 
             #endregion
 
@@ -2950,7 +3005,28 @@ namespace MPDCtrl.ViewModels
             else if ((data as string) == "isLocalFiles")
             {
                 IsBusy = true;
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    LocalFiles.Clear();
 
+                    foreach (var songfile in _MPC.LocalFiles)
+                    {
+                        try
+                        {
+                            Uri uri = new Uri(@"file:///" + songfile);
+                            if (uri.IsFile)
+                            {
+                                string filename = System.IO.Path.GetFileName(songfile);//System.IO.Path.GetFileName(uri.LocalPath);
+                                NodeEntry hoge = new NodeEntry(filename, uri, songfile);
+
+                                LocalFiles.Add(hoge);
+                            }
+                        }
+                        catch { }
+                    }
+                });
+
+                IsBusy = true;
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     MusicDirectories.Clear();
@@ -2964,6 +3040,7 @@ namespace MPDCtrl.ViewModels
 
                 });
 
+                IsBusy = true;
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     MusicEntries.Clear();
@@ -2976,7 +3053,7 @@ namespace MPDCtrl.ViewModels
                             if (uri.IsFile)
                             {
                                 string filename = System.IO.Path.GetFileName(songfile);//System.IO.Path.GetFileName(uri.LocalPath);
-                                NodeEntry hoge = new NodeEntry(filename, uri);
+                                NodeEntry hoge = new NodeEntry(filename, uri, songfile);
 
                                 MusicEntries.Add(hoge);
                             }
@@ -3555,13 +3632,13 @@ namespace MPDCtrl.ViewModels
 
             if (items.Count > 0)
             {
-                var collection = items.Cast<String>();
+                var collection = items.Cast<NodeEntry>();
 
-                List<string> uriList = new List<string>();
+                List<String> uriList = new List<String>();
 
                 foreach (var item in collection)
                 {
-                    uriList.Add(item.ToString());
+                    uriList.Add((item as NodeEntry).OriginalFileUri);
                 }
 
                 _MPC.MpdAdd(uriList);
@@ -3582,20 +3659,20 @@ namespace MPDCtrl.ViewModels
 
             if (items.Count > 1)
             {
-                var collection = items.Cast<String>();
+                var collection = items.Cast<NodeEntry>();
 
                 List<string> uriList = new List<string>();
 
                 foreach (var item in collection)
                 {
-                    uriList.Add(item);
+                    uriList.Add((item as NodeEntry).OriginalFileUri);
                 }
 
                 _MPC.MpdAdd(uriList);
             }
             else
             {
-                _MPC.MpdAdd(items[0] as string);
+                _MPC.MpdAdd((items[0] as NodeEntry).OriginalFileUri);
             }
         }
 
@@ -3607,6 +3684,7 @@ namespace MPDCtrl.ViewModels
         }
         public void LocalfileListviewLeftDoubleClickCommand_Execute(object obj)
         {
+            /*
             if (obj == null) return;
 
             System.Collections.IList items = (System.Collections.IList)obj;
@@ -3628,9 +3706,20 @@ namespace MPDCtrl.ViewModels
             {
                 _MPC.MpdAdd(items[0] as string);
             }
+            */
         }
 
-        
+        public ICommand FilterClearCommand { get; }
+        public bool FilterClearCommand_CanExecute()
+        {
+            if (string.IsNullOrEmpty(FilterQuery))
+                return false;
+            return true;
+        }
+        public void FilterClearCommand_Execute()
+        {
+            FilterQuery = "";
+        }
 
         #endregion
 
@@ -3648,6 +3737,11 @@ namespace MPDCtrl.ViewModels
             if (_selecctedPlaylist == "")
                 return;
 
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Queue.Clear();
+            });
+
             _MPC.MpdChangePlaylist(_selecctedPlaylist);
         }
 
@@ -3659,7 +3753,7 @@ namespace MPDCtrl.ViewModels
         }
         public void PlaylistListviewLeftDoubleClickCommand_ExecuteAsync(String playlist)
         {
-            _MPC.MpdLoadPlaylist(playlist);
+            //_MPC.MpdLoadPlaylist(playlist);
         }
 
         public ICommand PlaylistListviewEnterKeyCommand { get; set; }
@@ -3700,6 +3794,11 @@ namespace MPDCtrl.ViewModels
         {
             if (_selecctedPlaylist == "")
                 return;
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Queue.Clear();
+            });
 
             _MPC.MpdChangePlaylist(_selecctedPlaylist);
         }
@@ -4775,7 +4874,8 @@ namespace MPDCtrl.ViewModels
         public ICommand SearchExecCommand { get; }
         public bool SearchExecCommand_CanExecute()
         {
-            if (string.IsNullOrEmpty(SearchQuery)) return false;
+            if (string.IsNullOrEmpty(SearchQuery)) 
+                return false;
             return true;
         }
         public void SearchExecCommand_Execute()
@@ -4789,10 +4889,63 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
+
+        
+        public ICommand SongFilesListviewAddCommand { get; }
+        public bool SongFilesListviewAddCommand_CanExecute()
+        {
+            return true;
+        }
+        public void SongFilesListviewAddCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            System.Collections.IList items = (System.Collections.IList)obj;
+
+            if (items.Count > 0)
+            {
+                var collection = items.Cast<NodeEntry>();
+
+                List<String> uriList = new List<String>();
+
+                foreach (var item in collection)
+                {
+                    uriList.Add((item as NodeEntry).OriginalFileUri);
+                }
+
+                _MPC.MpdAdd(uriList);
+            }
+        }
+
+        public ICommand SongsListviewAddCommand { get; }
+        public bool SongsListviewAddCommand_CanExecute()
+        {
+            return true;
+        }
+        public void SongsListviewAddCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            System.Collections.IList items = (System.Collections.IList)obj;
+
+            if (items.Count > 0)
+            {
+                var collection = items.Cast<MPC.Song>();
+
+                List<String> uriList = new List<String>();
+
+                foreach (var item in collection)
+                {
+                    uriList.Add((item as MPC.Song).file);
+                }
+
+                _MPC.MpdAdd(uriList);
+            }
+        }
+
         #endregion
 
     }
-
 
     public enum SearchTags
     {

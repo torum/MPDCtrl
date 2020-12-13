@@ -1495,32 +1495,32 @@ namespace MPDCtrl.Models
                     bool isStoredPlaylist = false;
                     foreach (string line in SubSystems)
                     {
-                        if (line == "changed: playlist")
+                        if (line.ToLower() == "changed: playlist")
                         {
                             // playlist: the queue (i.e.the current playlist) has been modified
                             isCurrentQueue = true;
                         }
-                        if (line == "changed: player")
+                        if (line.ToLower() == "changed: player")
                         {
                             // player: the player has been started, stopped or seeked
                             isPlayer = true;
                         }
-                        if (line == "changed: options")
+                        if (line.ToLower() == "changed: options")
                         {
                             // options: options like repeat, random, crossfade, replay gain
                             isPlayer = true;
                         }
-                        if (line == "changed: mixer")
+                        if (line.ToLower() == "changed: mixer")
                         {
                             // mixer: the volume has been changed
                             isPlayer = true;
                         }
-                        if (line == "changed: stored_playlist")
+                        if (line.ToLower() == "changed: stored_playlist")
                         {
                             // stored_playlist: a stored playlist has been modified, renamed, created or deleted
                             isStoredPlaylist = true;
                         }
-                        if (line == "changed: update")
+                        if (line.ToLower() == "changed: update")
                         {
                             // update: a database update has started or finished.If the database was modified during the update, the database event is also emitted.
                             // TODO:
@@ -1629,7 +1629,9 @@ namespace MPDCtrl.Models
                 */
 
                 List<string> reLines = str.Split('\n').ToList();
-                Dictionary<string, string> Values = new Dictionary<string, string>();
+
+                var comparer = StringComparer.OrdinalIgnoreCase;
+                Dictionary<string, string> Values = new Dictionary<string, string>(comparer);
 
                 int i = 0;
                 foreach (string line in reLines)
@@ -1649,9 +1651,11 @@ namespace MPDCtrl.Models
                 if ((Values.ContainsKey("Id")) && Values.ContainsKey("Pos") && Values.ContainsKey("Title") && Values.ContainsKey("Artist"))
                 {
                     // Queue = true;
-                    ParsePlaylistInfo(reLines);
+                    if (ParsePlaylistInfo(reLines))
+                    {
+                        await Task.Run(() => { StatusUpdate?.Invoke(this, "isCurrentQueue"); });
+                    }
 
-                    await Task.Run(() => { StatusUpdate?.Invoke(this, "isCurrentQueue"); });
                 }
                 else if (Values.ContainsKey("Title") && Values.ContainsKey("Artist"))
                 {
@@ -1711,7 +1715,8 @@ namespace MPDCtrl.Models
                 return false;
             }
 
-            Dictionary<string, string> MpdStatusValues = new Dictionary<string, string>();
+            var comparer = StringComparer.OrdinalIgnoreCase;
+            Dictionary<string, string> MpdStatusValues = new Dictionary<string, string>(comparer);
 
             try
             {
@@ -1959,7 +1964,8 @@ namespace MPDCtrl.Models
                     CurrentQueue.Clear();
                 });
 
-                Dictionary<string, string> SongValues = new Dictionary<string, string>();
+                var comparer = StringComparer.OrdinalIgnoreCase;
+                Dictionary<string, string> SongValues = new Dictionary<string, string>(comparer);
 
                 int i = 0;
 
@@ -1972,120 +1978,37 @@ namespace MPDCtrl.Models
                         {
                             if (SongValues.ContainsKey("Id"))
                             {
-                                SongInfo sng = new SongInfo();
-                                sng.Id = SongValues["Id"];
+                                SongInfo sng = FillSongInfo(SongValues, i);
 
-                                if (SongValues.ContainsKey("Title"))
-                                {
-                                    sng.Title = SongValues["Title"];
-                                }
-                                else
-                                {
-                                    sng.Title = "";
-                                    if (SongValues.ContainsKey("file"))
-                                    {
-                                        sng.Title = Path.GetFileName(SongValues["file"]);
-                                    }
-                                }
-
-                                if (SongValues.ContainsKey("Artist"))
-                                {
-                                    sng.Artist = SongValues["Artist"];
-                                }
-                                else
-                                {
-                                    if (SongValues.ContainsKey("AlbumArtist"))
-                                    {
-                                        // TODO: Should I?
-                                        sng.Artist = SongValues["AlbumArtist"];
-                                    }
-                                    else
-                                    {
-                                        sng.Artist = "";
-                                    }
-                                }
-
-                                if (SongValues.ContainsKey("Last-Modified"))
-                                {
-                                    sng.LastModified = SongValues["Last-Modified"];
-                                }
-                                if (SongValues.ContainsKey("AlbumArtist"))
-                                {
-                                    sng.AlbumArtist = SongValues["AlbumArtist"];
-                                }
-                                if (SongValues.ContainsKey("Album"))
-                                {
-                                    sng.Album = SongValues["Album"];
-                                }
-                                if (SongValues.ContainsKey("Track"))
-                                {
-                                    sng.Track = SongValues["Track"];
-                                }
-                                if (SongValues.ContainsKey("Disc"))
-                                {
-                                    sng.Disc = SongValues["Disc"];
-                                }
-                                if (SongValues.ContainsKey("Date"))
-                                {
-                                    sng.Date = SongValues["Date"];
-                                }
-                                if (SongValues.ContainsKey("Genre"))
-                                {
-                                    sng.Genre = SongValues["Genre"];
-                                }
-                                if (SongValues.ContainsKey("Composer"))
-                                {
-                                    sng.Composer = SongValues["Composer"];
-                                }
-                                if (SongValues.ContainsKey("Time"))
-                                {
-                                    sng.Time = SongValues["Time"];
-                                }
-                                if (SongValues.ContainsKey("duration"))
-                                {
-                                    sng.Time = SongValues["duration"];
-                                    sng.duration = SongValues["duration"];
-                                }
-                                if (SongValues.ContainsKey("Pos"))
-                                {
-                                    sng.Pos = SongValues["Pos"];
-                                }
-                                if (SongValues.ContainsKey("file"))
-                                {
-                                    sng.file = SongValues["file"];
-                                }
-
-                                //
-                                if (sng.Id == _status.MpdSongID)
-                                {
-                                    _currentSong = sng;
-                                }
-
-                                // for sorting.
-                                sng.Index = i;
-                                i++;
-
-                                //
-                                SongValues.Clear();
-
-                                //
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
                                     CurrentQueue.Add(sng);
                                 });
 
+                                i++;
+
+                                SongValues.Clear();
                             }
 
-                            //SongValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim();
-                            SongValues[StatusValuePair[0].Trim()] = value.Replace(StatusValuePair[0].Trim() + ": ", ""); 
+                            SongValues.Add(StatusValuePair[0].Trim(), value.Replace(StatusValuePair[0].Trim() + ": ", ""));
                         }
                         else
                         {
-                            //SongValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
                             SongValues.Add(StatusValuePair[0].Trim(), value.Replace(StatusValuePair[0].Trim() + ": ", ""));
                         }
                     }
+                }
 
+                if ((SongValues.Count > 0) && SongValues.ContainsKey("Id"))
+                {
+                    SongInfo sng = FillSongInfo(SongValues, i);
+
+                    SongValues.Clear();
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        CurrentQueue.Add(sng);
+                    });
                 }
             }
             catch (Exception ex)
@@ -2096,6 +2019,118 @@ namespace MPDCtrl.Models
             }
             
             return true;
+        }
+
+        private SongInfo FillSongInfo(Dictionary<string, string> SongValues, int i)
+        {
+            SongInfo sng = new SongInfo();
+
+            if (SongValues.ContainsKey("Id"))
+            {
+                sng.Id = SongValues["Id"];
+            }
+
+            if (SongValues.ContainsKey("Title"))
+            {
+                sng.Title = SongValues["Title"];
+            }
+            else
+            {
+                sng.Title = "";
+                if (SongValues.ContainsKey("file"))
+                {
+                    sng.Title = Path.GetFileName(SongValues["file"]);
+                }
+            }
+
+            if (SongValues.ContainsKey("Artist"))
+            {
+                sng.Artist = SongValues["Artist"];
+            }
+            else
+            {
+                if (SongValues.ContainsKey("AlbumArtist"))
+                {
+                    // TODO: Should I?
+                    sng.Artist = SongValues["AlbumArtist"];
+                }
+                else
+                {
+                    sng.Artist = "";
+                }
+            }
+
+            if (SongValues.ContainsKey("Last-Modified"))
+            {
+                sng.LastModified = SongValues["Last-Modified"];
+            }
+
+            if (SongValues.ContainsKey("AlbumArtist"))
+            {
+                sng.AlbumArtist = SongValues["AlbumArtist"];
+            }
+
+            if (SongValues.ContainsKey("Album"))
+            {
+                sng.Album = SongValues["Album"];
+            }
+
+            if (SongValues.ContainsKey("Track"))
+            {
+                sng.Track = SongValues["Track"];
+            }
+
+            if (SongValues.ContainsKey("Disc"))
+            {
+                sng.Disc = SongValues["Disc"];
+            }
+
+            if (SongValues.ContainsKey("Date"))
+            {
+                sng.Date = SongValues["Date"];
+            }
+
+            if (SongValues.ContainsKey("Genre"))
+            {
+                sng.Genre = SongValues["Genre"];
+            }
+
+            if (SongValues.ContainsKey("Composer"))
+            {
+                sng.Composer = SongValues["Composer"];
+            }
+
+            if (SongValues.ContainsKey("Time"))
+            {
+                sng.Time = SongValues["Time"];
+            }
+
+            if (SongValues.ContainsKey("duration"))
+            {
+                sng.Time = SongValues["duration"];
+                sng.duration = SongValues["duration"];
+            }
+
+            if (SongValues.ContainsKey("Pos"))
+            {
+                sng.Pos = SongValues["Pos"];
+            }
+
+            if (SongValues.ContainsKey("file"))
+            {
+                sng.file = SongValues["file"];
+            }
+
+            //
+            if (sng.Id == _status.MpdSongID)
+            {
+                _currentSong = sng;
+            }
+
+            // for sorting.
+            sng.Index = i;
+
+            return sng;
         }
 
         private bool ParsePlaylists(List<string> sl)
@@ -2219,7 +2254,8 @@ namespace MPDCtrl.Models
                     SearchResult.Clear();
                 });
 
-                Dictionary<string, string> SongValues = new Dictionary<string, string>();
+                var comparer = StringComparer.OrdinalIgnoreCase;
+                Dictionary<string, string> SongValues = new Dictionary<string, string>(comparer);
 
                 int i = 0;
 
@@ -2230,96 +2266,17 @@ namespace MPDCtrl.Models
                     {
                         if (SongValues.ContainsKey(ValuePair[0].Trim()))
                         {
-                            // new
+                            // Contains means new one.
+
+                            // save old one and clear songvalues.
                             if (SongValues.ContainsKey("file"))
                             {
-                                Song sng = new Song();
+                                Song sng = FillSong(SongValues, i);
 
-                                if (SongValues.ContainsKey("Title"))
-                                {
-                                    sng.Title = SongValues["Title"];
-                                }
-                                else
-                                {
-                                    sng.Title = "";
-                                    if (SongValues.ContainsKey("file"))
-                                    {
-                                        sng.Title = Path.GetFileName(SongValues["file"]);
-                                    }
-                                }
-
-                                if (SongValues.ContainsKey("Artist"))
-                                {
-                                    sng.Artist = SongValues["Artist"];
-                                }
-                                else
-                                {
-                                    if (SongValues.ContainsKey("AlbumArtist"))
-                                    {
-                                        // TODO: Should I?
-                                        sng.Artist = SongValues["AlbumArtist"];
-                                    }
-                                    else
-                                    {
-                                        sng.Artist = "";
-                                    }
-                                }
-
-                                if (SongValues.ContainsKey("Last-Modified"))
-                                {
-                                    sng.LastModified = SongValues["Last-Modified"];
-                                }
-                                if (SongValues.ContainsKey("AlbumArtist"))
-                                {
-                                    sng.AlbumArtist = SongValues["AlbumArtist"];
-                                }
-                                if (SongValues.ContainsKey("Album"))
-                                {
-                                    sng.Album = SongValues["Album"];
-                                }
-                                if (SongValues.ContainsKey("Track"))
-                                {
-                                    sng.Track = SongValues["Track"];
-                                }
-                                if (SongValues.ContainsKey("Disc"))
-                                {
-                                    sng.Disc = SongValues["Disc"];
-                                }
-                                if (SongValues.ContainsKey("Date"))
-                                {
-                                    sng.Date = SongValues["Date"];
-                                }
-                                if (SongValues.ContainsKey("Genre"))
-                                {
-                                    sng.Genre = SongValues["Genre"];
-                                }
-                                if (SongValues.ContainsKey("Composer"))
-                                {
-                                    sng.Composer = SongValues["Composer"];
-                                }
-                                if (SongValues.ContainsKey("Time"))
-                                {
-                                    sng.Time = SongValues["Time"];
-                                }
-                                if (SongValues.ContainsKey("duration"))
-                                {
-                                    sng.Time = SongValues["duration"];
-                                    sng.duration = SongValues["duration"];
-                                }
-                                if (SongValues.ContainsKey("file"))
-                                {
-                                    sng.file = SongValues["file"];
-                                }
-
-
-                                // for sorting.
-                                sng.Index = i;
                                 i++;
 
-                                //
                                 SongValues.Clear();
 
-                                //
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
                                     SearchResult.Add(sng);
@@ -2327,15 +2284,30 @@ namespace MPDCtrl.Models
 
                             }
 
-                            SongValues[ValuePair[0].Trim()] = line.Replace(ValuePair[0].Trim() + ": ", "");
+                            // start over
+                            SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
                         }
                         else
                         {
                             SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
                         }
-                    }
 
+                    }
                 }
+
+                // last one
+                if ((SongValues.Count > 0) && SongValues.ContainsKey("file"))
+                {
+                    Song sng = FillSong(SongValues,i);
+                    
+                    SongValues.Clear();
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        SearchResult.Add(sng);
+                    });
+                }
+
             }
             catch (Exception ex)
             {
@@ -2345,6 +2317,103 @@ namespace MPDCtrl.Models
             }
 
             return true;
+        }
+
+        private Song FillSong(Dictionary<string, string> SongValues, int i)
+        {
+
+            Song sng = new Song();
+
+            if (SongValues.ContainsKey("Title"))
+            {
+                sng.Title = SongValues["Title"];
+            }
+            else
+            {
+                sng.Title = "";
+                if (SongValues.ContainsKey("file"))
+                {
+                    sng.Title = Path.GetFileName(SongValues["file"]);
+                }
+            }
+
+            if (SongValues.ContainsKey("Artist"))
+            {
+                sng.Artist = SongValues["Artist"];
+            }
+            else
+            {
+                if (SongValues.ContainsKey("AlbumArtist"))
+                {
+                    // TODO: Should I?
+                    sng.Artist = SongValues["AlbumArtist"];
+                }
+                else
+                {
+                    sng.Artist = "";
+                }
+            }
+
+            if (SongValues.ContainsKey("Last-Modified"))
+            {
+                sng.LastModified = SongValues["Last-Modified"];
+            }
+
+            if (SongValues.ContainsKey("AlbumArtist"))
+            {
+                sng.AlbumArtist = SongValues["AlbumArtist"];
+            }
+
+            if (SongValues.ContainsKey("Album"))
+            {
+                sng.Album = SongValues["Album"];
+            }
+
+            if (SongValues.ContainsKey("Track"))
+            {
+                sng.Track = SongValues["Track"];
+            }
+
+            if (SongValues.ContainsKey("Disc"))
+            {
+                sng.Disc = SongValues["Disc"];
+            }
+
+            if (SongValues.ContainsKey("Date"))
+            {
+                sng.Date = SongValues["Date"];
+            }
+
+            if (SongValues.ContainsKey("Genre"))
+            {
+                sng.Genre = SongValues["Genre"];
+            }
+
+            if (SongValues.ContainsKey("Composer"))
+            {
+                sng.Composer = SongValues["Composer"];
+            }
+
+            if (SongValues.ContainsKey("Time"))
+            {
+                sng.Time = SongValues["Time"];
+            }
+
+            if (SongValues.ContainsKey("duration"))
+            {
+                sng.Time = SongValues["duration"];
+                sng.duration = SongValues["duration"];
+            }
+
+            if (SongValues.ContainsKey("file"))
+            {
+                sng.file = SongValues["file"];
+            }
+
+            // for sorting.
+            sng.Index = i;
+
+            return sng;
         }
 
 

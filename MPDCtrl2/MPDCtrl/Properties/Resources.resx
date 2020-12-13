@@ -195,6 +195,9 @@
   <data name="DeveloperMode" xml:space="preserve">
     <value>Developer Mode</value>
   </data>
+  <data name="Dialog_CancelClose" xml:space="preserve">
+    <value>Close (Esc)</value>
+  </data>
   <data name="Dialog_Comfirmation" xml:space="preserve">
     <value>Comfirmation</value>
   </data>
@@ -221,6 +224,12 @@
   </data>
   <data name="Dialog_RemovePlaylistQ" xml:space="preserve">
     <value>Remove selected playlist?</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="FilterClear" xml:space="preserve">
+    <value>Clear Filter</value>
   </data>
   <data name="Host" xml:space="preserve">
     <value>Host</value>
@@ -257,6 +266,9 @@ SOFTWARE.</value>
   </data>
   <data name="LocalfileItemContextMenu_Add" xml:space="preserve">
     <value>Add (Enter)</value>
+  </data>
+  <data name="LocalfileListviewColumnHeader_FileName" xml:space="preserve">
+    <value>File Name</value>
   </data>
   <data name="LocalfileListviewTabitemHeader_LocalFiles" xml:space="preserve">
     <value>_Files</value>
@@ -425,6 +437,12 @@ SOFTWARE.</value>
   </data>
   <data name="Settings_UnlockAndChangePassword" xml:space="preserve">
     <value>Unlock and Change Password</value>
+  </data>
+  <data name="SongFilesItemContextMenu_Add" xml:space="preserve">
+    <value>Add to Current Queue</value>
+  </data>
+  <data name="SongsItemContextMenu_Add" xml:space="preserve">
+    <value>Add to Current Queue</value>
   </data>
   <data name="Update" xml:space="preserve">
     <value>Update</value>

@@ -158,6 +158,7 @@ namespace MPDCtrl.ViewModels.Classes
     public class NodeEntry : Node
     {
         public Uri FileUri { get; set; }
+        public String OriginalFileUri { get; set; }
         public string FilePath {
             get
             {
@@ -176,9 +177,10 @@ namespace MPDCtrl.ViewModels.Classes
             }
         }
 
-        public NodeEntry(string name, Uri fileUri) : base(name)
+        public NodeEntry(string name, Uri fileUri, String originalFileUri) : base(name)
         {
             FileUri = fileUri;
+            OriginalFileUri = originalFileUri;
             PathIcon = "M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,13H11V18A2,2 0 0,1 9,20A2,2 0 0,1 7,18A2,2 0 0,1 9,16C9.4,16 9.7,16.1 10,16.3V11H13V13M13,9V3.5L18.5,9H13Z";
         }
     }
@@ -251,10 +253,9 @@ namespace MPDCtrl.ViewModels.Classes
                         root.Children.Add(hoge);
                     }
                 }
-                catch 
-                { 
-                    // TODO:
-
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error@DirectoryTreeBuilder: " + ex.Message);
                 }
             }
 

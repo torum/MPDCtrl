@@ -195,6 +195,9 @@
   <data name="DeveloperMode" xml:space="preserve">
     <value>デベロッパーモード</value>
   </data>
+  <data name="Dialog_CancelClose" xml:space="preserve">
+    <value>閉じる (Esc)</value>
+  </data>
   <data name="Dialog_Comfirmation" xml:space="preserve">
     <value>確認</value>
   </data>
@@ -221,6 +224,12 @@
   </data>
   <data name="Dialog_RemovePlaylistQ" xml:space="preserve">
     <value>選択されたプレイリストを削除しますか？</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>絞り込み</value>
+  </data>
+  <data name="FilterClear" xml:space="preserve">
+    <value>絞り込みをクリアする</value>
   </data>
   <data name="Host" xml:space="preserve">
     <value>ホスト</value>
@@ -258,8 +267,11 @@ SOFTWARE.</value>
   <data name="LocalfileItemContextMenu_Add" xml:space="preserve">
     <value>キューに追加する (Enter)</value>
   </data>
+  <data name="LocalfileListviewColumnHeader_FileName" xml:space="preserve">
+    <value>ファイル名</value>
+  </data>
   <data name="LocalfileListviewTabitemHeader_LocalFiles" xml:space="preserve">
-    <value>ファイル</value>
+    <value>ファイル (_F)</value>
   </data>
   <data name="MPD_CommandError" xml:space="preserve">
     <value>MPD コマンドエラー</value>
@@ -316,7 +328,7 @@ SOFTWARE.</value>
     <value>プレイリストの名前を変更する</value>
   </data>
   <data name="PlaylistListviewTabitemHeader_Playlists" xml:space="preserve">
-    <value>プレイリスト</value>
+    <value>プレイリスト (_P)</value>
   </data>
   <data name="Port" xml:space="preserve">
     <value>ポート</value>
@@ -428,6 +440,12 @@ SOFTWARE.</value>
   </data>
   <data name="Settings_UnlockAndChangePassword" xml:space="preserve">
     <value>アンロックしてパスワードを変更する</value>
+  </data>
+  <data name="SongFilesItemContextMenu_Add" xml:space="preserve">
+    <value>現在のキューに追加</value>
+  </data>
+  <data name="SongsItemContextMenu_Add" xml:space="preserve">
+    <value>現在のキューに追加</value>
   </data>
   <data name="Update" xml:space="preserve">
     <value>更新</value>

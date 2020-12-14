@@ -31,13 +31,14 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// SendデータがDebugWindowに表示されないことがある件。
+    /// アルバムカバーで色々なファイル形式やサイズをテスト。
+    /// 
+    /// v2.0.5 AlbumArt対応版として公開。
     /// 
     /// 
-    /// v2.0.5
+    /// v2.0.6 以降
     /// 
     /// Ctrl+F検索とFilesから直接プレイリストに追加できるように「プレイリストに追加」をコンテキストメニューで。"Save Selected to" context menu.
-    /// 
     /// 「プレイリストの名前変更」をインラインで。
     /// "今すぐ再生"メニューを追加。
     /// Files: "再読み込み" context menu.
@@ -55,6 +56,7 @@ namespace MPDCtrl.ViewModels
     /// ステータスバーの右下で現在のprofileを表示してプルダウンで簡単に切り替えられるようにしたい。
 
     /// 更新履歴：
+    /// v2.0.4.2 fixed double query of albumart. added "clear text" button in the debug window.
     /// v2.0.4.1 アルバムカバー対応。
     /// v2.0.4  store公開。
     /// v2.0.3.4 ルートディレクトリにファイルがある時のテスト。
@@ -106,7 +108,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.4.1";
+        const string _appVer = "v2.0.4.2";
 
         public string AppVer
         {
@@ -461,8 +463,6 @@ namespace MPDCtrl.ViewModels
                 NotifyPropertyChanged("IsAlbumArtVisible");
             }
         }
-
-        
 
         private bool _isBusy;
         public bool IsBusy
@@ -2956,19 +2956,25 @@ namespace MPDCtrl.ViewModels
         // MPD updated information
         private void OnMpdStatusUpdate(MPC sender, object data)
         {
-            UpdateButtonStatus();
+            //UpdateButtonStatus();
 
             if ((data as string) == "isPlayer")
             {
-                // Clear IsPlaying icon
+                UpdateButtonStatus();
+
+                bool isSongChanged = false;
                 if (CurrentSong != null)
                 {
                     if (CurrentSong.Id != _MPC.MpdStatus.MpdSongID)
                     {
+                        isSongChanged = true;
+
+                        // Clear IsPlaying icon
                         CurrentSong.IsPlaying = false;
+                        
+                        IsAlbumArtVisible = false;
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            IsAlbumArtVisible = false;
                             AlbumArt = _albumArtDefault;
                         });
                     }
@@ -2982,23 +2988,23 @@ namespace MPDCtrl.ViewModels
                     var item = Queue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
                     if (item != null)
                     {
-                        //SelectedSong = (item as MPC.SongInfo);
                         CurrentSong = (item as MPC.SongInfo);
-
                         (item as MPC.SongInfo).IsPlaying = true;
-
-
-                        // AlbumArt
-                        if (!String.IsNullOrEmpty((item as MPC.SongInfo).file))
-                        {
-                            _MPC.MpdQueryAlbumArt((item as MPC.SongInfo).file);
-                        }
                     }
                     else
                     {
                         CurrentSong = null;
                     }
                 });
+
+                if (isSongChanged && (CurrentSong != null))
+                {
+                    // AlbumArt
+                    if (!String.IsNullOrEmpty(CurrentSong.file))
+                    {
+                        _MPC.MpdQueryAlbumArt(CurrentSong.file);
+                    }
+                }
 
                 IsBusy = false;
             }
@@ -3162,8 +3168,6 @@ namespace MPDCtrl.ViewModels
             }
             else if ((data as string) == "isAlbumart")
             {
-                // TODO:
-                //
                 if ((!_MPC.AlbumArt.IsDownloading) && _MPC.AlbumArt.IsSuccess)
                 {
                     if (_MPC.AlbumArt.AlbumImageSource != null)
@@ -3175,13 +3179,14 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-
+        // Raw string data Received
         private void OnDataReceived(MPC sender, object data)
         {
             if (IsShowDebugWindow)
                 OnDebugWindowOutput?.Invoke((data as string));
         }
 
+        // Raw string data Sent
         private void OnDataSent(MPC sender, object data)
         {
             if (IsShowDebugWindow)

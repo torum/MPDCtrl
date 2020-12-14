@@ -1571,6 +1571,8 @@ namespace MPDCtrl.Models
 
         private async void TCPClient_DataBinaryReceived(TCPC sender, byte[] data)
         {
+            await Task.Run(() => { DataReceived?.Invoke(this, "[binary data respose should follow]"); });
+
             if (data.Length > 2000000000)
             {
                 System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary file too big.");
@@ -1598,6 +1600,7 @@ namespace MPDCtrl.Models
             string res = Encoding.Default.GetString(data, 0, data.Length);
             List<string> values = res.Split('\n').ToList();
 
+            string debug = "";
             int gabStart = 0;
             int gabEnd = 0;
 
@@ -1619,6 +1622,8 @@ namespace MPDCtrl.Models
                             binSize =  i;
                         }
                     }
+
+                    debug = debug + Environment.NewLine + val;
                 }
                 else if (val.StartsWith("binary: "))
                 {
@@ -1633,11 +1638,14 @@ namespace MPDCtrl.Models
                             binResSize = i;
                         }
                     }
+                    debug = debug + Environment.NewLine + val + Environment.NewLine + "[binary data]";
                 }
                 else if (val.StartsWith("OK"))
                 {
                     //System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: OK: " + val);
                     gabEnd = gabEnd + val.Length + 1;
+
+                    debug = debug + Environment.NewLine + val;
                 }
                 else
                 {
@@ -1658,6 +1666,8 @@ namespace MPDCtrl.Models
 
             gabEnd = gabEnd + 1; // I'm not really sure why I need the extra +1. 
 
+            await Task.Run(() => { DataReceived?.Invoke(this, debug); });
+
             if ((binSize == 0))
             {
                 System.Diagnostics.Debug.WriteLine("binary file size is Zero: " + binSize.ToString() + ", " + binResSize.ToString() + ", " + data.Length.ToString());
@@ -1674,9 +1684,44 @@ namespace MPDCtrl.Models
                 return;
             }
 
-            if (binSize != _albumCover.BinaryData.Length)
+            if ((binSize != 0) && (binSize == binResSize))
             {
-                //System.Diagnostics.Debug.WriteLine("Trying again for the rest of binary data.");
+                // 小さいサイズの画像で一発で来た。
+
+                // 今回受け取ったバイナリ用にバイトアレイをイニシャライズ
+                byte[] resBinary = new byte[data.Length - gabStart - gabEnd];
+                try
+                {
+                    // 今回受け取ったバイナリをresBinaryへコピー
+                    Array.Copy(data, gabStart, resBinary, 0, resBinary.Length);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived: " + ex.Message);
+
+                    _albumCover.IsDownloading = false;
+                    return;
+                }
+
+                _albumCover.BinaryData = resBinary;
+
+                _albumCover.IsDownloading = false;
+
+                if (Application.Current == null) { return; }
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    _albumCover.AlbumImageSource = BitmapImageFromBytes(_albumCover.BinaryData);
+                });
+
+                _albumCover.IsSuccess = true;
+
+                await Task.Run(() => { StatusUpdate?.Invoke(this, "isAlbumart"); });
+
+                return;
+
+            }
+            else if (binSize != _albumCover.BinaryData.Length)
+            {
 
                 if (_albumCover.BinarySize == 0)
                 {
@@ -1700,19 +1745,39 @@ namespace MPDCtrl.Models
                     // 今回受け取ったバイナリをresBinaryへコピー
                     Array.Copy(data, gabStart, resBinary, 0, resBinary.Length);
 
-
                     // 既存のチャンクに追加する為の新たなバイトアレイをイニシャライズ
                     byte[] appended = new byte[_albumCover.BinaryData.Length + resBinary.Length];
-
                     // 既存のチャンクバイナリをappendedへコピー
                     Array.Copy(_albumCover.BinaryData, 0, appended, 0, _albumCover.BinaryData.Length);
-
                     // 今回受け取ったバイナリをappendedへコピー
                     Array.Copy(resBinary, 0, appended, _albumCover.BinaryData.Length, resBinary.Length);
 
                     _albumCover.BinaryData = appended;
 
-                    MpdReQueryAlbumArt(_albumCover.SongFilePath, _albumCover.BinaryData.Length);
+                    if (binSize != _albumCover.BinaryData.Length)
+                    {
+                        //System.Diagnostics.Debug.WriteLine("Trying again for the rest of binary data.");
+
+                        MpdReQueryAlbumArt(_albumCover.SongFilePath, _albumCover.BinaryData.Length);
+                    
+                    }
+                    else
+                    {
+                        _albumCover.IsDownloading = false;
+
+                        if (Application.Current == null) { return; }
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            _albumCover.AlbumImageSource = BitmapImageFromBytes(_albumCover.BinaryData);
+                        });
+
+                        _albumCover.IsSuccess = true;
+
+                        await Task.Run(() => { StatusUpdate?.Invoke(this, "isAlbumart"); });
+                       
+                    }
+
+                    return;
 
                 }
                 catch (Exception ex)
@@ -1720,11 +1785,12 @@ namespace MPDCtrl.Models
                     System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived: " + ex.Message);
 
                     _albumCover.IsDownloading = false;
+                    return;
                 }
 
                 return;
             }
-            else if (binResSize == 0)
+            else if ((binResSize == 0) && (binSize == _albumCover.BinaryData.Length))
             {
                 _albumCover.IsDownloading = false;
 
@@ -1748,9 +1814,9 @@ namespace MPDCtrl.Models
 
         }
 
-        // バイト配列をBitmapImageオブジェクトに変換（Imageに表示するSource）
         public BitmapImage BitmapImageFromBytes(Byte[] bytes)
         {
+            // バイト配列をBitmapImageオブジェクトに変換（Imageに表示するSource）
             using (var stream = new MemoryStream(bytes))
             {
                 BitmapImage bmimage = new BitmapImage();
@@ -1763,7 +1829,6 @@ namespace MPDCtrl.Models
                 return bmimage;
             }
         }
-
 
         private void DataReceived_Dispatch(string str)
         {

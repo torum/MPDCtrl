@@ -6,13 +6,24 @@
         xmlns:local="clr-namespace:MPDCtrl.Views"
         mc:Ignorable="d"
         
-        Background="{DynamicResource WindowBackgroundBaseColorBrush}"
-
         Title="Debug Window" Height="240" Width="450"
          DataContext="{StaticResource DebugViewModel}"
         Closing="DebugWindow_Closing">
     <Grid>
-        <TextBox x:Name="DebugTextBox" Text="{Binding DebugText, Mode=OneWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextChanged="DebugTextBox_TextChanged" Style="{StaticResource DefaultTextBoxStyle}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Row="0" HorizontalAlignment="Right">
+            <Button Content="_Clear Text" Padding="3" Margin="3" Command="{Binding ClearCommand}"></Button>
+        </StackPanel>
+        
+        <TextBox x:Name="DebugTextBox" Grid.Row="1" Text="{Binding DebugText, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="False" IsTabStop="False" Margin="0" MinHeight="24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextChanged="DebugTextBox_TextChanged">
         </TextBox>
+
     </Grid>
 </Window>

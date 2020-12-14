@@ -273,6 +273,8 @@ namespace MPDCtrl.Models.Classes
 
         public async void Send(string cmd)
         {
+            DataSent?.Invoke(this, ">>" + cmd);
+
             if (ConnectionState != ConnectionStatus.Connected) { return; }
 
             try
@@ -324,7 +326,7 @@ namespace MPDCtrl.Models.Classes
 
         private void DoSend(Socket client, String data)
         {
-            DataSent?.Invoke(this, ">>" + data);
+            //DataSent?.Invoke(this, ">>" + data);
 
             // Convert the string data to byte data using ASCII encoding.  
             byte[] byteData = Encoding.Default.GetBytes(data);

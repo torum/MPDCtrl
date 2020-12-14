@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using MPDCtrl.ViewModels.Classes;
+using MPDCtrl.Common;
 
 namespace MPDCtrl.ViewModels
 {
@@ -11,7 +12,6 @@ namespace MPDCtrl.ViewModels
     public class DebugViewModel : ViewModelBase
     {
         private string _debugText;
-
         public string DebugText
         {
             get
@@ -37,6 +37,25 @@ namespace MPDCtrl.ViewModels
             if (!string.IsNullOrEmpty(data))
                 DebugText += data + Environment.NewLine + Environment.NewLine;
         }
+
+        public DebugViewModel()
+        {
+            ClearCommand = new RelayCommand(ClearCommandExecute, ClearCommand_CanExecute);
+        }
+
+        public ICommand ClearCommand { get; }
+        public bool ClearCommand_CanExecute()
+        {
+            if (DebugText == "")
+                return false;
+
+            return true;
+        }
+        public void ClearCommandExecute()
+        {
+            DebugText = "";
+        }
+
     }
 
 }

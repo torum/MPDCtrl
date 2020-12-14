@@ -37,9 +37,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
+using System.Drawing;
 using MPDCtrl.Common;
 using MPDCtrl.Models.Classes;
 using MPDCtrl.ViewModels.Classes;
+using System.Windows.Media.Imaging;
 
 namespace MPDCtrl.Models
 {
@@ -48,6 +50,8 @@ namespace MPDCtrl.Models
     /// </summary>
     public class MPC
     {
+        #region == Classes == 
+
         public class Song : ViewModelBase
         {
             public string file { get; set; }
@@ -197,7 +201,6 @@ namespace MPDCtrl.Models
             }
         }
 
-
         public class Status
         {
             public enum MpdPlayState
@@ -284,7 +287,24 @@ namespace MPDCtrl.Models
 
         }
 
-        #region == Consts and Properties == 
+        public class AlbumCover
+        {
+            public bool IsDownloading { get; set; }
+            public bool IsSuccess { get; set; }
+
+            public string SongFilePath { get; set; }
+
+            public byte[] BinaryData { get; set; } =  new byte[0];
+
+            public int BinarySize { get; set; }
+
+            public BitmapImage AlbumImageSource { get; set; }
+
+        }
+
+        #endregion
+
+        #region == Consts, Properties, etc == 
 
         public enum MpdErrorTypes
         {
@@ -323,13 +343,19 @@ namespace MPDCtrl.Models
             }
         }
 
-        private Status _status;
+        private Status _status = new Status();
         public Status MpdStatus
         {
             get { return _status; }
         }
 
         public bool MpdStop { get; set; }
+
+        private AlbumCover _albumCover = new AlbumCover();
+        public AlbumCover AlbumArt
+        {
+            get { return _albumCover; }
+        }
 
         private Song _currentSong;
         public Song MpdCurrentSong
@@ -376,6 +402,8 @@ namespace MPDCtrl.Models
             get { return _searchResult; }
         }
 
+        private TCPC _asyncClient = new TCPC();
+
         #endregion
 
         #region == Events == 
@@ -409,22 +437,17 @@ namespace MPDCtrl.Models
 
         #endregion
 
-        private TCPC _asyncClient;
-
         public MPC(string h, int p, string a)
         {
             _host = h;
             _port = p;
             _password = a;
 
-            _status = new Status();
-
-            _asyncClient = new TCPC();
             _asyncClient.DataReceived += new TCPC.delDataReceived(TCPClient_DataReceived);
+            _asyncClient.DataBinaryReceived += new TCPC.delDataBinaryReceived(TCPClient_DataBinaryReceived);
             _asyncClient.DataSent += new TCPC.delDataSent(TCPClient_DataSent);
             _asyncClient.ConnectionStatusChanged += new TCPC.delConnectionStatusChanged(TCPClient_ConnectionStatusChanged);
         }
-
 
         #region == MPC Commands ==   
 
@@ -1413,6 +1436,84 @@ namespace MPDCtrl.Models
             }
         }
 
+        public void MpdQueryAlbumArt(string uri)
+        {
+            if (string.IsNullOrEmpty(uri))
+                return;
+
+            if (_albumCover.IsDownloading)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading");
+                return;
+            }
+
+            _albumCover = new AlbumCover();
+
+            _albumCover.IsDownloading = true;
+            _albumCover.SongFilePath = uri;
+
+            uri = Regex.Escape(uri);
+
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "albumart \"" + uri + "\" 0" + "\n";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "albumart \"" + uri + "\" 0" + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: " + ex.Message);
+            }
+        }
+
+        private void MpdReQueryAlbumArt(string uri, int offset)
+        {
+            if (string.IsNullOrEmpty(uri))
+                return;
+
+            _albumCover.IsDownloading = true;
+            _albumCover.SongFilePath = uri;
+
+            uri = Regex.Escape(uri);
+
+            try
+            {
+                string mpdCommand = "";
+                if (!string.IsNullOrEmpty(_password))
+                {
+                    mpdCommand = "command_list_begin" + "\n";
+                    mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
+                    mpdCommand = mpdCommand + "albumart \"" + uri + "\" " + offset.ToString() + "\n";
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "albumart \"" + uri + "\" " + offset.ToString() + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdReQueryAlbumArt: " + ex.Message);
+            }
+        }
+
         #endregion
 
         #region == Other Method == 
@@ -1444,8 +1545,18 @@ namespace MPDCtrl.Models
             }
             else if ((data as string).StartsWith("ACK"))
             {
-                System.Diagnostics.Debug.WriteLine("ACK@TCPClient_DataReceived: " + (data as string));
-                ErrorReturned?.Invoke(this, MpdErrorTypes.CommandError, (data as string));
+                // Ignore "ACK [50@1] {albumart} No file exists"
+                if ((data as string).Contains("{albumart}"))
+                {
+                    _albumCover = new AlbumCover();
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("ACK@TCPClient_DataReceived: " + (data as string));
+
+                    ErrorReturned?.Invoke(this, MpdErrorTypes.CommandError, (data as string));
+                }
+
                 return;
             }
             else
@@ -1457,6 +1568,202 @@ namespace MPDCtrl.Models
                 await Task.Run(() => { IsBusy?.Invoke(this, false); });
             }
         }
+
+        private async void TCPClient_DataBinaryReceived(TCPC sender, byte[] data)
+        {
+            if (data.Length > 2000000000)
+            {
+                System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary file too big.");
+
+                _albumCover.IsDownloading = false;
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_albumCover.SongFilePath))
+            {
+                System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: File path is not set.");
+
+                _albumCover.IsDownloading = false;
+                return;
+            }
+
+            if (!_albumCover.IsDownloading)
+            {
+                System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: IsDownloading = false. Downloading canceld? .");
+
+                _albumCover.IsDownloading = false;
+                return;
+            }
+
+            string res = Encoding.Default.GetString(data, 0, data.Length);
+            List<string> values = res.Split('\n').ToList();
+
+            int gabStart = 0;
+            int gabEnd = 0;
+
+            int binSize = 0;
+            int binResSize = 0;
+
+            foreach (var val in values)
+            {
+                if (val.StartsWith("size: "))
+                {
+                    //System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: size: " + val);
+                    gabStart = gabStart + val.Length + 1;
+
+                    List<string> s = val.Split(':').ToList();
+                    if (s.Count > 1)
+                    {
+                        if (Int32.TryParse(s[1], out int i))
+                        {
+                            binSize =  i;
+                        }
+                    }
+                }
+                else if (val.StartsWith("binary: "))
+                {
+                    //System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary: " + val);
+                    gabStart = gabStart + val.Length + 1;
+
+                    List<string> s = val.Split(':').ToList();
+                    if (s.Count > 1)
+                    {
+                        if (Int32.TryParse(s[1], out int i))
+                        {
+                            binResSize = i;
+                        }
+                    }
+                }
+                else if (val.StartsWith("OK"))
+                {
+                    //System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: OK: " + val);
+                    gabEnd = gabEnd + val.Length + 1;
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(val))
+                    {
+                        //System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: IsNullOrWhiteSpace: " + val);
+
+                        //gabEnd = gabEnd + val.Length;
+                    }
+                    else if (string.IsNullOrEmpty(val))
+                    {
+                        //System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: IsNullOrEmpty: " + val);
+
+                        //gabEnd = gabEnd + val.Length;
+                    }
+                }
+            }
+
+            gabEnd = gabEnd + 1; // I'm not really sure why I need the extra +1. 
+
+            if ((binSize == 0))
+            {
+                System.Diagnostics.Debug.WriteLine("binary file size is Zero: " + binSize.ToString() + ", " + binResSize.ToString() + ", " + data.Length.ToString());
+
+                _albumCover.IsDownloading = false;
+                return;
+            }
+
+            if (binResSize != ((data.Length - gabStart) - gabEnd))
+            {
+                System.Diagnostics.Debug.WriteLine("binary file size mismatch: " + binSize.ToString() + ", [" + binResSize.ToString() + ", " + (data.Length - gabStart - gabEnd) + "], " + data.Length.ToString());
+
+                _albumCover.IsDownloading = false;
+                return;
+            }
+
+            if (binSize != _albumCover.BinaryData.Length)
+            {
+                //System.Diagnostics.Debug.WriteLine("Trying again for the rest of binary data.");
+
+                if (_albumCover.BinarySize == 0)
+                {
+                    _albumCover.BinarySize = binSize;
+                }
+                else
+                {
+                    if (_albumCover.BinarySize != binSize)
+                    {
+                        System.Diagnostics.Debug.WriteLine("binary file size mismatch: Maybe different download? This should not be happening.");
+
+                        _albumCover.IsDownloading = false;
+                        return;
+                    }
+                }
+
+                try
+                {
+                    // 今回受け取ったバイナリ用にバイトアレイをイニシャライズ
+                    byte[] resBinary = new byte[data.Length - gabStart - gabEnd];
+                    // 今回受け取ったバイナリをresBinaryへコピー
+                    Array.Copy(data, gabStart, resBinary, 0, resBinary.Length);
+
+
+                    // 既存のチャンクに追加する為の新たなバイトアレイをイニシャライズ
+                    byte[] appended = new byte[_albumCover.BinaryData.Length + resBinary.Length];
+
+                    // 既存のチャンクバイナリをappendedへコピー
+                    Array.Copy(_albumCover.BinaryData, 0, appended, 0, _albumCover.BinaryData.Length);
+
+                    // 今回受け取ったバイナリをappendedへコピー
+                    Array.Copy(resBinary, 0, appended, _albumCover.BinaryData.Length, resBinary.Length);
+
+                    _albumCover.BinaryData = appended;
+
+                    MpdReQueryAlbumArt(_albumCover.SongFilePath, _albumCover.BinaryData.Length);
+
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived: " + ex.Message);
+
+                    _albumCover.IsDownloading = false;
+                }
+
+                return;
+            }
+            else if (binResSize == 0)
+            {
+                _albumCover.IsDownloading = false;
+
+                if (Application.Current == null) { return; }
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    _albumCover.AlbumImageSource = BitmapImageFromBytes(_albumCover.BinaryData);
+                });
+
+                _albumCover.IsSuccess = true;
+
+                await Task.Run(() => { StatusUpdate?.Invoke(this, "isAlbumart"); });
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("binary file download : Somehow, things went bad.");
+
+                _albumCover.IsDownloading = false;
+                return;
+            }
+
+        }
+
+        // バイト配列をBitmapImageオブジェクトに変換（Imageに表示するSource）
+        public BitmapImage BitmapImageFromBytes(Byte[] bytes)
+        {
+            using (var stream = new MemoryStream(bytes))
+            {
+                BitmapImage bmimage = new BitmapImage();
+
+                bmimage.BeginInit();
+                bmimage.CacheOption = BitmapCacheOption.OnLoad;
+                bmimage.StreamSource = stream;
+                bmimage.EndInit();
+
+                return bmimage;
+            }
+        }
+
 
         private void DataReceived_Dispatch(string str)
         {
@@ -1693,7 +2000,16 @@ namespace MPDCtrl.Models
             else if (str.StartsWith("updating_db:"))
             {
                 // update
+
+
                 await Task.Run(() => { StatusUpdate?.Invoke(this, "isUpdating_db"); });
+            }
+            else if (str.StartsWith("size: ") || str.StartsWith("binary: "))
+            {
+                //  albumart
+                // this should not be happening since binary response is handled at TCPClient_DataBinaryReceived
+
+                //await Task.Run(() => { StatusUpdate?.Invoke(this, "isAlbumart"); });
             }
             else
             {
@@ -1704,16 +2020,8 @@ namespace MPDCtrl.Models
         private bool ParseStatus(List<string> sl)
         {
             if (MpdStop) { return false; }
-            if (sl == null)
-            {
-                System.Diagnostics.Debug.WriteLine("ParseStatusResponse sl==null");
-                return false;
-            }
-            if (sl.Count == 0)
-            {
-                System.Diagnostics.Debug.WriteLine("ParseStatusResponse slCount == 0");
-                return false;
-            }
+            if (sl == null) return false;
+            if (sl.Count == 0) return false;
 
             var comparer = StringComparer.OrdinalIgnoreCase;
             Dictionary<string, string> MpdStatusValues = new Dictionary<string, string>(comparer);
@@ -1736,34 +2044,6 @@ namespace MPDCtrl.Models
                             MpdStatusValues.Add(StatusValuePair[0].Trim(), line.Replace(StatusValuePair[0].Trim() + ": ", ""));
                         }
                     }
-                    /*
-                    if (StatusValuePair.Length > 1)
-                    {
-                        if (MpdStatusValues.ContainsKey(StatusValuePair[0].Trim()))
-                        {
-                            if (StatusValuePair.Length == 2)
-                            {
-                                MpdStatusValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim();
-                            }
-                            else if (StatusValuePair.Length == 3)
-                            {
-                                MpdStatusValues[StatusValuePair[0].Trim()] = StatusValuePair[1].Trim() + ':' + StatusValuePair[2].Trim();
-                            }
-
-                        }
-                        else
-                        {
-                            if (StatusValuePair.Length == 2)
-                            {
-                                MpdStatusValues.Add(StatusValuePair[0].Trim(), StatusValuePair[1].Trim());
-                            }
-                            else if (StatusValuePair.Length == 3)
-                            {
-                                MpdStatusValues.Add(StatusValuePair[0].Trim(), (StatusValuePair[1].Trim() + ":" + StatusValuePair[2].Trim()));
-                            }
-                        }
-                    }
-                    */
                 }
 
                 // Play state

@@ -109,7 +109,7 @@
                             <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.1" To="1.0" Duration="0:0:2">
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1.0" Duration="0:0:2">
                                         </DoubleAnimation>
                                     </Storyboard>
                                 </BeginStoryboard>
@@ -248,12 +248,22 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Album cover TODO: -->
-                    <Grid Grid.Row="1" Grid.Column="0" Visibility="Collapsed">
-                        <StackPanel Margin="18 3 3 3">
-                            <TextBlock Text="{Binding CurrentSongArtist}" Style="{StaticResource DefaultTextBlockStyle}"></TextBlock>
-                            <Label Content="{Binding CurrentSongTitle}" Style="{StaticResource SectionTitle}"></Label>
-                        </StackPanel>
+                    <!-- Album cover -->
+                    <Grid Grid.Row="1" Grid.Column="0">
+                        <Grid Width="84" Height="84" Margin="32 0 0 0" HorizontalAlignment="Left">
+                            <Image Source="{Binding AlbumArt, NotifyOnTargetUpdated=True}" Width="84" Height="84" Visibility="{Binding IsAlbumArtVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                                <Image.Triggers>
+                                    <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1.0" Duration="0:0:1">
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Image.Triggers>
+                            </Image>
+                        </Grid>
                     </Grid>
 
                     <!-- Playback Controls -->

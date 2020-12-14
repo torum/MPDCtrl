@@ -25,16 +25,18 @@ using MPDCtrl.Views;
 using MPDCtrl.Models;
 using MPDCtrl.Models.Classes;
 using MPDCtrl.ViewModels.Classes;
+using System.Windows.Media.Imaging;
 
 namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
+    /// SendデータがDebugWindowに表示されないことがある件。
+    /// 
     /// 
     /// v2.0.5
     /// 
-    /// Ctrl+F検索とFilesでプレイリストに追加できるように。"Save Selected to" context menu.
-    /// 「プレイリストに追加」をコンテキストメニューで。
+    /// Ctrl+F検索とFilesから直接プレイリストに追加できるように「プレイリストに追加」をコンテキストメニューで。"Save Selected to" context menu.
     /// 
     /// 「プレイリストの名前変更」をインラインで。
     /// "今すぐ再生"メニューを追加。
@@ -42,7 +44,6 @@ namespace MPDCtrl.ViewModels
     /// 
     /// 
     /// [未定]
-    /// アルバムカバー対応。Last.fm? Bing? Local file?
     /// テーマの切り替え
     /// パスワード、多分毎回送る必要は無いと思う。
     /// Listview の水平スクロールバーのデザイン。
@@ -51,8 +52,10 @@ namespace MPDCtrl.ViewModels
     /// レイアウト見直し（スプリッターのせい）GridSplitterが右に行き過ぎる問題。
     /// Queue: ScrollIntoView to NowPlaying (not selected item).「現在の曲へ」のコンテキストメニューを追加。イベントでitemを渡す？
     /// レイアウト大改造？ ３ペイン（上キューと下に２ペイン) + (Treeviewでプレイリストとディレクトリ纏める？？）
+    /// ステータスバーの右下で現在のprofileを表示してプルダウンで簡単に切り替えられるようにしたい。
 
     /// 更新履歴：
+    /// v2.0.4.1 アルバムカバー対応。
     /// v2.0.4  store公開。
     /// v2.0.3.4 ルートディレクトリにファイルがある時のテスト。
     /// v2.0.3.3 Search and filter is done.
@@ -103,7 +106,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.4";
+        const string _appVer = "v2.0.4.1";
 
         public string AppVer
         {
@@ -441,6 +444,25 @@ namespace MPDCtrl.ViewModels
                     return false;
             }
         }
+
+        private bool _isAlbumArtVisible;
+        public bool IsAlbumArtVisible
+        {
+            get
+            {
+                return _isAlbumArtVisible;
+            }
+            set
+            {
+                if (_isAlbumArtVisible == value)
+                    return;
+
+                _isAlbumArtVisible = value;
+                NotifyPropertyChanged("IsAlbumArtVisible");
+            }
+        }
+
+        
 
         private bool _isBusy;
         public bool IsBusy
@@ -944,6 +966,24 @@ namespace MPDCtrl.ViewModels
         }
 
         #endregion
+
+        private ImageSource _albumArtDefault;
+        private ImageSource _albumArt;
+        public ImageSource AlbumArt
+        {
+            get
+            {
+                return _albumArt;
+            }
+            set
+            {
+                if (_albumArt == value)
+                    return;
+
+                _albumArt = value;
+                NotifyPropertyChanged("AlbumArt");
+            }
+        }
 
         #endregion
 
@@ -1906,7 +1946,7 @@ namespace MPDCtrl.ViewModels
 
             _MPC.Connected += new MPC.MpdConnected(OnConnected);
             _MPC.StatusChanged += new MPC.MpdStatusChanged(OnStatusChanged);
-            _MPC.StatusUpdate += new MPC.MpdStatusUpdate(OnStatusUpdate);
+            _MPC.StatusUpdate += new MPC.MpdStatusUpdate(OnMpdStatusUpdate);
             _MPC.DataReceived += new MPC.MpdDataReceived(OnDataReceived);
             _MPC.DataSent += new MPC.MpdDataSent(OnDataSent);
             _MPC.ErrorReturned += new MPC.MpdError(OnError);
@@ -1940,6 +1980,9 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
+            _albumArtDefault = BitmapSource.Create(1, 1, 1, 1, PixelFormats.BlackWhite, null, new byte[] { 0 }, 1);
+            //_albumArtDefault.MakeTransparent();
+            AlbumArt = _albumArtDefault;
         }
 
         #region == イベント ==
@@ -2911,7 +2954,7 @@ namespace MPDCtrl.ViewModels
         }
 
         // MPD updated information
-        private void OnStatusUpdate(MPC sender, object data)
+        private void OnMpdStatusUpdate(MPC sender, object data)
         {
             UpdateButtonStatus();
 
@@ -2923,6 +2966,11 @@ namespace MPDCtrl.ViewModels
                     if (CurrentSong.Id != _MPC.MpdStatus.MpdSongID)
                     {
                         CurrentSong.IsPlaying = false;
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            IsAlbumArtVisible = false;
+                            AlbumArt = _albumArtDefault;
+                        });
                     }
                 }
 
@@ -2938,10 +2986,16 @@ namespace MPDCtrl.ViewModels
                         CurrentSong = (item as MPC.SongInfo);
 
                         (item as MPC.SongInfo).IsPlaying = true;
+
+
+                        // AlbumArt
+                        if (!String.IsNullOrEmpty((item as MPC.SongInfo).file))
+                        {
+                            _MPC.MpdQueryAlbumArt((item as MPC.SongInfo).file);
+                        }
                     }
                     else
                     {
-                        //SelectedSong = null;
                         CurrentSong = null;
                     }
                 });
@@ -3010,6 +3064,12 @@ namespace MPDCtrl.ViewModels
                     {
                         CurrentSong = (curitem as MPC.SongInfo);
                         (curitem as MPC.SongInfo).IsPlaying = true;
+
+                        // AlbumArt
+                        if (!String.IsNullOrEmpty((curitem as MPC.SongInfo).file))
+                        {
+                            _MPC.MpdQueryAlbumArt((curitem as MPC.SongInfo).file);
+                        }
                     }
                     else
                     {
@@ -3098,8 +3158,23 @@ namespace MPDCtrl.ViewModels
             else if ((data as string) == "isUpdating_db")
             {
                 // TODO:
+
+            }
+            else if ((data as string) == "isAlbumart")
+            {
+                // TODO:
+                //
+                if ((!_MPC.AlbumArt.IsDownloading) && _MPC.AlbumArt.IsSuccess)
+                {
+                    if (_MPC.AlbumArt.AlbumImageSource != null)
+                    {
+                        AlbumArt = _MPC.AlbumArt.AlbumImageSource;
+                        IsAlbumArtVisible = true;
+                    }
+                }
             }
         }
+
 
         private void OnDataReceived(MPC sender, object data)
         {
@@ -4916,10 +4991,6 @@ namespace MPDCtrl.ViewModels
 
         }
 
-        #endregion
-
-
-        
         public ICommand SongFilesListviewAddCommand { get; }
         public bool SongFilesListviewAddCommand_CanExecute()
         {
@@ -4971,6 +5042,9 @@ namespace MPDCtrl.ViewModels
                 _MPC.MpdAdd(uriList);
             }
         }
+
+        #endregion
+
 
         #endregion
 

@@ -19,10 +19,11 @@ namespace MPDCtrl.Models.Classes
         public string errorMessage;
     }
 
-
+    /// <summary>
+    /// TCPClient wrapper class. 
+    /// </summary>
     public class TCPC
     {
-
         public enum ConnectionStatus
         {
             NeverConnected,
@@ -40,11 +41,6 @@ namespace MPDCtrl.Models.Classes
             Error
         }
 
-        private TcpClient _TCP;
-        private IPAddress _ip = IPAddress.None;
-        private int _p = 0;
-        private ConnectionStatus _ConStat;
-        private int _retryAttempt = 0;
         private class StateObject
         {
             // Client socket.  
@@ -53,16 +49,28 @@ namespace MPDCtrl.Models.Classes
             public const int BufferSize = 5000;
             // Receive buffer.  
             public byte[] buffer = new byte[BufferSize];
-            // Received data string.  
+            // Received string data.  
             public StringBuilder sb = new StringBuilder();
+            // Received binary data.  
+            public byte[] bb = new byte[0];
         }
 
+        private TcpClient _TCP;
+        private IPAddress _ip = IPAddress.None;
+        private int _p = 0;
+        private ConnectionStatus _ConStat;
+        private int _retryAttempt = 0;
+
+        #region == Events == 
         public delegate void delDataReceived(TCPC sender, object data);
         public event delDataReceived DataReceived;
+        public delegate void delDataBinaryReceived(TCPC sender, byte[] data);
+        public event delDataBinaryReceived DataBinaryReceived;
         public delegate void delConnectionStatusChanged(TCPC sender, ConnectionStatus status);
         public event delConnectionStatusChanged ConnectionStatusChanged;
         public delegate void delDataSent(TCPC sender, object data);
         public event delDataSent DataSent;
+        #endregion
 
         public ConnectionStatus ConnectionState
         {
@@ -203,17 +211,42 @@ namespace MPDCtrl.Models.Classes
                     string res = Encoding.Default.GetString(state.buffer, 0, bytesRead);
                     state.sb.Append(res);
 
+                    // 今回受け取ったバイナリ用にバイトアレイをイニシャライズ
+                    byte[] resBinary = new byte[bytesRead];
+                    // 今回受け取ったバイナリをバッファからコピー
+                    Array.Copy(state.buffer, 0, resBinary, 0, resBinary.Length);
+
+                    // 既存のチャンクに追加する為の新たなバイトアレイをイニシャライズ
+                    byte[] appended = new byte[state.bb.Length + resBinary.Length];
+
+                    // 既存のチャンクバイナリをappendedへコピー
+                    Array.Copy(state.bb, 0, appended, 0, state.bb.Length);
+
+                    // 今回受け取ったバイナリをappendedへコピー
+                    Array.Copy(resBinary, 0, appended, state.bb.Length, resBinary.Length);
+
+                    // 新たなバイトアレイをstateにセット。
+                    state.bb = appended;
+
                     if (res.EndsWith("OK\n") || res.StartsWith("OK MPD") || res.StartsWith("ACK"))
-                    //if (client.Available == 0)
                     {
+
                         if (!string.IsNullOrEmpty(state.sb.ToString().Trim()))
                         {
-                            DataReceived?.Invoke(this, state.sb.ToString().Trim());
+                            if (state.sb.ToString().Contains("binary: "))
+                            {
+                                DataBinaryReceived?.Invoke(this, state.bb);
+                            }
+                            else
+                            {
+                                DataReceived?.Invoke(this, state.sb.ToString().Trim());
+                            }
                         }
+
                         state = new StateObject();
                         state.workSocket = client;
                     }
-
+                    
                     client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
                 }
                 else

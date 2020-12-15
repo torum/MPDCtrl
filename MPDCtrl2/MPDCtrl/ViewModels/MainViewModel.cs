@@ -31,11 +31,6 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// アルバムカバーで色々なファイル形式やサイズをテスト。
-    /// 
-    /// v2.0.5 AlbumArt対応版として公開。
-    /// 
-    /// 
     /// v2.0.6 以降
     /// 
     /// Ctrl+F検索とFilesから直接プレイリストに追加できるように「プレイリストに追加」をコンテキストメニューで。"Save Selected to" context menu.
@@ -56,9 +51,11 @@ namespace MPDCtrl.ViewModels
     /// ステータスバーの右下で現在のprofileを表示してプルダウンで簡単に切り替えられるようにしたい。
 
     /// 更新履歴：
+    /// v2.0.5  AlbumArt対応版としてstore公開。
+    /// v2.0.4.3 キューのリストビューの本体にクリアメニューを追加。AlbumCoverのファイルサイズをMax 300Kに設定。
     /// v2.0.4.2 fixed double query of albumart. added "clear text" button in the debug window.
     /// v2.0.4.1 アルバムカバー対応。
-    /// v2.0.4  store公開。
+    /// v2.0.4  store公開。QueueListviewClearCommand
     /// v2.0.3.4 ルートディレクトリにファイルがある時のテスト。
     /// v2.0.3.3 Search and filter is done.
     /// v2.0.3.2 Clearコマンドを送る前にQueueをクリアしておくようにして高速化。プレイリストとFilesはダブルクリック無効にした（なんか混乱するから）。 KeyboardNavigation.TabNavigation="Cycle"の設定。
@@ -108,7 +105,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.4.2";
+        const string _appVer = "v2.0.5";
 
         public string AppVer
         {
@@ -1981,7 +1978,6 @@ namespace MPDCtrl.ViewModels
             #endregion
 
             _albumArtDefault = BitmapSource.Create(1, 1, 1, 1, PixelFormats.BlackWhite, null, new byte[] { 0 }, 1);
-            //_albumArtDefault.MakeTransparent();
             AlbumArt = _albumArtDefault;
         }
 
@@ -3170,10 +3166,17 @@ namespace MPDCtrl.ViewModels
             {
                 if ((!_MPC.AlbumArt.IsDownloading) && _MPC.AlbumArt.IsSuccess)
                 {
-                    if (_MPC.AlbumArt.AlbumImageSource != null)
+                    if ((CurrentSong != null) && (_MPC.AlbumArt.AlbumImageSource != null))
                     {
-                        AlbumArt = _MPC.AlbumArt.AlbumImageSource;
-                        IsAlbumArtVisible = true;
+                        // AlbumArt
+                        if (!String.IsNullOrEmpty(CurrentSong.file))
+                        {
+                            if (CurrentSong.file == _MPC.AlbumArt.SongFilePath)
+                            {
+                                AlbumArt = _MPC.AlbumArt.AlbumImageSource;
+                                IsAlbumArtVisible = true;
+                            }
+                        }
                     }
                 }
             }
@@ -4056,6 +4059,7 @@ namespace MPDCtrl.ViewModels
         public bool QueueListviewClearCommand_CanExecute()
         {
             if (_MPC == null) { return false; }
+            if (Queue.Count == 0) { return false; }
             return true;
         }
         public void QueueListviewClearCommand_ExecuteAsync()

@@ -1443,7 +1443,7 @@ namespace MPDCtrl.Models
 
             if (_albumCover.IsDownloading)
             {
-                System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading");
+                System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading. Ignoring.");
                 return;
             }
 
@@ -1479,10 +1479,13 @@ namespace MPDCtrl.Models
             }
         }
 
-        private void MpdReQueryAlbumArt(string uri, int offset)
+        private async void MpdReQueryAlbumArt(string uri, int offset)
         {
             if (string.IsNullOrEmpty(uri))
                 return;
+
+            // wait
+            await Task.Delay(100);
 
             _albumCover.IsDownloading = true;
             _albumCover.SongFilePath = uri;
@@ -1573,7 +1576,7 @@ namespace MPDCtrl.Models
         {
             await Task.Run(() => { DataReceived?.Invoke(this, "[binary data respose should follow]"); });
 
-            if (data.Length > 2000000000)
+            if (data.Length > 300000) //2000000000
             {
                 System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary file too big.");
 
@@ -1662,6 +1665,16 @@ namespace MPDCtrl.Models
                         //gabEnd = gabEnd + val.Length;
                     }
                 }
+            }
+
+            if (binSize > 300000) 
+            {
+                System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary file too big.");
+
+                await Task.Run(() => { DataReceived?.Invoke(this, "[binary file too big. (binSize > 300000) Max 300kb]"); });
+
+                _albumCover.IsDownloading = false;
+                return;
             }
 
             gabEnd = gabEnd + 1; // I'm not really sure why I need the extra +1. 
@@ -1788,7 +1801,6 @@ namespace MPDCtrl.Models
                     return;
                 }
 
-                return;
             }
             else if ((binResSize == 0) && (binSize == _albumCover.BinaryData.Length))
             {
@@ -1843,6 +1855,19 @@ namespace MPDCtrl.Models
                     {
                         DataReceived_ParseData(d);
                         d = "";
+                    }
+                } else if (value.StartsWith("ACK"))
+                {
+                    // Ignore "ACK [50@1] {albumart} No file exists"
+                    if (value.Contains("{albumart}"))
+                    {
+                        _albumCover = new AlbumCover();
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("ACK@DataReceived_Dispatch: " + value);
+
+                        ErrorReturned?.Invoke(this, MpdErrorTypes.CommandError, value);
                     }
                 }
                 else

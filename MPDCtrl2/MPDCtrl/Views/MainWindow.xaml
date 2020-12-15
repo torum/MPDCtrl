@@ -749,6 +749,19 @@
                                 <ContextMenu >
                                     <MenuItem Header="{x:Static properties:Resources.Search_ToolTip}" Command="{Binding ShowFindCommand}">
                                     </MenuItem>
+                                    <Separator/>
+                                    <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_QueueClear}" Command="{Binding Path=QueueListviewClearCommand}">
+                                        <MenuItem.Resources>
+                                            <ControlTemplate x:Key="DeleteEmptyOutline">
+                                                <Canvas Background="Transparent" >
+                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M20.37,8.91L19.37,10.64L7.24,3.64L8.24,1.91L11.28,3.66L12.64,3.29L16.97,5.79L17.34,7.16L20.37,8.91M6,19V7H11.07L18,11V19A2,2 0 0,1 16,21H8A2,2 0 0,1 6,19M8,19H16V12.2L10.46,9H8V19Z" />
+                                                </Canvas>
+                                            </ControlTemplate>
+                                        </MenuItem.Resources>
+                                        <MenuItem.Icon>
+                                            <ContentControl Template="{StaticResource DeleteEmptyOutline}" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
                                 </ContextMenu>
                             </ListView.ContextMenu>
                             <ListView.Resources>

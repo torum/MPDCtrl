@@ -2157,7 +2157,7 @@
                                                         </GridViewColumn>
 
                                                         <GridViewColumn Width="{Binding ElementName=SongFilesListviewDummy2, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Name">
-                                                            <GridViewColumnHeader Content="File"/>
+                                                            <GridViewColumnHeader Content="{x:Static properties:Resources.SongFilesListviewColumnHeader_File}"/>
                                                             <GridViewColumn.CellTemplate>
                                                                 <DataTemplate>
                                                                     <StackPanel>
@@ -2173,7 +2173,7 @@
                                                         </GridViewColumn>
 
                                                         <GridViewColumn Width="{Binding ElementName=SongFilesListviewDummy3, Path=ActualWidth}" helpers:GridViewSort.PropertyName="FilePath">
-                                                            <GridViewColumnHeader Content="Path"/>
+                                                            <GridViewColumnHeader Content="{x:Static properties:Resources.SongFilesListviewColumnHeader_Path}"/>
                                                             <GridViewColumn.CellTemplate>
                                                                 <DataTemplate>
                                                                     <StackPanel>

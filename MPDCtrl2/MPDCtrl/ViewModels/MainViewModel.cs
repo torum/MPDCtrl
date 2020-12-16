@@ -33,6 +33,7 @@ namespace MPDCtrl.ViewModels
     /// 
     /// v2.0.6 以降
     /// 
+    /// 
     /// Ctrl+F検索とFilesから直接プレイリストに追加できるように「プレイリストに追加」をコンテキストメニューで。"Save Selected to" context menu.
     /// 「プレイリストの名前変更」をインラインで。
     /// "今すぐ再生"メニューを追加。
@@ -50,7 +51,10 @@ namespace MPDCtrl.ViewModels
     /// レイアウト大改造？ ３ペイン（上キューと下に２ペイン) + (Treeviewでプレイリストとディレクトリ纏める？？）
     /// ステータスバーの右下で現在のprofileを表示してプルダウンで簡単に切り替えられるようにしたい。
 
+
     /// 更新履歴：
+    /// v2.0.5.2 起動時にデフォルトのMPDに接続出来なかった際に、表示崩れが起きる件。（サイドバーの幅とカラムヘッダーの表示・非表示）Fix
+    /// v2.0.5.1 File と Path の翻訳もれ。
     /// v2.0.5  AlbumArt対応版としてstore公開。
     /// v2.0.4.3 キューのリストビューの本体にクリアメニューを追加。AlbumCoverのファイルサイズをMax 300Kに設定。
     /// v2.0.4.2 fixed double query of albumart. added "clear text" button in the debug window.
@@ -83,7 +87,7 @@ namespace MPDCtrl.ViewModels
     /// v2.0.0.4: Consumeオプションを追加。
     /// v2.0.0.3: Queueの項目を増やしたり、IsPlayingとか。
     /// v2.0.0.2: DebugWindowの追加とかProfile関係とか色々。
-    /// 
+
 
     /// Key Gestures:
     /// Ctrl+S Show Settings
@@ -105,7 +109,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.5";
+        const string _appVer = "v2.0.5.2";
 
         public string AppVer
         {
@@ -157,6 +161,41 @@ namespace MPDCtrl.ViewModels
 
                 _isFullyLoaded = value;
                 this.NotifyPropertyChanged("IsFullyLoaded");
+            }
+        }
+
+
+        private bool _isFullyRendered;
+        public bool IsFullyRendered
+        {
+            get
+            {
+                return _isFullyRendered;
+            }
+            set
+            {
+                if (_isFullyRendered == value)
+                    return;
+
+                _isFullyRendered = value;
+                this.NotifyPropertyChanged("IsFullyRendered");
+            }
+        }
+
+        private bool _isMainRendered;
+        public bool IsMainRendered
+        {
+            get
+            {
+                return _isMainRendered;
+            }
+            set
+            {
+                if (_isMainRendered == value)
+                    return;
+
+                _isMainRendered = value;
+                this.NotifyPropertyChanged("IsMainRendered");
             }
         }
 
@@ -272,6 +311,9 @@ namespace MPDCtrl.ViewModels
 
                 _isMainShow = value;
                 NotifyPropertyChanged("IsMainShow");
+
+                if (_isMainShow)
+                    IsMainRendered = true;
             }
         }
 
@@ -2473,6 +2515,12 @@ namespace MPDCtrl.ViewModels
         // 起動後画面が描画された時の処理
         public void OnContentRendered(object sender, EventArgs e)
         {
+            RefreshColumnHeaderWidth();
+
+            IsFullyRendered = true;
+        }
+        public void RefreshColumnHeaderWidth()
+        {
             if (QueueColumnHeaderPositionVisibility) QueueColumnHeaderPositionWidth = _queueColumnHeaderPositionWidthUser;
             QueueColumnHeaderTitleWidth = _queueColumnHeaderTitleWidthUser;
             if (QueueColumnHeaderNowPlayingVisibility) QueueColumnHeaderNowPlayingWidth = _queueColumnHeaderNowPlayingWidthUser;
@@ -2744,124 +2792,127 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            #region == ヘッダーカラム設定の保存 ==
+            if (IsFullyRendered)
+            {
+                #region == ヘッダーカラム設定の保存 ==
 
-            XmlElement headers = doc.CreateElement(string.Empty, "Headers", string.Empty);
+                XmlElement headers = doc.CreateElement(string.Empty, "Headers", string.Empty);
 
-            XmlElement queueHeader;
-            XmlElement queueHeaderColumn;
+                XmlElement queueHeader;
+                XmlElement queueHeaderColumn;
 
-            XmlAttribute qAttrs;
+                XmlAttribute qAttrs;
 
-            queueHeader = doc.CreateElement(string.Empty, "Queue", string.Empty);
+                queueHeader = doc.CreateElement(string.Empty, "Queue", string.Empty);
 
 
-            // Position
-            queueHeaderColumn = doc.CreateElement(string.Empty, "Position", string.Empty);
+                // Position
+                queueHeaderColumn = doc.CreateElement(string.Empty, "Position", string.Empty);
 
-            qAttrs = doc.CreateAttribute("Visible");
-            qAttrs.Value = QueueColumnHeaderPositionVisibility.ToString();
-            queueHeaderColumn.SetAttributeNode(qAttrs);
+                qAttrs = doc.CreateAttribute("Visible");
+                qAttrs.Value = QueueColumnHeaderPositionVisibility.ToString();
+                queueHeaderColumn.SetAttributeNode(qAttrs);
 
-            qAttrs = doc.CreateAttribute("Width");
-            qAttrs.Value = QueueColumnHeaderPositionWidth.ToString();
-            queueHeaderColumn.SetAttributeNode(qAttrs);
+                qAttrs = doc.CreateAttribute("Width");
+                qAttrs.Value = QueueColumnHeaderPositionWidth.ToString();
+                queueHeaderColumn.SetAttributeNode(qAttrs);
 
-            queueHeader.AppendChild(queueHeaderColumn);
+                queueHeader.AppendChild(queueHeaderColumn);
 
-            // Now Playing
-            queueHeaderColumn = doc.CreateElement(string.Empty, "NowPlaying", string.Empty);
+                // Now Playing
+                queueHeaderColumn = doc.CreateElement(string.Empty, "NowPlaying", string.Empty);
 
-            qAttrs = doc.CreateAttribute("Visible");
-            qAttrs.Value = QueueColumnHeaderNowPlayingVisibility.ToString();
-            queueHeaderColumn.SetAttributeNode(qAttrs);
+                qAttrs = doc.CreateAttribute("Visible");
+                qAttrs.Value = QueueColumnHeaderNowPlayingVisibility.ToString();
+                queueHeaderColumn.SetAttributeNode(qAttrs);
 
-            qAttrs = doc.CreateAttribute("Width");
-            qAttrs.Value = QueueColumnHeaderNowPlayingWidth.ToString();
-            queueHeaderColumn.SetAttributeNode(qAttrs);
+                qAttrs = doc.CreateAttribute("Width");
+                qAttrs.Value = QueueColumnHeaderNowPlayingWidth.ToString();
+                queueHeaderColumn.SetAttributeNode(qAttrs);
 
-            queueHeader.AppendChild(queueHeaderColumn);
+                queueHeader.AppendChild(queueHeaderColumn);
 
-            // Title skip visibility
-            queueHeaderColumn = doc.CreateElement(string.Empty, "Title", string.Empty);
+                // Title skip visibility
+                queueHeaderColumn = doc.CreateElement(string.Empty, "Title", string.Empty);
 
-            qAttrs = doc.CreateAttribute("Width");
-            qAttrs.Value = QueueColumnHeaderTitleWidth.ToString();
-            queueHeaderColumn.SetAttributeNode(qAttrs);
+                qAttrs = doc.CreateAttribute("Width");
+                qAttrs.Value = QueueColumnHeaderTitleWidth.ToString();
+                queueHeaderColumn.SetAttributeNode(qAttrs);
 
-            queueHeader.AppendChild(queueHeaderColumn);
+                queueHeader.AppendChild(queueHeaderColumn);
 
-            // Time
-            queueHeaderColumn = doc.CreateElement(string.Empty, "Time", string.Empty);
+                // Time
+                queueHeaderColumn = doc.CreateElement(string.Empty, "Time", string.Empty);
 
-            qAttrs = doc.CreateAttribute("Visible");
-            qAttrs.Value = QueueColumnHeaderTimeVisibility.ToString();
-            queueHeaderColumn.SetAttributeNode(qAttrs);
+                qAttrs = doc.CreateAttribute("Visible");
+                qAttrs.Value = QueueColumnHeaderTimeVisibility.ToString();
+                queueHeaderColumn.SetAttributeNode(qAttrs);
 
-            qAttrs = doc.CreateAttribute("Width");
-            qAttrs.Value = QueueColumnHeaderTimeWidth.ToString();
-            queueHeaderColumn.SetAttributeNode(qAttrs);
+                qAttrs = doc.CreateAttribute("Width");
+                qAttrs.Value = QueueColumnHeaderTimeWidth.ToString();
+                queueHeaderColumn.SetAttributeNode(qAttrs);
 
-            queueHeader.AppendChild(queueHeaderColumn);
+                queueHeader.AppendChild(queueHeaderColumn);
 
-            // Artist
-            queueHeaderColumn = doc.CreateElement(string.Empty, "Artist", string.Empty);
+                // Artist
+                queueHeaderColumn = doc.CreateElement(string.Empty, "Artist", string.Empty);
 
-            qAttrs = doc.CreateAttribute("Visible");
-            qAttrs.Value = QueueColumnHeaderArtistVisibility.ToString();
-            queueHeaderColumn.SetAttributeNode(qAttrs);
+                qAttrs = doc.CreateAttribute("Visible");
+                qAttrs.Value = QueueColumnHeaderArtistVisibility.ToString();
+                queueHeaderColumn.SetAttributeNode(qAttrs);
 
-            qAttrs = doc.CreateAttribute("Width");
-            qAttrs.Value = QueueColumnHeaderArtistWidth.ToString();
-            queueHeaderColumn.SetAttributeNode(qAttrs);
+                qAttrs = doc.CreateAttribute("Width");
+                qAttrs.Value = QueueColumnHeaderArtistWidth.ToString();
+                queueHeaderColumn.SetAttributeNode(qAttrs);
 
-            queueHeader.AppendChild(queueHeaderColumn);
+                queueHeader.AppendChild(queueHeaderColumn);
 
-            // Album
-            queueHeaderColumn = doc.CreateElement(string.Empty, "Album", string.Empty);
+                // Album
+                queueHeaderColumn = doc.CreateElement(string.Empty, "Album", string.Empty);
 
-            qAttrs = doc.CreateAttribute("Visible");
-            qAttrs.Value = QueueColumnHeaderAlbumVisibility.ToString();
-            queueHeaderColumn.SetAttributeNode(qAttrs);
+                qAttrs = doc.CreateAttribute("Visible");
+                qAttrs.Value = QueueColumnHeaderAlbumVisibility.ToString();
+                queueHeaderColumn.SetAttributeNode(qAttrs);
 
-            qAttrs = doc.CreateAttribute("Width");
-            qAttrs.Value = QueueColumnHeaderAlbumWidth.ToString();
-            queueHeaderColumn.SetAttributeNode(qAttrs);
+                qAttrs = doc.CreateAttribute("Width");
+                qAttrs.Value = QueueColumnHeaderAlbumWidth.ToString();
+                queueHeaderColumn.SetAttributeNode(qAttrs);
 
-            queueHeader.AppendChild(queueHeaderColumn);
+                queueHeader.AppendChild(queueHeaderColumn);
 
-            // Genre
-            queueHeaderColumn = doc.CreateElement(string.Empty, "Genre", string.Empty);
+                // Genre
+                queueHeaderColumn = doc.CreateElement(string.Empty, "Genre", string.Empty);
 
-            qAttrs = doc.CreateAttribute("Visible");
-            qAttrs.Value = QueueColumnHeaderGenreVisibility.ToString();
-            queueHeaderColumn.SetAttributeNode(qAttrs);
+                qAttrs = doc.CreateAttribute("Visible");
+                qAttrs.Value = QueueColumnHeaderGenreVisibility.ToString();
+                queueHeaderColumn.SetAttributeNode(qAttrs);
 
-            qAttrs = doc.CreateAttribute("Width");
-            qAttrs.Value = QueueColumnHeaderGenreWidth.ToString();
-            queueHeaderColumn.SetAttributeNode(qAttrs);
+                qAttrs = doc.CreateAttribute("Width");
+                qAttrs.Value = QueueColumnHeaderGenreWidth.ToString();
+                queueHeaderColumn.SetAttributeNode(qAttrs);
 
-            queueHeader.AppendChild(queueHeaderColumn);
+                queueHeader.AppendChild(queueHeaderColumn);
 
-            // Last Modified
-            queueHeaderColumn = doc.CreateElement(string.Empty, "LastModified", string.Empty);
+                // Last Modified
+                queueHeaderColumn = doc.CreateElement(string.Empty, "LastModified", string.Empty);
 
-            qAttrs = doc.CreateAttribute("Visible");
-            qAttrs.Value = QueueColumnHeaderLastModifiedVisibility.ToString();
-            queueHeaderColumn.SetAttributeNode(qAttrs);
+                qAttrs = doc.CreateAttribute("Visible");
+                qAttrs.Value = QueueColumnHeaderLastModifiedVisibility.ToString();
+                queueHeaderColumn.SetAttributeNode(qAttrs);
 
-            qAttrs = doc.CreateAttribute("Width");
-            qAttrs.Value = QueueColumnHeaderLastModifiedWidth.ToString();
-            queueHeaderColumn.SetAttributeNode(qAttrs);
+                qAttrs = doc.CreateAttribute("Width");
+                qAttrs.Value = QueueColumnHeaderLastModifiedWidth.ToString();
+                queueHeaderColumn.SetAttributeNode(qAttrs);
 
-            queueHeader.AppendChild(queueHeaderColumn);
+                queueHeader.AppendChild(queueHeaderColumn);
 
-            //
-            headers.AppendChild(queueHeader);
-            ////
-            root.AppendChild(headers);
+                //
+                headers.AppendChild(queueHeader);
+                ////
+                root.AppendChild(headers);
 
-            #endregion
+                #endregion
+            }
 
             #region == レイアウトの保存 ==
 
@@ -2873,13 +2924,20 @@ namespace MPDCtrl.ViewModels
             // LeftPain
             leftpain = doc.CreateElement(string.Empty, "LeftPain", string.Empty);
             lAttrs = doc.CreateAttribute("Width");
-            if (windowWidth > (MainLeftPainActualWidth-24))
+            if (IsFullyRendered && IsMainRendered)
             {
-                lAttrs.Value = MainLeftPainActualWidth.ToString();
+                if (windowWidth > (MainLeftPainActualWidth - 24))
+                {
+                    lAttrs.Value = MainLeftPainActualWidth.ToString();
+                }
+                else
+                {
+                    lAttrs.Value = "241";
+                }
             }
             else
             {
-                lAttrs.Value = "241";
+                lAttrs.Value = MainLeftPainWidth.ToString();
             }
             leftpain.SetAttributeNode(lAttrs);
 

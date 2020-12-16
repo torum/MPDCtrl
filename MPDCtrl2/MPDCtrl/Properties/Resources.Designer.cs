@@ -988,6 +988,24 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   File に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongFilesListviewColumnHeader_File {
+            get {
+                return ResourceManager.GetString("SongFilesListviewColumnHeader_File", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Path に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SongFilesListviewColumnHeader_Path {
+            get {
+                return ResourceManager.GetString("SongFilesListviewColumnHeader_Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Add to Current Queue に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string SongsItemContextMenu_Add {

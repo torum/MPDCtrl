@@ -441,6 +441,12 @@ SOFTWARE.</value>
   <data name="SongFilesItemContextMenu_Add" xml:space="preserve">
     <value>Add to Current Queue</value>
   </data>
+  <data name="SongFilesListviewColumnHeader_File" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="SongFilesListviewColumnHeader_Path" xml:space="preserve">
+    <value>Path</value>
+  </data>
   <data name="SongsItemContextMenu_Add" xml:space="preserve">
     <value>Add to Current Queue</value>
   </data>

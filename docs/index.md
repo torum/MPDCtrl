@@ -37,10 +37,6 @@ __[Avalable at Micorsoft Store](https://www.microsoft.com/store/apps/9NV2BBJ82BR
 
 ![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v2/Settings.png?raw=true) 
 
-### MPDCtrl version 1.x
-
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v1/MPD-Ctrl_Screenshot1.png?raw=true)  
-
 ### MPDCtrl for mobile
 sometime in the future...
 

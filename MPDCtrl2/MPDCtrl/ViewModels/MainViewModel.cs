@@ -33,7 +33,6 @@ namespace MPDCtrl.ViewModels
     /// 
     /// v2.0.6 以降
     /// 
-    /// 
     /// Ctrl+F検索とFilesから直接プレイリストに追加できるように「プレイリストに追加」をコンテキストメニューで。"Save Selected to" context menu.
     /// 「プレイリストの名前変更」をインラインで。
     /// "今すぐ再生"メニューを追加。
@@ -53,7 +52,8 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
-    /// v2.0.5.2 起動時にデフォルトのMPDに接続出来なかった際に、表示崩れが起きる件。（サイドバーの幅とカラムヘッダーの表示・非表示）Fix
+    /// v2.0.5.3 バインディングエラーを一つfix。
+    /// v2.0.5.2 起動時にデフォルトのMPDに接続出来なかった際に、表示崩れが起きる件。（サイドバーの幅とカラムヘッダーの表示・非表示）Fix。
     /// v2.0.5.1 File と Path の翻訳もれ。
     /// v2.0.5  AlbumArt対応版としてstore公開。
     /// v2.0.4.3 キューのリストビューの本体にクリアメニューを追加。AlbumCoverのファイルサイズをMax 300Kに設定。
@@ -109,7 +109,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.5.2";
+        const string _appVer = "v2.0.5.3";
 
         public string AppVer
         {

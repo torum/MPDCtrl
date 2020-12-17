@@ -922,7 +922,7 @@
                                     </GridView.ColumnHeaderContainerStyle>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderPositionWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Position}" Tag="53" MinWidth="32" Visibility="{Binding Path=DataContext.QueueColumnHeaderPositionVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Position}" Tag="53" MinWidth="32" Visibility="{Binding Path=QueueColumnHeaderPositionVisibility, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>

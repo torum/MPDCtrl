@@ -222,7 +222,7 @@
             </Grid>
 
             <!-- メイン画面 -->
-            <Grid Grid.Row="1" Visibility="{Binding IsMainShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+            <Grid Grid.Row="1" Visibility="{Binding IsMainShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="0"/>
                     <RowDefinition Height="Auto"/>
@@ -922,7 +922,7 @@
                                     </GridView.ColumnHeaderContainerStyle>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderPositionWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Position}" Tag="53" MinWidth="32" Visibility="{Binding Path=QueueColumnHeaderPositionVisibility, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Position}" Tag="{Binding QueueColumnHeaderPositionWidthRestore, Mode=TwoWay}" MinWidth="32"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -933,7 +933,7 @@
                                     </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderNowPlayingWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Tag="32" MinWidth="32" Visibility="{Binding QueueColumnHeaderNowPlayingVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True">
+                                        <GridViewColumnHeader Tag="{Binding QueueColumnHeaderNowPlayingWidthRestore, Mode=TwoWay}" MinWidth="32">
                                             <Viewbox Width="16" Height="16" Margin="-2 0 0 -2">
                                                 <Canvas Width="24" Height="24">
                                                     <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="M8.5,8.64L13.77,12L8.5,15.36V8.64M6.5,5V19L17.5,12"/>
@@ -957,7 +957,7 @@
                                     </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderTitleWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Title}" Tag="180" MinWidth="120" />
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Title}" Tag="{Binding QueueColumnHeaderTitleWidthRestore, Mode=TwoWay}" MinWidth="120"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -977,7 +977,7 @@
                                     </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderTimeWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Time}" Tag="62" MinWidth="62" Visibility="{Binding QueueColumnHeaderTimeVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Time}" Tag="{Binding QueueColumnHeaderTimeWidthRestore, Mode=TwoWay}" MinWidth="62"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -997,7 +997,7 @@
                                     </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderArtistWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Artist}" Tag="120" MinWidth="62" Visibility="{Binding QueueColumnHeaderArtistVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Artist}" Tag="{Binding QueueColumnHeaderArtistWidthRestore, Mode=TwoWay}" MinWidth="62"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -1017,7 +1017,7 @@
                                     </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderAlbumWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Album}" Tag="120" MinWidth="62" Visibility="{Binding QueueColumnHeaderAlbumVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Album}" Tag="{Binding QueueColumnHeaderAlbumWidthRestore, Mode=TwoWay}" MinWidth="62"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -1037,7 +1037,7 @@
                                     </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderGenreWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Genre}" Tag="100" MinWidth="62" Visibility="{Binding QueueColumnHeaderGenreVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Genre}" Tag="{Binding QueueColumnHeaderGenreWidthRestore, Mode=TwoWay}" MinWidth="62"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -1057,7 +1057,7 @@
                                     </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderLastModifiedWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
-                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_LastModified}" Tag="180" MinWidth="62" Visibility="{Binding QueueColumnHeaderLastModifiedVisibility, Converter={StaticResource BooleanToVisibilityConverter}}" helpers:GridViewBehaviours.CollapseableColumn="True"/>
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_LastModified}" Tag="{Binding QueueColumnHeaderLastModifiedWidthRestore, Mode=TwoWay}" MinWidth="62"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -1116,7 +1116,7 @@
             </Grid>
 
             <!-- 初期設定兼再接続画面 -->
-            <Grid Grid.Row="1" Background="{DynamicResource BoardBackgroundColorBrush}" Visibility="{Binding IsConnectionSettingShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+            <Grid Grid.Row="1" Background="{DynamicResource BoardBackgroundColorBrush}" Visibility="{Binding IsConnectionSettingShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="0"/>
                     <RowDefinition Height="35*"/>
@@ -1171,7 +1171,7 @@
 
                 <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="top">
 
-                    <ComboBox Style="{StaticResource ComboBoxFlatStyle}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding CurrentProfile}" HorizontalAlignment="Center" Tag="New Profile"  Visibility="{Binding IsCurrentProfileSet, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                    <ComboBox Style="{StaticResource ComboBoxFlatStyle}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" HorizontalAlignment="Center" Tag="New Profile" Visibility="{Binding IsCurrentProfileSet, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -1213,7 +1213,23 @@
                         </TextBox.Style>
                     </TextBox>
 
+                    <TextBlock Text="{x:Static properties:Resources.Password}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
 
+                    <StackPanel Visibility="{Binding IsNotPasswordSet, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                        <PasswordBox x:Name="PasswordBoxNew" Style="{StaticResource DefaultPasswordBoxStyle}" PasswordChar="*" Width="240"></PasswordBox>
+                    </StackPanel>
+                    <StackPanel Visibility="{Binding IsPasswordSet, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" Orientation="Horizontal">
+                        <TextBlock Text="{Binding Password}" Width="198" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{DynamicResource DefaultTextBlockStyle}"></TextBlock>
+                        <Button Margin="12 -14 0 0" Width="30" Height="30" Style="{DynamicResource PathButton}" Command="{Binding ShowChangePasswordDialogCommand}" CommandParameter="{Binding ElementName=PasswordBoxNew}" ToolTip="{x:Static properties:Resources.Settings_UnlockAndChangePassword}" Content="M12,17C10.89,17 10,16.1 10,15C10,13.89 10.89,13 12,13A2,2 0 0,1 14,15A2,2 0 0,1 12,17M18,20V10H6V20H18M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10C4,8.89 4.89,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"></Button>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0 12 0 0">
+
+                        <Button Content="{x:Static properties:Resources.Connect}" IsEnabled="{Binding Path=IsNotConnectingNorConnected}" Command="{Binding ChangeConnectionProfileCommand}" CommandParameter="{Binding ElementName=PasswordBoxNew}" Padding="4" Width="100" IsDefault="True"></Button>
+
+                    </StackPanel>
+
+                    <!--
                     <TextBlock Text="{x:Static properties:Resources.Password}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
                     <PasswordBox x:Name="PasswordBoxNew" PasswordChar="*" Style="{DynamicResource DefaultPasswordBoxStyle}" Width="240">
                     </PasswordBox>
@@ -1221,13 +1237,15 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 24 0 0">
                         <Button Content="{x:Static properties:Resources.Connect}" IsDefault="True" IsEnabled="{Binding Path=IsNotConnectingNorConnected}" Command="{Binding ConnectCommand}" CommandParameter="{Binding ElementName=PasswordBoxNew}" Padding="4" Width="100"></Button>
                     </StackPanel>
+                    
+                    -->
 
                 </StackPanel>
 
             </Grid>
 
             <!-- 設定画面 -->
-            <Grid Grid.Row="1" Visibility="{Binding IsSettingsShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+            <Grid Grid.Row="1" Visibility="{Binding IsSettingsShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="0"/>
                     <RowDefinition Height="*"/>
@@ -1404,7 +1422,7 @@
                                                     <PasswordBox x:Name="PasswordBox" Style="{StaticResource DefaultPasswordBoxStyle}" PasswordChar="*" Width="240"></PasswordBox>
                                                 </StackPanel>
                                                 <StackPanel Visibility="{Binding IsPasswordSet, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding Password}" Width="198" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBlock>
+                                                    <TextBlock Text="{Binding Password}" Width="198" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{DynamicResource DefaultTextBlockStyle}"></TextBlock>
                                                     <Button Margin="12 -14 0 0" Width="30" Height="30" Style="{DynamicResource PathButton}" Command="{Binding ShowChangePasswordDialogCommand}" CommandParameter="{Binding ElementName=PasswordBox}" ToolTip="{x:Static properties:Resources.Settings_UnlockAndChangePassword}" Content="M12,17C10.89,17 10,16.1 10,15C10,13.89 10.89,13 12,13A2,2 0 0,1 14,15A2,2 0 0,1 12,17M18,20V10H6V20H18M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10C4,8.89 4.89,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"></Button>
                                                 </StackPanel>
                                                 

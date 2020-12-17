@@ -1015,6 +1015,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Updating db... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StatusMsg_UpdatingDb {
+            get {
+                return ResourceManager.GetString("StatusMsg_UpdatingDb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Update に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Update {

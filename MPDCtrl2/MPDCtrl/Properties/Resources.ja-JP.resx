@@ -453,6 +453,9 @@ SOFTWARE.</value>
   <data name="SongsItemContextMenu_Add" xml:space="preserve">
     <value>現在のキューに追加</value>
   </data>
+  <data name="StatusMsg_UpdatingDb" xml:space="preserve">
+    <value>データベースを更新中・・・</value>
+  </data>
   <data name="Update" xml:space="preserve">
     <value>更新</value>
   </data>

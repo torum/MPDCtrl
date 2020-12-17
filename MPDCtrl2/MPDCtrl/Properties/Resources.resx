@@ -450,6 +450,9 @@ SOFTWARE.</value>
   <data name="SongsItemContextMenu_Add" xml:space="preserve">
     <value>Add to Current Queue</value>
   </data>
+  <data name="StatusMsg_UpdatingDb" xml:space="preserve">
+    <value>Updating db...</value>
+  </data>
   <data name="Update" xml:space="preserve">
     <value>Update</value>
   </data>

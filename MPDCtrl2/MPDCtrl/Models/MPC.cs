@@ -285,6 +285,17 @@ namespace MPDCtrl.Models
                 }
             }
 
+            public void Reset()
+            {
+                _volume = 0;
+                _repeat = false;
+                _random = false;
+                _consume = false;
+                _songID = "";
+                _songTime = 0;
+                _songElapsed = 0;
+            }
+
         }
 
         public class AlbumCover
@@ -309,6 +320,7 @@ namespace MPDCtrl.Models
         public enum MpdErrorTypes
         {
             CommandError, //ACK
+            ConnectionError,
             StatusError, //[status] eg. "error: Failed to open audio output"
             ErrorClear, //
         }
@@ -447,6 +459,7 @@ namespace MPDCtrl.Models
             _asyncClient.DataBinaryReceived += new TCPC.delDataBinaryReceived(TCPClient_DataBinaryReceived);
             _asyncClient.DataSent += new TCPC.delDataSent(TCPClient_DataSent);
             _asyncClient.ConnectionStatusChanged += new TCPC.delConnectionStatusChanged(TCPClient_ConnectionStatusChanged);
+            _asyncClient.ConnectionError += new TCPC.delConnectionError(TCPClient_ConnectionError);
         }
 
         #region == MPC Commands ==   
@@ -455,6 +468,8 @@ namespace MPDCtrl.Models
         {
             try
             {
+                _status.Reset();
+
                 ConnectionResult isDone = await _asyncClient.Connect(IPAddress.Parse(_host), _port);
 
                 if (!isDone.isSuccess)
@@ -1524,6 +1539,10 @@ namespace MPDCtrl.Models
         private async void TCPClient_ConnectionStatusChanged(TCPC sender, TCPC.ConnectionStatus status)
         {
             await Task.Run(() => { ConnectionStatusChanged?.Invoke(this, status); });
+        }
+        private async void TCPClient_ConnectionError(TCPC sender, string data)
+        {
+            await Task.Run(() => { ErrorReturned?.Invoke(this, MpdErrorTypes.ConnectionError, data); });
         }
 
         private async void TCPClient_DataSent(TCPC sender, object data)

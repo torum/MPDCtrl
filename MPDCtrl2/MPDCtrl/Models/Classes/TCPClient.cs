@@ -29,8 +29,6 @@ namespace MPDCtrl.Models.Classes
             NeverConnected,
             Connecting,
             Connected,
-            MpdOK,
-            MpdAck,
             AutoReconnecting,
             DisconnectedByUser,
             DisconnectedByHost,
@@ -70,6 +68,8 @@ namespace MPDCtrl.Models.Classes
         public event delConnectionStatusChanged ConnectionStatusChanged;
         public delegate void delDataSent(TCPC sender, object data);
         public event delDataSent DataSent;
+        public delegate void delConnectionError(TCPC sender, string data);
+        public event delConnectionError ConnectionError;
         #endregion
 
         public ConnectionStatus ConnectionState
@@ -84,7 +84,8 @@ namespace MPDCtrl.Models.Classes
                 _ConStat = value;
 
                 if (raiseEvent)
-                    Task.Run(() => { ConnectionStatusChanged?.Invoke(this, _ConStat); });
+                    //Task.Run(() => { ConnectionStatusChanged?.Invoke(this, _ConStat); });
+                    ConnectionStatusChanged?.Invoke(this, _ConStat);
             }
         }
 
@@ -124,6 +125,8 @@ namespace MPDCtrl.Models.Classes
 
             try
             {
+                System.Diagnostics.Debug.WriteLine("**_TCP.Close()...");
+
                 _TCP.Close();
             }
             catch { }
@@ -133,6 +136,8 @@ namespace MPDCtrl.Models.Classes
             _TCP.SendTimeout = 5000;
             _TCP.Client.ReceiveTimeout = System.Threading.Timeout.Infinite;
             //_TCP.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+
+            System.Diagnostics.Debug.WriteLine("**DoConnect...");
 
             ConnectionResult r = await DoConnect(_ip, _p);
 
@@ -151,6 +156,7 @@ namespace MPDCtrl.Models.Classes
             {
                 System.Diagnostics.Debug.WriteLine("**Error@DoConnect: SocketException " + ex.Message);
                 ConnectionState = ConnectionStatus.Error;
+                ConnectionError?.Invoke(this, ex.Message);
 
                 r.isSuccess = false;
                 r.errorMessage = ex.Message + " (SocketException)";
@@ -160,6 +166,7 @@ namespace MPDCtrl.Models.Classes
             {
                 System.Diagnostics.Debug.WriteLine("**Error@DoConnect: Exception " + ex.Message);
                 ConnectionState = ConnectionStatus.Error;
+                ConnectionError?.Invoke(this, ex.Message);
 
                 r.isSuccess = false;
                 r.errorMessage = ex.Message + " (Exception)";
@@ -167,6 +174,8 @@ namespace MPDCtrl.Models.Classes
             }
 
             ConnectionState = ConnectionStatus.Connected;
+
+            //System.Diagnostics.Debug.WriteLine("**Connected...");
 
             Receive(_TCP.Client);
 
@@ -192,6 +201,7 @@ namespace MPDCtrl.Models.Classes
             {
                 System.Diagnostics.Debug.WriteLine("Error@Receive" + ex.ToString());
                 ConnectionState = ConnectionStatus.Error;
+                ConnectionError?.Invoke(this, ex.Message);
             }
         }
 
@@ -268,6 +278,7 @@ namespace MPDCtrl.Models.Classes
             {
                 System.Diagnostics.Debug.WriteLine("Error@ReceiveCallback: " + err.ToString() + ". " + ex.ToString() + ". ");
                 ConnectionState = ConnectionStatus.Error;
+                ConnectionError?.Invoke(this, ex.Message);
             }
         }
 
@@ -281,12 +292,14 @@ namespace MPDCtrl.Models.Classes
             {
                 DoSend(_TCP.Client, cmd);
             }
-            catch (IOException)
+            catch (IOException ex)
             {
                 //System.IO.IOException
                 //Unable to transfer data on the transport connection: An established connection was aborted by the software in your host machine.
 
                 System.Diagnostics.Debug.WriteLine("**Error@Send: IOException - TRYING TO RECONNECT.");
+
+                ConnectionError?.Invoke(this, ex.Message);
 
                 // Reconnect.
                 if (await ReConnect())
@@ -300,11 +313,13 @@ namespace MPDCtrl.Models.Classes
                 }
 
             }
-            catch (SocketException)
+            catch (SocketException ex)
             {
                 //System.Net.Sockets.SocketException
                 //An established connection was aborted by the software in your host machine
                 System.Diagnostics.Debug.WriteLine("**Error@Send: SocketException - TRYING TO RECONNECT.");
+                ConnectionState = ConnectionStatus.DisconnectedByHost;
+                ConnectionError?.Invoke(this, ex.Message);
 
                 // Reconnect.
                 if (await ReConnect())
@@ -314,13 +329,14 @@ namespace MPDCtrl.Models.Classes
                 else
                 {
                     System.Diagnostics.Debug.WriteLine("**Error@Send: SocketException - GIVING UP reconnect.");
-
+                    ConnectionState = ConnectionStatus.DisconnectedByHost;
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("**Error@Send: " + ex.Message);
 
+                ConnectionError?.Invoke(this, ex.Message);
             }
         }
 
@@ -339,6 +355,7 @@ namespace MPDCtrl.Models.Classes
             {
                 System.Diagnostics.Debug.WriteLine("Error@DoSend" + ex.ToString());
                 ConnectionState = ConnectionStatus.Error;
+                ConnectionError?.Invoke(this, ex.Message);
             }
         }
 
@@ -356,6 +373,7 @@ namespace MPDCtrl.Models.Classes
             {
                 System.Diagnostics.Debug.WriteLine("Error@SendCallback" + ex.ToString());
                 ConnectionState = ConnectionStatus.Error;
+                ConnectionError?.Invoke(this, ex.Message);
             }
         }
 

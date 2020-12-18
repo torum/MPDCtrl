@@ -324,6 +324,99 @@
                     </Style>
 
                 </ResourceDictionary>
+                
+                <!-- SystemButton -->
+                <ResourceDictionary>
+
+                    <Style x:Key="PathSysButton" TargetType="Button">
+                        <Setter Property="OverridesDefaultStyle" Value="true" />
+                        <Setter Property="SnapsToDevicePixels" Value="true" />
+                        <Setter Property="RenderOptions.EdgeMode" Value="Unspecified" />
+                        <Setter Property="IsTabStop" Value="False" />
+                        <Setter Property="Opacity" Value="1" />
+                        <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+                        <Setter Property="Width" Value="46" />
+                        <Setter Property="Height" Value="32" />
+                        <Setter Property="FocusVisualStyle" Value="{DynamicResource ButtonFocusVisual}" />
+                        <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
+                        <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="Border" TextBlock.Foreground="{DynamicResource ControlForegroundColorBrush}" Background="{TemplateBinding Background}" CornerRadius="0" BorderThickness="0">
+                                        <Border.BorderBrush>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <LinearGradientBrush.GradientStops>
+                                                    <GradientStopCollection>
+                                                        <GradientStop Color="{DynamicResource BorderLightColor}" Offset="0.0" />
+                                                        <GradientStop Color="{DynamicResource BorderDarkColor}" Offset="1.0" />
+                                                    </GradientStopCollection>
+                                                </LinearGradientBrush.GradientStops>
+                                            </LinearGradientBrush>
+                                        </Border.BorderBrush>
+
+                                        <Viewbox Width="32" Height="32">
+                                            <Path x:Name="PathIcon" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform" Stroke="Transparent" StrokeThickness="0" Margin="13" RenderTransformOrigin="0.5,0.5">
+                                                <Path.RenderTransform>
+                                                    <TransformGroup>
+                                                        <TransformGroup.Children>
+                                                            <RotateTransform Angle="0" />
+                                                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                                                        </TransformGroup.Children>
+                                                    </TransformGroup>
+                                                </Path.RenderTransform>
+                                                <Path.Fill>
+                                                    <SolidColorBrush x:Name="PathIconColor" Color="{DynamicResource ControlForegroundColor}"/>
+                                                </Path.Fill>
+                                            </Path>
+                                        </Viewbox>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="true">
+                                            <!--
+                                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource ControlMouseOverBackgroundColorBrush}"></Setter>
+                                            -->
+                                            <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
+                                        </Trigger>
+
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsPressed" Value="False" />
+                                                <Condition Property="IsMouseOver" Value="True" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}">
+                                                <!--
+                                                <Setter.Value>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                        <GradientBrush.GradientStops>
+                                                            <GradientStopCollection>
+                                                                <GradientStop Color="{DynamicResource ControlMouseOverColor}" Offset="0.0" />
+                                                                <GradientStop Color="{DynamicResource ControlDarkColor}" Offset="1.0" />
+                                                            </GradientStopCollection>
+                                                        </GradientBrush.GradientStops>
+                                                    </LinearGradientBrush>
+                                                </Setter.Value>
+                                                -->
+                                            </Setter>
+                                        </MultiTrigger>
+
+                                        <MultiTrigger>
+                                            <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlPressedColorBrush}"/>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsPressed" Value="true" />
+                                                <Condition Property="IsMouseOver" Value="True" />
+                                            </MultiTrigger.Conditions>
+
+                                        </MultiTrigger>
+
+                                    </ControlTemplate.Triggers>
+
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+
+                </ResourceDictionary>
 
                 <!-- PathToggleButton -->
                 <ResourceDictionary>
@@ -1664,16 +1757,21 @@
                                             </VisualStateGroup>
                                         </VisualStateManager.VisualStateGroups>
                                         -->
-                                        <Path x:Name="Arrow"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Data="{Binding Content, 
-                                            RelativeSource={RelativeSource TemplatedParent}}" >
-                                            <Path.Fill>
-                                                <SolidColorBrush Color="Gainsboro"/>
-                                            </Path.Fill>
+                                        <Path x:Name="Arrow" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" >
                                         </Path>
                                     </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="true">
+                                            <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}" />
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="true">
+                                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource ScrollBarPressedBrush}" />
+                                            <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource ControlPressedColorBrush}" />
+                                        </Trigger>
+                                        <Trigger Property="IsEnabled" Value="false">
+                                            <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource ScrollBarDisabledBrush}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
@@ -1735,16 +1833,22 @@
                                             </VisualStateGroup>
                                         </VisualStateManager.VisualStateGroups>
                                         -->
-                                        <Path x:Name="Arrow"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Data="{Binding Content, 
-                                            RelativeSource={RelativeSource TemplatedParent}}" >
-                                            <Path.Fill>
-                                                <SolidColorBrush Color="Gainsboro"/>
-                                            </Path.Fill>
+                                        <Path x:Name="Arrow" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" >
                                         </Path>
                                     </Border>
+
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="true">
+                                            <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}" />
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="true">
+                                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource ScrollBarPressedBrush}" />
+                                            <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource ControlPressedColorBrush}" />
+                                        </Trigger>
+                                        <Trigger Property="IsEnabled" Value="false">
+                                            <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource ScrollBarDisabledBrush}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
@@ -1825,6 +1929,16 @@
                                 <Setter Property="Foreground" Value="{DynamicResource BoardBackgroundColorBrush}" />
                                 <Setter Property="TextElement.FontWeight" Value="Bold"/>
                             </Trigger>
+
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsSelected" Value="True" />
+                                    <Condition Property="IsFocused" Value="False" />
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" Value="Gray" />
+                                <Setter Property="Foreground" Value="{DynamicResource BoardBackgroundColorBrush}" />
+                                <Setter Property="TextElement.FontWeight" Value="Bold"/>
+                            </MultiTrigger>
                         </Style.Triggers>
                     </Style>
 
@@ -2498,7 +2612,7 @@
                                                         <RepeatButton Style="{StaticResource ScrollBarTrackStyle}" Command="ScrollBar.PageDownCommand" />
                                                     </Track.IncreaseRepeatButton>
                                                 </Track>
-                                                <RepeatButton Grid.Row="2" Style="{StaticResource ScrollBarRepeatButtonStyle}" Height="{StaticResource ScrollBarRepeatButtonSize}"  Command="ScrollBar.LineDownCommand"  Content="M 0 0 L 4 4 L 8 0 Z"/>
+                                                <RepeatButton Grid.Row="2" Style="{StaticResource ScrollBarRepeatButtonStyle}" Height="{StaticResource ScrollBarRepeatButtonSize}" Command="ScrollBar.LineDownCommand"  Content="M 0 0 L 4 4 L 8 0 Z"/>
                                             </Grid>
                                         </ControlTemplate>
                                     </Setter.Value>

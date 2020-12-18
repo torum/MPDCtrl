@@ -25,7 +25,7 @@
         </Style>
     </Window.Style>
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="30" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"/>
+        <WindowChrome CaptionHeight="32" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"/>
     </WindowChrome.WindowChrome>
     <Window.InputBindings>
         <KeyBinding Command="{Binding PlayCommand}" Key="Play" />
@@ -44,7 +44,7 @@
     <Border Style="{StaticResource WindowMainPanelStyle}">
         <Grid Background="{DynamicResource BoardBackgroundColorBrush}">
             <Grid.RowDefinitions>
-                <RowDefinition Height="27"/>
+                <RowDefinition Height="32"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -54,7 +54,7 @@
             <!-- アプリタイトルバー -->
             <Grid x:Name="AppTitleBar">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="27"/>
+                    <RowDefinition Height="32"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -103,7 +103,7 @@
                 </StackPanel>
 
                 <!-- Now Playing -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="80 0 0 0" Visibility="{Binding IsConnected, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                <StackPanel Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12 0 0 0" Visibility="{Binding IsConnected, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                     <TextBlock Style="{StaticResource DefaultTextBlockStyle}">
                         <TextBlock.Triggers>
                             <EventTrigger RoutedEvent="Binding.TargetUpdated">
@@ -168,7 +168,7 @@
                 <!-- System icons -->
                 <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right" Margin="0">
 
-                    <Button x:Name="SettingsButton" Style="{DynamicResource PathButton}" Width="27" Height="27" Margin="0" Opacity="0.7" Command="{Binding ShowSettingsCommand}" ToolTip="{x:Static properties:Resources.Settings_ToolTip}" WindowChrome.IsHitTestVisibleInChrome="True"
+                    <Button x:Name="SettingsButton" Style="{DynamicResource PathSysButton}" Command="{Binding ShowSettingsCommand}" ToolTip="{x:Static properties:Resources.Settings_ToolTip}" WindowChrome.IsHitTestVisibleInChrome="True"
                                 Content="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,
 8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,
 11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,
@@ -181,19 +181,19 @@
 18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z">
                     </Button>
 
-                    <Button x:Name="MinimizeButton" Style="{StaticResource PathButton}" Width="27" Height="27" Margin="0" Opacity="0.7" Click="MinimizeButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
+                    <Button x:Name="MinimizeButton" Style="{StaticResource PathSysButton}" Click="MinimizeButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
                         M20,14H4V10H20
                     </Button>
 
-                    <Button x:Name="RestoreButton" Style="{StaticResource PathButton}" Width="27" Height="27" Margin="0" Opacity="0.7" Click="RestoreButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
+                    <Button x:Name="RestoreButton" Style="{StaticResource PathSysButton}" Click="RestoreButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
                         M4,8H8V4H20V16H16V20H4V8M16,8V14H18V6H10V8H16M6,12V18H14V12H6Z
                     </Button>
 
-                    <Button x:Name="MaxButton" Style="{StaticResource PathButton}" Width="27" Height="27" Margin="0" Opacity="0.7" Click="MaxButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
+                    <Button x:Name="MaxButton" Style="{StaticResource PathSysButton}" Click="MaxButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
                         M4,4H20V20H4V4M6,8V18H18V8H6Z
                     </Button>
 
-                    <Button x:Name="CloseButton" Style="{StaticResource PathButton}" Width="27" Height="27" Margin="0" Opacity="0.7" Click="CloseButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
+                    <Button x:Name="CloseButton" Style="{StaticResource PathSysButton}" Click="CloseButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
                         M13.46,12L19,17.54V19H17.54L12,13.46L6.46,19H5V17.54L10.54,12L5,6.46V5H6.46L12,10.54L17.54,5H19V6.46L13.46,12Z
                     </Button>
 
@@ -340,7 +340,7 @@
                             </Button>
                         </Grid>
                         
-                        <Grid Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0 0 18 0" Width="30">
+                        <Grid Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0 0 16 0" Width="30">
                             <Slider x:Name="SliderVol" ToolTip="{x:Static properties:Resources.Playback_SliderVolume}" Style="{DynamicResource CustomSliderStyle}" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Stretch" IsMoveToPointEnabled="True" Maximum="100" Value="{Binding Volume}">
                             </Slider>
                         </Grid>
@@ -944,7 +944,7 @@
                                             <DataTemplate>
                                                 <Viewbox Width="16" Height="16">
                                                     <Canvas Width="24" Height="24">
-                                                        <Path x:Name="IsPlayingIcon" Fill="{DynamicResource PriceDownColorBrush}" Data="M8,5.14V19.14L19,12.14L8,5.14Z" Visibility="{Binding IsPlaying, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                                        <Path x:Name="IsPlayingIcon" Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Data="M8,5.14V19.14L19,12.14L8,5.14Z" Visibility="{Binding IsPlaying, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                                     </Canvas>
                                                 </Viewbox>
                                                 <DataTemplate.Triggers>
@@ -1102,15 +1102,41 @@
                     </Grid>
 
                 </Grid>
-
+                
                 <!-- StatusBar -->
                 <StatusBar Grid.Row="5" Background="Transparent" VerticalAlignment="Center">
-                    <Viewbox Width="16" Height="16">
-                        <Canvas Width="24" Height="24">
-                            <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding StatusButton}" />
-                        </Canvas>
-                    </Viewbox>
-                    <Label Content="{Binding StatusMessage}" Style="{DynamicResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="0" Padding="0"></Label>
+                    <Grid >
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Viewbox Grid.Column="0" Width="16" Height="16" Margin="0" Opacity="0.7">
+                            <Canvas Width="24" Height="24">
+                                <Path Fill="{DynamicResource ControlDarkColorBrush}" Data="{Binding StatusButton}" />
+                            </Canvas>
+                        </Viewbox>
+
+                        <Label Grid.Column="1" Content="{Binding CurrentProfile.Name}" Style="{DynamicResource DefaultLabelStyle}" Foreground="{DynamicResource ControlDarkColorBrush}" VerticalAlignment="Center" Margin="6 0 6 0" Padding="0" Opacity="0.7"></Label>
+                        
+                        <Label Grid.Column="2" Content="{Binding ConnectionStatusMessage}" Style="{DynamicResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="6 0 6 0" Padding="0"></Label>
+
+                        <Viewbox Grid.Column="3" Width="16" Height="16" Margin="0">
+                            <Canvas Width="24" Height="24">
+                                <Path Fill="{DynamicResource ControlDarkColorBrush}" Data="{Binding MpdStatusButton}"  Opacity="0.7"/>
+                            </Canvas>
+                        </Viewbox>
+
+                        <Label Grid.Column="4" Content="{Binding MpdStatusMessage}" Style="{DynamicResource DefaultLabelStyle}" VerticalAlignment="Center" Margin="6 0 6 0" Padding="0"></Label>
+
+                    </Grid>
+
                 </StatusBar>
 
             </Grid>
@@ -1152,7 +1178,7 @@
                         </Canvas>
                     </Viewbox>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding StatusMessage, NotifyOnTargetUpdated=True}" TextElement.Foreground="WhiteSmoke" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextElement.FontWeight="Bold" TextWrapping="WrapWithOverflow">
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding ConnectionStatusMessage, NotifyOnTargetUpdated=True}" TextElement.Foreground="WhiteSmoke" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextElement.FontWeight="Bold" TextWrapping="WrapWithOverflow">
                         <TextBlock.Triggers>
                             <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                 <BeginStoryboard>
@@ -1218,8 +1244,9 @@
                     <StackPanel Visibility="{Binding IsNotPasswordSet, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                         <PasswordBox x:Name="PasswordBoxNew" Style="{StaticResource DefaultPasswordBoxStyle}" PasswordChar="*" Width="240"></PasswordBox>
                     </StackPanel>
+                    
                     <StackPanel Visibility="{Binding IsPasswordSet, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" Orientation="Horizontal">
-                        <TextBlock Text="{Binding Password}" Width="198" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{DynamicResource DefaultTextBlockStyle}"></TextBlock>
+                        <TextBlock Text="{Binding Password}" Width="198" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{DynamicResource DefaultTextBlockStyle}" Height="{Binding ElementName=PasswordBoxNew,Path=ActualHeight}" Margin="1"></TextBlock>
                         <Button Margin="12 -14 0 0" Width="30" Height="30" Style="{DynamicResource PathButton}" Command="{Binding ShowChangePasswordDialogCommand}" CommandParameter="{Binding ElementName=PasswordBoxNew}" ToolTip="{x:Static properties:Resources.Settings_UnlockAndChangePassword}" Content="M12,17C10.89,17 10,16.1 10,15C10,13.89 10.89,13 12,13A2,2 0 0,1 14,15A2,2 0 0,1 12,17M18,20V10H6V20H18M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10C4,8.89 4.89,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"></Button>
                     </StackPanel>
 
@@ -1421,8 +1448,9 @@
                                                 <StackPanel Visibility="{Binding IsNotPasswordSet, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                                                     <PasswordBox x:Name="PasswordBox" Style="{StaticResource DefaultPasswordBoxStyle}" PasswordChar="*" Width="240"></PasswordBox>
                                                 </StackPanel>
+                                                
                                                 <StackPanel Visibility="{Binding IsPasswordSet, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding Password}" Width="198" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{DynamicResource DefaultTextBlockStyle}"></TextBlock>
+                                                    <TextBlock Text="{Binding Password}" Width="198" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{DynamicResource DefaultTextBlockStyle}" Height="{Binding ElementName=PasswordBox,Path=ActualHeight}" Margin="1"></TextBlock>
                                                     <Button Margin="12 -14 0 0" Width="30" Height="30" Style="{DynamicResource PathButton}" Command="{Binding ShowChangePasswordDialogCommand}" CommandParameter="{Binding ElementName=PasswordBox}" ToolTip="{x:Static properties:Resources.Settings_UnlockAndChangePassword}" Content="M12,17C10.89,17 10,16.1 10,15C10,13.89 10.89,13 12,13A2,2 0 0,1 14,15A2,2 0 0,1 12,17M18,20V10H6V20H18M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10C4,8.89 4.89,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"></Button>
                                                 </StackPanel>
                                                 
@@ -1434,7 +1462,7 @@
                                                 </StackPanel>
 
                                                 <StackPanel Orientation="Horizontal" Margin="0 12 0 0" HorizontalAlignment="Left">
-                                                    <TextBlock Width="240" Text="{Binding StatusMessage, NotifyOnTargetUpdated=True}" TextElement.Foreground="WhiteSmoke" TextAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextElement.FontWeight="Bold" TextWrapping="WrapWithOverflow">
+                                                    <TextBlock Width="240" Text="{Binding ConnectionStatusMessage, NotifyOnTargetUpdated=True}" TextElement.Foreground="WhiteSmoke" TextAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextElement.FontWeight="Bold" TextWrapping="WrapWithOverflow">
                                                         <TextBlock.Triggers>
                                                             <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                                                 <BeginStoryboard>

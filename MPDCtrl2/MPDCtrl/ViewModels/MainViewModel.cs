@@ -31,6 +31,9 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
+    /// 
+    /// SysButton styleを使う。(RepsCoreから)
+    /// 
     /// v2.0.7 以降
     /// 
     /// 翻訳のリソース、名前の整理と見直し。
@@ -49,11 +52,13 @@ namespace MPDCtrl.ViewModels
     /// レイアウト見直し（スプリッターのせい）GridSplitterが右に行き過ぎる問題。
     /// Queue: ScrollIntoView to NowPlaying (not selected item).「現在の曲へ」のコンテキストメニューを追加。イベントでitemを渡す？
     /// レイアウト大改造？ ３ペイン（上キューと下に２ペイン) + (Treeviewでプレイリストとディレクトリ纏める？？）
-    /// ステータスバーの右下で現在のprofileを表示してプルダウンで簡単に切り替えられるようにしたい。
+    /// タイトルバー右上かどこかで現在のprofileを表示してプルダウンで簡単に切り替えられるようにしたい。
+    /// ステータスバーの右下にStat？
 
 
     /// 更新履歴：
-    /// v2.0.5.4 沢山バグ潰した。 
+    /// v2.0.5.5 バイナリにともなって色々まとめて来てた処理をちゃんと処理するようにした。沢山変更し過ぎて忘れた。
+    /// v2.0.5.4 沢山バグ潰した。 カラムヘッダーの幅を指定するヘルパーは使わないシンプルな方法に変更。
     /// v2.0.5.3 バインディングエラーを一つfix。
     /// v2.0.5.2 起動時にデフォルトのMPDに接続出来なかった際に、表示崩れが起きる件。（サイドバーの幅とカラムヘッダーの表示・非表示）Fix。
     /// v2.0.5.1 File と Path の翻訳もれ。
@@ -111,7 +116,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.5.4";
+        const string _appVer = "v2.0.5.5";
 
         public string AppVer
         {
@@ -145,9 +150,9 @@ namespace MPDCtrl.ViewModels
 
         #region == 設定フォルダ関連 ==  
 
-        private string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        private string _appDataFolder;
-        private string _appConfigFilePath;
+        private static string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        private static string _appDataFolder;
+        private static string _appConfigFilePath;
 
         private bool _isFullyLoaded;
         public bool IsFullyLoaded
@@ -317,6 +322,8 @@ namespace MPDCtrl.ViewModels
                 if (_isMainShow)
                 {
                     IsMainRendered = true;
+
+                    RefreshColumnHeaderWidth();
                 }
             }
         }
@@ -897,17 +904,31 @@ namespace MPDCtrl.ViewModels
 
         #region == ステータス系 == 
 
-        private string _statusMessage;
-        public string StatusMessage
+        private string _connectionStatusMessage;
+        public string ConnectionStatusMessage
         {
             get
             {
-                return _statusMessage;
+                return _connectionStatusMessage;
             }
             set
             {
-                _statusMessage = value;
-                NotifyPropertyChanged("StatusMessage");
+                _connectionStatusMessage = value;
+                NotifyPropertyChanged("ConnectionStatusMessage");
+            }
+        }
+
+        private string _mpdStatusMessage;
+        public string MpdStatusMessage
+        {
+            get
+            {
+                return _mpdStatusMessage;
+            }
+            set
+            {
+                _mpdStatusMessage = value;
+                NotifyPropertyChanged("MpdStatusMessage");
             }
         }
 
@@ -982,15 +1003,16 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private static string _pathDefaultNoneButton = "";
+
         private static string _pathConnectingButton = "M11 14H9C9 9.03 13.03 5 18 5V7C14.13 7 11 10.13 11 14M18 11V9C15.24 9 13 11.24 13 14H15C15 12.34 16.34 11 18 11M7 4C7 2.89 6.11 2 5 2S3 2.89 3 4 3.89 6 5 6 7 5.11 7 4M11.45 4.5H9.45C9.21 5.92 8 7 6.5 7H3.5C2.67 7 2 7.67 2 8.5V11H8V8.74C9.86 8.15 11.25 6.5 11.45 4.5M19 17C20.11 17 21 16.11 21 15S20.11 13 19 13 17 13.89 17 15 17.89 17 19 17M20.5 18H17.5C16 18 14.79 16.92 14.55 15.5H12.55C12.75 17.5 14.14 19.15 16 19.74V22H22V19.5C22 18.67 21.33 18 20.5 18Z";
-        //private static string _pathConnectedButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
-        private static string _pathConnectedButton = "";
-        private static string _pathDisconnectedButton = "";
+        private static string _pathConnectedButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
+        //private static string _pathConnectedButton = "";
+        //private static string _pathDisconnectedButton = "";
         private static string _pathNewConnectionButton = "M20,4C21.11,4 22,4.89 22,6V18C22,19.11 21.11,20 20,20H4C2.89,20 2,19.11 2,18V6C2,4.89 2.89,4 4,4H20M8.5,15V9H7.25V12.5L4.75,9H3.5V15H4.75V11.5L7.3,15H8.5M13.5,10.26V9H9.5V15H13.5V13.75H11V12.64H13.5V11.38H11V10.26H13.5M20.5,14V9H19.25V13.5H18.13V10H16.88V13.5H15.75V9H14.5V14A1,1 0 0,0 15.5,15H19.5A1,1 0 0,0 20.5,14Z";
-        //private static string _pathErrorInfoButton = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z";
         private static string _pathErrorInfoButton = "M23,12L20.56,14.78L20.9,18.46L17.29,19.28L15.4,22.46L12,21L8.6,22.47L6.71,19.29L3.1,18.47L3.44,14.78L1,12L3.44,9.21L3.1,5.53L6.71,4.72L8.6,1.54L12,3L15.4,1.54L17.29,4.72L20.9,5.54L20.56,9.22L23,12M20.33,12L18.5,9.89L18.74,7.1L16,6.5L14.58,4.07L12,5.18L9.42,4.07L8,6.5L5.26,7.09L5.5,9.88L3.67,12L5.5,14.1L5.26,16.9L8,17.5L9.42,19.93L12,18.81L14.58,19.92L16,17.5L18.74,16.89L18.5,14.1L20.33,12M11,15H13V17H11V15M11,7H13V13H11V7";
 
-        private string _statusButton = _pathDisconnectedButton;
+        private string _statusButton = _pathDefaultNoneButton;
         public string StatusButton
         {
             get
@@ -1004,6 +1026,25 @@ namespace MPDCtrl.ViewModels
 
                 _statusButton = value;
                 NotifyPropertyChanged("StatusButton");
+            }
+        }
+
+        private static string _pathErrorMpdAckButton = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z";
+
+        private string _mpdStatusButton = _pathDefaultNoneButton;
+        public string MpdStatusButton
+        {
+            get
+            {
+                return _mpdStatusButton;
+            }
+            set
+            {
+                if (_mpdStatusButton == value)
+                    return;
+
+                _mpdStatusButton = value;
+                NotifyPropertyChanged("MpdStatusButton");
             }
         }
 
@@ -2215,6 +2256,7 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
+
         }
 
         #region == イベント ==
@@ -2701,7 +2743,7 @@ namespace MPDCtrl.ViewModels
             NotifyPropertyChanged("IsCurrentProfileSet");
             if (CurrentProfile == null)
             {
-                StatusMessage = MPDCtrl.Properties.Resources.Init_NewConnectionSetting;
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.Init_NewConnectionSetting;
                 StatusButton = _pathNewConnectionButton;
                 IsConnectionSettingShow = true;
             }
@@ -2721,9 +2763,23 @@ namespace MPDCtrl.ViewModels
         // 起動後画面が描画された時の処理
         public void OnContentRendered(object sender, EventArgs e)
         {
+            RefreshColumnHeaderWidth();
             IsFullyRendered = true;
         }
-        
+
+        public void RefreshColumnHeaderWidth()
+        {
+            if (QueueColumnHeaderPositionVisibility) QueueColumnHeaderPositionWidth = _queueColumnHeaderPositionWidthUser;
+            QueueColumnHeaderTitleWidth = _queueColumnHeaderTitleWidthUser;
+            if (QueueColumnHeaderNowPlayingVisibility) QueueColumnHeaderNowPlayingWidth = _queueColumnHeaderNowPlayingWidthUser;
+            if (QueueColumnHeaderTimeVisibility) QueueColumnHeaderTimeWidth = _queueColumnHeaderTimeWidthUser;
+            if (QueueColumnHeaderArtistVisibility) QueueColumnHeaderArtistWidth = _queueColumnHeaderArtistWidthUser;
+            if (QueueColumnHeaderAlbumVisibility) QueueColumnHeaderAlbumWidth = _queueColumnHeaderAlbumWidthUser;
+            if (QueueColumnHeaderGenreVisibility) QueueColumnHeaderGenreWidth = _queueColumnHeaderGenreWidthUser;
+            if (QueueColumnHeaderLastModifiedVisibility) QueueColumnHeaderLastModifiedWidth = _queueColumnHeaderLastModifiedWidthUser;
+
+        }
+
         // 終了時の処理
         public void OnWindowClosing(object sender, CancelEventArgs e)
         {
@@ -3174,6 +3230,16 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
+            try
+            {
+                if (IsConnected)
+                {
+                    _MPC.MpdStop = true;
+                    _MPC.MpdDisconnect();
+                }
+            }
+            catch { }
+
         }
 
         private void OnMpdConnected(MPC sender)
@@ -3181,6 +3247,11 @@ namespace MPDCtrl.ViewModels
             // got MPD ver.
 
             IsConnected = true;
+
+            //Debug.WriteLine("MPD OK");
+
+            //MpdStatusMessage = "MPD OK";
+            //MpdStatusButton = _pathConnectedButton;
         }
 
         // MPD changed nortifiation
@@ -3300,7 +3371,7 @@ namespace MPDCtrl.ViewModels
                         Queue.Remove(hoge);
                     }
 
-                    // 新しいリストの中から既存のリストにないものを追加
+                    // 新しいリストの中から既存のリストにないものを追加または更新
                     foreach (var sng in _MPC.CurrentQueue)
                     {
                         var fuga = Queue.FirstOrDefault(i => i.Id == sng.Id);
@@ -3308,7 +3379,6 @@ namespace MPDCtrl.ViewModels
                         {
                             // TODO:
                             fuga.Pos = sng.Pos;
-                            fuga.Index = sng.Index;
                             //fuga.Id = sng.Id; // 流石にIDは変わらないだろう。
                             fuga.LastModified = sng.LastModified;
                             //fuga.Time = sng.Time; // format exception が煩い。
@@ -3322,10 +3392,14 @@ namespace MPDCtrl.ViewModels
                             fuga.file = sng.file;
                             fuga.Genre = sng.Genre;
                             fuga.Track = sng.Track;
+
+                            //Queue.Move(fuga.Index, sng.Index);
+                            fuga.Index = sng.Index;
                         }
                         else
                         {
                             Queue.Add(sng);
+                            //Queue.Insert(sng.Index, sng);
                         }
                     }
 
@@ -3337,19 +3411,35 @@ namespace MPDCtrl.ViewModels
                         (curitem as MPC.SongInfo).IsPlaying = true;
 
                         // AlbumArt
-                        if (!String.IsNullOrEmpty((curitem as MPC.SongInfo).file))
+                        if (_MPC.AlbumArt.SongFilePath != curitem.file)
                         {
-                            _MPC.MpdQueryAlbumArt((curitem as MPC.SongInfo).file);
+                            IsAlbumArtVisible = false;
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                AlbumArt = _albumArtDefault;
+                            });
+
+                            if (!String.IsNullOrEmpty((curitem as MPC.SongInfo).file))
+                            {
+                                _MPC.MpdQueryAlbumArt((curitem as MPC.SongInfo).file);
+                            }
                         }
                     }
                     else
                     {
                         CurrentSong = null;
+
+                        IsAlbumArtVisible = false;
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            AlbumArt = _albumArtDefault;
+                        });
                     }
 
                     // 移動したりするとPosが変更されても順番が反映されないので、
                     var collectionView = CollectionViewSource.GetDefaultView(Queue);
                     collectionView.SortDescriptions.Add(new SortDescription("Index", ListSortDirection.Ascending));
+                    collectionView.Refresh();
                 });
 
                 IsBusy = false;
@@ -3429,7 +3519,7 @@ namespace MPDCtrl.ViewModels
             else if ((data as string) == "isUpdating_db")
             {
                 System.Diagnostics.Debug.WriteLine("OnMpdStatusUpdate: isUpdating_db");
-                StatusMessage = "Updating db...";
+                ConnectionStatusMessage = "Updating db...";
 
                 IsUpdatingMpdDb = true;
             }
@@ -3485,12 +3575,12 @@ namespace MPDCtrl.ViewModels
                 s = s.Replace("{} ", string.Empty);
                 s = s.Replace("[] ", string.Empty);
 
-                StatusMessage = MPDCtrl.Properties.Resources.MPD_CommandError + ": " + s; 
-                StatusButton = _pathErrorInfoButton;
+                MpdStatusMessage = MPDCtrl.Properties.Resources.MPD_CommandError + ": " + s;
+                MpdStatusButton = _pathErrorMpdAckButton;
             }
             else if (errType == MPC.MpdErrorTypes.ConnectionError)
             {
-                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectionError + ": " + (data as string);
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectionError + ": " + (data as string);
                 StatusButton = _pathErrorInfoButton;
 
                 IsConnected = false;
@@ -3498,17 +3588,18 @@ namespace MPDCtrl.ViewModels
             }
             else if (errType == MPC.MpdErrorTypes.StatusError)
             {
-                StatusMessage = MPDCtrl.Properties.Resources.MPD_StatusError + ": " + (data as string);
-                StatusButton = _pathErrorInfoButton;
+                MpdStatusMessage = MPDCtrl.Properties.Resources.MPD_StatusError + ": " + (data as string);
+                MpdStatusButton = _pathErrorMpdAckButton;
             }
             else if (errType == MPC.MpdErrorTypes.ErrorClear)
             {
-                StatusMessage = "";
-                StatusButton = _pathConnectedButton;
+                MpdStatusMessage = "";
+                MpdStatusButton = _pathDefaultNoneButton;
             }
             else
             {
-                StatusMessage = (data as string);
+                // TODO:
+                ConnectionStatusMessage = "Unknown error: " + (data as string);
                 StatusButton = _pathErrorInfoButton;
             }
         }
@@ -3520,7 +3611,7 @@ namespace MPDCtrl.ViewModels
             IsConnected = false;
             IsConnectionSettingShow = true;
 
-            StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectionError + ": " + (data as string);
+            ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectionError + ": " + (data as string);
             StatusButton = _pathErrorInfoButton;
         }
 
@@ -3533,7 +3624,8 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = false;
                 IsConnectionSettingShow = false;
 
-                StatusMessage = "";
+                Debug.WriteLine("ConnectionStatus_Connected");
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connected;
                 StatusButton = _pathConnectedButton;
             }
             else if (status == TCPC.ConnectionStatus.Connecting)
@@ -3541,7 +3633,8 @@ namespace MPDCtrl.ViewModels
                 IsConnected = false;
                 IsConnecting = true;
 
-                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connecting;
+                Debug.WriteLine("ConnectionStatus_Connecting");
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connecting;
                 StatusButton = _pathConnectingButton;
             }
             else if (status == TCPC.ConnectionStatus.AutoReconnecting)
@@ -3550,7 +3643,7 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = true;
                 IsConnectionSettingShow = true;
 
-                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Reconnecting;
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Reconnecting;
                 StatusButton = _pathConnectingButton;
             }
             else if (status == TCPC.ConnectionStatus.ConnectFail_Timeout)
@@ -3559,7 +3652,7 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = false;
                 IsConnectionSettingShow = true;
 
-                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectFail_Timeout;
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectFail_Timeout;
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == TCPC.ConnectionStatus.DisconnectedByHost)
@@ -3568,7 +3661,8 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = false;
                 IsConnectionSettingShow = true;
 
-                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_DisconnectedByHost;
+                Debug.WriteLine("ConnectionStatus_DisconnectedByHost");
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_DisconnectedByHost;
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == TCPC.ConnectionStatus.DisconnectedByUser)
@@ -3577,7 +3671,7 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = false;
                 IsConnectionSettingShow = true;
 
-                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_DisconnectedByUser;
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_DisconnectedByUser;
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == TCPC.ConnectionStatus.Error)
@@ -3588,7 +3682,7 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = false;
                 //IsConnectionSettingShow = true;
 
-                //StatusMessage = "Error..";
+                //ConnectionStatusMessage = "Error..";
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == TCPC.ConnectionStatus.SendFail_NotConnected)
@@ -3597,7 +3691,7 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = false;
                 IsConnectionSettingShow = true;
 
-                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_SendFail_NotConnected;
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_SendFail_NotConnected;
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == TCPC.ConnectionStatus.SendFail_Timeout)
@@ -3606,7 +3700,7 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = false;
                 IsConnectionSettingShow = true;
 
-                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_SendFail_Timeout;
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_SendFail_Timeout;
                 StatusButton = _pathErrorInfoButton;
             }
             else if (status == TCPC.ConnectionStatus.NeverConnected)
@@ -3615,7 +3709,7 @@ namespace MPDCtrl.ViewModels
                 IsConnecting = false;
                 IsConnectionSettingShow = true;
 
-                StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_NeverConnected;
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_NeverConnected;
                 StatusButton = _pathErrorInfoButton;
             }
         }
@@ -3682,8 +3776,7 @@ namespace MPDCtrl.ViewModels
         {
 
             StatusButton = _pathConnectingButton;
-
-            StatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connecting;
+            ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connecting;
 
             return await _MPC.MpdConnect();
         }
@@ -4572,7 +4665,7 @@ namespace MPDCtrl.ViewModels
         {
             if (IsConnecting) return;
 
-            //StatusMessage = "";
+            //ConnectionStatusMessage = "";
 
             if (IsSettingsShow)
             {
@@ -4868,6 +4961,7 @@ namespace MPDCtrl.ViewModels
             //if (SelectedProfile == null) return false;
             if (string.IsNullOrWhiteSpace(Host)) return false;
             if (String.IsNullOrEmpty(Host)) return false;
+            if (IsConnecting) return false;
             return true;
         }
         public async void ChangeConnectionProfileCommand_Execute(object obj)
@@ -4881,8 +4975,8 @@ namespace MPDCtrl.ViewModels
 
             if (IsConnected)
             {
-                // TODO: MpdStop?
-                //_MPC.MpdDisconnect();
+                _MPC.MpdStop = true;
+                _MPC.MpdDisconnect();
             }
 
             // Validate Host input.
@@ -4953,43 +5047,11 @@ namespace MPDCtrl.ViewModels
             _MPC.MpdPort = _port;
             _MPC.MpdPassword = _password;
 
-
-            /*
-
-            SelectedProfile.Host = _host;
-            SelectedProfile.Port = _port;
-
-            // for Unbindable PasswordBox.
-            var passwordBox = obj as PasswordBox;
-            if (!String.IsNullOrEmpty(passwordBox.Password))
-            {
-                SelectedProfile.Password = passwordBox.Password;
-            }
-
-            if (SetIsDefault)
-            {
-                foreach (var p in Profiles)
-                {
-                    p.IsDefault = false;
-                }
-                SelectedProfile.IsDefault = true;
-            }
-            else
-            {
-                SelectedProfile.IsDefault = false;
-            }
-
-            SelectedProfile.Name = Host + ":" + _port.ToString();
-
-            CurrentProfile = SelectedProfile;
+            _MPC.MpdStop = false;
 
 
-            _MPC.MpdHost = CurrentProfile.Host;
-            _MPC.MpdPort = CurrentProfile.Port;
-            _MPC.MpdPassword = CurrentProfile.Password;
-
-            */
-
+            IsConnecting = true; 
+            
             ConnectionResult r = await StartConnection();
 
             if (r.isSuccess)
@@ -5046,6 +5108,10 @@ namespace MPDCtrl.ViewModels
                 _MPC.MpdQueryPlaylists();
                 _MPC.MpdQueryListAll();
                 //
+            }
+            else
+            {
+                IsConnecting = false;
             }
 
         }
@@ -5509,8 +5575,4 @@ namespace MPDCtrl.ViewModels
 
     }
 
-    public enum SearchTags
-    {
-        Title, Artist, Album, Genre
-    }
 }

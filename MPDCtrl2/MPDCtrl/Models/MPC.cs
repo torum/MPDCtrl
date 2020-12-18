@@ -7,9 +7,6 @@
 /// https://www.musicpd.org/doc/html/protocol.html
 /// 
 /// 
-/// TODO:
-///  Socket exception > log.
-///
 /// Known issue:
 /// 
 /// Mopidy related:
@@ -173,7 +170,22 @@ namespace MPDCtrl.Models
             }
 
             // for sorting.
-            public int Index { get; set; }
+            private int _index;
+            public int Index
+            {
+                get
+                {
+                    return _index;
+                }
+                set
+                {
+                    if (_index == value)
+                        return;
+
+                    _index = value;
+                    this.NotifyPropertyChanged("Index");
+                }
+            }
         }
 
         public class SongInfo: Song
@@ -181,7 +193,23 @@ namespace MPDCtrl.Models
             // Queue specific
 
             public string Id { get; set; }
-            public string Pos { get; set; }
+
+            private string _pos;
+            public string Pos
+            {
+                get
+                {
+                    return _pos;
+                }
+                set
+                {
+                    if (_pos == value)
+                        return;
+
+                    _pos = value;
+                    this.NotifyPropertyChanged("Pos");
+                }
+            }
 
             private bool _isPlaying;
             public bool IsPlaying
@@ -470,18 +498,41 @@ namespace MPDCtrl.Models
             {
                 _status.Reset();
 
+                await Task.Run(() => {
+                    ConnectionStatusChanged?.Invoke(this, TCPC.ConnectionStatus.Connecting);
+                });
+
                 ConnectionResult isDone = await _asyncClient.Connect(IPAddress.Parse(_host), _port);
 
-                if (!isDone.isSuccess)
+                if (isDone.isSuccess)
                 {
-                    ErrorConnected?.Invoke(this, isDone.errorMessage);
+                    //
+                    /*
+                    await Task.Run(() => {
+                        ConnectionStatusChanged?.Invoke(this, TCPC.ConnectionStatus.Connected);
+                    });
+                    */
+                }
+                else
+                {
+                    await Task.Run(() => {
+                        ErrorConnected?.Invoke(this, isDone.errorMessage);
+                    });
+                    await Task.Run(() => {
+                        ErrorReturned?.Invoke(this, MpdErrorTypes.ConnectionError, isDone.errorMessage);
+                    });
                 }
 
                 return isDone;
             }
             catch (Exception ex)
             {
-                ErrorConnected?.Invoke(this, ex.Message);
+                await Task.Run(() => {
+                    ErrorConnected?.Invoke(this, ex.Message);
+                });
+                await Task.Run(() => {
+                    ErrorReturned?.Invoke(this, MpdErrorTypes.ConnectionError, ex.Message);
+                });
 
                 ConnectionResult err = new ConnectionResult();
                 err.isSuccess = false;
@@ -1494,16 +1545,13 @@ namespace MPDCtrl.Models
             }
         }
 
-        private async void MpdReQueryAlbumArt(string uri, int offset)
+        private void MpdReQueryAlbumArt(string uri, int offset)
         {
             if (string.IsNullOrEmpty(uri))
                 return;
 
-            // wait
-            await Task.Delay(100);
-
-            _albumCover.IsDownloading = true;
-            _albumCover.SongFilePath = uri;
+            //_albumCover.IsDownloading = true;
+            //_albumCover.SongFilePath = uri;
 
             uri = Regex.Escape(uri);
 
@@ -1557,14 +1605,13 @@ namespace MPDCtrl.Models
             if ((data as string).StartsWith("OK MPD"))
             {
                 // Connected.
+                await Task.Run(() => { Connected?.Invoke(this); });
 
                 //TODO: Needs to be tested.
                 MpdSendPassword();
 
-                //
-                await Task.Run(() => { Connected?.Invoke(this); });
-
             }
+            /*
             else if ((data as string).StartsWith("ACK"))
             {
                 // Ignore "ACK [50@1] {albumart} No file exists"
@@ -1581,6 +1628,7 @@ namespace MPDCtrl.Models
 
                 return;
             }
+            */
             else
             {
                 await Task.Run(() => { IsBusy?.Invoke(this, true); });
@@ -1595,9 +1643,46 @@ namespace MPDCtrl.Models
         {
             await Task.Run(() => { DataReceived?.Invoke(this, "[binary data respose should follow]"); });
 
+            string res = Encoding.Default.GetString(data, 0, data.Length);
+
+            int gabPre = 0;
+            int gabAfter = 0;
+            bool found = false;
+
+            List<string> values = res.Split("OK\n").ToList();
+
+            if (values.Count > 0)
+            {
+                foreach (var val in values)
+                {
+                    if (!val.StartsWith("size: "))
+                    {
+                        if (found)
+                            gabAfter = gabAfter + val.Length;
+                        else
+                            gabPre = gabPre + val.Length;
+
+                        if (val != "") 
+                            TCPClient_DataReceived(sender, val);
+                    }
+                    else if (val.StartsWith("size: "))
+                    {
+                        found = true;
+                    }
+                }
+
+                BinaryDataReceived_ParseData(data, gabPre, gabAfter);
+            }
+
+        }
+
+        private async void BinaryDataReceived_ParseData(byte[] data, int gabPre, int gabAfter)
+        {
+            if (MpdStop) return;
+
             if (data.Length > 300000) //2000000000
             {
-                System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary file too big.");
+                System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary file too big: " + data.Length.ToString());
 
                 _albumCover.IsDownloading = false;
                 return;
@@ -1619,21 +1704,21 @@ namespace MPDCtrl.Models
                 return;
             }
 
-            string res = Encoding.Default.GetString(data, 0, data.Length);
-            List<string> values = res.Split('\n').ToList();
-
             string debug = "";
-            int gabStart = 0;
-            int gabEnd = 0;
+            int gabStart = gabPre;
+            int gabEnd = gabAfter;
 
             int binSize = 0;
             int binResSize = 0;
+
+            string res = Encoding.Default.GetString(data, 0, data.Length);
+
+            List<string> values = res.Split('\n').ToList();
 
             foreach (var val in values)
             {
                 if (val.StartsWith("size: "))
                 {
-                    //System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: size: " + val);
                     gabStart = gabStart + val.Length + 1;
 
                     List<string> s = val.Split(':').ToList();
@@ -1641,7 +1726,7 @@ namespace MPDCtrl.Models
                     {
                         if (Int32.TryParse(s[1], out int i))
                         {
-                            binSize =  i;
+                            binSize = i;
                         }
                     }
 
@@ -1649,7 +1734,6 @@ namespace MPDCtrl.Models
                 }
                 else if (val.StartsWith("binary: "))
                 {
-                    //System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary: " + val);
                     gabStart = gabStart + val.Length + 1;
 
                     List<string> s = val.Split(':').ToList();
@@ -1660,17 +1744,19 @@ namespace MPDCtrl.Models
                             binResSize = i;
                         }
                     }
+
                     debug = debug + Environment.NewLine + val + Environment.NewLine + "[binary data]";
                 }
                 else if (val.StartsWith("OK"))
                 {
-                    //System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: OK: " + val);
                     gabEnd = gabEnd + val.Length + 1;
 
                     debug = debug + Environment.NewLine + val;
                 }
                 else
                 {
+                    // should be binary...
+
                     if (string.IsNullOrWhiteSpace(val))
                     {
                         //System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: IsNullOrWhiteSpace: " + val);
@@ -1686,11 +1772,11 @@ namespace MPDCtrl.Models
                 }
             }
 
-            if (binSize > 300000) 
+            if (binSize > 300000)
             {
-                System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary file too big.");
+                System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary file too big: " + binSize.ToString());
 
-                await Task.Run(() => { DataReceived?.Invoke(this, "[binary file too big. (binSize > 300000) Max 300kb]"); });
+                await Task.Run(() => { DataReceived?.Invoke(this, "[binary file too big. (Size > 300000) Max 300kb]: " +  binSize.ToString()); });
 
                 _albumCover.IsDownloading = false;
                 return;
@@ -1772,49 +1858,71 @@ namespace MPDCtrl.Models
 
                 try
                 {
-                    // 今回受け取ったバイナリ用にバイトアレイをイニシャライズ
-                    byte[] resBinary = new byte[data.Length - gabStart - gabEnd];
-                    // 今回受け取ったバイナリをresBinaryへコピー
-                    Array.Copy(data, gabStart, resBinary, 0, resBinary.Length);
+                    try
+                    {
+                        // 今回受け取ったバイナリ用にバイトアレイをイニシャライズ
+                        byte[] resBinary = new byte[data.Length - gabStart - gabEnd];
+                        // 今回受け取ったバイナリをresBinaryへコピー
+                        Array.Copy(data, gabStart, resBinary, 0, resBinary.Length);
 
-                    // 既存のチャンクに追加する為の新たなバイトアレイをイニシャライズ
-                    byte[] appended = new byte[_albumCover.BinaryData.Length + resBinary.Length];
-                    // 既存のチャンクバイナリをappendedへコピー
-                    Array.Copy(_albumCover.BinaryData, 0, appended, 0, _albumCover.BinaryData.Length);
-                    // 今回受け取ったバイナリをappendedへコピー
-                    Array.Copy(resBinary, 0, appended, _albumCover.BinaryData.Length, resBinary.Length);
+                        // 既存のチャンクに追加する為の新たなバイトアレイをイニシャライズ
+                        byte[] appended = new byte[_albumCover.BinaryData.Length + resBinary.Length];
+                        // 既存のチャンクバイナリをappendedへコピー
+                        Array.Copy(_albumCover.BinaryData, 0, appended, 0, _albumCover.BinaryData.Length);
+                        // 今回受け取ったバイナリをappendedへコピー
+                        Array.Copy(resBinary, 0, appended, _albumCover.BinaryData.Length, resBinary.Length);
 
-                    _albumCover.BinaryData = appended;
+                        _albumCover.BinaryData = appended;
+
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived (a): " + ex.Message);
+
+                        _albumCover.IsDownloading = false;
+                        return;
+                    }
 
                     if (binSize != _albumCover.BinaryData.Length)
                     {
                         //System.Diagnostics.Debug.WriteLine("Trying again for the rest of binary data.");
 
                         MpdReQueryAlbumArt(_albumCover.SongFilePath, _albumCover.BinaryData.Length);
-                    
+
                     }
                     else
                     {
-                        _albumCover.IsDownloading = false;
-
-                        if (Application.Current == null) { return; }
-                        Application.Current.Dispatcher.Invoke(() =>
+                        try
                         {
-                            _albumCover.AlbumImageSource = BitmapImageFromBytes(_albumCover.BinaryData);
-                        });
+                            // wait little bit.
+                            await Task.Delay(100);
 
-                        _albumCover.IsSuccess = true;
+                            if (Application.Current == null) { return; }
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                _albumCover.AlbumImageSource = BitmapImageFromBytes(_albumCover.BinaryData);
+                            });
 
-                        await Task.Run(() => { StatusUpdate?.Invoke(this, "isAlbumart"); });
-                       
+                            _albumCover.IsSuccess = true;
+                            _albumCover.IsDownloading = false;
+
+                            await Task.Run(() => { StatusUpdate?.Invoke(this, "isAlbumart"); });
+
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived (b): " + ex.Message);
+
+                            _albumCover.IsDownloading = false;
+                            return;
+                        }
                     }
 
                     return;
-
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived: " + ex.Message);
+                    System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived (e): " + ex.Message);
 
                     _albumCover.IsDownloading = false;
                     return;
@@ -1861,7 +1969,7 @@ namespace MPDCtrl.Models
             }
         }
 
-        private void DataReceived_Dispatch(string str)
+        private async void DataReceived_Dispatch(string str)
         {
             List<string> reLines = str.Split('\n').ToList();
 
@@ -1875,7 +1983,20 @@ namespace MPDCtrl.Models
                         DataReceived_ParseData(d);
                         d = "";
                     }
-                } else if (value.StartsWith("ACK"))
+                }
+                /*
+                else if (value.StartsWith("OK MPD"))
+                {
+                    // Connected.
+
+                    //TODO: Needs to be tested.
+                    MpdSendPassword();
+
+                    //
+                    await Task.Run(() => { Connected?.Invoke(this); });
+                }
+                */
+                else if (value.StartsWith("ACK"))
                 {
                     // Ignore "ACK [50@1] {albumart} No file exists"
                     if (value.Contains("{albumart}"))
@@ -1886,7 +2007,7 @@ namespace MPDCtrl.Models
                     {
                         System.Diagnostics.Debug.WriteLine("ACK@DataReceived_Dispatch: " + value);
 
-                        ErrorReturned?.Invoke(this, MpdErrorTypes.CommandError, value);
+                        await Task.Run(() => { ErrorReturned?.Invoke(this, MpdErrorTypes.CommandError, value); });
                     }
                 }
                 else
@@ -1898,6 +2019,9 @@ namespace MPDCtrl.Models
 
         private async void DataReceived_ParseData(string str)
         {
+            if (MpdStop) return;
+            if (str == "") return;
+
             if (str.StartsWith("changed:"))
             {
                 await Task.Run(() => { StatusChanged?.Invoke(this, str); });

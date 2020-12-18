@@ -78,7 +78,7 @@
     <!-- トラック（レーン）の色 #33ffffff -->
     <SolidColorBrush x:Key="ScrollBarTrackBrush" Color="{DynamicResource WindowBackgroundColor}" />
     <!-- 三角の色 -->
-    <SolidColorBrush x:Key="ScrollBarHilightBrush" Color="#ccffffff" />
+    <SolidColorBrush x:Key="ScrollBarHilightBrush" Color="Gray" />
     <!-- ボタンを押した時の色 #99ffffff -->
     <SolidColorBrush x:Key="ScrollBarPressedBrush" Color="#1a1a1a" />
     <!-- 使用不可の色 -->

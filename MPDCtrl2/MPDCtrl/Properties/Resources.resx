@@ -156,6 +156,9 @@
   <data name="Connection" xml:space="preserve">
     <value>Connection</value>
   </data>
+  <data name="ConnectionStatus_Connected" xml:space="preserve">
+    <value />
+  </data>
   <data name="ConnectionStatus_ConnectFail_Timeout" xml:space="preserve">
     <value>Connection terminated. (ConnectFail_Timeout)</value>
   </data>
@@ -418,7 +421,7 @@ SOFTWARE.</value>
     <value>Port number is required.</value>
   </data>
   <data name="Settings_Opts_ShowDebugWidow" xml:space="preserve">
-    <value>Show Debug Widow</value>
+    <value>Show Debug Widow (this may significantly slow down repoponsiveness)</value>
   </data>
   <data name="Settings_Opts_UpdateDatabaseOnStartup" xml:space="preserve">
     <value>Update MPD Music Database on Startup</value>

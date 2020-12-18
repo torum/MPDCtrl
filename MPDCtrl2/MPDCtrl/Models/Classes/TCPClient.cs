@@ -84,8 +84,8 @@ namespace MPDCtrl.Models.Classes
                 _ConStat = value;
 
                 if (raiseEvent)
-                    //Task.Run(() => { ConnectionStatusChanged?.Invoke(this, _ConStat); });
-                    ConnectionStatusChanged?.Invoke(this, _ConStat);
+                    Task.Run(() => { ConnectionStatusChanged?.Invoke(this, _ConStat); });
+                    //ConnectionStatusChanged?.Invoke(this, _ConStat);
             }
         }
 
@@ -151,6 +151,8 @@ namespace MPDCtrl.Models.Classes
             try
             {
                 await _TCP.ConnectAsync(ip, port);
+
+                ConnectionState = ConnectionStatus.Connected;
             }
             catch (SocketException ex)
             {
@@ -173,7 +175,7 @@ namespace MPDCtrl.Models.Classes
                 return r;
             }
 
-            ConnectionState = ConnectionStatus.Connected;
+            //
 
             //System.Diagnostics.Debug.WriteLine("**Connected...");
 
@@ -205,12 +207,20 @@ namespace MPDCtrl.Models.Classes
             }
         }
 
-        private async void ReceiveCallback(IAsyncResult ar)
+        private void ReceiveCallback(IAsyncResult ar)
         {
+            if (ar == null)
+                return;
+
             // Retrieve the state object and the client socket from the asynchronous state object.  
             StateObject state = (StateObject)ar.AsyncState;
             Socket client = state.workSocket;
             SocketError err = new SocketError();
+
+            if (client == null)
+                return;
+            if (state == null)
+                return;
 
             try
             {
@@ -266,13 +276,19 @@ namespace MPDCtrl.Models.Classes
 
                     ConnectionState = ConnectionStatus.DisconnectedByHost;
 
+                    /*
                     if (!await ReConnect())
                     {
                         ConnectionState = ConnectionStatus.DisconnectedByHost;
 
                         System.Diagnostics.Debug.WriteLine("**ReceiveCallback: bytesRead 0 - GIVING UP reconnect.");
                     }
+                    */
                 }
+            }
+            catch (ObjectDisposedException ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@ReceiveCallback: " + err.ToString() + ". " + ex.ToString() + ". ");
             }
             catch (Exception ex)
             {
@@ -282,11 +298,11 @@ namespace MPDCtrl.Models.Classes
             }
         }
 
-        public async void Send(string cmd)
+        public void Send(string cmd)
         {
             DataSent?.Invoke(this, ">>" + cmd);
 
-            if (ConnectionState != ConnectionStatus.Connected) { return; }
+            //if (ConnectionState != ConnectionStatus.Connected) { return; }
 
             try
             {
@@ -297,10 +313,13 @@ namespace MPDCtrl.Models.Classes
                 //System.IO.IOException
                 //Unable to transfer data on the transport connection: An established connection was aborted by the software in your host machine.
 
-                System.Diagnostics.Debug.WriteLine("**Error@Send: IOException - TRYING TO RECONNECT.");
+                //System.Diagnostics.Debug.WriteLine("**Error@Send: IOException - TRYING TO RECONNECT.");
+                System.Diagnostics.Debug.WriteLine("**Error@Send: IOException:" + ex.Message);
 
+                ConnectionState = ConnectionStatus.DisconnectedByHost;
                 ConnectionError?.Invoke(this, ex.Message);
-
+                
+                /*
                 // Reconnect.
                 if (await ReConnect())
                 {
@@ -311,16 +330,20 @@ namespace MPDCtrl.Models.Classes
                     System.Diagnostics.Debug.WriteLine("**Error@Send: IOException - GIVING UP reconnect.");
 
                 }
-
+                */
             }
             catch (SocketException ex)
             {
                 //System.Net.Sockets.SocketException
                 //An established connection was aborted by the software in your host machine
-                System.Diagnostics.Debug.WriteLine("**Error@Send: SocketException - TRYING TO RECONNECT.");
-                ConnectionState = ConnectionStatus.DisconnectedByHost;
-                ConnectionError?.Invoke(this, ex.Message);
+                //System.Diagnostics.Debug.WriteLine("**Error@Send: SocketException - TRYING TO RECONNECT.");
 
+                System.Diagnostics.Debug.WriteLine("**Error@Send: SocketException:" + ex.Message);
+
+                ConnectionState = ConnectionStatus.Error;
+                ConnectionError?.Invoke(this, ex.Message);
+                
+                /*
                 // Reconnect.
                 if (await ReConnect())
                 {
@@ -331,11 +354,12 @@ namespace MPDCtrl.Models.Classes
                     System.Diagnostics.Debug.WriteLine("**Error@Send: SocketException - GIVING UP reconnect.");
                     ConnectionState = ConnectionStatus.DisconnectedByHost;
                 }
+                */
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("**Error@Send: " + ex.Message);
-
+                ConnectionState = ConnectionStatus.Error;
                 ConnectionError?.Invoke(this, ex.Message);
             }
         }
@@ -383,7 +407,7 @@ namespace MPDCtrl.Models.Classes
             try
             {
                 _TCP.Client.Shutdown(SocketShutdown.Both);
-                _TCP.Client.Close();
+                _TCP.Close();
             }
             catch { }
         }

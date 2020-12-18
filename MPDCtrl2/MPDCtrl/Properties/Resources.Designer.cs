@@ -178,6 +178,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///    に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConnectionStatus_Connected {
+            get {
+                return ResourceManager.GetString("ConnectionStatus_Connected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Connection terminated. (ConnectFail_Timeout) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string ConnectionStatus_ConnectFail_Timeout {
@@ -916,7 +925,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Show Debug Widow に類似しているローカライズされた文字列を検索します。
+        ///   Show Debug Widow (this may significantly slow down repoponsiveness) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_Opts_ShowDebugWidow {
             get {

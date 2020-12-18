@@ -156,6 +156,9 @@
   <data name="Connection" xml:space="preserve">
     <value>コネクション</value>
   </data>
+  <data name="ConnectionStatus_Connected" xml:space="preserve">
+    <value />
+  </data>
   <data name="ConnectionStatus_ConnectFail_Timeout" xml:space="preserve">
     <value>通信が遮断しました。（ConnectFail_Timeout）</value>
   </data>
@@ -421,7 +424,7 @@ SOFTWARE.</value>
     <value>ポート番号を入力してください。</value>
   </data>
   <data name="Settings_Opts_ShowDebugWidow" xml:space="preserve">
-    <value>デバッグウィンドウの表示</value>
+    <value>デバッグウィンドウの表示（アプリの応答が遅くなる場合があります）</value>
   </data>
   <data name="Settings_Opts_UpdateDatabaseOnStartup" xml:space="preserve">
     <value>起動時にMPDサーバーの楽曲データベースを最新の状態に更新する</value>

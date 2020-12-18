@@ -75,6 +75,54 @@ namespace MPDCtrl
             }
         }
 
+        public App()
+        {
+            // 未処理例外の処理
+            // UI スレッドで実行されているコードで処理されなかったら発生する（.NET 3.0 より）
+            DispatcherUnhandledException += App_DispatcherUnhandledException;
+            // バックグラウンドタスク内で処理されなかったら発生する（.NET 4.0 より）
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+            // 例外が処理されなかったら発生する（.NET 1.0 より）
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        }
+
+        private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            var exception = e.Exception as Exception;
+
+            System.Diagnostics.Debug.WriteLine("App_DispatcherUnhandledException: " + exception.Message);
+
+            e.Handled = true;
+        }
+
+        private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            var exception = e.Exception.InnerException as Exception;
+
+            System.Diagnostics.Debug.WriteLine("TaskScheduler_UnobservedTaskException: " + exception.Message);
+
+            e.SetObserved();
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            var exception = e.ExceptionObject as Exception;
+
+            if (exception is TaskCanceledException)
+            {
+                // can ignore.
+                System.Diagnostics.Debug.WriteLine("CurrentDomain_UnhandledException (TaskCanceledException): " + exception.Message);
+            }
+            else
+            {
+                // TODO: error log etc.
+                System.Diagnostics.Debug.WriteLine("CurrentDomain_UnhandledException: " + exception.Message);
+            }
+
+            Environment.Exit(1);
+        }
+
+
         // テーマ切替メソッド
         public void ChangeTheme(string themeName)
         {

@@ -32,7 +32,7 @@ namespace MPDCtrl.ViewModels
     /// TODO: 
     /// 
     /// 
-    /// v2.0.7 以降
+    /// v2.0.8 以降
     /// 
     /// 翻訳のリソース、名前の整理と見直し。
     /// テーマの切り替え
@@ -55,6 +55,7 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v2.0.7  store公開。
     /// v2.0.6.4 パスワード、多分毎回送る必要は無いと思う>ので削除した。
     /// v2.0.6.3 エラーログを保存するオプションを作った。
     /// v2.0.6.2 例外処理を沢山。 
@@ -119,7 +120,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.6.4";
+        const string _appVer = "v2.0.7.0";
 
         public string AppVer
         {

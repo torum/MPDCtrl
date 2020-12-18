@@ -925,6 +925,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Save logs file (MPDCtrl__errors.txt) to desktop when unexpected error occured. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_Opts_SaveLog {
+            get {
+                return ResourceManager.GetString("Settings_Opts_SaveLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Show Debug Widow (this may significantly slow down repoponsiveness) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_Opts_ShowDebugWidow {

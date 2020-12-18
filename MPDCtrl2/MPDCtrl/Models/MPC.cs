@@ -573,6 +573,7 @@ namespace MPDCtrl.Models
             {
                 string mpdCommand = "update" + "\n";
 
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -580,6 +581,7 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "update" + "\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
+                */
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -597,6 +599,7 @@ namespace MPDCtrl.Models
             {
                 string mpdCommand = "status" + "\n";
 
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -604,6 +607,7 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "status" + "\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
+                */
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -620,16 +624,16 @@ namespace MPDCtrl.Models
             try
             {
                 string mpdCommand = "playlistinfo" + "\n";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
-
                     mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
-
                     mpdCommand = mpdCommand + "playlistinfo" + "\n";
-
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
+                */
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -647,16 +651,16 @@ namespace MPDCtrl.Models
             try
             {
                 string mpdCommand = "listplaylists" + "\n";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
-
                     mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
-
                     mpdCommand = mpdCommand + "listplaylists" + "\n";
-
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
+                */
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -672,7 +676,9 @@ namespace MPDCtrl.Models
         {
             try
             {
-                string mpdCommand = "";
+                string mpdCommand = "listall" + "\n";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -680,10 +686,7 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "listall" + "\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
-                {
-                    mpdCommand = "listall" + "\n";
-                }
+                */
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -695,10 +698,9 @@ namespace MPDCtrl.Models
             }
         }
 
-        public void MpdQueryistPlaylistinfo(string playlistName)
+        public void MpdQueryListPlaylistinfo(string playlistName)
         {
-            // Don't use this. The reply cannot be differenciated with "find" result.
-
+            // Don't use this. The reply cannot be differenciated with "find/search" result.
 
             if (playlistName.Trim() != "")
             {
@@ -706,7 +708,9 @@ namespace MPDCtrl.Models
 
                 try
                 {
-                    string mpdCommand = "";
+                    string mpdCommand = "listplaylistinfo \"" + playlistName + "\"\n";
+
+                    /*
                     if (!string.IsNullOrEmpty(_password))
                     {
                         mpdCommand = "command_list_begin" + "\n";
@@ -714,10 +718,7 @@ namespace MPDCtrl.Models
                         mpdCommand = mpdCommand + "listplaylistinfo \"" + playlistName + "\"\n";
                         mpdCommand = mpdCommand + "command_list_end" + "\n";
                     }
-                    else
-                    {
-                        mpdCommand = "listplaylistinfo" + "\n";
-                    }
+                    */
 
                     _asyncClient.Send("noidle" + "\n");
                     _asyncClient.Send(mpdCommand);
@@ -735,7 +736,9 @@ namespace MPDCtrl.Models
         {
             try
             {
-                string mpdCommand = "";
+                string mpdCommand = "clear" + "\n";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -743,10 +746,7 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "clear" + "\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
-                {
-                    mpdCommand = "clear" + "\n";
-                }
+                */
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -766,7 +766,9 @@ namespace MPDCtrl.Models
 
                 try
                 {
-                    string mpdCommand = "";
+                    string mpdCommand = "save \"" + playlistName + "\"\n";
+
+                    /*
                     if (!string.IsNullOrEmpty(_password))
                     {
                         mpdCommand = "command_list_begin" + "\n";
@@ -774,10 +776,7 @@ namespace MPDCtrl.Models
                         mpdCommand = mpdCommand + "save \"" + playlistName + "\"\n";
                         mpdCommand = mpdCommand + "command_list_end" + "\n";
                     }
-                    else
-                    {
-                        mpdCommand = "save \"" + playlistName + "\"\n";
-                    }
+                    */
 
                     _asyncClient.Send("noidle" + "\n");
                     _asyncClient.Send(mpdCommand);
@@ -800,7 +799,9 @@ namespace MPDCtrl.Models
 
             try
             {
-                string mpdCommand = "";
+                string mpdCommand = "add \"" + uri + "\"\n";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -808,10 +809,7 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "add \"" + uri + "\"\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
-                {
-                    mpdCommand = "add \"" + uri + "\"\n";
-                }
+                */
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -831,6 +829,8 @@ namespace MPDCtrl.Models
             try
             {
                 string mpdCommand = "";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -842,16 +842,15 @@ namespace MPDCtrl.Models
                     }
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
+                */
+
+                mpdCommand = "command_list_begin" + "\n";
+                foreach (var uri in uris)
                 {
-                    mpdCommand = "command_list_begin" + "\n";
-                    foreach (var uri in uris)
-                    {
-                        var urie = Regex.Escape(uri);
-                        mpdCommand = mpdCommand + "add \"" + urie + "\"\n";
-                    }
-                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                    var urie = Regex.Escape(uri);
+                    mpdCommand = mpdCommand + "add \"" + urie + "\"\n";
                 }
+                mpdCommand = mpdCommand + "command_list_end" + "\n";
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -872,6 +871,8 @@ namespace MPDCtrl.Models
             try
             {
                 string mpdCommand = "";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -882,15 +883,14 @@ namespace MPDCtrl.Models
                     }
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
+                */
+
+                mpdCommand = "command_list_begin" + "\n";
+                foreach (var id in ids)
                 {
-                    mpdCommand = "command_list_begin" + "\n";
-                    foreach (var id in ids)
-                    {
-                        mpdCommand = mpdCommand + "deleteid " + id + "\n";
-                    }
-                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                    mpdCommand = mpdCommand + "deleteid " + id + "\n";
                 }
+                mpdCommand = mpdCommand + "command_list_end" + "\n";
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -910,6 +910,8 @@ namespace MPDCtrl.Models
             try
             {
                 string mpdCommand = "";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -920,15 +922,14 @@ namespace MPDCtrl.Models
                     }
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
+                */
+
+                mpdCommand = "command_list_begin" + "\n";
+                foreach (KeyValuePair<string, string> pair in IdToNewPosPair)
                 {
-                    mpdCommand = "command_list_begin" + "\n";
-                    foreach (KeyValuePair<string, string> pair in IdToNewPosPair)
-                    {
-                        mpdCommand = mpdCommand + "moveid " + pair.Key + " " + pair.Value + "\n";
-                    }
-                    mpdCommand = mpdCommand + "command_list_end" + "\n";
+                    mpdCommand = mpdCommand + "moveid " + pair.Key + " " + pair.Value + "\n";
                 }
+                mpdCommand = mpdCommand + "command_list_end" + "\n";
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -945,6 +946,8 @@ namespace MPDCtrl.Models
             try
             {
                 string mpdCommand = "";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = mpdCommand + "command_list_begin" + "\n";
@@ -959,16 +962,15 @@ namespace MPDCtrl.Models
                     }
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
+                */
+
+                if (songId != "")
+                {
+                    mpdCommand = "playid " + songId + "\n";
+                }
                 else
                 {
-                    if (songId != "")
-                    {
-                        mpdCommand = "playid " + songId + "\n";
-                    }
-                    else
-                    {
-                        mpdCommand = "play" + "\n";
-                    }
+                    mpdCommand = "play" + "\n";
                 }
 
                 _asyncClient.Send("noidle" + "\n");
@@ -987,7 +989,9 @@ namespace MPDCtrl.Models
 
             try
             {
-                string mpdCommand = "";
+                string mpdCommand = "seekid " + songId + " " + seekTime.ToString() + "\n";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -995,10 +999,7 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "seekid " + songId + " " + seekTime.ToString() + "\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
-                {
-                    mpdCommand = "seekid " + songId + " " + seekTime.ToString() + "\n";
-                }
+                */
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -1015,7 +1016,9 @@ namespace MPDCtrl.Models
         {
             try
             {
-                string mpdCommand = "";
+                string mpdCommand = "pause 1" + "\n";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -1023,10 +1026,7 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "pause 1" + "\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
-                {
-                    mpdCommand = "pause 1" + "\n";
-                }
+                */
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -1042,7 +1042,9 @@ namespace MPDCtrl.Models
         {
             try
             {
-                string mpdCommand = "";
+                string mpdCommand = "pause 0" + "\n";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -1050,10 +1052,7 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "pause 0" + "\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
-                {
-                    mpdCommand = "pause 0" + "\n";
-                }
+                */
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -1070,7 +1069,9 @@ namespace MPDCtrl.Models
         {
             try
             {
-                string mpdCommand = "";
+                string mpdCommand = "stop" + "\n";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -1078,10 +1079,7 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "stop" + "\n";
                     mpdCommand = mpdCommand + "command_list_end";
                 }
-                else
-                {
-                    mpdCommand = "stop" + "\n";
-                }
+                */
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -1098,7 +1096,9 @@ namespace MPDCtrl.Models
         {
             try
             {
-                string mpdCommand = "";
+                string mpdCommand = "next\n";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -1106,15 +1106,11 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "next" + "\n";
                     mpdCommand = mpdCommand + "command_list_end\n";
                 }
-                else
-                {
-                    mpdCommand = "next\n";
-                }
+                */
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
                 _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
-
 
             }
             catch (Exception ex)
@@ -1127,7 +1123,9 @@ namespace MPDCtrl.Models
         {
             try
             {
-                string mpdCommand = "";
+                string mpdCommand = "previous" + "\n";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -1135,10 +1133,7 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "previous" + "\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
-                {
-                    mpdCommand = "previous" + "\n";
-                }
+                */
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -1157,7 +1152,9 @@ namespace MPDCtrl.Models
 
             try
             {
-                string mpdCommand = "";
+                string mpdCommand = "setvol " + v.ToString() + "\n";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -1165,10 +1162,7 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "setvol " + v.ToString() + "\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
-                {
-                    mpdCommand = "setvol " + v.ToString() + "\n";
-                }
+                */
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -1188,6 +1182,8 @@ namespace MPDCtrl.Models
             try
             {
                 string mpdCommand = "";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -1202,16 +1198,15 @@ namespace MPDCtrl.Models
                     }
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
+                */
+
+                if (on)
+                {
+                    mpdCommand = "repeat 1" + "\n";
+                }
                 else
                 {
-                    if (on)
-                    {
-                        mpdCommand = "repeat 1" + "\n";
-                    }
-                    else
-                    {
-                        mpdCommand = "repeat 0" + "\n";
-                    }
+                    mpdCommand = "repeat 0" + "\n";
                 }
 
                 _asyncClient.Send("noidle" + "\n");
@@ -1232,6 +1227,8 @@ namespace MPDCtrl.Models
             try
             {
                 string mpdCommand = "";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -1246,16 +1243,15 @@ namespace MPDCtrl.Models
                     }
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
+                */
+
+                if (on)
+                {
+                    mpdCommand = "random 1" + "\n";
+                }
                 else
                 {
-                    if (on)
-                    {
-                        mpdCommand = "random 1" + "\n";
-                    }
-                    else
-                    {
-                        mpdCommand = "random 0" + "\n";
-                    }
+                    mpdCommand = "random 0" + "\n";
                 }
 
                 _asyncClient.Send("noidle" + "\n");
@@ -1276,6 +1272,8 @@ namespace MPDCtrl.Models
             try
             {
                 string mpdCommand = "";
+
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -1290,16 +1288,15 @@ namespace MPDCtrl.Models
                     }
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
+                */
+
+                if (on)
+                {
+                    mpdCommand = "consume 1" + "\n";
+                }
                 else
                 {
-                    if (on)
-                    {
-                        mpdCommand = "consume 1" + "\n";
-                    }
-                    else
-                    {
-                        mpdCommand = "consume 0" + "\n";
-                    }
+                    mpdCommand = "consume 0" + "\n";
                 }
 
                 _asyncClient.Send("noidle" + "\n");
@@ -1320,14 +1317,14 @@ namespace MPDCtrl.Models
                 playlistName = Regex.Escape(playlistName.Trim());
 
                 string mpdCommand = "command_list_begin" + "\n";
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
                 }
+                */
                 mpdCommand = mpdCommand + "clear" + "\n";
-
                 mpdCommand = mpdCommand + "load \"" + playlistName + "\"\n";
-
                 mpdCommand = mpdCommand + "command_list_end" + "\n";
 
                 _asyncClient.Send("noidle" + "\n");
@@ -1343,17 +1340,18 @@ namespace MPDCtrl.Models
             {
                 playlistName = Regex.Escape(playlistName.Trim());
 
+                /*
                 string mpdCommand = "command_list_begin" + "\n";
+                
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = mpdCommand + "password " + _password.Trim() + "\n";
                     mpdCommand = mpdCommand + "load \"" + playlistName + "\"\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
-                {
-                    mpdCommand = "load \"" + playlistName + "\"\n";
-                }
+                */
+
+                string mpdCommand = "load \"" + playlistName + "\"\n";
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -1369,6 +1367,7 @@ namespace MPDCtrl.Models
                 playlistName = Regex.Escape(playlistName.Trim());
                 newPlaylistName = Regex.Escape(newPlaylistName.Trim());
 
+                /*
                 string mpdCommand = "command_list_begin" + "\n";
                 if (!string.IsNullOrEmpty(_password))
                 {
@@ -1376,10 +1375,9 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "rename \"" + playlistName + "\" \"" + newPlaylistName + "\"\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
-                {
-                    mpdCommand = "rename \"" + playlistName + "\" \"" + newPlaylistName + "\"\n";
-                }
+                */
+
+                string mpdCommand = "rename \"" + playlistName + "\" \"" + newPlaylistName + "\"\n";
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -1394,6 +1392,7 @@ namespace MPDCtrl.Models
             {
                 playlistName = Regex.Escape(playlistName.Trim());
 
+                /*
                 string mpdCommand = "command_list_begin" + "\n";
                 if (!string.IsNullOrEmpty(_password))
                 {
@@ -1401,10 +1400,9 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "rm \"" + playlistName + "\"\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
-                {
-                    mpdCommand = "rm \"" + playlistName + "\"\n";
-                }
+                */
+
+                string mpdCommand = "rm \"" + playlistName + "\"\n";
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -1423,7 +1421,7 @@ namespace MPDCtrl.Models
                 playlistName = Regex.Escape(playlistName);
                 try
                 {
-                    string mpdCommand = "";
+                    /*
                     if (!string.IsNullOrEmpty(_password))
                     {
                         mpdCommand = "command_list_begin" + "\n";
@@ -1435,16 +1433,15 @@ namespace MPDCtrl.Models
                         }
                         mpdCommand = mpdCommand + "command_list_end" + "\n";
                     }
-                    else
+                    */
+
+                    string mpdCommand = "command_list_begin" + "\n";
+                    foreach (var uri in uris)
                     {
-                        mpdCommand = "command_list_begin" + "\n";
-                        foreach (var uri in uris)
-                        {
-                            var urie = Regex.Escape(uri);
-                            mpdCommand = mpdCommand + "playlistadd " + "\"" + playlistName + "\"" + " " + "\"" + urie + "\"\n";
-                        }
-                        mpdCommand = mpdCommand + "command_list_end" + "\n";
+                        var urie = Regex.Escape(uri);
+                        mpdCommand = mpdCommand + "playlistadd " + "\"" + playlistName + "\"" + " " + "\"" + urie + "\"\n";
                     }
+                    mpdCommand = mpdCommand + "command_list_end" + "\n";
 
                     _asyncClient.Send("noidle" + "\n");
                     _asyncClient.Send(mpdCommand);
@@ -1479,6 +1476,7 @@ namespace MPDCtrl.Models
 
             try
             {
+                /*
                 string mpdCommand = "";
                 if (!string.IsNullOrEmpty(_password))
                 {
@@ -1487,10 +1485,9 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "search \"(" + expression + ")\"\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
-                {
-                    mpdCommand = "search \"(" + expression + ")\"\n";
-                }
+                */
+
+                string mpdCommand = "search \"(" + expression + ")\"\n";
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -1522,7 +1519,7 @@ namespace MPDCtrl.Models
 
             try
             {
-                string mpdCommand = "";
+                /*
                 if (!string.IsNullOrEmpty(_password))
                 {
                     mpdCommand = "command_list_begin" + "\n";
@@ -1530,10 +1527,9 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "albumart \"" + uri + "\" 0" + "\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
-                {
-                    mpdCommand = "albumart \"" + uri + "\" 0" + "\n";
-                }
+                */
+
+                string mpdCommand = "albumart \"" + uri + "\" 0" + "\n";
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -1557,6 +1553,7 @@ namespace MPDCtrl.Models
 
             try
             {
+                /*
                 string mpdCommand = "";
                 if (!string.IsNullOrEmpty(_password))
                 {
@@ -1565,10 +1562,9 @@ namespace MPDCtrl.Models
                     mpdCommand = mpdCommand + "albumart \"" + uri + "\" " + offset.ToString() + "\n";
                     mpdCommand = mpdCommand + "command_list_end" + "\n";
                 }
-                else
-                {
-                    mpdCommand = "albumart \"" + uri + "\" " + offset.ToString() + "\n";
-                }
+                */
+
+                string mpdCommand = "albumart \"" + uri + "\" " + offset.ToString() + "\n";
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);

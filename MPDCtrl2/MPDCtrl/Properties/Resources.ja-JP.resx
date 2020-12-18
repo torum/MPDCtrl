@@ -423,6 +423,9 @@ SOFTWARE.</value>
   <data name="Settings_ErrorPortMustBeSpecified" xml:space="preserve">
     <value>ポート番号を入力してください。</value>
   </data>
+  <data name="Settings_Opts_SaveLog" xml:space="preserve">
+    <value>予期しないエラーが起きた際はログファイル（MPDCtrl__errors.txt）をデスクトップに保存する。</value>
+  </data>
   <data name="Settings_Opts_ShowDebugWidow" xml:space="preserve">
     <value>デバッグウィンドウの表示（アプリの応答が遅くなる場合があります）</value>
   </data>

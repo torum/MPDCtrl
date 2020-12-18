@@ -31,11 +31,13 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// エラーログの保存先の指定とタイミング。
     /// 
     /// v2.0.7 以降
     /// 
     /// 翻訳のリソース、名前の整理と見直し。
+    /// テーマの切り替え
+    /// 
+    /// 
     /// Ctrl+F検索とFilesから直接プレイリストに追加できるように「プレイリストに追加」をコンテキストメニューで。"Save Selected to" context menu.
     /// 「プレイリストの名前変更」をインラインで。
     /// "今すぐ再生"メニューを追加。
@@ -43,11 +45,8 @@ namespace MPDCtrl.ViewModels
     /// 
     /// 
     /// [未定]
-    /// テーマの切り替え
-    /// パスワード、多分毎回送る必要は無いと思う。
     /// Listview の水平スクロールバーのデザイン。
     /// スライダーの上でスクロールして音量変更。
-    /// exception trap and logging
     /// レイアウト見直し（スプリッターのせい）GridSplitterが右に行き過ぎる問題。
     /// Queue: ScrollIntoView to NowPlaying (not selected item).「現在の曲へ」のコンテキストメニューを追加。イベントでitemを渡す？
     /// レイアウト大改造？ ３ペイン（上キューと下に２ペイン) + (Treeviewでプレイリストとディレクトリ纏める？？）
@@ -56,8 +55,10 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v2.0.6.4 パスワード、多分毎回送る必要は無いと思う>ので削除した。
+    /// v2.0.6.3 エラーログを保存するオプションを作った。
     /// v2.0.6.2 例外処理を沢山。 
-    /// v2.0.6.1 エラーを保存するようにしてる。
+    /// v2.0.6.1 エラーログを保存するようにしてる。>ifdebug
     /// v2.0.6 store公開。
     /// v2.0.5.5 バイナリにともなって色々まとめて来てた処理をちゃんと処理するようにした。ステータスバー周りとかパスワードボックス周り、エラー周りなど変更し過ぎて忘れた。
     /// v2.0.5.4 沢山バグ潰した。 カラムヘッダーの幅を指定するヘルパーは使わないシンプルな方法に変更。
@@ -118,7 +119,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.6.2";
+        const string _appVer = "v2.0.6.4";
 
         public string AppVer
         {
@@ -1388,6 +1389,22 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private bool _isSaveLog;
+        public bool IsSaveLog
+        {
+            get { return _isSaveLog; }
+            set
+            {
+                if (_isSaveLog == value)
+                    return;
+
+                _isSaveLog = value;
+
+                NotifyPropertyChanged("IsSaveLog");
+            }
+        }
+
+
         private string _settingProfileEditMessage;
         public string SettingProfileEditMessage
         {
@@ -2388,6 +2405,21 @@ namespace MPDCtrl.ViewModels
                                 IsShowDebugWindow = false;
                             }
                         }
+
+                        hoge = opts.Attribute("SaveLog");
+                        if (hoge != null)
+                        {
+                            if (hoge.Value == "True")
+                            {
+                                IsSaveLog = true;
+
+                            }
+                            else
+                            {
+                                IsSaveLog = false;
+                            }
+                        }
+                        
                     }
 
                     #endregion
@@ -2760,6 +2792,16 @@ namespace MPDCtrl.ViewModels
 
                 Start();
             }
+
+            // log
+            if (IsSaveLog)
+            {
+                App app = App.Current as App;
+                if (app != null)
+                {
+                    app.IsSaveErrorLog = true;
+                }
+            }
         }
 
         // 起動後画面が描画された時の処理
@@ -2996,6 +3038,19 @@ namespace MPDCtrl.ViewModels
             }
             opts.SetAttributeNode(attrs);
 
+            //
+            attrs = doc.CreateAttribute("SaveLog");
+            if (IsSaveLog)
+            {
+                attrs.Value = "True";
+            }
+            else
+            {
+                attrs.Value = "False";
+            }
+            opts.SetAttributeNode(attrs);
+
+
             // 
             root.AppendChild(opts);
 
@@ -3231,6 +3286,13 @@ namespace MPDCtrl.ViewModels
             }
 
             #endregion
+
+            app = App.Current as App;
+            if (app != null)
+            {
+                if (IsSaveLog)
+                    app.SaveErrorLog(System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl_errors.txt");
+            }
 
             try
             {

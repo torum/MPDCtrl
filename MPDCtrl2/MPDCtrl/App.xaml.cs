@@ -125,16 +125,20 @@ namespace MPDCtrl
 
                 AppendErrorLog("CurrentDomain_UnhandledException", exception.Message);
 
-                // TODO:
-                SaveErrorLog(System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl_Errors.txt");
+                // save
+                if (IsSaveErrorLog)
+                    SaveErrorLog(System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl_errors.txt");
+
             }
 
+            // TODO:
             //Environment.Exit(1);
         }
 
         private StringBuilder Errortxt = new StringBuilder();
+        public bool IsSaveErrorLog;
 
-        private void AppendErrorLog(string errorTxt, string kindTxt)
+        public void AppendErrorLog(string errorTxt, string kindTxt)
         {
             DateTime dt = DateTime.Now;
             string nowString = dt.ToString("yyyy/MM/dd HH:mm:ss");
@@ -142,9 +146,11 @@ namespace MPDCtrl
             Errortxt.Append(nowString + " - " + kindTxt + " - " + errorTxt);
         }
 
-        private void SaveErrorLog(string logFilePath)
+        public void SaveErrorLog(string logFilePath)
         {
-            File.WriteAllText(logFilePath, Errortxt.ToString());
+            string s = Errortxt.ToString();
+            if (!string.IsNullOrEmpty(s))
+                File.WriteAllText(logFilePath, s);
         }
 
         // テーマ切替メソッド

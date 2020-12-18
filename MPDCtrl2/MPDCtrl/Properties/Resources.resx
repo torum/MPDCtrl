@@ -420,6 +420,9 @@ SOFTWARE.</value>
   <data name="Settings_ErrorPortMustBeSpecified" xml:space="preserve">
     <value>Port number is required.</value>
   </data>
+  <data name="Settings_Opts_SaveLog" xml:space="preserve">
+    <value>Save logs file (MPDCtrl__errors.txt) to desktop when unexpected error occured.</value>
+  </data>
   <data name="Settings_Opts_ShowDebugWidow" xml:space="preserve">
     <value>Show Debug Widow (this may significantly slow down repoponsiveness)</value>
   </data>

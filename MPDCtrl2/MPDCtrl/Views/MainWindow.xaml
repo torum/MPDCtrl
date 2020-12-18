@@ -1523,10 +1523,15 @@
                                         <Border Grid.Row="2" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
                                             <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.DeveloperMode}" HorizontalAlignment="Left"/>
                                         </Border>
+                                        
                                         <Grid Grid.Row="3" HorizontalAlignment="Left" Width="500" Margin="0 12 0 0">
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_ShowDebugWidow}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsShowDebugWindow}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
-                                        
+
+                                        <Grid Grid.Row="4" HorizontalAlignment="Left" Width="500" Margin="0 12 0 0">
+                                            <CheckBox Content="{x:Static properties:Resources.Settings_Opts_SaveLog}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsSaveLog}" Margin="0 12 0 0"></CheckBox>
+                                        </Grid>
+
                                     </Grid>
                                 </ScrollViewer>
 

@@ -92,6 +92,8 @@ namespace MPDCtrl
 
             System.Diagnostics.Debug.WriteLine("App_DispatcherUnhandledException: " + exception.Message);
 
+            AppendErrorLog("App_DispatcherUnhandledException", exception.Message);
+
             e.Handled = true;
         }
 
@@ -100,6 +102,8 @@ namespace MPDCtrl
             var exception = e.Exception.InnerException as Exception;
 
             System.Diagnostics.Debug.WriteLine("TaskScheduler_UnobservedTaskException: " + exception.Message);
+
+            AppendErrorLog("TaskScheduler_UnobservedTaskException", exception.Message);
 
             e.SetObserved();
         }
@@ -112,16 +116,36 @@ namespace MPDCtrl
             {
                 // can ignore.
                 System.Diagnostics.Debug.WriteLine("CurrentDomain_UnhandledException (TaskCanceledException): " + exception.Message);
+
+                AppendErrorLog("CurrentDomain_UnhandledException (TaskCanceledException)", exception.Message);
             }
             else
             {
-                // TODO: error log etc.
                 System.Diagnostics.Debug.WriteLine("CurrentDomain_UnhandledException: " + exception.Message);
+
+                AppendErrorLog("CurrentDomain_UnhandledException", exception.Message);
+
+                // TODO:
+                SaveErrorLog(System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl_Errors.txt");
             }
 
-            Environment.Exit(1);
+            //Environment.Exit(1);
         }
 
+        private StringBuilder Errortxt = new StringBuilder();
+
+        private void AppendErrorLog(string errorTxt, string kindTxt)
+        {
+            DateTime dt = DateTime.Now;
+            string nowString = dt.ToString("yyyy/MM/dd HH:mm:ss");
+
+            Errortxt.Append(nowString + " - " + kindTxt + " - " + errorTxt);
+        }
+
+        private void SaveErrorLog(string logFilePath)
+        {
+            File.WriteAllText(logFilePath, Errortxt.ToString());
+        }
 
         // テーマ切替メソッド
         public void ChangeTheme(string themeName)

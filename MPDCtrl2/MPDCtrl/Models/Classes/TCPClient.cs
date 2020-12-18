@@ -36,6 +36,7 @@ namespace MPDCtrl.Models.Classes
             ReceiveFail_Timeout,
             SendFail_Timeout,
             SendFail_NotConnected,
+            Disconnecting,
             Error
         }
 
@@ -84,8 +85,8 @@ namespace MPDCtrl.Models.Classes
                 _ConStat = value;
 
                 if (raiseEvent)
-                    Task.Run(() => { ConnectionStatusChanged?.Invoke(this, _ConStat); });
-                    //ConnectionStatusChanged?.Invoke(this, _ConStat);
+                    //Task.Run(() => { ConnectionStatusChanged?.Invoke(this, _ConStat); });
+                    ConnectionStatusChanged?.Invoke(this, _ConStat);
             }
         }
 
@@ -274,7 +275,8 @@ namespace MPDCtrl.Models.Classes
                     //https://msdn.microsoft.com/en-us/library/ms145145(v=vs.110).aspx
                     System.Diagnostics.Debug.WriteLine("ReceiveCallback bytesRead 0. Disconnected By Host.");
 
-                    ConnectionState = ConnectionStatus.DisconnectedByHost;
+                    if (ConnectionState == ConnectionStatus.Connected)
+                        ConnectionState = ConnectionStatus.DisconnectedByHost;
 
                     /*
                     if (!await ReConnect())
@@ -406,6 +408,8 @@ namespace MPDCtrl.Models.Classes
             // Release the socket.  
             try
             {
+                ConnectionState = ConnectionStatus.Disconnecting;
+
                 _TCP.Client.Shutdown(SocketShutdown.Both);
                 _TCP.Close();
             }

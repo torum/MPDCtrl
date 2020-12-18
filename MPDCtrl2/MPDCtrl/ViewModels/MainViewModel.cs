@@ -31,8 +31,7 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// 
-    /// SysButton styleを使う。(RepsCoreから)
+    /// エラーログの保存先の指定とタイミング。
     /// 
     /// v2.0.7 以降
     /// 
@@ -57,7 +56,10 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
-    /// v2.0.5.5 バイナリにともなって色々まとめて来てた処理をちゃんと処理するようにした。沢山変更し過ぎて忘れた。
+    /// v2.0.6.2 例外処理を沢山。 
+    /// v2.0.6.1 エラーを保存するようにしてる。
+    /// v2.0.6 store公開。
+    /// v2.0.5.5 バイナリにともなって色々まとめて来てた処理をちゃんと処理するようにした。ステータスバー周りとかパスワードボックス周り、エラー周りなど変更し過ぎて忘れた。
     /// v2.0.5.4 沢山バグ潰した。 カラムヘッダーの幅を指定するヘルパーは使わないシンプルな方法に変更。
     /// v2.0.5.3 バインディングエラーを一つfix。
     /// v2.0.5.2 起動時にデフォルトのMPDに接続出来なかった際に、表示崩れが起きる件。（サイドバーの幅とカラムヘッダーの表示・非表示）Fix。
@@ -116,7 +118,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.5.5";
+        const string _appVer = "v2.0.6.2";
 
         public string AppVer
         {
@@ -3712,6 +3714,18 @@ namespace MPDCtrl.ViewModels
                 ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_NeverConnected;
                 StatusButton = _pathErrorInfoButton;
             }
+            else if (status == TCPC.ConnectionStatus.Disconnecting)
+            {
+                IsConnected = false;
+                IsConnecting = false;
+                //IsConnectionSettingShow = true;
+
+                Debug.WriteLine("ConnectionStatus_Disconnecting");
+                //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_NeverConnected;
+                //StatusButton = _pathErrorInfoButton;
+            }
+            
+
         }
 
         private void OnClientIsBusy(MPC sender, bool on)

@@ -157,7 +157,7 @@
     <value>Connection</value>
   </data>
   <data name="ConnectionStatus_Connected" xml:space="preserve">
-    <value />
+    <value>Connected.</value>
   </data>
   <data name="ConnectionStatus_ConnectFail_Timeout" xml:space="preserve">
     <value>Connection terminated. (ConnectFail_Timeout)</value>

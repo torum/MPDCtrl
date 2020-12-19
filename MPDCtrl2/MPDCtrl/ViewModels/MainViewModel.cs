@@ -32,7 +32,7 @@ namespace MPDCtrl.ViewModels
     /// TODO: 
     /// 
     /// 
-    /// v2.0.8 以降
+    /// v2.0.9 以降
     /// 
     /// 翻訳のリソース、名前の整理と見直し。
     /// テーマの切り替え
@@ -55,7 +55,10 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
-    /// v2.0.7  store公開。
+    /// v2.0.8 store公開。
+    /// v2.0.7.2 パスワード送るタイミングを修正した。ステータスバーにMPDのバージョンを表示するようにした。ダミーパスワードが表示されていなかった。
+    /// v2.0.7.1 キューが空の時は余計な処理をしないようにして、高速化した。
+    /// v2.0.7  store公開・・してなかった。
     /// v2.0.6.4 パスワード、多分毎回送る必要は無いと思う>ので削除した。
     /// v2.0.6.3 エラーログを保存するオプションを作った。
     /// v2.0.6.2 例外処理を沢山。 
@@ -120,7 +123,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.7.0";
+        const string _appVer = "v2.0.8";
 
         public string AppVer
         {
@@ -1066,6 +1069,27 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private string _mpdVersion;
+        public string MpdVersion
+        {
+            get
+            {
+                if (_mpdVersion != "")
+                    return "MPD v" + _mpdVersion;
+                else
+                    return _mpdVersion;
+
+            }
+            set
+            {
+                if (value == _mpdVersion)
+                    return;
+
+                _mpdVersion = value;
+                NotifyPropertyChanged("MpdVersion");
+            }
+        }
+
         #endregion
 
         #region == AlbumArt == 
@@ -1244,9 +1268,9 @@ namespace MPDCtrl.ViewModels
 
                 _password = value;
 
-                NotifyPropertyChanged("Password");
-                NotifyPropertyChanged("IsPasswordSet");
                 NotifyPropertyChanged("IsNotPasswordSet");
+                NotifyPropertyChanged("IsPasswordSet");
+                NotifyPropertyChanged("Password");
             }
         }
 
@@ -2185,8 +2209,6 @@ namespace MPDCtrl.ViewModels
             UpdateProfileCommand = new GenericRelayCommand<object>(param => UpdateProfileCommand_Execute(param), param => UpdateProfileCommand_CanExecute());
             ChangeConnectionProfileCommand = new GenericRelayCommand<object>(param => ChangeConnectionProfileCommand_Execute(param), param => ChangeConnectionProfileCommand_CanExecute());
 
-            ConnectCommand = new GenericRelayCommand<object>(param => ConnectCommand_Execute(param), param => ConnectCommand_CanExecute());
-
             ListAllCommand = new RelayCommand(ListAllCommand_ExecuteAsync, ListAllCommand_CanExecute);
 
             ComfirmationDialogOKCommand = new RelayCommand(ComfirmationDialogOKCommand_Execute, ComfirmationDialogOKCommand_CanExecute);
@@ -2275,7 +2297,6 @@ namespace MPDCtrl.ViewModels
             AlbumArt = _albumArtDefault;
 
             #endregion
-
 
         }
 
@@ -3310,13 +3331,29 @@ namespace MPDCtrl.ViewModels
         private void OnMpdConnected(MPC sender)
         {
             // got MPD ver.
+            MpdVersion = _MPC.MpdVer;
 
-            IsConnected = true;
-
-            //Debug.WriteLine("MPD OK");
-
-            //MpdStatusMessage = "MPD OK";
+            //MpdStatusMessage = "MPD OK " + _MPC.MpdVer;
             //MpdStatusButton = _pathConnectedButton;
+
+            _MPC.MpdSendPassword();
+
+            if (IsUpdateOnStartup)
+            {
+                _MPC.MpdSendUpdate();
+            }
+
+            //
+            _MPC.MpdQueryCurrentQueue();
+
+            // Call Status "after" MpdQueryCurrentQueue() in order to get "current song" in the queue.
+            _MPC.MpdQueryStatus();
+
+            _MPC.MpdQueryPlaylists();
+
+            // heavy stuff should be the last.
+            _MPC.MpdQueryListAll();
+
         }
 
         // MPD changed nortifiation
@@ -3413,99 +3450,147 @@ namespace MPDCtrl.ViewModels
             {
                 IsBusy = true;
 
-                // 削除する曲の一時リスト
-                List<MPC.SongInfo> _tmpQueue = new List<MPC.SongInfo>();
-
-                Application.Current.Dispatcher.Invoke(() =>
+                if (Queue.Count > 0)
                 {
-                    IsBusy = true;
-                    // 既存のリストの中で新しいリストにないものを削除
-                    foreach (var sng in Queue)
+                    // 削除する曲の一時リスト
+                    List<MPC.SongInfo> _tmpQueue = new List<MPC.SongInfo>();
+
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
-                        var queitem = _MPC.CurrentQueue.FirstOrDefault(i => i.Id == sng.Id);
-                        if (queitem == null)
+                        IsBusy = true;
+                        // 既存のリストの中で新しいリストにないものを削除
+                        foreach (var sng in Queue)
                         {
-                            // 削除リストに追加
-                            _tmpQueue.Add(sng);
+                            var queitem = _MPC.CurrentQueue.FirstOrDefault(i => i.Id == sng.Id);
+                            if (queitem == null)
+                            {
+                                // 削除リストに追加
+                                _tmpQueue.Add(sng);
+                            }
                         }
-                    }
 
-                    // 削除リストをループ
-                    foreach (var hoge in _tmpQueue)
-                    {
-                        Queue.Remove(hoge);
-                    }
-
-                    // 新しいリストの中から既存のリストにないものを追加または更新
-                    foreach (var sng in _MPC.CurrentQueue)
-                    {
-                        var fuga = Queue.FirstOrDefault(i => i.Id == sng.Id);
-                        if (fuga != null)
+                        // 削除リストをループ
+                        foreach (var hoge in _tmpQueue)
                         {
-                            // TODO:
-                            fuga.Pos = sng.Pos;
-                            //fuga.Id = sng.Id; // 流石にIDは変わらないだろう。
-                            fuga.LastModified = sng.LastModified;
-                            //fuga.Time = sng.Time; // format exception が煩い。
-                            fuga.Title = sng.Title;
-                            fuga.Artist = sng.Artist;
-                            fuga.Album = sng.Album;
-                            fuga.AlbumArtist = sng.AlbumArtist;
-                            fuga.Composer = sng.Composer;
-                            fuga.Date = sng.Date;
-                            fuga.duration = sng.duration;
-                            fuga.file = sng.file;
-                            fuga.Genre = sng.Genre;
-                            fuga.Track = sng.Track;
+                            Queue.Remove(hoge);
+                        }
 
-                            //Queue.Move(fuga.Index, sng.Index);
-                            fuga.Index = sng.Index;
+                        // 新しいリストの中から既存のリストにないものを追加または更新
+                        foreach (var sng in _MPC.CurrentQueue)
+                        {
+                            var fuga = Queue.FirstOrDefault(i => i.Id == sng.Id);
+                            if (fuga != null)
+                            {
+                                // TODO:
+                                fuga.Pos = sng.Pos;
+                                //fuga.Id = sng.Id; // 流石にIDは変わらないだろう。
+                                fuga.LastModified = sng.LastModified;
+                                //fuga.Time = sng.Time; // format exception が煩い。
+                                fuga.Title = sng.Title;
+                                fuga.Artist = sng.Artist;
+                                fuga.Album = sng.Album;
+                                fuga.AlbumArtist = sng.AlbumArtist;
+                                fuga.Composer = sng.Composer;
+                                fuga.Date = sng.Date;
+                                fuga.duration = sng.duration;
+                                fuga.file = sng.file;
+                                fuga.Genre = sng.Genre;
+                                fuga.Track = sng.Track;
+
+                                //Queue.Move(fuga.Index, sng.Index);
+                                fuga.Index = sng.Index;
+                            }
+                            else
+                            {
+                                Queue.Add(sng);
+                                //Queue.Insert(sng.Index, sng);
+                            }
+                        }
+
+                        // Set Current and NowPlaying.
+                        var curitem = Queue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
+                        if (curitem != null)
+                        {
+                            CurrentSong = (curitem as MPC.SongInfo);
+                            (curitem as MPC.SongInfo).IsPlaying = true;
+
+                            // AlbumArt
+                            if (_MPC.AlbumArt.SongFilePath != curitem.file)
+                            {
+                                IsAlbumArtVisible = false;
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    AlbumArt = _albumArtDefault;
+                                });
+
+                                if (!String.IsNullOrEmpty((curitem as MPC.SongInfo).file))
+                                {
+                                    _MPC.MpdQueryAlbumArt((curitem as MPC.SongInfo).file);
+                                }
+                            }
                         }
                         else
                         {
-                            Queue.Add(sng);
-                            //Queue.Insert(sng.Index, sng);
-                        }
-                    }
+                            CurrentSong = null;
 
-                    // Set Current and NowPlaying.
-                    var curitem = Queue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
-                    if (curitem != null)
-                    {
-                        CurrentSong = (curitem as MPC.SongInfo);
-                        (curitem as MPC.SongInfo).IsPlaying = true;
-
-                        // AlbumArt
-                        if (_MPC.AlbumArt.SongFilePath != curitem.file)
-                        {
                             IsAlbumArtVisible = false;
                             Application.Current.Dispatcher.Invoke(() =>
                             {
                                 AlbumArt = _albumArtDefault;
                             });
+                        }
 
-                            if (!String.IsNullOrEmpty((curitem as MPC.SongInfo).file))
+                        // 移動したりするとPosが変更されても順番が反映されないので、
+                        var collectionView = CollectionViewSource.GetDefaultView(Queue);
+                        collectionView.SortDescriptions.Add(new SortDescription("Index", ListSortDirection.Ascending));
+                        collectionView.Refresh();
+                    });
+
+
+                }
+                else
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        foreach (var sng in _MPC.CurrentQueue)
+                        {
+                            Queue.Add(sng);
+                        }
+
+                        // Set Current and NowPlaying.
+                        var curitem = Queue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
+                        if (curitem != null)
+                        {
+                            CurrentSong = (curitem as MPC.SongInfo);
+                            (curitem as MPC.SongInfo).IsPlaying = true;
+
+                            // AlbumArt
+                            if (_MPC.AlbumArt.SongFilePath != curitem.file)
                             {
-                                _MPC.MpdQueryAlbumArt((curitem as MPC.SongInfo).file);
+                                IsAlbumArtVisible = false;
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    AlbumArt = _albumArtDefault;
+                                });
+
+                                if (!String.IsNullOrEmpty((curitem as MPC.SongInfo).file))
+                                {
+                                    _MPC.MpdQueryAlbumArt((curitem as MPC.SongInfo).file);
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        CurrentSong = null;
-
-                        IsAlbumArtVisible = false;
-                        Application.Current.Dispatcher.Invoke(() =>
+                        else
                         {
-                            AlbumArt = _albumArtDefault;
-                        });
-                    }
+                            CurrentSong = null;
 
-                    // 移動したりするとPosが変更されても順番が反映されないので、
-                    var collectionView = CollectionViewSource.GetDefaultView(Queue);
-                    collectionView.SortDescriptions.Add(new SortDescription("Index", ListSortDirection.Ascending));
-                    collectionView.Refresh();
-                });
+                            IsAlbumArtVisible = false;
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                AlbumArt = _albumArtDefault;
+                            });
+                        }
+                    });
+                }
 
                 IsBusy = false;
             }
@@ -3690,7 +3775,7 @@ namespace MPDCtrl.ViewModels
                 IsConnectionSettingShow = false;
 
                 Debug.WriteLine("ConnectionStatus_Connected");
-                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connected;
+                ConnectionStatusMessage = "";// MPDCtrl.Properties.Resources.ConnectionStatus_Connected;
                 StatusButton = _pathConnectedButton;
             }
             else if (status == TCPC.ConnectionStatus.Connecting)
@@ -3824,6 +3909,14 @@ namespace MPDCtrl.ViewModels
 
             if (r.isSuccess)
             {
+
+                // Wait for "MPD OK"
+
+                // Handled at OnMpdConnected
+                /*
+
+                //_MPC.MpdSendPassword();
+
                 if (IsUpdateOnStartup)
                 {
                     _MPC.MpdSendUpdate();
@@ -3840,6 +3933,7 @@ namespace MPDCtrl.ViewModels
                 // heavy stuff should be the last.
                 _MPC.MpdQueryListAll();
 
+                */
             }
             else
             {
@@ -3851,6 +3945,7 @@ namespace MPDCtrl.ViewModels
 
         private async Task<ConnectionResult> StartConnection()
         {
+            MpdVersion = "";
 
             StatusButton = _pathConnectingButton;
             ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connecting;
@@ -4911,127 +5006,6 @@ namespace MPDCtrl.ViewModels
             SettingProfileEditMessage = MPDCtrl.Properties.Resources.Settings_ProfileUpdated;
         }
 
-        public ICommand ConnectCommand { get; }
-        public bool ConnectCommand_CanExecute()
-        {
-            return true;
-        }
-        public async void ConnectCommand_Execute(object obj)
-        {
-            if (obj == null) return;
-
-            // Validate Host input.
-            if (Host == "")
-            {
-                SetError("Host", "Error: Host must be epecified."); //TODO: translate
-                NotifyPropertyChanged("Host");
-                return;
-            }
-            else
-            {
-                if (Host == "localhost")
-                {
-                    Host = "127.0.0.1";
-                }
-
-                IPAddress ipAddress = null;
-                try
-                {
-                    ipAddress = IPAddress.Parse(Host);
-                    if (ipAddress != null)
-                    {
-                        ClearErrror("Host");
-                    }
-                }
-                catch
-                {
-                    //System.FormatException
-                    SetError("Host", "Error: Invalid address format."); //TODO: translate
-
-                    return;
-                }
-            }
-
-            if (_port == 0)
-            {
-                SetError("Port", "Error: Port must be epecified."); //TODO: translate.
-                return;
-            }
-
-            // for Unbindable PasswordBox.
-            var passwordBox = obj as PasswordBox;
-            if (!String.IsNullOrEmpty(passwordBox.Password))
-            {
-                Password = passwordBox.Password;
-            }
-
-
-            //
-            _MPC.MpdHost = _host;
-            _MPC.MpdPort = _port;
-            _MPC.MpdPassword = _password;
-
-            // Clear current...
-            if (CurrentSong != null)
-            {
-                CurrentSong.IsPlaying = false;
-                CurrentSong = null;
-            }
-            if (CurrentSong != null)
-            {
-                SelectedSong = null;
-            }
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                Queue.Clear();
-                LocalFiles.Clear();
-                Playlists.Clear();
-            });
-
-            //
-            ConnectionResult r = await StartConnection();
-
-            if (r.isSuccess)
-            {
-                IsConnectionSettingShow = false;
-                IsSettingsShow = false;
-
-
-                if (CurrentProfile == null)
-                {
-                    //
-                    Profile prof = new Profile();
-                    prof.Name = _host + ":" + _port.ToString();
-                    prof.Host = _host;
-                    prof.Port = _port;
-                    prof.Password = _password;
-                    prof.IsDefault = true;
-
-                    CurrentProfile = prof;
-                    SelectedProfile = prof;
-
-                    Profiles.Add(prof);
-
-                    // 初回だからUpdateしておく。
-                    _MPC.MpdSendUpdate();
-                }
-                else
-                {
-                    CurrentProfile.Name = _host + ":" + _port.ToString();
-                    CurrentProfile.Host = _host;
-                    CurrentProfile.Port = _port;
-                    CurrentProfile.Password = _password;
-                }
-
-                //
-                _MPC.MpdQueryCurrentQueue();
-                _MPC.MpdQueryStatus();
-                _MPC.MpdQueryPlaylists();
-                _MPC.MpdQueryListAll();
-                //
-            }
-        }
-
         public ICommand ChangeConnectionProfileCommand { get; }
         public bool ChangeConnectionProfileCommand_CanExecute()
         {
@@ -5111,13 +5085,13 @@ namespace MPDCtrl.ViewModels
             {
                 SelectedSong = null;
             }
+
             Application.Current.Dispatcher.Invoke(() =>
             {
                 Queue.Clear();
                 LocalFiles.Clear();
                 Playlists.Clear();
             });
-
 
             //
             _MPC.MpdHost = _host;
@@ -5179,12 +5153,13 @@ namespace MPDCtrl.ViewModels
 
                 }
 
-                //
+                // Handled at OnMpdConnected.
+                /*
                 _MPC.MpdQueryCurrentQueue();
                 _MPC.MpdQueryStatus();
                 _MPC.MpdQueryPlaylists();
                 _MPC.MpdQueryListAll();
-                //
+                */
             }
             else
             {
@@ -5192,7 +5167,6 @@ namespace MPDCtrl.ViewModels
             }
 
         }
-
 
         #endregion
 

@@ -157,7 +157,7 @@
     <value>コネクション</value>
   </data>
   <data name="ConnectionStatus_Connected" xml:space="preserve">
-    <value />
+    <value>接続済み</value>
   </data>
   <data name="ConnectionStatus_ConnectFail_Timeout" xml:space="preserve">
     <value>通信が遮断しました。（ConnectFail_Timeout）</value>

@@ -237,7 +237,7 @@ namespace MPDCtrl.Models
             };
 
             private MpdPlayState _ps;
-            private int _volume;
+            private int _volume = 50;
             private bool _repeat;
             private bool _random;
             private bool _consume;
@@ -315,7 +315,7 @@ namespace MPDCtrl.Models
 
             public void Reset()
             {
-                _volume = 0;
+                _volume = 50;
                 _repeat = false;
                 _random = false;
                 _consume = false;
@@ -380,6 +380,16 @@ namespace MPDCtrl.Models
             set
             {
                 _password = value;
+            }
+        }
+
+        private string _mpdVer;
+        public string MpdVer
+        {
+            get { return _mpdVer; }
+            set
+            {
+                _mpdVer = value;
             }
         }
 
@@ -496,6 +506,7 @@ namespace MPDCtrl.Models
         {
             try
             {
+                MpdVer = "";
                 _status.Reset();
 
                 await Task.Run(() => {
@@ -545,6 +556,8 @@ namespace MPDCtrl.Models
 
         public void MpdDisconnect()
         {
+            MpdVer = "";
+
             _asyncClient.DisConnect();
         }
 
@@ -556,7 +569,7 @@ namespace MPDCtrl.Models
                 {
                     string mpdCommand = "password " + _password.Trim() + "\n";
 
-                    _asyncClient.Send("noidle" + "\n");
+                    _asyncClient.Send("noidle" + "\n"); // do I need this?
                     _asyncClient.Send(mpdCommand);
                     _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
                 }
@@ -1584,6 +1597,7 @@ namespace MPDCtrl.Models
         {
             await Task.Run(() => { ConnectionStatusChanged?.Invoke(this, status); });
         }
+
         private async void TCPClient_ConnectionError(TCPC sender, string data)
         {
             await Task.Run(() => { ErrorReturned?.Invoke(this, MpdErrorTypes.ConnectionError, data); });
@@ -1600,31 +1614,14 @@ namespace MPDCtrl.Models
 
             if ((data as string).StartsWith("OK MPD"))
             {
-                // Connected.
-                await Task.Run(() => { Connected?.Invoke(this); });
+                string ver = (data as string).Replace("OK MPD ", "");
+                MpdVer = ver.Trim();
 
-                //TODO: Needs to be tested.
                 MpdSendPassword();
 
+                // MpdConnected.
+                await Task.Run(() => { Connected?.Invoke(this); });
             }
-            /*
-            else if ((data as string).StartsWith("ACK"))
-            {
-                // Ignore "ACK [50@1] {albumart} No file exists"
-                if ((data as string).Contains("{albumart}"))
-                {
-                    _albumCover = new AlbumCover();
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("ACK@TCPClient_DataReceived: " + (data as string));
-
-                    ErrorReturned?.Invoke(this, MpdErrorTypes.CommandError, (data as string));
-                }
-
-                return;
-            }
-            */
             else
             {
                 await Task.Run(() => { IsBusy?.Invoke(this, true); });
@@ -2012,18 +2009,6 @@ namespace MPDCtrl.Models
                             d = "";
                         }
                     }
-                    /*
-                    else if (value.StartsWith("OK MPD"))
-                    {
-                        // Connected.
-
-                        //TODO: Needs to be tested.
-                        MpdSendPassword();
-
-                        //
-                        await Task.Run(() => { Connected?.Invoke(this); });
-                    }
-                    */
                     else if (value.StartsWith("ACK"))
                     {
                         // Ignore "ACK [50@1] {albumart} No file exists"
@@ -3007,8 +2992,5 @@ namespace MPDCtrl.Models
         #endregion
 
     }
-
-
-
 }
 

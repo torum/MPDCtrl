@@ -34,6 +34,23 @@ namespace MPDCtrl.Views
 
             RestoreButton.Visibility = Visibility.Collapsed;
             MaxButton.Visibility = Visibility.Visible;
+
+
+            if (this.DataContext is MainViewModel vm)
+            {
+                if (vm != null)
+                {
+                    vm.ScrollIntoView += (sender, arg) => { this.ScrollIntoViewTo(arg); };
+                }
+            }
+        }
+
+        public void ScrollIntoViewTo(int arg)
+        {
+            if (QueueListview.Items.Count > arg)
+            {
+                QueueListview.ScrollIntoView(QueueListview.Items[arg]);
+            }
         }
 
         public void BringToForeground()
@@ -84,11 +101,8 @@ namespace MPDCtrl.Views
 
         private void QueueListview_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Not really good when multiple items are selected
+            // Not really good especially when multiple items are selected
             //QueueListview.ScrollIntoView(QueueListview.SelectedItem);
-
-            // Listview flickering...
-            //QueueListview.ScrollToCenterOfView(QueueListview.SelectedItem);
         }
 
         private void TextBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)

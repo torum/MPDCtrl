@@ -781,6 +781,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Jump to Current Song に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueItemContextMenu_ScrollIntoNowPlaying {
+            get {
+                return ResourceManager.GetString("QueueItemContextMenu_ScrollIntoNowPlaying", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Selected Items に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string QueueItemContextMenu_SelectedItems {

@@ -372,6 +372,9 @@ SOFTWARE.</value>
   <data name="QueueItemContextMenu_SaveToPlaylist" xml:space="preserve">
     <value>Save to</value>
   </data>
+  <data name="QueueItemContextMenu_ScrollIntoNowPlaying" xml:space="preserve">
+    <value>Jump to Current Song</value>
+  </data>
   <data name="QueueItemContextMenu_SelectedItems" xml:space="preserve">
     <value>Selected Items</value>
   </data>

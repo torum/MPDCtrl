@@ -784,7 +784,19 @@
                                     </MenuItem>
                                 </ContextMenu>
                                 <ContextMenu x:Key="QueueItemContextMenu">
-
+                                    <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_ScrollIntoNowPlaying}" Command="{Binding Path=DataContext.ScrollIntoNowPlayingCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                        <MenuItem.Resources>
+                                            <ControlTemplate x:Key="NowPlayingIcon">
+                                                <Canvas Background="Transparent" >
+                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M8.5,8.64L13.77,12L8.5,15.36V8.64M6.5,5V19L17.5,12" />
+                                                </Canvas>
+                                            </ControlTemplate>
+                                        </MenuItem.Resources>
+                                        <MenuItem.Icon>
+                                            <ContentControl Template="{StaticResource NowPlayingIcon}" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <Separator/>
                                     <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_SelectedItems}">
                                         <MenuItem.Resources>
                                             <ControlTemplate x:Key="CheckUnderlineIcon">

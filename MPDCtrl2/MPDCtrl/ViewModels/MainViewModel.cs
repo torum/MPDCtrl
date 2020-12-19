@@ -34,13 +34,11 @@ namespace MPDCtrl.ViewModels
     /// 
     /// v2.0.9 以降
     /// 
-    /// 翻訳のリソース、名前の整理と見直し。
     /// テーマの切り替え
-    /// 
-    /// 
+    /// 翻訳のリソース、名前の整理と見直し。
     /// Ctrl+F検索とFilesから直接プレイリストに追加できるように「プレイリストに追加」をコンテキストメニューで。"Save Selected to" context menu.
     /// 「プレイリストの名前変更」をインラインで。
-    /// "今すぐ再生"メニューを追加。
+    /// Files: "追加して再生"メニューを追加。
     /// Files: "再読み込み" context menu.
     /// 
     /// 
@@ -48,13 +46,11 @@ namespace MPDCtrl.ViewModels
     /// Listview の水平スクロールバーのデザイン。
     /// スライダーの上でスクロールして音量変更。
     /// レイアウト見直し（スプリッターのせい）GridSplitterが右に行き過ぎる問題。
-    /// Queue: ScrollIntoView to NowPlaying (not selected item).「現在の曲へ」のコンテキストメニューを追加。イベントでitemを渡す？
-    /// レイアウト大改造？ ３ペイン（上キューと下に２ペイン) + (Treeviewでプレイリストとディレクトリ纏める？？）
     /// タイトルバー右上かどこかで現在のprofileを表示してプルダウンで簡単に切り替えられるようにしたい。
-    /// ステータスバーの右下にStat？
 
 
     /// 更新履歴：
+    /// v2.0.8.1 現在の曲へジャンプを追加。
     /// v2.0.8 store公開。
     /// v2.0.7.2 パスワード送るタイミングを修正した。ステータスバーにMPDのバージョンを表示するようにした。ダミーパスワードが表示されていなかった。
     /// v2.0.7.1 キューが空の時は余計な処理をしないようにして、高速化した。
@@ -123,7 +119,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.8";
+        const string _appVer = "v2.0.8.1";
 
         public string AppVer
         {
@@ -1454,6 +1450,8 @@ namespace MPDCtrl.ViewModels
         public event EventHandler<ShowDebugEventArgs> ShowDebugView;
         public ShowDebugEventArgs ShowDebug = new ShowDebugEventArgs();
 
+        public event EventHandler<int> ScrollIntoView;
+
         #endregion
 
         #region == ダイアログ ==
@@ -2244,6 +2242,7 @@ namespace MPDCtrl.ViewModels
             SongsListviewAddCommand = new GenericRelayCommand<object>(param => SongsListviewAddCommand_Execute(param), param => SongsListviewAddCommand_CanExecute());
             SongFilesListviewAddCommand = new GenericRelayCommand<object>(param => SongFilesListviewAddCommand_Execute(param), param => SongFilesListviewAddCommand_CanExecute());
 
+            ScrollIntoNowPlayingCommand = new RelayCommand(ScrollIntoNowPlayingCommand_Execute, ScrollIntoNowPlayingCommand_CanExecute);
 
             #endregion
 
@@ -3428,6 +3427,9 @@ namespace MPDCtrl.ViewModels
                     {
                         CurrentSong = (item as MPC.SongInfo);
                         (item as MPC.SongInfo).IsPlaying = true;
+
+                        // 
+                        //ScrollIntoView?.Invoke(this, CurrentSong.Index);
                     }
                     else
                     {
@@ -3443,6 +3445,7 @@ namespace MPDCtrl.ViewModels
                         _MPC.MpdQueryAlbumArt(CurrentSong.file);
                     }
                 }
+
 
                 IsBusy = false;
             }
@@ -3600,7 +3603,7 @@ namespace MPDCtrl.ViewModels
             }
             else if ((data as string) == "isStoredPlaylist")
             {
-                // TODO: 
+                // MPCが自動で見に行ってるから特にアクションなし。
             }
             else if ((data as string) == "isLocalFiles")
             {
@@ -4822,6 +4825,25 @@ namespace MPDCtrl.ViewModels
 
             return true;
         }
+
+
+        public ICommand ScrollIntoNowPlayingCommand { get; }
+        public bool ScrollIntoNowPlayingCommand_CanExecute()
+        {
+            if (_MPC == null) { return false; }
+            if (Queue.Count == 0) { return false; }
+            if (CurrentSong == null) { return false; }
+            return true;
+        }
+        public void ScrollIntoNowPlayingCommand_Execute()
+        {
+            if (Queue.Count == 0) return;
+            if (CurrentSong == null) return;
+            if (Queue.Count < CurrentSong.Index + 1) return;
+
+            ScrollIntoView?.Invoke(this, CurrentSong.Index);
+        }
+        
 
         #endregion
 

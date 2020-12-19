@@ -372,6 +372,9 @@ SOFTWARE.</value>
   <data name="QueueItemContextMenu_SaveToPlaylist" xml:space="preserve">
     <value>プレイリストに保存</value>
   </data>
+  <data name="QueueItemContextMenu_ScrollIntoNowPlaying" xml:space="preserve">
+    <value>現在の曲へジャンプ</value>
+  </data>
   <data name="QueueItemContextMenu_SelectedItems" xml:space="preserve">
     <value>選択項目</value>
   </data>

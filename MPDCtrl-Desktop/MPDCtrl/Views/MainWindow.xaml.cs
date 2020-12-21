@@ -50,6 +50,11 @@ namespace MPDCtrl.Views
             if (QueueListview.Items.Count > arg)
             {
                 QueueListview.ScrollIntoView(QueueListview.Items[arg]);
+
+                ListViewItem lvi = QueueListview.ItemContainerGenerator.ContainerFromIndex(arg) as ListViewItem;
+                if (lvi != null)
+                    lvi.Focus();
+
             }
         }
 

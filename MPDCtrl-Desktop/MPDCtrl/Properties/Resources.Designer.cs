@@ -718,7 +718,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Down (CTRL+D) に類似しているローカライズされた文字列を検索します。
+        ///   Down (Ctrl+D) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string QueueItemContextMenu_MoveDown {
             get {
@@ -727,7 +727,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Up (CTRL+U) に類似しているローカライズされた文字列を検索します。
+        ///   Up (Ctrl+U) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string QueueItemContextMenu_MoveUp {
             get {
@@ -763,7 +763,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Remove (CTRL+Delete) に類似しているローカライズされた文字列を検索します。
+        ///   Remove (Ctrl+Delete) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string QueueItemContextMenu_Remove {
             get {
@@ -781,7 +781,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Jump to Current Song に類似しているローカライズされた文字列を検索します。
+        ///   Jump to Current Song (Ctrl+J) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string QueueItemContextMenu_ScrollIntoNowPlaying {
             get {

@@ -143,7 +143,7 @@ namespace MPDCtrl
             DateTime dt = DateTime.Now;
             string nowString = dt.ToString("yyyy/MM/dd HH:mm:ss");
 
-            Errortxt.Append(nowString + " - " + kindTxt + " - " + errorTxt);
+            Errortxt.AppendLine(nowString + " - " + kindTxt + " - " + errorTxt);
         }
 
         public void SaveErrorLog(string logFilePath)

@@ -352,10 +352,10 @@ SOFTWARE.</value>
     <value>Move</value>
   </data>
   <data name="QueueItemContextMenu_MoveDown" xml:space="preserve">
-    <value>Down (CTRL+D)</value>
+    <value>Down (Ctrl+D)</value>
   </data>
   <data name="QueueItemContextMenu_MoveUp" xml:space="preserve">
-    <value>Up (CTRL+U)</value>
+    <value>Up (Ctrl+U)</value>
   </data>
   <data name="QueueItemContextMenu_Queue" xml:space="preserve">
     <value>Current Queue</value>
@@ -367,13 +367,13 @@ SOFTWARE.</value>
     <value>Save as playlist</value>
   </data>
   <data name="QueueItemContextMenu_Remove" xml:space="preserve">
-    <value>Remove (CTRL+Delete)</value>
+    <value>Remove (Ctrl+Delete)</value>
   </data>
   <data name="QueueItemContextMenu_SaveToPlaylist" xml:space="preserve">
     <value>Save to</value>
   </data>
   <data name="QueueItemContextMenu_ScrollIntoNowPlaying" xml:space="preserve">
-    <value>Jump to Current Song</value>
+    <value>Jump to Current Song (Ctrl+J)</value>
   </data>
   <data name="QueueItemContextMenu_SelectedItems" xml:space="preserve">
     <value>Selected Items</value>

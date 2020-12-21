@@ -1640,6 +1640,7 @@
 
                     <Style x:Key="ThumbStyle" TargetType="{x:Type Thumb}">
                         <Setter Property="Margin" Value="0,0,0,0" />
+                        <Setter Property="IsTabStop" Value="False" />
                         <Setter Property="Padding" Value="0,0,0,0" />
                         <Setter Property="BorderBrush" Value="Gray" />
                         <Setter Property="Background" Value="Gainsboro" />
@@ -1863,19 +1864,19 @@
                             </Grid.RowDefinitions>
                             <Border Grid.RowSpan="3" CornerRadius="0" Background="Transparent" />
 
-                            <RepeatButton Grid.Row="0" Height="18" Command="ScrollBar.LineUpCommand" Content="M 0 4 L 8 4 L 4 0 Z" Style="{StaticResource RepeatButtonStyleInc}"/>
+                            <RepeatButton Grid.Row="0" Height="18" Command="ScrollBar.LineUpCommand" Content="M 0 4 L 8 4 L 4 0 Z" Style="{StaticResource RepeatButtonStyleInc}" IsTabStop="False"/>
                             <Track x:Name="PART_Track" Grid.Row="1" IsDirectionReversed="true">
                                 <Track.DecreaseRepeatButton>
-                                    <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource RepeatButtonStyleDec}"/>
+                                    <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource RepeatButtonStyleDec}" IsTabStop="False"/>
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
                                     <Thumb Style="{StaticResource ThumbStyle}"></Thumb>
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
-                                    <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource RepeatButtonStyleInc}"/>
+                                    <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource RepeatButtonStyleInc}" IsTabStop="False"/>
                                 </Track.IncreaseRepeatButton>
                             </Track>
-                            <RepeatButton Grid.Row="3" Height="18" Command="ScrollBar.LineDownCommand" Content="M 0 0 L 4 4 L 8 0 Z" Style="{StaticResource RepeatButtonStyleDec}"/>
+                            <RepeatButton Grid.Row="3" Height="18" Command="ScrollBar.LineDownCommand" Content="M 0 0 L 4 4 L 8 0 Z" Style="{StaticResource RepeatButtonStyleDec}" IsTabStop="False"/>
                         </Grid>
                     </ControlTemplate>
 
@@ -2827,10 +2828,7 @@
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="*" />
                                         </Grid.RowDefinitions>
-                                        <TabPanel Grid.Row="0" x:Name="HeaderPanel" 
-                                                  HorizontalAlignment="Left"
-                                                  IsItemsHost="True" 
-                                                  Margin="0 0 0 0"/>
+                                        <TabPanel Grid.Row="0" x:Name="HeaderPanel" HorizontalAlignment="Left" IsItemsHost="True" Margin="0 0 0 0"/>
                                         <Border Grid.Row="1" x:Name="Border" BorderThickness="0 0.5 0 0" BorderBrush="DimGray" Margin="0">
                                             <ContentPresenter x:Name="PART_SelectedContentHost" Margin="0" ContentSource="SelectedContent" RecognizesAccessKey="True"/>
                                         </Border>
@@ -2842,21 +2840,15 @@
 
                     <Style x:Key="NoChromeTabHeader" TargetType="{x:Type TabItem}">
                         <Setter Property="FocusVisualStyle" Value="{StaticResource NoChromeTabFocusVisualStyle}"/>
+                        <Setter Property="Height" Value="26" />
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Margin" Value="0" />
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="TabItem">
                                     <Grid Name="Panel">
-                                        <Border Name="Border" 
-                                                BorderThickness="0 0 0 2" 
-                                                BorderBrush="Transparent" 
-                                                Margin="0 0 0 0"
-                                                 Background="{DynamicResource BoardBackgroundColorBrush}">
-                                            <ContentPresenter x:Name="ContentSite"
-                                                              VerticalAlignment="Center" 
-                                                              HorizontalAlignment="Center" 
-                                                              ContentSource="Header" 
-                                                               RecognizesAccessKey="True"
-                                                              Margin="4"/>
+                                        <Border Name="Border" BorderThickness="0 0 0 2" BorderBrush="Transparent" Margin="0 0 0 0" Background="{DynamicResource BoardBackgroundColorBrush}">
+                                            <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" RecognizesAccessKey="True" Margin="4"/>
                                         </Border>
                                     </Grid>
                                     <ControlTemplate.Triggers>

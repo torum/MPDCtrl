@@ -20,12 +20,12 @@ using System.Windows.Threading;
 using System.Globalization;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Windows.Media.Imaging;
 using MPDCtrl.Common;
 using MPDCtrl.Views;
 using MPDCtrl.Models;
 using MPDCtrl.Models.Classes;
 using MPDCtrl.ViewModels.Classes;
-using System.Windows.Media.Imaging;
 
 namespace MPDCtrl.ViewModels
 {
@@ -33,9 +33,8 @@ namespace MPDCtrl.ViewModels
     /// 
     /// 
     /// v2.0.9 以降
-    /// 
     /// テーマの切り替え
-    /// 翻訳のリソース、名前の整理と見直し。
+    /// 翻訳のリソースやスタイル、名前の整理と見直し。
     /// Ctrl+F検索とFilesから直接プレイリストに追加できるように「プレイリストに追加」をコンテキストメニューで。"Save Selected to" context menu.
     /// 「プレイリストの名前変更」をインラインで。
     /// Files: "追加して再生"メニューを追加。
@@ -50,6 +49,9 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v2.0.9 store公開。
+    /// v2.0.8.3 ジャンプしたアイテムにフォーカスを移動するように改良しキーボードショートカットを追加。
+    /// v2.0.8.2 エラーログでNewLineが無かった。
     /// v2.0.8.1 現在の曲へジャンプを追加。
     /// v2.0.8 store公開。
     /// v2.0.7.2 パスワード送るタイミングを修正した。ステータスバーにMPDのバージョンを表示するようにした。ダミーパスワードが表示されていなかった。
@@ -101,11 +103,12 @@ namespace MPDCtrl.ViewModels
 
     /// Key Gestures:
     /// Ctrl+S Show Settings
-    /// Ctrl+S Show Find 
-    /// Ctrl+S Playback Play
+    /// Ctrl+F Show Find 
+    /// Ctrl+P Playback Play
     /// Ctrl+U QueueListview Queue Move Up
     /// Ctrl+D QueueListview Queue Move Down
     /// Ctrl+Delete QueueListview Queue Selected Item delete.
+    /// Ctrl+J QueueListview Jump to now playing.
     /// Space Play > reserved for listview..
     /// Ctrl+Delete QueueListview Remove from Queue
     /// Esc Close dialogs.
@@ -119,7 +122,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.8.1";
+        const string _appVer = "v2.0.9.0";
 
         public string AppVer
         {
@@ -4841,7 +4844,11 @@ namespace MPDCtrl.ViewModels
             if (CurrentSong == null) return;
             if (Queue.Count < CurrentSong.Index + 1) return;
 
+            // should I?
+            //SelectedSong = CurrentSong;
+
             ScrollIntoView?.Invoke(this, CurrentSong.Index);
+
         }
         
 

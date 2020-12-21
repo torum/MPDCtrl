@@ -352,10 +352,10 @@ SOFTWARE.</value>
     <value>移動</value>
   </data>
   <data name="QueueItemContextMenu_MoveDown" xml:space="preserve">
-    <value>下へ (CTRL+D)</value>
+    <value>下へ (Ctrl+D)</value>
   </data>
   <data name="QueueItemContextMenu_MoveUp" xml:space="preserve">
-    <value>上へ (CTRL+U)</value>
+    <value>上へ (Ctrl+U)</value>
   </data>
   <data name="QueueItemContextMenu_Queue" xml:space="preserve">
     <value>現在のキュー</value>
@@ -367,13 +367,13 @@ SOFTWARE.</value>
     <value>キューをプレイリストとして保存する</value>
   </data>
   <data name="QueueItemContextMenu_Remove" xml:space="preserve">
-    <value>キューから削除 (CTRL+Delete)</value>
+    <value>キューから削除 (Ctrl+Delete)</value>
   </data>
   <data name="QueueItemContextMenu_SaveToPlaylist" xml:space="preserve">
     <value>プレイリストに保存</value>
   </data>
   <data name="QueueItemContextMenu_ScrollIntoNowPlaying" xml:space="preserve">
-    <value>現在の曲へジャンプ</value>
+    <value>現在の曲へジャンプ (Ctrl+J)</value>
   </data>
   <data name="QueueItemContextMenu_SelectedItems" xml:space="preserve">
     <value>選択項目</value>

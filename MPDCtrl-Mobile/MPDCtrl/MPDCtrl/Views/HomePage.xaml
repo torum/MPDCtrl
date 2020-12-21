@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MPDCtrl.Views.HomePage"
+             xmlns:vm="clr-namespace:MPDCtrl.ViewModels"
+             Title="{Binding Title}">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="Accent">#96d1ff</Color>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollView>
+            <StackLayout Orientation="Vertical" Padding="30,30,30,24" Spacing="10">
+
+                <Image WidthRequest="210" HeightRequest="210" Background="LightGray"></Image>
+
+                <Label Text="{Binding CurrentSongTitle}" FontSize="16" Padding="0,16,0,0" FontAttributes="Bold" HorizontalTextAlignment="Center" LineBreakMode="NoWrap" />
+                <Label FontSize="16" Padding="0,0,0,0" HorizontalTextAlignment="Center" LineBreakMode="NoWrap" >
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <FormattedString.Spans>
+                                <Span Text="{Binding CurrentSongArtist}"/>
+                                <Span Text=" -  "/>
+                                <Span Text="{Binding CurrentSongAlbum}"/>
+                            </FormattedString.Spans>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+
+            </StackLayout>
+        </ScrollView>
+        
+        <ActivityIndicator IsRunning="{Binding IsBusy}" VerticalOptions="CenterAndExpand" />
+
+        <StackLayout Grid.Row="1" BackgroundColor="{StaticResource Accent}" VerticalOptions="FillAndExpand" HorizontalOptions="Fill" HeightRequest="160">
+            <ContentView VerticalOptions="FillAndExpand">
+                <StackLayout Orientation="Horizontal" HorizontalOptions="Center" VerticalOptions="Center">
+                <!--
+                <ContentView Padding="0,40,0,40" VerticalOptions="FillAndExpand" HeightRequest="80">
+                    <Image Source="xamarin_logo.png" VerticalOptions="Center" HeightRequest="64" />
+                </ContentView>
+                -->
+                    <ImageButton Command="{Binding PlayBackButtonCommand}" Margin="0,10,0,0" WidthRequest="50" HeightRequest="50" BackgroundColor="{StaticResource NonePrimary}" />
+                    <ImageButton Command="{Binding PlayButtonCommand}" Margin="20,10,20,0" WidthRequest="50" HeightRequest="50" BackgroundColor="{StaticResource Primary}"  />
+                    <ImageButton Command="{Binding PlayNextButtonCommand}" Margin="0,10,0,0" WidthRequest="50" HeightRequest="50" BackgroundColor="{StaticResource NonePrimary}"  />
+
+                </StackLayout>
+            </ContentView>
+        </StackLayout>
+
+    </Grid>
+
+</ContentPage>

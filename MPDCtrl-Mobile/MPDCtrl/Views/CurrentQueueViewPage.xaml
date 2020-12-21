@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="MPDCtrl.Views.QueueViewPage" xmlns:vm="clr-namespace:MPDCtrl.ViewModels" Title="{Binding Title}" Shell.PresentationMode="ModalAnimated" xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core" ios:Page.UseSafeArea="true">
+    <ListView x:Name="MyListView" ItemsSource="{Binding Items}" ItemTapped="Handle_ItemTapped" CachingStrategy="RecycleElement">
+        <!--Built in Cells-->
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <TextCell Text="{Binding .}" />
+            </DataTemplate>
+        </ListView.ItemTemplate>
+        <!--Custom View Cells-->
+        <!--
+    <ListView.ItemTemplate>
+      <DataTemplate>
+        <ViewCell>
+          <StackLayout>
+            <Label Text="{Binding Text}" 
+                   Style="{DynamicResource ListItemTextStyle}" />
+            <Label Text="{Binding Detail}" 
+                   Style="{DynamicResource ListItemDetailTextStyle}"/>
+          </StackLayout>
+        </ViewCell>
+      </DataTemplate>
+    </ListView.ItemTemplate>
+    -->
+    </ListView>
+</ContentPage>

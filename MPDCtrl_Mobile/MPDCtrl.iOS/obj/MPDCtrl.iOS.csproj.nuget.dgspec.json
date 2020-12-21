@@ -1,0 +1,59 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/torum/Projects/MPDCtrl/MPDCtrl.iOS/MPDCtrl.iOS.csproj": {}
+  },
+  "projects": {
+    "/Users/torum/Projects/MPDCtrl/MPDCtrl.iOS/MPDCtrl.iOS.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/torum/Projects/MPDCtrl/MPDCtrl.iOS/MPDCtrl.iOS.csproj",
+        "projectName": "MPDCtrl.iOS",
+        "projectPath": "/Users/torum/Projects/MPDCtrl/MPDCtrl.iOS/MPDCtrl.iOS.csproj",
+        "packagesPath": "/Users/torum/.nuget/packages/",
+        "outputPath": "/Users/torum/Projects/MPDCtrl/MPDCtrl.iOS/obj/",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "configFilePaths": [
+          "/Users/torum/.config/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "xamarinios10"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "xamarinios10": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "xamarinios10": {
+          "dependencies": {
+            "Xamarin.Essentials": {
+              "target": "Package",
+              "version": "[1.5.3.2, )"
+            },
+            "Xamarin.Forms": {
+              "target": "Package",
+              "version": "[4.8.0.1451, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}

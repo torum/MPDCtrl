@@ -20,3 +20,4 @@ WPF/WpfMPD/Icons/data/wpd3.svg
 WPF/WpfMPD/Icons/data/wpd2.svg
 *.baml
 *.cache
+.DS_Store

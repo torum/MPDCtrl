@@ -7,6 +7,7 @@ using MPDCtrl.Models;
 using MPDCtrl.Models.Classes;
 using System.Diagnostics;
 using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace MPDCtrl.ViewModels
 {
@@ -100,6 +101,37 @@ namespace MPDCtrl.ViewModels
         }
 
         #endregion
+
+
+        private SongInfo _selectedItem;
+        public SongInfo SelectedItem
+        {
+            get => _selectedItem;
+            set
+            {
+                if (value == _selectedItem)
+                    return;
+
+                SetProperty(ref _selectedItem, value);
+
+                OnItemSelected(value);
+            }
+        }
+
+        public ObservableCollection<SongInfo> Queue
+        {
+            get
+            {
+                if (_con != null)
+                {
+                    return _con.Queue;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
         #region == Player controls ==
 
@@ -481,6 +513,8 @@ namespace MPDCtrl.ViewModels
         //
         private System.Timers.Timer _elapsedTimer;
 
+        public event EventHandler<SongInfo> ScrollIntoView;
+
         public HomeViewModel()
         {
             Title = "Now Playing";
@@ -509,6 +543,8 @@ namespace MPDCtrl.ViewModels
             SingleButtonCommand = new Command(() => SetSingle());
             VolumeSliderCommand = new Command(() => SetVolume());
             SeekSliderCommand = new Command(() => SetSeek());
+
+            ItemSelected = new Command<SongInfo>(OnItemSelected);
         }
 
         public void OnAppearing()
@@ -654,6 +690,11 @@ namespace MPDCtrl.ViewModels
                     {
                         CurrentSong = (item as SongInfo);
                         (item as SongInfo).IsPlaying = true;
+
+                        _selectedItem = CurrentSong;
+                        NotifyPropertyChanged("SelectedItem");
+
+                        ScrollIntoView?.Invoke(this, CurrentSong);
                     }
                     else
                     {
@@ -840,5 +881,14 @@ namespace MPDCtrl.ViewModels
 
 
         #endregion
+
+        public Command<SongInfo> ItemSelected { get; }
+        void OnItemSelected(SongInfo item)
+        {
+            if (item == null)
+                return;
+
+            _mpc.MpdPlaybackPlay(item.Id);
+        }
     }
 }

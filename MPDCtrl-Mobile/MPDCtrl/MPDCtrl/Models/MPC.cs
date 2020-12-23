@@ -788,7 +788,6 @@ namespace MPDCtrl.Models
             }
         }
         
-
         public void MpdChangePlaylist(string playlistName)
         {
             if (playlistName.Trim() != "")

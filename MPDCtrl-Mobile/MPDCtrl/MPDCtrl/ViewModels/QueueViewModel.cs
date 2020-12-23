@@ -24,12 +24,29 @@ namespace MPDCtrl.ViewModels
             get => _selectedItem;
             set
             {
+                if (value == _selectedItem)
+                    return;
+
                 SetProperty(ref _selectedItem, value);
+
                 OnItemSelected(value);
             }
         }
 
-        public ObservableCollection<SongInfo> Queue { get; set; } = new ObservableCollection<SongInfo>();
+        public ObservableCollection<SongInfo> Queue
+        {
+            get
+            {
+                if (_con != null)
+                {
+                    return _con.Queue;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
         public QueueViewModel()
         {
@@ -39,7 +56,7 @@ namespace MPDCtrl.ViewModels
             _con = me.MpdConection;
             _mpc = _con.Mpc;
 
-            Queue = _con.Queue;
+            //Queue = _con.Queue;
 
             _mpc.IsBusy += new MPC.MpdIsBusy(OnClientIsBusy);
 

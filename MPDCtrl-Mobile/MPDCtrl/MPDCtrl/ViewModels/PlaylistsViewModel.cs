@@ -19,7 +19,11 @@ namespace MPDCtrl.ViewModels
             get => _selectedItem;
             set
             {
+                if (value == _selectedItem)
+                    return;
+
                 SetProperty(ref _selectedItem, value);
+
                 OnItemSelected(value);
             }
         }

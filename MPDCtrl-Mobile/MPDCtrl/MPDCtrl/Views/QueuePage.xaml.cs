@@ -16,6 +16,7 @@ namespace MPDCtrl.Views
         {
             InitializeComponent();
             BindingContext = new QueueViewModel();
+
         }
 
         protected override void OnAppearing()
@@ -23,5 +24,6 @@ namespace MPDCtrl.Views
             base.OnAppearing();
             (BindingContext as QueueViewModel).OnAppearing();
         }
+
     }
 }

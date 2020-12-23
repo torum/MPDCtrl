@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using System.Collections.ObjectModel;
 using MPDCtrl.Models;
 using MPDCtrl.ViewModels;
 
@@ -13,6 +14,8 @@ namespace MPDCtrl.Views
         {
             InitializeComponent();
             BindingContext = new HomeViewModel();
+
+            (BindingContext as HomeViewModel).ScrollIntoView += (sender, arg) => { this.ScrollIntoViewTo(arg); };
         }
 
         protected override void OnAppearing()
@@ -20,5 +23,13 @@ namespace MPDCtrl.Views
             base.OnAppearing();
             (BindingContext as HomeViewModel).OnAppearing();
         }
+
+        public void ScrollIntoViewTo(SongInfo arg)
+        {
+
+            HomeQueueListview.ScrollTo(arg, Xamarin.Forms.ScrollToPosition.Start, true);
+
+        }
+
     }
 }

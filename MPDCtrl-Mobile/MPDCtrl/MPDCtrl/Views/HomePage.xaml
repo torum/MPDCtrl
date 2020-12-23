@@ -2,7 +2,11 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MPDCtrl.Views.HomePage"
-             xmlns:vm="clr-namespace:MPDCtrl.ViewModels"
+             xmlns:vm="clr-namespace:MPDCtrl.ViewModels" 
+             xmlns:model="clr-namespace:MPDCtrl.Models"
+             Shell.PresentationMode="ModalAnimated" 
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core" 
+             ios:Page.UseSafeArea="true"
              Title="{Binding Title}">
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -15,21 +19,31 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        <ScrollView>
+            <StackLayout Orientation="Vertical" Padding="10,30,10,24" Spacing="10" VerticalOptions="FillAndExpand" HorizontalOptions="Fill">
 
-        <StackLayout Orientation="Vertical" Padding="30,30,30,24" Spacing="10" VerticalOptions="FillAndExpand" HorizontalOptions="Fill">
-            
-            <Frame CornerRadius="5" Padding="0" IsClippedToBounds="True" VerticalOptions="FillAndExpand" HorizontalOptions="Center">
-                <Image Source="DefaultAlbumCoverGray.png" WidthRequest="210" HeightRequest="210" Aspect="AspectFit" VerticalOptions="FillAndExpand" HorizontalOptions="Center"></Image>
-            </Frame>
-            
-            <StackLayout Orientation="Vertical" HeightRequest="150" VerticalOptions="Center" HorizontalOptions="Fill">
-                <Label Text="{Binding CurrentSongTitle}" FontSize="16" Padding="0,16,0,0" FontAttributes="Bold" HorizontalTextAlignment="Center" LineBreakMode="NoWrap" />
-                <Label Text="{Binding CurrentSongArtistAndAlbum}" FontSize="16" Padding="0,0,0,0" HorizontalTextAlignment="Center" LineBreakMode="NoWrap"></Label>
+                <Frame CornerRadius="5" Padding="0" IsClippedToBounds="True" VerticalOptions="Center" HorizontalOptions="Center" Margin="0, 0, 0, 0">
+                    <Image Source="DefaultAlbumCoverGray.png" WidthRequest="210" HeightRequest="210" Aspect="AspectFit" VerticalOptions="Center" HorizontalOptions="Center"></Image>
+                </Frame>
+
+                <StackLayout Orientation="Vertical" VerticalOptions="Center" HorizontalOptions="Fill">
+                    <Label Text="{Binding CurrentSongTitle}" FontSize="16" Padding="0,0,0,0" FontAttributes="Bold" HorizontalTextAlignment="Center" LineBreakMode="NoWrap" />
+                    <Label Text="{Binding CurrentSongArtistAndAlbum}" FontSize="16" Padding="0,0,0,0" HorizontalTextAlignment="Center" LineBreakMode="NoWrap"></Label>
+                </StackLayout>
+
+                <ListView x:Name="HomeQueueListview" Margin="0, 24, 0, 0" ItemsSource="{Binding Queue}" SelectionMode="Single" SelectedItem="{Binding SelectedItem,Mode=TwoWay}" x:DataType="vm:HomeViewModel">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ImageCell ImageSource="Icon-music-circle.png" Text="{Binding Title}" Detail="{Binding ArtistAndAlbumText}" x:DataType="model:SongInfo">
+                            </ImageCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
             </StackLayout>
+        </ScrollView>
 
-        </StackLayout>
-
-        <StackLayout Grid.Row="1" BackgroundColor="{StaticResource Accent}" VerticalOptions="FillAndExpand" HorizontalOptions="Fill" HeightRequest="170">
+        <StackLayout Grid.Row="1" BackgroundColor="{StaticResource Accent}" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="170">
             <ContentView VerticalOptions="FillAndExpand">
 
                 <Grid HorizontalOptions="Center" VerticalOptions="Center">
@@ -40,7 +54,7 @@
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="60" />
-                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="60" />
                     </Grid.ColumnDefinitions>
 

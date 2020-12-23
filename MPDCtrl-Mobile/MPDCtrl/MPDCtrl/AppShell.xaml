@@ -14,13 +14,13 @@
     <Shell.Resources>
         <ResourceDictionary>
             <Style x:Key="BaseStyle" TargetType="Element">
-                <Setter Property="Shell.BackgroundColor" Value="{StaticResource Primary}" />
-                <Setter Property="Shell.ForegroundColor" Value="White" />
-                <Setter Property="Shell.TitleColor" Value="White" />
+                <Setter Property="Shell.BackgroundColor" Value="#eee" />
+                <Setter Property="Shell.ForegroundColor" Value="#2196F3" />
+                <Setter Property="Shell.TitleColor" Value="Black" />
                 <Setter Property="Shell.DisabledColor" Value="#B4FFFFFF" />
                 <Setter Property="Shell.UnselectedColor" Value="#95FFFFFF" />
-                <Setter Property="Shell.TabBarBackgroundColor" Value="{StaticResource Primary}" />
-                <Setter Property="Shell.TabBarForegroundColor" Value="White"/>
+                <Setter Property="Shell.TabBarBackgroundColor" Value="#eee" />
+                <Setter Property="Shell.TabBarForegroundColor" Value="#2196F3"/>
                 <Setter Property="Shell.TabBarUnselectedColor" Value="#95FFFFFF"/>
                 <Setter Property="Shell.TabBarTitleColor" Value="White"/>
             </Style>
@@ -47,7 +47,7 @@
                             </VisualState>
                             <VisualState x:Name="Selected">
                                 <VisualState.Setters>
-                                    <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                                    <Setter Property="BackgroundColor" Value="#2196F3" />
                                 </VisualState.Setters>
                             </VisualState>
                         </VisualStateGroup>
@@ -79,22 +79,27 @@
         FlyoutDisplayOptions="AsMultipleItems" will create a separate flyout item for each child element    
         https://docs.microsoft.com/dotnet/api/xamarin.forms.shellgroupitem.flyoutdisplayoptions?view=xamarin-forms
     -->
-    <FlyoutItem Title="Now Playing" Icon="icon_about.png">
+    <FlyoutItem Title="Now Playing" Icon="FlyoutIcon_NowPlaying.png">
         <ShellContent Route="HomePage" ContentTemplate="{DataTemplate local:HomePage}" />
     </FlyoutItem>
-    <FlyoutItem Title="Queue" Icon="icon_about.png">
+    <FlyoutItem Title="Queue" Icon="FlyoutIcon_Queue.png">
         <ShellContent Route="QueuePage" ContentTemplate="{DataTemplate local:QueuePage}" />
     </FlyoutItem>
-    <FlyoutItem Title="Playlists" Icon="icon_about.png">
+    <FlyoutItem Title="Playlists" Icon="FlyoutIcon_Playlists.png">
         <ShellContent Route="PlaylistsPage" ContentTemplate="{DataTemplate local:PlaylistsPage}" />
     </FlyoutItem>
-    <FlyoutItem Title="Browse" Icon="icon_feed.png">
+    <FlyoutItem Title="Search" Icon="FlyoutIcon_Search.png">
         <ShellContent Route="ItemsPage" ContentTemplate="{DataTemplate local:ItemsPage}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Setting" Icon="FlyoutIcon_Settings.png">
+        <ShellContent Route="SettingPage" ContentTemplate="{DataTemplate local:SettingPage}" />
     </FlyoutItem>
 
     <!-- When the Flyout is visible this will be a menu item you can tie a click behavior to  -->
+    <!--
     <MenuItem Text="Logout" StyleClass="MenuItemLayoutStyle" Clicked="OnMenuItemClicked">
     </MenuItem>
+    -->
 
     <!--
         TabBar lets you define content that won't show up in a flyout menu. When this content is active

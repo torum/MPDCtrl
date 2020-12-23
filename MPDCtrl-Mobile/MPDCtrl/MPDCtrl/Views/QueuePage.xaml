@@ -1,50 +1,82 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="MPDCtrl.Views.QueuePage" xmlns:vm="clr-namespace:MPDCtrl.ViewModels" xmlns:model="clr-namespace:MPDCtrl.Models" Title="{Binding Title}" Shell.PresentationMode="ModalAnimated" xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core" ios:Page.UseSafeArea="true">
     <ContentPage.ToolbarItems>
-        <!--
-        <ToolbarItem Text="Add" Command="{Binding AddItemCommand}" />
-        -->
-        <ToolbarItem Text="Edit" />
-
+        <ToolbarItem Text="Clear" Command="{Binding QueueClearCommand}" />
     </ContentPage.ToolbarItems>
-
     <Grid>
-        <!--
-      x:DataType enables compiled bindings for better performance and compile time validation of binding expressions.
-      https://docs.microsoft.com/xamarin/xamarin-forms/app-fundamentals/data-binding/compiled-bindings
-    -->
+
         <StackLayout>
-            <CollectionView ItemsSource="{Binding Queue}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}" x:DataType="vm:QueueViewModel">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <StackLayout Padding="6" x:DataType="model:SongInfo">
-                        <Label Text="{Binding Title}" LineBreakMode="NoWrap" Style="{DynamicResource ListItemTextStyle}" FontSize="16" />
-                        <Label LineBreakMode="NoWrap" Style="{DynamicResource ListItemDetailTextStyle}" FontSize="13" TextColor="Gray" >
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <FormattedString.Spans>
-                                        <Span Text="{Binding Artist}"/>
-                                        <Span Text=" -  "/>
-                                        <Span Text="{Binding Album}"/>
-                                    </FormattedString.Spans>
-                                </FormattedString>
-                            </Label.FormattedText>
-                        </Label>
-                        <StackLayout.GestureRecognizers>
-                            <TapGestureRecognizer NumberOfTapsRequired="1" Command="{Binding Path=ItemTapped, Source={RelativeSource AncestorType={x:Type vm:QueueViewModel}}}" CommandParameter="{Binding .}">
-                            </TapGestureRecognizer>
-                        </StackLayout.GestureRecognizers>
-                    </StackLayout>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+
+            <ListView ItemsSource="{Binding Queue}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}" x:DataType="vm:QueueViewModel">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ImageCell ImageSource="Icon-music-circle.png" Text="{Binding Title}" Detail="{Binding ArtistAndAlbumText}" x:DataType="model:SongInfo">
+                            <ImageCell.ContextActions>
+                                <MenuItem Text="Save to" Command="{Binding Path=QueueItemSaveToCommand, Source={RelativeSource AncestorType={x:Type vm:QueueViewModel}}}" CommandParameter="{Binding .}" />
+                                <MenuItem Text="Remove" Command="{Binding Path=QueueItemDeleteCommand, Source={RelativeSource AncestorType={x:Type vm:QueueViewModel}}}" CommandParameter="{Binding .}" IsDestructive="True" />
+                            </ImageCell.ContextActions>
+                        </ImageCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            
+            <!--
+            <CollectionView x:Name="QueueCollectionView" ItemsSource="{Binding Queue}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}" x:DataType="vm:QueueViewModel">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <SwipeView x:DataType="model:SongInfo">
+                            <SwipeView.RightItems>
+                                <SwipeItems>
+                                    <SwipeItem Text="Delete" BackgroundColor="Red" Command="{Binding Path=QueueItemDeleteCommand, Source={RelativeSource AncestorType={x:Type vm:QueueViewModel}}}" CommandParameter="{Binding .}" />
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+
+                            <StackLayout Padding="6" x:DataType="model:SongInfo">
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Image Grid.Row="0" Grid.Column="0" Source="music-note-36-black.png" WidthRequest="20" HeightRequest="20"></Image>
+
+                                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding Title}" LineBreakMode="NoWrap" Style="{DynamicResource ListItemTextStyle}" FontSize="16" />
+
+                                    <Label Grid.Row="1" Grid.Column="1" Margin="0" Padding="0" LineBreakMode="NoWrap" Style="{DynamicResource ListItemDetailTextStyle}" FontSize="13" TextColor="Gray" >
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <FormattedString.Spans>
+                                                    <Span Text="{Binding Artist}"/>
+                                                    <Span Text=" -  "/>
+                                                    <Span Text="{Binding Album}"/>
+                                                </FormattedString.Spans>
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                </Grid>
+
+                                <StackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer NumberOfTapsRequired="1" Command="{Binding Path=ItemTapped, Source={RelativeSource AncestorType={x:Type vm:QueueViewModel}}}" CommandParameter="{Binding .}">
+                                    </TapGestureRecognizer>
+                                </StackLayout.GestureRecognizers>
+
+                            </StackLayout>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            -->
+            
         </StackLayout>
     
         <ActivityIndicator IsRunning="{Binding IsBusy}" VerticalOptions="CenterAndExpand" />
 
     </Grid>
-    
-        
-
-
 </ContentPage>

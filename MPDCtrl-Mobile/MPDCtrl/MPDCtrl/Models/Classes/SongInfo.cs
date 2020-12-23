@@ -22,7 +22,7 @@ namespace MPDCtrl.Models
                     return;
 
                 _pos = value;
-                this.NotifyPropertyChanged("Pos");
+                NotifyPropertyChanged("Pos");
             }
         }
 
@@ -39,9 +39,25 @@ namespace MPDCtrl.Models
                     return;
 
                 _isPlaying = value;
-                this.NotifyPropertyChanged("IsPlaying");
+                NotifyPropertyChanged("IsPlaying");
+            }
+        }
+
+        public string ArtistAndAlbumText
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(Album))
+                {
+                    return Artist + " - " + Album;
+                }
+                else
+                {
+                    return Artist;
+                }
             }
         }
     }
+
 
 }

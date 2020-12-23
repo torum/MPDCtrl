@@ -27,6 +27,7 @@
     <MtouchArch>x86_64</MtouchArch>
     <MtouchLink>None</MtouchLink>
     <MtouchDebug>true</MtouchDebug>
+    <OptimizePNGs>true</OptimizePNGs>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -70,57 +71,66 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\AppIcon1024.png">
+      <Visible>false</Visible>
+    </ImageAsset>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon1024.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon180.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon167.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon152.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon120.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon87.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon80.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon76.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon60.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon58.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon40.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon29.png">
-      <Visible>false</Visible>
-    </ImageAsset>
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon20.png">
       <Visible>false</Visible>
     </ImageAsset>
     <BundleResource Include="Resources\icon_about.png" />
     <BundleResource Include="Resources\icon_about%402x.png" />
     <BundleResource Include="Resources\icon_about%403x.png" />
-    <BundleResource Include="Resources\icon_feed.png" />
-    <BundleResource Include="Resources\icon_feed%402x.png" />
-    <BundleResource Include="Resources\icon_feed%403x.png" />
-    <BundleResource Include="Resources\xamarin_logo.png" />
-    <BundleResource Include="Resources\xamarin_logo%402x.png" />
-    <BundleResource Include="Resources\xamarin_logo%403x.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon1201.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon1202.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon1521.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon1671.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon1801.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon201.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon291.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon401.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon402.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon403.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon581.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon582.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon601.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon761.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon801.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon802.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon871.png">
+      <Visible>false</Visible>
+    </ImageAsset>
     <InterfaceDefinition Include="Resources\LaunchScreen.storyboard" />
   </ItemGroup>
   <ItemGroup>
@@ -141,6 +151,114 @@
       <Project>{629EABA4-1323-4EA1-90BF-1B889319B7EC}</Project>
       <Name>MPDCtrl</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Player-play-circle-86-black.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Player-pause-circle-86-black.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Player-skip-next-circle-48-black.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Player-skip-previous-circle-48-black.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Player-consume-off.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Player-consume-on.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Player-repeat-off.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Player-repeat-on.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Player-shuffle-off.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Player-shuffle-on.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Player-single-off.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Player-single-on.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\DefaultAlbumCover.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\DefaultAlbumCoverGray.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\FlyoutIcon_NowPlaying.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\FlyoutIcon_NowPlaying%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\FlyoutIcon_NowPlaying%403x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\FlyoutIcon_Playlists.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\FlyoutIcon_Playlists%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\FlyoutIcon_Playlists%403x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\FlyoutIcon_Queue.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\FlyoutIcon_Queue%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\FlyoutIcon_Queue%403x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\FlyoutIcon_Search.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\FlyoutIcon_Search%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\FlyoutIcon_Search%403x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\FlyoutIcon_Settings.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\FlyoutIcon_Settings%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\FlyoutIcon_Settings%403x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Icon-music-circle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Icon-music-circle%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Icon-music-circle%403x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Icon-playlist.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Icon-playlist%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Icon-playlist%403x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Icon-60.png" />
   </ItemGroup>
   <ProjectExtensions>
     <VisualStudio>

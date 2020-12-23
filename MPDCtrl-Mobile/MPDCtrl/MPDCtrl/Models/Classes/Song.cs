@@ -139,7 +139,7 @@ namespace MPDCtrl.Models
                     return;
 
                 _index = value;
-                this.NotifyPropertyChanged("Index");
+                NotifyPropertyChanged("Index");
             }
         }
     }

@@ -15,7 +15,6 @@ namespace MPDCtrl.ViewModels
 {
     public class QueueViewModel : BaseViewModel
     {
-
         private MPC _mpc;
         private Connection _con;
 
@@ -32,10 +31,6 @@ namespace MPDCtrl.ViewModels
 
         public ObservableCollection<SongInfo> Queue { get; set; } = new ObservableCollection<SongInfo>();
 
-        public Command LoadItemsCommand { get; }
-
-        public Command<SongInfo> ItemTapped { get; }
-
         public QueueViewModel()
         {
             Title = "Queue";
@@ -48,75 +43,77 @@ namespace MPDCtrl.ViewModels
 
             _mpc.IsBusy += new MPC.MpdIsBusy(OnClientIsBusy);
 
+            QueueClearCommand = new Command(QueueClear);
 
-
-            ItemTapped = new Command<SongInfo>(OnItemSelected);
-
-            LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
+            //ItemTapped = new Command<SongInfo>(OnItemTapped);
+            ItemSelected = new Command<SongInfo>(OnItemSelected);
+            QueueItemDeleteCommand = new Command<SongInfo>(QueueItemDelete);
+            QueueItemSaveToCommand = new Command<SongInfo>(QueueItemSaveTo);
 
 
         }
 
-
         public void OnAppearing()
         {
-            //IsBusy = true;
             SelectedItem = null;
-
-            if (_con.IsConnected)
-            {
-                if (Queue.Count == 0)
-                {
-                    //_mpc.MpdQueryCurrentQueue();
-                }
-            }
         }
 
         private void OnClientIsBusy(MPC sender, bool on)
         {
-            this.IsBusy = on;
+            IsBusy = on;
         }
 
-        async Task ExecuteLoadItemsCommand()
+        public Command QueueClearCommand { get; }
+        void QueueClear()
         {
-            //IsBusy = true;
-
-            try
+            if (_con.IsConnected)
             {
-                //Queue.Clear();
-                if (Queue.Count == 0)
-                {
-                    _mpc.MpdQueryCurrentQueue();
-                }
-
-                /*
-                var items = await DataStore.GetItemsAsync(true);
-                foreach (var item in items)
-                {
-                    Items.Add(item);
-                }
-                */
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex);
-            }
-            finally
-            {
-                //IsBusy = false;
+                _mpc.MpdClear();
             }
         }
 
+        public Command<SongInfo> QueueItemDeleteCommand { get; }
+        void QueueItemDelete(SongInfo item)
+        {
+            if (item == null)
+                return;
 
+            if (_con.IsConnected)
+            {
+                _mpc.MpdDeleteId(item.Id);
+            }
+        }
+
+        public Command<SongInfo> QueueItemSaveToCommand { get; }
+        void QueueItemSaveTo(SongInfo item)
+        {
+            if (item == null)
+                return;
+
+            if (_con.IsConnected)
+            {
+                // TODO:
+            }
+        }
+
+        /*
+        public Command<SongInfo> ItemTapped { get; }
+        void OnItemTapped(SongInfo item)
+        {
+            if (item == null)
+                return;
+
+            _mpc.MpdPlaybackPlay(item.Id);
+        }
+        */
+
+        public Command<SongInfo> ItemSelected { get; }
         void OnItemSelected(SongInfo item)
         {
             if (item == null)
                 return;
 
             _mpc.MpdPlaybackPlay(item.Id);
-
-            // This will push the ItemDetailPage onto the navigation stack
-            //await Shell.Current.GoToAsync($"{nameof(ItemDetailPage)}?{nameof(ItemDetailViewModel.ItemId)}={item.Id}");
         }
     }
 }

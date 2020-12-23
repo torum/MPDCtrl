@@ -1,16 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:MPDCtrl.ViewModels"
-             x:Class="MPDCtrl.Views.PlaylistsPage">
-    <ContentPage.BindingContext>
-        <vm:PlaylistsViewModel />
-    </ContentPage.BindingContext>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="MPDCtrl.Views.PlaylistsPage" xmlns:vm="clr-namespace:MPDCtrl.ViewModels" xmlns:model="clr-namespace:MPDCtrl.Models" Title="{Binding Title}" Shell.PresentationMode="ModalAnimated" xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core" ios:Page.UseSafeArea="true">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Add"/>
+    </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout>
-            <Label Text="Playlists"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+            <ListView ItemsSource="{Binding Playlists}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}" x:DataType="vm:PlaylistsViewModel">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ImageCell ImageSource="Icon-playlist.png" Text="{Binding}" Detail="" x:DataType="x:String">
+                            <ImageCell.ContextActions>
+                                <MenuItem Text="Rename" Command="{Binding Path=PlaylistRenameCommand, Source={RelativeSource AncestorType={x:Type vm:PlaylistsViewModel}}}" CommandParameter="{Binding .}"  />
+                                <MenuItem Text="Delete" Command="{Binding Path=PlaylistDeleteCommand, Source={RelativeSource AncestorType={x:Type vm:PlaylistsViewModel}}}" CommandParameter="{Binding .}" IsDestructive="True" />
+                            </ImageCell.ContextActions>
+                        </ImageCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

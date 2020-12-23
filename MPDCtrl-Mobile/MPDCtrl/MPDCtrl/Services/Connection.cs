@@ -16,7 +16,8 @@ namespace MPDCtrl.Services
     public class Connection : BaseViewModel
     {
 
-        private MPC _mpc = new MPC("192.168.3.2", 6600, "");
+        private MPC _mpc = new MPC("192.168.3.2", 6600, "asdf");
+
         public MPC Mpc
         {
             get => _mpc;
@@ -83,6 +84,7 @@ namespace MPDCtrl.Services
 
         public ObservableCollection<SongInfo> Queue { get; set; } = new ObservableCollection<SongInfo>();
 
+
         public Connection()
         {
             _mpc.Connected += new MPC.MpdConnected(OnMpdConnected);
@@ -92,6 +94,7 @@ namespace MPDCtrl.Services
             _mpc.ErrorConnected += new MPC.MpdConnectionError(OnConnectionError);
             _mpc.ConnectionStatusChanged += new MPC.MpdConnectionStatusChanged(OnConnectionStatusChanged);
             _mpc.IsBusy += new MPC.MpdIsBusy(OnClientIsBusy);
+
         }
 
         public async void Start()
@@ -126,7 +129,7 @@ namespace MPDCtrl.Services
             // Call Status "after" MpdQueryCurrentQueue() in order to get "current song" in the queue.
             _mpc.MpdQueryStatus();
 
-            //_mpc.MpdQueryPlaylists();
+            _mpc.MpdQueryPlaylists();
 
             // heavy stuff should be the last.
             //_mpc.MpdQueryListAll();
@@ -519,7 +522,7 @@ namespace MPDCtrl.Services
 
         private void OnClientIsBusy(MPC sender, bool on)
         {
-            this.IsBusy = on;
+            IsBusy = on;
         }
 
 

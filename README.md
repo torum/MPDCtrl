@@ -1,6 +1,6 @@
 # MPDCtrl
 
-MPDCtrl is a Windows desktop client app for [MPD (Music player daemon)](http://www.musicpd.org/). It should also work with MPD-compatible servers such as [Mopidy](https://www.mopidy.com/) or [forked-daapd](http://ejurgensen.github.io/forked-daapd/). 
+MPDCtrl is a client app for [MPD (Music player daemon)](http://www.musicpd.org/). It should also work with MPD-compatible servers such as [Mopidy](https://www.mopidy.com/) or [forked-daapd](http://ejurgensen.github.io/forked-daapd/). 
   
 
 - Download:  
@@ -17,7 +17,7 @@ __[Avalable at Micorsoft Store](https://www.microsoft.com/store/apps/9NV2BBJ82BR
 
   
 ### MPDCtrl for mobile
-sometime in the future...
+sometime in the near future...
 
 ![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/mobile/iOS-pre-screnshot.png?raw=true) 
 

@@ -22,7 +22,7 @@ Windows 10 and a host running MPD.
 
 - Download:  
 MPDCtrl for desktop -
-__[Avalable at Micorsoft Store](https://www.microsoft.com/store/apps/9NV2BBJ82BRX)__
+[Download from Micorsoft Store](https://www.microsoft.com/store/apps/9NV2BBJ82BRX)
   
 
 ---------------------------------------

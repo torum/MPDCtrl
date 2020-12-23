@@ -40,7 +40,7 @@ __[Avalable at Micorsoft Store](https://www.microsoft.com/store/apps/9NV2BBJ82BR
 ### MPDCtrl for mobile
 sometime in the future...
 
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/mobile/iOS-pre-screnshot.png?raw=true) 
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/mobile/iOS-v0.0.0.1-screnshot.png?raw=true) 
 
 
 

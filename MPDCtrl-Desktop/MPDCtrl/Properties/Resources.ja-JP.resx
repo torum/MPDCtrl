@@ -303,6 +303,9 @@ SOFTWARE.</value>
   <data name="PlaybackOptions_Shuffle" xml:space="preserve">
     <value>シャッフル</value>
   </data>
+  <data name="PlaybackOptions_Single" xml:space="preserve">
+    <value>シングル</value>
+  </data>
   <data name="Playback_BackButton" xml:space="preserve">
     <value>戻る</value>
   </data>

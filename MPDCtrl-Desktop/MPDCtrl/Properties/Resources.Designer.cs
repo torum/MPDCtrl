@@ -619,6 +619,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Single に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PlaybackOptions_Single {
+            get {
+                return ResourceManager.GetString("PlaybackOptions_Single", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Clear current queue and Load に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string PlaylistItemContextMenu_ClearAndLoad {

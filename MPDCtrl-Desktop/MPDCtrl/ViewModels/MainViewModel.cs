@@ -49,6 +49,8 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v2.0.9.2 シングルモードを追加。
+    /// v2.0.9.1 シークが動いていなかった、要テスト。
     /// v2.0.9 store公開。
     /// v2.0.8.3 ジャンプしたアイテムにフォーカスを移動するように改良しキーボードショートカットを追加。
     /// v2.0.8.2 エラーログでNewLineが無かった。
@@ -122,7 +124,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.9.0";
+        const string _appVer = "v2.0.9.2";
 
         public string AppVer
         {
@@ -680,6 +682,28 @@ namespace MPDCtrl.ViewModels
                         if (SetConsumeCommand.CanExecute(null))
                         {
                             SetConsumeCommand.Execute(null);
+                        }
+                    }
+                }
+            }
+        }
+
+        private bool _single;
+        public bool Single
+        {
+            get { return _single; }
+            set
+            {
+                _single = value;
+                NotifyPropertyChanged("Single");
+
+                if (_MPC != null)
+                {
+                    if (_MPC.MpdStatus.MpdSingle != value)
+                    {
+                        if (SetSingleCommand.CanExecute(null))
+                        {
+                            SetSingleCommand.Execute(null);
                         }
                     }
                 }
@@ -2172,6 +2196,7 @@ namespace MPDCtrl.ViewModels
             SetRpeatCommand = new RelayCommand(SetRpeatCommand_ExecuteAsync, SetRpeatCommand_CanExecute);
             SetRandomCommand = new RelayCommand(SetRandomCommand_ExecuteAsync, SetRandomCommand_CanExecute);
             SetConsumeCommand = new RelayCommand(SetConsumeCommand_ExecuteAsync, SetConsumeCommand_CanExecute);
+            SetSingleCommand = new RelayCommand(SetSingleCommand_ExecuteAsync, SetSingleCommand_CanExecute);
 
             SetVolumeCommand = new RelayCommand(SetVolumeCommand_ExecuteAsync, SetVolumeCommand_CanExecute);
             VolumeMuteCommand = new RelayCommand(VolumeMuteCommand_Execute, VolumeMuteCommand_CanExecute);
@@ -3998,25 +4023,14 @@ namespace MPDCtrl.ViewModels
                 _consume = _MPC.MpdStatus.MpdConsume;
                 NotifyPropertyChanged("Consume");
 
-                if (CurrentSong != null)
-                {
-                    if (CurrentSong.Id != _MPC.MpdStatus.MpdSongID)
-                    {
-                        // no need to care about "double" updates for time.
-                        Time = _MPC.MpdStatus.MpdSongTime;
+                _single = _MPC.MpdStatus.MpdSingle;
+                NotifyPropertyChanged("Single");
 
-                        _elapsed = _MPC.MpdStatus.MpdSongElapsed;
-                        NotifyPropertyChanged("Elapsed");
-                    }
-                }
-                else
-                {
-                    // no need to care about "double" updates for time.
-                    Time = _MPC.MpdStatus.MpdSongTime;
+                // no need to care about "double" updates for time.
+                Time = _MPC.MpdStatus.MpdSongTime;
 
-                    _elapsed = _MPC.MpdStatus.MpdSongElapsed;
-                    NotifyPropertyChanged("Elapsed");
-                }
+                _elapsed = _MPC.MpdStatus.MpdSongElapsed;
+                NotifyPropertyChanged("Elapsed");
 
                 //start elapsed timer.
                 if (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
@@ -4190,6 +4204,17 @@ namespace MPDCtrl.ViewModels
         public void SetConsumeCommand_ExecuteAsync()
         {
             _MPC.MpdSetConsume(_consume);
+        }
+        
+        public ICommand SetSingleCommand { get; }
+        public bool SetSingleCommand_CanExecute()
+        {
+            if (_MPC == null) { return false; }
+            return true;
+        }
+        public void SetSingleCommand_ExecuteAsync()
+        {
+            _MPC.MpdSetSingle(_single);
         }
 
         #endregion

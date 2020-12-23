@@ -6,21 +6,6 @@
 /// MPD Protocol
 /// https://www.musicpd.org/doc/html/protocol.html
 /// 
-/// 
-/// Known issue:
-/// 
-/// Mopidy related:
-///  Mopidy does not accept command_list_begin + password
-///   https://github.com/mopidy/mopidy/issues/1661
-///    command_list_begin
-///    password hoge
-///    status
-///    command_list_end
-///    
-///  Mopidy has some issue with M3U and UTF-8, Ext M3Us.
-///    https://github.com/mopidy/mopidy/issues/1370
-///    
-
 
 using System;
 using System.Collections.Generic;
@@ -241,6 +226,7 @@ namespace MPDCtrl.Models
             private bool _repeat;
             private bool _random;
             private bool _consume;
+            private bool _single;
             private string _songID = "";
             private double _songTime = 0;
             private double _songElapsed = 0;
@@ -283,6 +269,15 @@ namespace MPDCtrl.Models
                 set
                 {
                     _consume = value;
+                }
+            }
+
+            public bool MpdSingle
+            {
+                get { return _single; }
+                set
+                {
+                    _single = value;
                 }
             }
 
@@ -1320,6 +1315,34 @@ namespace MPDCtrl.Models
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetRandom: " + ex.Message);
+            }
+        }
+
+        public void MpdSetSingle(bool on)
+        {
+            if (_status.MpdSingle == on) { return; }
+
+            try
+            {
+                string mpdCommand = "";
+
+                if (on)
+                {
+                    mpdCommand = "single 1" + "\n";
+                }
+                else
+                {
+                    mpdCommand = "single 0" + "\n";
+                }
+
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MPDPlaybackSetSingle: " + ex.Message);
             }
         }
 
@@ -2404,6 +2427,27 @@ namespace MPDCtrl.Models
                         else
                         {
                             _status.MpdConsume = false;
+                        }
+
+                    }
+                    catch (FormatException e)
+                    {
+                        System.Diagnostics.Debug.WriteLine(e.Message);
+                    }
+                }
+
+                // Single opt bool.
+                if (MpdStatusValues.ContainsKey("single"))
+                {
+                    try
+                    {
+                        if (Int32.Parse(MpdStatusValues["single"]) > 0)
+                        {
+                            _status.MpdSingle = true;
+                        }
+                        else
+                        {
+                            _status.MpdSingle = false;
                         }
 
                     }

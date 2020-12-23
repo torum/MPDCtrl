@@ -8,24 +8,26 @@
     Title="{Binding Title}" 
     Shell.PresentationMode="ModalAnimated" 
     xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core" 
-    ios:Page.UseSafeArea="true">
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Add"/>
-    </ContentPage.ToolbarItems>
+    ios:Page.UseSafeArea="true"
+    x:Name="playlistsPage">
     <ContentPage.Content>
         <StackLayout>
+
             <ListView ItemsSource="{Binding Playlists}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}" x:DataType="vm:PlaylistsViewModel">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ImageCell ImageSource="Icon-playlist.png" Text="{Binding}" Detail="" x:DataType="x:String">
                             <ImageCell.ContextActions>
-                                <MenuItem Text="Rename" Command="{Binding Path=PlaylistRenameCommand, Source={RelativeSource AncestorType={x:Type vm:PlaylistsViewModel}}}" CommandParameter="{Binding .}"  />
-                                <MenuItem Text="Delete" Command="{Binding Path=PlaylistDeleteCommand, Source={RelativeSource AncestorType={x:Type vm:PlaylistsViewModel}}}" CommandParameter="{Binding .}" IsDestructive="True" />
+                                <MenuItem Text="Rename" Command="{Binding Path=BindingContext.PlaylistItemRenameCommand, Source={x:Reference playlistsPage}}" CommandParameter="{Binding .}"  />
+                                <MenuItem Text="Delete" Command="{Binding Path=BindingContext.PlaylistItemDeleteCommand, Source={x:Reference playlistsPage}}" CommandParameter="{Binding .}" IsDestructive="True" />
                             </ImageCell.ContextActions>
                         </ImageCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+            
+            <Label Text="Tap to Load playlist to queue and start playing (queue will be cleared fist). Swipe left and Rename (playlist) or Delete (playlist from directory). " FontSize="12" LineBreakMode="WordWrap"  Padding="10,10,10,10" HorizontalOptions="Center" VerticalOptions="FillAndExpand"></Label>
+
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

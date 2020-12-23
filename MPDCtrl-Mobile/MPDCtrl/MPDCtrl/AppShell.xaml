@@ -89,7 +89,7 @@
         <ShellContent Route="PlaylistsPage" ContentTemplate="{DataTemplate local:PlaylistsPage}" />
     </FlyoutItem>
     <FlyoutItem Title="Search" Icon="FlyoutIcon_Search.png">
-        <ShellContent Route="ItemsPage" ContentTemplate="{DataTemplate local:ItemsPage}" />
+        <ShellContent Route="SearchPage" ContentTemplate="{DataTemplate local:SearchPage}" />
     </FlyoutItem>
     <FlyoutItem Title="Setting" Icon="FlyoutIcon_Settings.png">
         <ShellContent Route="SettingPage" ContentTemplate="{DataTemplate local:SettingPage}" />
@@ -106,7 +106,7 @@
         the flyout menu won't be available. This is useful for creating areas of the application where 
         you don't want users to be able to navigate away from. If you would like to navigate to this 
         content you can do so by calling 
-        await Shell.Current.GoToAsync("//LoginPage");
+        await Shell.Current.GoToAsync("//ConnectPage");
     -->
     <TabBar>
         <ShellContent Route="ConnectPage" ContentTemplate="{DataTemplate local:ConnectPage}" />

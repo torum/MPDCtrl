@@ -1,33 +1,24 @@
-ï»¿
+
 /////////////////////////////////////
 Current Version:
 
-v0.0.0.2
+v1.0.0.2
 
 /////////////////////////////////////
+
 TODO:
 
- Now Playing: 
-	AlbumCoverã®è¡¨ç¤ºã€‚
+ Now Playing:  AlbumCover‚Ì•\Ž¦B
+ SettingsFprofile‚Ì•ÒW•Û‘¶B
+ Ú‘±‰æ–ÊB
 
- Queue: 
-	"Save to"ã‚³ãƒžãƒ³ãƒ‰ã€‚
-
- Playlists: 
-	"Add"ã‚³ãƒžãƒ³ãƒ‰ã€‚
-	"Rename"ã‚³ãƒžãƒ³ãƒ‰ã€‚
-
- Search:
-	å…¨éƒ¨ã€‚
-
- Settings: 
-	å…¨éƒ¨ã€‚
-
+ƒGƒ‰[ƒnƒ“ƒhƒŠƒ“ƒOBƒGƒ‰[’Ê’m‚ÆƒGƒNƒZƒvƒVƒ‡ƒ“ƒnƒ“ƒhƒŠƒ“ƒOB
 
 
 /////////////////////////////////////
-æ›´æ–°å±¥æ­´ã¨ã„ã†ã‹ãƒ¡ãƒ¢:
+XV—š—ð‚Æ‚¢‚¤‚©ƒƒ‚:
 
-v0.0.0.2 NowPlayingã«ã‚­ãƒ¥ãƒ¼ã‚’è¡¨ç¤ºã•ã›ã‚‹ã‚ˆã†ã«ã—ãŸã€‚è‡ªå‹•ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã§ã€‚
+v1.0.0.2 ŒŸõƒy[ƒWŠ®—¹B
+v1.0.0.1 NowPlaying‚ÉƒLƒ…[‚ð•\Ž¦‚³‚¹‚é‚æ‚¤‚É‚µ‚½BŽ©“®ƒXƒNƒ[ƒ‹‚ÅB
 
 

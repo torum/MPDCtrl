@@ -125,6 +125,29 @@ namespace MPDCtrl.Models
             }
         }
 
+        public string ArtistAndAlbumFormated
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(Album))
+                {
+                    return Artist + " - " + Album;
+                }
+                else
+                {
+                    return Artist;
+                }
+            }
+        }
+
+        public string ArtistAlbumGenreFormated
+        {
+            get
+            {
+                return "Artist: " + Artist + ", Album: " + Album + ", Genre: " + Genre;
+            }
+        }
+
         // for sorting.
         private int _index;
         public int Index

@@ -48,6 +48,10 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        public event EventHandler<List<String>> AskNewPlaylistNameToGueueSaveAs;
+
+        public event EventHandler<AskWhichPlaylistToSaveQueueItemToEventArgs> AskWhichPlaylistToSaveTo;
+
         public QueueViewModel()
         {
             Title = "Queue";
@@ -56,17 +60,15 @@ namespace MPDCtrl.ViewModels
             _con = me.MpdConection;
             _mpc = _con.Mpc;
 
-            //Queue = _con.Queue;
-
             _mpc.IsBusy += new MPC.MpdIsBusy(OnClientIsBusy);
 
+            QueueSaveAsCommand = new Command(QueueSaveAs);
             QueueClearCommand = new Command(QueueClear);
 
             //ItemTapped = new Command<SongInfo>(OnItemTapped);
             ItemSelected = new Command<SongInfo>(OnItemSelected);
             QueueItemDeleteCommand = new Command<SongInfo>(QueueItemDelete);
             QueueItemSaveToCommand = new Command<SongInfo>(QueueItemSaveTo);
-
 
         }
 
@@ -85,7 +87,33 @@ namespace MPDCtrl.ViewModels
         {
             if (_con.IsConnected)
             {
+                _con.Queue.Clear();
                 _mpc.MpdClear();
+            }
+        }
+
+        public Command QueueSaveAsCommand { get; }
+        void QueueSaveAs()
+        {
+            if (_con.IsConnected)
+            {
+                if (_con.Queue.Count > 0)
+                {
+                    List<String> plts = _con.Playlists.ToList();
+
+                    AskNewPlaylistNameToGueueSaveAs?.Invoke(this, plts);
+                }
+            }
+        }
+
+        public void DoQueueSaveAs(string newName)
+        {
+            if (string.IsNullOrEmpty(newName))
+                return;
+
+            if (_con.IsConnected)
+            {
+                _mpc.MpdSave(newName);
             }
         }
 
@@ -98,6 +126,11 @@ namespace MPDCtrl.ViewModels
             if (_con.IsConnected)
             {
                 _mpc.MpdDeleteId(item.Id);
+
+                if (_con.Queue.Count == 1)
+                {
+                    _con.Queue.Clear();
+                }
             }
         }
 
@@ -109,7 +142,24 @@ namespace MPDCtrl.ViewModels
 
             if (_con.IsConnected)
             {
-                // TODO:
+                AskWhichPlaylistToSaveQueueItemToEventArgs arg = new AskWhichPlaylistToSaveQueueItemToEventArgs();
+                arg.File = item.file;
+                arg.Playlists = _con.Playlists.ToArray();
+
+                AskWhichPlaylistToSaveTo?.Invoke(this, arg); 
+            }
+        }
+        public void DoQueueItemSaveTo(string playlistName, string file)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+                return;
+
+            if (string.IsNullOrEmpty(file))
+                return;
+
+            if (_con.IsConnected)
+            {
+                _mpc.MpdPlaylistAdd(playlistName, file);
             }
         }
 

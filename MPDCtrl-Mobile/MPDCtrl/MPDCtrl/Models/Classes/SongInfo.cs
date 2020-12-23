@@ -43,20 +43,7 @@ namespace MPDCtrl.Models
             }
         }
 
-        public string ArtistAndAlbumText
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(Album))
-                {
-                    return Artist + " - " + Album;
-                }
-                else
-                {
-                    return Artist;
-                }
-            }
-        }
+
     }
 
 

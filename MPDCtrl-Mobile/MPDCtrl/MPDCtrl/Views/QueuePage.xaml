@@ -8,28 +8,32 @@
     Title="{Binding Title}" 
     Shell.PresentationMode="ModalAnimated" 
     xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core" 
-    ios:Page.UseSafeArea="true">
+    ios:Page.UseSafeArea="true"
+    x:Name="queuePage">
     <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Save" Command="{Binding QueueSaveAsCommand}" />
         <ToolbarItem Text="Clear" Command="{Binding QueueClearCommand}" />
     </ContentPage.ToolbarItems>
     <Grid>
 
         <StackLayout>
-
             <ListView ItemsSource="{Binding Queue}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}" x:DataType="vm:QueueViewModel">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <ImageCell ImageSource="Icon-music-circle.png" Text="{Binding Title}" Detail="{Binding ArtistAndAlbumText}" x:DataType="model:SongInfo">
+                        <ImageCell ImageSource="Icon-music-circle.png" Text="{Binding Title}" Detail="{Binding ArtistAndAlbumFormated}" x:DataType="model:SongInfo">
                             <ImageCell.ContextActions>
-                                <MenuItem Text="Save to" Command="{Binding Path=QueueItemSaveToCommand, Source={RelativeSource AncestorType={x:Type vm:QueueViewModel}}}" CommandParameter="{Binding .}" />
-                                <MenuItem Text="Remove" Command="{Binding Path=QueueItemDeleteCommand, Source={RelativeSource AncestorType={x:Type vm:QueueViewModel}}}" CommandParameter="{Binding .}" IsDestructive="True" />
+                                <MenuItem Text="Save to" Command="{Binding Path=BindingContext.QueueItemSaveToCommand, Source={x:Reference queuePage}}" CommandParameter="{Binding .}" />
+                                <MenuItem Text="Remove" Command="{Binding Path=BindingContext.QueueItemDeleteCommand, Source={x:Reference queuePage}}" CommandParameter="{Binding .}" IsDestructive="True" />
                             </ImageCell.ContextActions>
                         </ImageCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
             
-            <!--
+            <Label Text="Tap to play, Swipe left and Save to (a playlist) or Remove (from queue). " FontSize="12" LineBreakMode="WordWrap"  Padding="10,10,10,10" HorizontalOptions="Center" VerticalOptions="FillAndExpand"></Label>
+
+
+            <!-- CollectionView is yet unstable.
             <CollectionView x:Name="QueueCollectionView" ItemsSource="{Binding Queue}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}" x:DataType="vm:QueueViewModel">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>

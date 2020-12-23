@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MPDCtrl.Views.SearchPage"    
+             xmlns:vm="clr-namespace:MPDCtrl.ViewModels" 
+             xmlns:model="clr-namespace:MPDCtrl.Models" 
+             Title="{Binding Title}" 
+             Shell.PresentationMode="ModalAnimated" 
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core" 
+             ios:Page.UseSafeArea="true"
+             x:Name="searchPage">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Save" Command="{Binding SearchResultSaveAsCommand}" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <Grid>
+            <StackLayout>
+
+                <StackLayout Orientation="Vertical" Padding="10,30,10,10" Spacing="10" VerticalOptions="FillAndExpand" HorizontalOptions="Fill">
+
+                    <Entry Text="{Binding SearchQuery}" WidthRequest="200" Placeholder="search keyword" PlaceholderColor="Gray" ReturnType="Search" ClearButtonVisibility="WhileEditing"></Entry>
+
+                    <Picker Title="search: Title" SelectedItem="{Binding SelectedSearchTag}" WidthRequest="200">
+                        <Picker.ItemsSource>
+                            <x:Array Type="{x:Type x:String}">
+                                <x:String>Title</x:String>
+                                <x:String>Artist</x:String>
+                                <x:String>Album</x:String>
+                                <x:String>Genre</x:String>
+                            </x:Array>
+                        </Picker.ItemsSource>
+                    </Picker>
+
+                    <Button Text="Search" HorizontalOptions="Center" WidthRequest="100" Command="{Binding SearchExecCommand}"></Button>
+
+                </StackLayout>
+
+                <StackLayout Orientation="Vertical" VerticalOptions="FillAndExpand" HorizontalOptions="Fill">
+
+                    <ListView ItemsSource="{Binding SearchResult}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}" x:DataType="vm:SearchViewModel">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ImageCell Text="{Binding Title}" Detail="{Binding ArtistAlbumGenreFormated}" x:DataType="model:Song">
+                                    <ImageCell.ContextActions>
+                                        <MenuItem Text="Add" Command="{Binding Path=BindingContext.SearchResultItemAddCommand, Source={x:Reference searchPage}}" CommandParameter="{Binding .}" />
+                                        <MenuItem Text="Save" Command="{Binding Path=BindingContext.SearchResultItemSaveToCommand, Source={x:Reference searchPage}}" CommandParameter="{Binding .}" IsDestructive="True" />
+                                    </ImageCell.ContextActions>
+                                </ImageCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <Label Text="Swipe left and Add (to queue) or Save (to a playlist). " FontSize="12" LineBreakMode="WordWrap"  Padding="10,10,10,10" HorizontalOptions="Center" VerticalOptions="FillAndExpand"></Label>
+
+                    <!-- CollectionView is yet unstable.
+                    <Label Text="Swipe right (Add to queue), left (Save to playlist). " FontSize="12" LineBreakMode="WordWrap"  Padding="10,10,10,10" HorizontalOptions="Center" VerticalOptions="FillAndExpand"></Label>
+
+                    <CollectionView x:Name="QueueCollectionView" ItemsSource="{Binding SearchResult}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}" x:DataType="vm:SearchViewModel">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <SwipeView x:DataType="model:Song">
+                                    <SwipeView.LeftItems>
+                                        <SwipeItems>
+                                            <SwipeItem Text="Add" BackgroundColor="Gainsboro" Command="{Binding Path=SearchResultItemSaveToCommand, Source={RelativeSource AncestorType={x:Type vm:SearchViewModel}}}" CommandParameter="{Binding .}" />
+                                        </SwipeItems>
+                                    </SwipeView.LeftItems>
+                                    <SwipeView.RightItems>
+                                        <SwipeItems>
+                                            <SwipeItem Text="Save" BackgroundColor="Gainsboro" Command="{Binding Path=SearchResultItemSaveToCommand, Source={RelativeSource AncestorType={x:Type vm:SearchViewModel}}}" CommandParameter="{Binding .}" />
+                                        </SwipeItems>
+                                    </SwipeView.RightItems>
+
+                                    <StackLayout Padding="6" x:DataType="model:Song">
+
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Image Grid.Row="0" Grid.Column="0" Grid.RowSpan="4" Source="Icon-music-circle.png" VerticalOptions="Start"></Image>
+
+                                            <Label Grid.Row="0" Grid.Column="1" Text="{Binding Title}" LineBreakMode="NoWrap" Style="{DynamicResource ListItemTextStyle}" FontSize="16" Margin="0" Padding="0"/>
+
+                                            <Label Grid.Row="1" Grid.Column="1" Margin="0" Padding="0" LineBreakMode="NoWrap" Style="{DynamicResource ListItemDetailTextStyle}" FontSize="13" TextColor="Gray" >
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <FormattedString.Spans>
+                                                            <Span Text="Artist"/>
+                                                            <Span Text=": "/>
+                                                            <Span Text="{Binding Artist}"/>
+                                                        </FormattedString.Spans>
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                            <Label Grid.Row="2" Grid.Column="1" Margin="0" Padding="0" LineBreakMode="NoWrap" Style="{DynamicResource ListItemDetailTextStyle}" FontSize="13" TextColor="Gray" >
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <FormattedString.Spans>
+                                                            <Span Text="Album"/>
+                                                            <Span Text=": "/>
+                                                            <Span Text="{Binding Album}"/>
+                                                        </FormattedString.Spans>
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                            <Label Grid.Row="3" Grid.Column="1" Margin="0" Padding="0" LineBreakMode="NoWrap" Style="{DynamicResource ListItemDetailTextStyle}" FontSize="13" TextColor="Gray" >
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <FormattedString.Spans>
+                                                            <Span Text="Genre"/>
+                                                            <Span Text=": "/>
+                                                            <Span Text="{Binding Genre}"/>
+                                                        </FormattedString.Spans>
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </Grid>
+
+                                        <StackLayout.GestureRecognizers>
+                                            <TapGestureRecognizer NumberOfTapsRequired="1" Command="{Binding Path=ItemTapped, Source={RelativeSource AncestorType={x:Type vm:SearchViewModel}}}" CommandParameter="{Binding .}">
+                                            </TapGestureRecognizer>
+                                        </StackLayout.GestureRecognizers>
+
+                                    </StackLayout>
+                                </SwipeView>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    -->
+
+                </StackLayout>
+
+            </StackLayout>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" VerticalOptions="CenterAndExpand" />
+
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

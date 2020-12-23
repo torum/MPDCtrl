@@ -34,7 +34,7 @@
                 <ListView x:Name="HomeQueueListview" Margin="0, 24, 0, 0" ItemsSource="{Binding Queue}" SelectionMode="Single" SelectedItem="{Binding SelectedItem,Mode=TwoWay}" x:DataType="vm:HomeViewModel">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <ImageCell ImageSource="Icon-music-circle.png" Text="{Binding Title}" Detail="{Binding ArtistAndAlbumText}" x:DataType="model:SongInfo">
+                            <ImageCell ImageSource="Icon-music-circle.png" Text="{Binding Title}" Detail="{Binding ArtistAndAlbumFormated}" x:DataType="model:SongInfo">
                             </ImageCell>
                         </DataTemplate>
                     </ListView.ItemTemplate>
@@ -146,7 +146,7 @@
 
 
 
-                <!--
+                <!-- 
                 <StackLayout Orientation="Horizontal" HorizontalOptions="Center" VerticalOptions="Center">
                 
                 <ContentView Padding="0,40,0,40" VerticalOptions="FillAndExpand" HeightRequest="80">
@@ -158,7 +158,7 @@
             </ContentView>
         </StackLayout>
 
-        <ActivityIndicator Grid.Row="0" Grid.RowSpan="2" IsRunning="{Binding IsBusy}" VerticalOptions="CenterAndExpand" />
+        <ActivityIndicator Grid.Row="0" Grid.RowSpan="1" IsRunning="{Binding IsBusy}" VerticalOptions="CenterAndExpand" />
         
     </Grid>
 

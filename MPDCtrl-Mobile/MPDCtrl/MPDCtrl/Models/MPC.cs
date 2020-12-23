@@ -853,6 +853,31 @@ namespace MPDCtrl.Models
             }
         }
 
+        public void MpdPlaylistAdd(string playlistName, string uri)
+        {
+            if (string.IsNullOrEmpty(uri))
+                return;
+
+            if (playlistName.Trim() != "")
+            {
+                playlistName = Regex.Escape(playlistName);
+                try
+                {
+                    uri = Regex.Escape(uri);
+
+                    string mpdCommand = "playlistadd " + "\"" + playlistName + "\"" + " " + "\"" + uri + "\"\n";
+
+                    _asyncClient.Send("noidle" + "\n");
+                    _asyncClient.Send(mpdCommand);
+                    _asyncClient.Send("idle player mixer options playlist stored_playlist\n");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error@MpdPlaylistAdd: " + ex.Message);
+                }
+            }
+        }
+
         public void MpdPlaylistAdd(string playlistName, List<string> uris)
         {
             if (uris.Count < 1)
@@ -880,9 +905,6 @@ namespace MPDCtrl.Models
                     System.Diagnostics.Debug.WriteLine("Error@MpdPlaylistAdd: " + ex.Message);
                 }
             }
-
-
-
         }
 
         public void MpdSearch(string queryTag, string queryShiki, string queryValue)

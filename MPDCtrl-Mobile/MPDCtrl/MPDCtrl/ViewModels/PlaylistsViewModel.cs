@@ -5,6 +5,7 @@ using Xamarin.Forms;
 using MPDCtrl.Services;
 using MPDCtrl.Models;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace MPDCtrl.ViewModels
 {
@@ -43,6 +44,10 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        public event EventHandler<AskNewNameToRenameToEventArgs> AskNewNameToRenameTo;
+
+        public event EventHandler<string> ConfirmPlaylistItemDelete;
+
         public PlaylistsViewModel()
         {
             Title = "Playlists";
@@ -52,6 +57,7 @@ namespace MPDCtrl.ViewModels
             _mpc = _con.Mpc;
 
             ItemSelected = new Command<String>(OnItemSelected);
+            PlaylistItemRenameCommand = new Command<String>(PlaylistItemRename);
             PlaylistItemDeleteCommand = new Command<String>(PlaylistItemDelete);
 
             _mpc.IsBusy += new MPC.MpdIsBusy(OnClientIsBusy);
@@ -95,8 +101,53 @@ namespace MPDCtrl.ViewModels
 
             if (_con.IsConnected)
             {
-                // TODO: Comfirm dialog
-                _mpc.MpdRemovePlaylist(item);
+                ConfirmPlaylistItemDelete?.Invoke(this, item);
+            }
+        }
+        
+        public void DoPlaylistItemDelete(string playlistNameToDelete)
+        {
+            if (String.IsNullOrEmpty(playlistNameToDelete))
+                return;
+
+            if (_con.IsConnected)
+            {
+                _mpc.MpdRemovePlaylist(playlistNameToDelete);
+
+                if (_con.Playlists.Count == 1)
+                {
+                    _con.Playlists.Clear();
+                }
+            }
+        }
+
+        public Command<String> PlaylistItemRenameCommand { get; }
+        void PlaylistItemRename(String item)
+        {
+            if (String.IsNullOrEmpty(item))
+                return;
+
+            if (_con.IsConnected)
+            {
+                AskNewNameToRenameToEventArgs arg = new AskNewNameToRenameToEventArgs();
+                arg.Playlists = _con.Playlists.ToList();
+                arg.OriginalPlaylistName = item;
+
+                AskNewNameToRenameTo?.Invoke(this, arg);
+            }
+        }
+
+        public void DoPlaylistItemRename(String OldName, string NewName)
+        {
+            if (String.IsNullOrEmpty(OldName))
+                return;
+
+            if (String.IsNullOrEmpty(NewName))
+                return;
+
+            if (_con.IsConnected)
+            {
+                _mpc.MpdRenamePlaylist(OldName, NewName);
             }
         }
     }

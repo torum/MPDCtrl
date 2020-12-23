@@ -85,6 +85,21 @@ namespace MPDCtrl.Services
         public ObservableCollection<SongInfo> Queue { get; set; } = new ObservableCollection<SongInfo>();
 
 
+        public ObservableCollection<String> Playlists
+        {
+            get
+            {
+                if (_mpc != null)
+                {
+                    return _mpc.Playlists;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
         public Connection()
         {
             _mpc.Connected += new MPC.MpdConnected(OnMpdConnected);
@@ -399,7 +414,7 @@ namespace MPDCtrl.Services
             }
         }
 
-        private void OnConnectionError(MPC sender, object data)
+        private async void OnConnectionError(MPC sender, object data)
         {
             if (data == null) { return; }
 
@@ -408,9 +423,11 @@ namespace MPDCtrl.Services
 
             //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectionError + ": " + (data as string);
             //StatusButton = _pathErrorInfoButton;
+
+            await Shell.Current.GoToAsync("//ConnectPage");
         }
 
-        private void OnConnectionStatusChanged(MPC sender, TCPC.ConnectionStatus status)
+        private async void OnConnectionStatusChanged(MPC sender, TCPC.ConnectionStatus status)
         {
 
             if (status == TCPC.ConnectionStatus.Connected)
@@ -449,6 +466,8 @@ namespace MPDCtrl.Services
 
                 //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectFail_Timeout;
                 //StatusButton = _pathErrorInfoButton;
+
+                await Shell.Current.GoToAsync("//ConnectPage");
             }
             else if (status == TCPC.ConnectionStatus.DisconnectedByHost)
             {
@@ -459,6 +478,8 @@ namespace MPDCtrl.Services
                 Debug.WriteLine("ConnectionStatus_DisconnectedByHost");
                 ConnectionStatusMessage = "ConnectionStatus_DisconnectedByHost";//MPDCtrl.Properties.Resources.ConnectionStatus_DisconnectedByHost;
                 //StatusButton = _pathErrorInfoButton;
+
+                await Shell.Current.GoToAsync("//ConnectPage");
             }
             else if (status == TCPC.ConnectionStatus.DisconnectedByUser)
             {
@@ -468,6 +489,8 @@ namespace MPDCtrl.Services
 
                 //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_DisconnectedByUser;
                 //StatusButton = _pathErrorInfoButton;
+
+                await Shell.Current.GoToAsync("//ConnectPage");
             }
             else if (status == TCPC.ConnectionStatus.Error)
             {
@@ -479,6 +502,8 @@ namespace MPDCtrl.Services
 
                 //ConnectionStatusMessage = "Error..";
                 //StatusButton = _pathErrorInfoButton;
+
+                await Shell.Current.GoToAsync("//ConnectPage");
             }
             else if (status == TCPC.ConnectionStatus.SendFail_NotConnected)
             {
@@ -488,6 +513,8 @@ namespace MPDCtrl.Services
 
                 //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_SendFail_NotConnected;
                 //StatusButton = _pathErrorInfoButton;
+
+                await Shell.Current.GoToAsync("//ConnectPage");
             }
             else if (status == TCPC.ConnectionStatus.SendFail_Timeout)
             {
@@ -497,6 +524,8 @@ namespace MPDCtrl.Services
 
                 //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_SendFail_Timeout;
                 //StatusButton = _pathErrorInfoButton;
+
+                await Shell.Current.GoToAsync("//ConnectPage");
             }
             else if (status == TCPC.ConnectionStatus.NeverConnected)
             {
@@ -506,6 +535,8 @@ namespace MPDCtrl.Services
 
                 //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_NeverConnected;
                 //StatusButton = _pathErrorInfoButton;
+
+                await Shell.Current.GoToAsync("//ConnectPage");
             }
             else if (status == TCPC.ConnectionStatus.Disconnecting)
             {
@@ -516,6 +547,8 @@ namespace MPDCtrl.Services
                 Debug.WriteLine("ConnectionStatus_Disconnecting");
                 //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_NeverConnected;
                 //StatusButton = _pathErrorInfoButton;
+
+                await Shell.Current.GoToAsync("//ConnectPage");
             }
 
         }

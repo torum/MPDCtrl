@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Xamarin.Forms;
 
 namespace MPDCtrl.Models
 {
     public class AlbumCover
     {
         public bool IsDownloading { get; set; }
+
         public bool IsSuccess { get; set; }
 
         public string SongFilePath { get; set; }
@@ -16,6 +18,6 @@ namespace MPDCtrl.Models
         public int BinarySize { get; set; }
 
         //public BitmapImage AlbumImageSource { get; set; }
-
+        public ImageSource AlbumImageSource { get; set; }
     }
 }

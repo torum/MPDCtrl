@@ -8,6 +8,7 @@ using MPDCtrl.Models.Classes;
 using System.Diagnostics;
 using System.Linq;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace MPDCtrl.ViewModels
 {
@@ -102,6 +103,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
+        #region == Current queue ==
 
         private SongInfo _selectedItem;
         public SongInfo SelectedItem
@@ -132,6 +134,8 @@ namespace MPDCtrl.ViewModels
                 }
             }
         }
+
+        #endregion
 
         #region == Player controls ==
 
@@ -510,6 +514,28 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
+        #region == AlbumArt == 
+
+        private ImageSource _albumArtDefault = "DefaultAlbumCoverGray.png";
+        private ImageSource _albumArt = "DefaultAlbumCoverGray.png";
+        public ImageSource AlbumArt
+        {
+            get
+            {
+                return _albumArt;
+            }
+            set
+            {
+                if (_albumArt == value)
+                    return;
+
+                _albumArt = value;
+                NotifyPropertyChanged("AlbumArt");
+            }
+        }
+
+        #endregion
+
         //
         private System.Timers.Timer _elapsedTimer;
 
@@ -527,7 +553,7 @@ namespace MPDCtrl.ViewModels
             _mpc.StatusUpdate += new MPC.MpdStatusUpdate(OnMpdStatusUpdate);
 
             Elapsed = 0;
-            Time = 0.1; // 0 causes xamarin crash.
+            Time = 0.1; // 0 causes xamarin to crash.
 
             _elapsedTimer = new System.Timers.Timer();
             _elapsedTimer.Interval = (double)1000;
@@ -658,7 +684,7 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private void OnMpdStatusUpdate(MPC sender, object data)
+        private async void OnMpdStatusUpdate(MPC sender, object data)
         {
             if ((data as string) == "isPlayer")
             {
@@ -677,7 +703,7 @@ namespace MPDCtrl.ViewModels
                         //IsAlbumArtVisible = false;
                         Device.BeginInvokeOnMainThread(() =>
                         {
-                            //AlbumArt = _albumArtDefault;
+                            AlbumArt = _albumArtDefault;
                         });
                     }
                 }
@@ -700,14 +726,18 @@ namespace MPDCtrl.ViewModels
                     {
                         CurrentSong = null;
                     }
+
+
                 });
+
+                await Task.Delay(500);
 
                 if (isSongChanged && (CurrentSong != null))
                 {
                     // AlbumArt
                     if (!String.IsNullOrEmpty(CurrentSong.file))
                     {
-                        //_mpc.MpdQueryAlbumArt(CurrentSong.file);
+                        _mpc.MpdQueryAlbumArt(CurrentSong.file);
                     }
                 }
 
@@ -722,50 +752,84 @@ namespace MPDCtrl.ViewModels
                     {
                         CurrentSong = (curitem as SongInfo);
                         (curitem as SongInfo).IsPlaying = true;
-                        /*
+                        
                         // AlbumArt
-                        if (_MPC.AlbumArt.SongFilePath != curitem.file)
+                        if (_mpc.AlbumArt.SongFilePath != curitem.file)
                         {
-                            IsAlbumArtVisible = false;
-                            Application.Current.Dispatcher.Invoke(() =>
+                            //IsAlbumArtVisible = false;
+                            Device.BeginInvokeOnMainThread(() =>
                             {
                                 AlbumArt = _albumArtDefault;
-                            });
 
-                            if (!String.IsNullOrEmpty((curitem as MPC.SongInfo).file))
-                            {
-                                _MPC.MpdQueryAlbumArt((curitem as MPC.SongInfo).file);
-                            }
+                                if (!String.IsNullOrEmpty((curitem as SongInfo).file))
+                                {
+                                    _mpc.MpdQueryAlbumArt((curitem as SongInfo).file);
+                                }
+                            });
                         }
-                        */
                     }
                     else
                     {
                         CurrentSong = null;
-                        /*
-                        IsAlbumArtVisible = false;
-                        Application.Current.Dispatcher.Invoke(() =>
+
+                        //IsAlbumArtVisible = false;
+                        Device.BeginInvokeOnMainThread(() =>
                         {
                             AlbumArt = _albumArtDefault;
                         });
-                        */
+                        
                     }
                 });
             }
             else if ((data as string) == "isAlbumart")
             {
+                if (CurrentSong != null)
+                {
+                    if (CurrentSong.file == _mpc.AlbumArt.SongFilePath)
+                    {
+                        Device.BeginInvokeOnMainThread(() =>
+                        {
+                            AlbumArt = _mpc.AlbumArt.AlbumImageSource;
+                        });
+                    }
+                }
+
                 /*
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    Debug.WriteLine("isAlbumart0: " + CurrentSong.file + " : " + _mpc.AlbumArt.SongFilePath);
+                    AlbumArt = _mpc.AlbumArt.AlbumImageSource;
+                });
                 if ((!_mpc.AlbumArt.IsDownloading) && _mpc.AlbumArt.IsSuccess)
                 {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        Debug.WriteLine("isAlbumart1: " + CurrentSong.file + " : " + _mpc.AlbumArt.SongFilePath);
+                        AlbumArt = _mpc.AlbumArt.AlbumImageSource;
+                    });
                     if ((CurrentSong != null) && (_mpc.AlbumArt.AlbumImageSource != null))
                     {
+                        Device.BeginInvokeOnMainThread(() =>
+                        {
+                            Debug.WriteLine("isAlbumart2: " + CurrentSong.file + " : " + _mpc.AlbumArt.SongFilePath);
+                            AlbumArt = _mpc.AlbumArt.AlbumImageSource;
+                        });
                         // AlbumArt
                         if (!String.IsNullOrEmpty(CurrentSong.file))
                         {
+                            Device.BeginInvokeOnMainThread(() =>
+                            {
+                                Debug.WriteLine("isAlbumart3: " + CurrentSong.file + " : "+ _mpc.AlbumArt.SongFilePath);
+                                AlbumArt = _mpc.AlbumArt.AlbumImageSource;
+                            });
                             if (CurrentSong.file == _mpc.AlbumArt.SongFilePath)
                             {
-                                AlbumArt = _mpc.AlbumArt.AlbumImageSource;
-                                IsAlbumArtVisible = true;
+                                Device.BeginInvokeOnMainThread(() =>
+                                {
+                                    Debug.WriteLine("isAlbumart4");
+                                    AlbumArt = _mpc.AlbumArt.AlbumImageSource;
+                                });
+                                //IsAlbumArtVisible = true;
                             }
                         }
                     }

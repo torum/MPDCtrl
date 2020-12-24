@@ -47,7 +47,11 @@ namespace MPDCtrl.ViewModels
             if (changed == null)
                 return;
 
-            changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            //changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            });
         }
 
         protected void NotifyPropertyChanged(string propertyName)
@@ -56,8 +60,11 @@ namespace MPDCtrl.ViewModels
             if (changed == null)
                 return;
 
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            
+            //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            });
         }
 
         #endregion

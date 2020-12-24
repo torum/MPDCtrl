@@ -23,7 +23,7 @@
             <StackLayout Orientation="Vertical" Padding="10,30,10,24" Spacing="10" VerticalOptions="FillAndExpand" HorizontalOptions="Fill">
 
                 <Frame CornerRadius="5" Padding="0" IsClippedToBounds="True" VerticalOptions="Center" HorizontalOptions="Center" Margin="0, 0, 0, 0">
-                    <Image Source="DefaultAlbumCoverGray.png" WidthRequest="210" HeightRequest="210" Aspect="AspectFit" VerticalOptions="Center" HorizontalOptions="Center"></Image>
+                    <Image Source="{Binding AlbumArt}" WidthRequest="210" HeightRequest="210" Aspect="AspectFit" VerticalOptions="Center" HorizontalOptions="Center"></Image>
                 </Frame>
 
                 <StackLayout Orientation="Vertical" VerticalOptions="Center" HorizontalOptions="Fill">

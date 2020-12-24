@@ -5,7 +5,7 @@ using MPDCtrl.ViewModels;
 namespace MPDCtrl.Models
 {
 
-    public class Song : BaseViewModel
+    public class Song : ViewModelBase
     {
         public string file { get; set; }
         public string Title { get; set; }

@@ -1053,8 +1053,8 @@ namespace MPDCtrl.Models
             int gabAfter = 0;
             bool found = false;
 
-            // TODO: test StringSplitOptions.
-            List<string> values = res.Split(new string[] { "OK\n" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            List<string> values = res.Split(new string[] { "OK\n" }, StringSplitOptions.None).ToList();
+            //List<string> values = res.Split("OK\n").ToList();
 
             try
             {
@@ -1078,7 +1078,13 @@ namespace MPDCtrl.Models
                         }
                     }
 
+                    await Task.Delay(300);
+
+                    //await Task.Run(() => { IsBusy?.Invoke(this, true); });
+
                     BinaryDataReceived_ParseData(data, gabPre, gabAfter);
+
+                    //await Task.Run(() => { IsBusy?.Invoke(this, false); });
                 }
 
             }
@@ -1087,14 +1093,13 @@ namespace MPDCtrl.Models
                 System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived: " + e.ToString());
                 return;
             }
-
         }
 
         private async void BinaryDataReceived_ParseData(byte[] data, int gabPre, int gabAfter)
         {
             if (MpdStop) return;
 
-            if (data.Length > 300000) //2000000000
+            if (data.Length > 200000) //2000000000
             {
                 System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary file too big: " + data.Length.ToString());
 
@@ -1120,7 +1125,6 @@ namespace MPDCtrl.Models
 
             try
             {
-
                 string debug = "";
                 int gabStart = gabPre;
                 int gabEnd = gabAfter;
@@ -1189,11 +1193,11 @@ namespace MPDCtrl.Models
                     }
                 }
 
-                if (binSize > 300000)
+                if (binSize > 200000)
                 {
                     System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary file too big: " + binSize.ToString());
 
-                    await Task.Run(() => { DataReceived?.Invoke(this, "[binary file too big. (Size > 300000) Max 300kb]: " + binSize.ToString()); });
+                    await Task.Run(() => { DataReceived?.Invoke(this, "[binary file too big. (Size > 200000) Max 200kb]: " + binSize.ToString()); });
 
                     _albumCover.IsDownloading = false;
                     return;
@@ -1252,6 +1256,7 @@ namespace MPDCtrl.Models
                     () =>
                     {
                         //_albumCover.AlbumImageSource = BitmapImageFromBytes(_albumCover.BinaryData);
+                        _albumCover.AlbumImageSource = ImageSource.FromStream(() => new MemoryStream(_albumCover.BinaryData));
                     });
 
                     _albumCover.IsSuccess = true;
@@ -1318,7 +1323,7 @@ namespace MPDCtrl.Models
                             try
                             {
                                 // wait little bit.
-                                await Task.Delay(100);
+                                //await Task.Delay(100);
                                 /*
                                 if (Application.Current == null) { return; }
                                 Application.Current.Dispatcher.Invoke(() =>
@@ -1330,6 +1335,7 @@ namespace MPDCtrl.Models
                                 () =>
                                 {
                                     //_albumCover.AlbumImageSource = BitmapImageFromBytes(_albumCover.BinaryData);
+                                    _albumCover.AlbumImageSource = ImageSource.FromStream(() => new MemoryStream(_albumCover.BinaryData));
                                 });
                                 
                                 _albumCover.IsSuccess = true;
@@ -1337,6 +1343,7 @@ namespace MPDCtrl.Models
 
                                 await Task.Run(() => { StatusUpdate?.Invoke(this, "isAlbumart"); });
 
+                                return;
                             }
                             catch (Exception ex)
                             {
@@ -1372,10 +1379,13 @@ namespace MPDCtrl.Models
                     () =>
                     {
                         //_albumCover.AlbumImageSource = BitmapImageFromBytes(_albumCover.BinaryData);
+                        _albumCover.AlbumImageSource = ImageSource.FromStream(() => new MemoryStream(_albumCover.BinaryData));
                     });
                     _albumCover.IsSuccess = true;
 
                     await Task.Run(() => { StatusUpdate?.Invoke(this, "isAlbumart"); });
+
+                    return;
                 }
                 else
                 {

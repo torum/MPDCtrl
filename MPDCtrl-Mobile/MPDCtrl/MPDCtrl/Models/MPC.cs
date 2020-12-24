@@ -1075,6 +1075,7 @@ namespace MPDCtrl.Models
                             {
                                 TCPClient_DataReceived(sender, val + "OK");
                                 System.Diagnostics.Debug.WriteLine("TCPClient_DataBinaryReceived: " + val  + "OK");
+
                             }
                         }
                         else if (val.StartsWith("size: "))
@@ -1202,9 +1203,10 @@ namespace MPDCtrl.Models
                 {
                     System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary file too big: " + binSize.ToString());
 
+                    _albumCover.IsDownloading = false;
+
                     await Task.Run(() => { DataReceived?.Invoke(this, "[binary file too big. (Size > 200000) Max 200kb]: " + binSize.ToString()); });
 
-                    _albumCover.IsDownloading = false;
                     return;
                 }
 

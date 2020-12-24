@@ -1,25 +1,26 @@
-ï»¿
+
 /////////////////////////////////////
 Current Version:
 
-v1.0.0.4
+v1.0.0.5
 
 /////////////////////////////////////
 
 TODO:
 
- Settingsï¼šprofileã®ç·¨é›†ä¿å­˜ã€‚
- æŽ¥ç¶šç”»é¢ã€‚
+ SettingsFprofile‚Ì•ÒW•Û‘¶B
+ Ú‘±‰æ–ÊB
 
-ã‚¨ãƒ©ãƒ¼ãƒãƒ³ãƒ‰ãƒªãƒ³ã‚°ã€‚ã‚¨ãƒ©ãƒ¼é€šçŸ¥ã¨ã‚¨ã‚¯ã‚»ãƒ—ã‚·ãƒ§ãƒ³ãƒãƒ³ãƒ‰ãƒªãƒ³ã‚°ã€‚
+ƒGƒ‰[ƒnƒ“ƒhƒŠƒ“ƒOBƒGƒ‰[’Ê’m‚ÆƒGƒNƒZƒvƒVƒ‡ƒ“ƒnƒ“ƒhƒŠƒ“ƒOB
 
 
 /////////////////////////////////////
-æ›´æ–°å±¥æ­´ã¨ã„ã†ã‹ãƒ¡ãƒ¢:
+XV—š—ð‚Æ‚¢‚¤‚©ƒƒ‚:
 
-v1.0.0.4 AlbumCoverã®å–å¾—å‘¨ã‚Šã•ã‚‰ã«æ”¹è‰¯ã€‚ã‚ã¨ã€ãƒã‚¤ãƒŠãƒªã¨ä¸€ç·’ã«æ¥ã¦ã„ãŸã®ã‚’èª­ã¿å–ã‚Œã¦ã„ãªã‹ã£ãŸã€‚
-v1.0.0.3 AlbumCover è¡¨ç¤ºã€‚ãŸã ã—ã€èµ·å‹•æ™‚ã®æ™‚ã ã‘ç”»åƒãŒä¹±ã‚Œã‚‹ï¼žå°‘ã—awaitã™ã‚‹ã“ã¨ã«ã—ãŸã€‚
-v1.0.0.2 æ¤œç´¢ãƒšãƒ¼ã‚¸å®Œäº†ã€‚
-v1.0.0.1 NowPlayingã«ã‚­ãƒ¥ãƒ¼ã‚’è¡¨ç¤ºã•ã›ã‚‹ã‚ˆã†ã«ã—ãŸã€‚è‡ªå‹•ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã§ã€‚
+v1.0.0.5 AlbumCover‚Ìsize too big‚Åreturn‚·‚é‚Ì‚ª‰½ŒÌ‚©Œø‚¢‚Ä‚¢‚È‚©‚Á‚½Bawait‚Ì‡”Ô‚ð•Ï‚¦‚½‚ç³‰ðB
+v1.0.0.4 AlbumCover‚ÌŽæ“¾Žü‚è‚³‚ç‚É‰ü—ÇB‚ ‚ÆAƒoƒCƒiƒŠ‚Æˆê‚É—ˆ‚Ä‚¢‚½‚Ì‚ð“Ç‚ÝŽæ‚ê‚Ä‚¢‚È‚©‚Á‚½B
+v1.0.0.3 AlbumCover •\Ž¦B‚½‚¾‚µA‹N“®Žž‚ÌŽž‚¾‚¯‰æ‘œ‚ª—‚ê‚é„­‚µawait‚·‚é‚±‚Æ‚É‚µ‚½B
+v1.0.0.2 ŒŸõƒy[ƒWŠ®—¹B
+v1.0.0.1 NowPlaying‚ÉƒLƒ…[‚ð•\Ž¦‚³‚¹‚é‚æ‚¤‚É‚µ‚½BŽ©“®ƒXƒNƒ[ƒ‹‚ÅB
 
 

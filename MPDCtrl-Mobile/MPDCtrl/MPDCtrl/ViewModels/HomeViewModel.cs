@@ -698,7 +698,7 @@ namespace MPDCtrl.ViewModels
                     if (CurrentSong != null)
                     {
                         //Debug.WriteLine("AlbumArt isPlayer0: " + CurrentSong.Title);
-                        D//ebug.WriteLine("AlbumArt isPlayer0: " + CurrentSong.Id + ", " + _mpc.MpdStatus.MpdSongID);
+                        //Debug.WriteLine("AlbumArt isPlayer0: " + CurrentSong.Id + ", " + _mpc.MpdStatus.MpdSongID);
 
                         if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
                         {

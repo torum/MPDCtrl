@@ -32,9 +32,13 @@ namespace MPDCtrl.ViewModels
     /// TODO: 
     /// 
     /// 
+    /// 
     /// v2.0.9 以降
+    /// 
     /// テーマの切り替え
     /// 翻訳のリソースやスタイル、名前の整理と見直し。
+    /// 
+    /// 
     /// Ctrl+F検索とFilesから直接プレイリストに追加できるように「プレイリストに追加」をコンテキストメニューで。"Save Selected to" context menu.
     /// 「プレイリストの名前変更」をインラインで。
     /// Files: "追加して再生"メニューを追加。
@@ -49,6 +53,7 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v2.0.9.3 バイナリと一緒に来ていたのを読み取れてなかった。
     /// v2.0.9.2 シングルモードを追加。
     /// v2.0.9.1 シークが動いていなかった、要テスト。
     /// v2.0.9 store公開。
@@ -124,7 +129,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.9.2";
+        const string _appVer = "v2.0.9.3";
 
         public string AppVer
         {
@@ -218,7 +223,7 @@ namespace MPDCtrl.ViewModels
 
         #region == MPC ==  
 
-        private MPC _MPC;
+        private MPC _mpc;
 
 
         #endregion
@@ -579,7 +584,7 @@ namespace MPDCtrl.ViewModels
                     _volume = value;
                     NotifyPropertyChanged("Volume");
 
-                    if (_MPC != null)
+                    if (_mpc != null)
                     {
                         // If we have a timer and we are in this event handler, a user is still interact with the slider
                         // we stop the timer
@@ -606,9 +611,9 @@ namespace MPDCtrl.ViewModels
         private System.Timers.Timer _volumeDelayTimer = null;
         private void DoChangeVolume(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (_MPC != null)
+            if (_mpc != null)
             {
-                if (Convert.ToDouble(_MPC.MpdStatus.MpdVolume) != _volume)
+                if (Convert.ToDouble(_mpc.MpdStatus.MpdVolume) != _volume)
                 {
                     if (SetVolumeCommand.CanExecute(null))
                     {
@@ -631,9 +636,9 @@ namespace MPDCtrl.ViewModels
                 _repeat = value;
                 NotifyPropertyChanged("Repeat");
 
-                if (_MPC != null)
+                if (_mpc != null)
                 {
-                    if (_MPC.MpdStatus.MpdRepeat != value)
+                    if (_mpc.MpdStatus.MpdRepeat != value)
                     {
                         if (SetRpeatCommand.CanExecute(null))
                         {
@@ -653,9 +658,9 @@ namespace MPDCtrl.ViewModels
                 _random = value;
                 NotifyPropertyChanged("Random");
 
-                if (_MPC != null)
+                if (_mpc != null)
                 {
-                    if (_MPC.MpdStatus.MpdRandom != value)
+                    if (_mpc.MpdStatus.MpdRandom != value)
                     {
                         if (SetRandomCommand.CanExecute(null))
                         {
@@ -675,9 +680,9 @@ namespace MPDCtrl.ViewModels
                 _consume = value;
                 NotifyPropertyChanged("Consume");
 
-                if (_MPC != null)
+                if (_mpc != null)
                 {
-                    if (_MPC.MpdStatus.MpdConsume != value)
+                    if (_mpc.MpdStatus.MpdConsume != value)
                     {
                         if (SetConsumeCommand.CanExecute(null))
                         {
@@ -697,9 +702,9 @@ namespace MPDCtrl.ViewModels
                 _single = value;
                 NotifyPropertyChanged("Single");
 
-                if (_MPC != null)
+                if (_mpc != null)
                 {
-                    if (_MPC.MpdStatus.MpdSingle != value)
+                    if (_mpc.MpdStatus.MpdSingle != value)
                     {
                         if (SetSingleCommand.CanExecute(null))
                         {
@@ -762,7 +767,7 @@ namespace MPDCtrl.ViewModels
         private System.Timers.Timer _elapsedDelayTimer = null;
         private void DoChangeElapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (_MPC != null)
+            if (_mpc != null)
             {
                 if ((_elapsed < _time))
                 {
@@ -787,9 +792,9 @@ namespace MPDCtrl.ViewModels
         {
             get
             {
-                if (_MPC != null)
+                if (_mpc != null)
                 {
-                    return _MPC.Playlists;
+                    return _mpc.Playlists;
                 }
                 else
                 {
@@ -893,10 +898,10 @@ namespace MPDCtrl.ViewModels
         {
             get
             {
-                if (_MPC != null)
+                if (_mpc != null)
                 {
                     return _queue;
-                    //return _MPC.CurrentQueue;
+                    //return _mpc.CurrentQueue;
                 }
                 else
                 {
@@ -2124,9 +2129,9 @@ namespace MPDCtrl.ViewModels
         {
             get
             {
-                if (_MPC != null)
+                if (_mpc != null)
                 {
-                    return _MPC.SearchResult;
+                    return _mpc.SearchResult;
                 }
                 else
                 {
@@ -2276,21 +2281,21 @@ namespace MPDCtrl.ViewModels
 
             #region == MPC ==  
 
-            _MPC = new MPC(_host, _port, _password);
+            _mpc = new MPC(_host, _port, _password);
 
             #endregion
 
             #region == イベント ==
 
-            _MPC.Connected += new MPC.MpdConnected(OnMpdConnected);
-            _MPC.StatusChanged += new MPC.MpdStatusChanged(OnStatusChanged);
-            _MPC.StatusUpdate += new MPC.MpdStatusUpdate(OnMpdStatusUpdate);
-            _MPC.DataReceived += new MPC.MpdDataReceived(OnDataReceived);
-            _MPC.DataSent += new MPC.MpdDataSent(OnDataSent);
-            _MPC.ErrorReturned += new MPC.MpdError(OnError);
-            _MPC.ErrorConnected += new MPC.MpdConnectionError(OnConnectionError);
-            _MPC.ConnectionStatusChanged += new MPC.MpdConnectionStatusChanged(OnConnectionStatusChanged);
-            _MPC.IsBusy += new MPC.MpdIsBusy(OnClientIsBusy);
+            _mpc.Connected += new MPC.MpdConnected(OnMpdConnected);
+            _mpc.StatusChanged += new MPC.MpdStatusChanged(OnStatusChanged);
+            _mpc.StatusUpdate += new MPC.MpdStatusUpdate(OnMpdStatusUpdate);
+            _mpc.DataReceived += new MPC.MpdDataReceived(OnDataReceived);
+            _mpc.DataSent += new MPC.MpdDataSent(OnDataSent);
+            _mpc.ErrorReturned += new MPC.MpdError(OnError);
+            _mpc.ErrorConnected += new MPC.MpdConnectionError(OnConnectionError);
+            _mpc.ConnectionStatusChanged += new MPC.MpdConnectionStatusChanged(OnConnectionStatusChanged);
+            _mpc.IsBusy += new MPC.MpdIsBusy(OnClientIsBusy);
             
             #endregion
 
@@ -2835,9 +2840,9 @@ namespace MPDCtrl.ViewModels
                 IsConnectionSettingShow = false;
 
                 //
-                _MPC.MpdHost = CurrentProfile.Host;
-                _MPC.MpdPort = CurrentProfile.Port;
-                _MPC.MpdPassword = CurrentProfile.Password;
+                _mpc.MpdHost = CurrentProfile.Host;
+                _mpc.MpdPort = CurrentProfile.Port;
+                _mpc.MpdPassword = CurrentProfile.Password;
 
                 Start();
             }
@@ -3347,8 +3352,8 @@ namespace MPDCtrl.ViewModels
             {
                 if (IsConnected)
                 {
-                    _MPC.MpdStop = true;
-                    _MPC.MpdDisconnect();
+                    _mpc.MpdStop = true;
+                    _mpc.MpdDisconnect();
                 }
             }
             catch { }
@@ -3358,28 +3363,28 @@ namespace MPDCtrl.ViewModels
         private void OnMpdConnected(MPC sender)
         {
             // got MPD ver.
-            MpdVersion = _MPC.MpdVer;
+            MpdVersion = _mpc.MpdVer;
 
-            //MpdStatusMessage = "MPD OK " + _MPC.MpdVer;
+            //MpdStatusMessage = "MPD OK " + _mpc.MpdVer;
             //MpdStatusButton = _pathConnectedButton;
 
-            _MPC.MpdSendPassword();
+            _mpc.MpdSendPassword();
 
             if (IsUpdateOnStartup)
             {
-                _MPC.MpdSendUpdate();
+                _mpc.MpdSendUpdate();
             }
 
             //
-            _MPC.MpdQueryCurrentQueue();
+            _mpc.MpdQueryCurrentQueue();
 
             // Call Status "after" MpdQueryCurrentQueue() in order to get "current song" in the queue.
-            _MPC.MpdQueryStatus();
+            _mpc.MpdQueryStatus();
 
-            _MPC.MpdQueryPlaylists();
+            _mpc.MpdQueryPlaylists();
 
             // heavy stuff should be the last.
-            _MPC.MpdQueryListAll();
+            _mpc.MpdQueryListAll();
 
         }
 
@@ -3430,7 +3435,7 @@ namespace MPDCtrl.ViewModels
                 bool isSongChanged = false;
                 if (CurrentSong != null)
                 {
-                    if (CurrentSong.Id != _MPC.MpdStatus.MpdSongID)
+                    if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
                     {
                         isSongChanged = true;
 
@@ -3450,7 +3455,7 @@ namespace MPDCtrl.ViewModels
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     // Sets Current Song
-                    var item = Queue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
+                    var item = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
                     if (item != null)
                     {
                         CurrentSong = (item as MPC.SongInfo);
@@ -3470,7 +3475,7 @@ namespace MPDCtrl.ViewModels
                     // AlbumArt
                     if (!String.IsNullOrEmpty(CurrentSong.file))
                     {
-                        _MPC.MpdQueryAlbumArt(CurrentSong.file);
+                        _mpc.MpdQueryAlbumArt(CurrentSong.file);
                     }
                 }
 
@@ -3492,7 +3497,7 @@ namespace MPDCtrl.ViewModels
                         // 既存のリストの中で新しいリストにないものを削除
                         foreach (var sng in Queue)
                         {
-                            var queitem = _MPC.CurrentQueue.FirstOrDefault(i => i.Id == sng.Id);
+                            var queitem = _mpc.CurrentQueue.FirstOrDefault(i => i.Id == sng.Id);
                             if (queitem == null)
                             {
                                 // 削除リストに追加
@@ -3507,7 +3512,7 @@ namespace MPDCtrl.ViewModels
                         }
 
                         // 新しいリストの中から既存のリストにないものを追加または更新
-                        foreach (var sng in _MPC.CurrentQueue)
+                        foreach (var sng in _mpc.CurrentQueue)
                         {
                             var fuga = Queue.FirstOrDefault(i => i.Id == sng.Id);
                             if (fuga != null)
@@ -3539,14 +3544,14 @@ namespace MPDCtrl.ViewModels
                         }
 
                         // Set Current and NowPlaying.
-                        var curitem = Queue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
+                        var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
                         if (curitem != null)
                         {
                             CurrentSong = (curitem as MPC.SongInfo);
                             (curitem as MPC.SongInfo).IsPlaying = true;
 
                             // AlbumArt
-                            if (_MPC.AlbumArt.SongFilePath != curitem.file)
+                            if (_mpc.AlbumArt.SongFilePath != curitem.file)
                             {
                                 IsAlbumArtVisible = false;
                                 Application.Current.Dispatcher.Invoke(() =>
@@ -3556,7 +3561,7 @@ namespace MPDCtrl.ViewModels
 
                                 if (!String.IsNullOrEmpty((curitem as MPC.SongInfo).file))
                                 {
-                                    _MPC.MpdQueryAlbumArt((curitem as MPC.SongInfo).file);
+                                    _mpc.MpdQueryAlbumArt((curitem as MPC.SongInfo).file);
                                 }
                             }
                         }
@@ -3583,20 +3588,20 @@ namespace MPDCtrl.ViewModels
                 {
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        foreach (var sng in _MPC.CurrentQueue)
+                        foreach (var sng in _mpc.CurrentQueue)
                         {
                             Queue.Add(sng);
                         }
 
                         // Set Current and NowPlaying.
-                        var curitem = Queue.FirstOrDefault(i => i.Id == _MPC.MpdStatus.MpdSongID);
+                        var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
                         if (curitem != null)
                         {
                             CurrentSong = (curitem as MPC.SongInfo);
                             (curitem as MPC.SongInfo).IsPlaying = true;
 
                             // AlbumArt
-                            if (_MPC.AlbumArt.SongFilePath != curitem.file)
+                            if (_mpc.AlbumArt.SongFilePath != curitem.file)
                             {
                                 IsAlbumArtVisible = false;
                                 Application.Current.Dispatcher.Invoke(() =>
@@ -3606,7 +3611,7 @@ namespace MPDCtrl.ViewModels
 
                                 if (!String.IsNullOrEmpty((curitem as MPC.SongInfo).file))
                                 {
-                                    _MPC.MpdQueryAlbumArt((curitem as MPC.SongInfo).file);
+                                    _mpc.MpdQueryAlbumArt((curitem as MPC.SongInfo).file);
                                 }
                             }
                         }
@@ -3640,7 +3645,7 @@ namespace MPDCtrl.ViewModels
                 {
                     LocalFiles.Clear();
 
-                    foreach (var songfile in _MPC.LocalFiles)
+                    foreach (var songfile in _mpc.LocalFiles)
                     {
                         try
                         {
@@ -3662,7 +3667,7 @@ namespace MPDCtrl.ViewModels
                 {
                     MusicDirectories.Clear();
                     
-                    _musicDirectories.Load(_MPC.LocalDirectories.ToList<String>());
+                    _musicDirectories.Load(_mpc.LocalDirectories.ToList<String>());
 
                     if (MusicDirectories.Count > 0)
                     {
@@ -3676,7 +3681,7 @@ namespace MPDCtrl.ViewModels
                 {
                     MusicEntries.Clear();
 
-                    foreach (var songfile in _MPC.LocalFiles)
+                    foreach (var songfile in _mpc.LocalFiles)
                     {
                         try
                         {
@@ -3706,16 +3711,16 @@ namespace MPDCtrl.ViewModels
             }
             else if ((data as string) == "isAlbumart")
             {
-                if ((!_MPC.AlbumArt.IsDownloading) && _MPC.AlbumArt.IsSuccess)
+                if ((!_mpc.AlbumArt.IsDownloading) && _mpc.AlbumArt.IsSuccess)
                 {
-                    if ((CurrentSong != null) && (_MPC.AlbumArt.AlbumImageSource != null))
+                    if ((CurrentSong != null) && (_mpc.AlbumArt.AlbumImageSource != null))
                     {
                         // AlbumArt
                         if (!String.IsNullOrEmpty(CurrentSong.file))
                         {
-                            if (CurrentSong.file == _MPC.AlbumArt.SongFilePath)
+                            if (CurrentSong.file == _mpc.AlbumArt.SongFilePath)
                             {
-                                AlbumArt = _MPC.AlbumArt.AlbumImageSource;
+                                AlbumArt = _mpc.AlbumArt.AlbumImageSource;
                                 IsAlbumArtVisible = true;
                             }
                         }
@@ -3919,7 +3924,7 @@ namespace MPDCtrl.ViewModels
         private System.Timers.Timer _elapsedTimer;
         private void ElapsedTimer(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if ((_elapsed < _time) && (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play))
+            if ((_elapsed < _time) && (_mpc.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play))
             {
                 _elapsed += 0.5;
                 NotifyPropertyChanged("Elapsed");
@@ -3946,23 +3951,23 @@ namespace MPDCtrl.ViewModels
                 // Handled at OnMpdConnected
                 /*
 
-                //_MPC.MpdSendPassword();
+                //_mpc.MpdSendPassword();
 
                 if (IsUpdateOnStartup)
                 {
-                    _MPC.MpdSendUpdate();
+                    _mpc.MpdSendUpdate();
                 }
 
                 //
-                _MPC.MpdQueryCurrentQueue();
+                _mpc.MpdQueryCurrentQueue();
 
                 // Call Status "after" MpdQueryCurrentQueue() in order to get "current song" in the queue.
-                _MPC.MpdQueryStatus();
+                _mpc.MpdQueryStatus();
 
-                _MPC.MpdQueryPlaylists();
+                _mpc.MpdQueryPlaylists();
 
                 // heavy stuff should be the last.
-                _MPC.MpdQueryListAll();
+                _mpc.MpdQueryListAll();
 
                 */
             }
@@ -3981,7 +3986,7 @@ namespace MPDCtrl.ViewModels
             StatusButton = _pathConnectingButton;
             ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connecting;
 
-            return await _MPC.MpdConnect();
+            return await _mpc.MpdConnect();
         }
 
         private void UpdateButtonStatus()
@@ -3989,7 +3994,7 @@ namespace MPDCtrl.ViewModels
             try
             {
                 //Play button
-                switch (_MPC.MpdStatus.MpdState)
+                switch (_mpc.MpdStatus.MpdState)
                 {
                     case MPC.Status.MpdPlayState.Play:
                         {
@@ -4011,29 +4016,29 @@ namespace MPDCtrl.ViewModels
                 }
 
                 // "quietly" update view.
-                _volume = Convert.ToDouble(_MPC.MpdStatus.MpdVolume);
+                _volume = Convert.ToDouble(_mpc.MpdStatus.MpdVolume);
                 NotifyPropertyChanged("Volume");
 
-                _random = _MPC.MpdStatus.MpdRandom;
+                _random = _mpc.MpdStatus.MpdRandom;
                 NotifyPropertyChanged("Random");
 
-                _repeat = _MPC.MpdStatus.MpdRepeat;
+                _repeat = _mpc.MpdStatus.MpdRepeat;
                 NotifyPropertyChanged("Repeat");
 
-                _consume = _MPC.MpdStatus.MpdConsume;
+                _consume = _mpc.MpdStatus.MpdConsume;
                 NotifyPropertyChanged("Consume");
 
-                _single = _MPC.MpdStatus.MpdSingle;
+                _single = _mpc.MpdStatus.MpdSingle;
                 NotifyPropertyChanged("Single");
 
                 // no need to care about "double" updates for time.
-                Time = _MPC.MpdStatus.MpdSongTime;
+                Time = _mpc.MpdStatus.MpdSongTime;
 
-                _elapsed = _MPC.MpdStatus.MpdSongElapsed;
+                _elapsed = _mpc.MpdStatus.MpdSongElapsed;
                 NotifyPropertyChanged("Elapsed");
 
                 //start elapsed timer.
-                if (_MPC.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
+                if (_mpc.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
                 {
                     if (!_elapsedTimer.Enabled)
                         _elapsedTimer.Start();
@@ -4082,29 +4087,29 @@ namespace MPDCtrl.ViewModels
         public ICommand PlayCommand { get; }
         public bool PlayCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void PlayCommand_ExecuteAsync()
         {
-            switch (_MPC.MpdStatus.MpdState)
+            switch (_mpc.MpdStatus.MpdState)
             {
                 case MPC.Status.MpdPlayState.Play:
                     {
                         //State>>Play: So, send Pause command
-                        _MPC.MpdPlaybackPause();
+                        _mpc.MpdPlaybackPause();
                         break;
                     }
                 case MPC.Status.MpdPlayState.Pause:
                     {
                         //State>>Pause: So, send Resume command
-                        _MPC.MpdPlaybackResume();
+                        _mpc.MpdPlaybackResume();
                         break;
                     }
                 case MPC.Status.MpdPlayState.Stop:
                     {
                         //State>>Stop: So, send Play command
-                        _MPC.MpdPlaybackPlay();
+                        _mpc.MpdPlaybackPlay();
                         break;
                     }
             }
@@ -4113,60 +4118,60 @@ namespace MPDCtrl.ViewModels
         public ICommand PlayNextCommand { get; }
         public bool PlayNextCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             //if (Queue.Count < 1) { return false; }
             return true;
         }
         public void PlayNextCommand_ExecuteAsync()
         {
-            _MPC.MpdPlaybackNext();
+            _mpc.MpdPlaybackNext();
         }
 
         public ICommand PlayPrevCommand { get; }
         public bool PlayPrevCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             //if (Queue.Count < 1) { return false; }
             return true;
         }
         public void PlayPrevCommand_ExecuteAsync()
         {
-            _MPC.MpdPlaybackPrev();
+            _mpc.MpdPlaybackPrev();
         }
 
         public ICommand ChangeSongCommand { get; set; }
         public bool ChangeSongCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             if (Queue.Count < 1) { return false; }
             if (_selectedSong == null) { return false; }
             return true;
         }
         public void ChangeSongCommand_ExecuteAsync()
         {
-            _MPC.MpdPlaybackPlay(_selectedSong.Id);
+            _mpc.MpdPlaybackPlay(_selectedSong.Id);
         }
 
         public ICommand PlayPauseCommand { get; }
         public bool PlayPauseCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void PlayPauseCommand_Execute()
         {
-            _MPC.MpdPlaybackPause();
+            _mpc.MpdPlaybackPause();
         }
 
         public ICommand PlayStopCommand { get; }
         public bool PlayStopCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void PlayStopCommand_Execute()
         {
-            _MPC.MpdPlaybackStop();
+            _mpc.MpdPlaybackStop();
         }
 
         #endregion
@@ -4176,45 +4181,45 @@ namespace MPDCtrl.ViewModels
         public ICommand SetRandomCommand { get; }
         public bool SetRandomCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void SetRandomCommand_ExecuteAsync()
         {
-            _MPC.MpdSetRandom(_random);
+            _mpc.MpdSetRandom(_random);
         }
 
         public ICommand SetRpeatCommand { get; }
         public bool SetRpeatCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void SetRpeatCommand_ExecuteAsync()
         {
-            _MPC.MpdSetRepeat(_repeat);
+            _mpc.MpdSetRepeat(_repeat);
         }
 
         public ICommand SetConsumeCommand { get; }
         public bool SetConsumeCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void SetConsumeCommand_ExecuteAsync()
         {
-            _MPC.MpdSetConsume(_consume);
+            _mpc.MpdSetConsume(_consume);
         }
         
         public ICommand SetSingleCommand { get; }
         public bool SetSingleCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void SetSingleCommand_ExecuteAsync()
         {
-            _MPC.MpdSetSingle(_single);
+            _mpc.MpdSetSingle(_single);
         }
 
         #endregion
@@ -4224,62 +4229,62 @@ namespace MPDCtrl.ViewModels
         public ICommand SetVolumeCommand { get; }
         public bool SetVolumeCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void SetVolumeCommand_ExecuteAsync()
         {
-            _MPC.MpdSetVolume(Convert.ToInt32(_volume));
+            _mpc.MpdSetVolume(Convert.ToInt32(_volume));
         }
 
         public ICommand SetSeekCommand { get; }
         public bool SetSeekCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void SetSeekCommand_ExecuteAsync()
         {
-            _MPC.MpdPlaybackSeek(_MPC.MpdStatus.MpdSongID, Convert.ToInt32(_elapsed));
+            _mpc.MpdPlaybackSeek(_mpc.MpdStatus.MpdSongID, Convert.ToInt32(_elapsed));
         }
 
         public ICommand VolumeMuteCommand { get; }
         public bool VolumeMuteCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void VolumeMuteCommand_Execute()
         {
-            _MPC.MpdSetVolume(0);
+            _mpc.MpdSetVolume(0);
         }
 
 
         public ICommand VolumeDownCommand { get; }
         public bool VolumeDownCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void VolumeDownCommand_Execute()
         {
             if (_volume >= 10)
             {
-                _MPC.MpdSetVolume(Convert.ToInt32(_volume - 10));
+                _mpc.MpdSetVolume(Convert.ToInt32(_volume - 10));
             }
         }
 
         public ICommand VolumeUpCommand { get; }
         public bool VolumeUpCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void VolumeUpCommand_Execute()
         {
             if (_volume <= 90)
             {
-                _MPC.MpdSetVolume(Convert.ToInt32(_volume + 10));
+                _mpc.MpdSetVolume(Convert.ToInt32(_volume + 10));
             }
         }
 
@@ -4290,12 +4295,12 @@ namespace MPDCtrl.ViewModels
         public ICommand ListAllCommand { get; }
         public bool ListAllCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void ListAllCommand_ExecuteAsync()
         {
-            _MPC.MpdQueryListAll();
+            _mpc.MpdQueryListAll();
         }
 
         public ICommand LocalfileListviewAddCommand { get; }
@@ -4320,14 +4325,14 @@ namespace MPDCtrl.ViewModels
                     uriList.Add((item as NodeEntry).OriginalFileUri);
                 }
 
-                _MPC.MpdAdd(uriList);
+                _mpc.MpdAdd(uriList);
             }
         }
 
         public ICommand LocalfileListviewEnterKeyCommand { get; set; }
         public bool LocalfileListviewEnterKeyCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void LocalfileListviewEnterKeyCommand_Execute(object obj)
@@ -4347,18 +4352,18 @@ namespace MPDCtrl.ViewModels
                     uriList.Add((item as NodeEntry).OriginalFileUri);
                 }
 
-                _MPC.MpdAdd(uriList);
+                _mpc.MpdAdd(uriList);
             }
             else
             {
-                _MPC.MpdAdd((items[0] as NodeEntry).OriginalFileUri);
+                _mpc.MpdAdd((items[0] as NodeEntry).OriginalFileUri);
             }
         }
 
         public ICommand LocalfileListviewLeftDoubleClickCommand { get; set; }
         public bool LocalfileListviewLeftDoubleClickCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void LocalfileListviewLeftDoubleClickCommand_Execute(object obj)
@@ -4379,11 +4384,11 @@ namespace MPDCtrl.ViewModels
                     uriList.Add(item);
                 }
 
-                _MPC.MpdAdd(uriList);
+                _mpc.MpdAdd(uriList);
             }
             else
             {
-                _MPC.MpdAdd(items[0] as string);
+                _mpc.MpdAdd(items[0] as string);
             }
             */
         }
@@ -4407,7 +4412,7 @@ namespace MPDCtrl.ViewModels
         public ICommand ChangePlaylistCommand { get; set; }
         public bool ChangePlaylistCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             if (_selecctedPlaylist == "") { return false; }
             return true;
         }
@@ -4421,24 +4426,24 @@ namespace MPDCtrl.ViewModels
                 Queue.Clear();
             });
 
-            _MPC.MpdChangePlaylist(_selecctedPlaylist);
+            _mpc.MpdChangePlaylist(_selecctedPlaylist);
         }
 
         public ICommand PlaylistListviewLeftDoubleClickCommand { get; set; }
         public bool PlaylistListviewLeftDoubleClickCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void PlaylistListviewLeftDoubleClickCommand_ExecuteAsync(String playlist)
         {
-            //_MPC.MpdLoadPlaylist(playlist);
+            //_mpc.MpdLoadPlaylist(playlist);
         }
 
         public ICommand PlaylistListviewEnterKeyCommand { get; set; }
         public bool PlaylistListviewEnterKeyCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void PlaylistListviewEnterKeyCommand_ExecuteAsync()
@@ -4446,13 +4451,13 @@ namespace MPDCtrl.ViewModels
             if (_selecctedPlaylist == "")
                 return;
 
-            _MPC.MpdLoadPlaylist(_selecctedPlaylist);
+            _mpc.MpdLoadPlaylist(_selecctedPlaylist);
         }
 
         public ICommand PlaylistListviewLoadPlaylistCommand { get; set; }
         public bool PlaylistListviewLoadPlaylistCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void PlaylistListviewLoadPlaylistCommand_ExecuteAsync()
@@ -4460,13 +4465,13 @@ namespace MPDCtrl.ViewModels
             if (_selecctedPlaylist == "")
                 return;
 
-            _MPC.MpdLoadPlaylist(_selecctedPlaylist);
+            _mpc.MpdLoadPlaylist(_selecctedPlaylist);
         }
 
         public ICommand PlaylistListviewClearLoadPlaylistCommand { get; set; }
         public bool PlaylistListviewClearLoadPlaylistCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void PlaylistListviewClearLoadPlaylistCommand_ExecuteAsync()
@@ -4479,13 +4484,13 @@ namespace MPDCtrl.ViewModels
                 Queue.Clear();
             });
 
-            _MPC.MpdChangePlaylist(_selecctedPlaylist);
+            _mpc.MpdChangePlaylist(_selecctedPlaylist);
         }
 
         public ICommand PlaylistListviewRenamePlaylistCommand { get; set; }
         public bool PlaylistListviewRenamePlaylistCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void PlaylistListviewRenamePlaylistCommand_Execute(String playlist)
@@ -4501,7 +4506,7 @@ namespace MPDCtrl.ViewModels
             DialogResultFunction = null;
             DialogResultFunctionWith2Params = DoRenamePlaylist;
             DialogResultFunctionParamString = _selecctedPlaylist;
-            //_MPC.MpdRenamePlaylist(_selecctedPlaylist, "Hogehoge hoge");
+            //_mpc.MpdRenamePlaylist(_selecctedPlaylist, "Hogehoge hoge");
         }
         public bool DoRenamePlaylist(String oldPlaylistName, String newPlaylistName)
         {
@@ -4515,7 +4520,7 @@ namespace MPDCtrl.ViewModels
                 return false;
             }
 
-            _MPC.MpdRenamePlaylist(oldPlaylistName, newPlaylistName);
+            _mpc.MpdRenamePlaylist(oldPlaylistName, newPlaylistName);
 
             return true;
         }
@@ -4523,7 +4528,7 @@ namespace MPDCtrl.ViewModels
         public ICommand PlaylistListviewRemovePlaylistCommand { get; set; }
         public bool PlaylistListviewRemovePlaylistCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             return true;
         }
         public void PlaylistListviewRemovePlaylistCommand_Execute(String playlist)
@@ -4538,7 +4543,7 @@ namespace MPDCtrl.ViewModels
 
             DialogResultFunction = DoRemovePlaylist;
             DialogResultFunctionParamString = _selecctedPlaylist;
-            //_MPC.MpdRemovePlaylist(_selecctedPlaylist);
+            //_mpc.MpdRemovePlaylist(_selecctedPlaylist);
         }
 
         public bool DoRemovePlaylist(String playlist) 
@@ -4552,7 +4557,7 @@ namespace MPDCtrl.ViewModels
                 });
             }
 
-            _MPC.MpdRemovePlaylist(playlist);
+            _mpc.MpdRemovePlaylist(playlist);
 
             return true;
         }
@@ -4564,7 +4569,7 @@ namespace MPDCtrl.ViewModels
         public ICommand QueueListviewSaveCommand { get; }
         public bool QueueListviewSaveCommand_CanExecute()
         {
-            if (_MPC == null) return false;
+            if (_mpc == null) return false;
             if (Queue.Count == 0) return false;
             return true;
         }
@@ -4577,7 +4582,7 @@ namespace MPDCtrl.ViewModels
 
             DialogResultFunction = DoSave;
             DialogResultFunctionParamString = "";
-            //_MPC.MpdSave("New Playlist");
+            //_mpc.MpdSave("New Playlist");
         }
 
         public bool DoSave(string newPlaylistName)
@@ -4592,40 +4597,40 @@ namespace MPDCtrl.ViewModels
                 return false;
             }
 
-            _MPC.MpdSave(newPlaylistName);
+            _mpc.MpdSave(newPlaylistName);
             return true;
         }
 
         public ICommand QueueListviewEnterKeyCommand { get; set; }
         public bool QueueListviewEnterKeyCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             if (Queue.Count < 1) { return false; }
             if (_selectedSong == null) { return false; }
             return true;
         }
         public void QueueListviewEnterKeyCommand_ExecuteAsync()
         {
-            _MPC.MpdPlaybackPlay(_selectedSong.Id);
+            _mpc.MpdPlaybackPlay(_selectedSong.Id);
         }
 
         public ICommand QueueListviewLeftDoubleClickCommand { get; set; }
         public bool QueueListviewLeftDoubleClickCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             if (Queue.Count < 1) { return false; }
             if (_selectedSong == null) { return false; }
             return true;
         }
         public void QueueListviewLeftDoubleClickCommand_ExecuteAsync(MPC.SongInfo song)
         {
-            _MPC.MpdPlaybackPlay(song.Id);
+            _mpc.MpdPlaybackPlay(song.Id);
         }
 
         public ICommand QueueListviewClearCommand { get; }
         public bool QueueListviewClearCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             if (Queue.Count == 0) { return false; }
             return true;
         }
@@ -4637,7 +4642,7 @@ namespace MPDCtrl.ViewModels
                 Queue.Clear();
             });
 
-            _MPC.MpdClear();
+            _mpc.MpdClear();
         }
 
         public ICommand QueueListviewDeleteCommand { get; }
@@ -4687,7 +4692,7 @@ namespace MPDCtrl.ViewModels
                 });
             }
 
-            _MPC.MpdDeleteId(deleteIdList);
+            _mpc.MpdDeleteId(deleteIdList);
 
         }
 
@@ -4738,7 +4743,7 @@ namespace MPDCtrl.ViewModels
                 }
             }
             
-            _MPC.MpdMoveId(IdToNewPos);
+            _mpc.MpdMoveId(IdToNewPos);
         }
 
         public ICommand QueueListviewMoveDownCommand { get; }
@@ -4788,7 +4793,7 @@ namespace MPDCtrl.ViewModels
                 }
             }
 
-            _MPC.MpdMoveId(IdToNewPos);
+            _mpc.MpdMoveId(IdToNewPos);
         }
 
         public ICommand QueueListviewPlaylistAddCommand { get; }
@@ -4844,12 +4849,12 @@ namespace MPDCtrl.ViewModels
             }
 
             IsPlaylistSelectDialogShow = true;
-            //_MPC.MpdPlaylistAdd(playlistName, fileUrisToAddList);
+            //_mpc.MpdPlaylistAdd(playlistName, fileUrisToAddList);
         }
 
         public bool DoPlaylistAdd(String playlistName, List<string> fileUrisToAddList)
         {
-            _MPC.MpdPlaylistAdd(playlistName, fileUrisToAddList);
+            _mpc.MpdPlaylistAdd(playlistName, fileUrisToAddList);
 
             return true;
         }
@@ -4858,7 +4863,7 @@ namespace MPDCtrl.ViewModels
         public ICommand ScrollIntoNowPlayingCommand { get; }
         public bool ScrollIntoNowPlayingCommand_CanExecute()
         {
-            if (_MPC == null) { return false; }
+            if (_mpc == null) { return false; }
             if (Queue.Count == 0) { return false; }
             if (CurrentSong == null) { return false; }
             return true;
@@ -5030,7 +5035,7 @@ namespace MPDCtrl.ViewModels
 
                 if (SelectedProfile == CurrentProfile)
                 {
-                    _MPC.MpdPassword = passwordBox.Password;
+                    _mpc.MpdPassword = passwordBox.Password;
                 }
             }
 
@@ -5080,8 +5085,8 @@ namespace MPDCtrl.ViewModels
 
             if (IsConnected)
             {
-                _MPC.MpdStop = true;
-                _MPC.MpdDisconnect();
+                _mpc.MpdStop = true;
+                _mpc.MpdDisconnect();
             }
 
             // Validate Host input.
@@ -5148,11 +5153,11 @@ namespace MPDCtrl.ViewModels
             });
 
             //
-            _MPC.MpdHost = _host;
-            _MPC.MpdPort = _port;
-            _MPC.MpdPassword = _password;
+            _mpc.MpdHost = _host;
+            _mpc.MpdPort = _port;
+            _mpc.MpdPassword = _password;
 
-            _MPC.MpdStop = false;
+            _mpc.MpdStop = false;
 
 
             IsConnecting = true; 
@@ -5180,7 +5185,7 @@ namespace MPDCtrl.ViewModels
                     Profiles.Add(prof);
 
                     // 初回だからUpdateしておく。
-                    _MPC.MpdSendUpdate();
+                    _mpc.MpdSendUpdate();
                 }
                 else
                 {
@@ -5209,10 +5214,10 @@ namespace MPDCtrl.ViewModels
 
                 // Handled at OnMpdConnected.
                 /*
-                _MPC.MpdQueryCurrentQueue();
-                _MPC.MpdQueryStatus();
-                _MPC.MpdQueryPlaylists();
-                _MPC.MpdQueryListAll();
+                _mpc.MpdQueryCurrentQueue();
+                _mpc.MpdQueryStatus();
+                _mpc.MpdQueryPlaylists();
+                _mpc.MpdQueryListAll();
                 */
             }
             else
@@ -5343,7 +5348,7 @@ namespace MPDCtrl.ViewModels
 
                     if (SelectedProfile == CurrentProfile)
                     {
-                        _MPC.MpdPassword = SelectedProfile.Password;
+                        _mpc.MpdPassword = SelectedProfile.Password;
                     }
 
                     SettingProfileEditMessage = MPDCtrl.Properties.Resources.ChangePasswordDialog_PasswordUpdated;
@@ -5617,7 +5622,7 @@ namespace MPDCtrl.ViewModels
             if (string.IsNullOrEmpty(SearchQuery)) return;
             string queryShiki = "contains";//"==";
 
-            _MPC.MpdSearch(SelectedSearchTags.ToString(), queryShiki, SearchQuery);
+            _mpc.MpdSearch(SelectedSearchTags.ToString(), queryShiki, SearchQuery);
 
         }
 
@@ -5643,7 +5648,7 @@ namespace MPDCtrl.ViewModels
                     uriList.Add((item as NodeEntry).OriginalFileUri);
                 }
 
-                _MPC.MpdAdd(uriList);
+                _mpc.MpdAdd(uriList);
             }
         }
 
@@ -5669,7 +5674,7 @@ namespace MPDCtrl.ViewModels
                     uriList.Add((item as MPC.Song).file);
                 }
 
-                _MPC.MpdAdd(uriList);
+                _mpc.MpdAdd(uriList);
             }
         }
 

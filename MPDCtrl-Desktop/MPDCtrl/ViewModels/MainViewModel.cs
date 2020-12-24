@@ -33,7 +33,7 @@ namespace MPDCtrl.ViewModels
     /// 
     /// 
     /// 
-    /// v2.0.9 以降
+    /// v2.1.0 以降
     /// 
     /// テーマの切り替え
     /// 翻訳のリソースやスタイル、名前の整理と見直し。
@@ -53,6 +53,7 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v2.0.9.4 AlbumArtでsize too big のawaitの順番を変えた。
     /// v2.0.9.3 バイナリと一緒に来ていたのを読み取れてなかった。
     /// v2.0.9.2 シングルモードを追加。
     /// v2.0.9.1 シークが動いていなかった、要テスト。
@@ -129,7 +130,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.9.3";
+        const string _appVer = "v2.0.9.4";
 
         public string AppVer
         {

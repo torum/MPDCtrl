@@ -1670,6 +1670,8 @@ namespace MPDCtrl.Models
             //List<string> values = res.Split("OK\n").ToList();
             List<string> values = res.Split(new string[] { "OK\n" }, StringSplitOptions.None).ToList();
 
+            string ok = "OK";
+
             try
             {
                 if (values.Count > 0)
@@ -1685,8 +1687,9 @@ namespace MPDCtrl.Models
 
                             if (val != "")
                             {
-                                System.Diagnostics.Debug.WriteLine("TCPClient_DataBinaryReceived:" + val + "OK");
-                                TCPClient_DataReceived(sender, val + "OK");
+                                System.Diagnostics.Debug.WriteLine("TCPClient_DataBinaryReceived:" + val + ok);
+                                TCPClient_DataReceived(sender, val + ok);
+
                             }
                         }
                         else if (val.StartsWith("size: "))
@@ -1706,7 +1709,6 @@ namespace MPDCtrl.Models
                 System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived: " + e.ToString());
                 return;
             }
-
         }
 
         private async void BinaryDataReceived_ParseData(byte[] data, int gabPre, int gabAfter)
@@ -1812,9 +1814,10 @@ namespace MPDCtrl.Models
                 {
                     System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary file too big: " + binSize.ToString());
 
+                    _albumCover.IsDownloading = false;
+
                     await Task.Run(() => { DataReceived?.Invoke(this, "[binary file too big. (Size > 300000) Max 300kb]: " + binSize.ToString()); });
 
-                    _albumCover.IsDownloading = false;
                     return;
                 }
 
@@ -2017,10 +2020,10 @@ namespace MPDCtrl.Models
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("Error@ParseListAll: " + e.ToString());
+                System.Diagnostics.Debug.WriteLine("Error@BitmapImageFromBytes: " + e.ToString());
+
                 return null;
             }
-
         }
 
         private async void DataReceived_Dispatch(string str)
@@ -2079,7 +2082,7 @@ namespace MPDCtrl.Models
                 {
                     await Task.Run(() => { StatusChanged?.Invoke(this, str); });
 
-                    //List<string> SubSystems = str.Split('\n').ToList();
+                    List<string> SubSystems = str.Split('\n').ToList();
 
                     try
                     {
@@ -2087,39 +2090,6 @@ namespace MPDCtrl.Models
                         bool isCurrentQueue = false;
                         bool isStoredPlaylist = false;
 
-                        string line = str.Replace("\nOK", "").Trim();
-
-                        if (line.ToLower() == "changed: playlist")
-                        {
-                            // playlist: the queue (i.e.the current playlist) has been modified
-                            isCurrentQueue = true;
-                        }
-                        if (line.ToLower() == "changed: player")
-                        {
-                            // player: the player has been started, stopped or seeked
-                            isPlayer = true;
-                        }
-                        if (line.ToLower() == "changed: options")
-                        {
-                            // options: options like repeat, random, crossfade, replay gain
-                            isPlayer = true;
-                        }
-                        if (line.ToLower() == "changed: mixer")
-                        {
-                            // mixer: the volume has been changed
-                            isPlayer = true;
-                        }
-                        if (line.ToLower() == "changed: stored_playlist")
-                        {
-                            // stored_playlist: a stored playlist has been modified, renamed, created or deleted
-                            isStoredPlaylist = true;
-                        }
-                        if (line.ToLower() == "changed: update")
-                        {
-                            // update: a database update has started or finished.If the database was modified during the update, the database event is also emitted.
-                            // TODO:
-                        }
-                        /*
                         foreach (string line in SubSystems)
                         {
                             if (line.ToLower() == "changed: playlist")
@@ -2161,7 +2131,6 @@ namespace MPDCtrl.Models
                             //neighbor: a neighbor was found or lost
                             //mount: the mount list has changed
                         }
-                        */
 
                         if (isCurrentQueue)
                         {

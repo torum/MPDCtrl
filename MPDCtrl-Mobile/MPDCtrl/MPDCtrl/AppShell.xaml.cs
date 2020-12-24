@@ -18,7 +18,7 @@ namespace MPDCtrl
         /*
         private async void OnMenuItemClicked(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync("//ConnectPage");
+            //await Shell.Current.GoToAsync("//ConnectPage");
         }
         */
     }

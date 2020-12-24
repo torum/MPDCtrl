@@ -106,7 +106,7 @@
         the flyout menu won't be available. This is useful for creating areas of the application where 
         you don't want users to be able to navigate away from. If you would like to navigate to this 
         content you can do so by calling 
-        await Shell.Current.GoToAsync("//ConnectPage");
+        //await Shell.Current.GoToAsync("//ConnectPage");
     -->
     <TabBar>
         <ShellContent Route="ConnectPage" ContentTemplate="{DataTemplate local:ConnectPage}" />

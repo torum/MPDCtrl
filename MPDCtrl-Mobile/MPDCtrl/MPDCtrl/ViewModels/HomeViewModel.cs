@@ -684,38 +684,71 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private async void OnMpdStatusUpdate(MPC sender, object data)
+        private void OnMpdStatusUpdate(MPC sender, object data)
         {
             if ((data as string) == "isPlayer")
             {
-                UpdateButtonStatus();
-
-                bool isSongChanged = false;
-                if (CurrentSong != null)
-                {
-                    if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
-                    {
-                        isSongChanged = true;
-
-                        // Clear IsPlaying icon
-                        CurrentSong.IsPlaying = false;
-
-                        //IsAlbumArtVisible = false;
-                        Device.BeginInvokeOnMainThread(() =>
-                        {
-                            AlbumArt = _albumArtDefault;
-                        });
-                    }
-                }
-
                 Device.BeginInvokeOnMainThread(() =>
                 {
+                    UpdateButtonStatus();
+
+                    bool isSongChanged = false;
+                    bool isCurrentSongWasNull = false;
+
+                    if (CurrentSong != null)
+                    {
+                        //Debug.WriteLine("AlbumArt isPlayer0: " + CurrentSong.Title);
+                        D//ebug.WriteLine("AlbumArt isPlayer0: " + CurrentSong.Id + ", " + _mpc.MpdStatus.MpdSongID);
+
+                        if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
+                        {
+                            isSongChanged = true;
+
+                            // Clear IsPlaying icon
+                            CurrentSong.IsPlaying = false;
+
+                            //Device.BeginInvokeOnMainThread(() =>
+                            //{
+                                AlbumArt = _albumArtDefault;
+                            //});
+                        }
+                    }
+                    else
+                    {
+                        isCurrentSongWasNull = true;
+                    }
+
                     // Sets Current Song
                     var item = _con.Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
                     if (item != null)
                     {
                         CurrentSong = (item as SongInfo);
-                        (item as SongInfo).IsPlaying = true;
+                        CurrentSong.IsPlaying = true;
+
+                        // AlbumArt
+                        if (isSongChanged)
+                        {
+                            if (!String.IsNullOrEmpty(CurrentSong.file))
+                            {
+                                //Debug.WriteLine("AlbumArt isPlayer: " + CurrentSong.file);
+                                _mpc.MpdQueryAlbumArt(CurrentSong.file);
+                            }
+                        }
+                        else
+                        {
+                            if (isCurrentSongWasNull)
+                            {
+                                if (!String.IsNullOrEmpty(CurrentSong.file))
+                                {
+                                    //Debug.WriteLine("AlbumArt isPlayer: isCurrentSongWasNull");
+                                    _mpc.MpdQueryAlbumArt(CurrentSong.file);
+                                }
+                            }
+                            else
+                            {
+                                //Debug.WriteLine("AlbumArt isPlayer: !isSongChanged.");
+                            }
+                        }
 
                         _selectedItem = CurrentSong;
                         NotifyPropertyChanged("SelectedItem");
@@ -725,74 +758,83 @@ namespace MPDCtrl.ViewModels
                     else
                     {
                         CurrentSong = null;
+
+                        //Debug.WriteLine("AlbumArt isPlayer: CurrentSong null");
+
+                        //Device.BeginInvokeOnMainThread(() =>
+                        //{
+                            AlbumArt = _albumArtDefault;
+                        //});
                     }
-
-
                 });
-
-                await Task.Delay(500);
-
-                if (isSongChanged && (CurrentSong != null))
-                {
-                    // AlbumArt
-                    if (!String.IsNullOrEmpty(CurrentSong.file))
-                    {
-                        _mpc.MpdQueryAlbumArt(CurrentSong.file);
-                    }
-                }
-
             }
             else if ((data as string) == "isCurrentQueue")
             {
+                // Set Current and NowPlaying.
                 Device.BeginInvokeOnMainThread(() =>
                 {
-                    // Set Current and NowPlaying.
                     var curitem = _con.Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
                     if (curitem != null)
                     {
                         CurrentSong = (curitem as SongInfo);
-                        (curitem as SongInfo).IsPlaying = true;
-                        
-                        // AlbumArt
-                        if (_mpc.AlbumArt.SongFilePath != curitem.file)
-                        {
-                            //IsAlbumArtVisible = false;
-                            Device.BeginInvokeOnMainThread(() =>
-                            {
-                                AlbumArt = _albumArtDefault;
-
-                                if (!String.IsNullOrEmpty((curitem as SongInfo).file))
-                                {
-                                    _mpc.MpdQueryAlbumArt((curitem as SongInfo).file);
-                                }
-                            });
-                        }
+                        CurrentSong.IsPlaying = true;
                     }
                     else
                     {
                         CurrentSong = null;
+                    }
 
-                        //IsAlbumArtVisible = false;
-                        Device.BeginInvokeOnMainThread(() =>
+                    // AlbumArt
+                    if (CurrentSong != null)
+                    {
+                        if (_mpc.AlbumArt.SongFilePath != CurrentSong.file)
                         {
+                            //Device.BeginInvokeOnMainThread(() =>
+                            //{
+                                AlbumArt = _albumArtDefault;
+                            //});
+
+                            // a hack for iOS.
+                            //await Task.Delay(100);
+
+                            if (!String.IsNullOrEmpty(CurrentSong.file))
+                            {
+                                //Debug.WriteLine("AlbumArt isCurrentQueue: " + CurrentSong.file);
+
+                                _mpc.MpdQueryAlbumArt(CurrentSong.file);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //Debug.WriteLine("AlbumArt isCurrentQueue: CurrentSong null");
+
+                        //Device.BeginInvokeOnMainThread(() =>
+                        //{
                             AlbumArt = _albumArtDefault;
-                        });
-                        
+                        //});
                     }
                 });
+
+
             }
             else if ((data as string) == "isAlbumart")
             {
-                if (CurrentSong != null)
+                Device.BeginInvokeOnMainThread(() =>
                 {
-                    if (CurrentSong.file == _mpc.AlbumArt.SongFilePath)
+                    if (CurrentSong != null)
                     {
-                        Device.BeginInvokeOnMainThread(() =>
+                        if (CurrentSong.file == _mpc.AlbumArt.SongFilePath)
                         {
+                            // a hack for iOS.
+                            AlbumArt = null;
+
                             AlbumArt = _mpc.AlbumArt.AlbumImageSource;
-                        });
+                        }
                     }
-                }
+                });
+
+
 
                 /*
                 Device.BeginInvokeOnMainThread(() =>

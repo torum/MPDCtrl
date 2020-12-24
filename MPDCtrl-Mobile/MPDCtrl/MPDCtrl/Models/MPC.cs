@@ -198,9 +198,11 @@ namespace MPDCtrl.Models
                 MpdVer = "";
                 _status.Reset();
 
+                /*
                 await Task.Run(() => {
                     ConnectionStatusChanged?.Invoke(this, TCPC.ConnectionStatus.Connecting);
                 });
+                */
 
                 ConnectionResult isDone = await _asyncClient.Connect(IPAddress.Parse(_host), _port);
 
@@ -1070,7 +1072,10 @@ namespace MPDCtrl.Models
                                 gabPre = gabPre + val.Length;
 
                             if (val != "")
-                                TCPClient_DataReceived(sender, val);
+                            {
+                                TCPClient_DataReceived(sender, val + "OK");
+                                System.Diagnostics.Debug.WriteLine("TCPClient_DataBinaryReceived: " + val  + "OK");
+                            }
                         }
                         else if (val.StartsWith("size: "))
                         {
@@ -1078,7 +1083,7 @@ namespace MPDCtrl.Models
                         }
                     }
 
-                    await Task.Delay(300);
+                    await Task.Delay(100);
 
                     //await Task.Run(() => { IsBusy?.Invoke(this, true); });
 
@@ -1323,7 +1328,7 @@ namespace MPDCtrl.Models
                             try
                             {
                                 // wait little bit.
-                                //await Task.Delay(100);
+                                await Task.Delay(100);
                                 /*
                                 if (Application.Current == null) { return; }
                                 Application.Current.Dispatcher.Invoke(() =>
@@ -1496,49 +1501,47 @@ namespace MPDCtrl.Models
                         bool isPlayer = false;
                         bool isCurrentQueue = false;
                         bool isStoredPlaylist = false;
-                        foreach (string line in SubSystems)
-                        {
-                            if (line.ToLower() == "changed: playlist")
-                            {
-                                // playlist: the queue (i.e.the current playlist) has been modified
-                                isCurrentQueue = true;
-                            }
-                            if (line.ToLower() == "changed: player")
-                            {
-                                // player: the player has been started, stopped or seeked
-                                isPlayer = true;
-                            }
-                            if (line.ToLower() == "changed: options")
-                            {
-                                // options: options like repeat, random, crossfade, replay gain
-                                isPlayer = true;
-                            }
-                            if (line.ToLower() == "changed: mixer")
-                            {
-                                // mixer: the volume has been changed
-                                isPlayer = true;
-                            }
-                            if (line.ToLower() == "changed: stored_playlist")
-                            {
-                                // stored_playlist: a stored playlist has been modified, renamed, created or deleted
-                                isStoredPlaylist = true;
-                            }
-                            if (line.ToLower() == "changed: update")
-                            {
-                                // update: a database update has started or finished.If the database was modified during the update, the database event is also emitted.
-                                // TODO:
-                            }
 
-                            /*
-                            output: an audio output has been added, removed or modified(e.g.renamed, enabled or disabled)
-                            partition: a partition was added, removed or changed
-                            sticker: the sticker database has been modified.
-                            subscription: a client has subscribed or unsubscribed to a channel
-                            message: a message was received on a channel this client is subscribed to; this event is only emitted when the queue is empty
-                            neighbor: a neighbor was found or lost
-                            mount: the mount list has changed
-                             */
+                        string line = str.Replace("\nOK", "").Trim();
+
+                        if (line.ToLower() == "changed: playlist")
+                        {
+                            // playlist: the queue (i.e.the current playlist) has been modified
+                            isCurrentQueue = true;
                         }
+                        if (line.ToLower() == "changed: player")
+                        {
+                            // player: the player has been started, stopped or seeked
+                            isPlayer = true;
+                        }
+                        if (line.ToLower() == "changed: options")
+                        {
+                            // options: options like repeat, random, crossfade, replay gain
+                            isPlayer = true;
+                        }
+                        if (line.ToLower() == "changed: mixer")
+                        {
+                            // mixer: the volume has been changed
+                            isPlayer = true;
+                        }
+                        if (line.ToLower() == "changed: stored_playlist")
+                        {
+                            // stored_playlist: a stored playlist has been modified, renamed, created or deleted
+                            isStoredPlaylist = true;
+                        }
+                        if (line.ToLower() == "changed: update")
+                        {
+                            // update: a database update has started or finished.If the database was modified during the update, the database event is also emitted.
+                            // TODO:
+                        }
+
+                        //output: an audio output has been added, removed or modified(e.g.renamed, enabled or disabled)
+                        //partition: a partition was added, removed or changed
+                        //sticker: the sticker database has been modified.
+                        //subscription: a client has subscribed or unsubscribed to a channel
+                        //message: a message was received on a channel this client is subscribed to; this event is only emitted when the queue is empty
+                        //neighbor: a neighbor was found or lost
+                        //mount: the mount list has changed
 
                         if (isCurrentQueue)
                         {

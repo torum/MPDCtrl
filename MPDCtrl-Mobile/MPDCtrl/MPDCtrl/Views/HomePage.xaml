@@ -42,6 +42,8 @@
 
             </StackLayout>
         </ScrollView>
+        
+        <ActivityIndicator Grid.Row="0" IsRunning="{Binding IsBusy}" VerticalOptions="CenterAndExpand" />
 
         <StackLayout Grid.Row="1" BackgroundColor="{StaticResource Accent}" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="170">
             <ContentView VerticalOptions="FillAndExpand">
@@ -158,8 +160,6 @@
             </ContentView>
         </StackLayout>
 
-        <ActivityIndicator Grid.Row="0" Grid.RowSpan="1" IsRunning="{Binding IsBusy}" VerticalOptions="CenterAndExpand" />
-        
     </Grid>
 
 </ContentPage>

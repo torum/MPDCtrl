@@ -117,11 +117,13 @@ namespace MPDCtrl.Services
             await _mpc.MpdConnect();
         }
 
-        private void OnMpdConnected(MPC sender)
+        private async void OnMpdConnected(MPC sender)
         {
 
             IsMpdConnected = true;
 
+
+            await Task.Delay(100);
 
             Debug.WriteLine("OnMpdConnected");
             // got MPD ver.
@@ -414,7 +416,7 @@ namespace MPDCtrl.Services
             }
         }
 
-        private async void OnConnectionError(MPC sender, object data)
+        private void OnConnectionError(MPC sender, object data)
         {
             if (data == null) { return; }
 
@@ -424,7 +426,7 @@ namespace MPDCtrl.Services
             //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectionError + ": " + (data as string);
             //StatusButton = _pathErrorInfoButton;
 
-            await Shell.Current.GoToAsync("//ConnectPage");
+            //await Shell.Current.GoToAsync("//ConnectPage");
         }
 
         private async void OnConnectionStatusChanged(MPC sender, TCPC.ConnectionStatus status)
@@ -467,7 +469,7 @@ namespace MPDCtrl.Services
                 //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectFail_Timeout;
                 //StatusButton = _pathErrorInfoButton;
 
-                await Shell.Current.GoToAsync("//ConnectPage");
+                //await Shell.Current.GoToAsync("//ConnectPage");
             }
             else if (status == TCPC.ConnectionStatus.DisconnectedByHost)
             {
@@ -490,7 +492,7 @@ namespace MPDCtrl.Services
                 //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_DisconnectedByUser;
                 //StatusButton = _pathErrorInfoButton;
 
-                await Shell.Current.GoToAsync("//ConnectPage");
+                //await Shell.Current.GoToAsync("//ConnectPage");
             }
             else if (status == TCPC.ConnectionStatus.Error)
             {
@@ -503,7 +505,7 @@ namespace MPDCtrl.Services
                 //ConnectionStatusMessage = "Error..";
                 //StatusButton = _pathErrorInfoButton;
 
-                await Shell.Current.GoToAsync("//ConnectPage");
+                //await Shell.Current.GoToAsync("//ConnectPage");
             }
             else if (status == TCPC.ConnectionStatus.SendFail_NotConnected)
             {
@@ -514,7 +516,7 @@ namespace MPDCtrl.Services
                 //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_SendFail_NotConnected;
                 //StatusButton = _pathErrorInfoButton;
 
-                await Shell.Current.GoToAsync("//ConnectPage");
+                //await Shell.Current.GoToAsync("//ConnectPage");
             }
             else if (status == TCPC.ConnectionStatus.SendFail_Timeout)
             {
@@ -525,7 +527,7 @@ namespace MPDCtrl.Services
                 //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_SendFail_Timeout;
                 //StatusButton = _pathErrorInfoButton;
 
-                await Shell.Current.GoToAsync("//ConnectPage");
+                //await Shell.Current.GoToAsync("//ConnectPage");
             }
             else if (status == TCPC.ConnectionStatus.NeverConnected)
             {
@@ -536,7 +538,7 @@ namespace MPDCtrl.Services
                 //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_NeverConnected;
                 //StatusButton = _pathErrorInfoButton;
 
-                await Shell.Current.GoToAsync("//ConnectPage");
+                //await Shell.Current.GoToAsync("//ConnectPage");
             }
             else if (status == TCPC.ConnectionStatus.Disconnecting)
             {
@@ -548,7 +550,7 @@ namespace MPDCtrl.Services
                 //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_NeverConnected;
                 //StatusButton = _pathErrorInfoButton;
 
-                await Shell.Current.GoToAsync("//ConnectPage");
+                //await Shell.Current.GoToAsync("//ConnectPage");
             }
 
         }

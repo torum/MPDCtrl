@@ -943,6 +943,33 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Auto Scroll To Current Song (NowPlaying) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_Opts_AutoScrollToNowPlaying {
+            get {
+                return ResourceManager.GetString("Settings_Opts_AutoScrollToNowPlaying", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   MPD Database に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_Opts_MPDDatabase {
+            get {
+                return ResourceManager.GetString("Settings_Opts_MPDDatabase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Options に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_Opts_Options {
+            get {
+                return ResourceManager.GetString("Settings_Opts_Options", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Save logs file (MPDCtrl__errors.txt) to desktop when unexpected error occured. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_Opts_SaveLog {
@@ -961,7 +988,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Update MPD Music Database on Startup に類似しているローカライズされた文字列を検索します。
+        ///   Update MPD Music Database on Startup. (It may take a while to update) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_Opts_UpdateDatabaseOnStartup {
             get {

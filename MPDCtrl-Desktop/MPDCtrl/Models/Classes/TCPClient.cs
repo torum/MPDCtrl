@@ -368,7 +368,10 @@ namespace MPDCtrl.Models.Classes
 
         private void DoSend(Socket client, String data)
         {
-            //DataSent?.Invoke(this, ">>" + data);
+            if ((ConnectionState == ConnectionStatus.Connected) || ConnectionState == ConnectionStatus.Connecting)
+            { }
+            else { return; }
+                
 
             // Convert the string data to byte data using ASCII encoding.  
             byte[] byteData = Encoding.Default.GetBytes(data);

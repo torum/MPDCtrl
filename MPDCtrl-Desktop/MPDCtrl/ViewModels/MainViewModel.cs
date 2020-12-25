@@ -31,67 +31,76 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// 
+    /// AlbumCover のテスト・・・
+    /// シークが動いていなかった、要テスト。
     /// 
     /// v2.1.0 以降
     /// 
-    /// テーマの切り替え
     /// 翻訳のリソースやスタイル、名前の整理と見直し。
+    /// 完全なリファクタリング。特にプロトコルから。
+    /// テーマの切り替え
     /// 
     /// 
-    /// Ctrl+F検索とFilesから直接プレイリストに追加できるように「プレイリストに追加」をコンテキストメニューで。"Save Selected to" context menu.
     /// 「プレイリストの名前変更」をインラインで。
     /// Files: "追加して再生"メニューを追加。
     /// Files: "再読み込み" context menu.
     /// 
     /// 
     /// [未定]
+    /// 検索で、ExactかContainのオプション。
+    /// Ctrl+F検索とFilesから直接プレイリストに追加できるように「プレイリストに追加」をコンテキストメニューで。
+    ///  "Save Selected to playlist" context menu at Search Result listview.
+    ///  "Save this search result as new playlist".
     /// Listview の水平スクロールバーのデザイン。
     /// スライダーの上でスクロールして音量変更。
+    /// スライダーの変更時にブレる件。
+    /// ピクチャーインピクチャー？
     /// レイアウト見直し（スプリッターのせい）GridSplitterが右に行き過ぎる問題。
     /// タイトルバー右上かどこかで現在のprofileを表示してプルダウンで簡単に切り替えられるようにしたい。
 
 
     /// 更新履歴：
+    /// v2.1.0   Store 公開
+    /// v2.0.9.5 AlbumArt色々弄ったけど、解決策は無し。動かしているPC側の問題かも。DeveloperMode作ってDebugウィンドウは非表示にした。起動時少しdelay。AlbumArtの表示場所少し変更。自動で現在の曲へスクロール、オプションを作った。
     /// v2.0.9.4 AlbumArtでsize too big のawaitの順番を変えた。
     /// v2.0.9.3 バイナリと一緒に来ていたのを読み取れてなかった。
     /// v2.0.9.2 シングルモードを追加。
     /// v2.0.9.1 シークが動いていなかった、要テスト。
-    /// v2.0.9 store公開。
+    /// v2.0.9   store公開。
     /// v2.0.8.3 ジャンプしたアイテムにフォーカスを移動するように改良しキーボードショートカットを追加。
     /// v2.0.8.2 エラーログでNewLineが無かった。
     /// v2.0.8.1 現在の曲へジャンプを追加。
-    /// v2.0.8 store公開。
+    /// v2.0.8   store公開。
     /// v2.0.7.2 パスワード送るタイミングを修正した。ステータスバーにMPDのバージョンを表示するようにした。ダミーパスワードが表示されていなかった。
     /// v2.0.7.1 キューが空の時は余計な処理をしないようにして、高速化した。
-    /// v2.0.7  store公開・・してなかった。
+    /// v2.0.7   store公開・・してなかった。
     /// v2.0.6.4 パスワード、多分毎回送る必要は無いと思う>ので削除した。
     /// v2.0.6.3 エラーログを保存するオプションを作った。
     /// v2.0.6.2 例外処理を沢山。 
     /// v2.0.6.1 エラーログを保存するようにしてる。>ifdebug
-    /// v2.0.6 store公開。
+    /// v2.0.6   store公開。
     /// v2.0.5.5 バイナリにともなって色々まとめて来てた処理をちゃんと処理するようにした。ステータスバー周りとかパスワードボックス周り、エラー周りなど変更し過ぎて忘れた。
     /// v2.0.5.4 沢山バグ潰した。 カラムヘッダーの幅を指定するヘルパーは使わないシンプルな方法に変更。
     /// v2.0.5.3 バインディングエラーを一つfix。
     /// v2.0.5.2 起動時にデフォルトのMPDに接続出来なかった際に、表示崩れが起きる件。（サイドバーの幅とカラムヘッダーの表示・非表示）Fix。
     /// v2.0.5.1 File と Path の翻訳もれ。
-    /// v2.0.5  AlbumArt対応版としてstore公開。
+    /// v2.0.5   AlbumArt対応版としてstore公開。
     /// v2.0.4.3 キューのリストビューの本体にクリアメニューを追加。AlbumCoverのファイルサイズをMax 300Kに設定。
     /// v2.0.4.2 fixed double query of albumart. added "clear text" button in the debug window.
     /// v2.0.4.1 アルバムカバー対応。
-    /// v2.0.4  store公開。QueueListviewClearCommand
+    /// v2.0.4   store公開。QueueListviewClearCommand
     /// v2.0.3.4 ルートディレクトリにファイルがある時のテスト。
     /// v2.0.3.3 Search and filter is done.
     /// v2.0.3.2 Clearコマンドを送る前にQueueをクリアしておくようにして高速化。プレイリストとFilesはダブルクリック無効にした（なんか混乱するから）。 KeyboardNavigation.TabNavigation="Cycle"の設定。
     /// v2.0.3.1 検索とブラウズ途中。
-    /// v2.0.3    store公開。(v2.0.2.3の表示を更新し忘れた)　検索画面は無効にしてある。
+    /// v2.0.3   store公開。(v2.0.2.3の表示を更新し忘れた)　検索画面は無効にしてある。
     /// v2.0.2.3 コードをリファクタリングと移動。検索画面は途中。
     /// v2.0.2.2 色々リネーム。Ctrl+S が効いていなかった。選択アイテムを「プレイリストに保存」を追加した。ScrollIntoView止めた。コードをリファクタリング。
     /// v2.0.2.1 キューかStatusが更新される度にタイマーというかシークがオカシイのを直した。
-    /// v2.0.2    store公開。
+    /// v2.0.2   store公開。
     /// v2.0.1.2 Playlistの削除で残り一つの時クリアされないバグ。大量の曲がキューにある時重たい処理は砂時計を出すようにした。 Local Files のダブルクリックとWidth修正と覚える。アイコン追加。
     /// v2.0.1.1 TimeFormatedが一部表示されないバグ。
-    /// v2.0.1    store公開。
+    /// v2.0.1   store公開。
     /// v2.0.0.16 カラムヘッダーのサイズを覚えるようにした（色々とやっかい）
     /// v2.0.0.15 ヘッダーカラムの項目の表示・非表示を覚えるようにした。
     /// v2.0.0.14 Queue(playlistinfo)のパース方法を修正。ヘッダーカラムの項目(LastModified)を追加し、表示・非表示できるようにした。
@@ -130,7 +139,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.0.9.4";
+        const string _appVer = "v2.1.0";
 
         public string AppVer
         {
@@ -159,6 +168,7 @@ namespace MPDCtrl.ViewModels
 
         // For the application config file folder
         const string _appDeveloper = "torum";
+
 
         #endregion
 
@@ -545,6 +555,19 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+
+        public bool DeveloperMode
+        {
+            get
+            {
+#if DEBUG
+                return true;
+#else
+                return false; 
+#endif
+            }
+        }
+
         #endregion
 
         #region == コントロール関連 ==  
@@ -587,23 +610,26 @@ namespace MPDCtrl.ViewModels
 
                     if (_mpc != null)
                     {
-                        // If we have a timer and we are in this event handler, a user is still interact with the slider
-                        // we stop the timer
-                        if (_volumeDelayTimer != null)
-                            _volumeDelayTimer.Stop();
+                        if (Convert.ToDouble(_mpc.MpdStatus.MpdVolume) != _volume)
+                        {
+                            // If we have a timer and we are in this event handler, a user is still interact with the slider
+                            // we stop the timer
+                            if (_volumeDelayTimer != null)
+                                _volumeDelayTimer.Stop();
 
-                        //System.Diagnostics.Debug.WriteLine("Volume value is still changing. Skipping.");
+                            //System.Diagnostics.Debug.WriteLine("Volume value is still changing. Skipping.");
 
-                        // we always create a new instance of DispatcherTimer
-                        _volumeDelayTimer = new System.Timers.Timer();
-                        _volumeDelayTimer.AutoReset = false;
+                            // we always create a new instance of DispatcherTimer
+                            _volumeDelayTimer = new System.Timers.Timer();
+                            _volumeDelayTimer.AutoReset = false;
 
-                        // if one second passes, that means our user has stopped interacting with the slider
-                        // we do real event
-                        _volumeDelayTimer.Interval = (double)1000;
-                        _volumeDelayTimer.Elapsed += new System.Timers.ElapsedEventHandler(DoChangeVolume);
+                            // if one second passes, that means our user has stopped interacting with the slider
+                            // we do real event
+                            _volumeDelayTimer.Interval = (double)1000;
+                            _volumeDelayTimer.Elapsed += new System.Timers.ElapsedEventHandler(DoChangeVolume);
 
-                        _volumeDelayTimer.Start();
+                            _volumeDelayTimer.Start();
+                        }
                     }
                 }
             }
@@ -620,10 +646,6 @@ namespace MPDCtrl.ViewModels
                     {
                         SetVolumeCommand.Execute(null);
                     }
-                }
-                else
-                {
-                    //System.Diagnostics.Debug.WriteLine("Volume value is the same. Skipping.");
                 }
             }
         }
@@ -776,10 +798,6 @@ namespace MPDCtrl.ViewModels
                     {
                         SetSeekCommand.Execute(null);
                     }
-                }
-                else
-                {
-                    //System.Diagnostics.Debug.WriteLine("Seek value is the same. Skipping.");
                 }
             }
         }
@@ -985,6 +1003,9 @@ namespace MPDCtrl.ViewModels
                 NotifyPropertyChanged("CurrentSongTitle");
                 NotifyPropertyChanged("CurrentSongArtist");
                 NotifyPropertyChanged("CurrentSongAlbum");
+
+                if (value == null)
+                    _elapsedTimer.Stop();
             }
         }
 
@@ -1123,7 +1144,7 @@ namespace MPDCtrl.ViewModels
 
         #region == AlbumArt == 
 
-        private ImageSource _albumArtDefault;
+        private ImageSource _albumArtDefault = null;
         private ImageSource _albumArt;
         public ImageSource AlbumArt
         {
@@ -1410,7 +1431,7 @@ namespace MPDCtrl.ViewModels
             }
         }
         
-        private bool _isUpdateOnStartup = true;
+        private bool _isUpdateOnStartup = false;
         public bool IsUpdateOnStartup
         {
             get { return _isUpdateOnStartup; }
@@ -1425,6 +1446,21 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private bool _isAutoScrollToNowPlaying = false;
+        public bool IsAutoScrollToNowPlaying
+        {
+            get { return _isAutoScrollToNowPlaying; }
+            set
+            {
+                if (_isAutoScrollToNowPlaying == value)
+                    return;
+
+                _isAutoScrollToNowPlaying = value;
+
+                NotifyPropertyChanged("IsAutoScrollToNowPlaying");
+            }
+        }
+
         private bool _isShowDebugWindow;
         public bool IsShowDebugWindow
         {
@@ -1435,6 +1471,9 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isShowDebugWindow = value;
+
+                if (!DeveloperMode)
+                    return;
 
                 ShowDebug.WindowVisibility = _isShowDebugWindow;
                 ShowDebugView?.Invoke(this, ShowDebug);
@@ -2291,13 +2330,18 @@ namespace MPDCtrl.ViewModels
             _mpc.Connected += new MPC.MpdConnected(OnMpdConnected);
             _mpc.StatusChanged += new MPC.MpdStatusChanged(OnStatusChanged);
             _mpc.StatusUpdate += new MPC.MpdStatusUpdate(OnMpdStatusUpdate);
-            _mpc.DataReceived += new MPC.MpdDataReceived(OnDataReceived);
-            _mpc.DataSent += new MPC.MpdDataSent(OnDataSent);
             _mpc.ErrorReturned += new MPC.MpdError(OnError);
             _mpc.ErrorConnected += new MPC.MpdConnectionError(OnConnectionError);
             _mpc.ConnectionStatusChanged += new MPC.MpdConnectionStatusChanged(OnConnectionStatusChanged);
             _mpc.IsBusy += new MPC.MpdIsBusy(OnClientIsBusy);
-            
+            _mpc.OnAlbumArtStatusChanged += new MPC.MpdAlbumArtStatusChanged(OnAlbumArtStatusChanged);
+
+            if (DeveloperMode)
+            {
+                _mpc.DataReceived += new MPC.MpdDataReceived(OnDataReceived);
+                _mpc.DataSent += new MPC.MpdDataSent(OnDataSent);
+            }
+
             #endregion
 
             #region == タイマー ==  
@@ -2305,29 +2349,26 @@ namespace MPDCtrl.ViewModels
             // Init Song's time elapsed timer.
             _elapsedTimer = new System.Timers.Timer(500);
             _elapsedTimer.Elapsed += new System.Timers.ElapsedEventHandler(ElapsedTimer);
+
             #endregion
 
             #region == DebugWindow ==  
 
-            // Window hack for the DebugWindow.
-            App app = App.Current as App;
-            if (app != null) 
+            if (DeveloperMode)
             {
-                DebugViewModel dvm = new DebugViewModel();
+                // Window hack for the DebugWindow.
+                App app = App.Current as App;
+                if (app != null)
+                {
+                    DebugViewModel dvm = new DebugViewModel();
 
-                OnDebugWindowOutput += new DebugWindowOutput(dvm.OnDebugOutput);
+                    OnDebugWindowOutput += new DebugWindowOutput(dvm.OnDebugOutput);
 
-                ShowDebugView += (sender, arg) => { app.ShowDebugWindow(arg); };
+                    ShowDebugView += (sender, arg) => { app.ShowDebugWindow(arg); };
 
-                app.CreateDebugWindow(dvm);
+                    app.CreateDebugWindow(dvm);
+                }
             }
-
-            #endregion
-
-            #region == AlbumArt == 
-
-            _albumArtDefault = BitmapSource.Create(1, 1, 1, 1, PixelFormats.BlackWhite, null, new byte[] { 0 }, 1);
-            AlbumArt = _albumArtDefault;
 
             #endregion
 
@@ -2434,7 +2475,20 @@ namespace MPDCtrl.ViewModels
                     var opts = xdoc.Root.Element("Options");
                     if (opts != null)
                     {
-                        var hoge = opts.Attribute("UpdateOnStartup");
+                        var hoge = opts.Attribute("AutoScrollToNowPlaying");
+                        if (hoge != null)
+                        {
+                            if (hoge.Value == "True")
+                            {
+                                IsAutoScrollToNowPlaying = true;
+                            }
+                            else
+                            {
+                                IsAutoScrollToNowPlaying = false;
+                            }
+                        }
+
+                        hoge = opts.Attribute("UpdateOnStartup");
                         if (hoge != null)
                         {
                             if (hoge.Value == "True")
@@ -2447,34 +2501,36 @@ namespace MPDCtrl.ViewModels
                             }
                         }
 
-                        hoge = opts.Attribute("ShowDebugWindow");
-                        if (hoge != null)
+                        if (DeveloperMode)
                         {
-                            if (hoge.Value == "True")
+                            hoge = opts.Attribute("ShowDebugWindow");
+                            if (hoge != null)
                             {
-                                IsShowDebugWindow = true;
+                                if (hoge.Value == "True")
+                                {
+                                    IsShowDebugWindow = true;
 
+                                }
+                                else
+                                {
+                                    IsShowDebugWindow = false;
+                                }
                             }
-                            else
+
+                            hoge = opts.Attribute("SaveLog");
+                            if (hoge != null)
                             {
-                                IsShowDebugWindow = false;
+                                if (hoge.Value == "True")
+                                {
+                                    IsSaveLog = true;
+
+                                }
+                                else
+                                {
+                                    IsSaveLog = false;
+                                }
                             }
                         }
-
-                        hoge = opts.Attribute("SaveLog");
-                        if (hoge != null)
-                        {
-                            if (hoge.Value == "True")
-                            {
-                                IsSaveLog = true;
-
-                            }
-                            else
-                            {
-                                IsSaveLog = false;
-                            }
-                        }
-                        
                     }
 
                     #endregion
@@ -2980,87 +3036,92 @@ namespace MPDCtrl.ViewModels
 
             }
 
-            // DebugWindow
             App app = App.Current as App;
-            if (app != null)
+
+            if (DeveloperMode)
             {
-                foreach (var w in app.Windows)
+                // DebugWindow
+                                if (app != null)
                 {
-                    if (w is DebugWindow)
+                    foreach (var w in app.Windows)
                     {
-                        DebugWindow dw = (w as DebugWindow);
-
-                        if ((dw.WindowState == WindowState.Normal || dw.WindowState == WindowState.Maximized))
+                        if (w is DebugWindow)
                         {
-                            // Main Window element
-                            XmlElement debugWindow = doc.CreateElement(string.Empty, "DebugWindow", string.Empty);
+                            DebugWindow dw = (w as DebugWindow);
 
-                            // Main Window attributes
-                            attrs = doc.CreateAttribute("height");
-                            if (dw.WindowState == WindowState.Maximized)
+                            if ((dw.WindowState == WindowState.Normal || dw.WindowState == WindowState.Maximized))
                             {
-                                attrs.Value = dw.RestoreBounds.Height.ToString();
-                            }
-                            else
-                            {
-                                attrs.Value = dw.Height.ToString();
-                            }
-                            debugWindow.SetAttributeNode(attrs);
+                                // Main Window element
+                                XmlElement debugWindow = doc.CreateElement(string.Empty, "DebugWindow", string.Empty);
 
-                            attrs = doc.CreateAttribute("width");
-                            if (dw.WindowState == WindowState.Maximized)
-                            {
-                                attrs.Value = dw.RestoreBounds.Width.ToString();
-                            }
-                            else
-                            {
-                                attrs.Value = dw.Width.ToString();
-
-                            }
-                            debugWindow.SetAttributeNode(attrs);
-
-                            attrs = doc.CreateAttribute("top");
-                            if (dw.WindowState == WindowState.Maximized)
-                            {
-                                attrs.Value = dw.RestoreBounds.Top.ToString();
-                            }
-                            else
-                            {
-                                if (dw.Top > 0)
-                                    attrs.Value = dw.Top.ToString();
+                                // Main Window attributes
+                                attrs = doc.CreateAttribute("height");
+                                if (dw.WindowState == WindowState.Maximized)
+                                {
+                                    attrs.Value = dw.RestoreBounds.Height.ToString();
+                                }
                                 else
-                                    attrs.Value = "0";
-                            }
-                            debugWindow.SetAttributeNode(attrs);
+                                {
+                                    attrs.Value = dw.Height.ToString();
+                                }
+                                debugWindow.SetAttributeNode(attrs);
 
-                            attrs = doc.CreateAttribute("left");
-                            if (dw.WindowState == WindowState.Maximized)
-                            {
-                                attrs.Value = dw.RestoreBounds.Left.ToString();
-                            }
-                            else
-                            {
-                                if (dw.Left > 0)
-                                    attrs.Value = dw.Left.ToString();
+                                attrs = doc.CreateAttribute("width");
+                                if (dw.WindowState == WindowState.Maximized)
+                                {
+                                    attrs.Value = dw.RestoreBounds.Width.ToString();
+                                }
                                 else
-                                    attrs.Value = "0";
+                                {
+                                    attrs.Value = dw.Width.ToString();
+
+                                }
+                                debugWindow.SetAttributeNode(attrs);
+
+                                attrs = doc.CreateAttribute("top");
+                                if (dw.WindowState == WindowState.Maximized)
+                                {
+                                    attrs.Value = dw.RestoreBounds.Top.ToString();
+                                }
+                                else
+                                {
+                                    if (dw.Top > 0)
+                                        attrs.Value = dw.Top.ToString();
+                                    else
+                                        attrs.Value = "0";
+                                }
+                                debugWindow.SetAttributeNode(attrs);
+
+                                attrs = doc.CreateAttribute("left");
+                                if (dw.WindowState == WindowState.Maximized)
+                                {
+                                    attrs.Value = dw.RestoreBounds.Left.ToString();
+                                }
+                                else
+                                {
+                                    if (dw.Left > 0)
+                                        attrs.Value = dw.Left.ToString();
+                                    else
+                                        attrs.Value = "0";
+                                }
+                                debugWindow.SetAttributeNode(attrs);
+
+                                // set DebugWindow element to root.
+                                root.AppendChild(debugWindow);
+
                             }
-                            debugWindow.SetAttributeNode(attrs);
 
-                            // set DebugWindow element to root.
-                            root.AppendChild(debugWindow);
+                            /////
+                            // Tell it to close, don't hide.
+                            dw.SetClose();
+                            // Close it.
+                            dw.Close();
 
+                            break;
                         }
-
-                        /////
-                        // Tell it to close, don't hide.
-                        dw.SetClose();
-                        // Close it.
-                        dw.Close();
-
-                        break;
                     }
                 }
+
             }
 
             #endregion
@@ -3068,6 +3129,18 @@ namespace MPDCtrl.ViewModels
             #region == オプション設定の保存 ==
 
             XmlElement opts = doc.CreateElement(string.Empty, "Options", string.Empty);
+
+            //
+            attrs = doc.CreateAttribute("AutoScrollToNowPlaying");
+            if (IsAutoScrollToNowPlaying)
+            {
+                attrs.Value = "True";
+            }
+            else
+            {
+                attrs.Value = "False";
+            }
+            opts.SetAttributeNode(attrs);
 
             // 
             attrs = doc.CreateAttribute("UpdateOnStartup");
@@ -3342,7 +3415,7 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            app = App.Current as App;
+            //app = App.Current as App;
             if (app != null)
             {
                 if (IsSaveLog)
@@ -3361,8 +3434,10 @@ namespace MPDCtrl.ViewModels
 
         }
 
-        private void OnMpdConnected(MPC sender)
+        private async void OnMpdConnected(MPC sender)
         {
+            Debug.WriteLine("MPD OK: " + _mpc.MpdVer);
+
             // got MPD ver.
             MpdVersion = _mpc.MpdVer;
 
@@ -3376,13 +3451,19 @@ namespace MPDCtrl.ViewModels
                 _mpc.MpdSendUpdate();
             }
 
-            //
-            _mpc.MpdQueryCurrentQueue();
+            await Task.Delay(200);
 
-            // Call Status "after" MpdQueryCurrentQueue() in order to get "current song" in the queue.
             _mpc.MpdQueryStatus();
 
+            await Task.Delay(200);
+
+            _mpc.MpdQueryCurrentQueue();
+
+            await Task.Delay(200);
+
             _mpc.MpdQueryPlaylists();
+
+            await Task.Delay(200);
 
             // heavy stuff should be the last.
             _mpc.MpdQueryListAll();
@@ -3427,10 +3508,84 @@ namespace MPDCtrl.ViewModels
         // MPD updated information
         private void OnMpdStatusUpdate(MPC sender, object data)
         {
-            //UpdateButtonStatus();
-
             if ((data as string) == "isPlayer")
             {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    UpdateButtonStatus();
+
+                    bool isSongChanged = false;
+                    bool isCurrentSongWasNull = false;
+
+                    if (CurrentSong != null)
+                    {
+                        if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
+                        {
+                            isSongChanged = true;
+
+                            // Clear IsPlaying icon
+                            CurrentSong.IsPlaying = false;
+
+                            IsAlbumArtVisible = false;
+                            AlbumArt = _albumArtDefault;
+                        }
+                    }
+                    else
+                    {
+                        isCurrentSongWasNull = true;
+                    }
+
+                    // Sets Current Song
+                    var item = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
+                    if (item != null)
+                    {
+                        CurrentSong = (item as MPC.SongInfo);
+                        CurrentSong.IsPlaying = true;
+
+                        if (isSongChanged)
+                        {
+                            if (IsAutoScrollToNowPlaying)
+                                ScrollIntoView?.Invoke(this, CurrentSong.Index);
+
+                            // AlbumArt
+                            if (!String.IsNullOrEmpty(CurrentSong.file))
+                            {
+                                //Debug.WriteLine("AlbumArt isPlayer: " + CurrentSong.file);
+                                _mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
+                            }
+                        }
+                        else
+                        {
+                            if (isCurrentSongWasNull)
+                            {
+                                if (IsAutoScrollToNowPlaying)
+                                    ScrollIntoView?.Invoke(this, CurrentSong.Index);
+
+                                // AlbumArt
+                                if (!String.IsNullOrEmpty(CurrentSong.file))
+                                {
+                                    //Debug.WriteLine("AlbumArt isPlayer: isCurrentSongWasNull");
+                                    _mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
+                                }
+                            }
+                            else
+                            {
+                                //Debug.WriteLine("AlbumArt isPlayer: !isSongChanged.");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //Debug.WriteLine("AlbumArt isPlayer: CurrentSong null");
+
+                        CurrentSong = null;
+
+                        IsAlbumArtVisible = false;
+                        AlbumArt = _albumArtDefault;
+                    }
+                });
+
+                /*
                 UpdateButtonStatus();
 
                 bool isSongChanged = false;
@@ -3462,7 +3617,7 @@ namespace MPDCtrl.ViewModels
                         CurrentSong = (item as MPC.SongInfo);
                         (item as MPC.SongInfo).IsPlaying = true;
 
-                        // 
+                        // IsAutoScrollToNowPlaying
                         //ScrollIntoView?.Invoke(this, CurrentSong.Index);
                     }
                     else
@@ -3480,21 +3635,23 @@ namespace MPDCtrl.ViewModels
                     }
                 }
 
-
                 IsBusy = false;
+
+                */
             }
             else if ((data as string) == "isCurrentQueue")
             {
                 IsBusy = true;
 
-                if (Queue.Count > 0)
+                Application.Current.Dispatcher.Invoke(() =>
                 {
-                    // 削除する曲の一時リスト
-                    List<MPC.SongInfo> _tmpQueue = new List<MPC.SongInfo>();
-
-                    Application.Current.Dispatcher.Invoke(() =>
+                    if (Queue.Count > 0)
                     {
                         IsBusy = true;
+
+                        // 削除する曲の一時リスト
+                        List<MPC.SongInfo> _tmpQueue = new List<MPC.SongInfo>();
+
                         // 既存のリストの中で新しいリストにないものを削除
                         foreach (var sng in Queue)
                         {
@@ -3549,20 +3706,22 @@ namespace MPDCtrl.ViewModels
                         if (curitem != null)
                         {
                             CurrentSong = (curitem as MPC.SongInfo);
-                            (curitem as MPC.SongInfo).IsPlaying = true;
+                            CurrentSong.IsPlaying = true;
+
+                            if (IsAutoScrollToNowPlaying)
+                                ScrollIntoView?.Invoke(this, CurrentSong.Index);
 
                             // AlbumArt
                             if (_mpc.AlbumArt.SongFilePath != curitem.file)
                             {
                                 IsAlbumArtVisible = false;
-                                Application.Current.Dispatcher.Invoke(() =>
-                                {
-                                    AlbumArt = _albumArtDefault;
-                                });
+                                AlbumArt = _albumArtDefault;
 
-                                if (!String.IsNullOrEmpty((curitem as MPC.SongInfo).file))
+                                //Debug.WriteLine("AlbumArt isCurrentQueue: " + CurrentSong.file);
+
+                                if (!String.IsNullOrEmpty(CurrentSong.file))
                                 {
-                                    _mpc.MpdQueryAlbumArt((curitem as MPC.SongInfo).file);
+                                    _mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
                                 }
                             }
                         }
@@ -3571,24 +3730,19 @@ namespace MPDCtrl.ViewModels
                             CurrentSong = null;
 
                             IsAlbumArtVisible = false;
-                            Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                AlbumArt = _albumArtDefault;
-                            });
+                            AlbumArt = _albumArtDefault;
                         }
 
                         // 移動したりするとPosが変更されても順番が反映されないので、
                         var collectionView = CollectionViewSource.GetDefaultView(Queue);
                         collectionView.SortDescriptions.Add(new SortDescription("Index", ListSortDirection.Ascending));
                         collectionView.Refresh();
-                    });
 
-
-                }
-                else
-                {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    }
+                    else
                     {
+                        IsBusy = true;
+
                         foreach (var sng in _mpc.CurrentQueue)
                         {
                             Queue.Add(sng);
@@ -3599,35 +3753,35 @@ namespace MPDCtrl.ViewModels
                         if (curitem != null)
                         {
                             CurrentSong = (curitem as MPC.SongInfo);
-                            (curitem as MPC.SongInfo).IsPlaying = true;
+                            CurrentSong.IsPlaying = true;
+
+                            if (IsAutoScrollToNowPlaying)
+                                ScrollIntoView?.Invoke(this, CurrentSong.Index);
 
                             // AlbumArt
                             if (_mpc.AlbumArt.SongFilePath != curitem.file)
                             {
                                 IsAlbumArtVisible = false;
-                                Application.Current.Dispatcher.Invoke(() =>
-                                {
-                                    AlbumArt = _albumArtDefault;
-                                });
+                                AlbumArt = _albumArtDefault;
 
-                                if (!String.IsNullOrEmpty((curitem as MPC.SongInfo).file))
+                                //Debug.WriteLine("AlbumArt isCurrentQueue from Clear: " + CurrentSong.file);
+                                if (!String.IsNullOrEmpty(CurrentSong.file))
                                 {
-                                    _mpc.MpdQueryAlbumArt((curitem as MPC.SongInfo).file);
+                                    _mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
                                 }
                             }
                         }
                         else
                         {
+                            // just in case.
                             CurrentSong = null;
 
                             IsAlbumArtVisible = false;
-                            Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                AlbumArt = _albumArtDefault;
-                            });
+                            AlbumArt = _albumArtDefault;
                         }
-                    });
-                }
+                    }
+
+                });
 
                 IsBusy = false;
             }
@@ -3642,6 +3796,7 @@ namespace MPDCtrl.ViewModels
             else if ((data as string) == "isLocalFiles")
             {
                 IsBusy = true;
+
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     LocalFiles.Clear();
@@ -3661,11 +3816,7 @@ namespace MPDCtrl.ViewModels
                         }
                         catch { }
                     }
-                });
 
-                IsBusy = true;
-                Application.Current.Dispatcher.Invoke(() =>
-                {
                     MusicDirectories.Clear();
                     
                     _musicDirectories.Load(_mpc.LocalDirectories.ToList<String>());
@@ -3675,11 +3826,6 @@ namespace MPDCtrl.ViewModels
                         SelectedNode = _musicDirectories.Children[0];
                     }
 
-                });
-
-                IsBusy = true;
-                Application.Current.Dispatcher.Invoke(() =>
-                {
                     MusicEntries.Clear();
 
                     foreach (var songfile in _mpc.LocalFiles)
@@ -3710,24 +3856,34 @@ namespace MPDCtrl.ViewModels
 
                 IsUpdatingMpdDb = true;
             }
-            else if ((data as string) == "isAlbumart")
+
+        }
+
+        private void OnAlbumArtStatusChanged(MPC sender)
+        {
+
+            // AlbumArt
+            Application.Current.Dispatcher.Invoke(() =>
             {
                 if ((!_mpc.AlbumArt.IsDownloading) && _mpc.AlbumArt.IsSuccess)
                 {
                     if ((CurrentSong != null) && (_mpc.AlbumArt.AlbumImageSource != null))
                     {
-                        // AlbumArt
                         if (!String.IsNullOrEmpty(CurrentSong.file))
                         {
                             if (CurrentSong.file == _mpc.AlbumArt.SongFilePath)
                             {
-                                AlbumArt = _mpc.AlbumArt.AlbumImageSource;
                                 IsAlbumArtVisible = true;
+                                AlbumArt = _mpc.AlbumArt.AlbumImageSource;
+                                AlbumArt = null;
+
+                                AlbumArt = _mpc.AlbumArt.AlbumImageSource;
                             }
                         }
                     }
                 }
-            }
+            });
+
         }
 
         // Raw string data Received
@@ -4016,9 +4172,16 @@ namespace MPDCtrl.ViewModels
                         //_pathStopButton
                 }
 
-                // "quietly" update view.
-                _volume = Convert.ToDouble(_mpc.MpdStatus.MpdVolume);
-                NotifyPropertyChanged("Volume");
+                // "quietly" update.
+
+                double tmpVol = Convert.ToDouble(_mpc.MpdStatus.MpdVolume);
+                if (_volume != tmpVol)
+                {
+                    _volume = tmpVol;
+                    NotifyPropertyChanged("Volume");
+                }
+                //_volume = Convert.ToDouble(_mpc.MpdStatus.MpdVolume);
+                //NotifyPropertyChanged("Volume");
 
                 _random = _mpc.MpdStatus.MpdRandom;
                 NotifyPropertyChanged("Random");
@@ -4036,7 +4199,7 @@ namespace MPDCtrl.ViewModels
                 Time = _mpc.MpdStatus.MpdSongTime;
 
                 _elapsed = _mpc.MpdStatus.MpdSongElapsed;
-                NotifyPropertyChanged("Elapsed");
+                //NotifyPropertyChanged("Elapsed");
 
                 //start elapsed timer.
                 if (_mpc.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
@@ -4050,7 +4213,7 @@ namespace MPDCtrl.ViewModels
                 }
 
                 //
-                Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
+                //Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
 
             }
             catch

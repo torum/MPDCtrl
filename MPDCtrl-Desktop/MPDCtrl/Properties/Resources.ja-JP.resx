@@ -429,6 +429,15 @@ SOFTWARE.</value>
   <data name="Settings_ErrorPortMustBeSpecified" xml:space="preserve">
     <value>ポート番号を入力してください。</value>
   </data>
+  <data name="Settings_Opts_AutoScrollToNowPlaying" xml:space="preserve">
+    <value>現在の曲へ自動でジャンプする</value>
+  </data>
+  <data name="Settings_Opts_MPDDatabase" xml:space="preserve">
+    <value>MPDのデータベース</value>
+  </data>
+  <data name="Settings_Opts_Options" xml:space="preserve">
+    <value>オプション</value>
+  </data>
   <data name="Settings_Opts_SaveLog" xml:space="preserve">
     <value>予期しないエラーが起きた際はログファイル（MPDCtrl__errors.txt）をデスクトップに保存する。</value>
   </data>
@@ -436,7 +445,7 @@ SOFTWARE.</value>
     <value>デバッグウィンドウの表示（アプリの応答が遅くなる場合があります）</value>
   </data>
   <data name="Settings_Opts_UpdateDatabaseOnStartup" xml:space="preserve">
-    <value>起動時にMPDサーバーの楽曲データベースを最新の状態に更新する</value>
+    <value>起動時にMPDサーバーの楽曲データベースを最新の状態に更新する (更新されるまで、しばらくかかる場合があります)</value>
   </data>
   <data name="Settings_ProfileDeleted" xml:space="preserve">
     <value>プロファイルが削除されました。</value>

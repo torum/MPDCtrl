@@ -236,7 +236,7 @@
                 <!-- Header grid -->
                 <Grid Grid.Row="1" Background="{DynamicResource BoardBackgroundColorBrush}">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="4"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -250,8 +250,8 @@
 
                     <!-- Album cover -->
                     <Grid Grid.Row="1" Grid.Column="0">
-                        <Grid Width="84" Height="84" Margin="32 0 0 0" HorizontalAlignment="Left">
-                            <Image Source="{Binding AlbumArt, NotifyOnTargetUpdated=True}" Width="84" Height="84" Visibility="{Binding IsAlbumArtVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                        <Grid Width="86" Height="86" Margin="32 0 10 0" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                            <Image Source="{Binding AlbumArt, NotifyOnTargetUpdated=True}" Width="86" Height="86" Visibility="{Binding IsAlbumArtVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                                 <Image.Triggers>
                                     <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                         <BeginStoryboard>
@@ -322,7 +322,7 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom">
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0 0 0 0">
                             <ToggleButton x:Name="RepeatButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Repeat}" IsChecked="{Binding Mode=TwoWay,Path=Repeat}" Style="{DynamicResource PathToggleButton}"  Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
                                   Content="M17,17H7V14L3,18L7,22V19H19V13H17M7,7H17V10L21,6L17,2V5H5V11H7V7Z">
                             </ToggleButton>
@@ -1527,30 +1527,42 @@
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
 
                                         <!-- MPD Server -->
                                         <Border Grid.Row="0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
-                                            <Label Style="{DynamicResource SectionTitle}" Content="MPD Server" HorizontalAlignment="Left"/>
+                                            <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.Settings_Opts_MPDDatabase}" HorizontalAlignment="Left"/>
                                         </Border>
 
-                                        <Grid Grid.Row="1" HorizontalAlignment="Left" Width="500" Margin="0 12 0 0">
+                                        <Grid Grid.Row="1" HorizontalAlignment="Left" Margin="0 12 0 0">
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_UpdateDatabaseOnStartup}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsUpdateOnStartup}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
 
-                                        <!-- Developer Mode -->
+                                        <!-- Options -->
                                         <Border Grid.Row="2" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                            <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.Settings_Opts_Options}" HorizontalAlignment="Left"/>
+                                        </Border>
+
+                                        <Grid Grid.Row="3" HorizontalAlignment="Left" Margin="0 12 0 0">
+                                            <CheckBox Content="{x:Static properties:Resources.Settings_Opts_AutoScrollToNowPlaying}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsAutoScrollToNowPlaying}" Margin="0 12 0 0"></CheckBox>
+                                        </Grid>
+                                        
+                                        <!-- Developer Mode -->
+                                        <Border Grid.Row="4" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1" Visibility="{Binding DeveloperMode, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                                             <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.DeveloperMode}" HorizontalAlignment="Left"/>
                                         </Border>
-                                        
-                                        <Grid Grid.Row="3" HorizontalAlignment="Left" Width="500" Margin="0 12 0 0">
+
+                                        <Grid Grid.Row="5" HorizontalAlignment="Left" Margin="0 12 0 0" Visibility="{Binding DeveloperMode, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_ShowDebugWidow}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsShowDebugWindow}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
 
-                                        <Grid Grid.Row="4" HorizontalAlignment="Left" Width="500" Margin="0 12 0 0">
+                                        <Grid Grid.Row="6" HorizontalAlignment="Left" Margin="0 12 0 0" Visibility="{Binding DeveloperMode, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_SaveLog}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsSaveLog}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
+
 
                                     </Grid>
                                 </ScrollViewer>

@@ -31,10 +31,12 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// AlbumCover のテスト・・・
-    /// シークが動いていなかった、要テスト。
     /// 
-    /// v2.1.0 以降
+    /// ACK@DataReceived_Dispatch: ACK [5@0] {playid} Failed to decode C:/hoge/hoge.mp3; Failed to open C:/hoge/hoge.mp3: (some junk) 
+    /// : No such file or directory
+    /// 
+    /// 
+    /// v2.2.0 以降
     /// 
     /// 翻訳のリソースやスタイル、名前の整理と見直し。
     /// 完全なリファクタリング。特にプロトコルから。
@@ -60,8 +62,12 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v2.1.2   Store 公開
+    /// v2.1.1.1 AlbumArtと一緒に来ていたchangedを漏らしていた。DataReceived_ParseData(val);
+    /// v2.1.1   Store 公開＞キャンセル
+    /// v2.1.0.1 AlbumArtの画像崩れ、原因が分かった。
     /// v2.1.0   Store 公開
-    /// v2.0.9.5 AlbumArt色々弄ったけど、解決策は無し。動かしているPC側の問題かも。DeveloperMode作ってDebugウィンドウは非表示にした。起動時少しdelay。AlbumArtの表示場所少し変更。自動で現在の曲へスクロール、オプションを作った。
+    /// v2.0.9.5 DeveloperMode作ってDebugウィンドウは非表示にした。起動時少しdelay。AlbumArtの表示場所少し変更。自動で現在の曲へスクロール、オプションを作った。
     /// v2.0.9.4 AlbumArtでsize too big のawaitの順番を変えた。
     /// v2.0.9.3 バイナリと一緒に来ていたのを読み取れてなかった。
     /// v2.0.9.2 シングルモードを追加。
@@ -139,7 +145,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.1.0";
+        const string _appVer = "v2.1.2";
 
         public string AppVer
         {

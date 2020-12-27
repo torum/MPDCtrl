@@ -1536,18 +1536,18 @@ namespace MPDCtrl.Models
                 return;
 
             // wait for a second. 
-            await Task.Delay(1000);
+            await Task.Delay(100);
 
             if (_albumCover.IsDownloading)
             {
-                System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading. Ignoring.");
-                return;
+                //System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading. Ignoring.");
+                //return;
             }
 
             if (_albumCover.SongFilePath == uri)
             {
-                System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.SongFilePath == uri. Ignoring.");
-                return;
+                //System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.SongFilePath == uri. Ignoring.");
+                //return;
             }
 
             if (songId != MpdStatus.MpdSongID)
@@ -1572,7 +1572,8 @@ namespace MPDCtrl.Models
             try
             {
                 string mpdCommand = "albumart \"" + uri + "\" 0" + "\n";
-
+                //string mpdCommand = "readpicture \"" + uri + "\" 0" + "\n";
+                 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
                 _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
@@ -1588,6 +1589,10 @@ namespace MPDCtrl.Models
             if (string.IsNullOrEmpty(uri))
                 return;
 
+            // wait for a bit. 
+            await Task.Delay(100);
+
+
             if (!_albumCover.IsDownloading)
             {
                 System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading == false. Ignoring.");
@@ -1602,14 +1607,12 @@ namespace MPDCtrl.Models
                 return;
             }
 
-            // wait for a bit. 
-            await Task.Delay(300);
-
             uri = Regex.Escape(uri);
 
             try
             {
                 string mpdCommand = "albumart \"" + uri + "\" " + offset.ToString() + "\n";
+                //string mpdCommand = "readpicture \"" + uri + "\" " + offset.ToString() + "\n";
 
                 _asyncClient.Send("noidle" + "\n");
                 _asyncClient.Send(mpdCommand);
@@ -1725,7 +1728,7 @@ namespace MPDCtrl.Models
         {
             if (MpdStop) return;
 
-            if (data.Length > 300000) //2000000000
+            if (data.Length > 1000000) //2000000000
             {
                 System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary file too big: " + data.Length.ToString());
 
@@ -1762,10 +1765,13 @@ namespace MPDCtrl.Models
 
                 List<string> values = res.Split('\n').ToList();
 
+                bool found = false;
                 foreach (var val in values)
                 {
                     if (val.StartsWith("size: "))
                     {
+                        found = true;
+
                         gabStart = gabStart + val.Length + 1;
 
                         List<string> s = val.Split(':').ToList();
@@ -1778,6 +1784,12 @@ namespace MPDCtrl.Models
                         }
 
                         debug = debug + Environment.NewLine + val;
+                    }
+                    else if (val.StartsWith("type: "))
+                    {
+                        gabStart = gabStart + val.Length + 1;
+
+                        //
                     }
                     else if (val.StartsWith("binary: "))
                     {
@@ -1796,9 +1808,38 @@ namespace MPDCtrl.Models
                     }
                     else if (val.StartsWith("OK"))
                     {
-                        gabEnd = gabEnd + val.Length + 1;
+                        //gabEnd = gabEnd + val.Length + 1;
+                        if (found)
+                        {
+                            gabEnd = gabEnd + val.Length + 1;
+                            //System.Diagnostics.Debug.WriteLine("OK:after " + val);
+                        }
+                        else
+                        {
+                            gabStart = gabStart + val.Length + 1;
+                            //System.Diagnostics.Debug.WriteLine("OK:before " + val);
+                        }
 
                         debug = debug + Environment.NewLine + val;
+                    }
+                    else if (val.StartsWith("changed:"))
+                    {
+                        // Song is changed...so should skip ??
+                        DataReceived_ParseData(val);
+
+                        if (found)
+                        {
+                            gabEnd = gabEnd + val.Length + 1;
+                            System.Diagnostics.Debug.WriteLine("changed:after " + val);
+                        }
+                        else
+                        {
+                            gabStart = gabStart + val.Length + 1;
+                            System.Diagnostics.Debug.WriteLine("changed:before " + val);
+                        }
+
+                        debug = debug + Environment.NewLine + val;
+
                     }
                     else
                     {
@@ -1808,13 +1849,15 @@ namespace MPDCtrl.Models
 
                 gabEnd = gabEnd + 1; // 
 
-                if (binSize > 300000)
+                DataReceived?.Invoke(this, debug);
+
+                if (binSize > 1000000)
                 {
                     System.Diagnostics.Debug.WriteLine("**TCPClient_DataBinaryReceived: binary file too big: " + binSize.ToString());
 
                     _albumCover.IsDownloading = false;
 
-                    //await Task.Run(() => { DataReceived?.Invoke(this, "[binary file too big. (Size > 300000) Max 300kb]: " + binSize.ToString()); });
+                    //await Task.Run(() => { DataReceived?.Invoke(this, "[binary file too big. (Size > 1000000) Max 1MB]: " + binSize.ToString()); });
 
                     return;
                 }
@@ -1947,6 +1990,11 @@ namespace MPDCtrl.Models
                                     _albumCover.IsDownloading = false;
                                     return;
                                 }
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived (something is wrong) ");
+
                             }
                         }
 
@@ -2311,6 +2359,7 @@ namespace MPDCtrl.Models
 
                     //await Task.Run(() => { StatusUpdate?.Invoke(this, "isAlbumart"); });
                 }
+                //: No such file or directory
                 else
                 {
                     System.Diagnostics.Debug.WriteLine("Opps. DataReceived_ParseData NON: " + str);

@@ -13,7 +13,7 @@
         <ToolbarItem Text="Save" Command="{Binding SearchResultSaveAsCommand}" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <Grid>
+        <Grid BackgroundColor="{DynamicResource backgroundSecondaryColor}">
             <StackLayout>
 
                 <StackLayout Orientation="Vertical" Padding="10,30,10,10" Spacing="10" VerticalOptions="FillAndExpand" HorizontalOptions="Fill">
@@ -43,14 +43,14 @@
                                 <ImageCell Text="{Binding Title}" Detail="{Binding ArtistAlbumGenreFormated}" x:DataType="model:Song">
                                     <ImageCell.ContextActions>
                                         <MenuItem Text="Add" Command="{Binding Path=BindingContext.SearchResultItemAddCommand, Source={x:Reference searchPage}}" CommandParameter="{Binding .}" />
-                                        <MenuItem Text="Save" Command="{Binding Path=BindingContext.SearchResultItemSaveToCommand, Source={x:Reference searchPage}}" CommandParameter="{Binding .}" IsDestructive="True" />
+                                        <MenuItem Text="Save" Command="{Binding Path=BindingContext.SearchResultItemSaveToCommand, Source={x:Reference searchPage}}" CommandParameter="{Binding .}" />
                                     </ImageCell.ContextActions>
                                 </ImageCell>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
 
-                    <Label Text="Swipe left and Add (to queue) or Save (to a playlist). " FontSize="12" LineBreakMode="WordWrap"  Padding="10,10,10,10" HorizontalOptions="Center" VerticalOptions="FillAndExpand"></Label>
+                    <Label Text="Swipe left to add (to queue) or save (to a playlist). " TextColor="{DynamicResource TextTernaryColor}" FontSize="12" LineBreakMode="WordWrap"  Padding="10,10,10,10" HorizontalOptions="Center" VerticalOptions="FillAndExpand"></Label>
 
                     <!-- CollectionView is yet unstable.
                     <Label Text="Swipe right (Add to queue), left (Save to playlist). " FontSize="12" LineBreakMode="WordWrap"  Padding="10,10,10,10" HorizontalOptions="Center" VerticalOptions="FillAndExpand"></Label>

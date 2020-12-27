@@ -13,8 +13,17 @@ namespace MPDCtrl
             InitializeComponent();
             Routing.RegisterRoute(nameof(ItemDetailPage), typeof(ItemDetailPage));
             Routing.RegisterRoute(nameof(NewItemPage), typeof(NewItemPage));
+
+
+            //GoToSetting();
         }
 
+        /*
+        private async void GoToSetting()
+        {
+            await Shell.Current.GoToAsync("//SettingPage");
+        }
+        */
         /*
         private async void OnMenuItemClicked(object sender, EventArgs e)
         {

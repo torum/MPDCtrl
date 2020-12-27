@@ -14,7 +14,7 @@
         <ToolbarItem Text="Save" Command="{Binding QueueSaveAsCommand}" />
         <ToolbarItem Text="Clear" Command="{Binding QueueClearCommand}" />
     </ContentPage.ToolbarItems>
-    <Grid>
+    <Grid BackgroundColor="{DynamicResource backgroundSecondaryColor}">
 
         <StackLayout>
             <ListView ItemsSource="{Binding Queue}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}" x:DataType="vm:QueueViewModel">
@@ -22,15 +22,15 @@
                     <DataTemplate>
                         <ImageCell ImageSource="Icon-music-circle.png" Text="{Binding Title}" Detail="{Binding ArtistAndAlbumFormated}" x:DataType="model:SongInfo">
                             <ImageCell.ContextActions>
-                                <MenuItem Text="Save to" Command="{Binding Path=BindingContext.QueueItemSaveToCommand, Source={x:Reference queuePage}}" CommandParameter="{Binding .}" />
+                                <MenuItem Text="Save to" Command="{Binding Path=BindingContext.QueueItemSaveToCommand, Source={x:Reference queuePage}}" CommandParameter="{Binding .}"/>
                                 <MenuItem Text="Remove" Command="{Binding Path=BindingContext.QueueItemDeleteCommand, Source={x:Reference queuePage}}" CommandParameter="{Binding .}" IsDestructive="True" />
                             </ImageCell.ContextActions>
                         </ImageCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            
-            <Label Text="Tap to play, Swipe left and Save to (a playlist) or Remove (from queue). " FontSize="12" LineBreakMode="WordWrap"  Padding="10,10,10,10" HorizontalOptions="Center" VerticalOptions="FillAndExpand"></Label>
+
+            <Label Text="Tap to play, Swipe left to save to (a playlist) or remove (from queue). " TextColor="{DynamicResource TextTernaryColor}" FontSize="12" LineBreakMode="WordWrap"  Padding="10,10,10,10" HorizontalOptions="Center" VerticalOptions="FillAndExpand"></Label>
 
 
             <!-- CollectionView is yet unstable.

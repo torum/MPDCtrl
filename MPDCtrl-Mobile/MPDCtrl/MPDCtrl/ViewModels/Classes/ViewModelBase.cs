@@ -70,7 +70,6 @@ namespace MPDCtrl.ViewModels
                 _ErrorMessages[propertyName] = "";
         }
 
-
         #endregion
 
     }

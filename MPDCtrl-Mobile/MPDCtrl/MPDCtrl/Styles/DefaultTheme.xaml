@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ResourceDictionary xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MPDCtrl.Styles.DefaultTheme">
+
+    <ResourceDictionary>
+
+        <Color x:Key="backgroundColor">#eee</Color>
+        <Color x:Key="backgroundSecondaryColor">LightGray</Color>
+        <Color x:Key="backgroundBoardColor">White</Color>
+
+        <Color x:Key="Primary">#2196F3</Color>
+        <Color x:Key="Accent">#eee</Color>
+
+        <Color x:Key="TextPrimaryColor">#000000</Color>
+        <Color x:Key="TextSecondaryColor">#80000000</Color>
+        <Color x:Key="TextTernaryColor">#303030</Color>
+        
+        <ResourceDictionary.MergedDictionaries>
+
+            <ResourceDictionary>
+                <Style x:Key="BaseStyle" TargetType="Element">
+                    <!--
+                        <Setter Property="Shell.BackgroundColor" Value="#eee" />
+                    -->
+                    <Setter Property="Shell.BackgroundColor" Value="{DynamicResource backgroundColor}" />
+
+                    <Setter Property="Shell.ForegroundColor" Value="{DynamicResource Primary}" />
+                    <!--
+                    <Setter Property="Shell.TitleColor" Value="{DynamicResource TextPrimaryColor}" />
+                    -->
+                    <Setter Property="Shell.DisabledColor" Value="#B4FFFFFF" />
+                    <Setter Property="Shell.UnselectedColor" Value="#95FFFFFF" />
+                    <Setter Property="Shell.TabBarBackgroundColor" Value="{DynamicResource backgroundSecondaryColor}" />
+                    <Setter Property="Shell.TabBarForegroundColor" Value="{DynamicResource Primary}"/>
+                    <Setter Property="Shell.TabBarUnselectedColor" Value="#95FFFFFF"/>
+                    <Setter Property="Shell.TabBarTitleColor" Value="{DynamicResource TextPrimaryColor}"/>
+                </Style>
+                <Style TargetType="TabBar" BasedOn="{StaticResource BaseStyle}" />
+                <Style TargetType="FlyoutItem" BasedOn="{StaticResource BaseStyle}" />
+
+                <!--
+                Default Styles for all Flyout Items
+                https://docs.microsoft.com/xamarin/xamarin-forms/app-fundamentals/shell/flyout#flyoutitem-and-menuitem-style-classes
+                -->
+                <Style Class="FlyoutItemLabelStyle" TargetType="Label">
+                    <Setter Property="TextColor" Value="{DynamicResource TextPrimaryColor}"></Setter>
+                </Style>
+                <Style Class="FlyoutItemLayoutStyle" TargetType="Layout" ApplyToDerivedTypes="True">
+                    <Setter Property="BackgroundColor" Value="{DynamicResource backgroundSecondaryColor}"></Setter>
+                    <Setter Property="VisualStateManager.VisualStateGroups">
+                        <VisualStateGroupList>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal">
+                                    <VisualState.Setters>
+                                        <Setter Property="BackgroundColor" Value="{DynamicResource backgroundSecondaryColor}" />
+                                        <Setter TargetName="FlyoutItemLabel" Property="Label.TextColor" Value="{DynamicResource TextPrimaryColor}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Selected">
+                                    <VisualState.Setters>
+                                        <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                        <Setter TargetName="FlyoutItemLabel" Property="Label.TextColor" Value="{DynamicResource TextPrimaryColor}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateGroupList>
+                    </Setter>
+                </Style>
+
+                <!--
+                Custom Style you can apply to any Flyout Item
+                -->
+                <Style Class="MenuItemLayoutStyle" TargetType="Layout" ApplyToDerivedTypes="True">
+                    <Setter Property="VisualStateManager.VisualStateGroups">
+                        <VisualStateGroupList>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal">
+                                    <VisualState.Setters>
+                                        <Setter TargetName="FlyoutItemLabel" Property="Label.TextColor" Value="{DynamicResource Primary}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateGroupList>
+                    </Setter>
+                </Style>
+            </ResourceDictionary>
+
+            <ResourceDictionary>
+                <Style TargetType="Button">
+                    <Setter Property="TextColor" Value="{DynamicResource TextPrimaryColor}"></Setter>
+                    <Setter Property="VisualStateManager.VisualStateGroups">
+                        <VisualStateGroupList>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal">
+                                    <VisualState.Setters>
+                                        <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <VisualState.Setters>
+                                        <Setter Property="BackgroundColor" Value="#332196F3" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateGroupList>
+                    </Setter>
+                </Style>
+            </ResourceDictionary>
+
+
+
+        </ResourceDictionary.MergedDictionaries>
+
+    </ResourceDictionary>
+
+</ResourceDictionary>
+
+
+

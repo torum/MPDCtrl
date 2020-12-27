@@ -7,8 +7,39 @@
              x:Class="MPDCtrl.Views.ConnectPage"
              Shell.NavBarIsVisible="False">
     <ContentPage.Content>
-        <StackLayout Padding="10,0,10,0" VerticalOptions="Center">
-            <Button VerticalOptions="Center" Text="Login" Command="{Binding LoginCommand}"/>
+        <StackLayout Padding="10,0,10,0" VerticalOptions="Center" BackgroundColor="{DynamicResource backgroundSecondaryColor}">
+            <ScrollView x:Name="MainScrolView">
+                <StackLayout Orientation="Vertical" Padding="10,30,10,24" Spacing="10" VerticalOptions="FillAndExpand" HorizontalOptions="Fill">
+
+                    <Grid VerticalOptions="FillAndExpand" HorizontalOptions="Fill">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0" Text=""></Label>
+
+                        <Label Grid.Row="0" Text="{Binding ConnectionStatus}"></Label>
+
+                        <Entry Grid.Row="2" WidthRequest="200" Text="{Binding Host}" Placeholder="Host address (eg. 192.168.1.1)" PlaceholderColor="Gray" ClearButtonVisibility="WhileEditing" Margin="10"></Entry>
+
+                        <Entry Grid.Row="3" WidthRequest="200" Text="{Binding Port}" Placeholder="Host port number (eg.6600)" PlaceholderColor="Gray" ClearButtonVisibility="WhileEditing" Margin="10"></Entry>
+
+                        <Entry Grid.Row="4" WidthRequest="200" IsPassword="True" Text="{Binding Password}" Placeholder="Password if required" Margin="10"></Entry>
+
+                        <Button Grid.Row="5" Text="Connect" Padding="6" Margin="10"  Command="{Binding ConnectCommand}"/>
+
+                    </Grid>
+
+                </StackLayout>
+            </ScrollView>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

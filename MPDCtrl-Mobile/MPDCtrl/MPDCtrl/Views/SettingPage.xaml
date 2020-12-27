@@ -2,15 +2,67 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:MPDCtrl.ViewModels"
-             x:Class="MPDCtrl.Views.SettingPage">
-    <ContentPage.BindingContext>
-        <vm:SettingViewModel />
-    </ContentPage.BindingContext>
+             x:Class="MPDCtrl.Views.SettingPage"
+             xmlns:model="clr-namespace:MPDCtrl.Models" 
+             Title="{Binding Title}" 
+             Shell.PresentationMode="ModalAnimated" 
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core" 
+             ios:Page.UseSafeArea="true"
+             x:Name="settingPage">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Add" Command="{Binding AddNewProfileCommand}"/>
+        <ToolbarItem Text="Delete" Command="{Binding DeleteProfileCommand}"/>
+    </ContentPage.ToolbarItems>
+
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
+        <Grid BackgroundColor="{DynamicResource backgroundSecondaryColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <ScrollView x:Name="MainScrolView">
+                <StackLayout Orientation="Vertical" Padding="10,30,10,24" Spacing="10" VerticalOptions="FillAndExpand" HorizontalOptions="Fill">
+
+                    <Grid VerticalOptions="FillAndExpand" HorizontalOptions="Fill" x:DataType="vm:SettingViewModel">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0" Text="{Binding SettingProfileEditMessage}" Margin="10"></Label>
+
+                        <Picker Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Title="New Profile" WidthRequest="150" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" ItemDisplayBinding="{Binding Name}" Margin="10"></Picker>
+
+                        <Entry Grid.Row="2" Grid.ColumnSpan="3" WidthRequest="200" Text="{Binding Host}" Placeholder="Host address (eg. 192.168.1.1)" PlaceholderColor="Gray" ClearButtonVisibility="WhileEditing" Margin="10"></Entry>
+
+                        <Entry Grid.Row="3" Grid.ColumnSpan="3" WidthRequest="200" Text="{Binding Port}" Placeholder="Host port number (eg.6600)" PlaceholderColor="Gray" ClearButtonVisibility="WhileEditing" Margin="10"></Entry>
+
+                        <Entry Grid.Row="4" Grid.ColumnSpan="3" WidthRequest="200" IsPassword="True" Text="{Binding Password}" Placeholder="Password if required" Margin="10"></Entry>
+
+                        <StackLayout Orientation="Horizontal" Grid.Row="5" Grid.ColumnSpan="3" Margin="10">
+                            <Label Text="Use this profile as default." VerticalOptions="Center" HorizontalOptions="StartAndExpand"></Label>
+                            <Switch IsToggled="{Binding SetIsDefault}" Margin="10" HorizontalOptions="End"/>
+                        </StackLayout>
+
+                        <Button Grid.Row="6" Grid.ColumnSpan="3" Text="Save and Connect" Padding="6" Margin="10,20,10,10" Command="{Binding SaveOrUpdateProfileCommand}"></Button>
+
+                    </Grid>
+
+                </StackLayout>
+            </ScrollView>
+
+            <ActivityIndicator Grid.Row="0" IsRunning="{Binding IsBusy}" VerticalOptions="CenterAndExpand" />
+            
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

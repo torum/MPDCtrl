@@ -21,15 +21,20 @@ namespace MPDCtrl.Views
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            (BindingContext as HomeViewModel).OnAppearing();
+            //(BindingContext as HomeViewModel).OnAppearing();
+
         }
 
         public void ScrollIntoViewTo(SongInfo arg)
         {
 
-            HomeQueueListview.ScrollTo(arg, Xamarin.Forms.ScrollToPosition.Start, true);
+            //HomeQueueListview.ScrollTo(arg, Xamarin.Forms.ScrollToPosition.Start, false);
 
         }
 
+        private void ToolbarItemTop_Clicked(object sender, EventArgs e)
+        {
+            MainScrolView.ScrollToAsync(0,0,true);
+        }
     }
 }

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ResourceDictionary xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MPDCtrl.Styles.WhiteTheme"
+             Source="DefaultTheme.xaml">
+
+    <Color x:Key="backgroundColor">#eee</Color>
+    <Color x:Key="backgroundSecondaryColor">LightGray</Color>
+    <Color x:Key="backgroundBoardColor">#F3F2F7</Color>
+
+    <Color x:Key="Primary">#2196F3</Color>
+    <Color x:Key="Accent">#eee</Color>
+
+    <Color x:Key="TextPrimaryColor">#B0000000</Color>
+    <Color x:Key="TextSecondaryColor">#80000000</Color>
+    <Color x:Key="TextTernaryColor">#C8C8C8</Color>
+</ResourceDictionary>

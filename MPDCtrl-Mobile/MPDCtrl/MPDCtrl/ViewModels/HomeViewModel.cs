@@ -20,84 +20,54 @@ namespace MPDCtrl.ViewModels
 
         #region == Current song info ==
 
-        private SongInfo _currentSong;
+        public SongInfo _currentSong;
         public SongInfo CurrentSong
         {
-            get => _currentSong;
+            get
+            {
+                return _currentSong;
+            }
             set
             {
-                SetProperty(ref _currentSong, value);
+                if (_currentSong == value)
+                    return;
 
-                NotifyPropertyChanged("CurrentSongTitle");
-                NotifyPropertyChanged("CurrentSongArtist");
-                NotifyPropertyChanged("CurrentSongAlbum");
-                NotifyPropertyChanged("CurrentSongArtistAndAlbum");
+                _currentSong = value;
+                NotifyPropertyChanged("CurrentSong");
             }
         }
 
+        private string _currentSongTitle;
         public string CurrentSongTitle
         {
             get
             {
-                if (_currentSong != null)
-                {
-                    return _currentSong.Title;
-                }
-                else
-                {
-                    return string.Empty;
-                }
+                return _currentSongTitle;
             }
-        }
-
-        public string CurrentSongArtist
-        {
-            get
+            set
             {
-                if (_currentSong != null)
-                {
-                    if (!string.IsNullOrEmpty(_currentSong.Artist))
-                        return _currentSong.Artist.Trim();
-                    else
-                        return "";
-                }
-                else
-                {
-                    return string.Empty;
-                }
+                if (_currentSongTitle == value)
+                    return;
+
+                _currentSongTitle = value;
+                NotifyPropertyChanged("CurrentSongTitle");
             }
         }
 
-        public string CurrentSongAlbum
-        {
-            get
-            {
-                if (_currentSong != null)
-                {
-                    if (!string.IsNullOrEmpty(_currentSong.Album))
-                        return _currentSong.Album.Trim();
-                    else
-                        return "";
-                }
-                else
-                {
-                    return String.Empty;
-                }
-            }
-        }
-
+        private string _currentSongArtistAndAlbum;
         public string CurrentSongArtistAndAlbum
         {
             get
             {
-                if (!string.IsNullOrEmpty(CurrentSongAlbum))
-                {
-                    return CurrentSongArtist + " - " + CurrentSongAlbum;
-                }
-                else
-                {
-                    return CurrentSongArtist;
-                }
+                return _currentSongArtistAndAlbum;
+            }
+            set
+            {
+                if (_currentSongArtistAndAlbum == value)
+                    return;
+
+                _currentSongArtistAndAlbum = value;
+                NotifyPropertyChanged("CurrentSongArtistAndAlbum");
             }
         }
 
@@ -517,7 +487,7 @@ namespace MPDCtrl.ViewModels
         #region == AlbumArt == 
 
         private ImageSource _albumArtDefault = "DefaultAlbumCoverGray.png";
-        private ImageSource _albumArt = "DefaultAlbumCoverGray.png";
+        private ImageSource _albumArt;
         public ImageSource AlbumArt
         {
             get
@@ -536,21 +506,45 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        //
+        #region == タイマー ==
+        
         private System.Timers.Timer _elapsedTimer;
+        
+        #endregion
+
+        #region == イベント ==
 
         public event EventHandler<SongInfo> ScrollIntoView;
+        
+        #endregion
 
         public HomeViewModel()
         {
             Title = "Now Playing";
 
             App me = App.Current as App;
+            if (me.MpdConection == null)
+                return;
+
             _con = me.MpdConection;
             _mpc = _con.Mpc;
 
+            if (_con.CurrentSong != null)
+            {
+                // Not so smart solution.
+                CurrentSong = _con.CurrentSong;
+                CurrentSongTitle = _con.CurrentSongTitle;
+                CurrentSongArtistAndAlbum = _con.CurrentSongArtistAndAlbum;
+                AlbumArt = _con.AlbumArt;
+            }
+
+
+
             _mpc.IsBusy += new MPC.MpdIsBusy(OnClientIsBusy);
-            _mpc.StatusUpdate += new MPC.MpdStatusUpdate(OnMpdStatusUpdate);
+
+            _con.OnPlayerStatusChanged += new Connection.PlayerStatusChanged(OnPlayerStatusChanged);
+            _con.OnCurrentQueueStatusChanged += new Connection.CurrentQueueStatusChanged(OnCurrentQueueStatusChanged);
+            _con.OnAlbumArtStatusChanged += new Connection.AlbumArtStatusChanged(OnAlbumArtStatusChanged);
 
             Elapsed = 0;
             Time = 0.1; // 0 causes xamarin to crash.
@@ -573,24 +567,6 @@ namespace MPDCtrl.ViewModels
             ItemSelected = new Command<SongInfo>(OnItemSelected);
         }
 
-        public void OnAppearing()
-        {
-            if (_con.IsConnecting)
-            {
-                IsBusy = true;
-            }
-
-            if (_con.IsConnected && _con.IsMpdConnected)
-            {
-                //_mpc.MpdQueryStatus();
-            }
-        }
-
-        private void OnClientIsBusy(MPC sender, bool on)
-        {
-            IsBusy = on;
-        }
-
         private void ElapsedTimer(object sender, System.Timers.ElapsedEventArgs e)
         {
             if ((_elapsed <= _time) && (_mpc.MpdStatus.MpdState == Status.MpdPlayState.Play))
@@ -603,6 +579,8 @@ namespace MPDCtrl.ViewModels
                 _elapsedTimer.Stop();
             }
         }
+
+        #region == メソッド ==
 
         private void UpdateButtonStatus()
         {
@@ -662,7 +640,7 @@ namespace MPDCtrl.ViewModels
                 _elapsed = _mpc.MpdStatus.MpdSongElapsed;
                 NotifyPropertyChanged("Elapsed");
 
-                NotifyPropertyChanged("TimeRemainFormated");
+                NotifyPropertyChanged("ElapsedFormated");
                 NotifyPropertyChanged("TimeRemainFormated");
 
                 _volume = Convert.ToDouble(_mpc.MpdStatus.MpdVolume);
@@ -671,6 +649,7 @@ namespace MPDCtrl.ViewModels
                 // Start elapsed timer.
                 if (_mpc.MpdStatus.MpdState == Status.MpdPlayState.Play)
                 {
+
                     _elapsedTimer.Start();
                 }
                 else
@@ -684,201 +663,92 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private void OnMpdStatusUpdate(MPC sender, object data)
+        #endregion
+
+        #region == イベント ==
+
+        private void OnClientIsBusy(MPC sender, bool on)
         {
-            if ((data as string) == "isPlayer")
+            IsBusy = on;
+        }
+
+        private void OnPlayerStatusChanged(MPC sender, bool isCurrentSongChanged)
+        {
+            //Debug.WriteLine("OnPlayerStatusChanged");
+
+            UpdateButtonStatus();
+
+            if (isCurrentSongChanged)
             {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    UpdateButtonStatus();
+                // not a smart way.
+                CurrentSong = _con.CurrentSong;
+                CurrentSongTitle = _con.CurrentSongTitle;
+                CurrentSongArtistAndAlbum = _con.CurrentSongArtistAndAlbum;
 
-                    bool isSongChanged = false;
-                    bool isCurrentSongWasNull = false;
-
-                    if (CurrentSong != null)
-                    {
-                        //Debug.WriteLine("AlbumArt isPlayer0: " + CurrentSong.Title);
-                        //Debug.WriteLine("AlbumArt isPlayer0: " + CurrentSong.Id + ", " + _mpc.MpdStatus.MpdSongID);
-
-                        if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
-                        {
-                            isSongChanged = true;
-
-                            // Clear IsPlaying icon
-                            CurrentSong.IsPlaying = false;
-
-                            //Device.BeginInvokeOnMainThread(() =>
-                            //{
-                                AlbumArt = _albumArtDefault;
-                            //});
-                        }
-                    }
-                    else
-                    {
-                        isCurrentSongWasNull = true;
-                    }
-
-                    // Sets Current Song
-                    var item = _con.Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
-                    if (item != null)
-                    {
-                        CurrentSong = (item as SongInfo);
-                        CurrentSong.IsPlaying = true;
-
-                        // AlbumArt
-                        if (isSongChanged)
-                        {
-                            if (!String.IsNullOrEmpty(CurrentSong.file))
-                            {
-                                //Debug.WriteLine("AlbumArt isPlayer: " + CurrentSong.file);
-                                _mpc.MpdQueryAlbumArt(CurrentSong.file);
-                            }
-                        }
-                        else
-                        {
-                            if (isCurrentSongWasNull)
-                            {
-                                if (!String.IsNullOrEmpty(CurrentSong.file))
-                                {
-                                    //Debug.WriteLine("AlbumArt isPlayer: isCurrentSongWasNull");
-                                    _mpc.MpdQueryAlbumArt(CurrentSong.file);
-                                }
-                            }
-                            else
-                            {
-                                //Debug.WriteLine("AlbumArt isPlayer: !isSongChanged.");
-                            }
-                        }
-
-                        _selectedItem = CurrentSong;
-                        NotifyPropertyChanged("SelectedItem");
-
-                        ScrollIntoView?.Invoke(this, CurrentSong);
-                    }
-                    else
-                    {
-                        CurrentSong = null;
-
-                        //Debug.WriteLine("AlbumArt isPlayer: CurrentSong null");
-
-                        //Device.BeginInvokeOnMainThread(() =>
-                        //{
-                            AlbumArt = _albumArtDefault;
-                        //});
-                    }
-                });
+                AlbumArt = _albumArtDefault;
             }
-            else if ((data as string) == "isCurrentQueue")
+
+            if (CurrentSong != null)
             {
-                // Set Current and NowPlaying.
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    var curitem = _con.Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
-                    if (curitem != null)
-                    {
-                        CurrentSong = (curitem as SongInfo);
-                        CurrentSong.IsPlaying = true;
-                    }
-                    else
-                    {
-                        CurrentSong = null;
-                    }
+                _selectedItem = CurrentSong;
+                NotifyPropertyChanged("SelectedItem");
 
-                    // AlbumArt
-                    if (CurrentSong != null)
-                    {
-                        if (_mpc.AlbumArt.SongFilePath != CurrentSong.file)
-                        {
-                            //Device.BeginInvokeOnMainThread(() =>
-                            //{
-                                AlbumArt = _albumArtDefault;
-                            //});
-
-                            // a hack for iOS.
-                            //await Task.Delay(100);
-
-                            if (!String.IsNullOrEmpty(CurrentSong.file))
-                            {
-                                //Debug.WriteLine("AlbumArt isCurrentQueue: " + CurrentSong.file);
-
-                                _mpc.MpdQueryAlbumArt(CurrentSong.file);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //Debug.WriteLine("AlbumArt isCurrentQueue: CurrentSong null");
-
-                        //Device.BeginInvokeOnMainThread(() =>
-                        //{
-                            AlbumArt = _albumArtDefault;
-                        //});
-                    }
-                });
-
-
+                //ScrollIntoView?.Invoke(this, CurrentSong);
             }
-            else if ((data as string) == "isAlbumart")
+            else
             {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    if (CurrentSong != null)
-                    {
-                        if (CurrentSong.file == _mpc.AlbumArt.SongFilePath)
-                        {
-                            // a hack for iOS.
-                            AlbumArt = null;
-
-                            AlbumArt = _mpc.AlbumArt.AlbumImageSource;
-                        }
-                    }
-                });
-
-
-
-                /*
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    Debug.WriteLine("isAlbumart0: " + CurrentSong.file + " : " + _mpc.AlbumArt.SongFilePath);
-                    AlbumArt = _mpc.AlbumArt.AlbumImageSource;
-                });
-                if ((!_mpc.AlbumArt.IsDownloading) && _mpc.AlbumArt.IsSuccess)
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        Debug.WriteLine("isAlbumart1: " + CurrentSong.file + " : " + _mpc.AlbumArt.SongFilePath);
-                        AlbumArt = _mpc.AlbumArt.AlbumImageSource;
-                    });
-                    if ((CurrentSong != null) && (_mpc.AlbumArt.AlbumImageSource != null))
-                    {
-                        Device.BeginInvokeOnMainThread(() =>
-                        {
-                            Debug.WriteLine("isAlbumart2: " + CurrentSong.file + " : " + _mpc.AlbumArt.SongFilePath);
-                            AlbumArt = _mpc.AlbumArt.AlbumImageSource;
-                        });
-                        // AlbumArt
-                        if (!String.IsNullOrEmpty(CurrentSong.file))
-                        {
-                            Device.BeginInvokeOnMainThread(() =>
-                            {
-                                Debug.WriteLine("isAlbumart3: " + CurrentSong.file + " : "+ _mpc.AlbumArt.SongFilePath);
-                                AlbumArt = _mpc.AlbumArt.AlbumImageSource;
-                            });
-                            if (CurrentSong.file == _mpc.AlbumArt.SongFilePath)
-                            {
-                                Device.BeginInvokeOnMainThread(() =>
-                                {
-                                    Debug.WriteLine("isAlbumart4");
-                                    AlbumArt = _mpc.AlbumArt.AlbumImageSource;
-                                });
-                                //IsAlbumArtVisible = true;
-                            }
-                        }
-                    }
-                }
-                */
+                //Debug.WriteLine("OnPlayerStatusChanged: CurrentSong is null.");
             }
         }
+
+        private void OnCurrentQueueStatusChanged(MPC sender, bool isCurrentSongChanged)
+        {
+            //Debug.WriteLine("OnCurrentQueueStatusChanged");
+
+            if (isCurrentSongChanged)
+            {
+                // not a smart way.
+                CurrentSong = _con.CurrentSong;
+                CurrentSongTitle = _con.CurrentSongTitle;
+                CurrentSongArtistAndAlbum = _con.CurrentSongArtistAndAlbum;
+
+                AlbumArt = _albumArtDefault;
+            }
+
+            if (CurrentSong != null)
+            {
+                _selectedItem = CurrentSong;
+                NotifyPropertyChanged("SelectedItem");
+
+                //ScrollIntoView?.Invoke(this, CurrentSong);
+            }
+            else
+            {
+                //Debug.WriteLine("OnCurrentQueueStatusChanged: CurrentSong is null.");
+            }
+        }
+
+        private void OnAlbumArtStatusChanged(MPC sender)
+        {
+            //Debug.WriteLine("OnAlbumArtStatusChanged");
+
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                if (CurrentSong != null)
+                {
+                    if (CurrentSong.file == _mpc.AlbumArt.SongFilePath)
+                    {
+                        // iOS hack.
+                        AlbumArt = null;
+
+                        AlbumArt = _con.AlbumArt;
+                    }
+                }
+            });
+        }
+
+        #endregion
+
 
         #region == Player commands ==
 
@@ -988,6 +858,8 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
+        #region == other commands ==
+
         public Command<SongInfo> ItemSelected { get; }
         void OnItemSelected(SongInfo item)
         {
@@ -996,5 +868,7 @@ namespace MPDCtrl.ViewModels
 
             _mpc.MpdPlaybackPlay(item.Id);
         }
+
+        #endregion
     }
 }

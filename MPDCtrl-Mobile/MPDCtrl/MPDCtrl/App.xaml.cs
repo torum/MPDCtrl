@@ -3,6 +3,7 @@ using MPDCtrl.Views;
 using System;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using System.Diagnostics;
 
 namespace MPDCtrl
 {
@@ -20,12 +21,29 @@ namespace MPDCtrl
             InitializeComponent();
 
             DependencyService.Register<MockDataStore>();
-            MainPage = new AppShell();
+
+            //MainPage = new AppShell();
+            if (_con.IsProfileSet)
+            {
+                Debug.WriteLine("IsProfileSet");
+
+                MainPage = new AppShell();
+
+                _con.Start();
+            }
+            else
+            {
+                Debug.WriteLine("NOT IsProfileSet");
+
+                MainPage = new ConnectPage();
+            }
+
+
         }
 
         protected override void OnStart()
         {
-            _con.Start();
+            //
         }
 
         protected override void OnSleep()
@@ -34,6 +52,11 @@ namespace MPDCtrl
 
         protected override void OnResume()
         {
+        }
+
+        public static string AppTheme
+        {
+            get; set;
         }
     }
 }

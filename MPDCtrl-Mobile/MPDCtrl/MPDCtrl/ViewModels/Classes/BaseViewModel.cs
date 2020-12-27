@@ -8,7 +8,7 @@ using Xamarin.Forms;
 
 namespace MPDCtrl.ViewModels
 {
-    public class BaseViewModel : INotifyPropertyChanged
+    public class BaseViewModel : INotifyPropertyChanged, IDataErrorInfo
     {
         public IDataStore<Item> DataStore => DependencyService.Get<IDataStore<Item>>();
 
@@ -65,6 +65,40 @@ namespace MPDCtrl.ViewModels
             {
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             });
+        }
+
+        #endregion
+
+        #region == IDataErrorInfo ==
+
+        private Dictionary<string, string> _ErrorMessages = new Dictionary<string, string>();
+
+        string IDataErrorInfo.Error
+        {
+            get { return (_ErrorMessages.Count > 0) ? "Has Error" : null; }
+        }
+
+        string IDataErrorInfo.this[string columnName]
+        {
+            get
+            {
+                if (_ErrorMessages.ContainsKey(columnName))
+                    return _ErrorMessages[columnName];
+                else
+                    return "";
+            }
+        }
+
+        protected void SetError(string propertyName, string errorMessage)
+        {
+            _ErrorMessages[propertyName] = errorMessage;
+        }
+
+        protected void ClearErrror(string propertyName)
+        {
+            if (_ErrorMessages.ContainsKey(propertyName))
+                //_ErrorMessages.Remove(propertyName);
+                _ErrorMessages[propertyName] = "";
         }
 
         #endregion

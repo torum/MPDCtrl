@@ -41,9 +41,11 @@ namespace MPDCtrl.Views
                 if (vm != null)
                 {
                     vm.ScrollIntoView += (sender, arg) => { this.ScrollIntoViewTo(arg); };
+
                     vm.DebugWindowShowHide += () => OnDebugWindowShowHide();
                     vm.DebugWindowOutput += (sender, arg) => { this.OnDebugWindowOutput(arg); };
                     vm.DebugWindowClear += () => OnDebugWindowClear();
+
                     vm.AckWindowOutput += (sender, arg) => { this.OnAckWindowOutput(arg); };
                     vm.AckWindowShowHide += () => OnAckWindowShowHide();
                     vm.AckWindowClear += () => OnAckWindowClear();
@@ -61,7 +63,6 @@ namespace MPDCtrl.Views
                 ListViewItem lvi = QueueListview.ItemContainerGenerator.ContainerFromIndex(arg) as ListViewItem;
                 if (lvi != null)
                     lvi.Focus();
-
             }
         }
 
@@ -89,31 +90,40 @@ namespace MPDCtrl.Views
                 LayoutGrid.RowDefinitions[2].Height = new GridLength(1, GridUnitType.Star);
                 LayoutGrid.RowDefinitions[3].Height = new GridLength(0);
                 LayoutGrid.RowDefinitions[4].Height = new GridLength(0);
-
             }
             else
             {
-
                 LayoutGrid.RowDefinitions[2].Height = new GridLength(3, GridUnitType.Star);
                 LayoutGrid.RowDefinitions[3].Height = new GridLength(8);
                 LayoutGrid.RowDefinitions[4].Height = new GridLength(1, GridUnitType.Star);
 
                 DebugWindowGridSplitter.Visibility = Visibility.Visible;
                 DebugWindow.Visibility = Visibility.Visible;
-
-
-
             }
         }
 
         public void OnAckWindowShowHide()
         {
-            if (AckWindow.Visibility == Visibility.Visible)
+            if (AckWindowGridSplitter.Visibility == Visibility.Visible)
             {
+                AckWindowGridSplitter.Visibility = Visibility.Collapsed;
                 AckWindow.Visibility = Visibility.Collapsed;
+
+                LayoutGrid.RowDefinitions[2].Height = new GridLength(1, GridUnitType.Star);
+                //LayoutGrid.RowDefinitions[3].Height = new GridLength(0);
+                //LayoutGrid.RowDefinitions[4].Height = new GridLength(0);
+                LayoutGrid.RowDefinitions[5].Height = new GridLength(0);
+                LayoutGrid.RowDefinitions[6].Height = new GridLength(0);
             }
             else
             {
+                LayoutGrid.RowDefinitions[2].Height = new GridLength(3, GridUnitType.Star);
+                //LayoutGrid.RowDefinitions[3].Height = new GridLength(8);
+                //LayoutGrid.RowDefinitions[4].Height = new GridLength(1, GridUnitType.Star);
+                LayoutGrid.RowDefinitions[5].Height = new GridLength(8);
+                LayoutGrid.RowDefinitions[6].Height = new GridLength(1, GridUnitType.Star);
+
+                AckWindowGridSplitter.Visibility = Visibility.Visible;
                 AckWindow.Visibility = Visibility.Visible;
             }
         }

@@ -10,15 +10,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
+using MPDCtrl.Models;
 
 namespace MPDCtrl.Models.Classes
 {
-    public class ConnectionResult
-    {
-        public bool isSuccess;
-        public string errorMessage;
-    }
-
     /// <summary>
     /// TCPClient wrapper class. 
     /// </summary>
@@ -142,7 +137,7 @@ namespace MPDCtrl.Models.Classes
 
             ConnectionResult r = await DoConnect(_ip, _p);
 
-            return r.isSuccess;
+            return r.IsSuccess;
         }
 
         public async Task<ConnectionResult> DoConnect(IPAddress ip, int port)
@@ -161,8 +156,8 @@ namespace MPDCtrl.Models.Classes
                 ConnectionState = ConnectionStatus.Error;
                 ConnectionError?.Invoke(this, ex.Message);
 
-                r.isSuccess = false;
-                r.errorMessage = ex.Message + " (SocketException)";
+                r.IsSuccess = false;
+                r.ErrorMessage = ex.Message + " (SocketException)";
                 return r;
             }
             catch (Exception ex)
@@ -171,8 +166,8 @@ namespace MPDCtrl.Models.Classes
                 ConnectionState = ConnectionStatus.Error;
                 ConnectionError?.Invoke(this, ex.Message);
 
-                r.isSuccess = false;
-                r.errorMessage = ex.Message + " (Exception)";
+                r.IsSuccess = false;
+                r.ErrorMessage = ex.Message + " (Exception)";
                 return r;
             }
 
@@ -184,8 +179,8 @@ namespace MPDCtrl.Models.Classes
 
             _retryAttempt = 0;
 
-            r.isSuccess = true;
-            r.errorMessage = "";
+            r.IsSuccess = true;
+            r.ErrorMessage = "";
             return r;
         }
 

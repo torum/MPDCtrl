@@ -65,19 +65,30 @@ namespace MPDCtrl.ViewModels.Classes
 
     public class MenuTreeBuilder : NodeTree
     {
-
         public MenuTreeBuilder()
         {
-            this.Name = "root";
-            this.Selected = false;
-            this.Expanded = true;
-
             NodeMenuQueue queue = new NodeMenuQueue("Queue");
             queue.Selected = true;
             queue.Expanded = false;
 
             queue.Parent = this;
             this.Children.Add(queue);
+
+
+            NodeMenuSearch search = new NodeMenuSearch("Search");
+            search.Selected = false;
+            search.Expanded = false;
+
+            search.Parent = this;
+            this.Children.Add(search);
+
+
+            NodeMenuBrowse browse = new NodeMenuBrowse("Browse");
+            browse.Selected = false;
+            browse.Expanded = false;
+
+            browse.Parent = this;
+            this.Children.Add(browse);
 
 
             NodeMenuPlaylists playlists = new NodeMenuPlaylists("Playlists");
@@ -94,27 +105,6 @@ namespace MPDCtrl.ViewModels.Classes
             playlists.Parent = playlists;
             playlists.Children.Add(playlistItem);
 
-
-            NodeMenuBrowse browse = new NodeMenuBrowse("Browse");
-            browse.Selected = false;
-            browse.Expanded = false;
-
-            browse.Parent = this;
-            this.Children.Add(browse);
-
-
-            NodeMenuSearch search = new NodeMenuSearch("Search");
-            search.Selected = false;
-            search.Expanded = false;
-
-            search.Parent = this;
-            this.Children.Add(search);
         }
-
-
-
     }
-
-
-
 }

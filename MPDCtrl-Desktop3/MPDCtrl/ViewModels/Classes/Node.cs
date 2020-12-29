@@ -138,8 +138,4 @@ namespace MPDCtrl.ViewModels.Classes
 
     }
 
-
-
-
-
 }

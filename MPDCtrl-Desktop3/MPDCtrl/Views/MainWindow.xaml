@@ -328,7 +328,7 @@
             </Grid>
 
             <!-- Left  -->
-            <Grid Grid.Row="2" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}">
+            <Grid Grid.Row="2" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:SizeChange.IsEnabled="True" helpers:SizeChange.ActualWidth="{Binding MainLeftPainActualWidth, Mode=OneWayToSource}">
                 <TreeView Margin="0 1 0 0" Style="{DynamicResource TreeViewMenuStyle}" ItemsSource="{Binding MainMenuItems}"  helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeMenu, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <TreeView.Resources>
                         <Style TargetType="{x:Type ScrollBar}">
@@ -1418,7 +1418,7 @@
 
             <Grid x:Name="DebugWindow" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Visibility="Collapsed">
 
-                <TextBox x:Name="DebugTextBox" Padding="6 6 24 6" Height="{Binding ElementName=DebugWindow, Path=ActualHeight}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="False" IsTabStop="False" Margin="0" MinHeight="24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <TextBox x:Name="DebugTextBox" Padding="6 6 24 6" Height="{Binding ElementName=DebugWindow, Path=ActualHeight}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <TextBox.Resources>
                         <Style TargetType="{x:Type ScrollBar}">
                             <Setter Property="Margin" Value="0,0,0,0" />
@@ -1433,17 +1433,18 @@
                         </Style>
                     </TextBox.Resources>
                 </TextBox>
-
 
                 <Button Style="{StaticResource PathButton}" Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 46 0" VerticalAlignment="Top" Content="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" Command="{Binding ClearDebugTextCommand}"></Button>
 
                 <Button Style="{StaticResource PathButton}" Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 18 0" VerticalAlignment="Top" Content="M19,3H16.3H7.7H5A2,2 0 0,0 3,5V7.7V16.4V19A2,2 0 0,0 5,21H7.7H16.4H19A2,2 0 0,0 21,19V16.3V7.7V5A2,2 0 0,0 19,3M15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4L13.4,12L17,15.6L15.6,17Z" Command="{Binding ShowDebugWindowCommand}"></Button>
+            
             </Grid>
 
-            <GridSplitter Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" ResizeDirection="Rows" Style="{StaticResource GridSplitterStyle}" Visibility="Collapsed"></GridSplitter>
+            <GridSplitter x:Name="AckWindowGridSplitter" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" ResizeDirection="Rows" Style="{StaticResource GridSplitterStyle}" Visibility="Collapsed"></GridSplitter>
             
             <Grid x:Name="AckWindow" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" Background="Transparent" Visibility="Collapsed">
-                <TextBox x:Name="AckTextBox" Padding="6 6 24 6" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="False" IsTabStop="False" Margin="0" MinHeight="24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                
+                <TextBox x:Name="AckTextBox" Padding="6 6 24 6" Height="{Binding ElementName=AckWindow, Path=ActualHeight}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <TextBox.Resources>
                         <Style TargetType="{x:Type ScrollBar}">
                             <Setter Property="Margin" Value="0,0,0,0" />
@@ -1459,7 +1460,10 @@
                     </TextBox.Resources>
                 </TextBox>
 
-                <Button Style="{StaticResource PathButton}" Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 12 0" VerticalAlignment="Top" Content="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" Command="{Binding ClearAckTextCommand}"></Button>
+                <Button Style="{StaticResource PathButton}" Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 46 0" VerticalAlignment="Top" Content="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" Command="{Binding ClearAckTextCommand}"></Button>
+
+                <Button Style="{StaticResource PathButton}" Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 18 0" VerticalAlignment="Top" Content="M19,3H16.3H7.7H5A2,2 0 0,0 3,5V7.7V16.4V19A2,2 0 0,0 5,21H7.7H16.4H19A2,2 0 0,0 21,19V16.3V7.7V5A2,2 0 0,0 19,3M15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4L13.4,12L17,15.6L15.6,17Z" Command="{Binding ShowAckWindowCommand}"></Button>
+
             </Grid>
 
             <!-- StatusBar -->
@@ -1515,31 +1519,38 @@
                 <Separator Grid.Column="3" Background="#202020" />
                 
                 <StatusBarItem Grid.Column="4" HorizontalContentAlignment="Right">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 22 0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 16 0">
 
-
-                        <Button Style="{StaticResource PathButton}" Width="16" Height="16" Content="M18,7H15.19C14.74,6.2 14.12,5.5 13.37,5L15,3.41L13.59,2L11.42,4.17C10.96,4.06 10.5,4 10,4C9.5,4 9.05,4.06 8.59,4.17L6.41,2L5,3.41L6.62,5C5.87,5.5 5.26,6.21 4.81,7H2V9H4.09C4.03,9.33 4,9.66 4,10V11H2V13H4V14C4,14.34 4.03,14.67 4.09,15H2V17H4.81C6.26,19.5 9.28,20.61 12,19.65C12,19.43 12,19.22 12,19C12,16.46 13.61,14.2 16,13.35V13H18V11H16V10C16,9.66 15.97,9.33 15.91,9H18V7M12,15H8V13H12V15M12,11H8V9H12V11M17.75,22.16L15,19.16L16.16,18L17.75,19.59L21.34,16L22.5,17.41L17.75,22.16Z"></Button>
-
-
-                        <Button Width="16" Height="16" Margin="0" Command="{Binding ShowDebugWindowCommand}" VerticalAlignment="Center" ToolTip="{x:Static properties:Resources.Settings_Opts_ShowDebugWidow}">
+                        <Button Width="16" Height="16" Margin="0 0 6 0" Command="{Binding ShowDebugWindowCommand}" VerticalAlignment="Center" ToolTip="{x:Static properties:Resources.Settings_Opts_ShowDebugWidow}" Opacity="0.7">
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}">
                                     <Setter Property="OverridesDefaultStyle" Value="true" />
                                     <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
                                     <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
                                     <Setter Property="BorderThickness" Value="0" />
-                                    <Setter Property="Margin" Value="0" />
-                                    <Setter Property="Padding" Value="3" />
+                                    <Setter Property="Margin" Value="0 0 0 0" />
+                                    <Setter Property="Padding" Value="0" />
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="Border" Background="{TemplateBinding Background}" CornerRadius="0" BorderThickness="0">
-                                                    <Viewbox Width="13" Height="13" Margin="0">
-                                                        <Canvas Width="18" Height="18">
+                                                    <Viewbox Width="16" Height="16" Margin="0">
+                                                        <Canvas Width="24" Height="24">
+                                                            <Canvas.RenderTransform>
+                                                                <TranslateTransform X="1" Y="1.5"/>
+                                                            </Canvas.RenderTransform>
                                                             <Path x:Name="PathIcon" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform">
                                                                 <Path.Fill>
                                                                     <SolidColorBrush x:Name="PathIconColor" Color="{DynamicResource ControlForegroundColor}"/>
                                                                 </Path.Fill>
+                                                                <Path.RenderTransform>
+                                                                    <TransformGroup>
+                                                                        <TransformGroup.Children>
+                                                                            <RotateTransform Angle="0" />
+                                                                            <ScaleTransform ScaleX="1.18" ScaleY="1.18" />
+                                                                        </TransformGroup.Children>
+                                                                    </TransformGroup>
+                                                                </Path.RenderTransform>
                                                             </Path>
                                                         </Canvas>
                                                     </Viewbox>
@@ -1579,6 +1590,80 @@
                             <Button.Content>
                                 M20,8H17.19C16.74,7.2 16.12,6.5 15.37,6L17,4.41L15.59,3L13.42,5.17C12.96,5.06 12.5,5 12,5C11.5,5 11.05,5.06 10.59,5.17L8.41,3L7,4.41L8.62,6C7.87,6.5 7.26,7.21 6.81,8H4V10H6.09C6.03,10.33 6,10.66 6,11V12H4V14H6V15C6,15.34 6.03,15.67 6.09,16H4V18H6.81C8.47,20.87 12.14,21.84 15,20.18C15.91,19.66 16.67,18.9 17.19,18H20V16H17.91C17.97,15.67 18,15.34 18,15V14H20V12H18V11C18,10.66 17.97,10.33 17.91,10H20V8M16,15A4,4 0 0,1 12,19A4,4 0 0,1 8,15V11A4,4 0 0,1 12,7A4,4 0 0,1 16,11V15M14,10V12H10V10H14M10,14H14V16H10V14Z
                             </Button.Content>
+                            <!-- チェック付きバグマーク 
+                                M18,7H15.19C14.74,6.2 14.12,5.5 13.37,5L15,3.41L13.59,2L11.42,4.17C10.96,4.06 10.5,4 10,4C9.5,4 9.05,4.06 8.59,4.17L6.41,2L5,3.41L6.62,5C5.87,5.5 5.26,6.21 4.81,7H2V9H4.09C4.03,9.33 4,9.66 4,10V11H2V13H4V14C4,14.34 4.03,14.67 4.09,15H2V17H4.81C6.26,19.5 9.28,20.61 12,19.65C12,19.43 12,19.22 12,19C12,16.46 13.61,14.2 16,13.35V13H18V11H16V10C16,9.66 15.97,9.33 15.91,9H18V7M12,15H8V13H12V15M12,11H8V9H12V11M17.75,22.16L15,19.16L16.16,18L17.75,19.59L21.34,16L22.5,17.41L17.75,22.16Z
+                            -->
+                        </Button>
+
+                        <Button Width="16" Height="16" Margin="0 0 6 0" Command="{Binding ShowAckWindowCommand}" VerticalAlignment="Center" ToolTip="" Opacity="0.7">
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}">
+                                    <Setter Property="OverridesDefaultStyle" Value="true" />
+                                    <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="Margin" Value="0" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="Border" Background="{TemplateBinding Background}" CornerRadius="0" BorderThickness="0">
+                                                    <Viewbox Width="16" Height="16" Margin="0">
+                                                        <Canvas Width="24" Height="24">
+                                                            <Canvas.RenderTransform>
+                                                                <TranslateTransform X="2" Y="2.6"/>
+                                                            </Canvas.RenderTransform>
+                                                            <Path x:Name="PathIcon" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform">
+                                                                <Path.Fill>
+                                                                    <SolidColorBrush x:Name="PathIconColor" Color="{DynamicResource ControlForegroundColor}"/>
+                                                                </Path.Fill>
+                                                                <Path.RenderTransform>
+                                                                    <TransformGroup>
+                                                                        <TransformGroup.Children>
+                                                                            <RotateTransform Angle="0" />
+                                                                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                                                                        </TransformGroup.Children>
+                                                                    </TransformGroup>
+                                                                </Path.RenderTransform>
+                                                            </Path>
+                                                        </Canvas>
+                                                    </Viewbox>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+
+                                                    <Trigger Property="IsMouseOver" Value="true">
+                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
+                                                    </Trigger>
+
+                                                    <Trigger Property="IsMouseOver" Value="true">
+                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
+                                                    </Trigger>
+
+                                                    <MultiTrigger>
+                                                        <MultiTrigger.Conditions>
+                                                            <Condition Property="IsPressed" Value="False" />
+                                                            <Condition Property="IsMouseOver" Value="True" />
+                                                        </MultiTrigger.Conditions>
+                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
+                                                    </MultiTrigger>
+
+                                                    <MultiTrigger>
+                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlPressedColorBrush}"/>
+                                                        <MultiTrigger.Conditions>
+                                                            <Condition Property="IsPressed" Value="true" />
+                                                            <Condition Property="IsMouseOver" Value="True" />
+                                                        </MultiTrigger.Conditions>
+                                                    </MultiTrigger>
+
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                            <Button.Content>
+                                M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z
+                            </Button.Content>
                         </Button>
 
                     </StackPanel>
@@ -1587,7 +1672,7 @@
             </StatusBar>
 
             <!-- 初期設定兼再接続画面 -->
-            <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}" Visibility="{Binding IsConnectionSettingShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
+            <Grid Grid.Row="1" Grid.RowSpan="7" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}" Visibility="{Binding IsConnectionSettingShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="0"/>
                     <RowDefinition Height="35*"/>
@@ -1717,7 +1802,7 @@
             </Grid>
 
             <!-- 設定画面 -->
-            <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="3" Visibility="{Binding IsSettingsShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
+            <Grid Grid.Row="1" Grid.RowSpan="6" Grid.Column="0" Grid.ColumnSpan="3" Visibility="{Binding IsSettingsShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="0"/>
                     <RowDefinition Height="*"/>

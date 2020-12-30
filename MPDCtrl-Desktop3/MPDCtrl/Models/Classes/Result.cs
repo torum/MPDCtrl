@@ -22,4 +22,9 @@ namespace MPDCtrl.Models
         public string ResultText;
     }
 
+    public class IdleResult : Result
+    {
+        public string ResultText;
+    }
+
 }

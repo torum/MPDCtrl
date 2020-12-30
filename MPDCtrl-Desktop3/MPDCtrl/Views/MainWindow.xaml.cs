@@ -40,7 +40,7 @@ namespace MPDCtrl.Views
             {
                 if (vm != null)
                 {
-                    vm.ScrollIntoView += (sender, arg) => { this.ScrollIntoViewTo(arg); };
+                    vm.ScrollIntoView += (sender, arg) => { this.OnScrollIntoView(arg); };
 
                     vm.DebugWindowShowHide += () => OnDebugWindowShowHide();
                     vm.DebugWindowOutput += (sender, arg) => { this.OnDebugWindowOutput(arg); };
@@ -54,7 +54,7 @@ namespace MPDCtrl.Views
             }
         }
 
-        public void ScrollIntoViewTo(int arg)
+        public void OnScrollIntoView(int arg)
         {
             if (QueueListview.Items.Count > arg)
             {

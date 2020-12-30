@@ -63,6 +63,9 @@ namespace MPDCtrl.ViewModels.Classes
 
         public void Load(List<String> dirs)
         {
+            if (dirs == null)
+                return;
+
             Uri uri = new Uri(@"file:///./");
             NodeDirectory root = new NodeDirectory("/", uri);
             root.Selected = true;

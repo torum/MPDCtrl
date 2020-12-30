@@ -65,6 +65,16 @@ namespace MPDCtrl.ViewModels.Classes
 
     public class MenuTreeBuilder : NodeTree
     {
+        private NodeMenuPlaylists _playlistsDirectory;
+
+        public NodeMenuPlaylists PlaylistsDirectory
+        {
+            get
+            {
+                return _playlistsDirectory;
+            }
+        }
+
         public MenuTreeBuilder()
         {
             NodeMenuQueue queue = new NodeMenuQueue("Queue");
@@ -98,12 +108,16 @@ namespace MPDCtrl.ViewModels.Classes
             playlists.Parent = this;
             this.Children.Add(playlists);
 
+            _playlistsDirectory = playlists;
+
+            /*
             NodeMenuPlaylistItem playlistItem = new NodeMenuPlaylistItem("Playlist A");
             playlistItem.Selected = false;
             playlistItem.Expanded = false;
 
             playlists.Parent = playlists;
             playlists.Children.Add(playlistItem);
+            */
 
         }
     }

@@ -171,17 +171,20 @@
   <data name="ConnectionStatus_ConnectionErrorDetails" xml:space="preserve">
     <value>指定されたMPDサーバーに接続できませんでした。通信接続設定を見直すか、MPDサーバーを確認してください。</value>
   </data>
+  <data name="ConnectionStatus_Disconnected" xml:space="preserve">
+    <value>通信が遮断されました。</value>
+  </data>
   <data name="ConnectionStatus_DisconnectedByHost" xml:space="preserve">
     <value>通信が遮断しました。（DisconnectedByHost）</value>
   </data>
   <data name="ConnectionStatus_DisconnectedByUser" xml:space="preserve">
     <value>通信が遮断しました。（DisconnectedByUser）</value>
   </data>
+  <data name="ConnectionStatus_Disconnecting" xml:space="preserve">
+    <value>通信切断中・・・</value>
+  </data>
   <data name="ConnectionStatus_NeverConnected" xml:space="preserve">
     <value>未接続です。（NeverConnected）</value>
-  </data>
-  <data name="ConnectionStatus_Reconnecting" xml:space="preserve">
-    <value>通信が遮断しました。再接続中・・・</value>
   </data>
   <data name="ConnectionStatus_SendFail_NotConnected" xml:space="preserve">
     <value>通信が遮断しました。（SendFail_NotConnected）</value>

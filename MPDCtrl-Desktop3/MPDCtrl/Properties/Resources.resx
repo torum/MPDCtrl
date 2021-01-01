@@ -171,17 +171,20 @@
   <data name="ConnectionStatus_ConnectionErrorDetails" xml:space="preserve">
     <value>Unable to connect to specified MPD server. Please check your connection settings or MPD server.</value>
   </data>
+  <data name="ConnectionStatus_Disconnected" xml:space="preserve">
+    <value>Connection has been terminated.</value>
+  </data>
   <data name="ConnectionStatus_DisconnectedByHost" xml:space="preserve">
     <value>Connection terminated.</value>
   </data>
   <data name="ConnectionStatus_DisconnectedByUser" xml:space="preserve">
     <value>Connection terminated.</value>
   </data>
+  <data name="ConnectionStatus_Disconnecting" xml:space="preserve">
+    <value>Disconnecting...</value>
+  </data>
   <data name="ConnectionStatus_NeverConnected" xml:space="preserve">
     <value>Connection terminated.</value>
-  </data>
-  <data name="ConnectionStatus_Reconnecting" xml:space="preserve">
-    <value>Connection terminated. Reconnecting...</value>
   </data>
   <data name="ConnectionStatus_SendFail_NotConnected" xml:space="preserve">
     <value>Connection terminated.</value>

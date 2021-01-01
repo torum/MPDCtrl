@@ -43,8 +43,12 @@ namespace MPDCtrl.Views
                     vm.ScrollIntoView += (sender, arg) => { this.OnScrollIntoView(arg); };
 
                     vm.DebugWindowShowHide += () => OnDebugWindowShowHide();
-                    vm.DebugWindowOutput += (sender, arg) => { this.OnDebugWindowOutput(arg); };
-                    vm.DebugWindowClear += () => OnDebugWindowClear();
+
+                    vm.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
+                    vm.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
+
+                    vm.DebugCommandClear += () => OnDebugCommandClear();
+                    vm.DebugIdleClear += () => OnDebugIdleClear();
 
                     vm.AckWindowOutput += (sender, arg) => { this.OnAckWindowOutput(arg); };
                     vm.AckWindowShowHide += () => OnAckWindowShowHide();
@@ -66,34 +70,50 @@ namespace MPDCtrl.Views
             }
         }
 
-        public void OnDebugWindowOutput(string arg)
+        public void OnDebugCommandOutput(string arg)
         {
             // AppendText() is much faster than data binding.
-            DebugTextBox.AppendText(arg);
+            DebugCommandTextBox.AppendText(arg);
 
-            DebugTextBox.CaretIndex = DebugTextBox.Text.Length;
-            DebugTextBox.ScrollToEnd();
+            DebugCommandTextBox.CaretIndex = DebugCommandTextBox.Text.Length;
+            DebugCommandTextBox.ScrollToEnd();
         }
 
-        public void OnDebugWindowClear()
+        public void OnDebugIdleOutput(string arg)
         {
-            DebugTextBox.Clear();
+            // AppendText() is much faster than data binding.
+            DebugIdleTextBox.AppendText(arg);
+
+            DebugIdleTextBox.CaretIndex = DebugIdleTextBox.Text.Length;
+            DebugIdleTextBox.ScrollToEnd();
+        }
+
+        public void OnDebugCommandClear()
+        {
+            DebugCommandTextBox.Clear();
+        }
+
+        public void OnDebugIdleClear()
+        {
+            DebugIdleTextBox.Clear();
         }
 
         public void OnDebugWindowShowHide()
         {
             if (DebugWindowGridSplitter.Visibility == Visibility.Visible)
             {
-                DebugWindowGridSplitter.Visibility = Visibility.Collapsed;
-                DebugWindow.Visibility = Visibility.Collapsed;
-
                 LayoutGrid.RowDefinitions[2].Height = new GridLength(1, GridUnitType.Star);
+
                 LayoutGrid.RowDefinitions[3].Height = new GridLength(0);
                 LayoutGrid.RowDefinitions[4].Height = new GridLength(0);
+
+                DebugWindowGridSplitter.Visibility = Visibility.Collapsed;
+                DebugWindow.Visibility = Visibility.Collapsed;
             }
             else
             {
                 LayoutGrid.RowDefinitions[2].Height = new GridLength(3, GridUnitType.Star);
+
                 LayoutGrid.RowDefinitions[3].Height = new GridLength(8);
                 LayoutGrid.RowDefinitions[4].Height = new GridLength(1, GridUnitType.Star);
 
@@ -110,16 +130,14 @@ namespace MPDCtrl.Views
                 AckWindow.Visibility = Visibility.Collapsed;
 
                 LayoutGrid.RowDefinitions[2].Height = new GridLength(1, GridUnitType.Star);
-                //LayoutGrid.RowDefinitions[3].Height = new GridLength(0);
-                //LayoutGrid.RowDefinitions[4].Height = new GridLength(0);
+
                 LayoutGrid.RowDefinitions[5].Height = new GridLength(0);
                 LayoutGrid.RowDefinitions[6].Height = new GridLength(0);
             }
             else
             {
                 LayoutGrid.RowDefinitions[2].Height = new GridLength(3, GridUnitType.Star);
-                //LayoutGrid.RowDefinitions[3].Height = new GridLength(8);
-                //LayoutGrid.RowDefinitions[4].Height = new GridLength(1, GridUnitType.Star);
+
                 LayoutGrid.RowDefinitions[5].Height = new GridLength(8);
                 LayoutGrid.RowDefinitions[6].Height = new GridLength(1, GridUnitType.Star);
 

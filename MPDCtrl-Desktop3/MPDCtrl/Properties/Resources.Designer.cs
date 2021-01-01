@@ -223,6 +223,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Connection has been terminated. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConnectionStatus_Disconnected {
+            get {
+                return ResourceManager.GetString("ConnectionStatus_Disconnected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Connection terminated. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string ConnectionStatus_DisconnectedByHost {
@@ -241,20 +250,20 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Disconnecting... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConnectionStatus_Disconnecting {
+            get {
+                return ResourceManager.GetString("ConnectionStatus_Disconnecting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Connection terminated. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string ConnectionStatus_NeverConnected {
             get {
                 return ResourceManager.GetString("ConnectionStatus_NeverConnected", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Connection terminated. Reconnecting... に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string ConnectionStatus_Reconnecting {
-            get {
-                return ResourceManager.GetString("ConnectionStatus_Reconnecting", resourceCulture);
             }
         }
         

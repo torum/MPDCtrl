@@ -9,23 +9,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Net.Sockets;
-using System.Net;
-using System.Collections.ObjectModel;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
-using System.Drawing;
-using MPDCtrl.Common;
-using MPDCtrl.ViewModels.Classes;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Diagnostics;
-using System.Collections.Concurrent;
 
 namespace MPDCtrl.Models
 {
@@ -35,33 +27,6 @@ namespace MPDCtrl.Models
     public class MPC
     {
         #region == Consts, Properties, etc == 
-
-        /*
-        public enum MpdSubSystems
-        {
-            //player mixer options playlist stored_playlist
-            //database: the song database has been modified after update.
-            //update: a database update has started or finished. If the database was modified during the update, the database event is also emitted.
-            //stored_playlist: a stored playlist has been modified, renamed, created or deleted
-            //playlist: the queue (i.e.the current playlist) has been modified
-            //player: the player has been started, stopped or seeked
-            //mixer: the volume has been changed
-            //output: an audio output has been added, removed or modified(e.g.renamed, enabled or disabled)
-            //options: options like repeat, random, crossfade, replay gain
-            //partition: a partition was added, removed or changed
-            //sticker: the sticker database has been modified.
-            //subscription: a client has subscribed or unsubscribed to a channel
-            //message: a message was received on a channel this client is subscribed to; this event is only emitted when the queue is empty
-            //neighbor: a neighbor was found or lost
-            //mount: the mount list has changed
-
-            player,
-            mixer,
-            options,
-            playlist,
-            stored_playlist
-        }
-        */
 
         private string _host;
         public string MpdHost
@@ -95,12 +60,7 @@ namespace MPDCtrl.Models
 
         public bool MpdStop { get; set; }
 
-        private AlbumCover _albumCover = new AlbumCover();
-        public AlbumCover AlbumArt
-        {
-            get { return _albumCover; }
-        }
-
+        // TODO:
         private Song _currentSong;
         public Song MpdCurrentSong
         {
@@ -142,7 +102,12 @@ namespace MPDCtrl.Models
             get { return _searchResult; }
         }
 
-        //private TCPC _asyncClient = new TCPC();
+        // TODO:
+        private AlbumCover _albumCover = new AlbumCover();
+        public AlbumCover AlbumArt
+        {
+            get { return _albumCover; }
+        }
 
         #endregion
 
@@ -151,8 +116,11 @@ namespace MPDCtrl.Models
         public delegate void IsBusyEvent(MPC sender, bool on);
         public event IsBusyEvent IsBusy;
 
-        public delegate void DebugOutputEvent(MPC sender, string data);
-        public event DebugOutputEvent DebugOutput;
+        public delegate void DebugCommandOutputEvent(MPC sender, string data);
+        public event DebugCommandOutputEvent DebugCommandOutput;
+
+        public delegate void DebugIdleOutputEvent(MPC sender, string data);
+        public event DebugIdleOutputEvent DebugIdleOutput;
 
         public delegate void ConnectionStatusChangedEvent(MPC sender, ConnectionStatus status);
         public event ConnectionStatusChangedEvent ConnectionStatusChanged;
@@ -160,8 +128,8 @@ namespace MPDCtrl.Models
         public delegate void ConnectionErrorEvent(MPC sender, string data);
         public event ConnectionErrorEvent ConnectionError;
 
-        public delegate void IsMpdConnectedEvent(MPC sender);
-        public event IsMpdConnectedEvent MpdConnected;
+        public delegate void IsMpdIdleConnectedEvent(MPC sender);
+        public event IsMpdIdleConnectedEvent MpdIdleConnected;
 
         public delegate void MpdAckErrorEvent(MPC sender, string data);// << TODO:
         public event MpdAckErrorEvent MpdAckError;
@@ -178,6 +146,7 @@ namespace MPDCtrl.Models
 
         public delegate void MpdPlaylistsChangedEvent(MPC sender);
         public event MpdPlaylistsChangedEvent MpdPlaylistsChanged;
+
 
         /*
         public delegate void MpdStatusChanged(MPC sender, object data);
@@ -198,8 +167,13 @@ namespace MPDCtrl.Models
 
         #region == Connections ==
 
-        public bool IsMpdCommandConnected { get; set; }
-        public bool IsMpdIdleConnected { get; set; }
+        private static TcpClient _commandConnection = new TcpClient();
+        private StreamReader _commandReader;
+        private StreamWriter _commandWriter;
+
+        private static TcpClient _idleConnection = new TcpClient();
+        private static StreamReader _idleReader;
+        private static StreamWriter _idleWriter;
 
         public enum ConnectionStatus
         {
@@ -213,192 +187,64 @@ namespace MPDCtrl.Models
             SendFail_Timeout,
             SendFail_NotConnected,
             Disconnecting,
+            Disconnected,
             SeeConnectionErrorEvent
         }
 
-        private ConnectionStatus _connectionStatus;
+        private ConnectionStatus _connectionState;
         public ConnectionStatus ConnectionState
         {
             get
             {
-                return _connectionStatus;
+                return _connectionState;
             }
             private set
             {
-                if (value == _connectionStatus)
+                if (value == _connectionState)
                     return;
 
-                _connectionStatus = value;
+                _connectionState = value;
 
-                ConnectionStatusChanged?.Invoke(this, _connectionStatus);
+                ConnectionStatusChanged?.Invoke(this, _connectionState);
             }
         }
 
-        private static TcpClient _commandConnection = new TcpClient();
-        private StreamReader _commandReader;
-        private StreamWriter _commandWriter;
-
-        private static TcpClient _idleConnection = new TcpClient();
-        private static StreamReader _idleReader;
-        private static StreamWriter _idleWriter;
-
-        private static ManualResetEvent readDone =
-            new ManualResetEvent(false);
+        public bool IsMpdCommandConnected { get; set; }
+        public bool IsMpdIdleConnected { get; set; }
 
         #endregion
 
-        //ConcurrentQueue<string> commandQueue = new ConcurrentQueue<string>();
-
-
         public MPC()
         {
-            _connectionStatus = ConnectionStatus.NeverConnected;
+            ConnectionState = ConnectionStatus.NeverConnected;
 
         }
 
-        public async void MpdConnect(string host, int port)
+        #region == New Idle Connection ==
+
+        public async Task<bool> MpdIdleConnect(string host, int port)
         {
-            IsMpdCommandConnected = false;
+            IsMpdIdleConnected = false;
+
+            _idleConnection = new TcpClient();
 
             _host = host;
             _port = port;
 
-            DebugOutput?.Invoke(this, "TCP Command Connection: Trying to connect." + "\n" + "\n");
 
-            _connectionStatus = ConnectionStatus.Connecting;
+            DebugIdleOutput?.Invoke(this, "TCP Idle Connection: Trying to connect." + "\n" + "\n");
 
-            try
-            {
-                await _commandConnection.ConnectAsync(_host, _port);
-
-                if (_commandConnection.Client.Connected)
-                {
-                    DebugOutput?.Invoke(this, "TCP Command Connection: Connection established." + "\n" + "\n");
-
-                    _connectionStatus = ConnectionStatus.Connected;
-
-                    var tcpStream = _commandConnection.GetStream();
-                    tcpStream.ReadTimeout = System.Threading.Timeout.Infinite;
-
-                    _commandReader = new StreamReader(tcpStream);
-                    _commandWriter = new StreamWriter(tcpStream);
-                    _commandWriter.AutoFlush = true;
-
-                    string response = await _commandReader.ReadLineAsync();
-
-                    if (response.StartsWith("OK MPD "))
-                    {
-                        _mpdVer = response.Replace("OK MPD ", string.Empty).Trim();
-
-                        DebugOutput?.Invoke(this, "<<<<" + response.Trim() + "\n" + "\n");
-
-                        IsMpdCommandConnected = true;
-
-                        MpdConnected?.Invoke(this);
-
-                        // Done for now.
-                    }
-                    else
-                    {
-                        DebugOutput?.Invoke(this, "TCP Command Connection: MPD did not respond with proper respose." + "\n" + "\n");
-
-                        _connectionStatus = ConnectionStatus.SeeConnectionErrorEvent;
-
-                        ConnectionError?.Invoke(this, "TCP connection error: MPD did not respond with proper respose.");
-                    }
-                }
-                else
-                {
-                    //?
-
-                    Debug.WriteLine("**** !client.Client.Connected");
-
-                    DebugOutput?.Invoke(this, "TCP Command Connection: FAIL to established... Client not connected." + "\n" + "\n");
-
-                    _connectionStatus = ConnectionStatus.NeverConnected;
-
-                    ConnectionError?.Invoke(this, "TCP Command Connection: FAIL to established... Client not connected.");
-                }
-            }
-            catch (Exception e)
-            {
-                // TODO: Test.
-
-                DebugOutput?.Invoke(this, "TCP Command Connection: Error while connecting. Fail to connect: " + e.Message + "\n" + "\n");
-
-                _connectionStatus = ConnectionStatus.SeeConnectionErrorEvent;
-
-                ConnectionError?.Invoke(this, "TCP connection error: " + e.Message);
-            }
-
-        }
-
-        public void MpdDisconnect()
-        {
-            try
-            {
-                ConnectionState = ConnectionStatus.Disconnecting;
-
-                _commandConnection.Client.Shutdown(SocketShutdown.Both);
-                _commandConnection.Close();
-            }
-            catch { }
-            {
-                ConnectionState = ConnectionStatus.DisconnectedByUser;
-            }
+            ConnectionState = ConnectionStatus.Connecting;
 
             try
             {
-                ConnectionState = ConnectionStatus.Disconnecting;
-
-                _idleConnection.Client.Shutdown(SocketShutdown.Both);
-                _idleConnection.Close();
-            }
-            catch { }
-            finally
-            {
-                ConnectionState = ConnectionStatus.DisconnectedByUser;
-            }
-            
-
-        }
-
-        #region == Idle connection ==
-
-        public async void MpdIdleConnectionStart(string host, int port, string password)
-        {
-            ConnectionResult r = await MpdIdleConnect(host, port);
-
-            if (r.IsSuccess)
-            {
-                CommandResult d = await MpdSendIdleAuth(password);
-
-                if (d.IsSuccess)
-                {
-                    MpdIdle();
-                }
-            }
-
-        }
-
-        private async Task<ConnectionResult> MpdIdleConnect(string host, int port)
-        {
-
-            DebugOutput?.Invoke(this, "TCP Idle Connection: Trying to connect." + "\n" + "\n");
-
-            _connectionStatus = ConnectionStatus.Connecting;
-
-            ConnectionResult ret = new ConnectionResult();
-
-            try
-            {
-                await _idleConnection.ConnectAsync(host, port);
+                await _idleConnection.ConnectAsync(_host, _port);
 
                 if (_idleConnection.Client.Connected)
                 {
-                    DebugOutput?.Invoke(this, "TCP Idle Connection: Connection established." + "\n" + "\n");
+                    DebugIdleOutput?.Invoke(this, "TCP Idle Connection: Connection established." + "\n" + "\n");
 
-                    _connectionStatus = ConnectionStatus.Connected;
+                    ConnectionState = ConnectionStatus.Connected;
 
                     var tcpStream = _idleConnection.GetStream();
                     tcpStream.ReadTimeout = System.Threading.Timeout.Infinite;
@@ -411,22 +257,21 @@ namespace MPDCtrl.Models
 
                     if (response.StartsWith("OK MPD "))
                     {
-                        //_mpdVer = response.Replace("OK MPD ", string.Empty);
+                        _mpdVer = response.Replace("OK MPD ", string.Empty).Trim();
 
-                        Debug.WriteLine(response.Trim() + " @MPC.MpdIdleConnect");
+                        DebugIdleOutput?.Invoke(this, "<<<<" + response.Trim() + "\n" + "\n");
 
-                        DebugOutput?.Invoke(this, "<<" + response.Trim() + "\n" + "\n");
-                        
                         IsMpdIdleConnected = true;
 
-                        ret.IsSuccess = true;
-                        ret.ErrorMessage = "";
+                        MpdIdleConnected?.Invoke(this);
+
+                        // Done for now.
                     }
                     else
                     {
-                        DebugOutput?.Invoke(this, "TCP Idle Connection: MPD did not respond with proper respose." + "\n" + "\n");
+                        DebugIdleOutput?.Invoke(this, "TCP Idle Connection: MPD did not respond with proper respose." + "\n" + "\n");
 
-                        _connectionStatus = ConnectionStatus.SeeConnectionErrorEvent;
+                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
                         ConnectionError?.Invoke(this, "TCP connection error: MPD did not respond with proper respose.");
                     }
@@ -437,9 +282,9 @@ namespace MPDCtrl.Models
 
                     Debug.WriteLine("**** !client.Client.Connected");
 
-                    DebugOutput?.Invoke(this, "TCP Idle Connection: FAIL to established... Client not connected." + "\n" + "\n");
+                    DebugIdleOutput?.Invoke(this, "TCP Idle Connection: FAIL to established... Client not connected." + "\n" + "\n");
 
-                    _connectionStatus = ConnectionStatus.NeverConnected;
+                    ConnectionState = ConnectionStatus.NeverConnected;
 
                     ConnectionError?.Invoke(this, "TCP Idle Connection: FAIL to established... Client not connected.");
                 }
@@ -448,237 +293,540 @@ namespace MPDCtrl.Models
             {
                 // TODO: Test.
 
-                DebugOutput?.Invoke(this, "TCP Idle Connection: Error while connecting. Fail to connect: " + e.Message + "\n" + "\n");
+                DebugCommandOutput?.Invoke(this, "TCP Idle Connection: Error while connecting. Fail to connect: " + e.Message + "\n" + "\n");
 
-                _connectionStatus = ConnectionStatus.SeeConnectionErrorEvent;
+                ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
                 ConnectionError?.Invoke(this, "TCP connection error: " + e.Message);
+            }
+
+            return IsMpdIdleConnected;
+        }
+
+        private async Task<CommandResult> MpdIdleSendCommand(string cmd)
+        {
+            CommandResult ret = new CommandResult();
+
+            if (_idleConnection.Client == null)
+            {
+                Debug.WriteLine("@MpdIdleSendCommand: " + "TcpClient.Client == null");
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = "TcpClient.Client == null";
+
+                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdleSendCommand", "TcpClient.Client == null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+
+                return ret;
+            }
+
+            if ((_idleWriter == null) || (_idleReader == null))
+            {
+                Debug.WriteLine("@MpdIdleSendCommand: " + "_idleWriter or _idleReader is null");
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = "_idleWriter or _idleReader is null";
+
+                DebugIdleOutput?.Invoke(this, string.Format("################ Error :@{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdleSendCommand", "_idleWriter or _idleReader is null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+
+                return ret;
+            }
+
+            if (!_idleConnection.Client.Connected)
+            {
+                Debug.WriteLine("Exception@MpdIdleSendCommand: " + "NOT IsMpdIdleConnected");
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = "NOT IsMpdIdleConnected";
+
+                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdleSendCommand", "!CommandConnection.Client.Connected", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+
+                return ret;
+            }
+
+            string cmdDummy = cmd;
+            if (cmd.StartsWith("password "))
+                cmdDummy = "password ****";
+
+            DebugIdleOutput?.Invoke(this, ">>>>>>>>>>>>>>>>" + cmdDummy.Trim() + "\n" + "\n");
+
+            try
+            {
+                if (cmd.Trim().StartsWith("idle"))
+                {
+                    await _idleWriter.WriteAsync(cmd.Trim() + "\n");
+
+                    return ret;
+                }
+                else
+                {
+                    //await _idleWriter.WriteAsync("noidle\n" + cmd.Trim() + "\n");
+                    await _idleWriter.WriteAsync(cmd.Trim() + "\n");
+                }
+            }
+            catch (System.IO.IOException e)
+            {
+                Debug.WriteLine("IOException@MpdIdleSendCommand: " + cmd.Trim() + " WriteAsync :" + e.Message);
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = e.Message;
+
+                // Could be application shutdopwn.
+                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
+                {
+
+                }
+                else
+                {
+                    DebugIdleOutput?.Invoke(this, string.Format("################ Error@{0}, Reason:{1}, Data:{2}, {3} Exception: {4} {5}", "WriteAsync@MpdIdleSendCommand", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                    ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                    ConnectionError?.Invoke(this, "The connection (command) has been terminated (IOException): " + e.Message);
+                }
+
+                return ret;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Exception@MpdSendCommand: " + cmd.Trim() + " WriteAsync " + e.Message);
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = e.Message;
+
+                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
+                {
+
+                }
+                else
+                {
+                    DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "WriteAsync@MpdIdleSendCommand", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                    ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                    ConnectionError?.Invoke(this, "The connection (command) has been terminated (Exception): " + e.Message);
+                }
+
+                return ret;
+            }
+
+            try
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while (true)
+                {
+                    string line = await _idleReader.ReadLineAsync();
+
+                    if (line != null)
+                    {
+                        if (line.StartsWith("ACK"))
+                        {
+                            Debug.WriteLine("ACK line @MpdIdleSendCommand: " + cmd.Trim() + " and " + line);
+
+                            if (!string.IsNullOrEmpty(line))
+                                stringBuilder.Append(line + "\n");
+
+                            break;
+                            //isTalking = false;
+                        }
+                        else if (line.StartsWith("OK"))
+                        {
+                            ret.IsSuccess = true;
+
+                            if (!string.IsNullOrEmpty(line))
+                                stringBuilder.Append(line + "\n");
+
+                            break;
+                            //isTalking = false;
+                        }
+                        else if (line.StartsWith("changed: "))
+                        {
+                            if (!string.IsNullOrEmpty(line))
+                                stringBuilder.Append(line + "\n");
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(line))
+                            {
+                                stringBuilder.Append(line + "\n"); // << has to be \n
+                            }
+                            else
+                            {
+                                Debug.WriteLine("line == IsNullOrEmpty");
+
+                                break;
+                                //isTalking = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("@MpdIdleSendCommand ReadLineAsync line != null");
+
+                        DebugIdleOutput?.Invoke(this, string.Format("################ Error @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdleSendCommand", "ReadLineAsync received null data", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+
+                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                        ConnectionError?.Invoke(this, "The connection (command) has been terminated. ");
+
+                        ret.ResultText = stringBuilder.ToString();
+                        ret.ErrorMessage = "ReadLineAsync@MpdIdleSendCommand received null data";
+
+                        break;
+                        //isTalking = false;
+                    }
+                }
+
+                DebugIdleOutput?.Invoke(this, "<<<<<<<<<<<<<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<<<<<<<<<<<<<") + "\n" + "\n");
+
+                ret.ResultText = stringBuilder.ToString();
+                ret.ErrorMessage = "";
+
+                return ret;
+            }
+            catch (System.InvalidOperationException e)
+            {
+                // The stream is currently in use by a previous operation on the stream.
+
+                Debug.WriteLine("InvalidOperationException@MpdIdleSendCommand: " + cmd.Trim() + " ReadLineAsync ---- " + e.Message);
+
+                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdleSendCommand", "InvalidOperationException (Most likely the connection is overloaded)", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                //ConnectionError?.Invoke(this, "The connection (command) has been terminated. Most likely the connection has been overloaded.");
+
+
+                //await _idleWriter.WriteAsync("noidle\n");
+                //await _idleWriter.WriteAsync("idle player\n");
+                await Task.Delay(1000);
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = e.Message;
+
+                return ret;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Exception@MpdIdleSendCommand: " + cmd.Trim() + " ReadLineAsync ---- " + e.Message);
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = e.Message;
+
+                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdleSendCommand", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                return ret;
             }
 
             return ret;
         }
 
-        private async Task<CommandResult> MpdSendIdleAuth(string password = "")
+        public async Task<CommandResult> MpdIdleSendPassword(string password = "")
         {
+            _password = password;
+
             CommandResult ret = new CommandResult();
 
             if (string.IsNullOrEmpty(password))
             {
                 ret.IsSuccess = true;
-                ret.ResultText = "OK";//Or OK
+                ret.ResultText = "OK";
                 ret.ErrorMessage = "";
 
                 return ret;
             }
 
-            DebugOutput?.Invoke(this, ">>Password ******" + "\n" + "\n");
-
             string cmd = "password " + password + "\n";
 
-            try
+            return await MpdIdleSendCommand(cmd);
+
+        }
+
+        public async Task<CommandResult> MpdIdleQueryStatus()
+        {
+            CommandResult result = await MpdIdleSendCommand("status");
+            if (result.IsSuccess)
             {
-                if (_idleConnection.Client.Connected)
+                result.IsSuccess = ParseStatus(result.ResultText);
+                if (result.IsSuccess)
                 {
-                    if (IsMpdIdleConnected)
-                    {
-                        if ((_idleWriter != null) || (_idleReader != null))
-                        {
-                            try
-                            {
-                                await _idleWriter.WriteAsync(cmd);
-
-                                try
-                                {
-                                    string response = await _idleReader.ReadLineAsync();
-
-                                    ret.ResultText = response;
-                                    ret.IsSuccess = true;
-                                    ret.ErrorMessage = "";
-
-                                    DebugOutput?.Invoke(this, "<<" + response.Trim().Replace("\r\n", "\n" + "<<") + "\n" + "\n");
-                                }
-                                catch (Exception e)
-                                {
-                                    DebugOutput?.Invoke(this, string.Format("[Exception@MpdSendIdleAuth] ({0} ):\n{1}", "ReadLineAsync", e.Message));
-
-                                    Debug.WriteLine(e.Message);
-
-                                    ret.IsSuccess = false;
-                                    ret.ErrorMessage = e.Message;
-
-                                    return ret;
-                                }
-
-                            }
-                            catch (Exception e)
-                            {
-                                DebugOutput?.Invoke(this, string.Format("[Exception@MpdSendIdleAuth] ({0} ):\n{1}", "WriteAsync", e.Message));
-
-                                Debug.WriteLine(e.Message);
-
-                                ret.IsSuccess = false;
-                                ret.ErrorMessage = e.Message;
-
-                                return ret;
-
-                            }
-                        }
-                        else
-                        {
-                            ret.IsSuccess = false;
-                            ret.ErrorMessage = "_idleWriter or _idleReader is null";
-
-                            Debug.WriteLine("_idleWriter or _idleReader is null");
-                        }
-                    }
-                    else
-                    {
-                        ret.IsSuccess = false;
-                        ret.ErrorMessage = "NOT IsMpdIdleConnected";
-
-                        Debug.WriteLine("NOT IsMpdIdleConnected");
-                    }
-
+                    //Debug.WriteLine("@MpdQueryStatus: IsSuccess.");
                 }
                 else
                 {
-                    ret.IsSuccess = false;
-                    ret.ErrorMessage = "NOT _tcpIdleClient.Client.Connected";
-
-                    Debug.WriteLine("NOT _tcpIdleClient.Client.Connected");
+                    //Debug.WriteLine("@MpdQueryStatus: NOT IsSuccess.");
                 }
             }
-            catch (Exception e)
-            {
-                ret.IsSuccess = false;
-                ret.ErrorMessage = e.Message;
 
-                Debug.WriteLine(e.Message);
-            }
-
-            return ret;
+            return result;
         }
 
-        public async void MpdIdle()
+        public async Task<CommandResult> MpdIdleQueryCurrentQueue()
         {
+            CommandResult result = await MpdIdleSendCommand("playlistinfo");
+            if (result.IsSuccess)
+            {
+                result.IsSuccess = ParsePlaylistInfo(result.ResultText);
+                if (result.IsSuccess)
+                {
+                    //Debug.WriteLine("@MpdQueryStatus: IsSuccess.");
+                }
+                else
+                {
+                    //Debug.WriteLine("@MpdQueryStatus: NOT IsSuccess.");
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdIdleQueryPlaylists()
+        {
+            CommandResult result = await MpdIdleSendCommand("listplaylists");
+            if (result.IsSuccess)
+            {
+                result.IsSuccess = ParsePlaylists(result.ResultText);
+            }
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdIdleQueryListAll()
+        {
+            CommandResult result = await MpdIdleSendCommand("listall");
+            if (result.IsSuccess)
+            {
+                result.IsSuccess = ParseListAll(result.ResultText);
+            }
+
+            return result;
+        }
+
+        public void MpdIdleStart()
+        {
+            MpdIdle();
+        }
+
+        private async void MpdIdle()
+        {
+            if (MpdStop)
+                return;
+
             if (_idleConnection.Client == null)
             {
-                DebugOutput?.Invoke(this, string.Format("[Exception@MpdIdle] ({0} ):\n{1}", "_idleConnection.Client.Connected", "_idleConnection.Client == null"));
+                Debug.WriteLine("@MpdIdle: " + "TcpClient.Client == null");
 
-                Debug.WriteLine("_idleConnection.Client == null @MpdIdle]");
+                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdle", "TcpClient.Client == null", "", Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
 
                 return;
             }
 
-            if (IsMpdIdleConnected && _idleConnection.Client.Connected)
+            if ((_commandWriter == null) || (_commandReader == null))
             {
-                if ((_idleWriter != null) || (_idleReader != null))
+                Debug.WriteLine("@MpdIdle: " + "_idleWriter or _idleReader is null");
+
+                DebugIdleOutput?.Invoke(this, string.Format("################ Error :@{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdle", "_idleWriter or _idleReader is null", "", Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+
+                return;
+            }
+
+            if (!_idleConnection.Client.Connected)
+            {
+                Debug.WriteLine("@MpdIdle: " + "!_idleConnection.Client.Connected");
+
+                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdle", "!_idleConnection.Client.Connected", "", Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+
+                return;
+            }
+
+            string cmd = "idle player mixer options playlist stored_playlist\n";
+
+            DebugIdleOutput?.Invoke(this, ">>>>>>>>>>>>>>>>" + cmd.Trim() + "\n" + "\n");
+
+            try
+            {
+                await _idleWriter.WriteAsync(cmd);
+            }
+            catch (IOException e)
+            {
+                // connection terminated by ... something.
+
+                Debug.WriteLine("[IOException@MpdIdle] ({0} ):\n{1}", "WriteAsync", e.Message);
+
+                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "WriteAsync@MpdIdle", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                ConnectionError?.Invoke(this, "The connection (idle) has been terminated. IOException: " + e.Message);
+
+                return;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("[Exception@MpdIdle] ({0} ):\n{1}", "WriteAsync", e.Message);
+
+                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "WriteAsync@MpdIdle", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                ConnectionError?.Invoke(this, "The connection (idle) has been terminated. Exception: " + e.Message);
+
+                return;
+            }
+
+            try
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while (true)
                 {
-                    try
+                    if (MpdStop)
+                        break;
+
+                    string line = await _idleReader.ReadLineAsync();
+
+                    if (line != null)
                     {
-                        bool isMpdIdling = true;
-
-                        string cmd = "idle player mixer options playlist stored_playlist\n";
-
-                        DebugOutput?.Invoke(this, ">>>>>>>>>>>>>>>>" + cmd.Trim() + "\n" + "\n");
-
-                        await _idleWriter.WriteAsync(cmd);
-
-                        StringBuilder stringBuilder = new StringBuilder();
-
-                        try
+                        if (line.StartsWith("ACK"))
                         {
-                            while (isMpdIdling)
+                            Debug.WriteLine("ACK: " + line);
+
+                            if (!string.IsNullOrEmpty(line))
+                                stringBuilder.Append(line + "\n");
+
+                            break;
+                        }
+                        else if (line.StartsWith("OK"))
+                        {
+                            if (!string.IsNullOrEmpty(line))
+                                stringBuilder.Append(line + "\n");
+
+                            break;
+                        }
+                        else if (line.StartsWith("changed: "))
+                        {
+                            if (!string.IsNullOrEmpty(line))
+                                stringBuilder.Append(line + "\n");
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(line))
                             {
-                                string line = await _idleReader.ReadLineAsync();
-
-                                if (line != null)
-                                {
-                                    if (line.StartsWith("ACK"))
-                                    {
-                                        Debug.WriteLine("ACK: " + line);
-
-                                        if (!string.IsNullOrEmpty(line))
-                                            stringBuilder.Append(line + "\n");
-
-                                        isMpdIdling = false;
-                                    }
-                                    else if (line.StartsWith("OK"))
-                                    {
-                                        if (!string.IsNullOrEmpty(line))
-                                            stringBuilder.Append(line + "\n");
-
-                                        isMpdIdling = false;
-                                    }
-                                    else if (line.StartsWith("changed: "))
-                                    {
-                                        //Debug.WriteLine("changed line @MpdIdle " + line);
-
-                                        if (!string.IsNullOrEmpty(line))
-                                            stringBuilder.Append(line + "\n");
-                                    }
-                                    else
-                                    {
-                                        if (!string.IsNullOrEmpty(line))
-                                        {
-                                            Debug.WriteLine("ELSE @MpdIdle  " + line);
-
-                                            stringBuilder.Append(line + "\n");
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    Debug.WriteLine("line == null @MpdIdle]");
-
-                                    isMpdIdling = false;
-
-                                    DebugOutput?.Invoke(this, string.Format("[Exception@MpdIdle] ({0} ):\n{1}", "ReadLineAsync", "line == null"));
-
-                                    return;
-                                }
+                                stringBuilder.Append(line + "\n");
                             }
-
-                            string result = stringBuilder.ToString();
-
-                            DebugOutput?.Invoke(this, "<<<<<<<<<<<<<<<<" + result.Trim().Replace("\n", "\n" + "<<<<<<<<<<<<<<<<") + "\n" + "\n");
-
-                            // start over
-                            MpdIdle();
-
-                            // Parse & Raise event.
-                            ParseSubSystemsAndRaseChangedEvent(result);
-
-                        }
-                        catch (Exception e)
-                        {
-                            // Could be application shutdopwn.
-
-                            Debug.WriteLine("[Exception@MpdIdle] ({0} ):\n{1}", "ReadLineAsync", e.Message);
-                            DebugOutput?.Invoke(this, string.Format("[Exception@MpdIdle] ({0} ):\n{1}", "ReadLineAsync", e.Message));
                         }
                     }
-                    catch (Exception e)
+                    else
                     {
-                        Debug.WriteLine("[Exception@MpdIdle] ({0} ):\n{1}", "WriteAsync", e.Message);
-                        DebugOutput?.Invoke(this, string.Format("[Exception@MpdIdle] ({0} ):\n{1}", "WriteAsync", e.Message));
+                        if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser) || (ConnectionState == ConnectionStatus.Connecting))
+                        {
+                            // nothing wrong.
+                        }
+                        else
+                        {
+                            Debug.WriteLine("TCP Idle Connection: ReadLineAsync @MpdIdle received null data.");
+
+                            DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdle", "ReadLineAsync@MpdIdle received null data", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+                            
+                            ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                            ConnectionError?.Invoke(this, "The connection has been terminated.");
+                            
+                            break;
+                        }
+
+                        return;
                     }
+                }
+
+                string result = stringBuilder.ToString();
+
+                DebugIdleOutput?.Invoke(this, "<<<<<<<<<<<<<<<<" + result.Trim().Replace("\n", "\n" + "<<<<<<<<<<<<<<<<") + "\n" + "\n");
+
+                // Parse & Raise event and MpdIdle();
+                await ParseSubSystemsAndRaseChangedEvent(result);
+
+            }
+            catch (System.IO.IOException e)
+            {
+                // Could be application shutdopwn.
+
+                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser) || (ConnectionState == ConnectionStatus.Connecting))
+                {
+                    // no problem
                 }
                 else
                 {
+                    Debug.WriteLine("[IOException@MpdIdle] ({0}):\n{1}", "ReadLineAsync: " + ConnectionState.ToString(), e.Message);
 
-                    Debug.WriteLine("(_idleWriter != null) || (_idleReader != null) @MpdIdle");
+                    DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdle", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                    ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                    ConnectionError?.Invoke(this, "The connection (idle) has been terminated. Exception: " + e.Message);
                 }
             }
-            else
+            catch (System.InvalidOperationException e)
             {
+                // The stream is currently in use by a previous operation on the stream.
 
-                Debug.WriteLine("IsMpdIdleConnected && _idleConnection.Client.Connected @MpdIdle");
+                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdle", "InvalidOperationException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                ConnectionError?.Invoke(this, "The connection (idle) has been terminated. Most likely the connection is overloaded.");
+
+            }
+            catch (Exception e)
+            {
+                // Could be application shutdopwn.
+
+                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
+                {
+                    // no problem...probably.
+                }
+                else
+                {
+                    Debug.WriteLine("[Exception@MpdIdle] ({0} ):\n{1}", "ReadLineAsync", e.Message);
+
+                    DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdle", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                    ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                    ConnectionError?.Invoke(this, "The connection (idle) has been terminated. Exception: " + e.Message);
+                }
             }
         }
 
-        private void ParseSubSystemsAndRaseChangedEvent(string result)
+        private async Task<bool> ParseSubSystemsAndRaseChangedEvent(string result)
         {
+            /*
+            public enum MpdSubSystems
+            {
+                //player mixer options playlist stored_playlist
+                //database: the song database has been modified after update.
+                //update: a database update has started or finished. If the database was modified during the update, the database event is also emitted.
+                //stored_playlist: a stored playlist has been modified, renamed, created or deleted
+                //playlist: the queue (i.e.the current playlist) has been modified
+                //player: the player has been started, stopped or seeked
+                //mixer: the volume has been changed
+                //output: an audio output has been added, removed or modified(e.g.renamed, enabled or disabled)
+                //options: options like repeat, random, crossfade, replay gain
+                //partition: a partition was added, removed or changed
+                //sticker: the sticker database has been modified.
+                //subscription: a client has subscribed or unsubscribed to a channel
+                //message: a message was received on a channel this client is subscribed to; this event is only emitted when the queue is empty
+                //neighbor: a neighbor was found or lost
+                //mount: the mount list has changed
+
+                player,
+                mixer,
+                options,
+                playlist,
+                stored_playlist
+            }
+            */
+
             List<string> SubSystems = result.Split('\n').ToList();
 
             try
@@ -716,480 +864,153 @@ namespace MPDCtrl.Models
                     }
                 }
 
+                if (isPlayer)
+                {
+                    CommandResult idleResult = await MpdIdleQueryStatus();
+                    if (idleResult.IsSuccess)
+                    {
+                        MpdPlayerStatusChanged?.Invoke(this);
+                    }
+                }
+
                 if (isCurrentQueue)
                 {
-                    MpdCurrentQueueChanged?.Invoke(this);
+                    CommandResult idleResult = await MpdIdleQueryCurrentQueue();
+                    if (idleResult.IsSuccess)
+                    {
+                        MpdCurrentQueueChanged?.Invoke(this);
+                    }
                 }
 
                 if (isStoredPlaylist)
                 {
-                    MpdPlaylistsChanged?.Invoke(this);
+                    CommandResult idleResult = await MpdIdleQueryPlaylists();
+                    if (idleResult.IsSuccess)
+                    {
+                        MpdPlaylistsChanged?.Invoke(this);
+                    }
                 }
 
-                if (isPlayer)
-                {
-                    MpdPlayerStatusChanged?.Invoke(this);
-                }
-
+                // start over.
+                MpdIdle();
             }
             catch
             {
                 Debug.WriteLine("**Error@ParseSubSystemsAndRaseChangedEvent: " + result);
             }
+
+            return true;
         }
 
-        /*
-        public async Task<IdleResult> MpdNoIdle()
-        {
-            IdleResult ret = new IdleResult();
-
-            try
-            {
-                if (IsMpdIdleConnected && _idleConnection.Client.Connected)
-                {
-                    if ((_idleWriter != null) || (_idleReader != null))
-                    {
-                        try
-                        {
-                            string cmd = "noidle\n";
-
-                            DebugOutput?.Invoke(this, ">>" + cmd.Trim() + "\n" + "\n");
-
-                            await _idleWriter.WriteAsync(cmd);
-
-                            StringBuilder stringBuilder = new StringBuilder();
-
-                            try
-                            {
-                                while (true)
-                                {
-                                    string line = await _idleReader.ReadLineAsync();
-
-                                    if (line != null)
-                                    {
-                                        if (line.StartsWith("ACK"))
-                                        {
-
-                                            Debug.WriteLine("ACK: " + line);
-
-                                            if (!string.IsNullOrEmpty(line))
-                                                stringBuilder.Append(line + "\n");
-
-                                            break;
-                                        }
-                                        else if (line.StartsWith("OK"))
-                                        {
-                                            Debug.WriteLine("OK: " + line);
-
-                                            if (!string.IsNullOrEmpty(line))
-                                                stringBuilder.Append(line + "\n");
-
-                                            break;
-                                        }
-                                        else if (line.StartsWith("changed: "))
-                                        {
-                                            Debug.WriteLine("changed: " + line);
-
-                                            if (!string.IsNullOrEmpty(line))
-                                                stringBuilder.Append(line + "\n");
-                                        }
-                                        else
-                                        {
-                                            if (!string.IsNullOrEmpty(line))
-                                            {
-                                                Debug.WriteLine("ELSE: " + line);
-
-                                                stringBuilder.Append(line + "\n");
-                                            }
-                                            else
-                                            {
-                                                Debug.WriteLine("line == IsNullOrEmpty");
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Debug.WriteLine("line == null");
-                                        break;
-                                    }
-                                }
-
-                                ret.ResultText = stringBuilder.ToString();
-                                ret.IsSuccess = true;
-                                ret.ErrorMessage = "";
-
-                                DebugOutput?.Invoke(this, "<<" + ret.ResultText.Trim().Replace("\n", "\n" + "<<") + "\n" + "\n");
-                            }
-                            catch (Exception e)
-                            {
-                                ret.IsSuccess = false;
-                                ret.ErrorMessage = e.Message;
-
-                                return ret;
-                            }
-
-                        }
-                        catch (Exception e)
-                        {
-                            ret.IsSuccess = false;
-                            ret.ErrorMessage = e.Message;
-
-                            return ret;
-                        }
-                    }
-                    else
-                    {
-                        ret.IsSuccess = false;
-                        ret.ErrorMessage = "_idleWriter or _idleReader is null";
-                    }
-                }
-                else
-                {
-                    ret.IsSuccess = false;
-                    ret.ErrorMessage = "NOT IsMpdIdleConnected";
-                }
-            }
-            catch (Exception e)
-            {
-                ret.IsSuccess = false;
-                ret.ErrorMessage = e.Message;
-            }
-
-            return ret;
-        }
-        */
-        
         #endregion
 
-        #region == MPD Commands == 
+        #region == New Command Connection ==
 
-        private async Task<CommandResult> MpdSendCommand(string cmd)
+        public async void MpdCommandConnectionStart(string host, int port, string password)
         {
-            CommandResult ret = new CommandResult();
+            ConnectionResult r = await MpdCommandConnect(host, port);
 
-            if (cmd.Trim() == "idle")
+            if (r.IsSuccess)
             {
-                DebugOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
+                CommandResult d = await MpdCommandSendPassword(password);
+
+                if (d.IsSuccess)
+                {
+                    // ここでIdleにして、以降はnoidle + cmd + idleの組み合わせでやる。
+                    // ただし、実際にはidleのあとReadしていないからタイムアウトで切断されてしまう模様。
+
+                    // await しなくても良いのだけれど。
+                    await MpdSendIdle();
+                }
             }
-            else
-            {
-                DebugOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
-            }
+        }
+
+        public async Task<ConnectionResult> MpdCommandConnect(string host, int port)
+        {
+            ConnectionResult result = new ConnectionResult();
+
+            IsMpdCommandConnected = false;
+
+            _commandConnection = new TcpClient();
+
+            _host = host;
+            _port = port;
+
+
+            DebugCommandOutput?.Invoke(this, "TCP Command Connection: Trying to connect." + "\n" + "\n");
+
+            ConnectionState = ConnectionStatus.Connecting;
 
             try
             {
+                await _commandConnection.ConnectAsync(_host, _port);
+
                 if (_commandConnection.Client.Connected)
                 {
-                    if (IsMpdCommandConnected)
+                    DebugCommandOutput?.Invoke(this, "TCP Command Connection: Connection established." + "\n" + "\n");
+
+                    ConnectionState = ConnectionStatus.Connected;
+
+                    var tcpStream = _commandConnection.GetStream();
+                    tcpStream.ReadTimeout = System.Threading.Timeout.Infinite;
+
+                    _commandReader = new StreamReader(tcpStream);
+                    _commandWriter = new StreamWriter(tcpStream);
+                    _commandWriter.AutoFlush = true;
+
+                    string response = await _commandReader.ReadLineAsync();
+
+                    if (response.StartsWith("OK MPD "))
                     {
-                        if ((_commandWriter != null) || (_commandReader != null))
-                        {
-                            try
-                            {
-                                if (cmd.Trim() == "idle")
-                                {
-                                    // idle の場合は結果を待た（Readし）ない。
-                                    try
-                                    {
-                                        await _commandWriter.WriteAsync(cmd.Trim() + "\n");
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        ret.IsSuccess = false;
-                                        ret.ErrorMessage = e.Message;
-                                        DebugOutput?.Invoke(this, string.Format("<<<<Received ({0}):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), e.Message));
+                        _mpdVer = response.Replace("OK MPD ", string.Empty).Trim();
 
-                                        return ret;
-                                    }
+                        DebugCommandOutput?.Invoke(this, "<<<<" + response.Trim() + "\n" + "\n");
 
-                                    ret.IsSuccess = true;
-                                    ret.ErrorMessage = "";
-                                    return ret;
-                                }
-                                else
-                                {
-                                    await _commandWriter.WriteAsync(cmd.Trim() + "\n");
+                        IsMpdCommandConnected = true;
 
-                                    try
-                                    {
-                                        StringBuilder stringBuilder = new StringBuilder();
+                        result.IsSuccess = true;
 
-                                        while (true)
-                                        {
-                                            string line = await _commandReader.ReadLineAsync();
+                        //MpdConnected?.Invoke(this);
 
-                                            if (line != null)
-                                            {
-                                                if (line.StartsWith("ACK"))
-                                                {
-                                                    Debug.WriteLine("ACK line @MpdSendCommand: " + cmd.Trim() + " and " + line);
-
-                                                    if (!string.IsNullOrEmpty(line))
-                                                        stringBuilder.Append(line + "\n");
-
-                                                    break;
-                                                }
-                                                else if (line.StartsWith("OK"))
-                                                {
-                                                    ret.IsSuccess = true;
-
-                                                    if (!string.IsNullOrEmpty(line))
-                                                        stringBuilder.Append(line + "\n");
-
-                                                    break;
-                                                }
-                                                else if (line.StartsWith("changed: "))
-                                                {
-                                                    // noidleでついてくるかもしれないchanged. idleConnectionで見ているからここでは無視。
-
-                                                    if (!string.IsNullOrEmpty(line))
-                                                        stringBuilder.Append(line + "\n");
-                                                }
-                                                else
-                                                {
-                                                    if (!string.IsNullOrEmpty(line))
-                                                    {
-                                                        //Debug.WriteLine("ELSE: " + line);
-
-                                                        stringBuilder.Append(line + "\n"); // << has to be \n
-                                                    }
-                                                    else
-                                                    {
-                                                        Debug.WriteLine("line == IsNullOrEmpty");
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                break;
-                                            }
-                                        }
-
-                                        ret.ResultText = stringBuilder.ToString();
-                                        ret.ErrorMessage = "";
-
-                                        DebugOutput?.Invoke(this, "<<<<" + ret.ResultText.Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        Debug.WriteLine("Exception@MpdSendCommand: " + cmd.Trim() + " ReadLineAsync " + e.Message);
-
-                                        ret.IsSuccess = false;
-                                        ret.ErrorMessage = e.Message;
-                                        DebugOutput?.Invoke(this, string.Format("<<<<Received ({0} ):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), e.Message));
-
-                                        return ret;
-                                    }
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Debug.WriteLine("Exception@MpdSendCommand: " + cmd.Trim() + " WriteAsync " + e.Message);
-
-                                ret.IsSuccess = false;
-                                ret.ErrorMessage = e.Message;
-                                DebugOutput?.Invoke(this, string.Format("<<<<Received ({0}):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), e.Message));
-
-                                return ret;
-                            }
-                        }
-                        else
-                        {
-                            Debug.WriteLine("@MpdSendCommand:  _commandWriter or _commandReader is null");
-
-                            ret.IsSuccess = false;
-                            ret.ErrorMessage = "_commandWriter or _commandReader is null";
-                            DebugOutput?.Invoke(this, string.Format("<<<<Received ({0} ):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), ret.ErrorMessage));
-                        }
+                        // Done for now.
                     }
                     else
                     {
-                        Debug.WriteLine("@MpdSendCommand:  NOT IsMpdCommandConnected");
+                        DebugCommandOutput?.Invoke(this, "TCP Command Connection: MPD did not respond with proper respose." + "\n" + "\n");
 
-                        ret.IsSuccess = false;
-                        ret.ErrorMessage = "NOT IsMpdCommandConnected";
-                        DebugOutput?.Invoke(this, string.Format("<<<<Received ({0} ):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), ret.ErrorMessage));
+                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                        ConnectionError?.Invoke(this, "TCP connection error: MPD did not respond with proper respose.");
                     }
                 }
                 else
                 {
-                    Debug.WriteLine("@MpdSendCommand: NOT _tcpCommandClient.Client.Connected");
+                    //?
 
-                    ret.IsSuccess = false;
-                    ret.ErrorMessage = "NOT _tcpCommandClient.Client.Connected";
-                    DebugOutput?.Invoke(this, string.Format("<<<<Received ({0} ):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), ret.ErrorMessage));
+                    Debug.WriteLine("**** !client.Client.Connected");
+
+                    DebugCommandOutput?.Invoke(this, "TCP Command Connection: FAIL to established... Client not connected." + "\n" + "\n");
+
+                    ConnectionState = ConnectionStatus.NeverConnected;
+
+                    ConnectionError?.Invoke(this, "TCP Command Connection: FAIL to established... Client not connected.");
                 }
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Exception@MpdSendCommand: " + cmd.Trim()  + e.Message);
+                // TODO: Test.
 
-                ret.IsSuccess = false;
-                ret.ErrorMessage = e.Message;
+                DebugCommandOutput?.Invoke(this, "TCP Command Connection: Error while connecting. Fail to connect: " + e.Message + "\n" + "\n");
 
-                DebugOutput?.Invoke(this, string.Format("<<<<Received ({0} ):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), e.Message));
+                ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                ConnectionError?.Invoke(this, "TCP connection error: " + e.Message);
             }
 
-            return ret;
+            return result;
         }
 
-        private async Task<CommandResult> MpdSendCommandWithNoData(string cmd)
-        {
-            CommandResult ret = new CommandResult();
-
-            if (cmd.Trim() == "idle")
-            {
-                DebugOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
-            }
-            else
-            {
-                DebugOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
-            }
-
-            try
-            {
-                if (_commandConnection.Client.Connected)
-                {
-                    if (IsMpdCommandConnected)
-                    {
-                        if ((_commandWriter != null) || (_commandReader != null))
-                        {
-                            try
-                            {
-                                if (cmd.Trim() == "idle")
-                                {
-                                    await _commandWriter.WriteAsync(cmd.Trim() + "\n");
-                                }
-                                else
-                                {
-                                    await _commandWriter.WriteAsync(cmd.Trim() + "\n");
-
-                                    try
-                                    {
-
-                                        StringBuilder stringBuilder = new StringBuilder();
-
-                                        while (true)
-                                        {
-                                            string line = await _commandReader.ReadLineAsync();
-
-                                            if (line != null)
-                                            {
-                                                if (line.StartsWith("ACK"))
-                                                {
-                                                    Debug.WriteLine("ACK line @MpdSendCommand: " + cmd.Trim() + " and " + line);
-
-                                                    if (!string.IsNullOrEmpty(line))
-                                                        stringBuilder.Append(line + "\n");
-
-                                                    break;
-                                                }
-                                                else if (line.StartsWith("OK"))
-                                                {
-                                                    ret.IsSuccess = true;
-
-                                                    if (!string.IsNullOrEmpty(line))
-                                                        stringBuilder.Append(line + "\n");
-
-                                                    break;
-                                                }
-                                                else if (line.StartsWith("changed: "))
-                                                {
-                                                    // noidleでついてくるかもしれないchanged. idleConnectionで見ているからここでは無視。
-
-                                                    if (!string.IsNullOrEmpty(line))
-                                                        stringBuilder.Append(line + "\n");
-                                                }
-                                                else
-                                                {
-                                                    if (!string.IsNullOrEmpty(line))
-                                                    {
-                                                        stringBuilder.Append(line + "\n"); // << has to be \n
-                                                    }
-                                                    else
-                                                    {
-                                                        Debug.WriteLine("line == IsNullOrEmpty");
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                break;
-                                            }
-                                        }
-
-                                        ret.ErrorMessage = "";
-
-                                        DebugOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        Debug.WriteLine("Exception@MpdSendCommandWithNoData: " + cmd.Trim() + " ReadLineAsync " + e.Message);
-
-                                        ret.IsSuccess = false;
-                                        ret.ErrorMessage = e.Message;
-                                        DebugOutput?.Invoke(this, string.Format("<<<<Received ({0}):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), e.Message));
-
-                                        return ret;
-                                    }
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Debug.WriteLine("Exception@MpdSendCommandWithNoData: " + cmd.Trim() + " WriteAsync " + e.Message);
-
-                                ret.IsSuccess = false;
-                                ret.ErrorMessage = e.Message;
-                                DebugOutput?.Invoke(this, string.Format("<<<<Received ({0}):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), e.Message));
-
-                                return ret;
-                            }
-                        }
-                        else
-                        {
-                            Debug.WriteLine("Exception@MpdSendCommandWithNoData: " + "_commandWriter or _commandReader is null");
-
-                            ret.IsSuccess = false;
-                            ret.ErrorMessage = "_commandWriter or _commandReader is null";
-                            DebugOutput?.Invoke(this, string.Format("<<<<Received ({0} ):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), ret.ErrorMessage));
-                        }
-                    }
-                    else
-                    {
-                        Debug.WriteLine("Exception@MpdSendCommandWithNoData: " + "NOT IsMpdCommandConnected");
-
-                        ret.IsSuccess = false;
-                        ret.ErrorMessage = "NOT IsMpdCommandConnected";
-                        DebugOutput?.Invoke(this, string.Format("<<<<Received ({0} ):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), ret.ErrorMessage));
-                    }
-
-                }
-                else
-                {
-                    Debug.WriteLine("Exception@MpdSendCommandWithNoData: " + "NOT _tcpCommandClient.Client.Connected");
-
-                    ret.IsSuccess = false;
-                    ret.ErrorMessage = "NOT _tcpCommandClient.Client.Connected";
-                    DebugOutput?.Invoke(this, string.Format("<<<<Received ({0} ):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), ret.ErrorMessage));
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine("Exception@MpdSendCommandWithNoData: " + cmd.Trim() + " WriteAsync " + e.Message);
-
-                ret.IsSuccess = false;
-                ret.ErrorMessage = e.Message;
-
-                DebugOutput?.Invoke(this, string.Format("<<<<Received ({0} ):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), e.Message));
-            }
-
-            return ret;
-        }
-
-        public async Task<CommandResult> MpdSendPassword(string password = "")
+        public async Task<CommandResult> MpdCommandSendPassword(string password = "")
         {
             _password = password;
 
@@ -1206,160 +1027,654 @@ namespace MPDCtrl.Models
 
             string cmd = "password " + password + "\n";
 
-            return await MpdSendCommandWithNoData(cmd);
+            return await MpdSendCommand(cmd);
 
-            /*
-            DebugOutput?.Invoke(this, ">>>>password ******" + "\n" + "\n");
+        }
+
+        private async Task<CommandResult> MpdSendCommand(string cmd, bool isAutoIdling = false)
+        {
+            CommandResult ret = new CommandResult();
+
+            if (_commandConnection.Client == null)
+            {
+                Debug.WriteLine("@MpdSendCommand: " + "TcpClient.Client == null");
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = "TcpClient.Client == null";
+
+                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdSendCommand", "TcpClient.Client == null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+
+                return ret;
+            }
+
+            if ((_commandWriter == null) || (_commandReader == null))
+            {
+                Debug.WriteLine("@MpdSendCommand: " + "_commandWriter or _commandReader is null");
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = "_commandWriter or _commandReader is null";
+
+                DebugCommandOutput?.Invoke(this, string.Format("################ Error :@{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdSendCommand", "_commandWriter or _commandReader is null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+
+                return ret;
+            }
+
+            if (!_commandConnection.Client.Connected)
+            {
+                Debug.WriteLine("@MpdSendCommand: " + "NOT IsMpdCommandConnected");
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = "NOT IsMpdCommandConnected";
+
+                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdSendCommand", "!CommandConnection.Client.Connected", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+
+                return ret;
+            }
 
             try
             {
-                if (_commandConnection.Client.Connected)
+                if (cmd.Trim().StartsWith("idle"))
                 {
-                    if (IsMpdCommandConnected)
-                    {
-                        if ((_commandWriter != null) || (_commandReader != null))
-                        {
-                            try
-                            {
-                                await _commandWriter.WriteAsync(cmd);
+                    DebugCommandOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
 
-                                try
-                                {
-                                    string response = await _commandReader.ReadLineAsync();
+                    await _commandWriter.WriteAsync(cmd.Trim() + "\n");
 
-                                    ret.ResultText = response;
-                                    ret.ErrorMessage = "";
+                    if (!isAutoIdling)
+                        return ret;
+                }
+                else
+                {
+                    string cmdDummy = cmd;
+                    if (cmd.StartsWith("password "))
+                        cmdDummy = "password ****";
 
-                                    if (response.Trim() == "OK")
-                                    {
-                                        ret.IsSuccess = true;
-                                    }
+                    cmdDummy = cmdDummy.Trim().Replace("\n", "\n" + ">>>>");
 
-                                    DebugOutput?.Invoke(this, "<<<<" + response.Trim().Replace("\r\n", "\n" + "<<<<")  + "\n" + "\n");
-
-                                }
-                                catch (Exception e)
-                                {
-                                    DebugOutput?.Invoke(this, "<<<<(Exception)" + "\n" + e.Message.Trim() + "\n" + "\n");
-
-                                    ret.IsSuccess = false;
-                                    ret.ErrorMessage = e.Message;
-
-                                    return ret;
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                DebugOutput?.Invoke(this, "<<<<(Exception)" + "\n" + e.Message.Trim() + "\n" + "\n");
-
-                                ret.IsSuccess = false;
-                                ret.ErrorMessage = e.Message;
-
-                                return ret;
-                            }
-                        }
-                        else
-                        {
-                            ret.IsSuccess = false;
-                            ret.ErrorMessage = "_commandWriter or _commandReader is null";
-                        }
-                    }
+                    if (isAutoIdling)
+                        DebugCommandOutput?.Invoke(this, ">>>>" + "noidle\n>>>>" + cmdDummy.Trim() + "\n>>>>idle player" + "\n" + "\n");
                     else
-                    {
-                        ret.IsSuccess = false;
-                        ret.ErrorMessage = "NOT IsMpdCommandConnected";
-                    }
+                        DebugCommandOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n");
+
+                    if (isAutoIdling)
+                        await _commandWriter.WriteAsync("noidle\n" + cmd.Trim() + "\n" + "idle player\n");
+                    else
+                        await _commandWriter.WriteAsync(cmd.Trim() + "\n");
+                }
+            }
+            catch (System.IO.IOException e)
+            {
+                Debug.WriteLine("IOException@MpdSendCommand: " + cmd.Trim() + " WriteAsync :" + e.Message);
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = e.Message;
+
+                // Could be application shutdopwn.
+                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
+                {
 
                 }
                 else
                 {
-                    ret.IsSuccess = false;
-                    ret.ErrorMessage = "NOT _tcpCommandClient.Client.Connected";
+                    DebugCommandOutput?.Invoke(this, string.Format("################ Error@{0}, Reason:{1}, Data:{2}, {3} Exception: {4} {5}", "WriteAsync@MpdSendCommand", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+
+
+                    // タイムアウトしていたらここでエラーになる模様。
+
+                    // IOException : Unable to write data to the transport connection: 確立された接続がホスト コンピューターのソウトウェアによって中止されました。
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                    //ConnectionError?.Invoke(this, "The connection (command) has been terminated (IOException): " + e.Message);
+                }
+
+                return ret;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Exception@MpdSendCommand: " + cmd.Trim() + " WriteAsync " + e.Message);
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = e.Message;
+
+                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
+                {
+
+                }
+                else
+                {
+                    DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "WriteAsync@MpdSendCommand", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                    //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                    //ConnectionError?.Invoke(this, "The connection (command) has been terminated (Exception): " + e.Message);
+                }
+
+                return ret;
+            }
+
+
+            try
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+
+                bool isDoubleOk = false;
+
+                while (true)
+                {
+                    string line = await _commandReader.ReadLineAsync();
+
+                    if (line != null)
+                    {
+                        if (line.StartsWith("ACK"))
+                        {
+                            Debug.WriteLine("ACK line @MpdSendCommand: " + cmd.Trim() + " and " + line);
+
+                            if (!string.IsNullOrEmpty(line))
+                                stringBuilder.Append(line + "\n");
+
+                            break;
+                        }
+                        else if (line.StartsWith("OK"))
+                        {
+                            if (isAutoIdling)
+                            {
+                                if (isDoubleOk)
+                                {
+                                    if (!string.IsNullOrEmpty(line))
+                                        stringBuilder.Append(line + "\n");
+
+                                    ret.IsSuccess = true;
+
+                                    break;
+                                }
+
+                                if (!string.IsNullOrEmpty(line))
+                                    stringBuilder.Append(line + "\n");
+
+                                isDoubleOk = true;
+
+                            }
+                            else
+                            {
+                                ret.IsSuccess = true;
+
+                                if (!string.IsNullOrEmpty(line))
+                                    stringBuilder.Append(line + "\n");
+
+                                break;
+                            }
+                        }
+                        else if (line.StartsWith("changed: "))
+                        {
+                            // noidleでついてくるかもしれないchanged. idleConnectionで見ているからここでは無視したいが・・・。
+
+                            if (!string.IsNullOrEmpty(line))
+                                stringBuilder.Append(line + "\n");
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(line))
+                            {
+                                stringBuilder.Append(line + "\n"); // << has to be \n
+                            }
+                            else
+                            {
+                                Debug.WriteLine("line == IsNullOrEmpty");
+
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("@MpdSendCommand ReadLineAsync line != null");
+
+                        DebugCommandOutput?.Invoke(this, string.Format("################ Error @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "ReadLineAsync received null data", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+
+                        //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                        //ConnectionError?.Invoke(this, "The connection (command) has been terminated. ");
+
+                        ret.ResultText = stringBuilder.ToString();
+                        ret.ErrorMessage = "ReadLineAsync@MpdSendCommand received null data";
+
+                        break;
+                    }
+                }
+
+                DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
+
+                ret.ResultText = stringBuilder.ToString();
+                ret.ErrorMessage = "";
+
+                return ret;
+            }
+            catch (System.InvalidOperationException e)
+            {
+                // The stream is currently in use by a previous operation on the stream.
+
+                Debug.WriteLine("InvalidOperationException@MpdSendCommand: " + cmd.Trim() + " ReadLineAsync ---- " + e.Message);
+
+                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "InvalidOperationException (Most likely the connection is overloaded)", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                //ConnectionError?.Invoke(this, "The connection (command) has been terminated. Most likely the connection has been overloaded.");
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = e.Message;
+
+                return ret;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Exception@MpdSendCommand: " + cmd.Trim() + " ReadLineAsync ---- " + e.Message);
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = e.Message;
+
+                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                return ret;
+            }
+
+        }
+
+        #endregion
+
+        #region == MPD Commands == 
+
+        // TODO: 
+        private async Task<bool> CheckCommandQueue()
+        {
+            /*
+            int c = 100;
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (commandQueueCount <= 0)
+                    commandQueueCumulativeCount = 0;
+
+                commandQueueCumulativeCount++;
+                commandQueueCount++;
+
+            });
+
+            await Task.Delay(c);
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (commandQueueCount > 1)
+                    c = (commandQueueCumulativeCount * 100);
+
+                if (commandQueueCount > 1)
+                    MpcInfo?.Invoke(this, string.Format("Too many command requests({0}) for a short period of time. Throttling.... ({1})", commandQueueCumulativeCount.ToString(), commandQueueCount.ToString()));
+
+            });
+
+            await Task.Delay(c);
+
+            //Debug.WriteLine("Waiting@checkCommandQueue: " + commandQueueCount.ToString() + " : " + c.ToString());
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                commandQueueCount--;
+
+                if (commandQueueCount <= 0)
+                    MpcInfo?.Invoke(this, "");
+
+                if (commandQueueCount > 0)
+                    MpcInfo?.Invoke(this, string.Format("Too many command requests({0}) for a short period of time. Throttling.... ({1})", commandQueueCumulativeCount.ToString(), commandQueueCount.ToString()));
+
+            });
+            */
+            return true;
+        }
+
+        // TODO:
+        private async Task<CommandResult> MpdSendCommandSet(string cmd)
+        {
+            CommandResult ret = new CommandResult();
+
+            if (_commandConnection.Client == null)
+            {
+                Debug.WriteLine("Exception@MpdSendCommandSet: " + "NOT _tcpCommandClient.Client = null");
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = "NOT _tcpCommandClient.Client = null";
+                DebugCommandOutput?.Invoke(this, string.Format("<<<<Received ({0} ):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), ret.ErrorMessage));
+                return ret;
+            }
+
+            if (!_commandConnection.Client.Connected)
+            {
+                Debug.WriteLine("Exception@MpdSendCommandSet: " + "NOT IsMpdCommandConnected");
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = "NOT IsMpdCommandConnected";
+                DebugCommandOutput?.Invoke(this, string.Format("<<<<Received ({0} ):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), ret.ErrorMessage));
+                return ret;
+            }
+
+            if ((_commandWriter == null) || (_commandReader == null))
+            {
+                Debug.WriteLine("Exception@MpdSendCommandSet: " + "_commandWriter or _commandReader is null");
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = "_commandWriter or _commandReader is null";
+                DebugCommandOutput?.Invoke(this, string.Format("<<<<Received ({0} ):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), ret.ErrorMessage));
+                return ret;
+            }
+
+            try
+            {
+                if (cmd.Trim().StartsWith("idle"))
+                {
+                    DebugCommandOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
+
+                    await _commandWriter.WriteAsync(cmd.Trim() + "\n");
+
+                    return ret;
+                }
+                else if (cmd.Trim() == "noidle")
+                {
+                    DebugCommandOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
+
+                    await _commandWriter.WriteAsync(cmd.Trim() + "\n");
+
+                }
+                else
+                {
+                    string cmdlist = "command_list_begin" + "\n";
+                    cmdlist = cmdlist + cmd.Trim() + "\n";
+                    cmdlist = cmdlist + "command_list_end";
+
+                    DebugCommandOutput?.Invoke(this, ">>>>" + cmdlist.Trim().Replace("\n", "\n" + ">>>>") + "\n" + "\n");
+
+                    await _commandWriter.WriteAsync(cmd.Trim() + "\n");
                 }
             }
             catch (Exception e)
             {
+                Debug.WriteLine("Exception@MpdSendCommandSet: " + cmd.Trim() + " WriteAsync " + e.Message);
+
                 ret.IsSuccess = false;
                 ret.ErrorMessage = e.Message;
+                DebugCommandOutput?.Invoke(this, string.Format("<<<<Received ({0}):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), e.Message));
+
+                return ret;
+            }
+
+            try
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while (true)
+                {
+                    string line = await _commandReader.ReadLineAsync();
+
+                    if (line != null)
+                    {
+                        if (line.StartsWith("ACK"))
+                        {
+                            Debug.WriteLine("ACK line @MpdSendCommandSet: " + cmd.Trim() + " and " + line);
+
+                            if (!string.IsNullOrEmpty(line))
+                                stringBuilder.Append(line + "\n");
+
+                            break;
+                        }
+                        else if (line.StartsWith("OK"))
+                        {
+                            ret.IsSuccess = true;
+
+                            if (!string.IsNullOrEmpty(line))
+                                stringBuilder.Append(line + "\n");
+
+                            break;
+                        }
+                        else if (line.StartsWith("changed: "))
+                        {
+                            // noidleでついてくるかもしれないchanged. idleConnectionで見ているからここでは無視。
+
+                            if (!string.IsNullOrEmpty(line))
+                                stringBuilder.Append(line + "\n");
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(line))
+                            {
+                                stringBuilder.Append(line + "\n"); // << has to be \n
+                            }
+                            else
+                            {
+                                Debug.WriteLine("line == IsNullOrEmpty");
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("line != null");
+                        break;
+                    }
+                }
+
+                ret.ErrorMessage = "";
+
+                DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Exception@MpdSendCommandSet: " + cmd.Trim() + " ReadLineAsync " + e.Message);
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = e.Message;
+                DebugCommandOutput?.Invoke(this, string.Format("<<<<Received ({0}):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), e.Message));
+
+                return ret;
             }
 
             return ret;
-
-            */
         }
 
         public async Task<CommandResult> MpdSendIdle()
         {
-            return await MpdSendCommandWithNoData("idle");
+            return await MpdSendCommand("idle player");
         }
 
         public async Task<CommandResult> MpdSendNoIdle()
         {
-            return await MpdSendCommandWithNoData("noidle");
+            return await MpdSendCommand("noidle");
         }
 
-        public async Task<CommandResult> MpdQueryStatus()
+        public async Task<CommandResult> MpdQueryStatus(bool idling = true)
         {
-            CommandResult r = await MpdSendCommand("status");
+            Task<bool> check = CheckCommandQueue();
+            await check;
 
-            if (r.IsSuccess)
+            if (idling)
+                await MpdSendNoIdle();
+            CommandResult result = await MpdSendCommand("status");
+            if (result.IsSuccess)
             {
-                r.IsSuccess = ParseStatus(r.ResultText);
+                result.IsSuccess = ParseStatus(result.ResultText);
+                if (result.IsSuccess)
+                {
+                    //Debug.WriteLine("@MpdQueryStatus: IsSuccess.");
+                }
+                else
+                {
+                    //Debug.WriteLine("@MpdQueryStatus: NOT IsSuccess.");
+                }
             }
-
-            return r;
+            if (idling)
+                await MpdSendIdle();
+            return result;
         }
 
-        public async Task<CommandResult> MpdQueryCurrentSong()
+        public async Task<CommandResult> MpdQueryCurrentSong(bool idling = true)
         {
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            // TODO:
             // Currently not used. So do nothing.
 
-            return await MpdSendCommand("currentsong");
+            if (idling)
+                await MpdSendNoIdle();
+            CommandResult result = await MpdSendCommand("currentsong");
+            if (result.IsSuccess)
+            {
+                //
+            }
+            if (idling)
+                await MpdSendIdle();
+            return result;
         }
 
-        public async Task<CommandResult> MpdQueryCurrentQueue()
+        public async Task<CommandResult> MpdQueryCurrentQueue(bool idling = true)
         {
-            CommandResult r = await MpdSendCommand("playlistinfo");
+            Task<bool> check = CheckCommandQueue();
+            await check;
 
-            if (r.IsSuccess)
+            if (idling)
+                await MpdSendNoIdle();
+            CommandResult result = await MpdSendCommand("playlistinfo");
+            if (result.IsSuccess)
             {
-                if (ParsePlaylistInfo(r.ResultText))
+                result.IsSuccess = ParsePlaylistInfo(result.ResultText);
+            }
+            if (idling)
+                await MpdSendIdle();
+            return result;
+        }
+
+        public async Task<CommandResult> MpdQueryPlaylists(bool idling = true)
+        {
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            if (idling)
+                await MpdSendNoIdle();
+            CommandResult result = await MpdSendCommand("listplaylists");
+            if (result.IsSuccess)
+            {
+                result.IsSuccess = ParsePlaylists(result.ResultText);
+            }
+            if (idling)
+                await MpdSendIdle();
+            return result;
+        }
+
+        public async Task<CommandResult> MpdQueryListAll(bool idling = true)
+        {
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            if (idling)
+                await MpdSendNoIdle();
+            CommandResult result = await MpdSendCommand("listall");
+            if (result.IsSuccess)
+            {
+                result.IsSuccess = ParseListAll(result.ResultText);
+            }
+            if (idling)
+                await MpdSendIdle();
+            return result;
+        }
+
+        public async Task<CommandSearchResult> MpdSearch(string queryTag, string queryShiki, string queryValue)
+        {
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                SearchResult.Clear();
+            });
+            
+            CommandSearchResult result = new CommandSearchResult();
+
+            if (string.IsNullOrEmpty(queryTag) || string.IsNullOrEmpty(queryValue) || string.IsNullOrEmpty(queryShiki))
+            {
+                result.IsSuccess = false;
+                return result;
+            }
+
+            var expression = queryTag + " " + queryShiki + " \'" + Regex.Escape(queryValue) + "\'";
+
+            string cmd = "search \"(" + expression + ")\"\n";
+
+            /*
+            await MpdSendNoIdle();
+            CommandResult cm = await MpdSendCommand(cmd);
+            if (cm.IsSuccess)
+            {
+                if (ParseSearchResult(cm.ResultText))
                 {
-                    //
+                    result.IsSuccess = true;
+
+                    result.SearchResult = this.SearchResult;
+                }
+            }
+            await MpdSendIdle();
+            */
+            CommandResult cm = await MpdSendCommand(cmd, true);
+            if (cm.IsSuccess)
+            {
+                Debug.WriteLine("ffffffffffffff");
+
+                if (ParseSearchResult(cm.ResultText))
+                {
+                    result.IsSuccess = true;
+
+                    result.SearchResult = this.SearchResult;
                 }
             }
 
-            return r;
+            return result;
         }
 
-        public async Task<CommandResult> MpdQueryPlaylists()
+        public async Task<CommandPlaylistResult> MpdQueryPlaylistSongs(string playlistName)
         {
-            CommandResult r = await MpdSendCommand("listplaylists");
+            Task<bool> check = CheckCommandQueue();
+            await check;
 
-            if (r.IsSuccess)
+            CommandPlaylistResult result = new CommandPlaylistResult();
+
+            if (string.IsNullOrEmpty(playlistName))
             {
-                if (ParsePlaylists(r.ResultText))
-                {
-                    //
-                }
+                result.IsSuccess = false;
+                return result;
             }
 
-            return r;
-        }
+            playlistName = Regex.Escape(playlistName);
 
-        public async Task<CommandResult> MpdQueryListAll()
-        {
-            CommandResult r = await MpdSendCommand("listall");
-
-            if (r.IsSuccess)
+            await MpdSendNoIdle();
+            CommandResult cm = await MpdSendCommand("listplaylistinfo \"" + playlistName + "\"");
+            if (cm.IsSuccess)
             {
-                if (ParseListAll(r.ResultText))
-                {
-                    //
-                }
-            }
+                result.IsSuccess = cm.IsSuccess;
+                result.PlaylistSongs = ParsePlaylistSongsResult(cm.ResultText);
 
-            return r;
+            }
+            await MpdSendIdle();
+
+            return result;
         }
 
         #region == Response parser methods ==
@@ -1369,19 +1684,10 @@ namespace MPDCtrl.Models
             if (MpdStop) { return false; }
             if (string.IsNullOrEmpty(result)) return false;
 
-            /*
-            if (result.Trim() == "OK\nOK")
-            {
-                DebugOutput?.Invoke(this, "<<<<(Error) " + "An empty result (OKOK) returened for a status command." + Environment.NewLine + Environment.NewLine);
-
-                Debug.WriteLine("@ParseStatus: An empty result (OKOK) returened for a status command.");
-
-                return false;
-            }
-            */
             if (result.Trim() == "OK")
             {
-                DebugOutput?.Invoke(this, "<<<<(Error) " + "An empty result (OK) returened for a status command." + Environment.NewLine + Environment.NewLine);
+                DebugCommandOutput?.Invoke(this, "################(Error) " + "An empty result (OK) returened for a status command." + Environment.NewLine + Environment.NewLine);
+                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ParseStatus", "An empty result (OK) returened for a status command.", "", Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
 
                 Debug.WriteLine("@ParseStatus: An empty result (OK)  returened for a status command.");
 
@@ -1400,6 +1706,8 @@ namespace MPDCtrl.Models
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
+                    _status.Reset();
+
                     foreach (string line in resultLines)
                     {
                         string[] StatusValuePair = line.Split(':');
@@ -1447,6 +1755,8 @@ namespace MPDCtrl.Models
                         try
                         {
                             _status.MpdVolume = Int32.Parse(MpdStatusValues["volume"]);
+
+                            _status.MpdVolumeIdSet = true;
                         }
                         catch (FormatException e)
                         {
@@ -1601,7 +1911,7 @@ namespace MPDCtrl.Models
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("Error@ParseStatusResponse:" + ex.Message);
+                Debug.WriteLine("Error@ParseStatusResponse:" + ex.Message);
 
                 IsBusy?.Invoke(this, false);
             }
@@ -1613,11 +1923,14 @@ namespace MPDCtrl.Models
         {
             if (MpdStop) return false;
 
+            // TODO: warning?
             if (string.IsNullOrEmpty(result)) return false;
 
-            List<string> resultLines = result.Split('\n').ToList();
+            if (result.Trim() == "OK") return true;
 
-            if (resultLines.Count == 0) return false;
+            List<string> resultLines = result.Split('\n').ToList();
+            if (resultLines == null) return true;
+            if (resultLines.Count == 0) return true;
 
             // aka Queue
 
@@ -1702,7 +2015,7 @@ namespace MPDCtrl.Models
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("Error@ParsePlaylistInfoResponse: " + ex.Message);
+                Debug.WriteLine("Error@ParsePlaylistInfoResponse: " + ex.Message);
 
                 return false;
             }
@@ -1934,6 +2247,7 @@ namespace MPDCtrl.Models
             return true;
         }
 
+        // TODO: 不要？
         private bool ParseSongResult(List<string> sl)
         {
             if (MpdStop) return false;
@@ -2040,6 +2354,229 @@ namespace MPDCtrl.Models
             return true;
         }
 
+        private bool ParseSearchResult(string result)
+        {
+            Debug.WriteLine("asdfasdf");
+            if (MpdStop) return false;
+
+            if (Application.Current == null) { return false; }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                SearchResult.Clear();
+            });
+
+            if (string.IsNullOrEmpty(result)) return false;
+
+            //if (result.Trim() == "OK") return true;
+
+            List<string> resultLines = result.Split('\n').ToList();
+            if (resultLines == null) return true;
+            if (resultLines.Count == 0) return true;
+            
+
+
+            // "listplaylist" .. songs containd in a playlist.
+            /*
+             file: Nina Simone/Cellular Soundtrack/Sinnerman (remix).mp3
+             Last-Modified: 2020-09-07T22:56:19Z
+             Artist: Nina Simone 
+             Album: Cellular Soundtrack
+             Title: Sinnerman (remix)
+             Genre: Soundtrack
+             Time: 274
+             duration: 274.364
+            */
+
+            // "find" search result
+            /*
+             file: 2Pac/Better Dayz/17 Better Dayz (Feat. Mr. Biggs).mp3
+             Last-Modified: 2011-02-27T14:20:18Z
+             Format: 44100:f:2
+             Time: 258
+             duration: 257.677
+             Artist: 2Pac
+             Album: Better Dayz
+             Title: Better Dayz (Feat. Mr. Biggs)
+             Track: 17
+             Genre: Rap
+             Date: 2002
+             */
+
+            try
+            {
+                var comparer = StringComparer.OrdinalIgnoreCase;
+                Dictionary<string, string> SongValues = new Dictionary<string, string>(comparer);
+
+                int i = 0;
+
+                foreach (string line in resultLines)
+                {
+                    string[] ValuePair = line.Split(':');
+                    if (ValuePair.Length > 1)
+                    {
+                        if (SongValues.ContainsKey(ValuePair[0].Trim()))
+                        {
+                            // Contains means new one.
+
+                            // save old one and clear songvalues.
+                            if (SongValues.ContainsKey("file"))
+                            {
+                                Song sng = FillSong(SongValues, i);
+
+                                i++;
+
+                                SongValues.Clear();
+
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    SearchResult.Add(sng);
+                                });
+
+                            }
+
+                            // start over
+                            SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
+                        }
+                        else
+                        {
+                            SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
+                        }
+
+                    }
+                }
+
+                // last one
+                if ((SongValues.Count > 0) && SongValues.ContainsKey("file"))
+                {
+                    Song sng = FillSong(SongValues, i);
+
+                    SongValues.Clear();
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        SearchResult.Add(sng);
+                    });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error@ParseSearchResult: " + ex.Message);
+
+                return false;
+            }
+
+            return true;
+        }
+
+        private ObservableCollection<Song> ParsePlaylistSongsResult(string result)
+        {
+            ObservableCollection<Song> songList = new ObservableCollection<Song>();
+
+            if (MpdStop) return songList;
+
+            if (string.IsNullOrEmpty(result)) return songList;
+
+            if (result.Trim() == "OK") return songList;
+
+            List<string> resultLines = result.Split('\n').ToList();
+            if (resultLines == null) return songList;
+            if (resultLines.Count == 0) return songList;
+
+
+            // "listplaylist" .. songs containd in a playlist.
+            /*
+             file: Nina Simone/Cellular Soundtrack/Sinnerman (remix).mp3
+             Last-Modified: 2020-09-07T22:56:19Z
+             Artist: Nina Simone 
+             Album: Cellular Soundtrack
+             Title: Sinnerman (remix)
+             Genre: Soundtrack
+             Time: 274
+             duration: 274.364
+            */
+
+            // "find" search result
+            /*
+             file: 2Pac/Better Dayz/17 Better Dayz (Feat. Mr. Biggs).mp3
+             Last-Modified: 2011-02-27T14:20:18Z
+             Format: 44100:f:2
+             Time: 258
+             duration: 257.677
+             Artist: 2Pac
+             Album: Better Dayz
+             Title: Better Dayz (Feat. Mr. Biggs)
+             Track: 17
+             Genre: Rap
+             Date: 2002
+             */
+
+            try
+            {
+                var comparer = StringComparer.OrdinalIgnoreCase;
+                Dictionary<string, string> SongValues = new Dictionary<string, string>(comparer);
+
+                int i = 0;
+
+                foreach (string line in resultLines)
+                {
+                    string[] ValuePair = line.Split(':');
+                    if (ValuePair.Length > 1)
+                    {
+                        if (SongValues.ContainsKey(ValuePair[0].Trim()))
+                        {
+                            // Contains means new one.
+
+                            // save old one and clear songvalues.
+                            if (SongValues.ContainsKey("file"))
+                            {
+                                Song sng = FillSong(SongValues, i);
+
+                                i++;
+
+                                SongValues.Clear();
+
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    songList.Add(sng);
+                                });
+                            }
+
+                            // start over
+                            SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
+                        }
+                        else
+                        {
+                            SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
+                        }
+
+                    }
+                }
+
+                // last one
+                if ((SongValues.Count > 0) && SongValues.ContainsKey("file"))
+                {
+                    Song sng = FillSong(SongValues, i);
+
+                    SongValues.Clear();
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        songList.Add(sng);
+                    });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error@ParseSearchResult: " + ex.Message);
+
+                return songList;
+            }
+
+            return songList;
+        }
+
         private Song FillSong(Dictionary<string, string> SongValues, int i)
         {
 
@@ -2139,10 +2676,13 @@ namespace MPDCtrl.Models
 
         #endregion
 
-        #region == Other Commands ==
+        #region == MPD Commands ==
 
         public async Task<CommandResult> MpdPlaybackPlay(string songId = "")
         {
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
             string cmd;
 
             if (songId != "")
@@ -2154,116 +2694,91 @@ namespace MPDCtrl.Models
                 cmd = "play";
             }
 
-            CommandResult result = await MpdSendNoIdle();
-            if (result.IsSuccess)
-            {
-                result = await MpdSendCommandWithNoData(cmd);
-                if (result.IsSuccess)
-                {
-                    result = await MpdSendIdle();
-                    if (result.IsSuccess)
-                    {
-
-                    }
-                }
-            }
+            CommandResult result = await MpdSendCommand(cmd, true);
 
             return result;
         }
 
         public async Task<CommandResult> MpdPlaybackPause()
         {
-            CommandResult result = await MpdSendNoIdle();
-            if (result.IsSuccess)
-            {
-                result = await MpdSendCommandWithNoData("pause 1");
-                if (result.IsSuccess)
-                {
-                    result = await MpdSendIdle();
-                    if (result.IsSuccess)
-                    {
-
-                    }
-                }
-            }
+            Task<bool> check = CheckCommandQueue();
+            await check;
+            
+            CommandResult result = await MpdSendCommand("pause 1", true);
 
             return result;
         }
 
-        public async Task<CommandResult> MpdPlaybackResume()
+        public async Task<CommandResult> MpdPlaybackResume(int volume)
         {
-            CommandResult result = await MpdSendNoIdle();
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            /*
+            await MpdSendNoIdle();
+            CommandResult result = await MpdSendCommand("pause 0");
             if (result.IsSuccess)
             {
-                result = await MpdSendCommandWithNoData("pause 0");
-                if (result.IsSuccess)
-                {
-                    result = await MpdSendIdle();
-                    if (result.IsSuccess)
-                    {
-
-                    }
-                }
+                //
             }
+            await MpdSendIdle();
+            */
+            
 
-            return result;
+            if (MpdStatus.MpdVolumeIdSet)
+            {
+                CommandResult result = await MpdSendCommand("pause 0", true);
+
+                return result;
+            }
+            else
+            {
+                string cmd = "command_list_begin" + "\n";
+                cmd = cmd + "pause 0\n";
+                cmd = cmd + "setvol " + volume.ToString() + "\n";
+                cmd = cmd + "command_list_end" + "\n";
+
+                CommandResult result = await MpdSendCommand(cmd, true);
+
+                return result;
+            }
         }
 
         public async Task<CommandResult> MpdPlaybackStop()
         {
-            CommandResult result = await MpdSendNoIdle();
-            if (result.IsSuccess)
-            {
-                result = await MpdSendCommandWithNoData("stop");
-                if (result.IsSuccess)
-                {
-                    result = await MpdSendIdle();
-                    if (result.IsSuccess)
-                    {
+            Task<bool> check = CheckCommandQueue();
+            await check;
 
-                    }
-                }
-            }
+            CommandResult result = await MpdSendCommand("stop", true);
 
             return result;
         }
 
         public async Task<CommandResult> MpdPlaybackNext()
         {
-            CommandResult result = await MpdSendNoIdle();
-            if (result.IsSuccess)
-            {
-                result = await MpdSendCommandWithNoData("next");
-                if (result.IsSuccess)
-                {
-                    result = await MpdSendIdle();
-                    if (result.IsSuccess)
-                    {
+            Task<bool> check = CheckCommandQueue();
+            await check;
 
-                    }
-                }
-            }
+            CommandResult result = await MpdSendCommand("next", true);
 
             return result;
         }
 
         public async Task<CommandResult> MpdPlaybackPrev()
         {
-            CommandResult result = await MpdSendNoIdle();
-            if (result.IsSuccess)
-            {
-                result = await MpdSendCommandWithNoData("previous");
-                if (result.IsSuccess)
-                {
-                    result = await MpdSendIdle();
-                }
-            }
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            CommandResult result = await MpdSendCommand("previous", true);
 
             return result;
         }
 
         public async Task<CommandResult> MpdSetVolume(int v)
         {
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
             if (v == _status.MpdVolume) 
             {
                 CommandResult f = new CommandResult();
@@ -2271,50 +2786,488 @@ namespace MPDCtrl.Models
                 return f;
             }
 
-            CommandResult result = await MpdSendNoIdle();
-            if (result.IsSuccess)
-                result = await MpdSendCommandWithNoData("setvol " + v.ToString());
-            if (result.IsSuccess)
-                result = await MpdSendIdle();
+            CommandResult result = await MpdSendCommand("setvol " + v.ToString(), true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdPlaybackSeek(string songId, int seekTime)
+        {
+            if ((songId == "") || (seekTime == 0)) 
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = true;
+                return f;
+            }
+
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            CommandResult result = await MpdSendCommand("seekid " + songId + " " + seekTime.ToString(), true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdSetRepeat(bool on)
+        {
+            if (_status.MpdRepeat == on)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = true;
+                return f;
+            }
+
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            string cmd = "";
+            if (on)
+            {
+                cmd = "repeat 1";
+            }
+            else
+            {
+                cmd = "repeat 0";
+            }
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdSetRandom(bool on)
+        {
+            if (_status.MpdRandom == on)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = true;
+                return f;
+            }
+
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            string cmd = "";
+            if (on)
+            {
+                cmd = "random 1";
+            }
+            else
+            {
+                cmd = "random 0";
+            }
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdSetConsume(bool on)
+        {
+            if (_status.MpdConsume == on)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = true;
+                return f;
+            }
+
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            string cmd = "";
+            if (on)
+            {
+                cmd = "consume 1";
+            }
+            else
+            {
+                cmd = "consume 0";
+            }
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdSetSingle(bool on)
+        {
+            if (_status.MpdSingle == on)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = true;
+                return f;
+            }
+
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            string cmd = "";
+            if (on)
+            {
+                cmd = "single 1";
+            }
+            else
+            {
+                cmd = "single 0";
+            }
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdClear()
+        {
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            CommandResult result = await MpdSendCommand("clear", true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdSave(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            playlistName = Regex.Escape(playlistName);
+
+            CommandResult result = await MpdSendCommand("save \"" + playlistName + "\"", true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdAdd(string uri)
+        {
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            if (string.IsNullOrEmpty(uri))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            uri = Regex.Escape(uri);
+
+            CommandResult result = await MpdSendCommand("add \"" + uri + "\"", true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdAdd(List<string> uris)
+        {
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            if (uris.Count < 1)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            string cmd = "";
+            cmd = "command_list_begin" + "\n";
+            foreach (var uri in uris)
+            {
+                var urie = Regex.Escape(uri);
+                cmd = cmd + "add \"" + urie + "\"\n";
+            }
+            cmd = cmd + "command_list_end" + "\n";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdDeleteId(List<string> ids)
+        {
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            if (ids.Count < 1)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            string cmd = "";
+            cmd = "command_list_begin" + "\n";
+            foreach (var id in ids)
+            {
+                cmd = cmd + "deleteid " + id + "\n";
+            }
+            cmd = cmd + "command_list_end" + "\n";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdMoveId(Dictionary<string, string> IdToNewPosPair)
+        {
+            if (IdToNewPosPair == null)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+            if (IdToNewPosPair.Count < 1)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            string cmd = "";
+            cmd = "command_list_begin" + "\n";
+            foreach (KeyValuePair<string, string> pair in IdToNewPosPair)
+            {
+                cmd = cmd + "moveid " + pair.Key + " " + pair.Value + "\n";
+            }
+            cmd = cmd + "command_list_end" + "\n";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdChangePlaylist(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            playlistName = Regex.Escape(playlistName);
+
+            string cmd = "command_list_begin" + "\n";
+            cmd = cmd + "clear" + "\n";
+            cmd = cmd + "load \"" + playlistName + "\"\n";
+            cmd = cmd + "command_list_end" + "\n";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdLoadPlaylist(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            playlistName = Regex.Escape(playlistName);
+
+            string cmd = "load \"" + playlistName + "\"";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdRenamePlaylist(string playlistName, string newPlaylistName)
+        {
+            if (string.IsNullOrEmpty(playlistName) || string.IsNullOrEmpty(newPlaylistName))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            playlistName = Regex.Escape(playlistName);
+            newPlaylistName = Regex.Escape(newPlaylistName);
+
+            string cmd = "rename \"" + playlistName + "\" \"" + newPlaylistName + "\"";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdRemovePlaylist(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            playlistName = Regex.Escape(playlistName);
+
+            string cmd = "rm \"" + playlistName + "\"";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdPlaylistAdd(string playlistName, List<string> uris)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+            if (uris == null)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+            if (uris.Count < 1)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            Task<bool> check = CheckCommandQueue();
+            await check;
+
+            playlistName = Regex.Escape(playlistName);
+
+
+            string cmd = "command_list_begin" + "\n";
+            foreach (var uri in uris)
+            {
+                var urie = Regex.Escape(uri);
+                cmd = cmd + "playlistadd " + "\"" + playlistName + "\"" + " " + "\"" + urie + "\"\n";
+            }
+            cmd = cmd + "command_list_end" + "\n";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
 
             return result;
         }
 
         /*
+        public async void MpdQueryAlbumArt(string uri, string songId)
+        {
+            if (string.IsNullOrEmpty(uri))
+                return;
 
-MpdPlaybackSeek(string songId, int seekTime)
+            // wait for a second. 
+            await Task.Delay(100);
+
+            if (_albumCover.IsDownloading)
+            {
+                //System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading. Ignoring.");
+                //return;
+            }
+
+            if (_albumCover.SongFilePath == uri)
+            {
+                //System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.SongFilePath == uri. Ignoring.");
+                //return;
+            }
+
+            if (songId != MpdStatus.MpdSongID)
+            {
+                // probably you double clicked on "Next song".
+                System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: songId != MpdStatus.MpdSongID. Ignoring.");
+                return;
+            }
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                _albumCover = new AlbumCover();
+                _albumCover.IsDownloading = true;
+                _albumCover.SongFilePath = uri;
+                _albumCover.AlbumImageSource = null;
+                _albumCover.BinaryData =  new byte[0];
+                _albumCover.BinarySize = 0;
+            });
+
+            uri = Regex.Escape(uri);
+
+            try
+            {
+                string mpdCommand = "albumart \"" + uri + "\" 0" + "\n";
+                //string mpdCommand = "readpicture \"" + uri + "\" 0" + "\n";
+                 
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: " + ex.Message);
+            }
+        }
+
+        private async void MpdReQueryAlbumArt(string uri, int offset)
+        {
+            if (string.IsNullOrEmpty(uri))
+                return;
+
+            // wait for a bit. 
+            await Task.Delay(100);
 
 
+            if (!_albumCover.IsDownloading)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading == false. Ignoring.");
+                return;
+            }
 
-MpdSetRepeat(bool on)
-MpdSetRandom(bool on)
-MpdSetConsume(bool on)
-MpdSetSingle(bool on)
+            if (_albumCover.SongFilePath != uri)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.SongFilePath != uri. Ignoring.");
+                _albumCover.IsDownloading = false;
 
-MpdClear
-MpdSave(string playlistName)
-MpdAdd(string uri)
-MpdAdd(List<string> uris)
-MpdDeleteId(List<string> ids)
-MpdMoveId(Dictionary<string, string> IdToNewPosPair)
+                return;
+            }
 
-        
-MpdQueryListPlaylistinfo(string playlistName)
+            uri = Regex.Escape(uri);
 
-MpdChangePlaylist(string playlistName)
-MpdLoadPlaylist(string playlistName)
-MpdRenamePlaylist(string playlistName, string newPlaylistName)
-MpdRemovePlaylist(string playlistName)
-MpdPlaylistAdd(string playlistName, List<string> uris)
+            try
+            {
+                string mpdCommand = "albumart \"" + uri + "\" " + offset.ToString() + "\n";
+                //string mpdCommand = "readpicture \"" + uri + "\" " + offset.ToString() + "\n";
 
-
-MpdSearch(string queryTag, string queryShiki, string queryValue)
-
-MpdQueryAlbumArt(string uri, string songId)
-MpdReQueryAlbumArt(string uri, int offset)
-
-
-
+                _asyncClient.Send("noidle" + "\n");
+                _asyncClient.Send(mpdCommand);
+                _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@MpdReQueryAlbumArt: " + ex.Message);
+            }
+        }
 
 
         */
@@ -2322,6 +3275,124 @@ MpdReQueryAlbumArt(string uri, int offset)
         #endregion
 
         #endregion
+
+        #region == Idle connection ==
+
+
+        /*
+        private async Task<ConnectionResult> MpdIdleConnect(string host, int port)
+        {
+
+            DebugIdleOutput?.Invoke(this, "TCP Idle Connection: Trying to connect." + "\n" + "\n");
+
+            //ConnectionState = ConnectionStatus.Connecting;
+
+            ConnectionResult ret = new ConnectionResult();
+
+            _idleConnection = new TcpClient();
+
+            try
+            {
+                await _idleConnection.ConnectAsync(host, port);
+
+                if (_idleConnection.Client.Connected)
+                {
+                    DebugIdleOutput?.Invoke(this, "TCP Idle Connection: Connection established." + "\n" + "\n");
+
+                    //ConnectionState = ConnectionStatus.Connected;
+
+                    var tcpStream = _idleConnection.GetStream();
+                    tcpStream.ReadTimeout = System.Threading.Timeout.Infinite;
+
+                    _idleReader = new StreamReader(tcpStream);
+                    _idleWriter = new StreamWriter(tcpStream);
+                    _idleWriter.AutoFlush = true;
+
+                    string response = await _idleReader.ReadLineAsync();
+
+                    if (response.StartsWith("OK MPD "))
+                    {
+                        //_mpdVer = response.Replace("OK MPD ", string.Empty);
+
+                        Debug.WriteLine(response.Trim() + " @MPC.MpdIdleConnect");
+
+                        DebugIdleOutput?.Invoke(this, "<<" + response.Trim() + "\n" + "\n");
+
+                        IsMpdIdleConnected = true;
+
+                        ret.IsSuccess = true;
+                        ret.ErrorMessage = "";
+                    }
+                    else
+                    {
+                        DebugIdleOutput?.Invoke(this, "TCP Idle Connection: MPD did not respond with proper respose." + "\n" + "\n");
+
+                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                        ConnectionError?.Invoke(this, "TCP connection error: MPD did not respond with proper respose.");
+                    }
+                }
+                else
+                {
+                    //?
+
+                    Debug.WriteLine("**** !client.Client.Connected");
+
+                    DebugIdleOutput?.Invoke(this, "TCP Idle Connection: FAIL to established... Client not connected." + "\n" + "\n");
+
+                    //ConnectionState = ConnectionStatus.NeverConnected;
+
+                    ConnectionError?.Invoke(this, "TCP Idle Connection: FAIL to established... Client not connected.");
+                }
+            }
+            catch (Exception e)
+            {
+                // TODO: Test.
+
+                DebugIdleOutput?.Invoke(this, "TCP Idle Connection: Error while connecting. Fail to connect: " + e.Message + "\n" + "\n");
+
+                ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                ConnectionError?.Invoke(this, "TCP connection error: " + e.Message);
+            }
+
+            return ret;
+        }
+        */
+
+        #endregion
+
+
+        public void MpdDisconnect()
+        {
+            try
+            {
+                ConnectionState = ConnectionStatus.Disconnecting;
+
+                _commandConnection.Client.Shutdown(SocketShutdown.Both);
+                _commandConnection.Close();
+            }
+            catch { }
+            {
+                ConnectionState = ConnectionStatus.DisconnectedByUser;
+            }
+
+            try
+            {
+                ConnectionState = ConnectionStatus.Disconnecting;
+
+                _idleConnection.Client.Shutdown(SocketShutdown.Both);
+                _idleConnection.Close();
+            }
+            catch { }
+            finally
+            {
+                ConnectionState = ConnectionStatus.DisconnectedByUser;
+            }
+
+        }
+
+
     }
 }
 

@@ -51,7 +51,7 @@
                 <RowDefinition Height="0"/>
                 <RowDefinition Height="0"/>
                 <RowDefinition Height="0"/>
-                <RowDefinition Height="23"/>
+                <RowDefinition Height="28"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -752,10 +752,339 @@
                     </Grid>
 
                     <Grid Visibility="{Binding IsPlaylistsVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
-                        
+                        <Grid x:Name="PlaylistsListviewDummy" Grid.Row="1" Visibility="Hidden" Margin="0 0 20 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0" />
+                                <ColumnDefinition Width="32" />
+                                <ColumnDefinition Width="1*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!--  This is the hidden helper Field which is used to bind to, using the "Fill" column of the helper grid  -->
+                            <Grid x:Name="PlaylistsListviewDummy0" Grid.Column="0" />
+                            <Grid x:Name="PlaylistsListviewDummy1" Grid.Column="1" />
+                            <Grid x:Name="PlaylistsListviewDummy2" Grid.Column="2" />
+                        </Grid>
+
+                        <ListView x:Name="PlaylistsListview" ItemsSource="{Binding Playlists}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                            <ListView.Resources>
+                                <ContextMenu x:Key="PlaylistsListviewItemContextMenu">
+                                    <MenuItem Header="{x:Static properties:Resources.SongFilesItemContextMenu_Add}" Command="{Binding Path=DataContext.SongFilesListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                        <MenuItem.Resources>
+                                            <ControlTemplate x:Key="PlusIcon">
+                                                <Canvas Background="Transparent" >
+                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                                                </Canvas>
+                                            </ControlTemplate>
+                                        </MenuItem.Resources>
+                                        <MenuItem.Icon>
+                                            <ContentControl Template="{StaticResource PlusIcon}" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </ContextMenu>
+                                <Style TargetType="{x:Type ScrollBar}">
+                                    <Setter Property="Margin" Value="0,0,0,0" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Style.Triggers>
+                                        <Trigger Property="Orientation" Value="Vertical">
+                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Height" Value="Auto" />
+                                            <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListView.Resources>
+
+                            <ListView.View>
+                                <GridView>
+                                    <GridView.ColumnHeaderContainerStyle>
+                                        <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource GridViewColumnHeaderClickStyle}">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </Style>
+                                    </GridView.ColumnHeaderContainerStyle>
+
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistsListviewDummy0, Path=ActualWidth}">
+                                        <GridViewColumnHeader Content=""/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock Padding="3" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistsListviewDummy1, Path=ActualWidth}">
+                                        <GridViewColumnHeader Content=""/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Viewbox Width="16" Height="16">
+                                                    <Canvas Width="24" Height="24">
+                                                        <Path x:Name="MusicFileIcon" Fill="{DynamicResource ControlMediumColorBrush}" Canvas.Top="0" Stretch="Uniform" Data="" />
+                                                    </Canvas>
+                                                </Viewbox>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="MusicFileIcon" Property="Fill" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistsListviewDummy2, Path=ActualWidth}">
+                                        <GridViewColumnHeader Content="Playlists"/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock x:Name="PlaylistsListviewSongTitleListItemTextBlock" Text="{Binding }" Padding="3" />
+                                                </StackPanel>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="PlaylistsListviewSongTitleListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                </GridView>
+                            </ListView.View>
+
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
+                                    <Setter Property="ContextMenu" Value="{StaticResource PlaylistsListviewItemContextMenu}" />
+                                    <Setter Property="Margin" Value="0 0 0 0"/>
+                                    <Setter Property="Padding" Value="0 1 0 1"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                                <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
+                                                    <Border.InputBindings>
+
+                                                    </Border.InputBindings>
+                                                    <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+
+                        </ListView>
+
                     </Grid>
+                    
                     <Grid Visibility="{Binding IsPlaylistItemVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
-                        
+                        <Grid x:Name="PlaylistSongsListviewDummy" Visibility="Hidden" Margin="0 0 20 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0" />
+                                <ColumnDefinition Width="32" />
+                                <ColumnDefinition Width="5*" />
+                                <ColumnDefinition Width="62" />
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="2*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!--  This is the hidden helper Field which is used to bind to, using the "Fill" column of the helper grid  -->
+                            <Grid x:Name="PlaylistSongsListviewDummy0" Grid.Column="0" />
+                            <Grid x:Name="PlaylistSongsListviewDummy1" Grid.Column="1" />
+                            <Grid x:Name="PlaylistSongsListviewDummy2" Grid.Column="2" />
+                            <Grid x:Name="PlaylistSongsListviewDummy3" Grid.Column="3" />
+                            <Grid x:Name="PlaylistSongsListviewDummy4" Grid.Column="4" />
+                            <Grid x:Name="PlaylistSongsListviewDummy5" Grid.Column="5" />
+                            <Grid x:Name="PlaylistSongsListviewDummy6" Grid.Column="6" />
+                            <Grid x:Name="PlaylistSongsListviewDummy7" Grid.Column="7" />
+                        </Grid>
+
+                        <ListView x:Name="PlaylistSongsListview" Grid.Row="1" ItemsSource="{Binding PlaylistSongs}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                            <ListView.Resources>
+                                <ContextMenu x:Key="PlaylistSongsListviewItemContextMenu">
+                                    <MenuItem Header="{x:Static properties:Resources.SongsItemContextMenu_Add}" Command="{Binding Path=DataContext.SongsListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                        <MenuItem.Resources>
+                                            <ControlTemplate x:Key="PlusIcon">
+                                                <Canvas Background="Transparent" >
+                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                                                </Canvas>
+                                            </ControlTemplate>
+                                        </MenuItem.Resources>
+                                        <MenuItem.Icon>
+                                            <ContentControl Template="{StaticResource PlusIcon}" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </ContextMenu>
+                                <Style TargetType="{x:Type ScrollBar}">
+                                    <Setter Property="Margin" Value="0,0,0,0" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Style.Triggers>
+                                        <Trigger Property="Orientation" Value="Vertical">
+                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Height" Value="Auto" />
+                                            <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListView.Resources>
+
+                            <ListView.View>
+                                <GridView>
+                                    <GridView.ColumnHeaderContainerStyle>
+                                        <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource GridViewColumnHeaderClickStyle}">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </Style>
+                                    </GridView.ColumnHeaderContainerStyle>
+
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy0, Path=ActualWidth}">
+                                        <GridViewColumnHeader Content=""/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock Text="" Padding="3" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy1, Path=ActualWidth}">
+                                        <GridViewColumnHeader Content="">
+                                        </GridViewColumnHeader>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Viewbox Width="16" Height="16">
+                                                    <Canvas Width="24" Height="24">
+                                                        <Path x:Name="MusicFileIcon" Fill="{DynamicResource ControlMediumColorBrush}" Canvas.Top="0" Stretch="Uniform" Data="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,13H11V18A2,2 0 0,1 9,20A2,2 0 0,1 7,18A2,2 0 0,1 9,16C9.4,16 9.7,16.1 10,16.3V11H13V13M13,9V3.5L18.5,9H13Z" />
+                                                    </Canvas>
+                                                </Viewbox>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="MusicFileIcon" Property="Fill" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy2, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Title">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Title}"/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock x:Name="PlaylistSongsListviewSongTitleListItemTextBlock" Text="{Binding Path=Title}" Padding="3" />
+                                                </StackPanel>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="PlaylistSongsListviewSongTitleListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy3, Path=ActualWidth}" helpers:GridViewSort.PropertyName="TimeSort">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Time}"/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock x:Name="PlaylistSongsListviewTimeListItemTextBlock" Text="{Binding Path=TimeFormated}" Padding="3" />
+                                                </StackPanel>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="PlaylistSongsListviewTimeListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy4, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Artist">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Artist}"/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock x:Name="PlaylistSongsListviewArtistListItemTextBlock" Text="{Binding Path=Artist}" Padding="3" />
+                                                </StackPanel>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="PlaylistSongsListviewArtistListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy5, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Album">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Album}"/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock x:Name="PlaylistSongsListviewAlbumListItemTextBlock" Text="{Binding Path=Album}" Padding="3" />
+                                                </StackPanel>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="PlaylistSongsListviewAlbumListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy6, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Genre">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Genre}"/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock x:Name="PlaylistSongsListviewGenreListItemTextBlock" Text="{Binding Path=Genre}" Padding="3" />
+                                                </StackPanel>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="PlaylistSongsListviewGenreListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy7, Path=ActualWidth}" helpers:GridViewSort.PropertyName="LastModified">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_LastModified}"/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock x:Name="PlaylistSongsListviewLastModifiedListItemTextBlock" Text="{Binding Path=LastModifiedFormated}" Padding="3" />
+                                                </StackPanel>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="PlaylistSongsListviewLastModifiedListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
+                                    <Setter Property="ContextMenu" Value="{StaticResource PlaylistSongsListviewItemContextMenu}" />
+                                    <Setter Property="Margin" Value="0 0 0 0"/>
+                                    <Setter Property="Padding" Value="0 1 0 1"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                                <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
+                                                    <Border.InputBindings>
+
+                                                    </Border.InputBindings>
+                                                    <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+
+                        </ListView>
+
                     </Grid>
 
                     <Grid Visibility="{Binding IsBrowseVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
@@ -1194,10 +1523,10 @@
 
                         </Grid>
 
-                        <Grid x:Name="SongListviewDummy" Visibility="Hidden" Margin="0 0 20 0">
+                        <Grid x:Name="SearchResultListviewDummy" Visibility="Hidden" Margin="0 0 20 0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="0" />
-                                <ColumnDefinition Width="0" />
+                                <ColumnDefinition Width="32" />
                                 <ColumnDefinition Width="5*" />
                                 <ColumnDefinition Width="62" />
                                 <ColumnDefinition Width="2*" />
@@ -1207,19 +1536,19 @@
                             </Grid.ColumnDefinitions>
 
                             <!--  This is the hidden helper Field which is used to bind to, using the "Fill" column of the helper grid  -->
-                            <Grid x:Name="SongListviewDummy0" Grid.Column="0" />
-                            <Grid x:Name="SongListviewDummy1" Grid.Column="1" />
-                            <Grid x:Name="SongListviewDummy2" Grid.Column="2" />
-                            <Grid x:Name="SongListviewDummy3" Grid.Column="3" />
-                            <Grid x:Name="SongListviewDummy4" Grid.Column="4" />
-                            <Grid x:Name="SongListviewDummy5" Grid.Column="5" />
-                            <Grid x:Name="SongListviewDummy6" Grid.Column="6" />
-                            <Grid x:Name="SongListviewDummy7" Grid.Column="7" />
+                            <Grid x:Name="SearchResultListviewDummy0" Grid.Column="0" />
+                            <Grid x:Name="SearchResultListviewDummy1" Grid.Column="1" />
+                            <Grid x:Name="SearchResultListviewDummy2" Grid.Column="2" />
+                            <Grid x:Name="SearchResultListviewDummy3" Grid.Column="3" />
+                            <Grid x:Name="SearchResultListviewDummy4" Grid.Column="4" />
+                            <Grid x:Name="SearchResultListviewDummy5" Grid.Column="5" />
+                            <Grid x:Name="SearchResultListviewDummy6" Grid.Column="6" />
+                            <Grid x:Name="SearchResultListviewDummy7" Grid.Column="7" />
                         </Grid>
 
-                        <ListView x:Name="SongsListview" Grid.Row="1" ItemsSource="{Binding SearchResult}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                        <ListView x:Name="SearchResultListview" Grid.Row="1" ItemsSource="{Binding SearchResult}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible">
                             <ListView.Resources>
-                                <ContextMenu x:Key="SongsListviewItemContextMenu">
+                                <ContextMenu x:Key="SearchResultListviewItemContextMenu">
                                     <MenuItem Header="{x:Static properties:Resources.SongsItemContextMenu_Add}" Command="{Binding Path=DataContext.SongsListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                         <MenuItem.Resources>
                                             <ControlTemplate x:Key="PlusIcon">
@@ -1253,129 +1582,125 @@
                                             <Setter Property="Visibility" Value="Visible" />
                                         </Style>
                                     </GridView.ColumnHeaderContainerStyle>
+                                    <GridViewColumn Width="{Binding ElementName=SearchResultListviewDummy0, Path=ActualWidth}">
+                                        <GridViewColumnHeader Content=""/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock Text="" Padding="3" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
 
-                                    <!--
-                                                        <GridViewColumn Width="{Binding ElementName=SongListviewDummy0, Path=ActualWidth}">
-                                                            <GridViewColumnHeader Content=""/>
-                                                            <GridViewColumn.CellTemplate>
-                                                                <DataTemplate>
-                                                                    <StackPanel>
-                                                                        <TextBlock Text="" Padding="3" />
-                                                                    </StackPanel>
-                                                                </DataTemplate>
-                                                            </GridViewColumn.CellTemplate>
-                                                        </GridViewColumn>
-
-                                                        <GridViewColumn Width="{Binding ElementName=SongListviewDummy1, Path=ActualWidth}">
-                                                            <GridViewColumnHeader Content="">
-                                                            </GridViewColumnHeader>
-                                                            <GridViewColumn.CellTemplate>
-                                                                <DataTemplate>
-                                                                    <Viewbox Width="16" Height="16">
-                                                                        <Canvas Width="24" Height="24">
-                                                                            <Path x:Name="MusicFileIcon" Fill="{DynamicResource ControlMediumColorBrush}" Canvas.Top="0" Stretch="Uniform" Data="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,13H11V18A2,2 0 0,1 9,20A2,2 0 0,1 7,18A2,2 0 0,1 9,16C9.4,16 9.7,16.1 10,16.3V11H13V13M13,9V3.5L18.5,9H13Z" />
-                                                                        </Canvas>
-                                                                    </Viewbox>
-                                                                    <DataTemplate.Triggers>
-                                                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                                            <Setter TargetName="MusicFileIcon" Property="Fill" Value="#111111" />
-                                                                        </DataTrigger>
-                                                                    </DataTemplate.Triggers>
-                                                                </DataTemplate>
-                                                            </GridViewColumn.CellTemplate>
-                                                        </GridViewColumn>
-                                                        -->
-
-                                    <GridViewColumn Width="{Binding ElementName=SongListviewDummy2, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Title">
+                                    <GridViewColumn Width="{Binding ElementName=SearchResultListviewDummy1, Path=ActualWidth}">
+                                        <GridViewColumnHeader Content="">
+                                        </GridViewColumnHeader>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Viewbox Width="16" Height="16">
+                                                    <Canvas Width="24" Height="24">
+                                                        <Path x:Name="MusicFileIcon" Fill="{DynamicResource ControlMediumColorBrush}" Canvas.Top="0" Stretch="Uniform" Data="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,13H11V18A2,2 0 0,1 9,20A2,2 0 0,1 7,18A2,2 0 0,1 9,16C9.4,16 9.7,16.1 10,16.3V11H13V13M13,9V3.5L18.5,9H13Z" />
+                                                    </Canvas>
+                                                </Viewbox>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="MusicFileIcon" Property="Fill" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="{Binding ElementName=SearchResultListviewDummy2, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Title">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Title}"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="SongsListviewSongTitleListItemTextBlock" Text="{Binding Path=Title}" Padding="3" />
+                                                    <TextBlock x:Name="SearchResultListviewSongTitleListItemTextBlock" Text="{Binding Path=Title}" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="SongsListviewSongTitleListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="SearchResultListviewSongTitleListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
-                                    <GridViewColumn Width="{Binding ElementName=SongListviewDummy3, Path=ActualWidth}" helpers:GridViewSort.PropertyName="TimeSort">
+                                    <GridViewColumn Width="{Binding ElementName=SearchResultListviewDummy3, Path=ActualWidth}" helpers:GridViewSort.PropertyName="TimeSort">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Time}"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="SongsListviewTimeListItemTextBlock" Text="{Binding Path=TimeFormated}" Padding="3" />
+                                                    <TextBlock x:Name="SearchResultListviewTimeListItemTextBlock" Text="{Binding Path=TimeFormated}" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="SongsListviewTimeListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="SearchResultListviewTimeListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
-                                    <GridViewColumn Width="{Binding ElementName=SongListviewDummy4, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Artist">
+                                    <GridViewColumn Width="{Binding ElementName=SearchResultListviewDummy4, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Artist">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Artist}"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="SongsListviewArtistListItemTextBlock" Text="{Binding Path=Artist}" Padding="3" />
+                                                    <TextBlock x:Name="SearchResultListviewArtistListItemTextBlock" Text="{Binding Path=Artist}" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="SongsListviewArtistListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="SearchResultListviewArtistListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
-                                    <GridViewColumn Width="{Binding ElementName=SongListviewDummy5, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Album">
+                                    <GridViewColumn Width="{Binding ElementName=SearchResultListviewDummy5, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Album">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Album}"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="SongsListviewAlbumListItemTextBlock" Text="{Binding Path=Album}" Padding="3" />
+                                                    <TextBlock x:Name="SearchResultListviewAlbumListItemTextBlock" Text="{Binding Path=Album}" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="SongsListviewAlbumListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="SearchResultListviewAlbumListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
-                                    <GridViewColumn Width="{Binding ElementName=SongListviewDummy6, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Genre">
+                                    <GridViewColumn Width="{Binding ElementName=SearchResultListviewDummy6, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Genre">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Genre}"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="SongsListviewGenreListItemTextBlock" Text="{Binding Path=Genre}" Padding="3" />
+                                                    <TextBlock x:Name="SearchResultListviewGenreListItemTextBlock" Text="{Binding Path=Genre}" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="SongsListviewGenreListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="SearchResultListviewGenreListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
-                                    <GridViewColumn Width="{Binding ElementName=SongListviewDummy7, Path=ActualWidth}" helpers:GridViewSort.PropertyName="LastModified">
+                                    <GridViewColumn Width="{Binding ElementName=SearchResultListviewDummy7, Path=ActualWidth}" helpers:GridViewSort.PropertyName="LastModified">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_LastModified}"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="SongsListviewLastModifiedListItemTextBlock" Text="{Binding Path=LastModifiedFormated}" Padding="3" />
+                                                    <TextBlock x:Name="SearchResultListviewLastModifiedListItemTextBlock" Text="{Binding Path=LastModifiedFormated}" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="SongsListviewLastModifiedListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="SearchResultListviewLastModifiedListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -1385,7 +1710,7 @@
                             </ListView.View>
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
-                                    <Setter Property="ContextMenu" Value="{StaticResource SongsListviewItemContextMenu}" />
+                                    <Setter Property="ContextMenu" Value="{StaticResource SearchResultListviewItemContextMenu}" />
                                     <Setter Property="Margin" Value="0 0 0 0"/>
                                     <Setter Property="Padding" Value="0 1 0 1"/>
                                     <Setter Property="HorizontalContentAlignment" Value="Left"/>
@@ -1418,32 +1743,74 @@
 
             <Grid x:Name="DebugWindow" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Visibility="Collapsed">
 
-                <TextBox x:Name="DebugTextBox" Padding="6 6 24 6" Height="{Binding ElementName=DebugWindow, Path=ActualHeight}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                    <TextBox.Resources>
-                        <Style TargetType="{x:Type ScrollBar}">
-                            <Setter Property="Margin" Value="0,0,0,0" />
-                            <Setter Property="BorderThickness" Value="0" />
-                            <Style.Triggers>
-                                <Trigger Property="Orientation" Value="Vertical">
-                                    <Setter Property="Width" Value="18"/>
-                                    <Setter Property="Height" Value="Auto" />
-                                    <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBox.Resources>
-                </TextBox>
+                <Grid Height="{Binding ElementName=DebugWindow, Path=ActualHeight}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
 
-                <Button Style="{StaticResource PathButton}" Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 46 0" VerticalAlignment="Top" Content="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" Command="{Binding ClearDebugTextCommand}"></Button>
+                    <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Style="{StaticResource PathButton}" Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 18 0" VerticalAlignment="Top" Content="M19,3H16.3H7.7H5A2,2 0 0,0 3,5V7.7V16.4V19A2,2 0 0,0 5,21H7.7H16.4H19A2,2 0 0,0 21,19V16.3V7.7V5A2,2 0 0,0 19,3M15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4L13.4,12L17,15.6L15.6,17Z" Command="{Binding ShowDebugWindowCommand}"></Button>
 
-                <Button Style="{StaticResource PathButton}" Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 18 0" VerticalAlignment="Top" Content="M19,3H16.3H7.7H5A2,2 0 0,0 3,5V7.7V16.4V19A2,2 0 0,0 5,21H7.7H16.4H19A2,2 0 0,0 21,19V16.3V7.7V5A2,2 0 0,0 19,3M15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4L13.4,12L17,15.6L15.6,17Z" Command="{Binding ShowDebugWindowCommand}"></Button>
-            
+                    <Grid Grid.Row="1" Grid.Column="0">
+
+                        <TextBox x:Name="DebugCommandTextBox" Padding="6 6 24 6" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <TextBox.Resources>
+                                <Style TargetType="{x:Type ScrollBar}">
+                                    <Setter Property="Margin" Value="0,0,0,0" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Style.Triggers>
+                                        <Trigger Property="Orientation" Value="Vertical">
+                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Height" Value="Auto" />
+                                            <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+
+                        <Button Style="{StaticResource PathButton}" Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 18 0" VerticalAlignment="Top" Content="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" Command="{Binding ClearDebugCommandTextCommand}"></Button>
+
+                    </Grid>
+
+                    <GridSplitter Grid.Row="1" Grid.Column="1" ResizeDirection="Columns" Style="{StaticResource GridSplitterStyle}"></GridSplitter>
+
+                    <Grid Grid.Row="1" Grid.Column="2">
+
+                        <TextBox x:Name="DebugIdleTextBox" Padding="6 6 24 6" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <TextBox.Resources>
+                                <Style TargetType="{x:Type ScrollBar}">
+                                    <Setter Property="Margin" Value="0,0,0,0" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Style.Triggers>
+                                        <Trigger Property="Orientation" Value="Vertical">
+                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Height" Value="Auto" />
+                                            <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+
+                        <Button Style="{StaticResource PathButton}" Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 18 0" VerticalAlignment="Top" Content="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" Command="{Binding ClearDebugIdleTextCommand}"></Button>
+
+                    </Grid>
+
+                </Grid>
+
             </Grid>
 
+            <!-- GridSplitter -->
             <GridSplitter x:Name="AckWindowGridSplitter" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" ResizeDirection="Rows" Style="{StaticResource GridSplitterStyle}" Visibility="Collapsed"></GridSplitter>
-            
+
             <Grid x:Name="AckWindow" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" Background="Transparent" Visibility="Collapsed">
-                
+
                 <TextBox x:Name="AckTextBox" Padding="6 6 24 6" Height="{Binding ElementName=AckWindow, Path=ActualHeight}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <TextBox.Resources>
                         <Style TargetType="{x:Type ScrollBar}">
@@ -1467,11 +1834,13 @@
             </Grid>
 
             <!-- StatusBar -->
-            <StatusBar Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3" Background="Transparent" Padding="0 1 0 0" Height="23">
+            <StatusBar Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3" Background="Transparent" Padding="0 1 0 0" Height="28">
                 <StatusBar.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
@@ -1484,13 +1853,39 @@
 
                 <StatusBarItem Grid.Column="0">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 6 0">
+
                         <Viewbox Width="16" Height="16" Margin="0 0 4 0" Opacity="0.7">
                             <Canvas Width="24" Height="24">
                                 <Path Fill="{DynamicResource ControlDarkColorBrush}" Data="{Binding StatusButton}" />
                             </Canvas>
                         </Viewbox>
-                        
+<!--
                         <Label Content="{Binding CurrentProfile.Name}" Style="{DynamicResource DefaultLabelStyle}" Foreground="{DynamicResource ControlDarkColorBrush}" VerticalAlignment="Center" Margin="0 0 4 0" Padding="0" Opacity="0.7"></Label>
+-->
+                        <ComboBox Style="{StaticResource ComboBoxFlatStyle}" IsEnabled="{Binding IsNotConnecting}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedQuickProfile}" Foreground="{DynamicResource ControlDarkColorBrush}" HorizontalAlignment="Center" Tag="">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!--
+                                        <Viewbox Width="10" Height="10" Margin="0 0 6 0">
+                                            <Canvas Width="18" Height="18">
+                                                <Path Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" Fill="DimGray" Visibility="{Binding Path=IsDefault, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}"/>
+                                            </Canvas>
+                                        </Viewbox>
+                                        -->
+                                        <TextBlock Text="{Binding Path=Name}"></TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        
+                    </StackPanel>
+                </StatusBarItem>
+
+                <Separator Grid.Column="1" Background="#202020"/>
+
+                <StatusBarItem Grid.Column="2">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 6 0" Visibility="{Binding IsConnected, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
 
                         <Viewbox Width="16" Height="16" Margin="0 0 4 0" Opacity="0.7">
                             <Canvas Width="24" Height="24">
@@ -1503,22 +1898,24 @@
                     </StackPanel>
                 </StatusBarItem>
 
-                <Separator Grid.Column="1" Background="#202020"/>
-
-                <StatusBarItem Grid.Column="2" HorizontalContentAlignment="Left">
+                <Separator Grid.Column="3" Background="#202020"/>
+                
+                <StatusBarItem Grid.Column="4" HorizontalContentAlignment="Left">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="6 0 6 0">
-                        
+                        <!--
                         <TextBlock Text="{Binding ConnectionStatusMessage}" Style="{DynamicResource DefaultTextBlockStyle}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
+                                                <TextBlock Text="{Binding MpdStatusMessage}" Style="{DynamicResource DefaultTextBlockStyle}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
 
-                        <TextBlock Text="{Binding MpdStatusMessage}" Style="{DynamicResource DefaultTextBlockStyle}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
-                        
+                        -->
+                        <TextBlock Text="{Binding StatusBarMessage}" Style="{DynamicResource DefaultTextBlockStyle}" Foreground="{DynamicResource ControlDarkColorBrush}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
+
                     </StackPanel>
 
                 </StatusBarItem>
 
-                <Separator Grid.Column="3" Background="#202020" />
+                <Separator Grid.Column="5" Background="#202020" />
                 
-                <StatusBarItem Grid.Column="4" HorizontalContentAlignment="Right">
+                <StatusBarItem Grid.Column="6" HorizontalContentAlignment="Right">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 16 0">
 
                         <Button Width="16" Height="16" Margin="0 0 6 0" Command="{Binding ShowDebugWindowCommand}" VerticalAlignment="Center" ToolTip="{x:Static properties:Resources.Settings_Opts_ShowDebugWidow}" Opacity="0.7">
@@ -1672,7 +2069,7 @@
             </StatusBar>
 
             <!-- 初期設定兼再接続画面 -->
-            <Grid Grid.Row="1" Grid.RowSpan="7" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}" Visibility="{Binding IsConnectionSettingShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
+            <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}" Visibility="{Binding IsConnectionSettingShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="0"/>
                     <RowDefinition Height="35*"/>
@@ -1742,8 +2139,7 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-
-                    <TextBlock Text="{x:Static properties:Resources.Host}" Style="{DynamicResource DefaultTextBlockStyle}"></TextBlock>
+                    <TextBlock Text="{x:Static properties:Resources.Host}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
                     <TextBox x:Name="NewHost_TextBox" Text="{Binding Host, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240" IsVisibleChanged="TextBox_IsVisibleChanged">
                         <TextBox.Style>
                             <Style TargetType="TextBox">

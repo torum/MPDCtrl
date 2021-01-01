@@ -41,6 +41,8 @@ namespace MPDCtrl.Models
             }
         }
 
+        public bool MpdVolumeIdSet { get; set; }
+
         public bool MpdRepeat
         {
             get { return _repeat; }
@@ -106,6 +108,7 @@ namespace MPDCtrl.Models
         public void Reset()
         {
             _volume = 50;
+            MpdVolumeIdSet = false;
             _repeat = false;
             _random = false;
             _consume = false;

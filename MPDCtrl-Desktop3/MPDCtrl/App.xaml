@@ -1129,11 +1129,11 @@
                                 <Setter Property="Shape.Fill" TargetName="Arrow" Value="#FF8D979E"/>
                             </Trigger>
                             <Trigger Property="UIElement.IsEnabled" Value="False">
-                                <Setter Property="Panel.Background" TargetName="Border" Value="{StaticResource ComboBoxDisabledBackgroundBrush}"/>
-                                <Setter Property="Panel.Background" TargetName="ButtonBorder" Value="{StaticResource ComboBoxDisabledBackgroundBrush}"/>
+                                <Setter Property="Panel.Background" TargetName="Border" Value="Transparent"/>
+                                <Setter Property="Panel.Background" TargetName="ButtonBorder" Value="Transparent"/>
                                 <Setter Property="Border.BorderBrush" TargetName="ButtonBorder" Value="{StaticResource ComboBoxDisabledBorderBrush}"/>
                                 <Setter Property="TextElement.Foreground" Value="{StaticResource ComboBoxDisabledForegroundBrush}"/>
-                                <Setter Property="Shape.Fill" TargetName="Arrow" Value="#999"/>
+                                <Setter Property="Shape.Fill" TargetName="Arrow" Value="Transparent"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

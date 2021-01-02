@@ -131,11 +131,11 @@ namespace MPDCtrl.Models
         public delegate void IsMpdIdleConnectedEvent(MPC sender);
         public event IsMpdIdleConnectedEvent MpdIdleConnected;
 
-        public delegate void MpdAckErrorEvent(MPC sender, string data);// << TODO:
+        public delegate void MpdAckErrorEvent(MPC sender, string data);
         public event MpdAckErrorEvent MpdAckError;
 
-        public delegate void MpdStatusErrorEvent(MPC sender, string data);
-        public event MpdStatusErrorEvent MpdStatusError;
+        public delegate void MpdAckStatusErrorEvent(MPC sender, string data);
+        public event MpdAckStatusErrorEvent MpdAcmStatusError;
 
 
         public delegate void MpdPlayerStatusChangedEvent (MPC sender);
@@ -414,6 +414,9 @@ namespace MPDCtrl.Models
             {
                 StringBuilder stringBuilder = new StringBuilder();
 
+                bool isAck = false;
+                string ackText = "";
+
                 while (true)
                 {
                     string line = await _idleReader.ReadLineAsync();
@@ -427,8 +430,11 @@ namespace MPDCtrl.Models
                             if (!string.IsNullOrEmpty(line))
                                 stringBuilder.Append(line + "\n");
 
+                            isAck = true;
+                            ackText = line;
+                            ret.ErrorMessage = line;
+
                             break;
-                            //isTalking = false;
                         }
                         else if (line.StartsWith("OK"))
                         {
@@ -438,7 +444,6 @@ namespace MPDCtrl.Models
                                 stringBuilder.Append(line + "\n");
 
                             break;
-                            //isTalking = false;
                         }
                         else if (line.StartsWith("changed: "))
                         {
@@ -456,7 +461,6 @@ namespace MPDCtrl.Models
                                 Debug.WriteLine("line == IsNullOrEmpty");
 
                                 break;
-                                //isTalking = false;
                             }
                         }
                     }
@@ -474,15 +478,16 @@ namespace MPDCtrl.Models
                         ret.ErrorMessage = "ReadLineAsync@MpdIdleSendCommand received null data";
 
                         break;
-                        //isTalking = false;
                     }
                 }
 
                 DebugIdleOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
 
-                ret.ResultText = stringBuilder.ToString();
-                ret.ErrorMessage = "";
+                if (isAck)
+                    MpdAckError?.Invoke(this, stringBuilder.ToString() + " (MISC)");
 
+                ret.ResultText = stringBuilder.ToString();
+                
                 return ret;
             }
             catch (System.InvalidOperationException e)
@@ -679,6 +684,9 @@ namespace MPDCtrl.Models
             {
                 StringBuilder stringBuilder = new StringBuilder();
 
+                bool isAck = false;
+                string ackText = "";
+
                 while (true)
                 {
                     if (MpdStop)
@@ -694,6 +702,9 @@ namespace MPDCtrl.Models
 
                             if (!string.IsNullOrEmpty(line))
                                 stringBuilder.Append(line + "\n");
+
+                            isAck = true;
+                            ackText = line;
 
                             break;
                         }
@@ -743,6 +754,9 @@ namespace MPDCtrl.Models
                 string result = stringBuilder.ToString();
 
                 DebugIdleOutput?.Invoke(this, "<<<<" + result.Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
+
+                if (isAck)
+                    MpdAckError?.Invoke(this, ackText + " (idle)");
 
                 // Parse & Raise event and MpdIdle();
                 await ParseSubSystemsAndRaseChangedEvent(result);
@@ -1072,6 +1086,7 @@ namespace MPDCtrl.Models
                 return ret;
             }
 
+            // WriteAsync
             try
             {
                 if (cmd.Trim().StartsWith("idle"))
@@ -1166,12 +1181,14 @@ namespace MPDCtrl.Models
                 return ret;
             }
 
-
+            // ReadLineAsync
             try
             {
                 StringBuilder stringBuilder = new StringBuilder();
 
                 bool isDoubleOk = false;
+                bool isAck = false;
+                string ackText = "";
 
                 while (true)
                 {
@@ -1185,6 +1202,10 @@ namespace MPDCtrl.Models
 
                             if (!string.IsNullOrEmpty(line))
                                 stringBuilder.Append(line + "\n");
+
+                            ret.ErrorMessage = line;
+                            ackText = line;
+                            isAck = true;
 
                             break;
                         }
@@ -1258,8 +1279,10 @@ namespace MPDCtrl.Models
 
                 DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
 
+                if (isAck)
+                    MpdAckError?.Invoke(this, ackText + " (MSC)");
+
                 ret.ResultText = stringBuilder.ToString();
-                ret.ErrorMessage = "";
 
                 return ret;
             }
@@ -1527,6 +1550,7 @@ namespace MPDCtrl.Models
             return result;
         }
 
+        // TODO:
         public async Task<CommandResult> MpdQueryCurrentSong(bool idling = true)
         {
             Task<bool> check = CheckCommandQueue();
@@ -1894,17 +1918,14 @@ namespace MPDCtrl.Models
                     }
 
                     // Error
-                    //TODO:;
-                    /*
                     if (MpdStatusValues.ContainsKey("error"))
                     {
-                        ErrorReturned?.Invoke(this, MpdErrorTypes.StatusError, MpdStatusValues["error"]);
+                        _status.MpdError = MpdStatusValues["error"];
                     }
                     else
                     {
-                        ErrorReturned?.Invoke(this, MpdErrorTypes.ErrorClear, "");
+                        _status.MpdError = "";
                     }
-                    */
 
                     // TODO: more?
                 });
@@ -2677,27 +2698,41 @@ namespace MPDCtrl.Models
 
         #endregion
 
-        #region == MPD Commands ==
+        #region == MPD Commands (boolean result) ==
 
-        public async Task<CommandResult> MpdPlaybackPlay(string songId = "")
+        public async Task<CommandResult> MpdPlaybackPlay(int volume, string songId = "")
         {
             Task<bool> check = CheckCommandQueue();
             await check;
 
-            string cmd;
+            string cmd = "play";
 
             if (songId != "")
             {
                 cmd = "playid " + songId;
             }
+
+            if (MpdStatus.MpdVolumeIdSet)
+            {
+                CommandResult result = await MpdSendCommand(cmd, true);
+
+                return result;
+            }
             else
             {
-                cmd = "play";
+                string cmdList = "command_list_begin" + "\n";
+                cmdList = cmdList + "setvol " + volume.ToString() + "\n";
+                cmdList = cmdList + cmd + "\n";
+                cmdList = cmdList + "command_list_end" + "\n";
+
+                CommandResult result = await MpdSendCommand(cmdList, true);
+
+                return result;
             }
 
-            CommandResult result = await MpdSendCommand(cmd, true);
+            //CommandResult result = await MpdSendCommand(cmd, true);
 
-            return result;
+            //return result;
         }
 
         public async Task<CommandResult> MpdPlaybackPause()
@@ -2735,8 +2770,8 @@ namespace MPDCtrl.Models
             else
             {
                 string cmd = "command_list_begin" + "\n";
-                cmd = cmd + "pause 0\n";
                 cmd = cmd + "setvol " + volume.ToString() + "\n";
+                cmd = cmd + "pause 0\n";
                 cmd = cmd + "command_list_end" + "\n";
 
                 CommandResult result = await MpdSendCommand(cmd, true);

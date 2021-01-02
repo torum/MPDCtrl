@@ -2060,9 +2060,9 @@
                     </StackPanel>
                 </StatusBarItem>
 
-                <Separator Grid.Column="1" Background="#202020" Visibility="Collapsed"/>
+                <Separator Grid.Column="1" Background="#202020"/>
 
-                <StatusBarItem Grid.Column="2" Visibility="Collapsed">
+                <StatusBarItem Grid.Column="2">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 6 0" Visibility="{Binding IsConnected, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
 
                         <Viewbox Width="16" Height="16" Margin="0 0 4 0" Opacity="0.7">
@@ -2072,6 +2072,7 @@
                         </Viewbox>
 
                         <Label Content="{Binding MpdVersion}" Style="{DynamicResource DefaultLabelStyle}" Foreground="{DynamicResource ControlDarkColorBrush}" VerticalAlignment="Center" Margin="0 0 4 0" Padding="0" Opacity="0.7"></Label>
+                        <TextBlock Text="{Binding MpdStatusMessage}" Style="{DynamicResource DefaultTextBlockStyle}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
 
                     </StackPanel>
                 </StatusBarItem>
@@ -2082,7 +2083,6 @@
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="6 0 6 0">
                         <!--
                         <TextBlock Text="{Binding ConnectionStatusMessage}" Style="{DynamicResource DefaultTextBlockStyle}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
-                                                <TextBlock Text="{Binding MpdStatusMessage}" Style="{DynamicResource DefaultTextBlockStyle}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
 
                         -->
                         <TextBlock Text="{Binding StatusBarMessage}" Style="{DynamicResource DefaultTextBlockStyle}" Foreground="{DynamicResource ControlDarkColorBrush}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
@@ -2246,6 +2246,7 @@
 
             </StatusBar>
 
+            <!-- Ack window -->
             <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="3" Visibility="{Binding IsShowAckWindow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
 
                 <Grid SnapsToDevicePixels="True">
@@ -2271,7 +2272,7 @@
                         </Border.Style>
                         <Grid SnapsToDevicePixels="True" x:Name="AckWindow" MinHeight="36">
 
-                            <TextBox x:Name="AckTextBox" Padding="6 6 24 6" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="36" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                            <TextBox x:Name="AckTextBox" Padding="6 6 24 6" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="36" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type ScrollBar}">
                                         <Setter Property="SnapsToDevicePixels" Value="True" />

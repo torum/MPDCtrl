@@ -33,7 +33,7 @@ namespace MPDCtrl.ViewModels
     /// 
     /// v3.0.0
     /// 
-    /// プロトコル: ACK系（status ackとcommand ack）の通知はこれから。
+    /// status ackのテスト。
     /// 
     /// idleにしていても、実際にReadしていないと(changedがきているのにReadしないと)タイムアウトか何かで切断される模様。
     /// なので、copmmandConnectionで切断されてたら、、、を検知して、接続し直す。(idleConnectionが切断されていたら諦める)
@@ -67,7 +67,8 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
-    /// v3.0.4 色々やり過ぎて覚えていない・・・とりあえず。
+    /// v3.0.0.5 色々やり過ぎて覚えていない・・・
+    /// v3.0.0.4 色々やり過ぎて覚えていない・・・とりあえず。
     /// v3.0.3 基本のコマンドとidleからの更新ができるようになった・・・。
     /// v3.0.2 MPCを作り直し中。とりあえず接続とデータ取得まで。
     /// v3.0.1 MPCを作り直し中。 
@@ -95,7 +96,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.0.4";
+        const string _appVer = "v3.0.0.5";
 
         public static string AppVer
         {
@@ -126,7 +127,7 @@ namespace MPDCtrl.ViewModels
         // For the application config file folder
         const string _appDeveloper = "torum";
 
-        // For DebugOutputWindow etc.
+        // もう使ってない気がする。
         public static bool DeveloperMode
         {
             get
@@ -1984,7 +1985,7 @@ namespace MPDCtrl.ViewModels
 
         private static string _pathMpdOkButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
 
-        private static string _pathErrorMpdAckButton = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z";
+        private static string _pathMpdAckErrorButton = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z";
 
         private string _mpdStatusButton = _pathMpdOkButton;
         public string MpdStatusButton
@@ -2622,6 +2623,9 @@ namespace MPDCtrl.ViewModels
             _mpc.MpdCurrentQueueChanged += new MPC.MpdCurrentQueueChangedEvent(OnMpdCurrentQueueChanged);
             _mpc.MpdPlaylistsChanged += new MPC.MpdPlaylistsChangedEvent(OnMpdPlaylistsChanged);
 
+            _mpc.MpdAckError += new MPC.MpdAckErrorEvent(OnMpdAckError);
+            
+
             //_mpc.MpcInfo += new MPC.MpcInfoEvent(OnMpcInfoEvent);
 
             /*
@@ -3162,7 +3166,9 @@ namespace MPDCtrl.ViewModels
             {
                 IsConnectionSettingShow = false;
 
-                Volume = CurrentProfile.Volume;
+                // set this "quietly"
+                _volume = CurrentProfile.Volume;
+                NotifyPropertyChanged("Volume");
 
                 Start(CurrentProfile.Host, CurrentProfile.Port, CurrentProfile.Password);
             }
@@ -4086,6 +4092,18 @@ namespace MPDCtrl.ViewModels
                 _mpc.MpdStatus.MpdVolume = Convert.ToInt32(_volume);
             }
 
+            if (_mpc.MpdStatus.MpdError != "")
+            {
+                MpdStatusMessage = MPDCtrl.Properties.Resources.MPD_StatusError + ": " + _mpc.MpdStatus.MpdError;
+                MpdStatusButton = _pathMpdAckErrorButton;
+            }
+            else
+            {
+                MpdStatusMessage = "";
+                MpdStatusButton = _pathMpdOkButton;
+            }
+
+
             /*
             CommandResult result = await _mpc.MpdQueryStatus(); 
             if (result.IsSuccess)
@@ -4654,7 +4672,26 @@ namespace MPDCtrl.ViewModels
                 StatusBarMessage = ConnectionStatusMessage;
             }
         }
-        
+
+        private void OnMpdAckError(MPC sender, string ackMsg)
+        {
+            if (string.IsNullOrEmpty(ackMsg))
+                return;
+
+            string s = ackMsg;
+            string patternStr = @"[{\[].+?[}\]]";
+            s = System.Text.RegularExpressions.Regex.Replace(s, patternStr, string.Empty);
+            s = s.Replace("ACK ", string.Empty);
+            s = s.Replace("{} ", string.Empty);
+            s = s.Replace("[] ", string.Empty);
+
+            MpdStatusButton = _pathMpdAckErrorButton;
+
+            AckWindowOutput?.Invoke(this, MPDCtrl.Properties.Resources.MPD_CommandError + ": " + s + Environment.NewLine + Environment.NewLine);
+
+            IsShowAckWindow = true;
+        }
+
         //TODO:
         private void OnMpcInfoEvent(MPC sender, string msg)
         {
@@ -4718,7 +4755,7 @@ namespace MPDCtrl.ViewModels
                 case Status.MpdPlayState.Stop:
                     {
                         //State>>Stop: So, send Play command
-                        await _mpc.MpdPlaybackPlay();
+                        await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume));
                         break;
                     }
             }
@@ -4761,7 +4798,7 @@ namespace MPDCtrl.ViewModels
         }
         public async void ChangeSongCommand_ExecuteAsync()
         {
-            await _mpc.MpdPlaybackPlay(_selectedSong.Id);
+            await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), _selectedSong.Id);
         }
 
         public ICommand PlayPauseCommand { get; }
@@ -5224,7 +5261,7 @@ namespace MPDCtrl.ViewModels
         }
         public async void QueueListviewEnterKeyCommand_ExecuteAsync()
         {
-            await _mpc.MpdPlaybackPlay(_selectedSong.Id);
+            await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), _selectedSong.Id);
         }
 
         public ICommand QueueListviewLeftDoubleClickCommand { get; set; }
@@ -5237,7 +5274,7 @@ namespace MPDCtrl.ViewModels
         }
         public async void QueueListviewLeftDoubleClickCommand_ExecuteAsync(SongInfo song)
         {
-            await _mpc.MpdPlaybackPlay(song.Id);
+            await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), song.Id);
         }
 
         public ICommand QueueListviewClearCommand { get; }

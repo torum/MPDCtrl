@@ -25,6 +25,7 @@ namespace MPDCtrl.Models
         private string _songID = "";
         private double _songTime = 0;
         private double _songElapsed = 0;
+        private string _error = "";
 
         public MpdPlayState MpdState
         {
@@ -104,6 +105,14 @@ namespace MPDCtrl.Models
                 _songElapsed = value;
             }
         }
+        public string MpdError
+        {
+            get { return _error; }
+            set
+            {
+                _error = value;
+            }
+        }
 
         public void Reset()
         {
@@ -115,6 +124,7 @@ namespace MPDCtrl.Models
             _songID = "";
             _songTime = 0;
             _songElapsed = 0;
+            _error = "";
         }
 
     }

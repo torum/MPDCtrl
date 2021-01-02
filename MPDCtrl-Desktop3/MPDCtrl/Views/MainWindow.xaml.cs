@@ -51,7 +51,7 @@ namespace MPDCtrl.Views
                     vm.DebugIdleClear += () => OnDebugIdleClear();
 
                     vm.AckWindowOutput += (sender, arg) => { this.OnAckWindowOutput(arg); };
-                    vm.AckWindowShowHide += () => OnAckWindowShowHide();
+
                     vm.AckWindowClear += () => OnAckWindowClear();
 
                 }
@@ -119,30 +119,6 @@ namespace MPDCtrl.Views
 
                 DebugWindowGridSplitter.Visibility = Visibility.Visible;
                 DebugWindow.Visibility = Visibility.Visible;
-            }
-        }
-
-        public void OnAckWindowShowHide()
-        {
-            if (AckWindowGridSplitter.Visibility == Visibility.Visible)
-            {
-                AckWindowGridSplitter.Visibility = Visibility.Collapsed;
-                AckWindow.Visibility = Visibility.Collapsed;
-
-                LayoutGrid.RowDefinitions[2].Height = new GridLength(1, GridUnitType.Star);
-
-                LayoutGrid.RowDefinitions[5].Height = new GridLength(0);
-                LayoutGrid.RowDefinitions[6].Height = new GridLength(0);
-            }
-            else
-            {
-                LayoutGrid.RowDefinitions[2].Height = new GridLength(3, GridUnitType.Star);
-
-                LayoutGrid.RowDefinitions[5].Height = new GridLength(8);
-                LayoutGrid.RowDefinitions[6].Height = new GridLength(1, GridUnitType.Star);
-
-                AckWindowGridSplitter.Visibility = Visibility.Visible;
-                AckWindow.Visibility = Visibility.Visible;
             }
         }
 

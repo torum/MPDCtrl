@@ -491,6 +491,7 @@
                         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
                         <Setter Property="Width" Value="46" />
                         <Setter Property="Height" Value="32" />
+                        <Setter Property="Focusable" Value="False" />
                         <Setter Property="FocusVisualStyle" Value="{DynamicResource ButtonFocusVisual}" />
                         <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
                         <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
@@ -1724,125 +1725,46 @@
                     </Style>
 
                     <Style x:Key="ThumbStyle" TargetType="{x:Type Thumb}">
-                        <Setter Property="Margin" Value="0,0,0,0" />
-                        <Setter Property="IsTabStop" Value="False" />
+                        <Setter Property="SnapsToDevicePixels" Value="True" />
+                        <Setter Property="IsTabStop" Value="false" />
+                        <Setter Property="Focusable" Value="false" />
                         <Setter Property="Padding" Value="0,0,0,0" />
-                        <Setter Property="BorderBrush" Value="Gray" />
-                        <Setter Property="Background" Value="Gainsboro" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource ScrollBarBorderBrush}" />
+                        <Setter Property="Background" Value="{DynamicResource ScrollBarColorBrush}" />
                         <Setter Property="BorderThickness" Value="0" />
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type Thumb}">
-                                    <Rectangle x:Name="Rect" Width="13">
-                                        <Rectangle.Fill>
-                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                                <GradientStop Color="Gainsboro" Offset="1" />
-                                                <GradientStop Color="#ccc" />
-                                            </LinearGradientBrush>
-                                        </Rectangle.Fill>
-                                        <VisualStateManager.VisualStateGroups>
-                                            <VisualStateGroup x:Name="CommonStates">
-                                                <VisualState x:Name="Normal">
-                                                    <Storyboard>
-                                                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Rect" >
-                                                            <EasingDoubleKeyFrame KeyTime="0" Value="0.1"/>
-                                                        </DoubleAnimationUsingKeyFrames>
-                                                    </Storyboard>
-                                                </VisualState>
-                                                <VisualState x:Name="MouseOver">
-                                                    <Storyboard>
-                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[0].(GradientStop.Color)" Storyboard.TargetName="Rect">
-                                                            <EasingColorKeyFrame KeyTime="0" Value="#CCC" />
-                                                        </ColorAnimationUsingKeyFrames>
-                                                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Rect" >
-                                                            <EasingDoubleKeyFrame KeyTime="0" Value="0.6"/>
-                                                        </DoubleAnimationUsingKeyFrames>
-                                                    </Storyboard>
-                                                </VisualState>
-                                                <VisualState x:Name="Pressed">
-                                                    <Storyboard>
-                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[0].(GradientStop.Color)" Storyboard.TargetName="Rect">
-                                                            <EasingColorKeyFrame KeyTime="0" Value="Gray" />
-                                                        </ColorAnimationUsingKeyFrames>
-                                                    </Storyboard>
-                                                </VisualState>
-                                                <VisualState x:Name="Disabled">
-                                                    <Storyboard>
-                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Shape.Fill).(GradientBrush.GradientStops)[0].(GradientStop.Color)" Storyboard.TargetName="Rect">
-                                                            <EasingColorKeyFrame KeyTime="0" Value="#eee" />
-                                                        </ColorAnimationUsingKeyFrames>
-                                                    </Storyboard>
-                                                </VisualState>
-                                            </VisualStateGroup>
-                                        </VisualStateManager.VisualStateGroups>
-                                    </Rectangle>
-                                    <!-- <Border CornerRadius="0" 
+                                    <Border x:Name="Border" CornerRadius="3" 
                                             Background="{TemplateBinding Background}" 
                                             BorderBrush="{TemplateBinding BorderBrush}" 
-                                            BorderThickness="{TemplateBinding BorderThickness}" 
-                                            Height="8" />
-                                    -->
+                                            BorderThickness="{TemplateBinding BorderThickness}"/>
+
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="true">
+                                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource ScrollBarMouseOverColorBrush}" />
+                                        </Trigger>
+                                        <Trigger Property="IsEnabled" Value="false">
+                                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource ScrollBarDisabledBrush}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                    
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
                     </Style>
 
                     <Style x:Key="RepeatButtonStyleInc" TargetType="{x:Type RepeatButton}">
+                        <Setter Property="SnapsToDevicePixels" Value="True" />
                         <Setter Property="Margin" Value="0,0,0,0" />
                         <Setter Property="Background" Value="Transparent" />
                         <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="IsTabStop" Value="false" />
+                        <Setter Property="Focusable" Value="false" />
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type RepeatButton}">
                                     <Border x:Name="Border" Margin="0" CornerRadius="0" BorderThickness="0">
-                                        <Border.BorderBrush>
-                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" Opacity="1">
-                                                <LinearGradientBrush.GradientStops>
-                                                    <GradientStopCollection>
-                                                        <GradientStop Color="{DynamicResource BorderMediumColor}" Offset="0.0" />
-                                                        <GradientStop Color="{DynamicResource BorderDarkColor}" Offset="1.0" />
-                                                    </GradientStopCollection>
-                                                </LinearGradientBrush.GradientStops>
-                                            </LinearGradientBrush>
-                                        </Border.BorderBrush>
-                                        <Border.Background>
-                                            <LinearGradientBrush StartPoint="0,1" EndPoint="0,0" Opacity="0.1">
-                                                <LinearGradientBrush.GradientStops>
-                                                    <GradientStopCollection>
-                                                        <GradientStop Color="Transparent"/>
-                                                        <GradientStop Color="Transparent" Offset="1.0" />
-                                                    </GradientStopCollection>
-                                                </LinearGradientBrush.GradientStops>
-                                            </LinearGradientBrush>
-                                        </Border.Background>
-                                        <!--
-                                        <VisualStateManager.VisualStateGroups>
-                                            <VisualStateGroup x:Name="CommonStates">
-                                                <VisualState x:Name="Normal" />
-                                                <VisualState x:Name="MouseOver">
-                                                    <Storyboard>
-                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)">
-                                                            <EasingColorKeyFrame KeyTime="0" Value="Gainsboro" />
-                                                        </ColorAnimationUsingKeyFrames>
-                                                    </Storyboard>
-                                                </VisualState>
-                                                <VisualState x:Name="Pressed">
-                                                    <Storyboard>
-                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)">
-                                                            <EasingColorKeyFrame KeyTime="0" Value="{StaticResource ControlPressedColor}" />
-                                                        </ColorAnimationUsingKeyFrames>
-                                                    </Storyboard>
-                                                </VisualState>
-                                                <VisualState x:Name="Disabled">
-                                                    <Storyboard>
-                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetName="Arrow" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
-                                                            <EasingColorKeyFrame KeyTime="0" Value="{StaticResource DisabledForegroundColor}" />
-                                                        </ColorAnimationUsingKeyFrames>
-                                                    </Storyboard>
-                                                </VisualState>
-                                            </VisualStateGroup>
-                                        </VisualStateManager.VisualStateGroups>
-                                        -->
                                         <Path x:Name="Arrow" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" >
                                         </Path>
                                     </Border>
@@ -1864,61 +1786,16 @@
                     </Style>
 
                     <Style x:Key="RepeatButtonStyleDec" TargetType="{x:Type RepeatButton}">
+                        <Setter Property="SnapsToDevicePixels" Value="True" />
                         <Setter Property="Margin" Value="0,0,0,0" />
                         <Setter Property="Background" Value="Transparent" />
                         <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="IsTabStop" Value="false" />
+                        <Setter Property="Focusable" Value="false" />
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type RepeatButton}">
                                     <Border x:Name="Border" Margin="0" CornerRadius="0" BorderThickness="0">
-                                        <Border.BorderBrush>
-                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" Opacity="1">
-                                                <LinearGradientBrush.GradientStops>
-                                                    <GradientStopCollection>
-                                                        <GradientStop Color="{DynamicResource BorderMediumColor}" Offset="0.0" />
-                                                        <GradientStop Color="{DynamicResource BorderDarkColor}" Offset="1.0" />
-                                                    </GradientStopCollection>
-                                                </LinearGradientBrush.GradientStops>
-                                            </LinearGradientBrush>
-                                        </Border.BorderBrush>
-                                        <Border.Background>
-                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" Opacity="0.1">
-                                                <LinearGradientBrush.GradientStops>
-                                                    <GradientStopCollection>
-                                                        <GradientStop Color="Transparent"/>
-                                                        <GradientStop Color="Transparent" Offset="1.0" />
-                                                    </GradientStopCollection>
-                                                </LinearGradientBrush.GradientStops>
-                                            </LinearGradientBrush>
-                                        </Border.Background>
-                                        <!--
-                                        <VisualStateManager.VisualStateGroups>
-                                            <VisualStateGroup x:Name="CommonStates">
-                                                <VisualState x:Name="Normal" />
-                                                <VisualState x:Name="MouseOver">
-                                                    <Storyboard>
-                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)">
-                                                            <EasingColorKeyFrame KeyTime="0" Value="Gainsboro" />
-                                                        </ColorAnimationUsingKeyFrames>
-                                                    </Storyboard>
-                                                </VisualState>
-                                                <VisualState x:Name="Pressed">
-                                                    <Storyboard>
-                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Panel.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)">
-                                                            <EasingColorKeyFrame KeyTime="0" Value="{StaticResource ControlPressedColor}" />
-                                                        </ColorAnimationUsingKeyFrames>
-                                                    </Storyboard>
-                                                </VisualState>
-                                                <VisualState x:Name="Disabled">
-                                                    <Storyboard>
-                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetName="Arrow" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)">
-                                                            <EasingColorKeyFrame KeyTime="0" Value="{StaticResource DisabledForegroundColor}" />
-                                                        </ColorAnimationUsingKeyFrames>
-                                                    </Storyboard>
-                                                </VisualState>
-                                            </VisualStateGroup>
-                                        </VisualStateManager.VisualStateGroups>
-                                        -->
                                         <Path x:Name="Arrow" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" >
                                         </Path>
                                     </Border>
@@ -1955,13 +1832,38 @@
                                     <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource RepeatButtonStyleDec}" IsTabStop="False"/>
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
-                                    <Thumb Style="{StaticResource ThumbStyle}"></Thumb>
+                                    <Thumb Style="{StaticResource ThumbStyle}" Margin="5,0,5,0"></Thumb>
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
                                     <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource RepeatButtonStyleInc}" IsTabStop="False"/>
                                 </Track.IncreaseRepeatButton>
                             </Track>
-                            <RepeatButton Grid.Row="3" Height="18" Command="ScrollBar.LineDownCommand" Content="M 0 0 L 4 4 L 8 0 Z" Style="{StaticResource RepeatButtonStyleDec}" IsTabStop="False"/>
+                            <RepeatButton Grid.Row="2" Height="18" Command="ScrollBar.LineDownCommand" Content="M 0 0 L 4 4 L 8 0 Z" Style="{StaticResource RepeatButtonStyleDec}" IsTabStop="False"/>
+                        </Grid>
+                    </ControlTemplate>
+
+                    <ControlTemplate x:Key="HorizontalScrollBar" TargetType="{x:Type ScrollBar}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition MaxWidth="18" />
+                                <ColumnDefinition Width="0.00001*" />
+                                <ColumnDefinition MaxWidth="18" />
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.ColumnSpan="3" CornerRadius="0" Background="Transparent" />
+
+                            <RepeatButton Grid.Column="0" Style="{StaticResource RepeatButtonStyleInc}" Width="18" Command="ScrollBar.LineLeftCommand" Content="M 4 0 L 4 8 L 0 4 Z" IsTabStop="False" />
+                            <Track x:Name="PART_Track" Grid.Column="1" IsDirectionReversed="False">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Style="{StaticResource RepeatButtonStyleDec}" Command="ScrollBar.PageLeftCommand" IsTabStop="False" />
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource ThumbStyle}" Margin="0,5,0,5"></Thumb>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Style="{StaticResource RepeatButtonStyleInc}" Command="ScrollBar.PageRightCommand" IsTabStop="False" />
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                            <RepeatButton Grid.Column="2" Style="{StaticResource RepeatButtonStyleDec}" Width="18" Command="ScrollBar.LineRightCommand" Content="M 0 0 L 4 4 L 0 8 Z" IsTabStop="False" />
                         </Grid>
                     </ControlTemplate>
 

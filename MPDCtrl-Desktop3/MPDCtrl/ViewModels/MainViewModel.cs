@@ -31,37 +31,36 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
+    /// v3.0.0
+    /// 
     /// プロトコル: ACK系（status ackとcommand ack）の通知はこれから。
-    ///  ACKの表示方法、通知領域をPathの背景透明化の吹き出しで作る？それとも下部のAckWindow?
     /// 
     /// idleにしていても、実際にReadしていないと(changedがきているのにReadしないと)タイムアウトか何かで切断される模様。
-    /// なので、
-    /// copmmandConnectionで切断されてたら、、、を検知して、接続し直す。(idleConnectionが切断されていたら諦める)
+    /// なので、copmmandConnectionで切断されてたら、、、を検知して、接続し直す。(idleConnectionが切断されていたら諦める)
     /// と共に、idleConnectionの方で、playerのchangedが来たら、commandConnectionに通知を渡してreadする？
     /// 
-    /// プレイリストの追加削除と曲の一覧表示
-    /// ダイアログ系作り直し。「プレイリストの名前変更」をインラインで。
+    /// プレイリスト系もろもろ。
+    /// ダイアログ系作り直し。「プレイリストの名前変更」をインラインで。Popupでよい。
     /// 
     /// AlbumArt: MpdverをintのVersionで管理して、プロトコルのバージョンをチェックして、readpictureとかする。
     /// 
+    /// 
+    /// v3.1.0 以降
+    /// 
     /// リソース系：翻訳やスタイル、名前の整理と見直し。
     /// 
-    /// UI：キューの絞り込み検索が絶対欲しい。検索アイコンの場所で。
+    /// UI：キューの絞り込み検索が絶対欲しい。VSのようにキューの右上にするか。
+    /// 
     /// UI：テーマの切り替え
     /// 
     /// Files: "追加して再生"メニューを追加。
     /// Database: "再読み込み" context menu　と　設定画面でDBのUpdate。
-    /// 
-    ///  (とりあえず済み要テスト) idleConnection のほうで、connection_status をしっかりと管理する。
-    ///  (とりあえず済み要テスト) ボリュームが未設定できていたら設定する。初回のPlayとかresumeのタイミングでやらないといけない感じ？
-    ///  (とりあえず済み要テスト) UI：ステータスバー右下で現在のprofileを表示してプルダウンで簡単に切り替えられるようにしたい。
-    /// 
-    /// [未定]
-    /// 検索で、ExactかContainのオプション。
     /// Ctrl+F検索とFilesから直接プレイリストに追加できるように「プレイリストに追加」をコンテキストメニューで。
     ///  "Save Selected to playlist" context menu at Search Result listview.
     ///  "Save this search result as new playlist".
-    /// Listview の水平スクロールバーのデザイン。
+    /// 
+    /// [未定]
+    /// 検索で、ExactかContainのオプション。
     /// スライダーの上でスクロールして音量変更。
     /// スライダーの変更時にブレる件。
     /// ピクチャーインピクチャー？
@@ -96,7 +95,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.4";
+        const string _appVer = "v3.0.0.4";
 
         public static string AppVer
         {
@@ -932,22 +931,6 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        // TODO;
-        private bool _isShowDebugWindow;
-        public bool IsShowDebugWindow
-        {
-            get { return _isShowDebugWindow; }
-            set
-            {
-                if (_isShowDebugWindow == value)
-                    return;
-
-                _isShowDebugWindow = value;
-                
-                NotifyPropertyChanged("IsShowDebugWindow");
-            }
-        }
-
         private bool _isShowAckWindow
 ;
         public bool IsShowAckWindow
@@ -964,6 +947,32 @@ namespace MPDCtrl.ViewModels
                 NotifyPropertyChanged("IsShowAckWindow");
             }
         }
+
+        private bool _isShowDebugWindow;
+        public bool IsShowDebugWindow
+
+        {
+            get { return _isShowDebugWindow; }
+            set
+            {
+                if (_isShowDebugWindow == value)
+                    return;
+
+                _isShowDebugWindow = value;
+
+                NotifyPropertyChanged("IsShowDebugWindow");
+
+                if (_isShowDebugWindow)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        DebugWindowShowHide?.Invoke();
+                    });
+                }
+                    
+            }
+        }
+        
 
         #endregion
 
@@ -2031,7 +2040,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == 設定画面 ==
+        #region == Profileと設定画面 ==
 
         private ObservableCollection<Profile> _profiles = new ObservableCollection<Profile>();
         public ObservableCollection<Profile> Profiles
@@ -2050,10 +2059,12 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _currentProfile = value;
+                NotifyPropertyChanged("CurrentProfile");
 
                 SelectedProfile = _currentProfile;
 
-                NotifyPropertyChanged("CurrentProfile");
+                _volume = _currentProfile.Volume;
+                NotifyPropertyChanged("Volume");
             }
         }
 
@@ -2095,6 +2106,32 @@ namespace MPDCtrl.ViewModels
                 _selectedQuickProfile = _selectedProfile;
                 NotifyPropertyChanged("SelectedQuickProfile");
 
+            }
+        }
+
+        private Profile _selectedQuickProfile;
+        public Profile SelectedQuickProfile
+        {
+            get
+            {
+                return _selectedQuickProfile;
+            }
+            set
+            {
+                if (_selectedQuickProfile == value)
+                    return;
+
+                _selectedQuickProfile = value;
+
+                if (_selectedQuickProfile != null)
+                {
+                    SelectedProfile = _selectedQuickProfile;
+                    CurrentProfile = _selectedQuickProfile;
+
+                    ChangeConnection(_selectedQuickProfile);
+
+                    NotifyPropertyChanged("SelectedQuickProfile");
+                }
             }
         }
 
@@ -2344,7 +2381,6 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-
         private string _settingProfileEditMessage;
         public string SettingProfileEditMessage
         {
@@ -2445,7 +2481,6 @@ namespace MPDCtrl.ViewModels
 
         // AckWindow
         public delegate void AckWindowShowHideEventHandler();
-        public event AckWindowShowHideEventHandler AckWindowShowHide;
 
         public event EventHandler<string> AckWindowOutput;
 
@@ -2456,34 +2491,6 @@ namespace MPDCtrl.ViewModels
         public event EventHandler<int> ScrollIntoView;
 
         #endregion
-
-
-        private Profile _selectedQuickProfile;
-        public Profile SelectedQuickProfile
-        {
-            get
-            {
-                return _selectedQuickProfile;
-            }
-            set
-            {
-                if (_selectedQuickProfile == value)
-                    return;
-
-                _selectedQuickProfile = value;
-
-                if (_selectedQuickProfile != null)
-                {
-                    SelectedProfile = _selectedQuickProfile;
-                    CurrentProfile = _selectedQuickProfile;
-
-                    ChangeConnection(_selectedQuickProfile);
-
-                    NotifyPropertyChanged("SelectedQuickProfile");
-                }
-            }
-        }
-
 
 
         private MPC _mpc = new MPC();
@@ -2833,6 +2840,20 @@ namespace MPDCtrl.ViewModels
                                     }
                                 }
                             }
+                            if (p.Attribute("Volume") != null)
+                            {
+                                if (!string.IsNullOrEmpty(p.Attribute("Volume").Value))
+                                {
+                                    try
+                                    {
+                                        pro.Volume = Int32.Parse(p.Attribute("Volume").Value);
+                                    }
+                                    catch
+                                    {
+                                        pro.Volume = 50;
+                                    }
+                                }
+                            }
 
                             Profiles.Add(pro);
                         }
@@ -3119,11 +3140,11 @@ namespace MPDCtrl.ViewModels
             }
             catch (System.IO.FileNotFoundException)
             {
-                System.Diagnostics.Debug.WriteLine("■■■■■ Error  設定ファイルのロード中 - FileNotFoundException : " + _appConfigFilePath);
+                Debug.WriteLine("■■■■■ Error  設定ファイルのロード中 - FileNotFoundException : " + _appConfigFilePath);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("■■■■■ Error  設定ファイルのロード中: " + ex + " while opening : " + _appConfigFilePath);
+                Debug.WriteLine("■■■■■ Error  設定ファイルのロード中: " + ex + " while opening : " + _appConfigFilePath);
             }
 
             #endregion
@@ -3140,6 +3161,8 @@ namespace MPDCtrl.ViewModels
             else
             {
                 IsConnectionSettingShow = false;
+
+                Volume = CurrentProfile.Volume;
 
                 Start(CurrentProfile.Host, CurrentProfile.Port, CurrentProfile.Password);
             }
@@ -3356,6 +3379,18 @@ namespace MPDCtrl.ViewModels
                     xAttrs.Value = "True";
                     xProfile.SetAttributeNode(xAttrs);
                 }
+
+                xAttrs = doc.CreateAttribute("Volume");
+                if (p == CurrentProfile)
+                {
+                    xAttrs.Value = _volume.ToString();
+                }
+                else
+                {
+                    xAttrs.Value = p.Volume.ToString();
+                }
+                xProfile.SetAttributeNode(xAttrs);
+
 
                 xProfiles.AppendChild(xProfile);
             }
@@ -3580,9 +3615,6 @@ namespace MPDCtrl.ViewModels
         private async void Start(string host, int port, string password)
         {
             await _mpc.MpdIdleConnect(host, port);
-
-            // for debug.
-            ShowDebugWindowCommand_Execute();
         }
 
         private void UpdateButtonStatus()
@@ -3613,16 +3645,16 @@ namespace MPDCtrl.ViewModels
                             //_pathStopButton
                     }
 
-                    // "quietly" update.
-
-                    double tmpVol = Convert.ToDouble(_mpc.MpdStatus.MpdVolume);
-                    if (_volume != tmpVol)
+                    if (_mpc.MpdStatus.MpdVolumeIdSet)
                     {
-                        _volume = tmpVol;
-                        NotifyPropertyChanged("Volume");
+                        double tmpVol = Convert.ToDouble(_mpc.MpdStatus.MpdVolume);
+                        if (_volume != tmpVol)
+                        {
+                            // "quietly" update.
+                            _volume = tmpVol;
+                            NotifyPropertyChanged("Volume");
+                        }
                     }
-                    //_volume = Convert.ToDouble(_mpc.MpdStatus.MpdVolume);
-                    //NotifyPropertyChanged("Volume");
 
                     _random = _mpc.MpdStatus.MpdRandom;
                     NotifyPropertyChanged("Random");
@@ -4444,7 +4476,7 @@ namespace MPDCtrl.ViewModels
 
         private void OnDebugCommandOutput(MPC sender, string data)
         {
-            if (DeveloperMode)
+            if (IsShowDebugWindow)
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     DebugCommandOutput?.Invoke(this, data);
@@ -4453,7 +4485,7 @@ namespace MPDCtrl.ViewModels
 
         private void OnDebugIdleOutput(MPC sender, string data)
         {
-            if (DeveloperMode)
+            if (IsShowDebugWindow)
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     DebugIdleOutput?.Invoke(this, data);
@@ -4623,6 +4655,7 @@ namespace MPDCtrl.ViewModels
             }
         }
         
+        //TODO:
         private void OnMpcInfoEvent(MPC sender, string msg)
         {
             StatusBarMessage = msg;
@@ -5669,6 +5702,9 @@ namespace MPDCtrl.ViewModels
                 _mpc.MpdStop = false;
             }
 
+            // Save volume.
+            CurrentProfile.Volume = Convert.ToInt32(Volume);
+
             // Validate Host input.
             if (Host == "")
             {
@@ -6289,12 +6325,6 @@ namespace MPDCtrl.ViewModels
         }
         public void ShowDebugWindowCommand_Execute()
         {
-            /*
-            if (IsShowDebugWindow)
-                IsShowDebugWindow = false;
-            else
-                IsShowDebugWindow = true;
-            */
             Application.Current.Dispatcher.Invoke(() =>
             {
                 DebugWindowShowHide?.Invoke();
@@ -6321,16 +6351,10 @@ namespace MPDCtrl.ViewModels
         }
         public void ShowAckWindowCommand_Execute()
         {
-            /*
             if (IsShowAckWindow)
                 IsShowAckWindow = false;
             else
                 IsShowAckWindow = true;
-            */
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                AckWindowShowHide?.Invoke();
-            });
         }
 
         #endregion
@@ -6347,6 +6371,8 @@ namespace MPDCtrl.ViewModels
                 _mpc.MpdStop = false;
             }
 
+            // Save volume.
+            CurrentProfile.Volume = Convert.ToInt32(Volume);
 
             // Clear current...
             if (CurrentSong != null)
@@ -6380,6 +6406,8 @@ namespace MPDCtrl.ViewModels
 
                 // TODO: more
             });
+
+            
 
             Host = prof.Host;
             _port = prof.Port;

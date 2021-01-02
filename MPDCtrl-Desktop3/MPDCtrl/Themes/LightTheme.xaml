@@ -76,6 +76,7 @@
 
     <!-- スクロールバーの色 #66ffffff -->
     <SolidColorBrush x:Key="ScrollBarColorBrush" Color="#DDDDDD" />
+    <SolidColorBrush x:Key="ScrollBarMouseOverColorBrush" Color="{DynamicResource ControlMouseOverBackgroundColor}"/>
     <!-- ボーダーの色 #66ffffff -->
     <SolidColorBrush x:Key="ScrollBarBorderBrush" Color="Transparent" />
     <!-- トラック（レーン）の色 #33ffffff -->

@@ -209,6 +209,7 @@ namespace MPDCtrl.Models
             }
         }
 
+        // TODO:ちゃんと使っていないので利用する。
         public bool IsMpdCommandConnected { get; set; }
         public bool IsMpdIdleConnected { get; set; }
 
@@ -220,7 +221,7 @@ namespace MPDCtrl.Models
 
         }
 
-        #region == New Idle Connection ==
+        #region == Idle Connection ==
 
         public async Task<bool> MpdIdleConnect(string host, int port)
         {
@@ -347,7 +348,7 @@ namespace MPDCtrl.Models
             if (cmd.StartsWith("password "))
                 cmdDummy = "password ****";
 
-            DebugIdleOutput?.Invoke(this, ">>>>>>>>>>>>>>>>" + cmdDummy.Trim() + "\n" + "\n");
+            DebugIdleOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n");
 
             try
             {
@@ -477,7 +478,7 @@ namespace MPDCtrl.Models
                     }
                 }
 
-                DebugIdleOutput?.Invoke(this, "<<<<<<<<<<<<<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<<<<<<<<<<<<<") + "\n" + "\n");
+                DebugIdleOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
 
                 ret.ResultText = stringBuilder.ToString();
                 ret.ErrorMessage = "";
@@ -641,7 +642,7 @@ namespace MPDCtrl.Models
 
             string cmd = "idle player mixer options playlist stored_playlist\n";
 
-            DebugIdleOutput?.Invoke(this, ">>>>>>>>>>>>>>>>" + cmd.Trim() + "\n" + "\n");
+            DebugIdleOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
 
             try
             {
@@ -741,7 +742,7 @@ namespace MPDCtrl.Models
 
                 string result = stringBuilder.ToString();
 
-                DebugIdleOutput?.Invoke(this, "<<<<<<<<<<<<<<<<" + result.Trim().Replace("\n", "\n" + "<<<<<<<<<<<<<<<<") + "\n" + "\n");
+                DebugIdleOutput?.Invoke(this, "<<<<" + result.Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
 
                 // Parse & Raise event and MpdIdle();
                 await ParseSubSystemsAndRaseChangedEvent(result);
@@ -904,7 +905,7 @@ namespace MPDCtrl.Models
 
         #endregion
 
-        #region == New Command Connection ==
+        #region == Command Connection ==
 
         public async void MpdCommandConnectionStart(string host, int port, string password)
         {
@@ -3276,93 +3277,6 @@ namespace MPDCtrl.Models
 
         #endregion
 
-        #region == Idle connection ==
-
-
-        /*
-        private async Task<ConnectionResult> MpdIdleConnect(string host, int port)
-        {
-
-            DebugIdleOutput?.Invoke(this, "TCP Idle Connection: Trying to connect." + "\n" + "\n");
-
-            //ConnectionState = ConnectionStatus.Connecting;
-
-            ConnectionResult ret = new ConnectionResult();
-
-            _idleConnection = new TcpClient();
-
-            try
-            {
-                await _idleConnection.ConnectAsync(host, port);
-
-                if (_idleConnection.Client.Connected)
-                {
-                    DebugIdleOutput?.Invoke(this, "TCP Idle Connection: Connection established." + "\n" + "\n");
-
-                    //ConnectionState = ConnectionStatus.Connected;
-
-                    var tcpStream = _idleConnection.GetStream();
-                    tcpStream.ReadTimeout = System.Threading.Timeout.Infinite;
-
-                    _idleReader = new StreamReader(tcpStream);
-                    _idleWriter = new StreamWriter(tcpStream);
-                    _idleWriter.AutoFlush = true;
-
-                    string response = await _idleReader.ReadLineAsync();
-
-                    if (response.StartsWith("OK MPD "))
-                    {
-                        //_mpdVer = response.Replace("OK MPD ", string.Empty);
-
-                        Debug.WriteLine(response.Trim() + " @MPC.MpdIdleConnect");
-
-                        DebugIdleOutput?.Invoke(this, "<<" + response.Trim() + "\n" + "\n");
-
-                        IsMpdIdleConnected = true;
-
-                        ret.IsSuccess = true;
-                        ret.ErrorMessage = "";
-                    }
-                    else
-                    {
-                        DebugIdleOutput?.Invoke(this, "TCP Idle Connection: MPD did not respond with proper respose." + "\n" + "\n");
-
-                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                        ConnectionError?.Invoke(this, "TCP connection error: MPD did not respond with proper respose.");
-                    }
-                }
-                else
-                {
-                    //?
-
-                    Debug.WriteLine("**** !client.Client.Connected");
-
-                    DebugIdleOutput?.Invoke(this, "TCP Idle Connection: FAIL to established... Client not connected." + "\n" + "\n");
-
-                    //ConnectionState = ConnectionStatus.NeverConnected;
-
-                    ConnectionError?.Invoke(this, "TCP Idle Connection: FAIL to established... Client not connected.");
-                }
-            }
-            catch (Exception e)
-            {
-                // TODO: Test.
-
-                DebugIdleOutput?.Invoke(this, "TCP Idle Connection: Error while connecting. Fail to connect: " + e.Message + "\n" + "\n");
-
-                ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                ConnectionError?.Invoke(this, "TCP connection error: " + e.Message);
-            }
-
-            return ret;
-        }
-        */
-
-        #endregion
-
-
         public void MpdDisconnect()
         {
             try
@@ -3373,6 +3287,7 @@ namespace MPDCtrl.Models
                 _commandConnection.Close();
             }
             catch { }
+            finally
             {
                 ConnectionState = ConnectionStatus.DisconnectedByUser;
             }
@@ -3391,7 +3306,6 @@ namespace MPDCtrl.Models
             }
 
         }
-
 
     }
 }

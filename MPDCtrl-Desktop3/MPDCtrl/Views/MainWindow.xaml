@@ -49,8 +49,6 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="0"/>
                 <RowDefinition Height="0"/>
-                <RowDefinition Height="0"/>
-                <RowDefinition Height="0"/>
                 <RowDefinition Height="28"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -81,6 +79,7 @@
                                 <!--
                                 <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                                 -->
+                                <Setter Property="Focusable" Value="False" />
                                 <Setter Property="BorderThickness" Value="0" />
                                 <Setter Property="Margin" Value="0" />
                                 <Setter Property="Padding" Value="0" />
@@ -266,9 +265,11 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Button x:Name="BackButton" ToolTip="{x:Static properties:Resources.Playback_BackButton}" Grid.Column="0" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8H10V16H8M16,8V16L11,12" Style="{StaticResource PathButton}" Command="{Binding PlayPrevCommand}" >
-                        </Button>
+                        <!-- タブ移動等々の関係で上に持ってくる -->
                         <Button x:Name="PlayButton" ToolTip="{x:Static properties:Resources.Playback_PlayPauseButton}" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="62" Width="62" Background="Transparent" Foreground="White" Style="{StaticResource PathButton}" Command="{Binding PlayCommand}" Content="{Binding PlayButton}">
+                        </Button>
+                        
+                        <Button x:Name="BackButton" ToolTip="{x:Static properties:Resources.Playback_BackButton}" Grid.Column="0" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8H10V16H8M16,8V16L11,12" Style="{StaticResource PathButton}" Command="{Binding PlayPrevCommand}" >
                         </Button>
                         <Button x:Name="NextButton" ToolTip="{x:Static properties:Resources.Playback_NextButton}" Grid.Column="2" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8L13,12L8,16M14,8H16V16H14" Style="{StaticResource PathButton}" Command="{Binding PlayNextCommand}" >
                         </Button>
@@ -374,7 +375,7 @@
                 <Grid>
 
                     <Grid Visibility="{Binding IsQueueVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
-                        <ListView x:Name="QueueListview" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedSong, Mode=TwoWay}" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" SelectionChanged="QueueListview_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                        <ListView x:Name="QueueListview" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedSong, Mode=TwoWay}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" SelectionChanged="QueueListview_SelectionChanged">
                             <ListView.InputBindings>
                                 <KeyBinding Key="Return" Command="{Binding Path=DataContext.QueueListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                                 <KeyBinding Gesture="Ctrl+U" Command="{Binding Path=DataContext.QueueListviewMoveUpCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
@@ -550,18 +551,112 @@
 
                                 </ContextMenu>
                                 <Style TargetType="{x:Type ScrollBar}">
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="OverridesDefaultStyle" Value="true" />
                                     <Setter Property="Margin" Value="0,0,0,0" />
                                     <Setter Property="IsTabStop" Value="False" />
                                     <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="Background" Value="Transparent" />
                                     <Style.Triggers>
                                         <Trigger Property="Orientation" Value="Vertical">
                                             <Setter Property="Width" Value="18"/>
                                             <Setter Property="Height" Value="Auto" />
                                             <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
                                         </Trigger>
+                                        <Trigger Property="Orientation" Value="Horizontal">
+                                            <Setter Property="Width" Value="Auto"/>
+                                            <Setter Property="Height" Value="18" />
+                                            <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
+                                        </Trigger>
                                     </Style.Triggers>
                                 </Style>
+                                <Style x:Key="ListViewScrollViewerStyle" TargetType="{x:Type ScrollViewer}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    
+                                                    <!--
+                                                    <ScrollContentPresenter Grid.Column="0"/>
+                                                    -->
+                                                    <DockPanel Margin="{TemplateBinding Padding}">
+                                                        <ScrollViewer DockPanel.Dock="Top" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" Focusable="False">
+                                                            <GridViewHeaderRowPresenter Margin="2,0,2,0"
+                                                        Columns="{Binding Path=TemplatedParent.View.Columns, RelativeSource={RelativeSource TemplatedParent}}"
+                                                        ColumnHeaderContainerStyle="{Binding Path=TemplatedParent.View.ColumnHeaderContainerStyle, RelativeSource={RelativeSource TemplatedParent}}"
+                                                        ColumnHeaderTemplate="{Binding Path=TemplatedParent.View.ColumnHeaderTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                                        ColumnHeaderTemplateSelector="{Binding Path=TemplatedParent.View.ColumnHeaderTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}"
+                                                        AllowsColumnReorder="{Binding Path=TemplatedParent.View.AllowsColumnReorder, RelativeSource={RelativeSource TemplatedParent}}"
+                                                        ColumnHeaderContextMenu="{Binding Path=TemplatedParent.View.ColumnHeaderContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
+                                                        ColumnHeaderToolTip="{Binding Path=TemplatedParent.View.ColumnHeaderToolTip, RelativeSource={RelativeSource TemplatedParent}}"
+                                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                        </ScrollViewer>
+
+                                                        <ScrollContentPresenter Name="PART_ScrollContentPresenter" KeyboardNavigation.DirectionalNavigation="Local"/>
+                                                    </DockPanel>
+
+
+                                                    <ScrollBar Name="PART_VerticalScrollBar" Grid.Row="0" Grid.Column="1" Value="{TemplateBinding VerticalOffset}" Maximum="{TemplateBinding ScrollableHeight}" ViewportSize="{TemplateBinding ViewportHeight}" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"/>
+                                                    <ScrollBar Name="PART_HorizontalScrollBar" Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Value="{TemplateBinding HorizontalOffset}" Maximum="{TemplateBinding ScrollableWidth}" ViewportSize="{TemplateBinding ViewportWidth}" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"/>
+                                                    <Rectangle Grid.Row="1" Grid.Column="1" Fill="Transparent"/>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
                             </ListView.Resources>
+                            <ListView.Style>
+                                <Style TargetType="ListView">
+                                    <Setter Property="SnapsToDevicePixels" Value="true" />
+                                    <Setter Property="OverridesDefaultStyle" Value="True" />
+                                    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+                                    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+                                    <Setter Property="ScrollViewer.CanContentScroll" Value="true" />
+                                    <Setter Property="AlternationCount" Value="2"/>
+                                    <Setter Property="Margin" Value="0"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListView">
+                                                <Border Name="Border" BorderThickness="0" Background="{TemplateBinding Background}">
+                                                    <ScrollViewer Style="{DynamicResource ListViewScrollViewerStyle}">
+                                                        <ItemsPresenter />
+                                                    </ScrollViewer>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListView.Style>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
+                                    <Setter Property="ContextMenu" Value="{StaticResource QueueItemContextMenu}" />
+                                    <Setter Property="SnapsToDevicePixels" Value="true" />
+                                    <Setter Property="Margin" Value="0 0 0 0"/>
+                                    <Setter Property="Padding" Value="0 1 0 1"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                                <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
+                                                    <Border.InputBindings>
+                                                        <MouseBinding Command="{Binding Path=DataContext.QueueListviewLeftDoubleClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Gesture="LeftDoubleClick" />
+                                                    </Border.InputBindings>
+                                                    <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListView.ItemContainerStyle>
                             <ListView.View>
                                 <GridView>
                                     <GridView.ColumnHeaderContainerStyle>
@@ -727,26 +822,6 @@
                                     </GridViewColumn>
                                 </GridView>
                             </ListView.View>
-                            <ListView.ItemContainerStyle>
-                                <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
-                                    <Setter Property="ContextMenu" Value="{StaticResource QueueItemContextMenu}" />
-                                    <Setter Property="Margin" Value="0 0 0 0"/>
-                                    <Setter Property="Padding" Value="0 1 0 1"/>
-                                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                                <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
-                                                    <Border.InputBindings>
-                                                        <MouseBinding Command="{Binding Path=DataContext.QueueListviewLeftDoubleClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Gesture="LeftDoubleClick" />
-                                                    </Border.InputBindings>
-                                                    <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </ListView.ItemContainerStyle>
                         </ListView>
 
                     </Grid>
@@ -765,7 +840,7 @@
                             <Grid x:Name="PlaylistsListviewDummy2" Grid.Column="2" />
                         </Grid>
 
-                        <ListView x:Name="PlaylistsListview" ItemsSource="{Binding Playlists}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                        <ListView x:Name="PlaylistsListview" ItemsSource="{Binding Playlists}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListView.Resources>
                                 <ContextMenu x:Key="PlaylistsListviewItemContextMenu">
                                     <MenuItem Header="{x:Static properties:Resources.SongFilesItemContextMenu_Add}" Command="{Binding Path=DataContext.SongFilesListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
@@ -899,7 +974,7 @@
                             <Grid x:Name="PlaylistSongsListviewDummy7" Grid.Column="7" />
                         </Grid>
 
-                        <ListView x:Name="PlaylistSongsListview" Grid.Row="1" ItemsSource="{Binding PlaylistSongs}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                        <ListView x:Name="PlaylistSongsListview" Grid.Row="1" ItemsSource="{Binding PlaylistSongs}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListView.Resources>
                                 <ContextMenu x:Key="PlaylistSongsListviewItemContextMenu">
                                     <MenuItem Header="{x:Static properties:Resources.SongsItemContextMenu_Add}" Command="{Binding Path=DataContext.SongsListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
@@ -1267,7 +1342,7 @@
                                 <Grid x:Name="SongFilesListviewDummy3" Grid.Column="3" />
                             </Grid>
 
-                            <ListView x:Name="SongFilesListview" Grid.Row="1" ItemsSource="{Binding MusicEntries}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                            <ListView x:Name="SongFilesListview" Grid.Row="1" ItemsSource="{Binding MusicEntries}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                                 <ListView.Resources>
                                     <ContextMenu x:Key="SongFilesListviewItemContextMenu">
                                         <MenuItem Header="{x:Static properties:Resources.SongFilesItemContextMenu_Add}" Command="{Binding Path=DataContext.SongFilesListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
@@ -1406,7 +1481,7 @@
                         <Grid Grid.Row="0" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
 
                             <!-- 検索ボックス -->
-                            <TextBox x:Name="SearchTextBox" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" KeyboardNavigation.TabNavigation="Local" IsVisibleChanged="TextBox_IsVisibleChanged" Margin="0" Padding="3" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+                            <TextBox x:Name="SearchTextBox" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" KeyboardNavigation.TabNavigation="Local" Margin="0" Padding="3" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
                                 <TextBox.Style>
                                     <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource DefaultTextBoxStyle}">
                                         <Setter Property="Template">
@@ -1546,7 +1621,7 @@
                             <Grid x:Name="SearchResultListviewDummy7" Grid.Column="7" />
                         </Grid>
 
-                        <ListView x:Name="SearchResultListview" Grid.Row="1" ItemsSource="{Binding SearchResult}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                        <ListView x:Name="SearchResultListview" Grid.Row="1" ItemsSource="{Binding SearchResult}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListView.Resources>
                                 <ContextMenu x:Key="SearchResultListviewItemContextMenu">
                                     <MenuItem Header="{x:Static properties:Resources.SongsItemContextMenu_Add}" Command="{Binding Path=DataContext.SongsListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
@@ -1745,7 +1820,7 @@
 
                 <Grid Height="{Binding ElementName=DebugWindow, Path=ActualHeight}">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -1754,13 +1829,81 @@
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Style="{StaticResource PathButton}" Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 18 0" VerticalAlignment="Top" Content="M19,3H16.3H7.7H5A2,2 0 0,0 3,5V7.7V16.4V19A2,2 0 0,0 5,21H7.7H16.4H19A2,2 0 0,0 21,19V16.3V7.7V5A2,2 0 0,0 19,3M15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4L13.4,12L17,15.6L15.6,17Z" Command="{Binding ShowDebugWindowCommand}"></Button>
+                    <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Right" Width="16" Height="16" Margin="4 4 0 4" Padding="0" VerticalAlignment="Center" Content="M19,3H16.3H7.7H5A2,2 0 0,0 3,5V7.7V16.4V19A2,2 0 0,0 5,21H7.7H16.4H19A2,2 0 0,0 21,19V16.3V7.7V5A2,2 0 0,0 19,3M15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4L13.4,12L17,15.6L15.6,17Z" Command="{Binding ShowDebugWindowCommand}">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="OverridesDefaultStyle" Value="true" />
+                                <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Margin" Value="0" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="Border" Background="{TemplateBinding Background}" CornerRadius="0" BorderThickness="0">
+                                                <Viewbox Width="16" Height="16" Margin="0">
+                                                    <Canvas Width="24" Height="24">
+                                                        <Canvas.RenderTransform>
+                                                            <TranslateTransform X="2" Y="2.6"/>
+                                                        </Canvas.RenderTransform>
+                                                        <Path x:Name="PathIcon" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform">
+                                                            <Path.Fill>
+                                                                <SolidColorBrush x:Name="PathIconColor" Color="{DynamicResource ControlForegroundColor}"/>
+                                                            </Path.Fill>
+                                                            <Path.RenderTransform>
+                                                                <TransformGroup>
+                                                                    <TransformGroup.Children>
+                                                                        <RotateTransform Angle="0" />
+                                                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                                                    </TransformGroup.Children>
+                                                                </TransformGroup>
+                                                            </Path.RenderTransform>
+                                                        </Path>
+                                                    </Canvas>
+                                                </Viewbox>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+
+                                                <Trigger Property="IsMouseOver" Value="true">
+                                                    <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
+                                                </Trigger>
+
+                                                <Trigger Property="IsMouseOver" Value="true">
+                                                    <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
+                                                </Trigger>
+
+                                                <MultiTrigger>
+                                                    <MultiTrigger.Conditions>
+                                                        <Condition Property="IsPressed" Value="False" />
+                                                        <Condition Property="IsMouseOver" Value="True" />
+                                                    </MultiTrigger.Conditions>
+                                                    <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
+                                                </MultiTrigger>
+
+                                                <MultiTrigger>
+                                                    <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlPressedColorBrush}"/>
+                                                    <MultiTrigger.Conditions>
+                                                        <Condition Property="IsPressed" Value="true" />
+                                                        <Condition Property="IsMouseOver" Value="True" />
+                                                    </MultiTrigger.Conditions>
+                                                </MultiTrigger>
+
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
 
                     <Grid Grid.Row="1" Grid.Column="0">
 
-                        <TextBox x:Name="DebugCommandTextBox" Padding="6 6 24 6" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <TextBox x:Name="DebugCommandTextBox" Padding="6 6 24 6" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
                             <TextBox.Resources>
                                 <Style TargetType="{x:Type ScrollBar}">
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="OverridesDefaultStyle" Value="true" />
                                     <Setter Property="Margin" Value="0,0,0,0" />
                                     <Setter Property="BorderThickness" Value="0" />
                                     <Style.Triggers>
@@ -1769,7 +1912,37 @@
                                             <Setter Property="Height" Value="Auto" />
                                             <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
                                         </Trigger>
+                                        <Trigger Property="Orientation" Value="Horizontal">
+                                            <Setter Property="Width" Value="Auto"/>
+                                            <Setter Property="Height" Value="18" />
+                                            <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
+                                        </Trigger>
                                     </Style.Triggers>
+                                </Style>
+                                <Style TargetType="{x:Type ScrollViewer}">
+                                    <Setter Property="OverridesDefaultStyle" Value="True" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                                                <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="*" />
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+                                                    <!--
+                                                    <Rectangle x:Name="Corner" Grid.Row="1" Grid.Column="1" Fill="Transparent" />
+                                                    -->
+                                                    <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" Grid.Row="0" Grid.Column="0" Margin="{TemplateBinding Padding}" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="False" CanVerticallyScroll="False" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                                    <ScrollBar x:Name="PART_VerticalScrollBar" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" ViewportSize="{TemplateBinding ViewportHeight}" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{Binding VerticalOffset, Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                                                    <ScrollBar x:Name="PART_HorizontalScrollBar" Grid.Row="1" Grid.Column="0" AutomationProperties.AutomationId="HorizontalScrollBar" Cursor="Arrow" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0" Orientation="Horizontal" ViewportSize="{TemplateBinding ViewportWidth}" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" Value="{Binding HorizontalOffset,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
                                 </Style>
                             </TextBox.Resources>
                         </TextBox>
@@ -1782,9 +1955,11 @@
 
                     <Grid Grid.Row="1" Grid.Column="2">
 
-                        <TextBox x:Name="DebugIdleTextBox" Padding="6 6 24 6" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <TextBox x:Name="DebugIdleTextBox" Padding="6 6 24 6" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
                             <TextBox.Resources>
                                 <Style TargetType="{x:Type ScrollBar}">
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="OverridesDefaultStyle" Value="true" />
                                     <Setter Property="Margin" Value="0,0,0,0" />
                                     <Setter Property="BorderThickness" Value="0" />
                                     <Style.Triggers>
@@ -1793,7 +1968,37 @@
                                             <Setter Property="Height" Value="Auto" />
                                             <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
                                         </Trigger>
+                                        <Trigger Property="Orientation" Value="Horizontal">
+                                            <Setter Property="Width" Value="Auto"/>
+                                            <Setter Property="Height" Value="18" />
+                                            <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
+                                        </Trigger>
                                     </Style.Triggers>
+                                </Style>
+                                <Style TargetType="{x:Type ScrollViewer}">
+                                    <Setter Property="OverridesDefaultStyle" Value="True" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                                                <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="*" />
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+                                                    <!--
+                                                    <Rectangle x:Name="Corner" Grid.Row="1" Grid.Column="1" Fill="Transparent" />
+                                                    -->
+                                                    <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" Grid.Row="0" Grid.Column="0" Margin="{TemplateBinding Padding}" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="False" CanVerticallyScroll="False" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                                    <ScrollBar x:Name="PART_VerticalScrollBar" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" ViewportSize="{TemplateBinding ViewportHeight}" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{Binding VerticalOffset, Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                                                    <ScrollBar x:Name="PART_HorizontalScrollBar" Grid.Row="1" Grid.Column="0" AutomationProperties.AutomationId="HorizontalScrollBar" Cursor="Arrow" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0" Orientation="Horizontal" ViewportSize="{TemplateBinding ViewportWidth}" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" Value="{Binding HorizontalOffset,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
                                 </Style>
                             </TextBox.Resources>
                         </TextBox>
@@ -1806,35 +2011,8 @@
 
             </Grid>
 
-            <!-- GridSplitter -->
-            <GridSplitter x:Name="AckWindowGridSplitter" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" ResizeDirection="Rows" Style="{StaticResource GridSplitterStyle}" Visibility="Collapsed"></GridSplitter>
-
-            <Grid x:Name="AckWindow" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" Background="Transparent" Visibility="Collapsed">
-
-                <TextBox x:Name="AckTextBox" Padding="6 6 24 6" Height="{Binding ElementName=AckWindow, Path=ActualHeight}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                    <TextBox.Resources>
-                        <Style TargetType="{x:Type ScrollBar}">
-                            <Setter Property="Margin" Value="0,0,0,0" />
-                            <Setter Property="BorderThickness" Value="0" />
-                            <Style.Triggers>
-                                <Trigger Property="Orientation" Value="Vertical">
-                                    <Setter Property="Width" Value="18"/>
-                                    <Setter Property="Height" Value="Auto" />
-                                    <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBox.Resources>
-                </TextBox>
-
-                <Button Style="{StaticResource PathButton}" Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 46 0" VerticalAlignment="Top" Content="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" Command="{Binding ClearAckTextCommand}"></Button>
-
-                <Button Style="{StaticResource PathButton}" Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 18 0" VerticalAlignment="Top" Content="M19,3H16.3H7.7H5A2,2 0 0,0 3,5V7.7V16.4V19A2,2 0 0,0 5,21H7.7H16.4H19A2,2 0 0,0 21,19V16.3V7.7V5A2,2 0 0,0 19,3M15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4L13.4,12L17,15.6L15.6,17Z" Command="{Binding ShowAckWindowCommand}"></Button>
-
-            </Grid>
-
             <!-- StatusBar -->
-            <StatusBar Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3" Background="Transparent" Padding="0 1 0 0" Height="28">
+            <StatusBar Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Background="Transparent" Padding="0 1 0 0" Height="28">
                 <StatusBar.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Grid>
@@ -1882,9 +2060,9 @@
                     </StackPanel>
                 </StatusBarItem>
 
-                <Separator Grid.Column="1" Background="#202020"/>
+                <Separator Grid.Column="1" Background="#202020" Visibility="Collapsed"/>
 
-                <StatusBarItem Grid.Column="2">
+                <StatusBarItem Grid.Column="2" Visibility="Collapsed">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 6 0" Visibility="{Binding IsConnected, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
 
                         <Viewbox Width="16" Height="16" Margin="0 0 4 0" Opacity="0.7">
@@ -1916,9 +2094,80 @@
                 <Separator Grid.Column="5" Background="#202020" />
                 
                 <StatusBarItem Grid.Column="6" HorizontalContentAlignment="Right">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 16 0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 0 0">
+                        
+                        <Button x:Name="InfoButton" Width="16" Height="16" Margin="0 0 16 0" Command="{Binding ShowAckWindowCommand}" VerticalAlignment="Center" ToolTip="" Opacity="0.7">
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}">
+                                    <Setter Property="OverridesDefaultStyle" Value="true" />
+                                    <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="Margin" Value="0" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="Border" Background="{TemplateBinding Background}" CornerRadius="0" BorderThickness="0">
+                                                    <Viewbox Width="16" Height="16" Margin="0">
+                                                        <Canvas Width="24" Height="24">
+                                                            <Canvas.RenderTransform>
+                                                                <TranslateTransform X="2" Y="2.6"/>
+                                                            </Canvas.RenderTransform>
+                                                            <Path x:Name="PathIcon" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform">
+                                                                <Path.Fill>
+                                                                    <SolidColorBrush x:Name="PathIconColor" Color="{DynamicResource ControlForegroundColor}"/>
+                                                                </Path.Fill>
+                                                                <Path.RenderTransform>
+                                                                    <TransformGroup>
+                                                                        <TransformGroup.Children>
+                                                                            <RotateTransform Angle="0" />
+                                                                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                                                                        </TransformGroup.Children>
+                                                                    </TransformGroup>
+                                                                </Path.RenderTransform>
+                                                            </Path>
+                                                        </Canvas>
+                                                    </Viewbox>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
 
-                        <Button Width="16" Height="16" Margin="0 0 6 0" Command="{Binding ShowDebugWindowCommand}" VerticalAlignment="Center" ToolTip="{x:Static properties:Resources.Settings_Opts_ShowDebugWidow}" Opacity="0.7">
+                                                    <Trigger Property="IsMouseOver" Value="true">
+                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
+                                                    </Trigger>
+
+                                                    <Trigger Property="IsMouseOver" Value="true">
+                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
+                                                    </Trigger>
+
+                                                    <MultiTrigger>
+                                                        <MultiTrigger.Conditions>
+                                                            <Condition Property="IsPressed" Value="False" />
+                                                            <Condition Property="IsMouseOver" Value="True" />
+                                                        </MultiTrigger.Conditions>
+                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
+                                                    </MultiTrigger>
+
+                                                    <MultiTrigger>
+                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlPressedColorBrush}"/>
+                                                        <MultiTrigger.Conditions>
+                                                            <Condition Property="IsPressed" Value="true" />
+                                                            <Condition Property="IsMouseOver" Value="True" />
+                                                        </MultiTrigger.Conditions>
+                                                    </MultiTrigger>
+
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                            <Button.Content>
+                                M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z
+                            </Button.Content>
+                        </Button>
+
+                        <Button Width="16" Height="16" Margin="0 0 0 0" Command="{Binding ShowDebugWindowCommand}" VerticalAlignment="Center" ToolTip="{x:Static properties:Resources.Settings_Opts_ShowDebugWidow}" Opacity="0.7" Visibility="{Binding IsShowDebugWindow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}">
                                     <Setter Property="OverridesDefaultStyle" Value="true" />
@@ -1992,81 +2241,92 @@
                             -->
                         </Button>
 
-                        <Button Width="16" Height="16" Margin="0 0 6 0" Command="{Binding ShowAckWindowCommand}" VerticalAlignment="Center" ToolTip="" Opacity="0.7">
-                            <Button.Style>
-                                <Style TargetType="{x:Type Button}">
-                                    <Setter Property="OverridesDefaultStyle" Value="true" />
-                                    <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
-                                    <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
-                                    <Setter Property="BorderThickness" Value="0" />
-                                    <Setter Property="Margin" Value="0" />
-                                    <Setter Property="Padding" Value="0" />
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border x:Name="Border" Background="{TemplateBinding Background}" CornerRadius="0" BorderThickness="0">
-                                                    <Viewbox Width="16" Height="16" Margin="0">
-                                                        <Canvas Width="24" Height="24">
-                                                            <Canvas.RenderTransform>
-                                                                <TranslateTransform X="2" Y="2.6"/>
-                                                            </Canvas.RenderTransform>
-                                                            <Path x:Name="PathIcon" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform">
-                                                                <Path.Fill>
-                                                                    <SolidColorBrush x:Name="PathIconColor" Color="{DynamicResource ControlForegroundColor}"/>
-                                                                </Path.Fill>
-                                                                <Path.RenderTransform>
-                                                                    <TransformGroup>
-                                                                        <TransformGroup.Children>
-                                                                            <RotateTransform Angle="0" />
-                                                                            <ScaleTransform ScaleX="1" ScaleY="1" />
-                                                                        </TransformGroup.Children>
-                                                                    </TransformGroup>
-                                                                </Path.RenderTransform>
-                                                            </Path>
-                                                        </Canvas>
-                                                    </Viewbox>
-                                                </Border>
-                                                <ControlTemplate.Triggers>
-
-                                                    <Trigger Property="IsMouseOver" Value="true">
-                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
-                                                    </Trigger>
-
-                                                    <Trigger Property="IsMouseOver" Value="true">
-                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
-                                                    </Trigger>
-
-                                                    <MultiTrigger>
-                                                        <MultiTrigger.Conditions>
-                                                            <Condition Property="IsPressed" Value="False" />
-                                                            <Condition Property="IsMouseOver" Value="True" />
-                                                        </MultiTrigger.Conditions>
-                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
-                                                    </MultiTrigger>
-
-                                                    <MultiTrigger>
-                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlPressedColorBrush}"/>
-                                                        <MultiTrigger.Conditions>
-                                                            <Condition Property="IsPressed" Value="true" />
-                                                            <Condition Property="IsMouseOver" Value="True" />
-                                                        </MultiTrigger.Conditions>
-                                                    </MultiTrigger>
-
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </Button.Style>
-                            <Button.Content>
-                                M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z
-                            </Button.Content>
-                        </Button>
-
                     </StackPanel>
                 </StatusBarItem>
 
             </StatusBar>
+
+            <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="3" Visibility="{Binding IsShowAckWindow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+
+                <Grid SnapsToDevicePixels="True">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="160" MinHeight="36"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="7*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Row="1" Grid.Column="1" CornerRadius="4" BorderBrush="{DynamicResource BorderDarkColorBrush}" BorderThickness="2" Margin="30" Background="{DynamicResource BoardBackgroundColorBrush}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}"/>
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="{DynamicResource ShadowBoardColor}" Opacity="1" ShadowDepth="1.8" BlurRadius="5" Direction="315"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Border.Style>
+                        <Grid SnapsToDevicePixels="True" x:Name="AckWindow" MinHeight="36">
+
+                            <TextBox x:Name="AckTextBox" Padding="6 6 24 6" Background="{DynamicResource WindowBackgroundBaseColorBrush}" Foreground="Gray" BorderThickness="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="36" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                <TextBox.Resources>
+                                    <Style TargetType="{x:Type ScrollBar}">
+                                        <Setter Property="SnapsToDevicePixels" Value="True" />
+                                        <Setter Property="OverridesDefaultStyle" Value="true" />
+                                        <Setter Property="Margin" Value="0,0,0,0" />
+                                        <Setter Property="BorderThickness" Value="0" />
+                                        <Style.Triggers>
+                                            <Trigger Property="Orientation" Value="Vertical">
+                                                <Setter Property="Width" Value="18"/>
+                                                <Setter Property="Height" Value="Auto" />
+                                                <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
+                                            </Trigger>
+                                            <Trigger Property="Orientation" Value="Horizontal">
+                                                <Setter Property="Width" Value="Auto"/>
+                                                <Setter Property="Height" Value="18" />
+                                                <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                    <Style TargetType="{x:Type ScrollViewer}">
+                                        <Setter Property="OverridesDefaultStyle" Value="True" />
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                                                    <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*" />
+                                                            <RowDefinition Height="Auto" />
+                                                        </Grid.RowDefinitions>
+                                                        <!--
+                                                    <Rectangle x:Name="Corner" Grid.Row="1" Grid.Column="1" Fill="Transparent" />
+                                                    -->
+                                                        <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" Grid.Row="0" Grid.Column="0" Margin="{TemplateBinding Padding}" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="False" CanVerticallyScroll="False" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                                        <ScrollBar x:Name="PART_VerticalScrollBar" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" ViewportSize="{TemplateBinding ViewportHeight}" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{Binding VerticalOffset, Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                                                        <ScrollBar x:Name="PART_HorizontalScrollBar" Grid.Row="1" Grid.Column="0" AutomationProperties.AutomationId="HorizontalScrollBar" Cursor="Arrow" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0" Orientation="Horizontal" ViewportSize="{TemplateBinding ViewportWidth}" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" Value="{Binding HorizontalOffset,Mode=OneWay,RelativeSource={RelativeSource TemplatedParent}}" />
+                                                    </Grid>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </TextBox.Resources>
+                            </TextBox>
+
+                            <Button Style="{StaticResource PathButton}" Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 46 0" VerticalAlignment="Top" Content="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" Command="{Binding ClearAckTextCommand}"></Button>
+
+                            <Button Style="{StaticResource PathButton}" Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 18 0" VerticalAlignment="Top" Content="M19,3H16.3H7.7H5A2,2 0 0,0 3,5V7.7V16.4V19A2,2 0 0,0 5,21H7.7H16.4H19A2,2 0 0,0 21,19V16.3V7.7V5A2,2 0 0,0 19,3M15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4L13.4,12L17,15.6L15.6,17Z" Command="{Binding ShowAckWindowCommand}"></Button>
+
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
 
             <!-- 初期設定兼再接続画面 -->
             <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}" Visibility="{Binding IsConnectionSettingShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
@@ -2198,7 +2458,7 @@
             </Grid>
 
             <!-- 設定画面 -->
-            <Grid Grid.Row="1" Grid.RowSpan="6" Grid.Column="0" Grid.ColumnSpan="3" Visibility="{Binding IsSettingsShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
+            <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="3" Visibility="{Binding IsSettingsShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="0"/>
                     <RowDefinition Height="*"/>
@@ -2457,11 +2717,15 @@
                                         </Grid>
                                         
                                         <!-- Developer Mode -->
-                                        <Border Grid.Row="4" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1" Visibility="{Binding DeveloperMode, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                                        <Border Grid.Row="4" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
                                             <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.DeveloperMode}" HorizontalAlignment="Left"/>
                                         </Border>
 
                                         <Grid Grid.Row="5" HorizontalAlignment="Left" Margin="0 12 0 0" Visibility="{Binding DeveloperMode, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                                            <CheckBox Content="{x:Static properties:Resources.Settings_Opts_ShowDebugWidow}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsShowDebugWindow}" Margin="0 12 0 0"></CheckBox>
+                                        </Grid>
+                                        
+                                        <Grid Grid.Row="6" HorizontalAlignment="Left" Margin="0 12 0 0" Visibility="{Binding DeveloperMode, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_SaveLog}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsSaveLog}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
 

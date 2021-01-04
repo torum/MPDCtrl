@@ -24,8 +24,16 @@ namespace MPDCtrl.Models
         public string ResultText;
     }
 
+    public class CommandBinaryResult : Result
+    {
+        public int WholeSize;
+        public int ChunkSize;
+        public string Type;
+        public byte[] BinaryData;
+    }
+
     /*
-    // for commands that return nothing but "OK".
+    // for commands that return nothing but "OK" or "ACK".
     public class CommandBoolResult : CommandResult
     {
     }
@@ -35,9 +43,7 @@ namespace MPDCtrl.Models
     {
         
     }
-
     */
-
 
     // for commands that return playlist songs.
     public class CommandPlaylistResult : CommandResult
@@ -51,7 +57,7 @@ namespace MPDCtrl.Models
         public ObservableCollection<Song> SearchResult;
     }
 
-
+    // TODO: 不要？
     public class IdleResult : CommandResult
     {
 

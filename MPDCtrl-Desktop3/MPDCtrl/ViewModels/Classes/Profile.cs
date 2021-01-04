@@ -83,8 +83,8 @@ namespace MPDCtrl.ViewModels.Classes
             }
         }
 
-        private int _volume = 50;
-        public int Volume
+        private double _volume = 50;
+        public double Volume
         {
             get { return _volume; }
             set

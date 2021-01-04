@@ -18,6 +18,7 @@ namespace MPDCtrl.Models
 
         private MpdPlayState _ps;
         private int _volume = 50;
+        private bool _volumeIsSet;
         private bool _repeat;
         private bool _random;
         private bool _consume;
@@ -42,8 +43,15 @@ namespace MPDCtrl.Models
             }
         }
 
-        public bool MpdVolumeIdSet { get; set; }
-
+        public bool MpdVolumeIsSet
+        {
+            get { return _volumeIsSet; }
+            set
+            {
+                _repeat = _volumeIsSet;
+            }
+        }
+        
         public bool MpdRepeat
         {
             get { return _repeat; }
@@ -117,7 +125,7 @@ namespace MPDCtrl.Models
         public void Reset()
         {
             _volume = 50;
-            MpdVolumeIdSet = false;
+            _volumeIsSet = false;
             _repeat = false;
             _random = false;
             _consume = false;

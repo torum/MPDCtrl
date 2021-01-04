@@ -1,6 +1,4 @@
-﻿/// 
-/// 
-/// MPDCtrl
+﻿/// MPDCtrl
 /// https://github.com/torum/MPDCtrl
 /// 
 /// MPD Protocol
@@ -18,6 +16,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace MPDCtrl.Models
 {
@@ -103,66 +102,12 @@ namespace MPDCtrl.Models
         }
 
         // TODO:
-        private AlbumCover _albumCover = new AlbumCover();
-        public AlbumCover AlbumArt
+        private AlbumImage _albumCover = new AlbumImage();
+        public AlbumImage AlbumCover
         {
             get { return _albumCover; }
         }
 
-        #endregion
-
-        #region == Events == 
-
-        public delegate void IsBusyEvent(MPC sender, bool on);
-        public event IsBusyEvent IsBusy;
-
-        public delegate void DebugCommandOutputEvent(MPC sender, string data);
-        public event DebugCommandOutputEvent DebugCommandOutput;
-
-        public delegate void DebugIdleOutputEvent(MPC sender, string data);
-        public event DebugIdleOutputEvent DebugIdleOutput;
-
-        public delegate void ConnectionStatusChangedEvent(MPC sender, ConnectionStatus status);
-        public event ConnectionStatusChangedEvent ConnectionStatusChanged;
-
-        public delegate void ConnectionErrorEvent(MPC sender, string data);
-        public event ConnectionErrorEvent ConnectionError;
-
-        public delegate void IsMpdIdleConnectedEvent(MPC sender);
-        public event IsMpdIdleConnectedEvent MpdIdleConnected;
-
-        public delegate void MpdAckErrorEvent(MPC sender, string data);
-        public event MpdAckErrorEvent MpdAckError;
-
-        public delegate void MpdAckStatusErrorEvent(MPC sender, string data);
-        public event MpdAckStatusErrorEvent MpdAcmStatusError;
-
-
-        public delegate void MpdPlayerStatusChangedEvent (MPC sender);
-        public event MpdPlayerStatusChangedEvent MpdPlayerStatusChanged;
-
-        public delegate void MpdCurrentQueueChangedEvent(MPC sender);
-        public event MpdCurrentQueueChangedEvent MpdCurrentQueueChanged;
-
-        public delegate void MpdPlaylistsChangedEvent(MPC sender);
-        public event MpdPlaylistsChangedEvent MpdPlaylistsChanged;
-
-
-        /*
-        public delegate void MpdStatusChanged(MPC sender, object data);
-        public event MpdStatusChanged StatusChanged;
-
-        public delegate void MpdError(MPC sender, MpdErrorTypes err, object data);
-        public event MpdError ErrorReturned;
-
-
-        public delegate void MpdStatusUpdate(MPC sender, object data);
-        public event MpdStatusUpdate StatusUpdate;
-
-
-        public delegate void MpdAlbumArtStatusChanged(MPC sender);
-        public event MpdAlbumArtStatusChanged OnAlbumArtStatusChanged;
-        */
         #endregion
 
         #region == Connections ==
@@ -191,7 +136,7 @@ namespace MPDCtrl.Models
             SeeConnectionErrorEvent
         }
 
-        private ConnectionStatus _connectionState;
+        private ConnectionStatus _connectionState = ConnectionStatus.NeverConnected;
         public ConnectionStatus ConnectionState
         {
             get
@@ -209,22 +154,82 @@ namespace MPDCtrl.Models
             }
         }
 
-        // TODO:ちゃんと使っていないので利用する。
+        // TODO:ちゃんと使っていないので利用するか削除すべきか。
         public bool IsMpdCommandConnected { get; set; }
         public bool IsMpdIdleConnected { get; set; }
 
         #endregion
 
+        #region == Events == 
+
+        public delegate void IsBusyEvent(MPC sender, bool on);
+        public event IsBusyEvent IsBusy;
+
+        public delegate void DebugCommandOutputEvent(MPC sender, string data);
+        public event DebugCommandOutputEvent DebugCommandOutput;
+
+        public delegate void DebugIdleOutputEvent(MPC sender, string data);
+        public event DebugIdleOutputEvent DebugIdleOutput;
+
+        public delegate void ConnectionStatusChangedEvent(MPC sender, ConnectionStatus status);
+        public event ConnectionStatusChangedEvent ConnectionStatusChanged;
+
+        public delegate void ConnectionErrorEvent(MPC sender, string data);
+        public event ConnectionErrorEvent ConnectionError;
+
+        public delegate void IsMpdIdleConnectedEvent(MPC sender);
+        public event IsMpdIdleConnectedEvent MpdIdleConnected;
+
+        public delegate void MpdAckErrorEvent(MPC sender, string data);
+        public event MpdAckErrorEvent MpdAckError;
+
+        public delegate void MpdPlayerStatusChangedEvent(MPC sender);
+        public event MpdPlayerStatusChangedEvent MpdPlayerStatusChanged;
+
+        public delegate void MpdCurrentQueueChangedEvent(MPC sender);
+        public event MpdCurrentQueueChangedEvent MpdCurrentQueueChanged;
+
+        public delegate void MpdPlaylistsChangedEvent(MPC sender);
+        public event MpdPlaylistsChangedEvent MpdPlaylistsChanged;
+
+        public delegate void MpdAlbumArtChangedEvent(MPC sender);
+        public event MpdAlbumArtChangedEvent MpdAlbumArtChanged;
+
+        #endregion
+
         public MPC()
         {
-            ConnectionState = ConnectionStatus.NeverConnected;
 
         }
 
         #region == Idle Connection ==
 
-        public async Task<bool> MpdIdleConnect(string host, int port)
+        public async Task<bool> MpdIdleConnectionStart(string host, int port, string password)
         {
+            // 現在、使ってない。
+
+            ConnectionResult r = await MpdIdleConnect(host, port);
+
+            bool ret = false;
+
+            if (r.IsSuccess)
+            {
+                CommandResult d = await MpdIdleSendPassword(password);
+
+                if (d.IsSuccess)
+                {
+                    ret = true;
+
+                }
+            }
+
+            return ret;
+        }
+
+        public async Task<ConnectionResult> MpdIdleConnect(string host, int port)
+        {
+            ConnectionResult result = new ConnectionResult();
+
             IsMpdIdleConnected = false;
 
             _idleConnection = new TcpClient();
@@ -232,8 +237,7 @@ namespace MPDCtrl.Models
             _host = host;
             _port = port;
 
-
-            DebugIdleOutput?.Invoke(this, "TCP Idle Connection: Trying to connect." + "\n" + "\n");
+            DebugIdleOutput?.Invoke(this, "TCP Idle Connection: Connecting." + "\n" + "\n");
 
             ConnectionState = ConnectionStatus.Connecting;
 
@@ -263,6 +267,8 @@ namespace MPDCtrl.Models
                         DebugIdleOutput?.Invoke(this, "<<<<" + response.Trim() + "\n" + "\n");
 
                         IsMpdIdleConnected = true;
+
+                        result.IsSuccess = true;
 
                         MpdIdleConnected?.Invoke(this);
 
@@ -301,7 +307,28 @@ namespace MPDCtrl.Models
                 ConnectionError?.Invoke(this, "TCP connection error: " + e.Message);
             }
 
-            return IsMpdIdleConnected;
+            return result;
+        }
+
+        public async Task<CommandResult> MpdIdleSendPassword(string password = "")
+        {
+            _password = password;
+
+            CommandResult ret = new CommandResult();
+
+            if (string.IsNullOrEmpty(password))
+            {
+                ret.IsSuccess = true;
+                ret.ResultText = "OK";
+                ret.ErrorMessage = "";
+
+                return ret;
+            }
+
+            string cmd = "password " + password + "\n";
+
+            return await MpdIdleSendCommand(cmd);
+
         }
 
         private async Task<CommandResult> MpdIdleSendCommand(string cmd)
@@ -484,7 +511,7 @@ namespace MPDCtrl.Models
                 DebugIdleOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
 
                 if (isAck)
-                    MpdAckError?.Invoke(this, stringBuilder.ToString() + " (MISC)");
+                    MpdAckError?.Invoke(this, stringBuilder.ToString() + " (@MISC)");
 
                 ret.ResultText = stringBuilder.ToString();
                 
@@ -505,7 +532,7 @@ namespace MPDCtrl.Models
 
                 //await _idleWriter.WriteAsync("noidle\n");
                 //await _idleWriter.WriteAsync("idle player\n");
-                await Task.Delay(1000);
+                //await Task.Delay(1000);
 
                 ret.IsSuccess = false;
                 ret.ErrorMessage = e.Message;
@@ -523,28 +550,6 @@ namespace MPDCtrl.Models
 
                 return ret;
             }
-
-            return ret;
-        }
-
-        public async Task<CommandResult> MpdIdleSendPassword(string password = "")
-        {
-            _password = password;
-
-            CommandResult ret = new CommandResult();
-
-            if (string.IsNullOrEmpty(password))
-            {
-                ret.IsSuccess = true;
-                ret.ResultText = "OK";
-                ret.ErrorMessage = "";
-
-                return ret;
-            }
-
-            string cmd = "password " + password + "\n";
-
-            return await MpdIdleSendCommand(cmd);
 
         }
 
@@ -756,10 +761,10 @@ namespace MPDCtrl.Models
                 DebugIdleOutput?.Invoke(this, "<<<<" + result.Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
 
                 if (isAck)
-                    MpdAckError?.Invoke(this, ackText + " (idle)");
+                    MpdAckError?.Invoke(this, ackText + " (@idle)");
 
                 // Parse & Raise event and MpdIdle();
-                await ParseSubSystemsAndRaseChangedEvent(result);
+                await ParseSubSystemsAndRaiseChangedEvent(result);
 
             }
             catch (System.IO.IOException e)
@@ -813,7 +818,7 @@ namespace MPDCtrl.Models
             }
         }
 
-        private async Task<bool> ParseSubSystemsAndRaseChangedEvent(string result)
+        private async Task<bool> ParseSubSystemsAndRaiseChangedEvent(string result)
         {
             /*
             public enum MpdSubSystems
@@ -921,7 +926,7 @@ namespace MPDCtrl.Models
 
         #region == Command Connection ==
 
-        public async void MpdCommandConnectionStart(string host, int port, string password)
+        public async Task<bool> MpdCommandConnectionStart(string host, int port, string password)
         {
             ConnectionResult r = await MpdCommandConnect(host, port);
 
@@ -934,10 +939,14 @@ namespace MPDCtrl.Models
                     // ここでIdleにして、以降はnoidle + cmd + idleの組み合わせでやる。
                     // ただし、実際にはidleのあとReadしていないからタイムアウトで切断されてしまう模様。
 
-                    // await しなくても良いのだけれど。
-                    await MpdSendIdle();
+                    // awaitが必要だった。
+                    d = await MpdSendIdle();
+
+                    return d.IsSuccess;
                 }
             }
+
+            return false;
         }
 
         public async Task<ConnectionResult> MpdCommandConnect(string host, int port)
@@ -952,7 +961,7 @@ namespace MPDCtrl.Models
             _port = port;
 
 
-            DebugCommandOutput?.Invoke(this, "TCP Command Connection: Trying to connect." + "\n" + "\n");
+            DebugCommandOutput?.Invoke(this, "TCP Command Connection: Connecting." + "\n" + "\n");
 
             ConnectionState = ConnectionStatus.Connecting;
 
@@ -985,8 +994,6 @@ namespace MPDCtrl.Models
 
                         result.IsSuccess = true;
 
-                        //MpdConnected?.Invoke(this);
-
                         // Done for now.
                     }
                     else
@@ -1013,9 +1020,7 @@ namespace MPDCtrl.Models
             }
             catch (Exception e)
             {
-                // TODO: Test.
-
-                DebugCommandOutput?.Invoke(this, "TCP Command Connection: Error while connecting. Fail to connect: " + e.Message + "\n" + "\n");
+                DebugCommandOutput?.Invoke(this, "TCP Command Connection: Error while connecting. Fail to connect (Exception): " + e.Message + "\n" + "\n");
 
                 ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
@@ -1046,6 +1051,7 @@ namespace MPDCtrl.Models
 
         }
 
+        // TODO: Rename MpdSendCommand to MpdCommandSendCommand
         private async Task<CommandResult> MpdSendCommand(string cmd, bool isAutoIdling = false)
         {
             CommandResult ret = new CommandResult();
@@ -1096,7 +1102,11 @@ namespace MPDCtrl.Models
                     await _commandWriter.WriteAsync(cmd.Trim() + "\n");
 
                     if (!isAutoIdling)
+                    {
+                        ret.IsSuccess = true;
+
                         return ret;
+                    }
                 }
                 else
                 {
@@ -1119,7 +1129,7 @@ namespace MPDCtrl.Models
             }
             catch (System.IO.IOException e)
             {
-                Debug.WriteLine("IOException@MpdSendCommand: " + cmd.Trim() + " WriteAsync :" + e.Message);
+                // IOException : Unable to write data to the transport connection: 確立された接続がホスト コンピューターのソウトウェアによって中止されました。
 
                 ret.IsSuccess = false;
                 ret.ErrorMessage = e.Message;
@@ -1133,27 +1143,35 @@ namespace MPDCtrl.Models
                 {
                     DebugCommandOutput?.Invoke(this, string.Format("################ Error@{0}, Reason:{1}, Data:{2}, {3} Exception: {4} {5}", "WriteAsync@MpdSendCommand", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
 
+                    // タイムアウトしていたらここで「も」エラーになる模様。
+                    
+                    IsMpdCommandConnected = false;
 
+                    DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
 
-                    // タイムアウトしていたらここでエラーになる模様。
+                    _commandConnection.Close();
 
-                    // IOException : Unable to write data to the transport connection: 確立された接続がホスト コンピューターのソウトウェアによって中止されました。
+                    ConnectionResult newCon = await MpdCommandConnect(_host,_port);
 
+                    if (newCon.IsSuccess)
+                    {
+                        CommandResult d = await MpdCommandSendPassword(_password);
 
+                        if (d.IsSuccess)
+                        {
+                            DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. " + Environment.NewLine + Environment.NewLine));
 
+                            ret = await MpdSendCommand(cmd, isAutoIdling);
+                        }
+                    }
+                    else
+                    {
+                        DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Failed. " + Environment.NewLine + Environment.NewLine));
 
+                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
-
-
-
-
-
-
-
-
-                    //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                    //ConnectionError?.Invoke(this, "The connection (command) has been terminated (IOException): " + e.Message);
+                        ConnectionError?.Invoke(this, "The connection (command) has been terminated (IOException): " + e.Message);
+                    }
                 }
 
                 return ret;
@@ -1189,6 +1207,7 @@ namespace MPDCtrl.Models
                 bool isDoubleOk = false;
                 bool isAck = false;
                 string ackText = "";
+                bool isNullReturn = false;
 
                 while (true)
                 {
@@ -1252,39 +1271,70 @@ namespace MPDCtrl.Models
                             {
                                 stringBuilder.Append(line + "\n"); // << has to be \n
                             }
-                            else
-                            {
-                                Debug.WriteLine("line == IsNullOrEmpty");
-
-                                break;
-                            }
                         }
                     }
                     else
                     {
-                        Debug.WriteLine("@MpdSendCommand ReadLineAsync line != null");
-
-                        DebugCommandOutput?.Invoke(this, string.Format("################ Error @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "ReadLineAsync received null data", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
-
-                        //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                        //ConnectionError?.Invoke(this, "The connection (command) has been terminated. ");
-
-                        ret.ResultText = stringBuilder.ToString();
-                        ret.ErrorMessage = "ReadLineAsync@MpdSendCommand received null data";
+                        isNullReturn = true;
 
                         break;
                     }
                 }
 
-                DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
+                if (isNullReturn)
+                {
+                    Debug.WriteLine("@MpdSendCommand ReadLineAsync isNullReturn");
 
-                if (isAck)
-                    MpdAckError?.Invoke(this, ackText + " (MSC)");
+                    DebugCommandOutput?.Invoke(this, string.Format("################ Error @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "ReadLineAsync received null data", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
 
-                ret.ResultText = stringBuilder.ToString();
+                    ret.ResultText = stringBuilder.ToString();
+                    ret.ErrorMessage = "ReadLineAsync@MpdSendCommand received null data";
 
-                return ret;
+                    // タイムアウトしていたらここで「も」エラーになる模様。
+
+                    IsMpdCommandConnected = false;
+
+                    DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
+
+                    _commandConnection.Close();
+
+                    ConnectionResult newCon = await MpdCommandConnect(_host, _port);
+
+                    if (newCon.IsSuccess)
+                    {
+                        CommandResult d = await MpdCommandSendPassword(_password);
+
+                        if (d.IsSuccess)
+                        {
+                            DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. " + Environment.NewLine + Environment.NewLine));
+
+                            ret = await MpdSendCommand(cmd, isAutoIdling);
+                        }
+                    }
+                    else
+                    {
+                        // 
+                        DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Failed. " + Environment.NewLine + Environment.NewLine));
+
+                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                        ConnectionError?.Invoke(this, "The connection (command) has been terminated (null return).");
+                    }
+
+                    return ret;
+                }
+                else
+                {
+                    DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
+
+                    if (isAck)
+                        MpdAckError?.Invoke(this, ackText + " (@MSC)");
+
+                    ret.ResultText = stringBuilder.ToString();
+
+                    return ret;
+                }
+
             }
             catch (System.InvalidOperationException e)
             {
@@ -1303,6 +1353,57 @@ namespace MPDCtrl.Models
 
                 return ret;
             }
+            catch (System.IO.IOException e)
+            {
+                // IOException : Unable to write data to the transport connection: 確立された接続がホスト コンピューターのソウトウェアによって中止されました。
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = e.Message;
+
+                // Could be application shutdopwn.
+                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
+                {
+
+                }
+                else
+                {
+                    DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                    // タイムアウトしていたらここで「も」エラーになる模様。
+
+                    IsMpdCommandConnected = false;
+
+                    DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
+
+                    _commandConnection.Close();
+
+                    ConnectionResult newCon = await MpdCommandConnect(_host, _port);
+
+                    if (newCon.IsSuccess)
+                    {
+                        CommandResult d = await MpdCommandSendPassword(_password);
+
+                        if (d.IsSuccess)
+                        {
+                            DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. " + Environment.NewLine + Environment.NewLine));
+
+                            ret = await MpdSendCommand(cmd, isAutoIdling);
+                        }
+                    }
+                    else
+                    {
+                        // Unable to read data from the transport connection: 既に接続済みのソケットに対して接続を要求しました。.
+
+                        DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Failed. " + Environment.NewLine + Environment.NewLine));
+
+                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                        ConnectionError?.Invoke(this, "The connection (command) has been terminated (IOException): " + e.Message);
+                    }
+                }
+
+                return ret;
+            }
             catch (Exception e)
             {
                 Debug.WriteLine("Exception@MpdSendCommand: " + cmd.Trim() + " ReadLineAsync ---- " + e.Message);
@@ -1317,92 +1418,47 @@ namespace MPDCtrl.Models
 
         }
 
-        #endregion
-
-        #region == MPD Commands == 
-
-        // TODO: 
-        private async Task<bool> CheckCommandQueue()
+        private async Task<CommandBinaryResult> MpdCommandGetBinary(string cmd, bool isAutoIdling = false)
         {
-            /*
-            int c = 100;
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                if (commandQueueCount <= 0)
-                    commandQueueCumulativeCount = 0;
-
-                commandQueueCumulativeCount++;
-                commandQueueCount++;
-
-            });
-
-            await Task.Delay(c);
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                if (commandQueueCount > 1)
-                    c = (commandQueueCumulativeCount * 100);
-
-                if (commandQueueCount > 1)
-                    MpcInfo?.Invoke(this, string.Format("Too many command requests({0}) for a short period of time. Throttling.... ({1})", commandQueueCumulativeCount.ToString(), commandQueueCount.ToString()));
-
-            });
-
-            await Task.Delay(c);
-
-            //Debug.WriteLine("Waiting@checkCommandQueue: " + commandQueueCount.ToString() + " : " + c.ToString());
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                commandQueueCount--;
-
-                if (commandQueueCount <= 0)
-                    MpcInfo?.Invoke(this, "");
-
-                if (commandQueueCount > 0)
-                    MpcInfo?.Invoke(this, string.Format("Too many command requests({0}) for a short period of time. Throttling.... ({1})", commandQueueCumulativeCount.ToString(), commandQueueCount.ToString()));
-
-            });
-            */
-            return true;
-        }
-
-        // TODO:
-        private async Task<CommandResult> MpdSendCommandSet(string cmd)
-        {
-            CommandResult ret = new CommandResult();
+            CommandBinaryResult ret = new CommandBinaryResult();
 
             if (_commandConnection.Client == null)
             {
-                Debug.WriteLine("Exception@MpdSendCommandSet: " + "NOT _tcpCommandClient.Client = null");
+                Debug.WriteLine("@MpdCommandGetBinary: " + "TcpClient.Client == null");
 
                 ret.IsSuccess = false;
-                ret.ErrorMessage = "NOT _tcpCommandClient.Client = null";
-                DebugCommandOutput?.Invoke(this, string.Format("<<<<Received ({0} ):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), ret.ErrorMessage));
-                return ret;
-            }
+                ret.ErrorMessage = "TcpClient.Client == null";
 
-            if (!_commandConnection.Client.Connected)
-            {
-                Debug.WriteLine("Exception@MpdSendCommandSet: " + "NOT IsMpdCommandConnected");
+                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdCommandGetBinary", "TcpClient.Client == null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
 
-                ret.IsSuccess = false;
-                ret.ErrorMessage = "NOT IsMpdCommandConnected";
-                DebugCommandOutput?.Invoke(this, string.Format("<<<<Received ({0} ):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), ret.ErrorMessage));
                 return ret;
             }
 
             if ((_commandWriter == null) || (_commandReader == null))
             {
-                Debug.WriteLine("Exception@MpdSendCommandSet: " + "_commandWriter or _commandReader is null");
+                Debug.WriteLine("@MpdCommandGetBinary: " + "_commandWriter or _commandReader is null");
 
                 ret.IsSuccess = false;
                 ret.ErrorMessage = "_commandWriter or _commandReader is null";
-                DebugCommandOutput?.Invoke(this, string.Format("<<<<Received ({0} ):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), ret.ErrorMessage));
+
+                DebugCommandOutput?.Invoke(this, string.Format("################ Error :@{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdCommandGetBinary", "_commandWriter or _commandReader is null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+
                 return ret;
             }
 
+            if (!_commandConnection.Client.Connected)
+            {
+                Debug.WriteLine("@MpdCommandGetBinary: " + "NOT IsMpdCommandConnected");
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = "NOT IsMpdCommandConnected";
+
+                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdCommandGetBinary", "!CommandConnection.Client.Connected", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+
+                return ret;
+            }
+
+            // WriteAsync
             try
             {
                 if (cmd.Trim().StartsWith("idle"))
@@ -1411,109 +1467,404 @@ namespace MPDCtrl.Models
 
                     await _commandWriter.WriteAsync(cmd.Trim() + "\n");
 
-                    return ret;
+                    if (!isAutoIdling)
+                        return ret;
                 }
-                else if (cmd.Trim() == "noidle")
+                else
                 {
-                    DebugCommandOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
+                    string cmdDummy = cmd;
+                    if (cmd.StartsWith("password "))
+                        cmdDummy = "password ****";
 
-                    await _commandWriter.WriteAsync(cmd.Trim() + "\n");
+                    cmdDummy = cmdDummy.Trim().Replace("\n", "\n" + ">>>>");
+
+                    if (isAutoIdling)
+                        DebugCommandOutput?.Invoke(this, ">>>>" + "noidle\n>>>>" + cmdDummy.Trim() + "\n>>>>idle player" + "\n" + "\n");
+                    else
+                        DebugCommandOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n");
+
+                    if (isAutoIdling)
+                        await _commandWriter.WriteAsync("noidle\n" + cmd.Trim() + "\n" + "idle player\n");
+                    else
+                        await _commandWriter.WriteAsync(cmd.Trim() + "\n");
+                }
+            }
+            catch (System.IO.IOException e)
+            {
+                // IOException : Unable to write data to the transport connection: 確立された接続がホスト コンピューターのソウトウェアによって中止されました。
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = e.Message;
+
+                // Could be application shutdopwn.
+                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
+                {
 
                 }
                 else
                 {
-                    string cmdlist = "command_list_begin" + "\n";
-                    cmdlist = cmdlist + cmd.Trim() + "\n";
-                    cmdlist = cmdlist + "command_list_end";
+                    DebugCommandOutput?.Invoke(this, string.Format("################ Error@{0}, Reason:{1}, Data:{2}, {3} Exception: {4} {5}", "WriteAsync@MpdCommandGetBinary", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
 
-                    DebugCommandOutput?.Invoke(this, ">>>>" + cmdlist.Trim().Replace("\n", "\n" + ">>>>") + "\n" + "\n");
+                    // タイムアウトしていたらここで「も」エラーになる模様。
 
-                    await _commandWriter.WriteAsync(cmd.Trim() + "\n");
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine("Exception@MpdSendCommandSet: " + cmd.Trim() + " WriteAsync " + e.Message);
+                    IsMpdCommandConnected = false;
 
-                ret.IsSuccess = false;
-                ret.ErrorMessage = e.Message;
-                DebugCommandOutput?.Invoke(this, string.Format("<<<<Received ({0}):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), e.Message));
+                    DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
 
-                return ret;
-            }
+                    _commandConnection.Close();
 
-            try
-            {
-                StringBuilder stringBuilder = new StringBuilder();
+                    ConnectionResult newCon = await MpdCommandConnect(_host, _port);
 
-                while (true)
-                {
-                    string line = await _commandReader.ReadLineAsync();
-
-                    if (line != null)
+                    if (newCon.IsSuccess)
                     {
-                        if (line.StartsWith("ACK"))
+                        CommandResult d = await MpdCommandSendPassword(_password);
+
+                        if (d.IsSuccess)
                         {
-                            Debug.WriteLine("ACK line @MpdSendCommandSet: " + cmd.Trim() + " and " + line);
+                            DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. " + Environment.NewLine + Environment.NewLine));
 
-                            if (!string.IsNullOrEmpty(line))
-                                stringBuilder.Append(line + "\n");
-
-                            break;
-                        }
-                        else if (line.StartsWith("OK"))
-                        {
-                            ret.IsSuccess = true;
-
-                            if (!string.IsNullOrEmpty(line))
-                                stringBuilder.Append(line + "\n");
-
-                            break;
-                        }
-                        else if (line.StartsWith("changed: "))
-                        {
-                            // noidleでついてくるかもしれないchanged. idleConnectionで見ているからここでは無視。
-
-                            if (!string.IsNullOrEmpty(line))
-                                stringBuilder.Append(line + "\n");
-                        }
-                        else
-                        {
-                            if (!string.IsNullOrEmpty(line))
-                            {
-                                stringBuilder.Append(line + "\n"); // << has to be \n
-                            }
-                            else
-                            {
-                                Debug.WriteLine("line == IsNullOrEmpty");
-                                break;
-                            }
+                            ret = await MpdCommandGetBinary(cmd, isAutoIdling);
                         }
                     }
                     else
                     {
-                        Debug.WriteLine("line != null");
-                        break;
+                        DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Failed. " + Environment.NewLine + Environment.NewLine));
+
+                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                        ConnectionError?.Invoke(this, "The connection (command) has been terminated (IOException): " + e.Message);
                     }
                 }
 
-                ret.ErrorMessage = "";
-
-                DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
+                return ret;
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Exception@MpdSendCommandSet: " + cmd.Trim() + " ReadLineAsync " + e.Message);
+                Debug.WriteLine("Exception@MpdCommandGetBinary: " + cmd.Trim() + " WriteAsync " + e.Message);
 
                 ret.IsSuccess = false;
                 ret.ErrorMessage = e.Message;
-                DebugCommandOutput?.Invoke(this, string.Format("<<<<Received ({0}):\n{1}" + Environment.NewLine + Environment.NewLine, cmd.Trim(), e.Message));
+
+                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
+                {
+
+                }
+                else
+                {
+                    DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "WriteAsync@MpdCommandGetBinary", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                    //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                    //ConnectionError?.Invoke(this, "The connection (command) has been terminated (Exception): " + e.Message);
+                }
 
                 return ret;
             }
 
-            return ret;
+            // ReadAsync
+            try
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+
+                byte[] bin = new byte[0];
+
+                bool isDoubleOk = false;
+                bool isAck = false;
+                string ackText = "";
+                bool isNullReturn = false;
+                bool isBinaryFound = false;
+
+                bool isWaitForOK = true;
+
+                while (isWaitForOK)
+                {
+
+                    int readSize = 0;
+                    int bufferSize = 5000;
+                    byte[] buffer = new byte[bufferSize];
+                    byte[] bindata = new byte[0];
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        while ((readSize = await _commandReader.BaseStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                        {
+                            ms.Write(buffer, 0, readSize);
+
+                            //Debug.WriteLine("ms.Write:" + readSize.ToString());
+
+                            if (readSize < bufferSize)
+                            {
+                                //Debug.WriteLine("done ReadAsync");
+
+                                break;
+                            }
+                        }
+
+                        bindata = ms.ToArray();
+                    }
+
+                    if (bindata.Length == 0)
+                    {
+                        isNullReturn = true;
+
+                        isWaitForOK = false;
+                    }
+                    else
+                    {
+
+                        bin = CombineByteArray(bin, bindata);
+
+                        //Debug.WriteLine("Done .Write:" + bin.Length.ToString());
+
+                        string res = Encoding.Default.GetString(bindata, 0, bindata.Length);
+
+                        List<string> values = res.Split("\n").ToList();
+
+                        foreach (var line in values)
+                        {
+                            if (line != null)
+                            {
+                                if (line.StartsWith("ACK"))
+                                {
+                                    //Debug.WriteLine("ACK line @MpdCommandGetBinary: " + cmd.Trim() + " and " + line);
+
+                                    if (!string.IsNullOrEmpty(line))
+                                        stringBuilder.Append(line + "\n");
+
+                                    ret.ErrorMessage = line;
+                                    ackText = line;
+                                    isAck = true;
+
+                                    isWaitForOK = false;
+
+                                    break;
+                                }
+                                else if (line.StartsWith("changed: "))
+                                {
+                                    // noidleでついてくるかもしれないchanged. idleConnectionで見ているからここでは無視したいが・・・。
+
+                                    if (!string.IsNullOrEmpty(line))
+                                        stringBuilder.Append(line + "\n");
+                                }
+                                else if (line.StartsWith("size: "))
+                                {
+                                    if (!string.IsNullOrEmpty(line))
+                                        stringBuilder.Append(line + "\n");
+
+                                    List<string> s = line.Split(':').ToList();
+                                    if (s.Count > 1)
+                                    {
+                                        if (Int32.TryParse(s[1], out int i))
+                                        {
+                                            ret.WholeSize = i;
+                                        }
+                                    }
+                                }
+                                else if (line.StartsWith("type: "))
+                                {
+                                    if (!string.IsNullOrEmpty(line))
+                                        stringBuilder.Append(line + "\n");
+
+                                    List<string> s = line.Split(':').ToList();
+                                    if (s.Count > 1)
+                                    {
+                                        ret.Type = s[1].Trim();
+                                    }
+                                }
+                                else if (line.StartsWith("binary: "))
+                                {
+                                    isBinaryFound = true;
+
+                                    if (!string.IsNullOrEmpty(line))
+                                        stringBuilder.Append(line + "\n");
+
+                                    stringBuilder.Append("{binary data}" + "\n");
+
+                                    List<string> s = line.Split(':').ToList();
+                                    if (s.Count > 1)
+                                    {
+                                        if (Int32.TryParse(s[1], out int i))
+                                        {
+                                            ret.ChunkSize = i;
+                                        }
+                                    }
+
+                                }
+                                else if (line == "OK") // ==
+                                {
+                                    if (isAutoIdling)
+                                    {
+                                        if (isDoubleOk)
+                                        {
+                                            if (!string.IsNullOrEmpty(line))
+                                                stringBuilder.Append(line + "\n");
+
+                                            ret.IsSuccess = true;
+
+                                            isWaitForOK = false;
+                                            break;
+                                        }
+
+                                        if (!string.IsNullOrEmpty(line))
+                                            stringBuilder.Append(line + "\n");
+
+                                        isDoubleOk = true;
+
+                                    }
+                                    else
+                                    {
+                                        ret.IsSuccess = true;
+
+                                        if (!string.IsNullOrEmpty(line))
+                                            stringBuilder.Append(line + "\n");
+
+                                        isWaitForOK = false;
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    // This should be binary data if not reading correctly above.
+
+                                    //Debug.WriteLine(line);
+                                }
+                            }
+                            else
+                            {
+                                isNullReturn = true;
+
+                                isWaitForOK = false;
+                                break;
+                            }
+                        }
+
+                    }
+                }
+
+                if (isNullReturn)
+                {
+                    Debug.WriteLine("@MpdCommandGetBinary ReadAsync isNullReturn");
+
+                    DebugCommandOutput?.Invoke(this, string.Format("################ Error @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadAsync@MpdCommandGetBinary", "ReadLineAsync received null data", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+
+                    ret.ErrorMessage = "ReadAsync@MpdCommandGetBinary received null data";
+
+                    return ret;
+                }
+                else
+                {
+                    DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
+
+                    if (isAck)
+                    {
+                        // とりあえず今の所、アルバムカバーのfile not existsは無視するようにしている。
+                        //MpdAckError?.Invoke(this, ackText + " (@MCGB)");
+
+                        return ret;
+                    }
+                    else if (isBinaryFound)
+                    {
+                        //return ret;
+                        //return ParseAlbumArtResponse(bin);
+                        return ParseAlbumImageData(bin);
+                    }
+                    else
+                    {
+                        //Debug.WriteLine("No binary data(size) found. Could be a readpicture command?");
+
+                        // TODO: 
+
+                        DebugCommandOutput?.Invoke(this, "No binary data(size) found. Could be a readpicture command?" + "\n" + "\n");
+
+                        return ret;
+                    }
+                }
+            }
+            catch (System.InvalidOperationException e)
+            {
+                // The stream is currently in use by a previous operation on the stream.
+
+                Debug.WriteLine("InvalidOperationException@MpdCommandGetBinary: " + cmd.Trim() + " ReadAsync ---- " + e.Message);
+
+                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadAsync@MpdCommandGetBinary", "InvalidOperationException (Most likely the connection is overloaded)", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                //ConnectionError?.Invoke(this, "The connection (command) has been terminated. Most likely the connection has been overloaded.");
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = e.Message;
+
+                return ret;
+            }
+            catch (System.IO.IOException e)
+            {
+                // IOException : Unable to write data to the transport connection: 確立された接続がホスト コンピューターのソウトウェアによって中止されました。
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = e.Message;
+
+                // Could be application shutdopwn.
+                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
+                {
+
+                }
+                else
+                {
+                    DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadAsync@MpdCommandGetBinary", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                    // タイムアウトしていたらここで「も」エラーになる模様。
+
+                    IsMpdCommandConnected = false;
+
+                    DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
+
+                    _commandConnection.Close();
+
+                    ConnectionResult newCon = await MpdCommandConnect(_host, _port);
+
+                    if (newCon.IsSuccess)
+                    {
+                        CommandResult d = await MpdCommandSendPassword(_password);
+
+                        if (d.IsSuccess)
+                        {
+                            DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. " + Environment.NewLine + Environment.NewLine));
+
+                            ret = await MpdCommandGetBinary(cmd, isAutoIdling);
+                        }
+                    }
+                    else
+                    {
+                        // Unable to read data from the transport connection: 既に接続済みのソケットに対して接続を要求しました。.
+
+                        DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Failed. " + Environment.NewLine + Environment.NewLine));
+
+                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                        ConnectionError?.Invoke(this, "The connection (command) has been terminated (IOException): " + e.Message);
+                    }
+                }
+
+                return ret;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Exception@MpdCommandGetBinary: " + cmd.Trim() + " ReadAsync ---- " + e.Message);
+
+                ret.IsSuccess = false;
+                ret.ErrorMessage = e.Message;
+
+                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadAsync@MpdCommandGetBinary", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+
+                return ret;
+            }
+
         }
+
+        #endregion
+
+        #region == Command Connection's MPD Commands with results other than OK == 
 
         public async Task<CommandResult> MpdSendIdle()
         {
@@ -1525,108 +1876,68 @@ namespace MPDCtrl.Models
             return await MpdSendCommand("noidle");
         }
 
-        public async Task<CommandResult> MpdQueryStatus(bool idling = true)
+        // TODO: autoIdling parameter is no longer needed since idle connection has its own QueryStatus function, but I'll leave this as is for now.
+        public async Task<CommandResult> MpdQueryStatus(bool autoIdling = true)
         {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            if (idling)
-                await MpdSendNoIdle();
-            CommandResult result = await MpdSendCommand("status");
+            CommandResult result = await MpdSendCommand("status", autoIdling);
             if (result.IsSuccess)
             {
                 result.IsSuccess = ParseStatus(result.ResultText);
-                if (result.IsSuccess)
-                {
-                    //Debug.WriteLine("@MpdQueryStatus: IsSuccess.");
-                }
-                else
-                {
-                    //Debug.WriteLine("@MpdQueryStatus: NOT IsSuccess.");
-                }
             }
-            if (idling)
-                await MpdSendIdle();
+
             return result;
         }
 
         // TODO:
-        public async Task<CommandResult> MpdQueryCurrentSong(bool idling = true)
+        public async Task<CommandResult> MpdQueryCurrentSong(bool autoIdling = true)
         {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
             // TODO:
             // Currently not used. So do nothing.
 
-            if (idling)
-                await MpdSendNoIdle();
-            CommandResult result = await MpdSendCommand("currentsong");
+            CommandResult result = await MpdSendCommand("currentsong", autoIdling);
             if (result.IsSuccess)
             {
                 //
             }
-            if (idling)
-                await MpdSendIdle();
+
             return result;
         }
 
-        public async Task<CommandResult> MpdQueryCurrentQueue(bool idling = true)
+        public async Task<CommandResult> MpdQueryCurrentQueue(bool autoIdling = true)
         {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            if (idling)
-                await MpdSendNoIdle();
-            CommandResult result = await MpdSendCommand("playlistinfo");
+            CommandResult result = await MpdSendCommand("playlistinfo", autoIdling);
             if (result.IsSuccess)
             {
                 result.IsSuccess = ParsePlaylistInfo(result.ResultText);
             }
-            if (idling)
-                await MpdSendIdle();
+
             return result;
         }
 
-        public async Task<CommandResult> MpdQueryPlaylists(bool idling = true)
+        public async Task<CommandResult> MpdQueryPlaylists(bool autoIdling = true)
         {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            if (idling)
-                await MpdSendNoIdle();
-            CommandResult result = await MpdSendCommand("listplaylists");
+            CommandResult result = await MpdSendCommand("listplaylists", autoIdling);
             if (result.IsSuccess)
             {
                 result.IsSuccess = ParsePlaylists(result.ResultText);
             }
-            if (idling)
-                await MpdSendIdle();
+
             return result;
         }
 
-        public async Task<CommandResult> MpdQueryListAll(bool idling = true)
+        public async Task<CommandResult> MpdQueryListAll(bool autoIdling = true)
         {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            if (idling)
-                await MpdSendNoIdle();
-            CommandResult result = await MpdSendCommand("listall");
+            CommandResult result = await MpdSendCommand("listall", autoIdling);
             if (result.IsSuccess)
             {
                 result.IsSuccess = ParseListAll(result.ResultText);
             }
-            if (idling)
-                await MpdSendIdle();
+
             return result;
         }
 
-        public async Task<CommandSearchResult> MpdSearch(string queryTag, string queryShiki, string queryValue)
+        public async Task<CommandSearchResult> MpdSearch(string queryTag, string queryShiki, string queryValue, bool autoIdling = true)
         {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
             Application.Current.Dispatcher.Invoke(() =>
             {
                 SearchResult.Clear();
@@ -1644,25 +1955,9 @@ namespace MPDCtrl.Models
 
             string cmd = "search \"(" + expression + ")\"\n";
 
-            /*
-            await MpdSendNoIdle();
-            CommandResult cm = await MpdSendCommand(cmd);
+            CommandResult cm = await MpdSendCommand(cmd, autoIdling);
             if (cm.IsSuccess)
             {
-                if (ParseSearchResult(cm.ResultText))
-                {
-                    result.IsSuccess = true;
-
-                    result.SearchResult = this.SearchResult;
-                }
-            }
-            await MpdSendIdle();
-            */
-            CommandResult cm = await MpdSendCommand(cmd, true);
-            if (cm.IsSuccess)
-            {
-                Debug.WriteLine("ffffffffffffff");
-
                 if (ParseSearchResult(cm.ResultText))
                 {
                     result.IsSuccess = true;
@@ -1674,11 +1969,8 @@ namespace MPDCtrl.Models
             return result;
         }
 
-        public async Task<CommandPlaylistResult> MpdQueryPlaylistSongs(string playlistName)
+        public async Task<CommandPlaylistResult> MpdQueryPlaylistSongs(string playlistName, bool autoIdling = true)
         {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
             CommandPlaylistResult result = new CommandPlaylistResult();
 
             if (string.IsNullOrEmpty(playlistName))
@@ -1689,20 +1981,972 @@ namespace MPDCtrl.Models
 
             playlistName = Regex.Escape(playlistName);
 
-            await MpdSendNoIdle();
-            CommandResult cm = await MpdSendCommand("listplaylistinfo \"" + playlistName + "\"");
+            CommandResult cm = await MpdSendCommand("listplaylistinfo \"" + playlistName + "\"", autoIdling);
             if (cm.IsSuccess)
             {
                 result.IsSuccess = cm.IsSuccess;
                 result.PlaylistSongs = ParsePlaylistSongsResult(cm.ResultText);
 
             }
-            await MpdSendIdle();
 
             return result;
         }
 
+        #endregion
+
+        #region == Command Connection's MPD Commands with boolean result ==
+
+        public async Task<CommandResult> MpdPlaybackPlay(int volume, string songId = "")
+        {
+            string cmd = "play";
+
+            if (songId != "")
+            {
+                cmd = "playid " + songId;
+            }
+
+            if (MpdStatus.MpdVolumeIsSet)
+            {
+                CommandResult result = await MpdSendCommand(cmd, true);
+
+                return result;
+            }
+            else
+            {
+                string cmdList = "command_list_begin" + "\n";
+                cmdList = cmdList + cmd + "\n";
+                cmdList = cmdList + "setvol " + volume.ToString() + "\n";
+                cmdList = cmdList + "command_list_end" + "\n";
+
+                CommandResult result = await MpdSendCommand(cmdList, true);
+
+                return result;
+            }
+
+            //CommandResult result = await MpdSendCommand(cmd, true);
+
+            //return result;
+        }
+
+        public async Task<CommandResult> MpdPlaybackPause()
+        {
+            CommandResult result = await MpdSendCommand("pause 1", true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdPlaybackResume(int volume)
+        {
+            if (MpdStatus.MpdVolumeIsSet)
+            {
+                CommandResult result = await MpdSendCommand("pause 0", true);
+
+                return result;
+            }
+            else
+            {
+                string cmd = "command_list_begin" + "\n";
+                cmd = cmd + "pause 0\n";
+                cmd = cmd + "setvol " + volume.ToString() + "\n";
+                cmd = cmd + "command_list_end" + "\n";
+
+                CommandResult result = await MpdSendCommand(cmd, true);
+
+                return result;
+            }
+        }
+
+        public async Task<CommandResult> MpdPlaybackStop()
+        {
+            CommandResult result = await MpdSendCommand("stop", true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdPlaybackNext()
+        {
+            CommandResult result = await MpdSendCommand("next", true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdPlaybackPrev()
+        {
+            CommandResult result = await MpdSendCommand("previous", true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdSetVolume(int v)
+        {
+            if (v == _status.MpdVolume) 
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = true;
+                return f;
+            }
+
+            CommandResult result = await MpdSendCommand("setvol " + v.ToString(), true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdPlaybackSeek(string songId, int seekTime)
+        {
+            if ((songId == "") || (seekTime == 0)) 
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = true;
+                return f;
+            }
+
+            CommandResult result = await MpdSendCommand("seekid " + songId + " " + seekTime.ToString(), true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdSetRepeat(bool on)
+        {
+            if (_status.MpdRepeat == on)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = true;
+                return f;
+            }
+
+            string cmd = "";
+            if (on)
+            {
+                cmd = "repeat 1";
+            }
+            else
+            {
+                cmd = "repeat 0";
+            }
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdSetRandom(bool on)
+        {
+            if (_status.MpdRandom == on)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = true;
+                return f;
+            }
+
+            string cmd = "";
+            if (on)
+            {
+                cmd = "random 1";
+            }
+            else
+            {
+                cmd = "random 0";
+            }
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdSetConsume(bool on)
+        {
+            if (_status.MpdConsume == on)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = true;
+                return f;
+            }
+
+            string cmd = "";
+            if (on)
+            {
+                cmd = "consume 1";
+            }
+            else
+            {
+                cmd = "consume 0";
+            }
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdSetSingle(bool on)
+        {
+            if (_status.MpdSingle == on)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = true;
+                return f;
+            }
+
+            string cmd = "";
+            if (on)
+            {
+                cmd = "single 1";
+            }
+            else
+            {
+                cmd = "single 0";
+            }
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdClear()
+        {
+            CommandResult result = await MpdSendCommand("clear", true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdSave(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            playlistName = Regex.Escape(playlistName);
+
+            CommandResult result = await MpdSendCommand("save \"" + playlistName + "\"", true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdAdd(string uri)
+        {
+            if (string.IsNullOrEmpty(uri))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            uri = Regex.Escape(uri);
+
+            CommandResult result = await MpdSendCommand("add \"" + uri + "\"", true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdAdd(List<string> uris)
+        {
+            if (uris.Count < 1)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            string cmd = "command_list_begin" + "\n";
+            foreach (var uri in uris)
+            {
+                var urie = Regex.Escape(uri);
+                cmd = cmd + "add \"" + urie + "\"\n";
+            }
+            cmd = cmd + "command_list_end" + "\n";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdDeleteId(List<string> ids)
+        {
+            if (ids.Count < 1)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            string cmd = "command_list_begin" + "\n";
+            foreach (var id in ids)
+            {
+                cmd = cmd + "deleteid " + id + "\n";
+            }
+            cmd = cmd + "command_list_end" + "\n";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdMoveId(Dictionary<string, string> IdToNewPosPair)
+        {
+            if (IdToNewPosPair == null)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+            if (IdToNewPosPair.Count < 1)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            string cmd = "command_list_begin" + "\n";
+            foreach (KeyValuePair<string, string> pair in IdToNewPosPair)
+            {
+                cmd = cmd + "moveid " + pair.Key + " " + pair.Value + "\n";
+            }
+            cmd = cmd + "command_list_end" + "\n";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdChangePlaylist(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            playlistName = Regex.Escape(playlistName);
+
+            string cmd = "command_list_begin" + "\n";
+            cmd = cmd + "clear" + "\n";
+            cmd = cmd + "load \"" + playlistName + "\"\n";
+            cmd = cmd + "command_list_end" + "\n";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdLoadPlaylist(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            playlistName = Regex.Escape(playlistName);
+
+            string cmd = "load \"" + playlistName + "\"";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdRenamePlaylist(string playlistName, string newPlaylistName)
+        {
+            if (string.IsNullOrEmpty(playlistName) || string.IsNullOrEmpty(newPlaylistName))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            playlistName = Regex.Escape(playlistName);
+            newPlaylistName = Regex.Escape(newPlaylistName);
+
+            string cmd = "rename \"" + playlistName + "\" \"" + newPlaylistName + "\"";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdRemovePlaylist(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            playlistName = Regex.Escape(playlistName);
+
+            string cmd = "rm \"" + playlistName + "\"";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdPlaylistAdd(string playlistName, List<string> uris)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+            if (uris == null)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+            if (uris.Count < 1)
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            playlistName = Regex.Escape(playlistName);
+
+            string cmd = "command_list_begin" + "\n";
+            foreach (var uri in uris)
+            {
+                var urie = Regex.Escape(uri);
+                cmd = cmd + "playlistadd " + "\"" + playlistName + "\"" + " " + "\"" + urie + "\"\n";
+            }
+            cmd = cmd + "command_list_end" + "\n";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdQueryAlbumArt(string uri, string songId)
+        {
+            if (string.IsNullOrEmpty(uri))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            if (_albumCover.IsDownloading)
+            {
+                //Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading. Ignoring.");
+                //return;
+            }
+
+            if (_albumCover.SongFilePath == uri)
+            {
+                //Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.SongFilePath == uri. Ignoring.");
+                //return;
+            }
+
+            if (songId != MpdStatus.MpdSongID)
+            {
+                // probably you clicked on "Next" too farst or double clicked.
+                Debug.WriteLine("Error@MpdQueryAlbumArt: songId != MpdStatus.MpdSongID. Ignoring.");
+
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                _albumCover = new AlbumImage();
+                _albumCover.IsDownloading = true;
+                _albumCover.SongFilePath = uri;
+                _albumCover.AlbumImageSource = null;
+                _albumCover.BinaryData =  new byte[0];
+                _albumCover.BinarySize = 0;
+            });
+
+            uri = Regex.Escape(uri);
+
+            //string cmd = "albumart \"" + uri + "\" 0" + "\n";
+            string cmd = "readpicture \"" + uri + "\" 0" + "\n";
+
+            CommandBinaryResult result = await MpdCommandGetBinary(cmd, true);
+
+            if (result.IsSuccess)
+            {
+                _albumCover.BinaryData = result.BinaryData;
+
+                if ((result.WholeSize != 0) && (result.WholeSize == result.ChunkSize))
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
+                        _albumCover.IsSuccess = true;
+                        _albumCover.IsDownloading = false;
+
+                        MpdAlbumArtChanged?.Invoke(this);
+                    });
+                }
+                else
+                {
+                    if ((result.WholeSize != 0) && (result.WholeSize > result.ChunkSize))
+                    {
+                        while ((result.WholeSize > _albumCover.BinaryData.Length) && result.IsSuccess)
+                        {
+                            result = await MpdReQueryAlbumArt(_albumCover.SongFilePath, _albumCover.BinaryData.Length);
+
+                            if (result.IsSuccess && (result.BinaryData != null))
+                                _albumCover.BinaryData = CombineByteArray(_albumCover.BinaryData, result.BinaryData);
+                        }
+
+                        if (result.IsSuccess && (result.BinaryData != null))
+                        {
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
+                                _albumCover.IsSuccess = true;
+                                _albumCover.IsDownloading = false;
+
+                                MpdAlbumArtChanged?.Invoke(this);
+                            });
+                        }
+                    }
+                }
+            }
+
+            CommandResult b = new CommandResult();
+            b.IsSuccess = result.IsSuccess;
+
+            return b;
+        }
+
+        private async Task<CommandBinaryResult> MpdReQueryAlbumArt(string uri, int offset)
+        {
+            if (string.IsNullOrEmpty(uri))
+            {
+                CommandBinaryResult f = new CommandBinaryResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            if (!_albumCover.IsDownloading)
+            {
+                Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading == false. Ignoring.");
+
+                CommandBinaryResult f = new CommandBinaryResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            if (_albumCover.SongFilePath != uri)
+            {
+                Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.SongFilePath != uri. Ignoring.");
+
+                _albumCover.IsDownloading = false;
+
+                CommandBinaryResult f = new CommandBinaryResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            uri = Regex.Escape(uri);
+
+            //string cmd = "albumart \"" + uri + "\" " + offset.ToString() + "\n";
+            string cmd = "readpicture \"" + uri + "\" " + offset.ToString() + "\n";
+
+            return await MpdCommandGetBinary(cmd, true);
+        }
+
+        #endregion
+
         #region == Response parser methods ==
+
+        #region == AlbumImage ==
+
+        private CommandBinaryResult ParseAlbumImageData(byte[] data)
+        {
+            CommandBinaryResult r = new CommandBinaryResult();
+
+            if (MpdStop) return r;
+
+            if (data.Length > 1000000) //2000000000
+            {
+                Debug.WriteLine("**ParseAlbumImageData: binary file size too big: " + data.Length.ToString());
+
+                _albumCover.IsDownloading = false;
+                return r;
+            }
+
+            if (string.IsNullOrEmpty(_albumCover.SongFilePath))
+            {
+                Debug.WriteLine("**ParseAlbumImageData: File path is not set.");
+
+                _albumCover.IsDownloading = false;
+                return r;
+            }
+
+            if (!_albumCover.IsDownloading)
+            {
+                Debug.WriteLine("**ParseAlbumImageData: IsDownloading = false. Downloading canceld? .");
+
+                _albumCover.IsDownloading = false;
+                return r;
+            }
+
+            try
+            {
+                //int gabStart = gabPre;
+                //int gabEnd = gabAfter;
+                int gabStart = 0;
+                int gabEnd = 0;
+
+                string res = Encoding.Default.GetString(data, 0, data.Length);
+
+                int binSize = 0;
+                int binResSize = 0;
+
+                List<string> values = res.Split('\n').ToList();
+
+                bool found = false;
+                foreach (var val in values)
+                {
+                    if (val.StartsWith("size: "))
+                    {
+                        found = true;
+
+                        gabStart = gabStart + val.Length + 1;
+
+                        List<string> s = val.Split(':').ToList();
+                        if (s.Count > 1)
+                        {
+                            if (Int32.TryParse(s[1], out int i))
+                            {
+                                binSize = i;
+
+                                r.WholeSize = i;
+                            }
+                        }
+
+                    }
+                    else if (val.StartsWith("type: "))
+                    {
+                        gabStart = gabStart + val.Length + 1;
+
+                        List<string> s = val.Split(':').ToList();
+                        if (s.Count > 1)
+                        {
+                            r.Type = s[1];
+                        }
+
+                    }
+                    else if (val.StartsWith("binary: "))
+                    {
+                        gabStart = gabStart + val.Length + 1;
+
+                        List<string> s = val.Split(':').ToList();
+                        if (s.Count > 1)
+                        {
+                            if (Int32.TryParse(s[1], out int i))
+                            {
+                                binResSize = i;
+
+                                r.ChunkSize = binResSize;
+                            }
+                        }
+
+                    }
+                    else if (val == "OK") // ==
+                    {
+                        //gabEnd = gabEnd + val.Length + 1;
+                        if (found)
+                        {
+                            gabEnd = gabEnd + val.Length + 1;
+                            //System.Diagnostics.Debug.WriteLine("OK:after " + val);
+                        }
+                        else
+                        {
+                            gabStart = gabStart + val.Length + 1;
+                            //System.Diagnostics.Debug.WriteLine("OK:before " + val);
+                        }
+
+                    }
+                    else if(val.StartsWith("ACK"))
+                    {
+                        // ACK 応答はここまで到達しないはず。
+
+                        if (found)
+                        {
+                            gabEnd = gabEnd + val.Length + 1;
+                            //System.Diagnostics.Debug.WriteLine("changed:after " + val);
+                        }
+                        else
+                        {
+                            gabStart = gabStart + val.Length + 1;
+                            //System.Diagnostics.Debug.WriteLine("changed:before " + val);
+                        }
+                    }
+                    else if (val.StartsWith("changed:"))
+                    {
+                        // Song is changed...so should skip ??
+                        //DataReceived_ParseData(val);
+
+                        if (found)
+                        {
+                            gabEnd = gabEnd + val.Length + 1;
+                            //System.Diagnostics.Debug.WriteLine("changed:after " + val);
+                        }
+                        else
+                        {
+                            gabStart = gabStart + val.Length + 1;
+                            //System.Diagnostics.Debug.WriteLine("changed:before " + val);
+                        }
+
+                    }
+                    else
+                    {
+                        // should be binary...
+                    }
+                }
+
+                gabEnd = gabEnd + 1; //
+
+                // test
+                //gabEnd = 4; // \n O K \n
+
+
+                if (binSize > 1000000)
+                {
+                    Debug.WriteLine("binary file too big: " + binSize.ToString());
+
+                    DebugCommandOutput?.Invoke(this, "binary file too big: " + binSize.ToString() + "\n" + "\n");
+
+                    _albumCover.IsDownloading = false;
+
+                    return r;
+                }
+
+                if ((binSize == 0))
+                {
+                    Debug.WriteLine("binary file size is Zero: " + binSize.ToString() + ", " + binResSize.ToString() + ", " + data.Length.ToString());
+
+                    _albumCover.IsDownloading = false;
+
+                    return r;
+                }
+
+                if (binResSize != ((data.Length - gabStart) - gabEnd))
+                {
+                    Debug.WriteLine("binary file size mismatch: " + binSize.ToString() + ", [" + binResSize.ToString() + ", " + (data.Length - gabStart - gabEnd) + "], " + data.Length.ToString());
+
+                    DebugCommandOutput?.Invoke(this, "binary file size mismatch." + "\n" + "\n");
+
+                    //DebugCommandOutput?.Invoke(this, "raw text data:\n" + res  + "\n" + "\n");
+
+                    _albumCover.IsDownloading = false;
+
+                    return r;
+                }
+
+                r.WholeSize = binSize;
+                r.ChunkSize = binResSize;
+                
+                // 今回受け取ったバイナリ用にバイトアレイをイニシャライズ
+                byte[] resBinary = new byte[data.Length - gabStart - gabEnd];
+                // 今回受け取ったバイナリをresBinaryへコピー
+                Array.Copy(data, gabStart, resBinary, 0, resBinary.Length);
+
+                r.BinaryData = resBinary;
+                
+                r.IsSuccess = true;
+
+                return r;
+                
+                /*
+                if ((binSize != 0) && (binSize == binResSize))
+                {
+                    // 小さいサイズの画像で一発で来た。
+
+                    // 今回受け取ったバイナリ用にバイトアレイをイニシャライズ
+                    byte[] resBinary = new byte[data.Length - gabStart - gabEnd];
+                    try
+                    {
+                        // 今回受け取ったバイナリをresBinaryへコピー
+                        Array.Copy(data, gabStart, resBinary, 0, resBinary.Length);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived: " + ex.Message);
+
+                        _albumCover.IsDownloading = false;
+                        return r;
+                    }
+
+                    _albumCover.BinaryData = resBinary;
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        _albumCover.AlbumImageSource = BitmaSourceFromByteArray(resBinary);
+                        _albumCover.IsSuccess = true;
+                        _albumCover.IsDownloading = false;
+
+                        //MpdAlbumArtChanged?.Invoke(this);
+                    });
+
+
+                    //await Task.Run(() => { StatusUpdate?.Invoke(this, "isAlbumart"); });
+
+                    r.IsSuccess = true;
+                    r.WholeSize = binSize;
+                    r.ChunkSize = binResSize;
+                    r.BinaryData = resBinary;
+
+                    return r;
+                }
+                else if (binSize > _albumCover.BinaryData.Length)
+                {
+                    if (_albumCover.BinarySize == 0)
+                    {
+                        _albumCover.BinarySize = binSize;
+                    }
+                    else
+                    {
+                        if (_albumCover.BinarySize != binSize)
+                        {
+                            System.Diagnostics.Debug.WriteLine("binary file size mismatch: Maybe different download? This should not be happening.");
+
+                            _albumCover.IsDownloading = false;
+                            return r;
+                        }
+                    }
+
+                    try
+                    {
+                        try
+                        {
+                            // 今回受け取ったバイナリ用にバイトアレイをイニシャライズ
+                            byte[] resBinary = new byte[data.Length - gabStart - gabEnd];
+                            // 今回受け取ったバイナリをresBinaryへコピー
+                            Array.Copy(data, gabStart, resBinary, 0, resBinary.Length);
+
+                            _albumCover.BinaryData = CombineByteArray(_albumCover.BinaryData, resBinary);
+
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived (a): " + ex.Message);
+
+                            _albumCover.IsDownloading = false;
+                            return r;
+                        }
+
+                        if (binSize > _albumCover.BinaryData.Length)
+                        {
+                            System.Diagnostics.Debug.WriteLine("Trying again for the rest of binary data.");
+
+                            //CommandResult r = await MpdReQueryAlbumArt(_albumCover.SongFilePath, _albumCover.BinaryData.Length);
+
+                            //return r.IsSuccess;
+                        }
+                        else
+                        {
+                            if (binSize == _albumCover.BinaryData.Length)
+                            {
+                                try
+                                {
+                                    Application.Current.Dispatcher.Invoke(() =>
+                                    {
+                                        _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
+                                        _albumCover.IsSuccess = true;
+                                        _albumCover.IsDownloading = false;
+
+                                        MpdAlbumArtChanged?.Invoke(this);
+                                    });
+
+                                    r.IsSuccess = true;
+                                    r.WholeSize = binSize;
+                                    r.ChunkSize = binResSize;
+                                    r.BinaryData = _albumCover.BinaryData;
+
+                                    return r;
+                                }
+                                catch (Exception ex)
+                                {
+                                    System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived (b): " + ex.Message);
+
+                                    _albumCover.IsDownloading = false;
+                                    return r;
+                                }
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived (something is wrong) ");
+                                return r;
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived (e): " + ex.Message);
+
+                        _albumCover.IsDownloading = false;
+                        return r;
+                    }
+
+                }
+                else if ((binResSize == 0) && (binSize == _albumCover.BinaryData.Length))
+                {
+                    // this should not happen anymore
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
+                        _albumCover.IsSuccess = true;
+                        _albumCover.IsDownloading = false;
+
+                        MpdAlbumArtChanged?.Invoke(this);
+                    });
+
+                    r.IsSuccess = true;
+                    r.WholeSize = binSize;
+                    r.ChunkSize = binResSize;
+                    r.BinaryData = _albumCover.BinaryData;
+
+                    return r;
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("binary file download : Somehow, things went bad.");
+
+                    _albumCover.IsDownloading = false;
+                    return r;
+                }
+                */
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived (l): " + ex.Message);
+
+                _albumCover.IsDownloading = false;
+                return r;
+            }
+        }
+
+        public static byte[] CombineByteArray(byte[] first, byte[] second)
+        {
+            byte[] ret = new byte[first.Length + second.Length];
+            Buffer.BlockCopy(first, 0, ret, 0, first.Length);
+            Buffer.BlockCopy(second, 0, ret, first.Length, second.Length);
+            return ret;
+        }
+
+        public static BitmapSource BitmaSourceFromByteArray(byte[] buffer)
+        {
+            using (var stream = new MemoryStream(buffer))
+            {
+                return BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+            }
+        }
+
+        #endregion
 
         private bool ParseStatus(string result)
         {
@@ -1781,7 +3025,7 @@ namespace MPDCtrl.Models
                         {
                             _status.MpdVolume = Int32.Parse(MpdStatusValues["volume"]);
 
-                            _status.MpdVolumeIdSet = true;
+                            _status.MpdVolumeIsSet = true;
                         }
                         catch (FormatException e)
                         {
@@ -2394,7 +3638,7 @@ namespace MPDCtrl.Models
             List<string> resultLines = result.Split('\n').ToList();
             if (resultLines == null) return true;
             if (resultLines.Count == 0) return true;
-            
+
 
 
             // "listplaylist" .. songs containd in a playlist.
@@ -2695,620 +3939,6 @@ namespace MPDCtrl.Models
 
             return sng;
         }
-
-        #endregion
-
-        #region == MPD Commands (boolean result) ==
-
-        public async Task<CommandResult> MpdPlaybackPlay(int volume, string songId = "")
-        {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            string cmd = "play";
-
-            if (songId != "")
-            {
-                cmd = "playid " + songId;
-            }
-
-            if (MpdStatus.MpdVolumeIdSet)
-            {
-                CommandResult result = await MpdSendCommand(cmd, true);
-
-                return result;
-            }
-            else
-            {
-                string cmdList = "command_list_begin" + "\n";
-                cmdList = cmdList + "setvol " + volume.ToString() + "\n";
-                cmdList = cmdList + cmd + "\n";
-                cmdList = cmdList + "command_list_end" + "\n";
-
-                CommandResult result = await MpdSendCommand(cmdList, true);
-
-                return result;
-            }
-
-            //CommandResult result = await MpdSendCommand(cmd, true);
-
-            //return result;
-        }
-
-        public async Task<CommandResult> MpdPlaybackPause()
-        {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-            
-            CommandResult result = await MpdSendCommand("pause 1", true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdPlaybackResume(int volume)
-        {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            /*
-            await MpdSendNoIdle();
-            CommandResult result = await MpdSendCommand("pause 0");
-            if (result.IsSuccess)
-            {
-                //
-            }
-            await MpdSendIdle();
-            */
-            
-
-            if (MpdStatus.MpdVolumeIdSet)
-            {
-                CommandResult result = await MpdSendCommand("pause 0", true);
-
-                return result;
-            }
-            else
-            {
-                string cmd = "command_list_begin" + "\n";
-                cmd = cmd + "setvol " + volume.ToString() + "\n";
-                cmd = cmd + "pause 0\n";
-                cmd = cmd + "command_list_end" + "\n";
-
-                CommandResult result = await MpdSendCommand(cmd, true);
-
-                return result;
-            }
-        }
-
-        public async Task<CommandResult> MpdPlaybackStop()
-        {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            CommandResult result = await MpdSendCommand("stop", true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdPlaybackNext()
-        {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            CommandResult result = await MpdSendCommand("next", true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdPlaybackPrev()
-        {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            CommandResult result = await MpdSendCommand("previous", true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdSetVolume(int v)
-        {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            if (v == _status.MpdVolume) 
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = true;
-                return f;
-            }
-
-            CommandResult result = await MpdSendCommand("setvol " + v.ToString(), true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdPlaybackSeek(string songId, int seekTime)
-        {
-            if ((songId == "") || (seekTime == 0)) 
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = true;
-                return f;
-            }
-
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            CommandResult result = await MpdSendCommand("seekid " + songId + " " + seekTime.ToString(), true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdSetRepeat(bool on)
-        {
-            if (_status.MpdRepeat == on)
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = true;
-                return f;
-            }
-
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            string cmd = "";
-            if (on)
-            {
-                cmd = "repeat 1";
-            }
-            else
-            {
-                cmd = "repeat 0";
-            }
-
-            CommandResult result = await MpdSendCommand(cmd, true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdSetRandom(bool on)
-        {
-            if (_status.MpdRandom == on)
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = true;
-                return f;
-            }
-
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            string cmd = "";
-            if (on)
-            {
-                cmd = "random 1";
-            }
-            else
-            {
-                cmd = "random 0";
-            }
-
-            CommandResult result = await MpdSendCommand(cmd, true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdSetConsume(bool on)
-        {
-            if (_status.MpdConsume == on)
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = true;
-                return f;
-            }
-
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            string cmd = "";
-            if (on)
-            {
-                cmd = "consume 1";
-            }
-            else
-            {
-                cmd = "consume 0";
-            }
-
-            CommandResult result = await MpdSendCommand(cmd, true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdSetSingle(bool on)
-        {
-            if (_status.MpdSingle == on)
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = true;
-                return f;
-            }
-
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            string cmd = "";
-            if (on)
-            {
-                cmd = "single 1";
-            }
-            else
-            {
-                cmd = "single 0";
-            }
-
-            CommandResult result = await MpdSendCommand(cmd, true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdClear()
-        {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            CommandResult result = await MpdSendCommand("clear", true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdSave(string playlistName)
-        {
-            if (string.IsNullOrEmpty(playlistName))
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            playlistName = Regex.Escape(playlistName);
-
-            CommandResult result = await MpdSendCommand("save \"" + playlistName + "\"", true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdAdd(string uri)
-        {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            if (string.IsNullOrEmpty(uri))
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-
-            uri = Regex.Escape(uri);
-
-            CommandResult result = await MpdSendCommand("add \"" + uri + "\"", true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdAdd(List<string> uris)
-        {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            if (uris.Count < 1)
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-
-            string cmd = "";
-            cmd = "command_list_begin" + "\n";
-            foreach (var uri in uris)
-            {
-                var urie = Regex.Escape(uri);
-                cmd = cmd + "add \"" + urie + "\"\n";
-            }
-            cmd = cmd + "command_list_end" + "\n";
-
-            CommandResult result = await MpdSendCommand(cmd, true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdDeleteId(List<string> ids)
-        {
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            if (ids.Count < 1)
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-
-            string cmd = "";
-            cmd = "command_list_begin" + "\n";
-            foreach (var id in ids)
-            {
-                cmd = cmd + "deleteid " + id + "\n";
-            }
-            cmd = cmd + "command_list_end" + "\n";
-
-            CommandResult result = await MpdSendCommand(cmd, true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdMoveId(Dictionary<string, string> IdToNewPosPair)
-        {
-            if (IdToNewPosPair == null)
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-            if (IdToNewPosPair.Count < 1)
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            string cmd = "";
-            cmd = "command_list_begin" + "\n";
-            foreach (KeyValuePair<string, string> pair in IdToNewPosPair)
-            {
-                cmd = cmd + "moveid " + pair.Key + " " + pair.Value + "\n";
-            }
-            cmd = cmd + "command_list_end" + "\n";
-
-            CommandResult result = await MpdSendCommand(cmd, true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdChangePlaylist(string playlistName)
-        {
-            if (string.IsNullOrEmpty(playlistName))
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            playlistName = Regex.Escape(playlistName);
-
-            string cmd = "command_list_begin" + "\n";
-            cmd = cmd + "clear" + "\n";
-            cmd = cmd + "load \"" + playlistName + "\"\n";
-            cmd = cmd + "command_list_end" + "\n";
-
-            CommandResult result = await MpdSendCommand(cmd, true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdLoadPlaylist(string playlistName)
-        {
-            if (string.IsNullOrEmpty(playlistName))
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            playlistName = Regex.Escape(playlistName);
-
-            string cmd = "load \"" + playlistName + "\"";
-
-            CommandResult result = await MpdSendCommand(cmd, true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdRenamePlaylist(string playlistName, string newPlaylistName)
-        {
-            if (string.IsNullOrEmpty(playlistName) || string.IsNullOrEmpty(newPlaylistName))
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            playlistName = Regex.Escape(playlistName);
-            newPlaylistName = Regex.Escape(newPlaylistName);
-
-            string cmd = "rename \"" + playlistName + "\" \"" + newPlaylistName + "\"";
-
-            CommandResult result = await MpdSendCommand(cmd, true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdRemovePlaylist(string playlistName)
-        {
-            if (string.IsNullOrEmpty(playlistName))
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            playlistName = Regex.Escape(playlistName);
-
-            string cmd = "rm \"" + playlistName + "\"";
-
-            CommandResult result = await MpdSendCommand(cmd, true);
-
-            return result;
-        }
-
-        public async Task<CommandResult> MpdPlaylistAdd(string playlistName, List<string> uris)
-        {
-            if (string.IsNullOrEmpty(playlistName))
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-            if (uris == null)
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-            if (uris.Count < 1)
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-
-            Task<bool> check = CheckCommandQueue();
-            await check;
-
-            playlistName = Regex.Escape(playlistName);
-
-
-            string cmd = "command_list_begin" + "\n";
-            foreach (var uri in uris)
-            {
-                var urie = Regex.Escape(uri);
-                cmd = cmd + "playlistadd " + "\"" + playlistName + "\"" + " " + "\"" + urie + "\"\n";
-            }
-            cmd = cmd + "command_list_end" + "\n";
-
-            CommandResult result = await MpdSendCommand(cmd, true);
-
-            return result;
-        }
-
-        /*
-        public async void MpdQueryAlbumArt(string uri, string songId)
-        {
-            if (string.IsNullOrEmpty(uri))
-                return;
-
-            // wait for a second. 
-            await Task.Delay(100);
-
-            if (_albumCover.IsDownloading)
-            {
-                //System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading. Ignoring.");
-                //return;
-            }
-
-            if (_albumCover.SongFilePath == uri)
-            {
-                //System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.SongFilePath == uri. Ignoring.");
-                //return;
-            }
-
-            if (songId != MpdStatus.MpdSongID)
-            {
-                // probably you double clicked on "Next song".
-                System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: songId != MpdStatus.MpdSongID. Ignoring.");
-                return;
-            }
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                _albumCover = new AlbumCover();
-                _albumCover.IsDownloading = true;
-                _albumCover.SongFilePath = uri;
-                _albumCover.AlbumImageSource = null;
-                _albumCover.BinaryData =  new byte[0];
-                _albumCover.BinarySize = 0;
-            });
-
-            uri = Regex.Escape(uri);
-
-            try
-            {
-                string mpdCommand = "albumart \"" + uri + "\" 0" + "\n";
-                //string mpdCommand = "readpicture \"" + uri + "\" 0" + "\n";
-                 
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: " + ex.Message);
-            }
-        }
-
-        private async void MpdReQueryAlbumArt(string uri, int offset)
-        {
-            if (string.IsNullOrEmpty(uri))
-                return;
-
-            // wait for a bit. 
-            await Task.Delay(100);
-
-
-            if (!_albumCover.IsDownloading)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading == false. Ignoring.");
-                return;
-            }
-
-            if (_albumCover.SongFilePath != uri)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.SongFilePath != uri. Ignoring.");
-                _albumCover.IsDownloading = false;
-
-                return;
-            }
-
-            uri = Regex.Escape(uri);
-
-            try
-            {
-                string mpdCommand = "albumart \"" + uri + "\" " + offset.ToString() + "\n";
-                //string mpdCommand = "readpicture \"" + uri + "\" " + offset.ToString() + "\n";
-
-                _asyncClient.Send("noidle" + "\n");
-                _asyncClient.Send(mpdCommand);
-                _asyncClient.Send("idle player mixer options playlist stored_playlist" + "\n");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@MpdReQueryAlbumArt: " + ex.Message);
-            }
-        }
-
-
-        */
-
-        #endregion
 
         #endregion
 

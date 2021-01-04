@@ -280,10 +280,10 @@ SOFTWARE.</value>
     <value>ファイル (_F)</value>
   </data>
   <data name="MPD_CommandError" xml:space="preserve">
-    <value>MPD コマンドエラー</value>
+    <value>コマンド応答</value>
   </data>
   <data name="MPD_StatusError" xml:space="preserve">
-    <value>MPD ステータスエラー</value>
+    <value>ステータス通知</value>
   </data>
   <data name="New" xml:space="preserve">
     <value>新規</value>
@@ -445,7 +445,7 @@ SOFTWARE.</value>
     <value>予期しないエラーが起きた際はログファイル（MPDCtrl__errors.txt）をデスクトップに保存する。</value>
   </data>
   <data name="Settings_Opts_ShowDebugWidow" xml:space="preserve">
-    <value>デバッグウィンドウの表示（アプリの応答が遅くなる場合があります）</value>
+    <value>デバッグウィンドウの有効化（アプリの応答が遅くなる場合があります）</value>
   </data>
   <data name="Settings_Opts_UpdateDatabaseOnStartup" xml:space="preserve">
     <value>起動時にMPDサーバーの楽曲データベースを最新の状態に更新する (更新されるまで、しばらくかかる場合があります)</value>

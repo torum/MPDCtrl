@@ -502,7 +502,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   MPD Command Error に類似しているローカライズされた文字列を検索します。
+        ///   Command Response に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MPD_CommandError {
             get {
@@ -511,7 +511,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   MPD Status Error に類似しているローカライズされた文字列を検索します。
+        ///   Status Notification に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MPD_StatusError {
             get {
@@ -988,7 +988,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Show Debug Widow (this may significantly slow down repoponsiveness) に類似しているローカライズされた文字列を検索します。
+        ///   Enable Debug Widow (this may slow down repoponsiveness) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_Opts_ShowDebugWidow {
             get {

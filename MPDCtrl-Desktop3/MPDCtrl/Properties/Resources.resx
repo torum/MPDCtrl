@@ -280,10 +280,10 @@ SOFTWARE.</value>
     <value>_Files</value>
   </data>
   <data name="MPD_CommandError" xml:space="preserve">
-    <value>MPD Command Error</value>
+    <value>Command Response</value>
   </data>
   <data name="MPD_StatusError" xml:space="preserve">
-    <value>MPD Status Error</value>
+    <value>Status Notification</value>
   </data>
   <data name="New" xml:space="preserve">
     <value>New</value>
@@ -442,7 +442,7 @@ SOFTWARE.</value>
     <value>Save logs file (MPDCtrl__errors.txt) to desktop when unexpected error occured.</value>
   </data>
   <data name="Settings_Opts_ShowDebugWidow" xml:space="preserve">
-    <value>Show Debug Widow (this may significantly slow down repoponsiveness)</value>
+    <value>Enable Debug Widow (this may slow down repoponsiveness)</value>
   </data>
   <data name="Settings_Opts_UpdateDatabaseOnStartup" xml:space="preserve">
     <value>Update MPD Music Database on Startup. (It may take a while to update)</value>

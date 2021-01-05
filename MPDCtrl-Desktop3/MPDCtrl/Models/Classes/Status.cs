@@ -48,7 +48,7 @@ namespace MPDCtrl.Models
             get { return _volumeIsSet; }
             set
             {
-                _repeat = _volumeIsSet;
+                _volumeIsSet = value;
             }
         }
         

@@ -56,6 +56,7 @@ namespace MPDCtrl.Views
 
                 }
             }
+
         }
 
         public void OnScrollIntoView(int arg)

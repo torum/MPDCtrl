@@ -339,6 +339,9 @@ SOFTWARE.</value>
   <data name="PlaylistListviewTabitemHeader_Playlists" xml:space="preserve">
     <value>_Playlists</value>
   </data>
+  <data name="PlaylistSongsContextMenu_Remove" xml:space="preserve">
+    <value>Remove From Playlist</value>
+  </data>
   <data name="Port" xml:space="preserve">
     <value>Port</value>
   </data>
@@ -370,13 +373,16 @@ SOFTWARE.</value>
     <value>Clear</value>
   </data>
   <data name="QueueItemContextMenu_QueueSaveAsPlaylist" xml:space="preserve">
-    <value>Save as playlist</value>
+    <value>Save As</value>
   </data>
   <data name="QueueItemContextMenu_Remove" xml:space="preserve">
     <value>Remove (Ctrl+Delete)</value>
   </data>
-  <data name="QueueItemContextMenu_SaveToPlaylist" xml:space="preserve">
-    <value>Save to</value>
+  <data name="QueueItemContextMenu_SaveSelectedAs" xml:space="preserve">
+    <value>Save Selected As</value>
+  </data>
+  <data name="QueueItemContextMenu_SaveSelectedTo" xml:space="preserve">
+    <value>Save Selected To...</value>
   </data>
   <data name="QueueItemContextMenu_ScrollIntoNowPlaying" xml:space="preserve">
     <value>Jump to Current Song (Ctrl+J)</value>
@@ -463,7 +469,7 @@ SOFTWARE.</value>
     <value>Unlock and Change Password</value>
   </data>
   <data name="SongFilesItemContextMenu_Add" xml:space="preserve">
-    <value>Add to Current Queue</value>
+    <value>(not used)</value>
   </data>
   <data name="SongFilesListviewColumnHeader_File" xml:space="preserve">
     <value>File</value>

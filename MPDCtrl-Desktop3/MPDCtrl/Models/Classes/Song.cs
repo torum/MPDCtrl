@@ -130,7 +130,7 @@ namespace MPDCtrl.Models
             }
         }
 
-        // for sorting.
+        // for sorting and (playlist pos)
         private int _index;
         public int Index
         {

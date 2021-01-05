@@ -1234,7 +1234,7 @@
                     <SolidColorBrush x:Key="OptionMark.MouseOver.Background" Color="#FFF3F9FF"/>
                     <SolidColorBrush x:Key="OptionMark.MouseOver.Border" Color="#FF5593FF"/>
                     <SolidColorBrush x:Key="OptionMark.MouseOver.Glyph" Color="#FF212121"/>
-                    <SolidColorBrush x:Key="OptionMark.Disabled.Background" Color="#FFE6E6E6"/>
+                    <SolidColorBrush x:Key="OptionMark.Disabled.Background" Color="#FF707070"/>
                     <SolidColorBrush x:Key="OptionMark.Disabled.Border" Color="#FFBCBCBC"/>
                     <SolidColorBrush x:Key="OptionMark.Disabled.Glyph" Color="#FF707070"/>
                     <SolidColorBrush x:Key="OptionMark.Pressed.Background" Color="#FFD9ECFF"/>
@@ -1608,7 +1608,7 @@
                             <Setter.Value>
                                 <ControlTemplate TargetType="GridViewColumnHeader">
                                     <Grid>
-                                        <Border Name="HeaderBorder" Padding="12 0 0 0" BorderBrush="Gray" BorderThickness="0,0,0,0.5" Background="{TemplateBinding Background}">
+                                        <Border Name="HeaderBorder" Padding="12 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0.5" Background="{TemplateBinding Background}">
                                             <ContentPresenter Name="HeaderContent" Margin="0,0,0,4" RecognizesAccessKey="True" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                         </Border>
                                         <!-- disable colum header resize by removing this. -->
@@ -1672,7 +1672,7 @@
                             <Setter.Value>
                                 <ControlTemplate TargetType="GridViewColumnHeader">
                                     <Grid>
-                                        <Border Name="HeaderBorder" Padding="12 0 0 0" BorderBrush="Gray" BorderThickness="0,0,0,0.5" Background="{TemplateBinding Background}">
+                                        <Border Name="HeaderBorder" Padding="12 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0.5" Background="{TemplateBinding Background}">
                                             <ContentPresenter Name="HeaderContent" Margin="0,0,0,4" RecognizesAccessKey="True" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                         </Border>
                                         <!-- disable colum header resize by removing this. -->

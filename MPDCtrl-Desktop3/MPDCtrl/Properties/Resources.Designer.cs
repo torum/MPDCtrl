@@ -682,6 +682,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Remove From Playlist に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PlaylistSongsContextMenu_Remove {
+            get {
+                return ResourceManager.GetString("PlaylistSongsContextMenu_Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Port に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Port {
@@ -772,7 +781,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Save as playlist に類似しているローカライズされた文字列を検索します。
+        ///   Save As に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string QueueItemContextMenu_QueueSaveAsPlaylist {
             get {
@@ -790,11 +799,20 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Save to に類似しているローカライズされた文字列を検索します。
+        ///   Save Selected As に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string QueueItemContextMenu_SaveToPlaylist {
+        public static string QueueItemContextMenu_SaveSelectedAs {
             get {
-                return ResourceManager.GetString("QueueItemContextMenu_SaveToPlaylist", resourceCulture);
+                return ResourceManager.GetString("QueueItemContextMenu_SaveSelectedAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Save Selected To... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueItemContextMenu_SaveSelectedTo {
+            get {
+                return ResourceManager.GetString("QueueItemContextMenu_SaveSelectedTo", resourceCulture);
             }
         }
         
@@ -1051,7 +1069,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Add to Current Queue に類似しているローカライズされた文字列を検索します。
+        ///   (not used) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string SongFilesItemContextMenu_Add {
             get {

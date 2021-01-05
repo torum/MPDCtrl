@@ -339,6 +339,9 @@ SOFTWARE.</value>
   <data name="PlaylistListviewTabitemHeader_Playlists" xml:space="preserve">
     <value>プレイリスト (_P)</value>
   </data>
+  <data name="PlaylistSongsContextMenu_Remove" xml:space="preserve">
+    <value>プレイリストから削除する</value>
+  </data>
   <data name="Port" xml:space="preserve">
     <value>ポート</value>
   </data>
@@ -367,16 +370,19 @@ SOFTWARE.</value>
     <value>現在のキュー</value>
   </data>
   <data name="QueueItemContextMenu_QueueClear" xml:space="preserve">
-    <value>キューをクリアする</value>
+    <value>クリアする</value>
   </data>
   <data name="QueueItemContextMenu_QueueSaveAsPlaylist" xml:space="preserve">
-    <value>キューをプレイリストとして保存する</value>
+    <value>プレイリストとして保存する</value>
   </data>
   <data name="QueueItemContextMenu_Remove" xml:space="preserve">
     <value>キューから削除 (Ctrl+Delete)</value>
   </data>
-  <data name="QueueItemContextMenu_SaveToPlaylist" xml:space="preserve">
-    <value>プレイリストに保存</value>
+  <data name="QueueItemContextMenu_SaveSelectedAs" xml:space="preserve">
+    <value>プレイリストとして保存する</value>
+  </data>
+  <data name="QueueItemContextMenu_SaveSelectedTo" xml:space="preserve">
+    <value>プレイリストに保存する</value>
   </data>
   <data name="QueueItemContextMenu_ScrollIntoNowPlaying" xml:space="preserve">
     <value>現在の曲へジャンプ (Ctrl+J)</value>
@@ -466,7 +472,7 @@ SOFTWARE.</value>
     <value>アンロックしてパスワードを変更する</value>
   </data>
   <data name="SongFilesItemContextMenu_Add" xml:space="preserve">
-    <value>現在のキューに追加</value>
+    <value>(not used)</value>
   </data>
   <data name="SongFilesListviewColumnHeader_File" xml:space="preserve">
     <value>ファイル</value>

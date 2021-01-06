@@ -27,17 +27,20 @@ MPDCtrl for desktop -
 
 ---------------------------------------
 
-### MPDCtrl for desktop v2.x
+### MPDCtrl for desktop v3.x
 
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v2/Main.png?raw=true) 
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v3/Main.png?raw=true) 
 
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v2/Search.png?raw=true) 
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v3/Search.png?raw=true) 
 
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v2/Browse.png?raw=true) 
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v3/Library.png?raw=true) 
 
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v2/Filter.png?raw=true) 
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v3/Playlist.png?raw=true) 
 
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v2/Settings.png?raw=true) 
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v3/I19n.png?raw=true) 
+
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v3/Debug.png?raw=true) 
+
 
 ### MPDCtrl for mobile
 sometime in the future...

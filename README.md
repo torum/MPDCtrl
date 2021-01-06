@@ -4,16 +4,28 @@ MPDCtrl is a client app for [MPD (Music player daemon)](http://www.musicpd.org/)
   
 
 - Download:  
-[Micorsoft Store](https://www.microsoft.com/store/apps/9NV2BBJ82BRX)
+MPDCtrl for desktop -
+[Download from Micorsoft Store](https://www.microsoft.com/store/apps/9NV2BBJ82BRX)
   
 - More:  
 [https://torum.github.io/MPDCtrl/](https://torum.github.io/MPDCtrl/)
 
    
 
-### MPDCtrl for desktop v2.x
+### MPDCtrl for desktop v3.x
 
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v2/Main.png?raw=true) 
+
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v3/Main.png?raw=true) 
+
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v3/Search.png?raw=true) 
+
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v3/Library.png?raw=true) 
+
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v3/Playlist.png?raw=true) 
+
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v3/I19n.png?raw=true) 
+
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v3/Debug.png?raw=true) 
 
   
 ### MPDCtrl for mobile

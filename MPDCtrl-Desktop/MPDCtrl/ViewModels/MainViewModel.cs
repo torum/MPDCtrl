@@ -31,97 +31,51 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
+    /// v3.0.0.x
     /// 
-    /// ACK@DataReceived_Dispatch: ACK [5@0] {playid} Failed to decode C:/hoge/hoge.mp3; Failed to open C:/hoge/hoge.mp3: (some junk) 
-    /// : No such file or directory
+    /// テスト。
+    /// 
+    /// ストア公開：Internatinalization (multi language support)、スクショ。
     /// 
     /// 
-    /// v2.2.0 以降
-    /// 
-    /// 翻訳のリソースやスタイル、名前の整理と見直し。
-    /// 完全なリファクタリング。特にプロトコルから。
-    /// テーマの切り替え
-    /// 
+    /// v3.0.1 以降
     /// 
     /// 「プレイリストの名前変更」をインラインで。
-    /// Files: "追加して再生"メニューを追加。
-    /// Files: "再読み込み" context menu.
     /// 
+    /// Ctrl+Fをどうするか決める。
+    /// キューの絞り込み検索が絶対欲しい。VSのようにキューの右上にするか。
+    /// 
+    /// TreeView menuのプレイリスト選択からコンテキストメニュー。
+    /// 
+    /// UI：左ペインの幅を覚える件。
+    /// 
+    /// Database: 設定画面でDBのUpdate。
+    /// イベントのidleからの"再読み込み"通知。
+    /// 
+    /// v3.1.0 以降
+    /// 
+    /// リソース系：翻訳やスタイル、名前の整理と見直し。
+    /// 
+    /// UI：テーマの切り替え
     /// 
     /// [未定]
+    /// AlbumArt画像のキャッシュとアルバムビュー。
+    /// "追加して再生"メニューを追加。　
     /// 検索で、ExactかContainのオプション。
-    /// Ctrl+F検索とFilesから直接プレイリストに追加できるように「プレイリストに追加」をコンテキストメニューで。
-    ///  "Save Selected to playlist" context menu at Search Result listview.
-    ///  "Save this search result as new playlist".
-    /// Listview の水平スクロールバーのデザイン。
     /// スライダーの上でスクロールして音量変更。
     /// スライダーの変更時にブレる件。
     /// ピクチャーインピクチャー？
-    /// レイアウト見直し（スプリッターのせい）GridSplitterが右に行き過ぎる問題。
-    /// タイトルバー右上かどこかで現在のprofileを表示してプルダウンで簡単に切り替えられるようにしたい。
 
 
     /// 更新履歴：
-    /// v2.1.2   Store 公開
-    /// v2.1.1.1 AlbumArtと一緒に来ていたchangedを漏らしていた。DataReceived_ParseData(val);
-    /// v2.1.1   Store 公開＞キャンセル
-    /// v2.1.0.1 AlbumArtの画像崩れ、原因が分かった。
-    /// v2.1.0   Store 公開
-    /// v2.0.9.5 DeveloperMode作ってDebugウィンドウは非表示にした。起動時少しdelay。AlbumArtの表示場所少し変更。自動で現在の曲へスクロール、オプションを作った。
-    /// v2.0.9.4 AlbumArtでsize too big のawaitの順番を変えた。
-    /// v2.0.9.3 バイナリと一緒に来ていたのを読み取れてなかった。
-    /// v2.0.9.2 シングルモードを追加。
-    /// v2.0.9.1 シークが動いていなかった、要テスト。
-    /// v2.0.9   store公開。
-    /// v2.0.8.3 ジャンプしたアイテムにフォーカスを移動するように改良しキーボードショートカットを追加。
-    /// v2.0.8.2 エラーログでNewLineが無かった。
-    /// v2.0.8.1 現在の曲へジャンプを追加。
-    /// v2.0.8   store公開。
-    /// v2.0.7.2 パスワード送るタイミングを修正した。ステータスバーにMPDのバージョンを表示するようにした。ダミーパスワードが表示されていなかった。
-    /// v2.0.7.1 キューが空の時は余計な処理をしないようにして、高速化した。
-    /// v2.0.7   store公開・・してなかった。
-    /// v2.0.6.4 パスワード、多分毎回送る必要は無いと思う>ので削除した。
-    /// v2.0.6.3 エラーログを保存するオプションを作った。
-    /// v2.0.6.2 例外処理を沢山。 
-    /// v2.0.6.1 エラーログを保存するようにしてる。>ifdebug
-    /// v2.0.6   store公開。
-    /// v2.0.5.5 バイナリにともなって色々まとめて来てた処理をちゃんと処理するようにした。ステータスバー周りとかパスワードボックス周り、エラー周りなど変更し過ぎて忘れた。
-    /// v2.0.5.4 沢山バグ潰した。 カラムヘッダーの幅を指定するヘルパーは使わないシンプルな方法に変更。
-    /// v2.0.5.3 バインディングエラーを一つfix。
-    /// v2.0.5.2 起動時にデフォルトのMPDに接続出来なかった際に、表示崩れが起きる件。（サイドバーの幅とカラムヘッダーの表示・非表示）Fix。
-    /// v2.0.5.1 File と Path の翻訳もれ。
-    /// v2.0.5   AlbumArt対応版としてstore公開。
-    /// v2.0.4.3 キューのリストビューの本体にクリアメニューを追加。AlbumCoverのファイルサイズをMax 300Kに設定。
-    /// v2.0.4.2 fixed double query of albumart. added "clear text" button in the debug window.
-    /// v2.0.4.1 アルバムカバー対応。
-    /// v2.0.4   store公開。QueueListviewClearCommand
-    /// v2.0.3.4 ルートディレクトリにファイルがある時のテスト。
-    /// v2.0.3.3 Search and filter is done.
-    /// v2.0.3.2 Clearコマンドを送る前にQueueをクリアしておくようにして高速化。プレイリストとFilesはダブルクリック無効にした（なんか混乱するから）。 KeyboardNavigation.TabNavigation="Cycle"の設定。
-    /// v2.0.3.1 検索とブラウズ途中。
-    /// v2.0.3   store公開。(v2.0.2.3の表示を更新し忘れた)　検索画面は無効にしてある。
-    /// v2.0.2.3 コードをリファクタリングと移動。検索画面は途中。
-    /// v2.0.2.2 色々リネーム。Ctrl+S が効いていなかった。選択アイテムを「プレイリストに保存」を追加した。ScrollIntoView止めた。コードをリファクタリング。
-    /// v2.0.2.1 キューかStatusが更新される度にタイマーというかシークがオカシイのを直した。
-    /// v2.0.2   store公開。
-    /// v2.0.1.2 Playlistの削除で残り一つの時クリアされないバグ。大量の曲がキューにある時重たい処理は砂時計を出すようにした。 Local Files のダブルクリックとWidth修正と覚える。アイコン追加。
-    /// v2.0.1.1 TimeFormatedが一部表示されないバグ。
-    /// v2.0.1   store公開。
-    /// v2.0.0.16 カラムヘッダーのサイズを覚えるようにした（色々とやっかい）
-    /// v2.0.0.15 ヘッダーカラムの項目の表示・非表示を覚えるようにした。
-    /// v2.0.0.14 Queue(playlistinfo)のパース方法を修正。ヘッダーカラムの項目(LastModified)を追加し、表示・非表示できるようにした。
-    /// v2.0.0.13 Queue: キュー一覧の更新で、差分を取って追加削除するようにした。でないと選択項目が一々クリアされてしまう。
-    /// v2.0.0    store公開。
-    /// v2.0.0.11,12: 細かい表示周りのバグ修正。 
-    /// v2.0.0.10: パスワード周りオーバーホール。タイトルバーのNowPlayingを修正。
-    /// v2.0.0.9: Queueの上下移動。KeyGestureを幾つか追加。
-    /// v2.0.0.8: プレイリストの（新規作成）保存、削除、リネーム。ダイアログの作成。
-    /// v2.0.0.7: スライダー等のデザインとりあえず完成。elasedTimerの変更（正確なsystem.timerに）。
-    /// v2.0.0.6: 設定画面とりあえず完成。i19nとりあえず完了。
-    /// v2.0.0.5: DebugWindowがオンの時だけテキストを追加するようにした（consumeで激重になる）。
-    /// v2.0.0.4: Consumeオプションを追加。
-    /// v2.0.0.3: Queueの項目を増やしたり、IsPlayingとか。
-    /// v2.0.0.2: DebugWindowの追加とかProfile関係とか色々。
+    /// v3.0.0.7 とりあえず、プレイリスト系は大体できた。
+    /// v3.0.0.6 とりあえずAlbumArtの取得はできるようにしたけれど、Downloaderクラスが必要。
+    /// v3.0.0.5 色々やり過ぎて覚えていない・・・
+    /// v3.0.0.4 色々やり過ぎて覚えていない・・・とりあえず。
+    /// v3.0.3 基本のコマンドとidleからの更新ができるようになった・・・。
+    /// v3.0.2 MPCを作り直し中。とりあえず接続とデータ取得まで。
+    /// v3.0.1 MPCを作り直し中。 
+    /// v3.0.0 v2.1.2から分岐。レイアウトを見直し。
 
 
     /// Key Gestures:
@@ -139,15 +93,15 @@ namespace MPDCtrl.ViewModels
 
     public class MainViewModel : ViewModelBase
     {
-        #region == 基本 ==  
+        #region == Basic ==  
 
         // Application name
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v2.1.2";
+        const string _appVer = "v3.0.0-pre9";
 
-        public string AppVer
+        public static string AppVer
         {
             get
             {
@@ -155,8 +109,8 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        // Application Window Title
-        public string AppTitle
+        // Application Title (for system)
+        public static string AppTitle
         {
             get
             {
@@ -164,7 +118,8 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        public string AppTitleVer
+        // Application Window Title (for display)
+        public static string AppTitleVer
         {
             get
             {
@@ -175,6 +130,18 @@ namespace MPDCtrl.ViewModels
         // For the application config file folder
         const string _appDeveloper = "torum";
 
+        // もう使ってない気がする。
+        public static bool DeveloperMode
+        {
+            get
+            {
+#if DEBUG
+                return true;
+#else
+                return false; 
+#endif
+            }
+        }
 
         #endregion
 
@@ -201,7 +168,6 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-
         private bool _isFullyRendered;
         public bool IsFullyRendered
         {
@@ -219,29 +185,487 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private bool _isMainRendered;
-        public bool IsMainRendered
+        #endregion
+
+        #region == レイアウト関連 ==
+
+        // TODO:現在のレイアウトでは無効
+
+        private double _mainLeftPainActualWidth = 241;
+        public double MainLeftPainActualWidth
         {
             get
             {
-                return _isMainRendered;
+                return _mainLeftPainActualWidth;
             }
             set
             {
-                if (_isMainRendered == value)
+                if (value == _mainLeftPainActualWidth) return;
+
+                _mainLeftPainActualWidth = value;
+
+                NotifyPropertyChanged("MainLeftPainActualWidth");
+            }
+        }
+
+        private double _mainLeftPainWidth = 241;
+        public double MainLeftPainWidth
+        {
+            get
+            {
+                return _mainLeftPainWidth;
+            }
+            set
+            {
+                if (value == _mainLeftPainWidth) return;
+
+                _mainLeftPainWidth = value;
+
+                NotifyPropertyChanged("MainLeftPainWidth");
+            }
+        }
+
+        #region == Queueカラムヘッダー ==
+
+        private bool _queueColumnHeaderPositionVisibility = true;
+        public bool QueueColumnHeaderPositionVisibility
+        {
+            get
+            {
+                return _queueColumnHeaderPositionVisibility;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderPositionVisibility)
                     return;
 
-                _isMainRendered = value;
-                this.NotifyPropertyChanged("IsMainRendered");
+                _queueColumnHeaderPositionVisibility = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderPositionVisibility");
+            }
+        }
+
+        private double _queueColumnHeaderPositionWidth = 53;
+        public double QueueColumnHeaderPositionWidth
+        {
+            get
+            {
+                return _queueColumnHeaderPositionWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderPositionWidth)
+                    return;
+
+                _queueColumnHeaderPositionWidth = value;
+
+                if (value > 0)
+                    QueueColumnHeaderPositionWidthRestore = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderPositionWidth");
+            }
+        }
+
+        private double _queueColumnHeaderPositionWidthUser = 53;
+        public double QueueColumnHeaderPositionWidthRestore
+        {
+            get
+            {
+                return _queueColumnHeaderPositionWidthUser;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderPositionWidthUser)
+                    return;
+
+                _queueColumnHeaderPositionWidthUser = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderPositionWidthRestore");
+            }
+        }
+
+        private bool _queueColumnHeaderNowPlayingVisibility = true;
+        public bool QueueColumnHeaderNowPlayingVisibility
+        {
+            get
+            {
+                return _queueColumnHeaderNowPlayingVisibility;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderNowPlayingVisibility)
+                    return;
+
+                _queueColumnHeaderNowPlayingVisibility = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderNowPlayingVisibility");
+            }
+        }
+
+        private double _queueColumnHeaderNowPlayingWidth = 32;
+        public double QueueColumnHeaderNowPlayingWidth
+        {
+            get
+            {
+                return _queueColumnHeaderNowPlayingWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderNowPlayingWidth)
+                    return;
+
+                _queueColumnHeaderNowPlayingWidth = value;
+
+                if (value > 0)
+                    QueueColumnHeaderNowPlayingWidthRestore = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderNowPlayingWidth");
+            }
+        }
+
+        private double _queueColumnHeaderNowPlayingWidthUser = 32;
+        public double QueueColumnHeaderNowPlayingWidthRestore
+        {
+            get
+            {
+                return _queueColumnHeaderNowPlayingWidthUser;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderNowPlayingWidthUser)
+                    return;
+
+                _queueColumnHeaderNowPlayingWidthUser = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderNowPlayingWidthRestore");
+            }
+        }
+
+        private double _queueColumnHeaderTitleWidth = 180;
+        public double QueueColumnHeaderTitleWidth
+        {
+            get
+            {
+                return _queueColumnHeaderTitleWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderTitleWidth)
+                    return;
+
+                _queueColumnHeaderTitleWidth = value;
+
+                if (value > 0)
+                    QueueColumnHeaderTitleWidthRestore = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderTitleWidth");
+            }
+        }
+
+        private double _queueColumnHeaderTitleWidthUser = 180;
+        public double QueueColumnHeaderTitleWidthRestore
+        {
+            get
+            {
+                return _queueColumnHeaderTitleWidthUser;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderTitleWidthUser)
+                    return;
+
+                _queueColumnHeaderTitleWidthUser = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderTitleWidthRestore");
+            }
+        }
+
+        private bool _queueColumnHeaderTimeVisibility = true;
+        public bool QueueColumnHeaderTimeVisibility
+        {
+            get
+            {
+                return _queueColumnHeaderTimeVisibility;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderTimeVisibility)
+                    return;
+
+                _queueColumnHeaderTimeVisibility = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderTimeVisibility");
+            }
+        }
+
+        private double _queueColumnHeaderTimeWidth = 62;
+        public double QueueColumnHeaderTimeWidth
+        {
+            get
+            {
+                return _queueColumnHeaderTimeWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderTimeWidth)
+                    return;
+
+                _queueColumnHeaderTimeWidth = value;
+
+                if (value > 0)
+                    QueueColumnHeaderTitleWidthRestore = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderTimeWidth");
+            }
+        }
+
+        private double _queueColumnHeaderTimeWidthUser = 62;
+        public double QueueColumnHeaderTimeWidthRestore
+        {
+            get
+            {
+                return _queueColumnHeaderTimeWidthUser;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderTimeWidthUser)
+                    return;
+
+                _queueColumnHeaderTimeWidthUser = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderTimeWidthRestore");
+            }
+        }
+
+        private bool _queueColumnHeaderArtistVisibility = true;
+        public bool QueueColumnHeaderArtistVisibility
+        {
+            get
+            {
+                return _queueColumnHeaderArtistVisibility;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderArtistVisibility)
+                    return;
+
+                _queueColumnHeaderArtistVisibility = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderArtistVisibility");
+            }
+        }
+
+        private double _queueColumnHeaderArtistWidth = 120;
+        public double QueueColumnHeaderArtistWidth
+        {
+            get
+            {
+                return _queueColumnHeaderArtistWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderArtistWidth)
+                    return;
+
+                _queueColumnHeaderArtistWidth = value;
+
+                if (value > 0)
+                    QueueColumnHeaderArtistWidthRestore = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderArtistWidth");
+            }
+        }
+
+        private double _queueColumnHeaderArtistWidthUser = 120;
+        public double QueueColumnHeaderArtistWidthRestore
+        {
+            get
+            {
+                return _queueColumnHeaderArtistWidthUser;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderArtistWidthUser)
+                    return;
+
+                _queueColumnHeaderArtistWidthUser = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderArtistWidthRestore");
+            }
+        }
+
+        private bool _queueColumnHeaderAlbumVisibility = true;
+        public bool QueueColumnHeaderAlbumVisibility
+        {
+            get
+            {
+                return _queueColumnHeaderAlbumVisibility;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderAlbumVisibility)
+                    return;
+
+                _queueColumnHeaderAlbumVisibility = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderAlbumVisibility");
+            }
+        }
+
+        private double _queueColumnHeaderAlbumWidth = 120;
+        public double QueueColumnHeaderAlbumWidth
+        {
+            get
+            {
+                return _queueColumnHeaderAlbumWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderAlbumWidth)
+                    return;
+
+                _queueColumnHeaderAlbumWidth = value;
+
+                if (value > 0)
+                    QueueColumnHeaderAlbumWidthRestore = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderAlbumWidth");
+            }
+        }
+
+        private double _queueColumnHeaderAlbumWidthUser = 120;
+        public double QueueColumnHeaderAlbumWidthRestore
+        {
+            get
+            {
+                return _queueColumnHeaderAlbumWidthUser;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderAlbumWidthUser)
+                    return;
+
+                _queueColumnHeaderAlbumWidthUser = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderAlbumWidthRestore");
+            }
+        }
+
+        private bool _queueColumnHeaderGenreVisibility = true;
+        public bool QueueColumnHeaderGenreVisibility
+        {
+            get
+            {
+                return _queueColumnHeaderGenreVisibility;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderGenreVisibility)
+                    return;
+
+                _queueColumnHeaderGenreVisibility = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderGenreVisibility");
+            }
+        }
+
+        private double _queueColumnHeaderGenreWidth = 100;
+        public double QueueColumnHeaderGenreWidth
+        {
+            get
+            {
+                return _queueColumnHeaderGenreWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderGenreWidth)
+                    return;
+
+                _queueColumnHeaderGenreWidth = value;
+
+                if (value > 0)
+                    QueueColumnHeaderGenreWidthRestore = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderGenreWidth");
+            }
+        }
+
+        private double _queueColumnHeaderGenreWidthUser = 100;
+        public double QueueColumnHeaderGenreWidthRestore
+        {
+            get
+            {
+                return _queueColumnHeaderGenreWidthUser;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderGenreWidthUser)
+                    return;
+
+                _queueColumnHeaderGenreWidthUser = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderGenreWidthRestore");
+            }
+        }
+
+        private bool _queueColumnHeaderLastModifiedVisibility = true;
+        public bool QueueColumnHeaderLastModifiedVisibility
+        {
+            get
+            {
+                return _queueColumnHeaderLastModifiedVisibility;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderLastModifiedVisibility)
+                    return;
+
+                _queueColumnHeaderLastModifiedVisibility = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderLastModifiedVisibility");
+            }
+        }
+
+        private double _queueColumnHeaderLastModifiedWidth = 180;
+        public double QueueColumnHeaderLastModifiedWidth
+        {
+            get
+            {
+                return _queueColumnHeaderLastModifiedWidth;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderLastModifiedWidth)
+                    return;
+
+                _queueColumnHeaderLastModifiedWidth = value;
+
+                if (value > 0)
+                    QueueColumnHeaderLastModifiedWidthRestore = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderLastModifiedWidth");
+            }
+        }
+
+        private double _queueColumnHeaderLastModifiedWidthUser = 180;
+        public double QueueColumnHeaderLastModifiedWidthRestore
+        {
+            get
+            {
+                return _queueColumnHeaderLastModifiedWidthUser;
+            }
+            set
+            {
+                if (value == _queueColumnHeaderLastModifiedWidthUser)
+                    return;
+
+                _queueColumnHeaderLastModifiedWidthUser = value;
+
+                NotifyPropertyChanged("QueueColumnHeaderLastModifiedWidthRestore");
             }
         }
 
         #endregion
-
-        #region == MPC ==  
-
-        private MPC _mpc;
-
 
         #endregion
 
@@ -261,23 +685,6 @@ namespace MPDCtrl.ViewModels
 
                 _isConnected = value;
                 NotifyPropertyChanged("IsConnected");
-
-                if (_isConnected)
-                {
-                    IsMainShow = true;
-                    IsConnectionSettingShow = false;
-                    IsConnecting = false;
-                    IsNotConnectingNorConnected = false;
-                }
-                else
-                {
-                    IsMainShow = false;
-                    IsConnectionSettingShow = true;
-                    if (!IsConnecting)
-                    {
-                        IsNotConnectingNorConnected = true;
-                    }
-                }
             }
         }
 
@@ -297,18 +704,6 @@ namespace MPDCtrl.ViewModels
                 NotifyPropertyChanged("IsConnecting");
                 NotifyPropertyChanged("IsNotConnecting");
                 
-
-                if (_isConnecting)
-                {
-                    IsNotConnectingNorConnected = false;
-                }
-                else
-                {
-                    if (!IsConnected)
-                    {
-                        IsNotConnectingNorConnected = true;
-                    }
-                }
             }
         }
 
@@ -334,27 +729,6 @@ namespace MPDCtrl.ViewModels
             get
             {
                 return !_isConnecting;
-            }
-        }
-
-        private bool _isMainShow;
-        public bool IsMainShow
-        {
-            get { return _isMainShow; }
-            set
-            {
-                if (_isMainShow == value)
-                    return;
-
-                _isMainShow = value;
-                NotifyPropertyChanged("IsMainShow");
-
-                if (_isMainShow)
-                {
-                    IsMainRendered = true;
-
-                    RefreshColumnHeaderWidth();
-                }
             }
         }
 
@@ -448,6 +822,7 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        // 
         private bool _isInputDialogShow;
         public bool IsInputDialogShow
         {
@@ -561,22 +936,126 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private bool _isShowAckWindow
+;
+        public bool IsShowAckWindow
 
-        public bool DeveloperMode
         {
-            get
+            get { return _isShowAckWindow; }
+            set
             {
-#if DEBUG
-                return true;
-#else
-                return false; 
-#endif
+                if (_isShowAckWindow == value)
+                    return;
+
+                _isShowAckWindow = value;
+
+                NotifyPropertyChanged("IsShowAckWindow");
             }
         }
+
+        private bool _isShowDebugWindow;
+        public bool IsShowDebugWindow
+
+        {
+            get { return _isShowDebugWindow; }
+            set
+            {
+                if (_isShowDebugWindow == value)
+                    return;
+
+                _isShowDebugWindow = value;
+
+                NotifyPropertyChanged("IsShowDebugWindow");
+
+                if (_isShowDebugWindow)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        DebugWindowShowHide?.Invoke();
+                    });
+                }
+                    
+            }
+        }
+        
 
         #endregion
 
         #region == コントロール関連 ==  
+
+        private SongInfo _currentSong;
+        public SongInfo CurrentSong
+        {
+            get
+            {
+                return _currentSong;
+            }
+            set
+            {
+                if (_currentSong == value)
+                    return;
+
+                _currentSong = value;
+                NotifyPropertyChanged("CurrentSong");
+                NotifyPropertyChanged("CurrentSongTitle");
+                NotifyPropertyChanged("CurrentSongArtist");
+                NotifyPropertyChanged("CurrentSongAlbum");
+
+                if (value == null)
+                    _elapsedTimer.Stop();
+            }
+        }
+
+        public string CurrentSongTitle
+        {
+            get
+            {
+                if (_currentSong != null)
+                {
+                    return _currentSong.Title;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+        }
+
+        public string CurrentSongArtist
+        {
+            get
+            {
+                if (_currentSong != null)
+                {
+                    if (!string.IsNullOrEmpty(_currentSong.Artist))
+                        return _currentSong.Artist.Trim();
+                    else
+                        return "";
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+        }
+
+        public string CurrentSongAlbum
+        {
+            get
+            {
+                if (_currentSong != null)
+                {
+                    if (!string.IsNullOrEmpty(_currentSong.Album))
+                        return _currentSong.Album.Trim();
+                    else
+                        return "";
+                }
+                else
+                {
+                    return String.Empty;
+                }
+            }
+        }
 
         #region == Playback ==  
 
@@ -811,6 +1290,397 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
+
+        #region == AlbumArt == 
+
+        private ImageSource _albumArtDefault = null;
+        private ImageSource _albumArt;
+        public ImageSource AlbumArt
+        {
+            get
+            {
+                return _albumArt;
+            }
+            set
+            {
+                if (_albumArt == value)
+                    return;
+
+                _albumArt = value;
+                NotifyPropertyChanged("AlbumArt");
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region == メイン画面のメニューと各画面の機能 ==
+
+        #region == Queue ==  
+
+        private ObservableCollection<SongInfo> _queue = new ObservableCollection<SongInfo>();
+        public ObservableCollection<SongInfo> Queue
+        {
+            get
+            {
+                if (_mpc != null)
+                {
+                    return _queue;
+                    //return _mpc.CurrentQueue;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            set
+            {
+                if (_queue == value)
+                    return;
+
+                _queue = value;
+                NotifyPropertyChanged("Queue");
+            }
+        }
+
+        private SongInfo _selectedSong;
+        public SongInfo SelectedSong
+        {
+            get
+            {
+                return _selectedSong;
+            }
+            set
+            {
+                if (_selectedSong == value)
+                    return;
+
+                _selectedSong = value;
+                NotifyPropertyChanged("SelectedSong");
+            }
+        }
+
+        #endregion
+
+        #region == Browse ==
+
+        private DirectoryTreeBuilder _musicDirectories = new DirectoryTreeBuilder();
+        public ObservableCollection<NodeTree> MusicDirectories
+        {
+            get { return _musicDirectories.Children; }
+            set
+            {
+                _musicDirectories.Children = value;
+                NotifyPropertyChanged(nameof(MusicDirectories));
+            }
+        }
+
+        private NodeTree _selectedNodeDirectory = new NodeDirectory(".",new Uri(@"file:///./"));
+        public NodeTree SelectedNodeDirectory
+        {
+            get { return _selectedNodeDirectory; }
+            set
+            {
+                if (_selectedNodeDirectory == value)
+                    return;
+
+                _selectedNodeDirectory = value;
+                NotifyPropertyChanged(nameof(SelectedNodeDirectory));
+
+                if (_selectedNodeDirectory == null)
+                    return;
+
+                if (MusicEntries == null)
+                    return;
+                if (MusicEntries.Count == 0)
+                    return;
+
+                // TODO: 絞り込みモードか、マッチしたフォルダ内だけかの切り替え
+                bool filteringMode = true;
+
+                // Treeview で選択ノードが変更されたのでListview でフィルターを掛ける。
+                var collectionView = CollectionViewSource.GetDefaultView(MusicEntries);
+                if (collectionView == null)
+                    return;
+
+                try
+                {
+                    collectionView.Filter = x =>
+                    {
+                        var entry = (NodeFile)x;
+
+                        if (entry == null)
+                            return false;
+
+                        if (entry.FileUri == null)
+                            return false;
+
+                        string path = entry.FileUri.LocalPath; //person.FileUri.AbsoluteUri;
+                        if (string.IsNullOrEmpty(path))
+                            return false;
+                        string filename = System.IO.Path.GetFileName(path);//System.IO.Path.GetFileName(uri.LocalPath);
+                        if (string.IsNullOrEmpty(filename))
+                            return false;
+
+                        if ((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath == "/")
+                        {
+                            if (filteringMode)
+                            {
+                                // 絞り込みモード
+                                if (!string.IsNullOrEmpty(_filterQuery))
+                                {
+                                    return (filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                                }
+                                else
+                                {
+                                    return true;
+                                }
+                            }
+                            else
+                            {
+                                // マッチしたフォルダ内だけ
+                                path = path.Replace("/", "");
+
+                                if (!string.IsNullOrEmpty(_filterQuery))
+                                {
+                                    return ((path == filename) && filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                                }
+                                else
+                                {
+                                    return (path == filename);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            path = path.Replace(("/" + filename), "");
+
+                            if (filteringMode)
+                            {
+                                // 絞り込みモード
+
+                                if (!string.IsNullOrEmpty(_filterQuery))
+                                {
+                                    return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath) && filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                                }
+                                else
+                                {
+                                    return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath));
+                                }
+                            }
+                            else
+                            {
+                                // マッチしたフォルダ内だけ
+                                if (!string.IsNullOrEmpty(_filterQuery))
+                                {
+                                    return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath) && filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                                }
+                                else
+                                {
+                                    return (path == (_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath);
+                                }
+                            }
+                        }
+                    };
+
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine("collectionView.Filter = x => " + e.Message);
+                }
+
+            }
+        }
+
+        private ObservableCollection<NodeFile> _musicEntries = new ObservableCollection<NodeFile>();
+        public ObservableCollection<NodeFile> MusicEntries
+        {
+            get
+            {
+                return _musicEntries; 
+            }
+            set
+            {
+                if (value == _musicEntries)
+                    return;
+
+                _musicEntries = value;
+                NotifyPropertyChanged(nameof(MusicEntries));
+
+            }
+        }
+
+        private string _filterQuery = "";
+        public string FilterQuery
+        {
+            get
+            {
+                return _filterQuery;
+            }
+            set
+            {
+                if (_filterQuery == value)
+                    return;
+
+                _filterQuery = value;
+                NotifyPropertyChanged("FilterQuery");
+
+                /*
+                var collectionView = CollectionViewSource.GetDefaultView(MusicEntries);
+
+                collectionView.Filter = x =>
+                {
+                    var entry = (NodeFile)x;
+
+                    string test = entry.FilePath + entry.Name;
+
+                    // 絞り込み
+                    return (test.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                };
+                collectionView.Refresh();
+
+                */
+
+                if (_selectedNodeDirectory == null)
+                    return;
+
+                // TODO: 絞り込みモードか、マッチしたフォルダ内だけかの切り替え
+                bool filteringMode = true;
+
+                // Treeview で選択ノードが変更されたのでListview でフィルターを掛ける。
+                var collectionView = CollectionViewSource.GetDefaultView(MusicEntries);
+                collectionView.Filter = x =>
+                {
+                    var entry = (NodeFile)x;
+
+                    if (entry.FileUri == null)
+                        return false;
+
+                    string path = entry.FileUri.LocalPath; //person.FileUri.AbsoluteUri;
+                    string filename = System.IO.Path.GetFileName(path);//System.IO.Path.GetFileName(uri.LocalPath);
+
+                    if ((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath == "/")
+                    {
+                        if (filteringMode)
+                        {
+                            // 絞り込みモード
+                            if (FilterQuery != "")
+                            {
+                                return (filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            // マッチしたフォルダ内だけ
+                            path = path.Replace("/", "");
+
+                            if (FilterQuery != "")
+                            {
+                                return ((path == filename) && filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                            }
+                            else
+                            {
+                                return (path == filename);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        path = path.Replace(("/" + filename), "");
+
+                        if (filteringMode)
+                        {
+                            // 絞り込みモード
+
+                            if (FilterQuery != "")
+                            {
+                                return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath) && filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                            }
+                            else
+                            {
+                                return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath));
+                            }
+                        }
+                        else
+                        {
+                            // マッチしたフォルダ内だけ
+                            if (FilterQuery != "")
+                            {
+                                return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath) && filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                            }
+                            else
+                            {
+                                return (path == (_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath);
+                            }
+                        }
+                    }
+                };
+
+                collectionView.Refresh();
+
+            }
+        }
+
+        #endregion
+
+        #region == Search ==
+
+        public ObservableCollection<Song> SearchResult
+        {
+            get
+            {
+                if (_mpc != null)
+                {
+                    return _mpc.SearchResult;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        private SearchTags _selectedSearchTags = SearchTags.Title;
+        public SearchTags SelectedSearchTags
+        {
+            get
+            {
+                return _selectedSearchTags;
+            }
+            set
+            {
+                if (_selectedSearchTags == value)
+                    return;
+
+                _selectedSearchTags = value;
+                NotifyPropertyChanged("SelectedSearchTags");
+            }
+        }
+
+        private string _searchQuery;
+        public string SearchQuery
+        {
+            get
+            {
+                return _searchQuery;
+            }
+            set
+            {
+                if (_searchQuery == value)
+                    return;
+
+                _searchQuery = value;
+                NotifyPropertyChanged("SearchQuery");
+            }
+        }
+
+        #endregion
+
         #region == Playlists ==  
 
         public ObservableCollection<string> Playlists
@@ -847,122 +1717,231 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == Local Files ==
+        #region == Playlist Items ==
 
-        private ObservableCollection<NodeEntry> _localFiles = new ObservableCollection<NodeEntry>();
-        public ObservableCollection<NodeEntry> LocalFiles
+        private ObservableCollection<Song> _playlistSongs = new ObservableCollection<Song>();
+        public ObservableCollection<Song> PlaylistSongs
         {
             get
             {
-                return _localFiles;
+                return _playlistSongs;
             }
             set
             {
-                if (_localFiles != value)
+                if (_playlistSongs != value)
                 {
-                    _localFiles = value;
-                    NotifyPropertyChanged("LocalFiles");
+                    _playlistSongs = value;
+                    NotifyPropertyChanged("PlaylistSongs");
                 }
             }
         }
 
-        private NodeEntry _selecctedLocalfile;
-        public NodeEntry SelectedLocalfile
+        private Song _selecctedPlaylistSong;
+        public Song SelectedPlaylistSong
         {
             get
             {
-                return _selecctedLocalfile;
+                return _selecctedPlaylistSong;
             }
             set
             {
-                if (_selecctedLocalfile != value)
+                if (_selecctedPlaylistSong != value)
                 {
-                    _selecctedLocalfile = value;
-                    NotifyPropertyChanged("SelectedLocalfile");
+                    _selecctedPlaylistSong = value;
+                    NotifyPropertyChanged("SelectedPlaylistSong");
                 }
-            }
-        }
-
-        private string _filterQuery;
-        public string FilterQuery
-        {
-            get
-            {
-                return _filterQuery;
-            }
-            set
-            {
-                if (_filterQuery == value)
-                    return;
-
-                _filterQuery = value;
-                NotifyPropertyChanged("FilterQuery");
-
-                var collectionView = CollectionViewSource.GetDefaultView(LocalFiles);
-
-                collectionView.Filter = x =>
-                {
-                    var entry = (NodeEntry)x;
-
-                    string test = entry.FilePath + entry.Name;
-
-                    // 絞り込み
-                    return (test.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
-                };
-                collectionView.Refresh();
-
             }
         }
 
         #endregion
 
-        #region == Queue ==  
+        #region == MenuTree ==
 
-        private ObservableCollection<MPC.SongInfo> _queue = new ObservableCollection<MPC.SongInfo>();
-        public ObservableCollection<MPC.SongInfo> Queue
+        private MenuTreeBuilder _mainMenuItems = new MenuTreeBuilder();
+        public ObservableCollection<NodeTree> MainMenuItems
         {
-            get
+            get { return _mainMenuItems.Children; }
+            set
             {
-                if (_mpc != null)
+                _mainMenuItems.Children = value;
+                NotifyPropertyChanged(nameof(MainMenuItems));
+            }
+        }
+
+        private bool _isQueueVisible = true;
+        public bool IsQueueVisible
+        {
+            get { return _isQueueVisible; }
+            set
+            {
+                if (_isQueueVisible == value)
+                    return;
+
+                _isQueueVisible = value;
+                NotifyPropertyChanged("IsQueueVisible");
+            }
+        }
+
+        private bool _isPlaylistsVisible = true;
+        public bool IsPlaylistsVisible
+        {
+            get { return _isPlaylistsVisible; }
+            set
+            {
+                if (_isPlaylistsVisible == value)
+                    return;
+
+                _isPlaylistsVisible = value;
+                NotifyPropertyChanged("IsPlaylistsVisible");
+            }
+        }
+
+        private bool _isPlaylistItemVisible = true;
+        public bool IsPlaylistItemVisible
+        {
+            get { return _isPlaylistItemVisible; }
+            set
+            {
+                if (_isPlaylistItemVisible == value)
+                    return;
+
+                _isPlaylistItemVisible = value;
+                NotifyPropertyChanged("IsPlaylistItemVisible");
+            }
+        }
+
+        private bool _isBrowseVisible = true;
+        public  bool IsBrowseVisible
+        {
+            get { return _isBrowseVisible; }
+            set
+            {
+                if (_isBrowseVisible == value)
+                    return;
+
+                _isBrowseVisible = value;
+                NotifyPropertyChanged("IsBrowseVisible");
+            }
+        }
+
+        private bool _isSearchVisible = true;
+        public bool IsSearchVisible
+        {
+            get { return _isSearchVisible; }
+            set
+            {
+                if (_isSearchVisible == value)
+                    return;
+
+                _isSearchVisible = value;
+                NotifyPropertyChanged("IsSearchVisible");
+            }
+        }
+
+        private NodeTree _selectedNodeMenu = new NodeMenu("root");
+        public NodeTree SelectedNodeMenu
+        {
+            get { return _selectedNodeMenu; }
+            set
+            {
+                if (_selectedNodeMenu == value)
+                    return;
+
+                if (value == null)
                 {
-                    return _queue;
-                    //return _mpc.CurrentQueue;
+                    //Debug.WriteLine("selectedNodeMenu is null");
+                    return;
+                }
+
+                _selectedNodeMenu = value;
+                NotifyPropertyChanged(nameof(SelectedNodeMenu));
+
+                if (value is NodeMenuQueue)
+                {
+                    IsQueueVisible = true;
+                    IsPlaylistsVisible = false;
+                    IsPlaylistItemVisible = false;
+                    IsBrowseVisible = false;
+                    IsSearchVisible = false;
+                }
+                else if (value is NodeMenuPlaylists)
+                {
+                    IsQueueVisible = false;
+                    IsPlaylistsVisible = true;
+                    IsPlaylistItemVisible = false;
+                    IsBrowseVisible = false;
+                    IsSearchVisible = false;
+                }
+                else if (value is NodeMenuPlaylistItem)
+                {
+                    //Debug.WriteLine("selectedNodeMenu is NodeMenuPlaylistItem");
+                    IsQueueVisible = false;
+                    IsPlaylistsVisible = false;
+                    IsPlaylistItemVisible = true;
+                    IsBrowseVisible = false;
+                    IsSearchVisible = false;
+
+                    PlaylistSongs = (value as NodeMenuPlaylistItem).PlaylistSongs;
+
+                    if ((PlaylistSongs.Count == 0) || (value as NodeMenuPlaylistItem).IsUpdateRequied)
+                        GetPlaylistSongs(value as NodeMenuPlaylistItem);
+
+                }
+                else if (value is NodeMenuBrowse)
+                {
+                    IsQueueVisible = false;
+                    IsPlaylistsVisible = false;
+                    IsPlaylistItemVisible = false;
+                    IsBrowseVisible = true;
+                    IsSearchVisible = false;
+                }
+                else if (value is NodeMenuSearch)
+                {
+                    IsQueueVisible = false;
+                    IsPlaylistsVisible = false;
+                    IsPlaylistItemVisible = false;
+                    IsBrowseVisible = false;
+                    IsSearchVisible = true;
+                }
+                else if (value is NodeMenu)
+                {
+                    //Debug.WriteLine("selectedNodeMenu is NodeMenu ...unknown:" + _selectedNodeMenu.Name);
+
+                    if (value.Name != "root")
+                        throw new NotImplementedException();
+
+                    IsQueueVisible = true;
                 }
                 else
                 {
-                    return null;
+                    //Debug.WriteLine(value.Name);
+
+                    throw new NotImplementedException();
                 }
-            }
-            set
-            {
-                if (_queue == value)
-                    return;
 
-                _queue = value;
-                NotifyPropertyChanged("Queue");
+
             }
         }
 
-        private MPC.SongInfo _selectedSong;
-        public MPC.SongInfo SelectedSong
-        {
-            get
-            {
-                return _selectedSong;
-            }
-            set
-            {
-                if (_selectedSong == value)
-                    return;
-
-                _selectedSong = value;
-                NotifyPropertyChanged("SelectedSong");
-            }
-        }
+        #endregion
 
         #endregion
 
         #region == ステータス系 == 
+        
+        private string _statusBarMessage;
+        public string StatusBarMessage
+        {
+            get
+            {
+                return _statusBarMessage;
+            }
+            set
+            {
+                _statusBarMessage = value;
+                NotifyPropertyChanged("StatusBarMessage");
+            }
+        }
 
         private string _connectionStatusMessage;
         public string ConnectionStatusMessage
@@ -989,84 +1968,26 @@ namespace MPDCtrl.ViewModels
             {
                 _mpdStatusMessage = value;
                 NotifyPropertyChanged("MpdStatusMessage");
-            }
-        }
 
-        private MPC.SongInfo _currentSong;
-        public MPC.SongInfo CurrentSong
-        {
-            get
-            {
-                return _currentSong;
-            }
-            set
-            {
-                if (_currentSong == value)
-                    return;
-
-                _currentSong = value;
-                NotifyPropertyChanged("CurrentSong");
-                NotifyPropertyChanged("CurrentSongTitle");
-                NotifyPropertyChanged("CurrentSongArtist");
-                NotifyPropertyChanged("CurrentSongAlbum");
-
-                if (value == null)
-                    _elapsedTimer.Stop();
-            }
-        }
-
-        public string CurrentSongTitle
-        {
-            get
-            {
-                if (_currentSong != null)
-                {
-                    return _currentSong.Title;
-                }
+                if (_mpdStatusMessage != "")
+                    _isMpdStatusMessageContainsText = true;
                 else
-                {
-                    return string.Empty;
-                }
+                    _isMpdStatusMessageContainsText = false;
+                NotifyPropertyChanged("IsMpdStatusMessageContainsText");
             }
         }
 
-        public string CurrentSongArtist
+        private bool _isMpdStatusMessageContainsText;
+        public bool IsMpdStatusMessageContainsText
         {
             get
             {
-                if (_currentSong != null)
-                {
-                    if (!string.IsNullOrEmpty(_currentSong.Artist))
-                        return _currentSong.Artist.Trim();
-                    else
-                        return "";
-                }
-                else
-                {
-                    return string.Empty;
-                }
-            }
-        }
-
-        public string CurrentSongAlbum
-        {
-            get
-            {
-                if (_currentSong != null)
-                {
-                    if (!string.IsNullOrEmpty(_currentSong.Album))
-                        return _currentSong.Album.Trim();
-                    else
-                        return "";
-                }
-                else
-                {
-                    return String.Empty;
-                }
+                return _isMpdStatusMessageContainsText;
             }
         }
 
         private static string _pathDefaultNoneButton = "";
+        private static string _pathDisconnectedButton = "M4,1C2.89,1 2,1.89 2,3V7C2,8.11 2.89,9 4,9H1V11H13V9H10C11.11,9 12,8.11 12,7V3C12,1.89 11.11,1 10,1H4M4,3H10V7H4V3M14,13C12.89,13 12,13.89 12,15V19C12,20.11 12.89,21 14,21H11V23H23V21H20C21.11,21 22,20.11 22,19V15C22,13.89 21.11,13 20,13H14M3.88,13.46L2.46,14.88L4.59,17L2.46,19.12L3.88,20.54L6,18.41L8.12,20.54L9.54,19.12L7.41,17L9.54,14.88L8.12,13.46L6,15.59L3.88,13.46M14,15H20V19H14V15Z";
 
         private static string _pathConnectingButton = "M11 14H9C9 9.03 13.03 5 18 5V7C14.13 7 11 10.13 11 14M18 11V9C15.24 9 13 11.24 13 14H15C15 12.34 16.34 11 18 11M7 4C7 2.89 6.11 2 5 2S3 2.89 3 4 3.89 6 5 6 7 5.11 7 4M11.45 4.5H9.45C9.21 5.92 8 7 6.5 7H3.5C2.67 7 2 7.67 2 8.5V11H8V8.74C9.86 8.15 11.25 6.5 11.45 4.5M19 17C20.11 17 21 16.11 21 15S20.11 13 19 13 17 13.89 17 15 17.89 17 19 17M20.5 18H17.5C16 18 14.79 16.92 14.55 15.5H12.55C12.75 17.5 14.14 19.15 16 19.74V22H22V19.5C22 18.67 21.33 18 20.5 18Z";
         private static string _pathConnectedButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
@@ -1092,9 +2013,11 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private static string _pathErrorMpdAckButton = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z";
+        private static string _pathMpdOkButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
 
-        private string _mpdStatusButton = _pathDefaultNoneButton;
+        private static string _pathMpdAckErrorButton = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z";
+
+        private string _mpdStatusButton = _pathMpdOkButton;
         public string MpdStatusButton
         {
             get
@@ -1131,7 +2054,7 @@ namespace MPDCtrl.ViewModels
             get
             {
                 if (_mpdVersion != "")
-                    return "MPD v" + _mpdVersion;
+                    return "MPD protocol v" + _mpdVersion;
                 else
                     return _mpdVersion;
 
@@ -1148,31 +2071,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == AlbumArt == 
-
-        private ImageSource _albumArtDefault = null;
-        private ImageSource _albumArt;
-        public ImageSource AlbumArt
-        {
-            get
-            {
-                return _albumArt;
-            }
-            set
-            {
-                if (_albumArt == value)
-                    return;
-
-                _albumArt = value;
-                NotifyPropertyChanged("AlbumArt");
-            }
-        }
-
-        #endregion
-
-        #endregion
-
-        #region == 設定画面 ==
+        #region == Profileと設定画面 ==
 
         private ObservableCollection<Profile> _profiles = new ObservableCollection<Profile>();
         public ObservableCollection<Profile> Profiles
@@ -1191,13 +2090,13 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _currentProfile = value;
+                NotifyPropertyChanged("CurrentProfile");
 
                 SelectedProfile = _currentProfile;
 
-                NotifyPropertyChanged("CurrentProfile");
-
-                NotifyPropertyChanged("IsCurrentProfileNull");
-                            }
+                _volume = _currentProfile.Volume;
+                NotifyPropertyChanged("Volume");
+            }
         }
 
         private Profile _selectedProfile;
@@ -1233,6 +2132,37 @@ namespace MPDCtrl.ViewModels
                 }
 
                 NotifyPropertyChanged("SelectedProfile");
+
+                //
+                _selectedQuickProfile = _selectedProfile;
+                NotifyPropertyChanged("SelectedQuickProfile");
+
+            }
+        }
+
+        private Profile _selectedQuickProfile;
+        public Profile SelectedQuickProfile
+        {
+            get
+            {
+                return _selectedQuickProfile;
+            }
+            set
+            {
+                if (_selectedQuickProfile == value)
+                    return;
+
+                _selectedQuickProfile = value;
+
+                if (_selectedQuickProfile != null)
+                {
+                    SelectedProfile = _selectedQuickProfile;
+                    CurrentProfile = _selectedQuickProfile;
+
+                    ChangeConnection(_selectedQuickProfile);
+
+                    NotifyPropertyChanged("SelectedQuickProfile");
+                }
             }
         }
 
@@ -1248,8 +2178,8 @@ namespace MPDCtrl.ViewModels
                 // Validate input.
                 if (value == "")
                 {
-                    SetError("Host", MPDCtrl.Properties.Resources.Settings_ErrorHostMustBeSpecified); 
-                    
+                    SetError("Host", MPDCtrl.Properties.Resources.Settings_ErrorHostMustBeSpecified);
+
                 }
                 else if (value == "localhost")
                 {
@@ -1287,7 +2217,7 @@ namespace MPDCtrl.ViewModels
 
                 if (value == "")
                 {
-                    SetError("Port", MPDCtrl.Properties.Resources.Settings_ErrorPortMustBeSpecified); 
+                    SetError("Port", MPDCtrl.Properties.Resources.Settings_ErrorPortMustBeSpecified);
                     _port = 0;
                 }
                 else
@@ -1381,6 +2311,20 @@ namespace MPDCtrl.ViewModels
             return e;
         }
 
+        private string _settingProfileEditMessage;
+        public string SettingProfileEditMessage
+        {
+            get
+            {
+                return _settingProfileEditMessage;
+            }
+            set
+            {
+                _settingProfileEditMessage = value;
+                NotifyPropertyChanged("SettingProfileEditMessage");
+            }
+        }
+
         public bool IsPasswordSet
         {
             get
@@ -1436,7 +2380,7 @@ namespace MPDCtrl.ViewModels
                 NotifyPropertyChanged("SetIsDefault");
             }
         }
-        
+
         private bool _isUpdateOnStartup = false;
         public bool IsUpdateOnStartup
         {
@@ -1467,27 +2411,6 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private bool _isShowDebugWindow;
-        public bool IsShowDebugWindow
-        {
-            get { return _isShowDebugWindow; }
-            set
-            {
-                if (_isShowDebugWindow == value)
-                    return;
-
-                _isShowDebugWindow = value;
-
-                if (!DeveloperMode)
-                    return;
-
-                ShowDebug.WindowVisibility = _isShowDebugWindow;
-                ShowDebugView?.Invoke(this, ShowDebug);
-
-                NotifyPropertyChanged("IsShowDebugWindow");
-            }
-        }
-
         private bool _isSaveLog;
         public bool IsSaveLog
         {
@@ -1503,35 +2426,39 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-
-        private string _settingProfileEditMessage;
-        public string SettingProfileEditMessage
+        private bool _isDownloadAlbumArt = false;
+        public bool IsDownloadAlbumArt
         {
-            get
-            {
-                return _settingProfileEditMessage;
-            }
+            get { return _isDownloadAlbumArt; }
             set
             {
-                _settingProfileEditMessage = value;
-                NotifyPropertyChanged("SettingProfileEditMessage");
+                if (_isDownloadAlbumArt == value)
+                    return;
+
+                _isDownloadAlbumArt = value;
+
+                NotifyPropertyChanged("IsDownloadAlbumArt");
+            }
+        }
+
+        private bool _isDownloadAlbumArtEmbeddedUsingReadPicture = false;
+        public bool IsDownloadAlbumArtEmbeddedUsingReadPicture
+        {
+            get { return _isDownloadAlbumArtEmbeddedUsingReadPicture; }
+            set
+            {
+                if (_isDownloadAlbumArtEmbeddedUsingReadPicture == value)
+                    return;
+
+                _isDownloadAlbumArtEmbeddedUsingReadPicture = value;
+
+                NotifyPropertyChanged("IsDownloadAlbumArtEmbeddedUsingReadPicture");
             }
         }
 
         #endregion
 
-        #region == イベント ==
-
-        public delegate void DebugWindowOutput(String data);
-        public event DebugWindowOutput OnDebugWindowOutput;
-
-        public event EventHandler<ShowDebugEventArgs> ShowDebugView;
-        public ShowDebugEventArgs ShowDebug = new ShowDebugEventArgs();
-
-        public event EventHandler<int> ScrollIntoView;
-
-        #endregion
-
+        // TODO
         #region == ダイアログ ==
 
         private string _dialogTitle;
@@ -1599,628 +2526,281 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == レイアウト関連 ==
+        #region == 新ダイアログ ==
 
-        private double _mainLeftPainActualWidth = 241;
-        public double MainLeftPainActualWidth
+        private List<string> queueListviewSelectedSongIdsForPopup = new List<string>();
+        private List<string> searchResultListviewSelectedSongUriForPopup = new List<string>();
+        private List<string> songFilesListviewSelectedSongUriForPopup = new List<string>();
+
+        private bool _isSaveAsPlaylistPopupVisible;
+        public bool IsSaveAsPlaylistPopupVisible
         {
             get
             {
-                return _mainLeftPainActualWidth;
+                return _isSaveAsPlaylistPopupVisible;
             }
             set
             {
-                if (value == _mainLeftPainActualWidth) return;
-
-                _mainLeftPainActualWidth = value;
-
-                NotifyPropertyChanged("MainLeftPainActualWidth");
-            }
-        }
-
-        private double _mainLeftPainWidth = 241;
-        public double MainLeftPainWidth
-        {
-            get
-            {
-                return _mainLeftPainWidth;
-            }
-            set
-            {
-                if (value == _mainLeftPainWidth) return;
-
-                _mainLeftPainWidth = value;
-
-                NotifyPropertyChanged("MainLeftPainWidth");
-            }
-        }
-
-        #region == Queueカラムヘッダー ==
-
-        private bool _queueColumnHeaderPositionVisibility = true;
-        public bool QueueColumnHeaderPositionVisibility
-        {
-            get
-            {
-                return _queueColumnHeaderPositionVisibility;
-            }
-            set
-            {
-                if (value == _queueColumnHeaderPositionVisibility)
+                if (_isSaveAsPlaylistPopupVisible == value)
                     return;
 
-                _queueColumnHeaderPositionVisibility = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderPositionVisibility");
+                _isSaveAsPlaylistPopupVisible = value;
+                NotifyPropertyChanged("IsSaveAsPlaylistPopupVisible");
             }
         }
 
-        private double _queueColumnHeaderPositionWidth = 53;
-        public double QueueColumnHeaderPositionWidth
+        private bool _isConfirmClearQueuePopupVisible;
+        public bool IsConfirmClearQueuePopupVisible
         {
             get
             {
-                return _queueColumnHeaderPositionWidth;
+                return _isConfirmClearQueuePopupVisible;
             }
             set
             {
-                if (value == _queueColumnHeaderPositionWidth) 
+                if (_isConfirmClearQueuePopupVisible == value)
                     return;
 
-                _queueColumnHeaderPositionWidth = value;
-
-                if (value > 0)
-                    QueueColumnHeaderPositionWidthRestore = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderPositionWidth");
+                _isConfirmClearQueuePopupVisible = value;
+                NotifyPropertyChanged("IsConfirmClearQueuePopupVisible");
             }
         }
 
-        private double _queueColumnHeaderPositionWidthUser = 53;
-        public double QueueColumnHeaderPositionWidthRestore
+        private bool _isSelectedSaveToPopupVisible;
+        public bool IsSelectedSaveToPopupVisible
         {
             get
             {
-                return _queueColumnHeaderPositionWidthUser;
+                return _isSelectedSaveToPopupVisible;
             }
             set
             {
-                if (value == _queueColumnHeaderPositionWidthUser)
+                if (_isSelectedSaveToPopupVisible == value)
                     return;
 
-                _queueColumnHeaderPositionWidthUser = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderPositionWidthRestore");
+                _isSelectedSaveToPopupVisible = value;
+                NotifyPropertyChanged("IsSelectedSaveToPopupVisible");
             }
         }
 
-        private bool _queueColumnHeaderNowPlayingVisibility = true;
-        public bool QueueColumnHeaderNowPlayingVisibility
+        private bool _isSelectedSaveAsPopupVisible;
+        public bool IsSelectedSaveAsPopupVisible
         {
             get
             {
-                return _queueColumnHeaderNowPlayingVisibility;
+                return _isSelectedSaveAsPopupVisible;
             }
             set
             {
-                if (value == _queueColumnHeaderNowPlayingVisibility)
+                if (_isSelectedSaveAsPopupVisible == value)
                     return;
 
-                _queueColumnHeaderNowPlayingVisibility = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderNowPlayingVisibility");
+                _isSelectedSaveAsPopupVisible = value;
+                NotifyPropertyChanged("IsSelectedSaveAsPopupVisible");
             }
         }
 
-        private double _queueColumnHeaderNowPlayingWidth = 32;
-        public double QueueColumnHeaderNowPlayingWidth
+        private bool _isConfirmDeleteQueuePopupVisible;
+        public bool IsConfirmDeleteQueuePopupVisible
         {
             get
             {
-                return _queueColumnHeaderNowPlayingWidth;
+                return _isConfirmDeleteQueuePopupVisible;
             }
             set
             {
-                if (value == _queueColumnHeaderNowPlayingWidth) 
+                if (_isConfirmDeleteQueuePopupVisible == value)
                     return;
 
-                _queueColumnHeaderNowPlayingWidth = value;
-
-                if (value > 0)
-                    QueueColumnHeaderNowPlayingWidthRestore = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderNowPlayingWidth");
+                _isConfirmDeleteQueuePopupVisible = value;
+                NotifyPropertyChanged("IsConfirmDeleteQueuePopupVisible");
             }
         }
 
-        private double _queueColumnHeaderNowPlayingWidthUser = 32;
-        public double QueueColumnHeaderNowPlayingWidthRestore
+        private bool _isConfirmDeletePlaylistPopupVisible;
+        public bool IsConfirmDeletePlaylistPopupVisible
         {
             get
             {
-                return _queueColumnHeaderNowPlayingWidthUser;
+                return _isConfirmDeletePlaylistPopupVisible;
             }
             set
             {
-                if (value == _queueColumnHeaderNowPlayingWidthUser)
+                if (_isConfirmDeletePlaylistPopupVisible == value)
                     return;
 
-                _queueColumnHeaderNowPlayingWidthUser = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderNowPlayingWidthRestore");
+                _isConfirmDeletePlaylistPopupVisible = value;
+                NotifyPropertyChanged("IsConfirmDeletePlaylistPopupVisible");
             }
         }
 
-        private double _queueColumnHeaderTitleWidth = 180;
-        public double QueueColumnHeaderTitleWidth
+        private bool _isConfirmUpdatePlaylistSongsPopupVisible;
+        public bool IsConfirmUpdatePlaylistSongsPopupVisible
         {
             get
             {
-                return _queueColumnHeaderTitleWidth;
+                return _isConfirmUpdatePlaylistSongsPopupVisible;
             }
             set
             {
-                if (value == _queueColumnHeaderTitleWidth) 
+                if (_isConfirmUpdatePlaylistSongsPopupVisible == value)
                     return;
 
-                _queueColumnHeaderTitleWidth = value;
-
-                if (value > 0)
-                    QueueColumnHeaderTitleWidthRestore = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderTitleWidth");
+                _isConfirmUpdatePlaylistSongsPopupVisible = value;
+                NotifyPropertyChanged("IsConfirmUpdatePlaylistSongsPopupVisible");
             }
         }
 
-        private double _queueColumnHeaderTitleWidthUser = 180;
-        public double QueueColumnHeaderTitleWidthRestore
+        private bool _isConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible;
+        public bool IsConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible
         {
             get
             {
-                return _queueColumnHeaderTitleWidthUser;
+                return _isConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible;
             }
             set
             {
-                if (value == _queueColumnHeaderTitleWidthUser)
+                if (_isConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible == value)
                     return;
 
-                _queueColumnHeaderTitleWidthUser = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderTitleWidthRestore");
+                _isConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible = value;
+                NotifyPropertyChanged("IsConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible");
             }
         }
 
-        private bool _queueColumnHeaderTimeVisibility = true;
-        public bool QueueColumnHeaderTimeVisibility
+        private bool _isConfirmDeletePlaylistSongPopupVisible;
+        public bool IsConfirmDeletePlaylistSongPopupVisible
         {
             get
             {
-                return _queueColumnHeaderTimeVisibility;
+                return _isConfirmDeletePlaylistSongPopupVisible;
             }
             set
             {
-                if (value == _queueColumnHeaderTimeVisibility)
+                if (_isConfirmDeletePlaylistSongPopupVisible == value)
                     return;
 
-                _queueColumnHeaderTimeVisibility = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderTimeVisibility");
+                _isConfirmDeletePlaylistSongPopupVisible = value;
+                NotifyPropertyChanged("IsConfirmDeletePlaylistSongPopupVisible");
             }
         }
 
-        private double _queueColumnHeaderTimeWidth = 62;
-        public double QueueColumnHeaderTimeWidth
+        private bool _isConfirmPlaylistClearPopupVisible;
+        public bool IsConfirmPlaylistClearPopupVisible
         {
             get
             {
-                return _queueColumnHeaderTimeWidth;
+                return _isConfirmPlaylistClearPopupVisible;
             }
             set
             {
-                if (value == _queueColumnHeaderTimeWidth) 
+                if (_isConfirmPlaylistClearPopupVisible == value)
                     return;
 
-                _queueColumnHeaderTimeWidth = value;
-
-                if (value > 0)
-                    QueueColumnHeaderTitleWidthRestore = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderTimeWidth");
+                _isConfirmPlaylistClearPopupVisible = value;
+                NotifyPropertyChanged("IsConfirmPlaylistClearPopupVisible");
             }
         }
 
-        private double _queueColumnHeaderTimeWidthUser = 62;
-        public double QueueColumnHeaderTimeWidthRestore
+        private bool _isSearchResultSelectedSaveAsPopupVisible;
+        public bool IsSearchResultSelectedSaveAsPopupVisible
         {
             get
             {
-                return _queueColumnHeaderTimeWidthUser;
+                return _isSearchResultSelectedSaveAsPopupVisible;
             }
             set
             {
-                if (value == _queueColumnHeaderTimeWidthUser)
+                if (_isSearchResultSelectedSaveAsPopupVisible == value)
                     return;
 
-                _queueColumnHeaderTimeWidthUser = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderTimeWidthRestore");
+                _isSearchResultSelectedSaveAsPopupVisible = value;
+                NotifyPropertyChanged("IsSearchResultSelectedSaveAsPopupVisible");
             }
         }
 
-        private bool _queueColumnHeaderArtistVisibility = true;
-        public bool QueueColumnHeaderArtistVisibility
+        private bool _isSearchResultSelectedSaveToPopupVisible;
+        public bool IsSearchResultSelectedSaveToPopupVisible
         {
             get
             {
-                return _queueColumnHeaderArtistVisibility;
+                return _isSearchResultSelectedSaveToPopupVisible;
             }
             set
             {
-                if (value == _queueColumnHeaderArtistVisibility)
+                if (_isSearchResultSelectedSaveToPopupVisible == value)
                     return;
 
-                _queueColumnHeaderArtistVisibility = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderArtistVisibility");
+                _isSearchResultSelectedSaveToPopupVisible = value;
+                NotifyPropertyChanged("IsSearchResultSelectedSaveToPopupVisible");
             }
         }
 
-        private double _queueColumnHeaderArtistWidth = 120;
-        public double QueueColumnHeaderArtistWidth
+        private bool _sSongFilesSelectedSaveAsPopupVisible;
+        public bool IsSongFilesSelectedSaveAsPopupVisible
         {
             get
             {
-                return _queueColumnHeaderArtistWidth;
+                return _sSongFilesSelectedSaveAsPopupVisible;
             }
             set
             {
-                if (value == _queueColumnHeaderArtistWidth) 
+                if (_sSongFilesSelectedSaveAsPopupVisible == value)
                     return;
 
-                _queueColumnHeaderArtistWidth = value;
-
-                if (value > 0)
-                    QueueColumnHeaderArtistWidthRestore = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderArtistWidth");
+                _sSongFilesSelectedSaveAsPopupVisible = value;
+                NotifyPropertyChanged("IsSongFilesSelectedSaveAsPopupVisible");
             }
         }
 
-        private double _queueColumnHeaderArtistWidthUser = 120;
-        public double QueueColumnHeaderArtistWidthRestore
+        private bool _isSongFilesSelectedSaveToPopupVisible;
+        public bool IsSongFilesSelectedSaveToPopupVisible
         {
             get
             {
-                return _queueColumnHeaderArtistWidthUser;
+                return _isSongFilesSelectedSaveToPopupVisible;
             }
             set
             {
-                if (value == _queueColumnHeaderArtistWidthUser)
+                if (_isSongFilesSelectedSaveToPopupVisible == value)
                     return;
 
-                _queueColumnHeaderArtistWidthUser = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderArtistWidthRestore");
-            }
-        }
-
-        private bool _queueColumnHeaderAlbumVisibility = true;
-        public bool QueueColumnHeaderAlbumVisibility
-        {
-            get
-            {
-                return _queueColumnHeaderAlbumVisibility;
-            }
-            set
-            {
-                if (value == _queueColumnHeaderAlbumVisibility)
-                    return;
-
-                _queueColumnHeaderAlbumVisibility = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderAlbumVisibility");
-            }
-        }
-
-        private double _queueColumnHeaderAlbumWidth = 120;
-        public double QueueColumnHeaderAlbumWidth
-        {
-            get
-            {
-                return _queueColumnHeaderAlbumWidth;
-            }
-            set
-            {
-                if (value == _queueColumnHeaderAlbumWidth) 
-                    return;
-
-                _queueColumnHeaderAlbumWidth = value;
-
-                if (value > 0)
-                    QueueColumnHeaderAlbumWidthRestore = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderAlbumWidth");
-            }
-        }
-
-        private double _queueColumnHeaderAlbumWidthUser = 120;
-        public double QueueColumnHeaderAlbumWidthRestore
-        {
-            get
-            {
-                return _queueColumnHeaderAlbumWidthUser;
-            }
-            set
-            {
-                if (value == _queueColumnHeaderAlbumWidthUser)
-                    return;
-
-                _queueColumnHeaderAlbumWidthUser = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderAlbumWidthRestore");
-            }
-        }
-
-        private bool _queueColumnHeaderGenreVisibility = true;
-        public bool QueueColumnHeaderGenreVisibility
-        {
-            get
-            {
-                return _queueColumnHeaderGenreVisibility;
-            }
-            set
-            {
-                if (value == _queueColumnHeaderGenreVisibility)
-                    return;
-
-                _queueColumnHeaderGenreVisibility = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderGenreVisibility");
-            }
-        }
-
-        private double _queueColumnHeaderGenreWidth = 100;
-        public double QueueColumnHeaderGenreWidth
-        {
-            get
-            {
-                return _queueColumnHeaderGenreWidth;
-            }
-            set
-            {
-                if (value == _queueColumnHeaderGenreWidth) 
-                    return;
-
-                _queueColumnHeaderGenreWidth = value;
-
-                if (value > 0)
-                    QueueColumnHeaderGenreWidthRestore = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderGenreWidth");
-            }
-        }
-
-        private double _queueColumnHeaderGenreWidthUser = 100;
-        public double QueueColumnHeaderGenreWidthRestore
-        {
-            get
-            {
-                return _queueColumnHeaderGenreWidthUser;
-            }
-            set
-            {
-                if (value == _queueColumnHeaderGenreWidthUser)
-                    return;
-
-                _queueColumnHeaderGenreWidthUser = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderGenreWidthRestore");
-            }
-        }
-
-        private bool _queueColumnHeaderLastModifiedVisibility = true;
-        public bool QueueColumnHeaderLastModifiedVisibility
-        {
-            get
-            {
-                return _queueColumnHeaderLastModifiedVisibility;
-            }
-            set
-            {
-                if (value == _queueColumnHeaderLastModifiedVisibility)
-                    return;
-
-                _queueColumnHeaderLastModifiedVisibility = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderLastModifiedVisibility");
-            }
-        }
-
-        private double _queueColumnHeaderLastModifiedWidth = 180;
-        public double QueueColumnHeaderLastModifiedWidth
-        {
-            get
-            {
-                return _queueColumnHeaderLastModifiedWidth;
-            }
-            set
-            {
-                if (value == _queueColumnHeaderLastModifiedWidth) 
-                    return;
-
-                _queueColumnHeaderLastModifiedWidth = value;
-
-                if (value > 0)
-                    QueueColumnHeaderLastModifiedWidthRestore = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderLastModifiedWidth");
-            }
-        }
-
-        private double _queueColumnHeaderLastModifiedWidthUser = 180;
-        public double QueueColumnHeaderLastModifiedWidthRestore
-        {
-            get
-            {
-                return _queueColumnHeaderLastModifiedWidthUser;
-            }
-            set
-            {
-                if (value == _queueColumnHeaderLastModifiedWidthUser)
-                    return;
-
-                _queueColumnHeaderLastModifiedWidthUser = value;
-
-                NotifyPropertyChanged("QueueColumnHeaderLastModifiedWidthRestore");
+                _isSongFilesSelectedSaveToPopupVisible = value;
+                NotifyPropertyChanged("IsSongFilesSelectedSaveToPopupVisible");
             }
         }
 
         #endregion
 
-        #endregion
+        #region == イベント ==
 
-        #region == 検索画面 ==
+        // DebugWindow
+        public delegate void DebugWindowShowHideEventHandler();
+        public event DebugWindowShowHideEventHandler DebugWindowShowHide;
 
-        private DirectoryTreeBuilder _musicDirectories = new DirectoryTreeBuilder();
-        public ObservableCollection<NodeDirectory> MusicDirectories
-        {
-            get { return _musicDirectories.Children; }
-            set
-            {
-                _musicDirectories.Children = value;
-                NotifyPropertyChanged(nameof(MusicDirectories));
-            }
-        }
+        public event EventHandler<string> DebugCommandOutput;
+        public event EventHandler<string> DebugIdleOutput;
 
-        private NodeDirectory _selectedNode = new NodeDirectory(".",new Uri(@"file:///./"));
-        public NodeDirectory SelectedNode
-        {
-            get { return _selectedNode; }
-            set
-            {
-                if (_selectedNode == value)
-                    return;
-
-                _selectedNode = value;
-                NotifyPropertyChanged(nameof(SelectedNode));
-
-                // TODO: 絞り込みモードか、マッチしたフォルダ内だけかの切り替え
-                bool filteringMode = true;
-
-                // Treeview で選択ノードが変更されたのでListview でフィルターを掛ける。
-                var collectionView = CollectionViewSource.GetDefaultView(MusicEntries);
-                collectionView.Filter = x =>
-                {
-                    var entry = (NodeEntry)x;
-
-                    string path = entry.FileUri.LocalPath; //person.FileUri.AbsoluteUri;
-                    string filename = System.IO.Path.GetFileName(path);//System.IO.Path.GetFileName(uri.LocalPath);
-
-                    if (_selectedNode.DireUri.LocalPath == "/")
-                    {
-                        if (filteringMode)
-                        {
-                            // 絞り込みモード
-                            return true;
-                        }
-                        else
-                        {
-                            // マッチしたフォルダ内だけ
-                            path = path.Replace("/", "");
-                            return (path == filename);
-                        }
-                    }
-                    else
-                    {
-                        path = path.Replace(("/" + filename), "");
-
-                        if (filteringMode)
-                        {
-                            // 絞り込みモード
-                            return (path.StartsWith(_selectedNode.DireUri.LocalPath));
-                        }
-                        else
-                        {
-                            // マッチしたフォルダ内だけ
-                            return (path == _selectedNode.DireUri.LocalPath);
-                        }
-                    }
+        public delegate void DebugCommandClearEventHandler();
+        public event DebugCommandClearEventHandler DebugCommandClear;
+        public delegate void DebugIdleClearEventHandler();
+        public event DebugIdleClearEventHandler DebugIdleClear;
 
 
-                };
+        // AckWindow
+        public delegate void AckWindowShowHideEventHandler();
 
-                collectionView.Refresh();
-            }
-        }
+        public event EventHandler<string> AckWindowOutput;
 
-        private ObservableCollection<NodeEntry> _musicEntries = new ObservableCollection<NodeEntry>();
-        public ObservableCollection<NodeEntry> MusicEntries
-        {
-            get
-            {
-                return _musicEntries; 
-            }
-            set
-            {
-                if (value == _musicEntries)
-                    return;
+        public delegate void AckWindowClearEventHandler();
+        public event AckWindowClearEventHandler AckWindowClear;
 
-                _musicEntries = value;
-                NotifyPropertyChanged(nameof(MusicEntries));
-
-            }
-        }
-
-        public ObservableCollection<MPC.Song> SearchResult
-        {
-            get
-            {
-                if (_mpc != null)
-                {
-                    return _mpc.SearchResult;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
-        private SearchTags _selectedSearchTags = SearchTags.Title;
-        public SearchTags SelectedSearchTags
-        {
-            get
-            {
-                return _selectedSearchTags;
-            }
-            set
-            {
-                if (_selectedSearchTags == value)
-                    return;
-
-                _selectedSearchTags = value;
-                NotifyPropertyChanged("SelectedSearchTags");
-            }
-        }
-
-        private string _searchQuery;
-        public string SearchQuery
-        {
-            get
-            {
-                return _searchQuery;
-            }
-            set
-            {
-                if (_searchQuery == value)
-                    return;
-
-                _searchQuery = value;
-                NotifyPropertyChanged("SearchQuery");
-            }
-        }
+        // Queue listview ScrollIntoView
+        public event EventHandler<int> ScrollIntoView;
 
         #endregion
+
+        private MPC _mpc = new MPC();
 
         public MainViewModel()
         {
@@ -2235,7 +2815,7 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            #region == コマンド初期化 ==
+            #region == コマンドの初期化 ==
 
             PlayCommand = new RelayCommand(PlayCommand_ExecuteAsync, PlayCommand_CanExecute);
             PlayStopCommand = new RelayCommand(PlayStopCommand_Execute, PlayStopCommand_CanExecute);
@@ -2262,20 +2842,35 @@ namespace MPDCtrl.ViewModels
             PlaylistListviewLeftDoubleClickCommand = new GenericRelayCommand<String>(param => PlaylistListviewLeftDoubleClickCommand_ExecuteAsync(param), param => PlaylistListviewLeftDoubleClickCommand_CanExecute());
             ChangePlaylistCommand = new RelayCommand(ChangePlaylistCommand_ExecuteAsync, ChangePlaylistCommand_CanExecute);
             PlaylistListviewRemovePlaylistCommand = new GenericRelayCommand<String>(param => PlaylistListviewRemovePlaylistCommand_Execute(param), param => PlaylistListviewRemovePlaylistCommand_CanExecute());
+
+            PlaylistListviewConfirmRemovePlaylistPopupCommand = new RelayCommand(PlaylistListviewConfirmRemovePlaylistPopupCommand_Execute, PlaylistListviewConfirmRemovePlaylistPopupCommand_CanExecute);
             PlaylistListviewRenamePlaylistCommand = new GenericRelayCommand<String>(param => PlaylistListviewRenamePlaylistCommand_Execute(param), param => PlaylistListviewRenamePlaylistCommand_CanExecute());
+
+            PlaylistListviewConfirmUpdatePopupCommand = new RelayCommand(PlaylistListviewConfirmUpdatePopupCommand_Execute, PlaylistListviewConfirmUpdatePopupCommand_CanExecute);
+            PlaylistListviewClearCommand = new RelayCommand(PlaylistListviewClearCommand_Execute, PlaylistListviewClearCommand_CanExecute);
+            PlaylistListviewClearPopupCommand = new RelayCommand(PlaylistListviewClearPopupCommand_Execute, PlaylistListviewClearPopupCommand_CanExecute);
 
             LocalfileListviewEnterKeyCommand = new GenericRelayCommand<object>(param => LocalfileListviewEnterKeyCommand_Execute(param), param => LocalfileListviewEnterKeyCommand_CanExecute());
             LocalfileListviewAddCommand = new GenericRelayCommand<object>(param => LocalfileListviewAddCommand_Execute(param), param => LocalfileListviewAddCommand_CanExecute());
             LocalfileListviewLeftDoubleClickCommand = new GenericRelayCommand<object>(param => LocalfileListviewLeftDoubleClickCommand_Execute(param), param => LocalfileListviewLeftDoubleClickCommand_CanExecute());
 
             QueueListviewEnterKeyCommand = new RelayCommand(QueueListviewEnterKeyCommand_ExecuteAsync, QueueListviewEnterKeyCommand_CanExecute);
-            QueueListviewLeftDoubleClickCommand = new GenericRelayCommand<MPC.SongInfo>(param => QueueListviewLeftDoubleClickCommand_ExecuteAsync(param), param => QueueListviewLeftDoubleClickCommand_CanExecute());
+            QueueListviewLeftDoubleClickCommand = new GenericRelayCommand<SongInfo>(param => QueueListviewLeftDoubleClickCommand_ExecuteAsync(param), param => QueueListviewLeftDoubleClickCommand_CanExecute());
             QueueListviewDeleteCommand = new GenericRelayCommand<object>(param => QueueListviewDeleteCommand_Execute(param), param => QueueListviewDeleteCommand_CanExecute());
+            QueueListviewConfirmDeletePopupCommand = new RelayCommand(QueueListviewConfirmDeletePopupCommand_Execute, QueueListviewConfirmDeletePopupCommand_CanExecute);
+
             QueueListviewClearCommand = new RelayCommand(QueueListviewClearCommand_ExecuteAsync, QueueListviewClearCommand_CanExecute);
-            QueueListviewSaveCommand = new RelayCommand(QueueListviewSaveCommand_ExecuteAsync, QueueListviewSaveCommand_CanExecute);
+            QueueListviewConfirmClearPopupCommand = new RelayCommand(QueueListviewConfirmClearPopupCommand_Execute, QueueListviewConfirmClearPopupCommand_CanExecute);
+            QueueListviewSaveAsCommand = new RelayCommand(QueueListviewSaveAsCommand_ExecuteAsync, QueueListviewSaveAsCommand_CanExecute);
+            QueueListviewSaveAsPopupCommand = new GenericRelayCommand<string>(param => QueueListviewSaveAsPopupCommand_Execute(param), param => QueueListviewSaveAsPopupCommand_CanExecute());
             QueueListviewMoveUpCommand = new GenericRelayCommand<object>(param => QueueListviewMoveUpCommand_Execute(param), param => QueueListviewMoveUpCommand_CanExecute());
             QueueListviewMoveDownCommand = new GenericRelayCommand<object>(param => QueueListviewMoveDownCommand_Execute(param), param => QueueListviewMoveDownCommand_CanExecute());
-            QueueListviewPlaylistAddCommand = new GenericRelayCommand<object>(param => QueueListviewPlaylistAddCommand_Execute(param), param => QueueListviewPlaylistAddCommand_CanExecute());
+
+            QueueListviewSaveSelectedAsCommand = new GenericRelayCommand<object>(param => QueueListviewSaveSelectedAsCommand_Execute(param), param => QueueListviewSaveSelectedAsCommand_CanExecute());
+            QueueListviewSaveSelectedAsPopupCommand = new GenericRelayCommand<string>(param => QueueListviewSaveSelectedAsPopupCommand_Execute(param), param => QueueListviewSaveSelectedAsPopupCommand_CanExecute());
+
+            QueueListviewSaveSelectedToCommand = new GenericRelayCommand<object>(param => QueueListviewSaveSelectedToCommand_Execute(param), param => QueueListviewSaveSelectedToCommand_CanExecute());
+            QueueListviewSaveSelectedToPopupCommand = new GenericRelayCommand<string>(param => QueueListviewSaveSelectedToPopupCommand_Execute(param), param => QueueListviewSaveSelectedToPopupCommand_CanExecute());
 
             ShowSettingsCommand = new RelayCommand(ShowSettingsCommand_Execute, ShowSettingsCommand_CanExecute);
             SettingsOKCommand = new RelayCommand(SettingsOKCommand_Execute, SettingsOKCommand_CanExecute);
@@ -2318,35 +2913,58 @@ namespace MPDCtrl.ViewModels
             SearchExecCommand = new RelayCommand(SearchExecCommand_Execute, SearchExecCommand_CanExecute);
             FilterClearCommand = new RelayCommand(FilterClearCommand_Execute, FilterClearCommand_CanExecute);
 
+            SearchResultListviewSaveSelectedAsCommand = new GenericRelayCommand<object>(param => SearchResultListviewSaveSelectedAsCommand_Execute(param), param => SearchResultListviewSaveSelectedAsCommand_CanExecute());
+            SearchResultListviewSaveSelectedAsPopupCommand = new GenericRelayCommand<string>(param => SearchResultListviewSaveSelectedAsPopupCommand_Execute(param), param => SearchResultListviewSaveSelectedAsPopupCommand_CanExecute());
+            SearchResultListviewSaveSelectedToCommand = new GenericRelayCommand<object>(param => SearchResultListviewSaveSelectedToCommand_Execute(param), param => SearchResultListviewSaveSelectedToCommand_CanExecute());
+            SearchResultListviewSaveSelectedToPopupCommand = new GenericRelayCommand<string>(param => SearchResultListviewSaveSelectedToPopupCommand_Execute(param), param => SearchResultListviewSaveSelectedToPopupCommand_CanExecute());
+
+
             SongsListviewAddCommand = new GenericRelayCommand<object>(param => SongsListviewAddCommand_Execute(param), param => SongsListviewAddCommand_CanExecute());
             SongFilesListviewAddCommand = new GenericRelayCommand<object>(param => SongFilesListviewAddCommand_Execute(param), param => SongFilesListviewAddCommand_CanExecute());
 
+            SongFilesListviewSaveSelectedAsCommand = new GenericRelayCommand<object>(param => SongFilesListviewSaveSelectedAsCommand_Execute(param), param => SongFilesListviewSaveSelectedAsCommand_CanExecute());
+            SongFilesListviewSaveSelectedAsPopupCommand = new GenericRelayCommand<string>(param => SongFilesListviewSaveSelectedAsPopupCommand_Execute(param), param => SongFilesListviewSaveSelectedAsPopupCommand_CanExecute());
+            SongFilesListviewSaveSelectedToCommand = new GenericRelayCommand<object>(param => SongFilesListviewSaveSelectedToCommand_Execute(param), param => SongFilesListviewSaveSelectedToCommand_CanExecute());
+            SongFilesListviewSaveSelectedToPopupCommand = new GenericRelayCommand<string>(param => SongFilesListviewSaveSelectedToPopupCommand_Execute(param), param => SongFilesListviewSaveSelectedToPopupCommand_CanExecute());
+
+
             ScrollIntoNowPlayingCommand = new RelayCommand(ScrollIntoNowPlayingCommand_Execute, ScrollIntoNowPlayingCommand_CanExecute);
 
+            ClearDebugCommandTextCommand = new RelayCommand(ClearDebugCommandTextCommand_Execute, ClearDebugCommandTextCommand_CanExecute);
+            ClearDebugIdleTextCommand = new RelayCommand(ClearDebugIdleTextCommand_Execute, ClearDebugIdleTextCommand_CanExecute);
+            ShowDebugWindowCommand = new RelayCommand(ShowDebugWindowCommand_Execute, ShowDebugWindowCommand_CanExecute);
+
+            ClearAckTextCommand = new RelayCommand(ClearAckTextCommand_Execute, ClearAckTextCommand_CanExecute);
+            ShowAckWindowCommand = new RelayCommand(ShowAckWindowCommand_Execute, ShowAckWindowCommand_CanExecute);
+
+            PlaylistListviewDeletePosCommand = new GenericRelayCommand<object>(param => PlaylistListviewDeletePosCommand_Execute(param), param => PlaylistListviewDeletePosCommand_CanExecute());
+            PlaylistListviewDeletePosPopupCommand = new RelayCommand(PlaylistListviewDeletePosPopupCommand_Execute, PlaylistListviewDeletePosPopupCommand_CanExecute);
+            PlaylistListviewConfirmDeletePosNotSupportedPopupCommand = new RelayCommand(PlaylistListviewConfirmDeletePosNotSupportedPopupCommand_Execute, PlaylistListviewConfirmDeletePosNotSupportedPopupCommand_CanExecute);
+
             #endregion
 
-            #region == MPC ==  
+            #region == イベントへのサブスクライブ ==
 
-            _mpc = new MPC(_host, _port, _password);
+            _mpc.IsBusy += new MPC.IsBusyEvent(OnMpcIsBusy);
 
-            #endregion
+            _mpc.MpdIdleConnected += new MPC.IsMpdIdleConnectedEvent(OnMpdIdleConnected);
 
-            #region == イベント ==
+            _mpc.DebugCommandOutput += new MPC.DebugCommandOutputEvent(OnDebugCommandOutput);
+            _mpc.DebugIdleOutput += new MPC.DebugIdleOutputEvent(OnDebugIdleOutput);
 
-            _mpc.Connected += new MPC.MpdConnected(OnMpdConnected);
-            _mpc.StatusChanged += new MPC.MpdStatusChanged(OnStatusChanged);
-            _mpc.StatusUpdate += new MPC.MpdStatusUpdate(OnMpdStatusUpdate);
-            _mpc.ErrorReturned += new MPC.MpdError(OnError);
-            _mpc.ErrorConnected += new MPC.MpdConnectionError(OnConnectionError);
-            _mpc.ConnectionStatusChanged += new MPC.MpdConnectionStatusChanged(OnConnectionStatusChanged);
-            _mpc.IsBusy += new MPC.MpdIsBusy(OnClientIsBusy);
-            _mpc.OnAlbumArtStatusChanged += new MPC.MpdAlbumArtStatusChanged(OnAlbumArtStatusChanged);
+            _mpc.ConnectionStatusChanged += new MPC.ConnectionStatusChangedEvent(OnConnectionStatusChanged);
+            _mpc.ConnectionError += new MPC.ConnectionErrorEvent(OnConnectionError);
 
-            if (DeveloperMode)
-            {
-                _mpc.DataReceived += new MPC.MpdDataReceived(OnDataReceived);
-                _mpc.DataSent += new MPC.MpdDataSent(OnDataSent);
-            }
+            _mpc.MpdPlayerStatusChanged += new MPC.MpdPlayerStatusChangedEvent(OnMpdPlayerStatusChanged);
+            _mpc.MpdCurrentQueueChanged += new MPC.MpdCurrentQueueChangedEvent(OnMpdCurrentQueueChanged);
+            _mpc.MpdPlaylistsChanged += new MPC.MpdPlaylistsChangedEvent(OnMpdPlaylistsChanged);
+
+            _mpc.MpdAckError += new MPC.MpdAckErrorEvent(OnMpdAckError);
+            
+            //_mpc.MpcInfo += new MPC.MpcInfoEvent(OnMpcInfoEvent);
+
+            _mpc.MpdAlbumArtChanged += new MPC.MpdAlbumArtChangedEvent(OnAlbumArtChanged);
+
 
             #endregion
 
@@ -2358,29 +2976,9 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            #region == DebugWindow ==  
-
-            if (DeveloperMode)
-            {
-                // Window hack for the DebugWindow.
-                App app = App.Current as App;
-                if (app != null)
-                {
-                    DebugViewModel dvm = new DebugViewModel();
-
-                    OnDebugWindowOutput += new DebugWindowOutput(dvm.OnDebugOutput);
-
-                    ShowDebugView += (sender, arg) => { app.ShowDebugWindow(arg); };
-
-                    app.CreateDebugWindow(dvm);
-                }
-            }
-
-            #endregion
-
         }
 
-        #region == イベント ==
+        #region == Startup and Shutdown ==
 
         // 起動時の処理
         public void OnWindowLoaded(object sender, RoutedEventArgs e)
@@ -2445,34 +3043,7 @@ namespace MPDCtrl.ViewModels
                         }
                     }
 
-                    var debugWindow = xdoc.Root.Element("DebugWindow");
-                    if (debugWindow != null)
-                    {
-                        var hoge = debugWindow.Attribute("top");
-                        if (hoge != null)
-                        {
-                            ShowDebug.Top = double.Parse(hoge.Value);
-                        }
 
-                        hoge = debugWindow.Attribute("left");
-                        if (hoge != null)
-                        {
-                            ShowDebug.Left = double.Parse(hoge.Value);
-                        }
-
-                        hoge = debugWindow.Attribute("height");
-                        if (hoge != null)
-                        {
-                            ShowDebug.Height = double.Parse(hoge.Value);
-                        }
-
-                        hoge = debugWindow.Attribute("width");
-                        if (hoge != null)
-                        {
-                            ShowDebug.Width = double.Parse(hoge.Value);
-                        }
-
-                    }
 
                     #endregion
 
@@ -2507,34 +3078,59 @@ namespace MPDCtrl.ViewModels
                             }
                         }
 
-                        if (DeveloperMode)
+                        hoge = opts.Attribute("ShowDebugWindow");
+                        if (hoge != null)
                         {
-                            hoge = opts.Attribute("ShowDebugWindow");
-                            if (hoge != null)
+                            if (hoge.Value == "True")
                             {
-                                if (hoge.Value == "True")
-                                {
-                                    IsShowDebugWindow = true;
+                                IsShowDebugWindow = true;
 
-                                }
-                                else
-                                {
-                                    IsShowDebugWindow = false;
-                                }
                             }
-
-                            hoge = opts.Attribute("SaveLog");
-                            if (hoge != null)
+                            else
                             {
-                                if (hoge.Value == "True")
-                                {
-                                    IsSaveLog = true;
+                                IsShowDebugWindow = false;
+                            }
+                        }
 
-                                }
-                                else
-                                {
-                                    IsSaveLog = false;
-                                }
+                        hoge = opts.Attribute("SaveLog");
+                        if (hoge != null)
+                        {
+                            if (hoge.Value == "True")
+                            {
+                                IsSaveLog = true;
+
+                            }
+                            else
+                            {
+                                IsSaveLog = false;
+                            }
+                        }
+
+                        hoge = opts.Attribute("DownloadAlbumArt");
+                        if (hoge != null)
+                        {
+                            if (hoge.Value == "True")
+                            {
+                                IsDownloadAlbumArt = true;
+
+                            }
+                            else
+                            {
+                                IsDownloadAlbumArt = false;
+                            }
+                        }
+
+                        hoge = opts.Attribute("DownloadAlbumArtEmbeddedUsingReadPicture");
+                        if (hoge != null)
+                        {
+                            if (hoge.Value == "True")
+                            {
+                                IsDownloadAlbumArtEmbeddedUsingReadPicture = true;
+
+                            }
+                            else
+                            {
+                                IsDownloadAlbumArtEmbeddedUsingReadPicture = false;
                             }
                         }
                     }
@@ -2594,6 +3190,20 @@ namespace MPDCtrl.ViewModels
                                     }
                                 }
                             }
+                            if (p.Attribute("Volume") != null)
+                            {
+                                if (!string.IsNullOrEmpty(p.Attribute("Volume").Value))
+                                {
+                                    try
+                                    {
+                                        pro.Volume = double.Parse(p.Attribute("Volume").Value);
+                                    }
+                                    catch
+                                    {
+                                        pro.Volume = 50;
+                                    }
+                                }
+                            }
 
                             Profiles.Add(pro);
                         }
@@ -2639,7 +3249,7 @@ namespace MPDCtrl.ViewModels
                                         }
                                     }
                                 }
-                                if (QueueColumnHeaderPositionWidth > 0) 
+                                if (QueueColumnHeaderPositionWidth > 0)
                                     QueueColumnHeaderPositionWidthRestore = QueueColumnHeaderPositionWidth;
                             }
                             column = Que.Element("NowPlaying");
@@ -2777,7 +3387,7 @@ namespace MPDCtrl.ViewModels
                                         }
                                         catch
                                         {
-                                            QueueColumnHeaderAlbumWidth= 53;
+                                            QueueColumnHeaderAlbumWidth = 53;
                                         }
                                     }
                                 }
@@ -2880,11 +3490,11 @@ namespace MPDCtrl.ViewModels
             }
             catch (System.IO.FileNotFoundException)
             {
-                System.Diagnostics.Debug.WriteLine("■■■■■ Error  設定ファイルのロード中 - FileNotFoundException : " + _appConfigFilePath);
+                Debug.WriteLine("■■■■■ Error  設定ファイルのロード中 - FileNotFoundException : " + _appConfigFilePath);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("■■■■■ Error  設定ファイルのロード中: " + ex + " while opening : " + _appConfigFilePath);
+                Debug.WriteLine("■■■■■ Error  設定ファイルのロード中: " + ex + " while opening : " + _appConfigFilePath);
             }
 
             #endregion
@@ -2902,12 +3512,11 @@ namespace MPDCtrl.ViewModels
             {
                 IsConnectionSettingShow = false;
 
-                //
-                _mpc.MpdHost = CurrentProfile.Host;
-                _mpc.MpdPort = CurrentProfile.Port;
-                _mpc.MpdPassword = CurrentProfile.Password;
+                // set this "quietly"
+                _volume = CurrentProfile.Volume;
+                NotifyPropertyChanged("Volume");
 
-                Start();
+                Start(CurrentProfile.Host, CurrentProfile.Port, CurrentProfile.Password);
             }
 
             // log
@@ -2924,26 +3533,13 @@ namespace MPDCtrl.ViewModels
         // 起動後画面が描画された時の処理
         public void OnContentRendered(object sender, EventArgs e)
         {
-            RefreshColumnHeaderWidth();
             IsFullyRendered = true;
-        }
-
-        public void RefreshColumnHeaderWidth()
-        {
-            if (QueueColumnHeaderPositionVisibility) QueueColumnHeaderPositionWidth = _queueColumnHeaderPositionWidthUser;
-            QueueColumnHeaderTitleWidth = _queueColumnHeaderTitleWidthUser;
-            if (QueueColumnHeaderNowPlayingVisibility) QueueColumnHeaderNowPlayingWidth = _queueColumnHeaderNowPlayingWidthUser;
-            if (QueueColumnHeaderTimeVisibility) QueueColumnHeaderTimeWidth = _queueColumnHeaderTimeWidthUser;
-            if (QueueColumnHeaderArtistVisibility) QueueColumnHeaderArtistWidth = _queueColumnHeaderArtistWidthUser;
-            if (QueueColumnHeaderAlbumVisibility) QueueColumnHeaderAlbumWidth = _queueColumnHeaderAlbumWidthUser;
-            if (QueueColumnHeaderGenreVisibility) QueueColumnHeaderGenreWidth = _queueColumnHeaderGenreWidthUser;
-            if (QueueColumnHeaderLastModifiedVisibility) QueueColumnHeaderLastModifiedWidth = _queueColumnHeaderLastModifiedWidthUser;
-
         }
 
         // 終了時の処理
         public void OnWindowClosing(object sender, CancelEventArgs e)
         {
+            // 二重起動とか途中でシャットダウンした時にデータが消えないように。
             if (!IsFullyLoaded)
                 return;
 
@@ -3042,94 +3638,6 @@ namespace MPDCtrl.ViewModels
 
             }
 
-            App app = App.Current as App;
-
-            if (DeveloperMode)
-            {
-                // DebugWindow
-                                if (app != null)
-                {
-                    foreach (var w in app.Windows)
-                    {
-                        if (w is DebugWindow)
-                        {
-                            DebugWindow dw = (w as DebugWindow);
-
-                            if ((dw.WindowState == WindowState.Normal || dw.WindowState == WindowState.Maximized))
-                            {
-                                // Main Window element
-                                XmlElement debugWindow = doc.CreateElement(string.Empty, "DebugWindow", string.Empty);
-
-                                // Main Window attributes
-                                attrs = doc.CreateAttribute("height");
-                                if (dw.WindowState == WindowState.Maximized)
-                                {
-                                    attrs.Value = dw.RestoreBounds.Height.ToString();
-                                }
-                                else
-                                {
-                                    attrs.Value = dw.Height.ToString();
-                                }
-                                debugWindow.SetAttributeNode(attrs);
-
-                                attrs = doc.CreateAttribute("width");
-                                if (dw.WindowState == WindowState.Maximized)
-                                {
-                                    attrs.Value = dw.RestoreBounds.Width.ToString();
-                                }
-                                else
-                                {
-                                    attrs.Value = dw.Width.ToString();
-
-                                }
-                                debugWindow.SetAttributeNode(attrs);
-
-                                attrs = doc.CreateAttribute("top");
-                                if (dw.WindowState == WindowState.Maximized)
-                                {
-                                    attrs.Value = dw.RestoreBounds.Top.ToString();
-                                }
-                                else
-                                {
-                                    if (dw.Top > 0)
-                                        attrs.Value = dw.Top.ToString();
-                                    else
-                                        attrs.Value = "0";
-                                }
-                                debugWindow.SetAttributeNode(attrs);
-
-                                attrs = doc.CreateAttribute("left");
-                                if (dw.WindowState == WindowState.Maximized)
-                                {
-                                    attrs.Value = dw.RestoreBounds.Left.ToString();
-                                }
-                                else
-                                {
-                                    if (dw.Left > 0)
-                                        attrs.Value = dw.Left.ToString();
-                                    else
-                                        attrs.Value = "0";
-                                }
-                                debugWindow.SetAttributeNode(attrs);
-
-                                // set DebugWindow element to root.
-                                root.AppendChild(debugWindow);
-
-                            }
-
-                            /////
-                            // Tell it to close, don't hide.
-                            dw.SetClose();
-                            // Close it.
-                            dw.Close();
-
-                            break;
-                        }
-                    }
-                }
-
-            }
-
             #endregion
 
             #region == オプション設定の保存 ==
@@ -3184,8 +3692,31 @@ namespace MPDCtrl.ViewModels
             }
             opts.SetAttributeNode(attrs);
 
+            //
+            attrs = doc.CreateAttribute("DownloadAlbumArt");
+            if (IsDownloadAlbumArt)
+            {
+                attrs.Value = "True";
+            }
+            else
+            {
+                attrs.Value = "False";
+            }
+            opts.SetAttributeNode(attrs);
 
-            // 
+            //
+            attrs = doc.CreateAttribute("DownloadAlbumArtEmbeddedUsingReadPicture");
+            if (IsDownloadAlbumArtEmbeddedUsingReadPicture)
+            {
+                attrs.Value = "True";
+            }
+            else
+            {
+                attrs.Value = "False";
+            }
+            opts.SetAttributeNode(attrs);
+
+            /// 
             root.AppendChild(opts);
 
             #endregion
@@ -3224,6 +3755,18 @@ namespace MPDCtrl.ViewModels
                     xProfile.SetAttributeNode(xAttrs);
                 }
 
+                xAttrs = doc.CreateAttribute("Volume");
+                if (p == CurrentProfile)
+                {
+                    xAttrs.Value = _volume.ToString();
+                }
+                else
+                {
+                    xAttrs.Value = p.Volume.ToString();
+                }
+                xProfile.SetAttributeNode(xAttrs);
+
+
                 xProfiles.AppendChild(xProfile);
             }
 
@@ -3251,7 +3794,7 @@ namespace MPDCtrl.ViewModels
             queueHeaderColumn.SetAttributeNode(qAttrs);
 
             qAttrs = doc.CreateAttribute("Width");
-            if (IsFullyRendered && IsMainRendered)
+            if (IsFullyRendered)
                 qAttrs.Value = QueueColumnHeaderPositionWidth.ToString();
             else
                 qAttrs.Value = _queueColumnHeaderPositionWidthUser.ToString();
@@ -3267,7 +3810,7 @@ namespace MPDCtrl.ViewModels
             queueHeaderColumn.SetAttributeNode(qAttrs);
 
             qAttrs = doc.CreateAttribute("Width");
-            if (IsFullyRendered && IsMainRendered)
+            if (IsFullyRendered)
                 qAttrs.Value = QueueColumnHeaderNowPlayingWidth.ToString();
             else
                 qAttrs.Value = _queueColumnHeaderNowPlayingWidthUser.ToString();
@@ -3279,7 +3822,7 @@ namespace MPDCtrl.ViewModels
             queueHeaderColumn = doc.CreateElement(string.Empty, "Title", string.Empty);
 
             qAttrs = doc.CreateAttribute("Width");
-            if (IsFullyRendered && IsMainRendered)
+            if (IsFullyRendered)
                 qAttrs.Value = QueueColumnHeaderTitleWidth.ToString();
             else
                 qAttrs.Value = _queueColumnHeaderTitleWidthUser.ToString();
@@ -3295,7 +3838,7 @@ namespace MPDCtrl.ViewModels
             queueHeaderColumn.SetAttributeNode(qAttrs);
 
             qAttrs = doc.CreateAttribute("Width");
-            if (IsFullyRendered && IsMainRendered)
+            if (IsFullyRendered)
                 qAttrs.Value = QueueColumnHeaderTimeWidth.ToString();
             else
                 qAttrs.Value = _queueColumnHeaderTimeWidthUser.ToString();
@@ -3311,7 +3854,7 @@ namespace MPDCtrl.ViewModels
             queueHeaderColumn.SetAttributeNode(qAttrs);
 
             qAttrs = doc.CreateAttribute("Width");
-            if (IsFullyRendered && IsMainRendered)
+            if (IsFullyRendered)
                 qAttrs.Value = QueueColumnHeaderArtistWidth.ToString();
             else
                 qAttrs.Value = _queueColumnHeaderArtistWidthUser.ToString();
@@ -3327,7 +3870,7 @@ namespace MPDCtrl.ViewModels
             queueHeaderColumn.SetAttributeNode(qAttrs);
 
             qAttrs = doc.CreateAttribute("Width");
-            if (IsFullyRendered && IsMainRendered)
+            if (IsFullyRendered)
                 qAttrs.Value = QueueColumnHeaderAlbumWidth.ToString();
             else
                 qAttrs.Value = _queueColumnHeaderAlbumWidthUser.ToString();
@@ -3343,7 +3886,7 @@ namespace MPDCtrl.ViewModels
             queueHeaderColumn.SetAttributeNode(qAttrs);
 
             qAttrs = doc.CreateAttribute("Width");
-            if (IsFullyRendered && IsMainRendered)
+            if (IsFullyRendered)
                 qAttrs.Value = QueueColumnHeaderGenreWidth.ToString();
             else
                 qAttrs.Value = _queueColumnHeaderGenreWidthUser.ToString();
@@ -3359,7 +3902,7 @@ namespace MPDCtrl.ViewModels
             queueHeaderColumn.SetAttributeNode(qAttrs);
 
             qAttrs = doc.CreateAttribute("Width");
-            if (IsFullyRendered && IsMainRendered)
+            if (IsFullyRendered)
                 qAttrs.Value = QueueColumnHeaderLastModifiedWidth.ToString();
             else
                 qAttrs.Value = _queueColumnHeaderLastModifiedWidthUser.ToString();
@@ -3374,7 +3917,7 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            #region == レイアウトの保存 ==
+            #region == レイアウトの保存 (使ってない、というか無効) ==
 
             XmlElement lay = doc.CreateElement(string.Empty, "Layout", string.Empty);
 
@@ -3384,7 +3927,7 @@ namespace MPDCtrl.ViewModels
             // LeftPain
             leftpain = doc.CreateElement(string.Empty, "LeftPain", string.Empty);
             lAttrs = doc.CreateAttribute("Width");
-            if (IsFullyRendered && IsMainRendered)
+            if (IsFullyRendered)
             {
                 if (windowWidth > (MainLeftPainActualWidth - 24))
                 {
@@ -3416,12 +3959,12 @@ namespace MPDCtrl.ViewModels
             //catch (System.IO.FileNotFoundException) { }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("■■■■■ Error  設定ファイルの保存中: " + ex + " while opening : " + _appConfigFilePath);
+                Debug.WriteLine("■■■■■ Error  設定ファイルの保存中: " + ex + " while opening : " + _appConfigFilePath);
             }
 
             #endregion
 
-            //app = App.Current as App;
+            App app = App.Current as App;
             if (app != null)
             {
                 if (IsSaveLog)
@@ -3433,6 +3976,8 @@ namespace MPDCtrl.ViewModels
                 if (IsConnected)
                 {
                     _mpc.MpdStop = true;
+
+                    // TODO: this causes anoying exception in the dev environment. Although it's a good thing to close...
                     _mpc.MpdDisconnect();
                 }
             }
@@ -3440,161 +3985,107 @@ namespace MPDCtrl.ViewModels
 
         }
 
-        private async void OnMpdConnected(MPC sender)
+        #endregion
+
+        #region == メソッド ==
+
+        private async void Start(string host, int port, string password)
         {
-            Debug.WriteLine("MPD OK: " + _mpc.MpdVer);
+            await _mpc.MpdIdleConnect(host, port);
+        }
 
-            // got MPD ver.
-            MpdVersion = _mpc.MpdVer;
-
-            //MpdStatusMessage = "MPD OK " + _mpc.MpdVer;
-            //MpdStatusButton = _pathConnectedButton;
-
-            _mpc.MpdSendPassword();
-
-            if (IsUpdateOnStartup)
+        private void UpdateButtonStatus()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                _mpc.MpdSendUpdate();
-            }
+                try
+                {
+                    //Play button
+                    switch (_mpc.MpdStatus.MpdState)
+                    {
+                        case Status.MpdPlayState.Play:
+                            {
+                                PlayButton = _pathPauseButton;
+                                break;
+                            }
+                        case Status.MpdPlayState.Pause:
+                            {
+                                PlayButton = _pathPlayButton;
+                                break;
+                            }
+                        case Status.MpdPlayState.Stop:
+                            {
+                                PlayButton = _pathPlayButton;
+                                break;
+                            }
 
-            await Task.Delay(200);
+                            //_pathStopButton
+                    }
 
-            _mpc.MpdQueryStatus();
+                    if (_mpc.MpdStatus.MpdVolumeIsSet)
+                    {
+                        double tmpVol = Convert.ToDouble(_mpc.MpdStatus.MpdVolume);
+                        if (_volume != tmpVol)
+                        {
+                            // "quietly" update.
+                            _volume = tmpVol;
+                            NotifyPropertyChanged("Volume");
+                        }
+                    }
 
-            await Task.Delay(200);
+                    _random = _mpc.MpdStatus.MpdRandom;
+                    NotifyPropertyChanged("Random");
 
-            _mpc.MpdQueryCurrentQueue();
+                    _repeat = _mpc.MpdStatus.MpdRepeat;
+                    NotifyPropertyChanged("Repeat");
 
-            await Task.Delay(200);
+                    _consume = _mpc.MpdStatus.MpdConsume;
+                    NotifyPropertyChanged("Consume");
 
-            _mpc.MpdQueryPlaylists();
+                    _single = _mpc.MpdStatus.MpdSingle;
+                    NotifyPropertyChanged("Single");
 
-            await Task.Delay(200);
+                    // no need to care about "double" updates for time.
+                    Time = _mpc.MpdStatus.MpdSongTime;
 
-            // heavy stuff should be the last.
-            _mpc.MpdQueryListAll();
+                    _elapsed = _mpc.MpdStatus.MpdSongElapsed;
+                    //NotifyPropertyChanged("Elapsed");
+
+                    //start elapsed timer.
+                    if (_mpc.MpdStatus.MpdState == Status.MpdPlayState.Play)
+                    {
+                        if (!_elapsedTimer.Enabled)
+                            _elapsedTimer.Start();
+                    }
+                    else
+                    {
+                        _elapsedTimer.Stop();
+                    }
+
+                    //
+                    //Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
+
+                }
+                catch
+                {
+                    Debug.WriteLine("Error@UpdateButtonStatus");
+                }
+
+            });
 
         }
 
-        // MPD changed nortifiation
-        private void OnStatusChanged(MPC sender, object data)
+        private async void UpdateStatus()
         {
-            //System.Diagnostics.Debug.WriteLine("OnStatusChanged " + data);
-
             UpdateButtonStatus();
 
-            List<string> SubSystems = (data as string).Split('\n').ToList();
+            bool isAlbumArtChanged = false;
 
-            foreach (string line in SubSystems)
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                if (line == "changed: playlist")
-                {
-
-                }
-                else if (line == "changed: player")
-                {
-
-                }
-                else if (line == "changed: options")
-                {
-
-                }
-                else if (line == "changed: mixer")
-                {
-
-                }
-                else if (line == "changed: stored_playlist")
-                {
-
-                }
-            }
-
-        }
-
-        // MPD updated information
-        private void OnMpdStatusUpdate(MPC sender, object data)
-        {
-            if ((data as string) == "isPlayer")
-            {
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    UpdateButtonStatus();
-
-                    bool isSongChanged = false;
-                    bool isCurrentSongWasNull = false;
-
-                    if (CurrentSong != null)
-                    {
-                        if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
-                        {
-                            isSongChanged = true;
-
-                            // Clear IsPlaying icon
-                            CurrentSong.IsPlaying = false;
-
-                            IsAlbumArtVisible = false;
-                            AlbumArt = _albumArtDefault;
-                        }
-                    }
-                    else
-                    {
-                        isCurrentSongWasNull = true;
-                    }
-
-                    // Sets Current Song
-                    var item = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
-                    if (item != null)
-                    {
-                        CurrentSong = (item as MPC.SongInfo);
-                        CurrentSong.IsPlaying = true;
-
-                        if (isSongChanged)
-                        {
-                            if (IsAutoScrollToNowPlaying)
-                                ScrollIntoView?.Invoke(this, CurrentSong.Index);
-
-                            // AlbumArt
-                            if (!String.IsNullOrEmpty(CurrentSong.file))
-                            {
-                                //Debug.WriteLine("AlbumArt isPlayer: " + CurrentSong.file);
-                                _mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
-                            }
-                        }
-                        else
-                        {
-                            if (isCurrentSongWasNull)
-                            {
-                                if (IsAutoScrollToNowPlaying)
-                                    ScrollIntoView?.Invoke(this, CurrentSong.Index);
-
-                                // AlbumArt
-                                if (!String.IsNullOrEmpty(CurrentSong.file))
-                                {
-                                    //Debug.WriteLine("AlbumArt isPlayer: isCurrentSongWasNull");
-                                    _mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
-                                }
-                            }
-                            else
-                            {
-                                //Debug.WriteLine("AlbumArt isPlayer: !isSongChanged.");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //Debug.WriteLine("AlbumArt isPlayer: CurrentSong null");
-
-                        CurrentSong = null;
-
-                        IsAlbumArtVisible = false;
-                        AlbumArt = _albumArtDefault;
-                    }
-                });
-
-                /*
-                UpdateButtonStatus();
-
                 bool isSongChanged = false;
+                bool isCurrentSongWasNull = false;
+
                 if (CurrentSong != null)
                 {
                     if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
@@ -3603,481 +4094,684 @@ namespace MPDCtrl.ViewModels
 
                         // Clear IsPlaying icon
                         CurrentSong.IsPlaying = false;
-                        
+
                         IsAlbumArtVisible = false;
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            AlbumArt = _albumArtDefault;
-                        });
+                        AlbumArt = _albumArtDefault;
                     }
                 }
-
-                IsBusy = true;
-
-                Application.Current.Dispatcher.Invoke(() =>
+                else
                 {
-                    // Sets Current Song
-                    var item = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
-                    if (item != null)
-                    {
-                        CurrentSong = (item as MPC.SongInfo);
-                        (item as MPC.SongInfo).IsPlaying = true;
+                    isCurrentSongWasNull = true;
+                }
 
-                        // IsAutoScrollToNowPlaying
-                        //ScrollIntoView?.Invoke(this, CurrentSong.Index);
+                // Sets Current Song
+                var item = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
+                if (item != null)
+                {
+                    CurrentSong = (item as SongInfo);
+                    CurrentSong.IsPlaying = true;
+
+                    if (isSongChanged)
+                    {
+                        if (IsAutoScrollToNowPlaying)
+                            ScrollIntoView?.Invoke(this, CurrentSong.Index);
+
+                        // AlbumArt
+                        if (!String.IsNullOrEmpty(CurrentSong.file))
+                        {
+                            //Debug.WriteLine("AlbumArt isPlayer: " + CurrentSong.file);
+                            isAlbumArtChanged = true;
+                        }
+                    }
+                    else
+                    {
+                        if (isCurrentSongWasNull)
+                        {
+                            if (IsAutoScrollToNowPlaying)
+                                ScrollIntoView?.Invoke(this, CurrentSong.Index);
+
+                            // AlbumArt
+                            if (!String.IsNullOrEmpty(CurrentSong.file))
+                            {
+                                //Debug.WriteLine("AlbumArt isPlayer: isCurrentSongWasNull");
+                                //_mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
+                                isAlbumArtChanged = true;
+                            }
+                        }
+                        else
+                        {
+                            //Debug.WriteLine("AlbumArt isPlayer: !isSongChanged.");
+                        }
+                    }
+                }
+                else
+                {
+                    CurrentSong = null;
+
+                    IsAlbumArtVisible = false;
+                    AlbumArt = _albumArtDefault;
+                }
+            });
+
+            if (IsDownloadAlbumArt)
+                if (isAlbumArtChanged)
+                    await _mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+        }
+
+        private async void UpdateCurrentQueue()
+        {
+            bool isAlbumArtChanged = false;
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (Queue.Count > 0)
+                {
+                    IsBusy = true;
+
+                    // 削除する曲の一時リスト
+                    List<SongInfo> _tmpQueue = new List<SongInfo>();
+
+                    // 既存のリストの中で新しいリストにないものを削除
+                    foreach (var sng in Queue)
+                    {
+                        var queitem = _mpc.CurrentQueue.FirstOrDefault(i => i.Id == sng.Id);
+                        if (queitem == null)
+                        {
+                            // 削除リストに追加
+                            _tmpQueue.Add(sng);
+                        }
+                    }
+
+                    // 削除リストをループ
+                    foreach (var hoge in _tmpQueue)
+                    {
+                        Queue.Remove(hoge);
+                    }
+
+                    // 新しいリストの中から既存のリストにないものを追加または更新
+                    foreach (var sng in _mpc.CurrentQueue)
+                    {
+                        var fuga = Queue.FirstOrDefault(i => i.Id == sng.Id);
+                        if (fuga != null)
+                        {
+                            // TODO:
+                            fuga.Pos = sng.Pos;
+                            //fuga.Id = sng.Id; // 流石にIDは変わらないだろう。
+                            fuga.LastModified = sng.LastModified;
+                            //fuga.Time = sng.Time; // format exception が煩い。
+                            fuga.Title = sng.Title;
+                            fuga.Artist = sng.Artist;
+                            fuga.Album = sng.Album;
+                            fuga.AlbumArtist = sng.AlbumArtist;
+                            fuga.Composer = sng.Composer;
+                            fuga.Date = sng.Date;
+                            fuga.duration = sng.duration;
+                            fuga.file = sng.file;
+                            fuga.Genre = sng.Genre;
+                            fuga.Track = sng.Track;
+
+                            //Queue.Move(fuga.Index, sng.Index);
+                            fuga.Index = sng.Index;
+                        }
+                        else
+                        {
+                            Queue.Add(sng);
+                            //Queue.Insert(sng.Index, sng);
+                        }
+                    }
+
+                    // Set Current and NowPlaying.
+                    var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
+                    if (curitem != null)
+                    {
+                        CurrentSong = (curitem as SongInfo);
+                        CurrentSong.IsPlaying = true;
+
+                        if (IsAutoScrollToNowPlaying)
+                            ScrollIntoView?.Invoke(this, CurrentSong.Index);
+
+                        // AlbumArt
+                        if (_mpc.AlbumCover.SongFilePath != curitem.file)
+                        {
+                            IsAlbumArtVisible = false;
+                            AlbumArt = _albumArtDefault;
+
+                            //Debug.WriteLine("AlbumArt isCurrentQueue: " + CurrentSong.file);
+
+                            if (!String.IsNullOrEmpty(CurrentSong.file))
+                            {
+                                //_mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
+                                isAlbumArtChanged = true;
+                            }
+                        }
                     }
                     else
                     {
                         CurrentSong = null;
-                    }
-                });
 
-                if (isSongChanged && (CurrentSong != null))
-                {
-                    // AlbumArt
-                    if (!String.IsNullOrEmpty(CurrentSong.file))
-                    {
-                        _mpc.MpdQueryAlbumArt(CurrentSong.file);
+                        IsAlbumArtVisible = false;
+                        AlbumArt = _albumArtDefault;
                     }
+
+                    // 移動したりするとPosが変更されても順番が反映されないので、
+                    var collectionView = CollectionViewSource.GetDefaultView(Queue);
+                    collectionView.SortDescriptions.Add(new SortDescription("Index", ListSortDirection.Ascending));
+                    collectionView.Refresh();
+
+                    IsBusy = false;
                 }
-
-                IsBusy = false;
-
-                */
-            }
-            else if ((data as string) == "isCurrentQueue")
-            {
-                IsBusy = true;
-
-                Application.Current.Dispatcher.Invoke(() =>
+                else
                 {
-                    if (Queue.Count > 0)
+                    IsBusy = true;
+
+                    foreach (var sng in _mpc.CurrentQueue)
                     {
-                        IsBusy = true;
+                        Queue.Add(sng);
+                    }
 
-                        // 削除する曲の一時リスト
-                        List<MPC.SongInfo> _tmpQueue = new List<MPC.SongInfo>();
+                    // Set Current and NowPlaying.
+                    var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
+                    if (curitem != null)
+                    {
+                        CurrentSong = (curitem as SongInfo);
+                        CurrentSong.IsPlaying = true;
 
-                        // 既存のリストの中で新しいリストにないものを削除
-                        foreach (var sng in Queue)
+                        if (IsAutoScrollToNowPlaying)
+                            ScrollIntoView?.Invoke(this, CurrentSong.Index);
+
+                        // AlbumArt
+                        if (_mpc.AlbumCover.SongFilePath != curitem.file)
                         {
-                            var queitem = _mpc.CurrentQueue.FirstOrDefault(i => i.Id == sng.Id);
-                            if (queitem == null)
-                            {
-                                // 削除リストに追加
-                                _tmpQueue.Add(sng);
-                            }
-                        }
-
-                        // 削除リストをループ
-                        foreach (var hoge in _tmpQueue)
-                        {
-                            Queue.Remove(hoge);
-                        }
-
-                        // 新しいリストの中から既存のリストにないものを追加または更新
-                        foreach (var sng in _mpc.CurrentQueue)
-                        {
-                            var fuga = Queue.FirstOrDefault(i => i.Id == sng.Id);
-                            if (fuga != null)
-                            {
-                                // TODO:
-                                fuga.Pos = sng.Pos;
-                                //fuga.Id = sng.Id; // 流石にIDは変わらないだろう。
-                                fuga.LastModified = sng.LastModified;
-                                //fuga.Time = sng.Time; // format exception が煩い。
-                                fuga.Title = sng.Title;
-                                fuga.Artist = sng.Artist;
-                                fuga.Album = sng.Album;
-                                fuga.AlbumArtist = sng.AlbumArtist;
-                                fuga.Composer = sng.Composer;
-                                fuga.Date = sng.Date;
-                                fuga.duration = sng.duration;
-                                fuga.file = sng.file;
-                                fuga.Genre = sng.Genre;
-                                fuga.Track = sng.Track;
-
-                                //Queue.Move(fuga.Index, sng.Index);
-                                fuga.Index = sng.Index;
-                            }
-                            else
-                            {
-                                Queue.Add(sng);
-                                //Queue.Insert(sng.Index, sng);
-                            }
-                        }
-
-                        // Set Current and NowPlaying.
-                        var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
-                        if (curitem != null)
-                        {
-                            CurrentSong = (curitem as MPC.SongInfo);
-                            CurrentSong.IsPlaying = true;
-
-                            if (IsAutoScrollToNowPlaying)
-                                ScrollIntoView?.Invoke(this, CurrentSong.Index);
-
-                            // AlbumArt
-                            if (_mpc.AlbumArt.SongFilePath != curitem.file)
-                            {
-                                IsAlbumArtVisible = false;
-                                AlbumArt = _albumArtDefault;
-
-                                //Debug.WriteLine("AlbumArt isCurrentQueue: " + CurrentSong.file);
-
-                                if (!String.IsNullOrEmpty(CurrentSong.file))
-                                {
-                                    _mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            CurrentSong = null;
-
                             IsAlbumArtVisible = false;
                             AlbumArt = _albumArtDefault;
+
+                            //Debug.WriteLine("AlbumArt isCurrentQueue from Clear: " + CurrentSong.file);
+                            if (!String.IsNullOrEmpty(CurrentSong.file))
+                            {
+                                //_mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
+                                isAlbumArtChanged = true;
+                            }
                         }
-
-                        // 移動したりするとPosが変更されても順番が反映されないので、
-                        var collectionView = CollectionViewSource.GetDefaultView(Queue);
-                        collectionView.SortDescriptions.Add(new SortDescription("Index", ListSortDirection.Ascending));
-                        collectionView.Refresh();
-
                     }
                     else
                     {
-                        IsBusy = true;
+                        // just in case.
+                        CurrentSong = null;
 
-                        foreach (var sng in _mpc.CurrentQueue)
-                        {
-                            Queue.Add(sng);
-                        }
-
-                        // Set Current and NowPlaying.
-                        var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
-                        if (curitem != null)
-                        {
-                            CurrentSong = (curitem as MPC.SongInfo);
-                            CurrentSong.IsPlaying = true;
-
-                            if (IsAutoScrollToNowPlaying)
-                                ScrollIntoView?.Invoke(this, CurrentSong.Index);
-
-                            // AlbumArt
-                            if (_mpc.AlbumArt.SongFilePath != curitem.file)
-                            {
-                                IsAlbumArtVisible = false;
-                                AlbumArt = _albumArtDefault;
-
-                                //Debug.WriteLine("AlbumArt isCurrentQueue from Clear: " + CurrentSong.file);
-                                if (!String.IsNullOrEmpty(CurrentSong.file))
-                                {
-                                    _mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // just in case.
-                            CurrentSong = null;
-
-                            IsAlbumArtVisible = false;
-                            AlbumArt = _albumArtDefault;
-                        }
+                        IsAlbumArtVisible = false;
+                        AlbumArt = _albumArtDefault;
                     }
 
-                });
+                    IsBusy = false;
+                }
+            });
 
-                IsBusy = false;
-            }
-            else if((data as string) == "isSongs")
-            {
-                // Find の結果か playlistinfoの結果
-            }
-            else if ((data as string) == "isStoredPlaylist")
-            {
-                // MPCが自動で見に行ってるから特にアクションなし。
-            }
-            else if ((data as string) == "isLocalFiles")
-            {
-                IsBusy = true;
-
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    LocalFiles.Clear();
-
-                    foreach (var songfile in _mpc.LocalFiles)
-                    {
-                        try
-                        {
-                            Uri uri = new Uri(@"file:///" + songfile);
-                            if (uri.IsFile)
-                            {
-                                string filename = System.IO.Path.GetFileName(songfile);//System.IO.Path.GetFileName(uri.LocalPath);
-                                NodeEntry hoge = new NodeEntry(filename, uri, songfile);
-
-                                LocalFiles.Add(hoge);
-                            }
-                        }
-                        catch { }
-                    }
-
-                    MusicDirectories.Clear();
-                    
-                    _musicDirectories.Load(_mpc.LocalDirectories.ToList<String>());
-
-                    if (MusicDirectories.Count > 0)
-                    {
-                        SelectedNode = _musicDirectories.Children[0];
-                    }
-
-                    MusicEntries.Clear();
-
-                    foreach (var songfile in _mpc.LocalFiles)
-                    {
-                        try
-                        {
-                            Uri uri = new Uri(@"file:///" + songfile);
-                            if (uri.IsFile)
-                            {
-                                string filename = System.IO.Path.GetFileName(songfile);//System.IO.Path.GetFileName(uri.LocalPath);
-                                NodeEntry hoge = new NodeEntry(filename, uri, songfile);
-
-                                MusicEntries.Add(hoge);
-                            }
-
-                        }
-                        catch { }
-                    }
-                });
-
-                IsBusy = false;
-
-            }
-            else if ((data as string) == "isUpdating_db")
-            {
-                System.Diagnostics.Debug.WriteLine("OnMpdStatusUpdate: isUpdating_db");
-                ConnectionStatusMessage = "Updating db...";
-
-                IsUpdatingMpdDb = true;
-            }
+            if (IsDownloadAlbumArt)
+                if (isAlbumArtChanged)
+                    await _mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id, IsDownloadAlbumArtEmbeddedUsingReadPicture);
 
         }
 
-        private void OnAlbumArtStatusChanged(MPC sender)
+        private void UpdatePlaylists()
         {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
 
+                NodeMenuPlaylists playlistDir = _mainMenuItems.PlaylistsDirectory;
+
+                if (playlistDir != null)
+                {
+                    foreach (var hoge in _mpc.Playlists)
+                    {
+                        var fuga = playlistDir.Children.FirstOrDefault(i => i.Name == hoge);
+                        if (fuga == null)
+                        {
+                            NodeMenuPlaylistItem playlistNode = new NodeMenuPlaylistItem(hoge);
+                            playlistDir.Children.Add(playlistNode);
+                        }
+                    }
+
+                    List<NodeTree> tobedeleted = new List<NodeTree>();
+                    foreach (var hoge in playlistDir.Children)
+                    {
+                        var fuga = _mpc.Playlists.FirstOrDefault(i => i == hoge.Name);
+                        if (fuga == null)
+                        {
+                            tobedeleted.Add(hoge);
+                        }
+                        else
+                        {
+                            if (hoge is NodeMenuPlaylistItem)
+                                (hoge as NodeMenuPlaylistItem).IsUpdateRequied = true;
+                        }
+                    }
+
+                    foreach (var hoge in tobedeleted)
+                    {
+                        playlistDir.Children.Remove(hoge);
+                    }
+
+                    // 通知する
+                    if (SelectedNodeMenu is NodeMenuPlaylistItem)
+                    {
+                        if ((SelectedNodeMenu as NodeMenuPlaylistItem).IsUpdateRequied)
+                        {
+                            IsConfirmUpdatePlaylistSongsPopupVisible = true;
+                        }
+                    }
+
+                }
+
+            });
+        }
+
+        private void UpdateLocalFiles()
+        {
+            IsBusy = true;
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                MusicEntries.Clear();
+
+                foreach (var songfile in _mpc.LocalFiles)
+                {
+                    if (string.IsNullOrEmpty(songfile)) continue;
+
+                    try
+                    {
+                        IsBusy = true;
+
+                        Uri uri = new Uri(@"file:///" + songfile);
+                        if (uri.IsFile)
+                        {
+                            string filename = System.IO.Path.GetFileName(songfile);//System.IO.Path.GetFileName(uri.LocalPath);
+                            NodeFile hoge = new NodeFile(filename, uri, songfile);
+
+                            MusicEntries.Add(hoge);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine(songfile + e.Message);
+
+                        IsBusy = false;
+                    }
+                }
+
+                //
+                MusicDirectories.Clear();
+                try
+                {
+                    IsBusy = true;
+
+                    _musicDirectories.Load(_mpc.LocalDirectories.ToList<String>());
+                    
+                    IsBusy = false;
+
+                    if (MusicDirectories.Count > 0)
+                    {
+                        //SelectedNodeDirectory = MusicDirectories[0] as NodeDirectory;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine("_musicDirectories.Load: " + e.Message);
+
+                    IsBusy = false;
+                }
+            });
+
+            IsBusy = false;
+        }
+
+        private async void GetPlaylistSongs(NodeMenuPlaylistItem playlistNode)
+        {
+            if (playlistNode == null) 
+                return;
+
+            if (playlistNode.PlaylistSongs.Count > 0)
+                playlistNode.PlaylistSongs.Clear();
+
+            CommandPlaylistResult result = await _mpc.MpdQueryPlaylistSongs(playlistNode.Name);
+            if (result.IsSuccess)
+            {
+                playlistNode.PlaylistSongs = result.PlaylistSongs;
+
+                if (SelectedNodeMenu == playlistNode)
+                    PlaylistSongs = playlistNode.PlaylistSongs;
+
+                playlistNode.IsUpdateRequied = false;
+            }
+        }
+
+        #endregion
+
+        #region == イベント ==
+
+        private async void OnMpdIdleConnected(MPC sender)
+        {
+            Debug.WriteLine("OK MPD " + _mpc.MpdVerText + " @OnMpdConnected");
+
+            MpdVersion = _mpc.MpdVerText;
+
+            MpdStatusButton = _pathMpdOkButton;
+
+            StatusBarMessage = "";
+
+            IsBusy = true;
+
+            // これしないとCurrentSongが表示されない。
+            IsConnected = true;
+
+            CommandResult result = await _mpc.MpdIdleSendPassword(_password);
+
+            if (result.IsSuccess)
+            {
+                bool r = await _mpc.MpdCommandConnectionStart(_mpc.MpdHost, _mpc.MpdPort, _mpc.MpdPassword);
+
+                if (IsUpdateOnStartup)
+                {
+                    await _mpc.MpdSendUpdate();
+                }
+
+                if (r)
+                {
+                    if (result.IsSuccess)
+                        result = await _mpc.MpdIdleQueryStatus();
+
+                    if (result.IsSuccess)
+                    {
+                        UpdateStatus();
+
+                        result = await _mpc.MpdIdleQueryCurrentQueue();
+                    }
+
+                    if (result.IsSuccess)
+                    {
+                        UpdateCurrentQueue();
+
+                        result = await _mpc.MpdIdleQueryPlaylists();
+                    }
+
+                    if (result.IsSuccess)
+                    {
+                        UpdatePlaylists();
+
+                        // heavy stuff should be the last.
+                        result = await _mpc.MpdIdleQueryListAll();
+                    }
+
+                    if (result.IsSuccess)
+                    {
+                        UpdateLocalFiles();
+                    }
+
+                    _mpc.MpdIdleStart();
+
+                }
+            }
+
+            IsBusy = false;
+        }
+
+        private void OnMpdPlayerStatusChanged(MPC sender)
+        {
+            if (_mpc.MpdStatus.MpdError != "")
+            {
+                MpdStatusMessage = MpdVersion + ": " + MPDCtrl.Properties.Resources.MPD_StatusError + " - " + _mpc.MpdStatus.MpdError;
+                MpdStatusButton = _pathMpdAckErrorButton;
+            }
+            else
+            {
+                MpdStatusMessage = "";
+                MpdStatusButton = _pathMpdOkButton;
+            }
+
+            UpdateStatus();
+        }
+
+        private void OnMpdCurrentQueueChanged(MPC sender)
+        {
+            UpdateCurrentQueue();
+        }
+
+        private void OnMpdPlaylistsChanged(MPC sender)
+        {
+            UpdatePlaylists();
+        }
+
+        private void OnAlbumArtChanged(MPC sender)
+        {
             // AlbumArt
             Application.Current.Dispatcher.Invoke(() =>
             {
-                if ((!_mpc.AlbumArt.IsDownloading) && _mpc.AlbumArt.IsSuccess)
+                if ((!_mpc.AlbumCover.IsDownloading) && _mpc.AlbumCover.IsSuccess)
                 {
-                    if ((CurrentSong != null) && (_mpc.AlbumArt.AlbumImageSource != null))
+                    if ((CurrentSong != null) && (_mpc.AlbumCover.AlbumImageSource != null))
                     {
                         if (!String.IsNullOrEmpty(CurrentSong.file))
                         {
-                            if (CurrentSong.file == _mpc.AlbumArt.SongFilePath)
+                            if (CurrentSong.file == _mpc.AlbumCover.SongFilePath)
                             {
+                                //AlbumArt = null;
+                                AlbumArt = _mpc.AlbumCover.AlbumImageSource;
                                 IsAlbumArtVisible = true;
-                                AlbumArt = _mpc.AlbumArt.AlbumImageSource;
-                                AlbumArt = null;
-
-                                AlbumArt = _mpc.AlbumArt.AlbumImageSource;
                             }
                         }
                     }
                 }
             });
-
         }
 
-        // Raw string data Received
-        private void OnDataReceived(MPC sender, object data)
+        private void OnDebugCommandOutput(MPC sender, string data)
         {
             if (IsShowDebugWindow)
-                OnDebugWindowOutput?.Invoke((data as string));
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    DebugCommandOutput?.Invoke(this, data);
+                });
         }
 
-        // Raw string data Sent
-        private void OnDataSent(MPC sender, object data)
+        private void OnDebugIdleOutput(MPC sender, string data)
         {
             if (IsShowDebugWindow)
-            {
-                var s = (data as string);
-                s = Regex.Replace(s, @"password .*?\n", "password *******\n");
-
-                OnDebugWindowOutput?.Invoke(s);
-            }
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    DebugIdleOutput?.Invoke(this, data);
+                });
         }
 
-        private void OnError(MPC sender, MPC.MpdErrorTypes errType, object data)
+        private void OnConnectionError(MPC sender, string msg)
         {
-            if (data == null) { return; }
-
-            if (errType == MPC.MpdErrorTypes.CommandError)
-            {
-                string s = (data as string);
-                string patternStr = @"[{\[].+?[}\]]";//@"[.*?]";
-                s = System.Text.RegularExpressions.Regex.Replace(s, patternStr, string.Empty);
-                s = s.Replace("ACK ", string.Empty);
-                s = s.Replace("{} ", string.Empty);
-                s = s.Replace("[] ", string.Empty);
-
-                MpdStatusMessage = MPDCtrl.Properties.Resources.MPD_CommandError + ": " + s;
-                MpdStatusButton = _pathErrorMpdAckButton;
-            }
-            else if (errType == MPC.MpdErrorTypes.ConnectionError)
-            {
-                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectionError + ": " + (data as string);
-                StatusButton = _pathErrorInfoButton;
-
-                IsConnected = false;
-                IsConnectionSettingShow = true;
-            }
-            else if (errType == MPC.MpdErrorTypes.StatusError)
-            {
-                MpdStatusMessage = MPDCtrl.Properties.Resources.MPD_StatusError + ": " + (data as string);
-                MpdStatusButton = _pathErrorMpdAckButton;
-            }
-            else if (errType == MPC.MpdErrorTypes.ErrorClear)
-            {
-                MpdStatusMessage = "";
-                MpdStatusButton = _pathDefaultNoneButton;
-            }
-            else
-            {
-                // TODO:
-                ConnectionStatusMessage = "Unknown error: " + (data as string);
-                StatusButton = _pathErrorInfoButton;
-            }
-        }
-
-        private void OnConnectionError(MPC sender, object data)
-        {
-            if (data == null) { return; }
+            if (string.IsNullOrEmpty(msg))
+                return;
 
             IsConnected = false;
+            IsConnecting = false;
             IsConnectionSettingShow = true;
 
-            ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectionError + ": " + (data as string);
+            ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectionError + ": " + msg;
             StatusButton = _pathErrorInfoButton;
+
+            StatusBarMessage = ConnectionStatusMessage;
         }
 
-        private void OnConnectionStatusChanged(MPC sender, TCPC.ConnectionStatus status)
+        private void OnConnectionStatusChanged(MPC sender, MPC.ConnectionStatus status)
         {
 
-            if (status == TCPC.ConnectionStatus.Connected)
+            if (status == MPC.ConnectionStatus.NeverConnected)
+            {
+                IsConnected = false;
+                IsConnecting = false;
+                IsNotConnectingNorConnected = true;
+                IsConnectionSettingShow = true;
+
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_NeverConnected;
+                StatusButton = _pathDisconnectedButton;
+
+                StatusBarMessage = "";
+            }
+            else if (status == MPC.ConnectionStatus.Connected)
             {
                 IsConnected = true;
                 IsConnecting = false;
+                IsNotConnectingNorConnected = false;
                 IsConnectionSettingShow = false;
 
-                Debug.WriteLine("ConnectionStatus_Connected");
-                ConnectionStatusMessage = "";// MPDCtrl.Properties.Resources.ConnectionStatus_Connected;
+                //Debug.WriteLine("ConnectionStatus_Connected");
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connected;
                 StatusButton = _pathConnectedButton;
+
+                StatusBarMessage = "";
             }
-            else if (status == TCPC.ConnectionStatus.Connecting)
+            else if (status == MPC.ConnectionStatus.Connecting)
             {
                 IsConnected = false;
                 IsConnecting = true;
+                IsNotConnectingNorConnected = false;
+                //IsConnectionSettingShow = true;
 
-                Debug.WriteLine("ConnectionStatus_Connecting");
+                //Debug.WriteLine("ConnectionStatus_Connecting");
                 ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connecting;
                 StatusButton = _pathConnectingButton;
-            }
-            else if (status == TCPC.ConnectionStatus.AutoReconnecting)
-            {
-                IsConnected = false;
-                IsConnecting = true;
-                IsConnectionSettingShow = true;
 
-                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Reconnecting;
-                StatusButton = _pathConnectingButton;
+                StatusBarMessage = ConnectionStatusMessage;
             }
-            else if (status == TCPC.ConnectionStatus.ConnectFail_Timeout)
+            else if (status == MPC.ConnectionStatus.ConnectFail_Timeout)
             {
                 IsConnected = false;
                 IsConnecting = false;
+                IsNotConnectingNorConnected = true;
                 IsConnectionSettingShow = true;
 
+                Debug.WriteLine("ConnectionStatus_ConnectFail_Timeout");
                 ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_ConnectFail_Timeout;
                 StatusButton = _pathErrorInfoButton;
+
+                StatusBarMessage = ConnectionStatusMessage;
             }
-            else if (status == TCPC.ConnectionStatus.DisconnectedByHost)
+            else if (status == MPC.ConnectionStatus.SeeConnectionErrorEvent)
             {
                 IsConnected = false;
                 IsConnecting = false;
+                IsNotConnectingNorConnected = true;
+                IsConnectionSettingShow = true;
+
+                Debug.WriteLine("ConnectionStatus_SeeConnectionErrorEvent");
+                //ConnectionStatusMessage = "";
+                StatusButton = _pathErrorInfoButton;
+
+            }
+            else if (status == MPC.ConnectionStatus.Disconnected)
+            {
+                IsConnected = false;
+                IsConnecting = false;
+                IsNotConnectingNorConnected = true;
+                IsConnectionSettingShow = true;
+
+                Debug.WriteLine("ConnectionStatus_Disconnected");
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Disconnected;
+                StatusButton = _pathErrorInfoButton;
+
+                StatusBarMessage = ConnectionStatusMessage;
+            }
+            else if (status == MPC.ConnectionStatus.DisconnectedByHost)
+            {
+                // TODO: not really usued now...
+
+                IsConnected = false;
+                IsConnecting = false;
+                IsNotConnectingNorConnected = true;
                 IsConnectionSettingShow = true;
 
                 Debug.WriteLine("ConnectionStatus_DisconnectedByHost");
                 ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_DisconnectedByHost;
                 StatusButton = _pathErrorInfoButton;
+
+                StatusBarMessage = ConnectionStatusMessage;
             }
-            else if (status == TCPC.ConnectionStatus.DisconnectedByUser)
+            else if (status == MPC.ConnectionStatus.Disconnecting)
             {
                 IsConnected = false;
                 IsConnecting = false;
-                IsConnectionSettingShow = true;
-
-                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_DisconnectedByUser;
-                StatusButton = _pathErrorInfoButton;
-            }
-            else if (status == TCPC.ConnectionStatus.Error)
-            {
-                // TODO: OnConnectionErrorと被る。
-
-                IsConnected = false;
-                IsConnecting = false;
+                IsNotConnectingNorConnected = false;
                 //IsConnectionSettingShow = true;
 
-                //ConnectionStatusMessage = "Error..";
-                StatusButton = _pathErrorInfoButton;
+                //Debug.WriteLine("ConnectionStatus_Disconnecting");
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Disconnecting;
+                StatusButton = _pathConnectingButton;
+
+                StatusBarMessage = ConnectionStatusMessage;
             }
-            else if (status == TCPC.ConnectionStatus.SendFail_NotConnected)
+            else if (status == MPC.ConnectionStatus.DisconnectedByUser)
             {
                 IsConnected = false;
                 IsConnecting = false;
+                IsNotConnectingNorConnected = true;
+                //IsConnectionSettingShow = true;
+
+                Debug.WriteLine("ConnectionStatus_DisconnectedByUser");
+                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_DisconnectedByUser;
+                StatusButton = _pathDisconnectedButton;
+
+                StatusBarMessage = ConnectionStatusMessage;
+            }
+            else if (status == MPC.ConnectionStatus.SendFail_NotConnected)
+            {
+                IsConnected = false;
+                IsConnecting = false;
+                IsNotConnectingNorConnected = true;
                 IsConnectionSettingShow = true;
 
+                Debug.WriteLine("ConnectionStatus_SendFail_NotConnected");
                 ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_SendFail_NotConnected;
                 StatusButton = _pathErrorInfoButton;
+
+                StatusBarMessage = ConnectionStatusMessage;
             }
-            else if (status == TCPC.ConnectionStatus.SendFail_Timeout)
+            else if (status == MPC.ConnectionStatus.SendFail_Timeout)
             {
                 IsConnected = false;
                 IsConnecting = false;
+                IsNotConnectingNorConnected = true;
                 IsConnectionSettingShow = true;
 
+                Debug.WriteLine("ConnectionStatus_SendFail_Timeout");
                 ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_SendFail_Timeout;
                 StatusButton = _pathErrorInfoButton;
-            }
-            else if (status == TCPC.ConnectionStatus.NeverConnected)
-            {
-                IsConnected = false;
-                IsConnecting = false;
-                IsConnectionSettingShow = true;
 
-                ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_NeverConnected;
-                StatusButton = _pathErrorInfoButton;
+                StatusBarMessage = ConnectionStatusMessage;
             }
-            else if (status == TCPC.ConnectionStatus.Disconnecting)
-            {
-                IsConnected = false;
-                IsConnecting = false;
-                //IsConnectionSettingShow = true;
-
-                Debug.WriteLine("ConnectionStatus_Disconnecting");
-                //ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_NeverConnected;
-                //StatusButton = _pathErrorInfoButton;
-            }
-            
-
         }
 
-        private void OnClientIsBusy(MPC sender, bool on)
+        private void OnMpdAckError(MPC sender, string ackMsg)
+        {
+            if (string.IsNullOrEmpty(ackMsg))
+                return;
+
+            string s = ackMsg;
+            string patternStr = @"[\[].+?[\]]";//@"[{\[].+?[}\]]";
+            s = System.Text.RegularExpressions.Regex.Replace(s, patternStr, string.Empty);
+            s = s.Replace("ACK ", string.Empty);
+            s = s.Replace("{} ", string.Empty);
+            //s = s.Replace("[] ", string.Empty);
+
+            AckWindowOutput?.Invoke(this, MpdVersion + ": " + MPDCtrl.Properties.Resources.MPD_CommandError + " - " + s + Environment.NewLine);
+
+            IsShowAckWindow = true;
+        }
+
+        //TODO:
+        private void OnMpcInfoEvent(MPC sender, string msg)
+        {
+            StatusBarMessage = msg;
+        }
+
+        private void OnMpcIsBusy(MPC sender, bool on)
         {
             this.IsBusy = on;
+
+            Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
         }
 
         #endregion
@@ -4087,7 +4781,7 @@ namespace MPDCtrl.ViewModels
         private System.Timers.Timer _elapsedTimer;
         private void ElapsedTimer(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if ((_elapsed < _time) && (_mpc.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play))
+            if ((_elapsed < _time) && (_mpc.MpdStatus.MpdState == Status.MpdPlayState.Play))
             {
                 _elapsed += 0.5;
                 NotifyPropertyChanged("Elapsed");
@@ -4100,156 +4794,6 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == メソッド ==
-
-        private async void Start()
-        {
-            ConnectionResult r = await StartConnection();
-
-            if (r.isSuccess)
-            {
-
-                // Wait for "MPD OK"
-
-                // Handled at OnMpdConnected
-                /*
-
-                //_mpc.MpdSendPassword();
-
-                if (IsUpdateOnStartup)
-                {
-                    _mpc.MpdSendUpdate();
-                }
-
-                //
-                _mpc.MpdQueryCurrentQueue();
-
-                // Call Status "after" MpdQueryCurrentQueue() in order to get "current song" in the queue.
-                _mpc.MpdQueryStatus();
-
-                _mpc.MpdQueryPlaylists();
-
-                // heavy stuff should be the last.
-                _mpc.MpdQueryListAll();
-
-                */
-            }
-            else
-            {
-                IsConnected = false;
-                IsMainShow = false;
-                IsConnectionSettingShow = true;
-            }
-        }
-
-        private async Task<ConnectionResult> StartConnection()
-        {
-            MpdVersion = "";
-
-            StatusButton = _pathConnectingButton;
-            ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connecting;
-
-            return await _mpc.MpdConnect();
-        }
-
-        private void UpdateButtonStatus()
-        {
-            try
-            {
-                //Play button
-                switch (_mpc.MpdStatus.MpdState)
-                {
-                    case MPC.Status.MpdPlayState.Play:
-                        {
-                            PlayButton = _pathPauseButton;
-                            break;
-                        }
-                    case MPC.Status.MpdPlayState.Pause:
-                        {
-                            PlayButton = _pathPlayButton;
-                            break;
-                        }
-                    case MPC.Status.MpdPlayState.Stop:
-                        {
-                            PlayButton = _pathPlayButton;
-                            break;
-                        }
-
-                        //_pathStopButton
-                }
-
-                // "quietly" update.
-
-                double tmpVol = Convert.ToDouble(_mpc.MpdStatus.MpdVolume);
-                if (_volume != tmpVol)
-                {
-                    _volume = tmpVol;
-                    NotifyPropertyChanged("Volume");
-                }
-                //_volume = Convert.ToDouble(_mpc.MpdStatus.MpdVolume);
-                //NotifyPropertyChanged("Volume");
-
-                _random = _mpc.MpdStatus.MpdRandom;
-                NotifyPropertyChanged("Random");
-
-                _repeat = _mpc.MpdStatus.MpdRepeat;
-                NotifyPropertyChanged("Repeat");
-
-                _consume = _mpc.MpdStatus.MpdConsume;
-                NotifyPropertyChanged("Consume");
-
-                _single = _mpc.MpdStatus.MpdSingle;
-                NotifyPropertyChanged("Single");
-
-                // no need to care about "double" updates for time.
-                Time = _mpc.MpdStatus.MpdSongTime;
-
-                _elapsed = _mpc.MpdStatus.MpdSongElapsed;
-                //NotifyPropertyChanged("Elapsed");
-
-                //start elapsed timer.
-                if (_mpc.MpdStatus.MpdState == MPC.Status.MpdPlayState.Play)
-                {
-                    if (!_elapsedTimer.Enabled)
-                        _elapsedTimer.Start();
-                }
-                else
-                {
-                    _elapsedTimer.Stop();
-                }
-
-                //
-                //Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
-
-            }
-            catch
-            {
-                System.Diagnostics.Debug.WriteLine("Error@UpdateButtonStatus");
-            }
-        }
-
-        private bool CheckPlaylistNameExists(string playlistName)
-        {
-            bool match = false;
-
-            if (Playlists.Count > 0)
-            {
-
-                foreach (var hoge in Playlists)
-                {
-                    if (hoge.ToLower() == playlistName.ToLower())
-                    {
-                        match = true;
-                        break;
-                    }
-                }
-            }
-
-            return match;
-        }
-
-        #endregion
-
         #region == コマンド ==
 
         #region == Playback play ==
@@ -4257,91 +4801,92 @@ namespace MPDCtrl.ViewModels
         public ICommand PlayCommand { get; }
         public bool PlayCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             return true;
         }
-        public void PlayCommand_ExecuteAsync()
+        public async void PlayCommand_ExecuteAsync()
         {
             switch (_mpc.MpdStatus.MpdState)
             {
-                case MPC.Status.MpdPlayState.Play:
+                case Status.MpdPlayState.Play:
                     {
                         //State>>Play: So, send Pause command
-                        _mpc.MpdPlaybackPause();
+                        await _mpc.MpdPlaybackPause();
                         break;
                     }
-                case MPC.Status.MpdPlayState.Pause:
+                case Status.MpdPlayState.Pause:
                     {
                         //State>>Pause: So, send Resume command
-                        _mpc.MpdPlaybackResume();
+                        await _mpc.MpdPlaybackResume(Convert.ToInt32(_volume));
                         break;
                     }
-                case MPC.Status.MpdPlayState.Stop:
+                case Status.MpdPlayState.Stop:
                     {
                         //State>>Stop: So, send Play command
-                        _mpc.MpdPlaybackPlay();
+                        await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume));
                         break;
                     }
             }
+
         }
 
         public ICommand PlayNextCommand { get; }
         public bool PlayNextCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             //if (Queue.Count < 1) { return false; }
             return true;
         }
-        public void PlayNextCommand_ExecuteAsync()
+        public async void PlayNextCommand_ExecuteAsync()
         {
-            _mpc.MpdPlaybackNext();
+            await _mpc.MpdPlaybackNext(Convert.ToInt32(_volume));
         }
 
         public ICommand PlayPrevCommand { get; }
         public bool PlayPrevCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             //if (Queue.Count < 1) { return false; }
             return true;
         }
-        public void PlayPrevCommand_ExecuteAsync()
+        public async void PlayPrevCommand_ExecuteAsync()
         {
-            _mpc.MpdPlaybackPrev();
+            await _mpc.MpdPlaybackPrev(Convert.ToInt32(_volume));
         }
 
         public ICommand ChangeSongCommand { get; set; }
         public bool ChangeSongCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             if (Queue.Count < 1) { return false; }
             if (_selectedSong == null) { return false; }
             return true;
         }
-        public void ChangeSongCommand_ExecuteAsync()
+        public async void ChangeSongCommand_ExecuteAsync()
         {
-            _mpc.MpdPlaybackPlay(_selectedSong.Id);
+            await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), _selectedSong.Id);
         }
 
         public ICommand PlayPauseCommand { get; }
         public bool PlayPauseCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             return true;
         }
-        public void PlayPauseCommand_Execute()
+        public async void PlayPauseCommand_Execute()
         {
-            _mpc.MpdPlaybackPause();
+            await _mpc.MpdPlaybackPause();
         }
 
         public ICommand PlayStopCommand { get; }
         public bool PlayStopCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             return true;
         }
-        public void PlayStopCommand_Execute()
+        public async void PlayStopCommand_Execute()
         {
-            _mpc.MpdPlaybackStop();
+            await _mpc.MpdPlaybackStop();
         }
 
         #endregion
@@ -4351,45 +4896,45 @@ namespace MPDCtrl.ViewModels
         public ICommand SetRandomCommand { get; }
         public bool SetRandomCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             return true;
         }
-        public void SetRandomCommand_ExecuteAsync()
+        public async void SetRandomCommand_ExecuteAsync()
         {
-            _mpc.MpdSetRandom(_random);
+            await _mpc.MpdSetRandom(_random);
         }
 
         public ICommand SetRpeatCommand { get; }
         public bool SetRpeatCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             return true;
         }
-        public void SetRpeatCommand_ExecuteAsync()
+        public async void SetRpeatCommand_ExecuteAsync()
         {
-            _mpc.MpdSetRepeat(_repeat);
+            await _mpc.MpdSetRepeat(_repeat);
         }
 
         public ICommand SetConsumeCommand { get; }
         public bool SetConsumeCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             return true;
         }
-        public void SetConsumeCommand_ExecuteAsync()
+        public async void SetConsumeCommand_ExecuteAsync()
         {
-            _mpc.MpdSetConsume(_consume);
+            await _mpc.MpdSetConsume(_consume);
         }
-        
+
         public ICommand SetSingleCommand { get; }
         public bool SetSingleCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             return true;
         }
-        public void SetSingleCommand_ExecuteAsync()
+        public async void SetSingleCommand_ExecuteAsync()
         {
-            _mpc.MpdSetSingle(_single);
+            await _mpc.MpdSetSingle(_single);
         }
 
         #endregion
@@ -4399,425 +4944,153 @@ namespace MPDCtrl.ViewModels
         public ICommand SetVolumeCommand { get; }
         public bool SetVolumeCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             return true;
         }
-        public void SetVolumeCommand_ExecuteAsync()
+        public async void SetVolumeCommand_ExecuteAsync()
         {
-            _mpc.MpdSetVolume(Convert.ToInt32(_volume));
+            await _mpc.MpdSetVolume(Convert.ToInt32(_volume));
         }
 
         public ICommand SetSeekCommand { get; }
         public bool SetSeekCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             return true;
         }
-        public void SetSeekCommand_ExecuteAsync()
+        public async void SetSeekCommand_ExecuteAsync()
         {
-            _mpc.MpdPlaybackSeek(_mpc.MpdStatus.MpdSongID, Convert.ToInt32(_elapsed));
+            await _mpc.MpdPlaybackSeek(_mpc.MpdStatus.MpdSongID, Convert.ToInt32(_elapsed));
         }
 
         public ICommand VolumeMuteCommand { get; }
         public bool VolumeMuteCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             return true;
         }
-        public void VolumeMuteCommand_Execute()
+        public async void VolumeMuteCommand_Execute()
         {
-            _mpc.MpdSetVolume(0);
+            await _mpc.MpdSetVolume(0);
         }
-
 
         public ICommand VolumeDownCommand { get; }
         public bool VolumeDownCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             return true;
         }
-        public void VolumeDownCommand_Execute()
+        public async void VolumeDownCommand_Execute()
         {
             if (_volume >= 10)
             {
-                _mpc.MpdSetVolume(Convert.ToInt32(_volume - 10));
+                await _mpc.MpdSetVolume(Convert.ToInt32(_volume - 10));
             }
         }
 
         public ICommand VolumeUpCommand { get; }
         public bool VolumeUpCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             return true;
         }
-        public void VolumeUpCommand_Execute()
+        public async void VolumeUpCommand_Execute()
         {
             if (_volume <= 90)
             {
-                _mpc.MpdSetVolume(Convert.ToInt32(_volume + 10));
+                await _mpc.MpdSetVolume(Convert.ToInt32(_volume + 10));
             }
-        }
-
-        #endregion
-
-        #region == Local Files ==
-
-        public ICommand ListAllCommand { get; }
-        public bool ListAllCommand_CanExecute()
-        {
-            if (_mpc == null) { return false; }
-            return true;
-        }
-        public void ListAllCommand_ExecuteAsync()
-        {
-            _mpc.MpdQueryListAll();
-        }
-
-        public ICommand LocalfileListviewAddCommand { get; }
-        public bool LocalfileListviewAddCommand_CanExecute()
-        {
-            return true;
-        }
-        public void LocalfileListviewAddCommand_Execute(object obj)
-        {
-            if (obj == null) return;
-
-            System.Collections.IList items = (System.Collections.IList)obj;
-
-            if (items.Count > 0)
-            {
-                var collection = items.Cast<NodeEntry>();
-
-                List<String> uriList = new List<String>();
-
-                foreach (var item in collection)
-                {
-                    uriList.Add((item as NodeEntry).OriginalFileUri);
-                }
-
-                _mpc.MpdAdd(uriList);
-            }
-        }
-
-        public ICommand LocalfileListviewEnterKeyCommand { get; set; }
-        public bool LocalfileListviewEnterKeyCommand_CanExecute()
-        {
-            if (_mpc == null) { return false; }
-            return true;
-        }
-        public void LocalfileListviewEnterKeyCommand_Execute(object obj)
-        {
-            if (obj == null) return;
-
-            System.Collections.IList items = (System.Collections.IList)obj;
-
-            if (items.Count > 1)
-            {
-                var collection = items.Cast<NodeEntry>();
-
-                List<string> uriList = new List<string>();
-
-                foreach (var item in collection)
-                {
-                    uriList.Add((item as NodeEntry).OriginalFileUri);
-                }
-
-                _mpc.MpdAdd(uriList);
-            }
-            else
-            {
-                _mpc.MpdAdd((items[0] as NodeEntry).OriginalFileUri);
-            }
-        }
-
-        public ICommand LocalfileListviewLeftDoubleClickCommand { get; set; }
-        public bool LocalfileListviewLeftDoubleClickCommand_CanExecute()
-        {
-            if (_mpc == null) { return false; }
-            return true;
-        }
-        public void LocalfileListviewLeftDoubleClickCommand_Execute(object obj)
-        {
-            /*
-            if (obj == null) return;
-
-            System.Collections.IList items = (System.Collections.IList)obj;
-
-            if (items.Count > 1)
-            {
-                var collection = items.Cast<String>();
-
-                List<string> uriList = new List<string>();
-
-                foreach (var item in collection)
-                {
-                    uriList.Add(item);
-                }
-
-                _mpc.MpdAdd(uriList);
-            }
-            else
-            {
-                _mpc.MpdAdd(items[0] as string);
-            }
-            */
-        }
-
-        public ICommand FilterClearCommand { get; }
-        public bool FilterClearCommand_CanExecute()
-        {
-            if (string.IsNullOrEmpty(FilterQuery))
-                return false;
-            return true;
-        }
-        public void FilterClearCommand_Execute()
-        {
-            FilterQuery = "";
-        }
-
-        #endregion
-
-        #region == Playlists ==
-
-        public ICommand ChangePlaylistCommand { get; set; }
-        public bool ChangePlaylistCommand_CanExecute()
-        {
-            if (_mpc == null) { return false; }
-            if (_selecctedPlaylist == "") { return false; }
-            return true;
-        }
-        public void ChangePlaylistCommand_ExecuteAsync()
-        {
-            if (_selecctedPlaylist == "")
-                return;
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                Queue.Clear();
-            });
-
-            _mpc.MpdChangePlaylist(_selecctedPlaylist);
-        }
-
-        public ICommand PlaylistListviewLeftDoubleClickCommand { get; set; }
-        public bool PlaylistListviewLeftDoubleClickCommand_CanExecute()
-        {
-            if (_mpc == null) { return false; }
-            return true;
-        }
-        public void PlaylistListviewLeftDoubleClickCommand_ExecuteAsync(String playlist)
-        {
-            //_mpc.MpdLoadPlaylist(playlist);
-        }
-
-        public ICommand PlaylistListviewEnterKeyCommand { get; set; }
-        public bool PlaylistListviewEnterKeyCommand_CanExecute()
-        {
-            if (_mpc == null) { return false; }
-            return true;
-        }
-        public void PlaylistListviewEnterKeyCommand_ExecuteAsync()
-        {
-            if (_selecctedPlaylist == "")
-                return;
-
-            _mpc.MpdLoadPlaylist(_selecctedPlaylist);
-        }
-
-        public ICommand PlaylistListviewLoadPlaylistCommand { get; set; }
-        public bool PlaylistListviewLoadPlaylistCommand_CanExecute()
-        {
-            if (_mpc == null) { return false; }
-            return true;
-        }
-        public void PlaylistListviewLoadPlaylistCommand_ExecuteAsync()
-        {
-            if (_selecctedPlaylist == "")
-                return;
-
-            _mpc.MpdLoadPlaylist(_selecctedPlaylist);
-        }
-
-        public ICommand PlaylistListviewClearLoadPlaylistCommand { get; set; }
-        public bool PlaylistListviewClearLoadPlaylistCommand_CanExecute()
-        {
-            if (_mpc == null) { return false; }
-            return true;
-        }
-        public void PlaylistListviewClearLoadPlaylistCommand_ExecuteAsync()
-        {
-            if (_selecctedPlaylist == "")
-                return;
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                Queue.Clear();
-            });
-
-            _mpc.MpdChangePlaylist(_selecctedPlaylist);
-        }
-
-        public ICommand PlaylistListviewRenamePlaylistCommand { get; set; }
-        public bool PlaylistListviewRenamePlaylistCommand_CanExecute()
-        {
-            if (_mpc == null) { return false; }
-            return true;
-        }
-        public void PlaylistListviewRenamePlaylistCommand_Execute(String playlist)
-        {
-            if (_selecctedPlaylist == "")
-                return;
-
-            ResetDialog();
-            DialogTitle = MPDCtrl.Properties.Resources.Dialog_Input;
-            DialogMessage = MPDCtrl.Properties.Resources.Dialog_NewPlaylistName;
-            IsInputDialogShow = true;
-
-            DialogResultFunction = null;
-            DialogResultFunctionWith2Params = DoRenamePlaylist;
-            DialogResultFunctionParamString = _selecctedPlaylist;
-            //_mpc.MpdRenamePlaylist(_selecctedPlaylist, "Hogehoge hoge");
-        }
-        public bool DoRenamePlaylist(String oldPlaylistName, String newPlaylistName)
-        {
-            if (CheckPlaylistNameExists(newPlaylistName))
-            {
-                ResetDialog();
-                DialogTitle = MPDCtrl.Properties.Resources.Dialog_Information;
-                DialogMessage = MPDCtrl.Properties.Resources.Dialog_PlaylistNameAlreadyExists;
-                IsInformationDialogShow = true;
-
-                return false;
-            }
-
-            _mpc.MpdRenamePlaylist(oldPlaylistName, newPlaylistName);
-
-            return true;
-        }
-
-        public ICommand PlaylistListviewRemovePlaylistCommand { get; set; }
-        public bool PlaylistListviewRemovePlaylistCommand_CanExecute()
-        {
-            if (_mpc == null) { return false; }
-            return true;
-        }
-        public void PlaylistListviewRemovePlaylistCommand_Execute(String playlist)
-        {
-            if (_selecctedPlaylist == "")
-                return;
-
-            ResetDialog();
-            DialogTitle = MPDCtrl.Properties.Resources.Dialog_Comfirmation;
-            DialogMessage = MPDCtrl.Properties.Resources.Dialog_RemovePlaylistQ;
-            IsComfirmationDialogShow = true;
-
-            DialogResultFunction = DoRemovePlaylist;
-            DialogResultFunctionParamString = _selecctedPlaylist;
-            //_mpc.MpdRemovePlaylist(_selecctedPlaylist);
-        }
-
-        public bool DoRemovePlaylist(String playlist) 
-        {
-            if (Playlists.Count == 1)
-            {
-                if (Application.Current == null) { return false; }
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    Playlists.Clear();
-                });
-            }
-
-            _mpc.MpdRemovePlaylist(playlist);
-
-            return true;
         }
 
         #endregion
 
         #region == Queue ==
 
-        public ICommand QueueListviewSaveCommand { get; }
-        public bool QueueListviewSaveCommand_CanExecute()
+        public ICommand QueueListviewSaveAsCommand { get; }
+        public bool QueueListviewSaveAsCommand_CanExecute()
         {
-            if (_mpc == null) return false;
+            if (IsBusy) return false;
             if (Queue.Count == 0) return false;
             return true;
         }
-        public void QueueListviewSaveCommand_ExecuteAsync()
+        public void QueueListviewSaveAsCommand_ExecuteAsync()
         {
-            ResetDialog();
-            DialogTitle = MPDCtrl.Properties.Resources.Dialog_Input;
-            DialogMessage = MPDCtrl.Properties.Resources.Dialog_NewPlaylistName;
-            IsInputDialogShow = true;
-
-            DialogResultFunction = DoSave;
-            DialogResultFunctionParamString = "";
-            //_mpc.MpdSave("New Playlist");
+            IsSaveAsPlaylistPopupVisible = true;
         }
 
-        public bool DoSave(string newPlaylistName)
+        public ICommand QueueListviewSaveAsPopupCommand { get; }
+        public bool QueueListviewSaveAsPopupCommand_CanExecute()
         {
-            if (CheckPlaylistNameExists(newPlaylistName))
-            {
-                ResetDialog();
-                DialogTitle = MPDCtrl.Properties.Resources.Dialog_Information;
-                DialogMessage = MPDCtrl.Properties.Resources.Dialog_PlaylistNameAlreadyExists;
-                IsInformationDialogShow = true;
-
-                return false;
-            }
-
-            _mpc.MpdSave(newPlaylistName);
+            if (IsBusy) return false;
+            if (Queue.Count == 0) return false;
             return true;
+        }
+        public async void QueueListviewSaveAsPopupCommand_Execute(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+                return;
+
+            await _mpc.MpdSave(playlistName);
+            
+            IsSaveAsPlaylistPopupVisible = false;
         }
 
         public ICommand QueueListviewEnterKeyCommand { get; set; }
         public bool QueueListviewEnterKeyCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             if (Queue.Count < 1) { return false; }
             if (_selectedSong == null) { return false; }
             return true;
         }
-        public void QueueListviewEnterKeyCommand_ExecuteAsync()
+        public async void QueueListviewEnterKeyCommand_ExecuteAsync()
         {
-            _mpc.MpdPlaybackPlay(_selectedSong.Id);
+            await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), _selectedSong.Id);
         }
 
         public ICommand QueueListviewLeftDoubleClickCommand { get; set; }
         public bool QueueListviewLeftDoubleClickCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             if (Queue.Count < 1) { return false; }
             if (_selectedSong == null) { return false; }
             return true;
         }
-        public void QueueListviewLeftDoubleClickCommand_ExecuteAsync(MPC.SongInfo song)
+        public async void QueueListviewLeftDoubleClickCommand_ExecuteAsync(SongInfo song)
         {
-            _mpc.MpdPlaybackPlay(song.Id);
+            await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), song.Id);
         }
 
         public ICommand QueueListviewClearCommand { get; }
         public bool QueueListviewClearCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
             if (Queue.Count == 0) { return false; }
             return true;
         }
         public void QueueListviewClearCommand_ExecuteAsync()
         {
-            // Clear queue here because "playlistinfo" ASYNC request returns nothing.
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                Queue.Clear();
-            });
+            IsConfirmClearQueuePopupVisible = true;
+        }
 
-            _mpc.MpdClear();
+        public ICommand QueueListviewConfirmClearPopupCommand { get; }
+        public bool QueueListviewConfirmClearPopupCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (Queue.Count == 0) return false;
+            return true;
+        }
+        public async void QueueListviewConfirmClearPopupCommand_Execute()
+        {
+            await _mpc.MpdClear();
+
+            IsConfirmClearQueuePopupVisible = false;
         }
 
         public ICommand QueueListviewDeleteCommand { get; }
         public bool QueueListviewDeleteCommand_CanExecute()
         {
+            if (IsBusy) return false;
+            if (SelectedSong == null) return false;
             return true;
         }
         public void QueueListviewDeleteCommand_Execute(object obj)
@@ -4825,7 +5098,7 @@ namespace MPDCtrl.ViewModels
             if (obj == null) return;
 
             // 選択アイテム保持用
-            List<MPC.SongInfo> selectedList = new List<MPC.SongInfo>();
+            List<SongInfo> selectedList = new List<SongInfo>();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -4833,11 +5106,11 @@ namespace MPDCtrl.ViewModels
             {
                 System.Collections.IList items = (System.Collections.IList)obj;
 
-                var collection = items.Cast<MPC.SongInfo>();
+                var collection = items.Cast<SongInfo>();
 
                 foreach (var item in collection)
                 {
-                    selectedList.Add(item as MPC.SongInfo);
+                    selectedList.Add(item as SongInfo);
                 }
             });
 
@@ -4848,35 +5121,52 @@ namespace MPDCtrl.ViewModels
                 deleteIdList.Add(item.Id);
             }
 
-            // Clear queue here because "playlistinfo" ASYNC request returns nothing .
-            // 非同期で結果が返ってくるので、キューが全部削除されて０になった場合、
-            // 結果はOKしか返って来ないので分からない為、
-            // ここでクリアする。
+            queueListviewSelectedSongIdsForPopup = deleteIdList;
 
-            if (deleteIdList.Count == Queue.Count)
-            {
-                if (Application.Current == null) { return; }
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    Queue.Clear();
-                });
-            }
+            IsConfirmDeleteQueuePopupVisible = true;
 
-            _mpc.MpdDeleteId(deleteIdList);
+        }
 
+        public ICommand QueueListviewConfirmDeletePopupCommand { get; }
+        public bool QueueListviewConfirmDeletePopupCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (SelectedSong == null) return false;
+            if (Queue.Count == 0) return false;
+            return true;
+        }
+        public async void QueueListviewConfirmDeletePopupCommand_Execute()
+        {
+            if (queueListviewSelectedSongIdsForPopup.Count < 1)
+                return;
+
+            if (queueListviewSelectedSongIdsForPopup.Count == 1)
+                await _mpc.MpdDeleteId(queueListviewSelectedSongIdsForPopup[0]);
+            else if (queueListviewSelectedSongIdsForPopup.Count >= 1)
+                await _mpc.MpdDeleteId(queueListviewSelectedSongIdsForPopup);
+
+            queueListviewSelectedSongIdsForPopup.Clear();
+
+            IsConfirmDeleteQueuePopupVisible = false;
         }
 
         public ICommand QueueListviewMoveUpCommand { get; }
         public bool QueueListviewMoveUpCommand_CanExecute()
         {
+            if (IsBusy) return false;
+            if (Queue.Count == 0) return false;
+            if (SelectedSong == null) return false;
             return true;
         }
-        public void QueueListviewMoveUpCommand_Execute(object obj)
+        public async void QueueListviewMoveUpCommand_Execute(object obj)
         {
             if (obj == null) return;
 
+            if (Queue.Count >= 1)
+                return;
+
             // 選択アイテム保持用
-            List<MPC.SongInfo> selectedList = new List<MPC.SongInfo>();
+            List<SongInfo> selectedList = new List<SongInfo>();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -4884,11 +5174,11 @@ namespace MPDCtrl.ViewModels
             {
                 System.Collections.IList items = (System.Collections.IList)obj;
 
-                var collection = items.Cast<MPC.SongInfo>();
+                var collection = items.Cast<SongInfo>();
 
                 foreach (var item in collection)
                 {
-                    selectedList.Add(item as MPC.SongInfo);
+                    selectedList.Add(item as SongInfo);
                 }
             });
 
@@ -4912,21 +5202,27 @@ namespace MPDCtrl.ViewModels
                     return;
                 }
             }
-            
-            _mpc.MpdMoveId(IdToNewPos);
+
+            await _mpc.MpdMoveId(IdToNewPos);
         }
 
         public ICommand QueueListviewMoveDownCommand { get; }
         public bool QueueListviewMoveDownCommand_CanExecute()
         {
+            if (IsBusy) return false;
+            if (Queue.Count == 0) return false;
+            if (SelectedSong == null) return false;
             return true;
         }
-        public void QueueListviewMoveDownCommand_Execute(object obj)
+        public async void QueueListviewMoveDownCommand_Execute(object obj)
         {
             if (obj == null) return;
 
+            if (Queue.Count >= 1)
+                return;
+
             // 選択アイテム保持用
-            List<MPC.SongInfo> selectedList = new List<MPC.SongInfo>();
+            List<SongInfo> selectedList = new List<SongInfo>();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -4934,11 +5230,11 @@ namespace MPDCtrl.ViewModels
             {
                 System.Collections.IList items = (System.Collections.IList)obj;
 
-                var collection = items.Cast<MPC.SongInfo>();
+                var collection = items.Cast<SongInfo>();
 
                 foreach (var item in collection)
                 {
-                    selectedList.Add(item as MPC.SongInfo);
+                    selectedList.Add(item as SongInfo);
                 }
             });
 
@@ -4963,20 +5259,23 @@ namespace MPDCtrl.ViewModels
                 }
             }
 
-            _mpc.MpdMoveId(IdToNewPos);
+            await _mpc.MpdMoveId(IdToNewPos);
         }
 
-        public ICommand QueueListviewPlaylistAddCommand { get; }
-        public bool QueueListviewPlaylistAddCommand_CanExecute()
+        public ICommand QueueListviewSaveSelectedAsCommand { get; }
+        public bool QueueListviewSaveSelectedAsCommand_CanExecute()
         {
+            if (IsBusy) return false;
+            if (Queue.Count == 0) return false;
+            if (SelectedSong == null) return false;
             return true;
         }
-        public void QueueListviewPlaylistAddCommand_Execute(object obj)
+        public void QueueListviewSaveSelectedAsCommand_Execute(object obj)
         {
             if (obj == null) return;
 
             // 選択アイテム保持用
-            List<MPC.SongInfo> selectedList = new List<MPC.SongInfo>();
+            List<SongInfo> selectedList = new List<SongInfo>();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -4984,11 +5283,11 @@ namespace MPDCtrl.ViewModels
             {
                 System.Collections.IList items = (System.Collections.IList)obj;
 
-                var collection = items.Cast<MPC.SongInfo>();
+                var collection = items.Cast<SongInfo>();
 
                 foreach (var item in collection)
                 {
-                    selectedList.Add(item as MPC.SongInfo);
+                    selectedList.Add(item as SongInfo);
                 }
             });
 
@@ -5003,37 +5302,108 @@ namespace MPDCtrl.ViewModels
             if (fileUrisToAddList.Count == 0)
                 return;
 
-            ResetDialog();
-            DialogTitle = MPDCtrl.Properties.Resources.Dialog_PlaylistSelect_SaveSelectedTo;
-            DialogMessage = MPDCtrl.Properties.Resources.Dialog_PlaylistSelect_SelectPlaylist;
+            queueListviewSelectedSongIdsForPopup = fileUrisToAddList;
 
-            DialogResultFunctionWith2ParamsWithObject = DoPlaylistAdd;
-            DialogResultFunctionParamObject = fileUrisToAddList;
+            IsSelectedSaveAsPopupVisible = true;
 
-            PlaylistNamesWithNew.Clear();
-            PlaylistNamesWithNew.Add("["+ MPDCtrl.Properties.Resources.Dialog_PlaylistSelect_NewPlaylistName + "]");
-
-            foreach (var s in Playlists)
-            {
-                PlaylistNamesWithNew.Add(s);
-            }
-
-            IsPlaylistSelectDialogShow = true;
-            //_mpc.MpdPlaylistAdd(playlistName, fileUrisToAddList);
         }
 
-        public bool DoPlaylistAdd(String playlistName, List<string> fileUrisToAddList)
+        public ICommand QueueListviewSaveSelectedAsPopupCommand { get; }
+        public bool QueueListviewSaveSelectedAsPopupCommand_CanExecute()
         {
-            _mpc.MpdPlaylistAdd(playlistName, fileUrisToAddList);
-
+            if (IsBusy) return false;
+            if (Queue.Count == 0) return false;
+            if (SelectedSong == null) return false;
             return true;
         }
+        public async void QueueListviewSaveSelectedAsPopupCommand_Execute(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+                return;
 
+            if (queueListviewSelectedSongIdsForPopup.Count < 1)
+                return;
+
+            await _mpc.MpdPlaylistAdd(playlistName, queueListviewSelectedSongIdsForPopup);
+
+            queueListviewSelectedSongIdsForPopup.Clear();
+
+            IsSelectedSaveAsPopupVisible = false;
+        }
+
+        public ICommand QueueListviewSaveSelectedToPopupCommand { get; }
+        public bool QueueListviewSaveSelectedToPopupCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (Queue.Count == 0) return false;
+            if (SelectedSong == null) return false;
+            return true;
+        }
+        public async void QueueListviewSaveSelectedToPopupCommand_Execute(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+                return;
+
+            if (queueListviewSelectedSongIdsForPopup.Count < 1)
+                return;
+
+            await _mpc.MpdPlaylistAdd(playlistName, queueListviewSelectedSongIdsForPopup);
+
+            queueListviewSelectedSongIdsForPopup.Clear();
+
+            IsSelectedSaveToPopupVisible = false;
+        }
+
+        public ICommand QueueListviewSaveSelectedToCommand { get; }
+        public bool QueueListviewSaveSelectedToCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (Queue.Count == 0) return false;
+            if (SelectedSong == null) return false;
+            return true;
+        }
+        public void QueueListviewSaveSelectedToCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            // 選択アイテム保持用
+            List<SongInfo> selectedList = new List<SongInfo>();
+
+            // 念のため、UIスレッドで。
+            if (Application.Current == null) { return; }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                System.Collections.IList items = (System.Collections.IList)obj;
+
+                var collection = items.Cast<SongInfo>();
+
+                foreach (var item in collection)
+                {
+                    selectedList.Add(item as SongInfo);
+                }
+            });
+
+            List<string> fileUrisToAddList = new List<string>();
+
+            foreach (var item in selectedList)
+            {
+                if (!string.IsNullOrEmpty(item.file))
+                    fileUrisToAddList.Add(item.file);
+            }
+
+            if (fileUrisToAddList.Count == 0)
+                return;
+
+            queueListviewSelectedSongIdsForPopup = fileUrisToAddList;
+
+            IsSelectedSaveToPopupVisible = true;
+
+        }
 
         public ICommand ScrollIntoNowPlayingCommand { get; }
         public bool ScrollIntoNowPlayingCommand_CanExecute()
         {
-            if (_mpc == null) { return false; }
+            if (IsBusy) return false;
             if (Queue.Count == 0) { return false; }
             if (CurrentSong == null) { return false; }
             return true;
@@ -5050,7 +5420,710 @@ namespace MPDCtrl.ViewModels
             ScrollIntoView?.Invoke(this, CurrentSong.Index);
 
         }
-        
+
+
+        #endregion
+
+        #region == Search ==
+
+        public ICommand SearchExecCommand { get; }
+        public bool SearchExecCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (string.IsNullOrEmpty(SearchQuery))
+                return false;
+            return true;
+        }
+        public async void SearchExecCommand_Execute()
+        {
+            if (string.IsNullOrEmpty(SearchQuery)) return;
+
+            // TODO: Make this an option.
+            //"==";
+
+            string queryShiki = "contains";
+
+            await _mpc.MpdSearch(SelectedSearchTags.ToString(), queryShiki, SearchQuery);
+        }
+
+        public ICommand SearchResultListviewSaveSelectedAsCommand { get; }
+        public bool SearchResultListviewSaveSelectedAsCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (SearchResult.Count == 0) return false;
+            return true;
+        }
+        public void SearchResultListviewSaveSelectedAsCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            // 選択アイテム保持用
+            List<Song> selectedList = new List<Song>();
+
+            // 念のため、UIスレッドで。
+            if (Application.Current == null) { return; }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                System.Collections.IList items = (System.Collections.IList)obj;
+
+                var collection = items.Cast<Song>();
+
+                foreach (var item in collection)
+                {
+                    selectedList.Add(item as Song);
+                }
+            });
+
+            List<string> fileUrisToAddList = new List<string>();
+
+            foreach (var item in selectedList)
+            {
+                if (!string.IsNullOrEmpty(item.file))
+                    fileUrisToAddList.Add(item.file);
+            }
+
+            if (fileUrisToAddList.Count == 0)
+                return;
+
+            searchResultListviewSelectedSongUriForPopup = fileUrisToAddList;
+
+            IsSearchResultSelectedSaveAsPopupVisible = true;
+        }
+
+        public ICommand SearchResultListviewSaveSelectedAsPopupCommand { get; }
+        public bool SearchResultListviewSaveSelectedAsPopupCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (SearchResult.Count == 0) return false;
+            return true;
+        }
+        public async void SearchResultListviewSaveSelectedAsPopupCommand_Execute(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+                return;
+
+            if (searchResultListviewSelectedSongUriForPopup.Count < 1)
+                return;
+
+            await _mpc.MpdPlaylistAdd(playlistName, searchResultListviewSelectedSongUriForPopup);
+
+            searchResultListviewSelectedSongUriForPopup.Clear();
+
+            IsSearchResultSelectedSaveAsPopupVisible = false;
+        }
+
+        public ICommand SearchResultListviewSaveSelectedToCommand { get; }
+        public bool SearchResultListviewSaveSelectedToCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (SearchResult.Count == 0) return false;
+            return true;
+        }
+        public void SearchResultListviewSaveSelectedToCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            // 選択アイテム保持用
+            List<Song> selectedList = new List<Song>();
+
+            // 念のため、UIスレッドで。
+            if (Application.Current == null) { return; }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                System.Collections.IList items = (System.Collections.IList)obj;
+
+                var collection = items.Cast<Song>();
+
+                foreach (var item in collection)
+                {
+                    selectedList.Add(item as Song);
+                }
+            });
+
+            List<string> fileUrisToAddList = new List<string>();
+
+            foreach (var item in selectedList)
+            {
+                if (!string.IsNullOrEmpty(item.file))
+                    fileUrisToAddList.Add(item.file);
+            }
+
+            if (fileUrisToAddList.Count == 0)
+                return;
+
+            searchResultListviewSelectedSongUriForPopup = fileUrisToAddList;
+
+            IsSearchResultSelectedSaveToPopupVisible = true;
+
+        }
+
+        public ICommand SearchResultListviewSaveSelectedToPopupCommand { get; }
+        public bool SearchResultListviewSaveSelectedToPopupCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (SearchResult.Count == 0) return false;
+            return true;
+        }
+        public async void SearchResultListviewSaveSelectedToPopupCommand_Execute(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+                return;
+
+            if (searchResultListviewSelectedSongUriForPopup.Count < 1)
+                return;
+
+            await _mpc.MpdPlaylistAdd(playlistName, searchResultListviewSelectedSongUriForPopup);
+
+            searchResultListviewSelectedSongUriForPopup.Clear();
+
+            IsSearchResultSelectedSaveToPopupVisible = false;
+        }
+
+        #endregion
+
+        #region == Browse ==
+
+        public ICommand SongFilesListviewAddCommand { get; }
+        public bool SongFilesListviewAddCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (MusicEntries.Count == 0) return false;
+            return true;
+        }
+        public async void SongFilesListviewAddCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            System.Collections.IList items = (System.Collections.IList)obj;
+
+            if (items.Count > 1)
+            {
+                var collection = items.Cast<NodeFile>();
+
+                List<String> uriList = new List<String>();
+
+                foreach (var item in collection)
+                {
+                    uriList.Add((item as NodeFile).OriginalFileUri);
+                }
+
+                await _mpc.MpdAdd(uriList);
+            }
+            else
+            {
+                if (items.Count == 1)
+                    await _mpc.MpdAdd((items[0] as NodeFile).OriginalFileUri);
+            }
+        }
+
+        public ICommand SongFilesListviewSaveSelectedAsCommand { get; }
+        public bool SongFilesListviewSaveSelectedAsCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (MusicEntries.Count == 0) return false;
+            return true;
+        }
+        public void SongFilesListviewSaveSelectedAsCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            // 選択アイテム保持用
+            List<NodeFile> selectedList = new List<NodeFile>();
+
+            // 念のため、UIスレッドで。
+            if (Application.Current == null) { return; }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                System.Collections.IList items = (System.Collections.IList)obj;
+
+                var collection = items.Cast<NodeFile>();
+
+                foreach (var item in collection)
+                {
+                    selectedList.Add(item as NodeFile);
+                }
+            });
+
+            List<string> fileUrisToAddList = new List<string>();
+
+            foreach (var item in selectedList)
+            {
+                if (!string.IsNullOrEmpty(item.OriginalFileUri))
+                    fileUrisToAddList.Add(item.OriginalFileUri);
+            }
+
+            if (fileUrisToAddList.Count == 0)
+                return;
+
+            songFilesListviewSelectedSongUriForPopup = fileUrisToAddList;
+
+            IsSongFilesSelectedSaveAsPopupVisible = true;
+        }
+
+        public ICommand SongFilesListviewSaveSelectedAsPopupCommand { get; }
+        public bool SongFilesListviewSaveSelectedAsPopupCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (MusicEntries.Count == 0) return false;
+            return true;
+        }
+        public async void SongFilesListviewSaveSelectedAsPopupCommand_Execute(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+                return;
+
+            if (songFilesListviewSelectedSongUriForPopup.Count < 1)
+                return;
+
+            await _mpc.MpdPlaylistAdd(playlistName, songFilesListviewSelectedSongUriForPopup);
+
+            songFilesListviewSelectedSongUriForPopup.Clear();
+
+            IsSongFilesSelectedSaveAsPopupVisible = false;
+        }
+
+        public ICommand SongFilesListviewSaveSelectedToCommand { get; }
+        public bool SongFilesListviewSaveSelectedToCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (MusicEntries.Count == 0) return false;
+            return true;
+        }
+        public void SongFilesListviewSaveSelectedToCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            // 選択アイテム保持用
+            List<NodeFile> selectedList = new List<NodeFile>();
+
+            // 念のため、UIスレッドで。
+            if (Application.Current == null) { return; }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                System.Collections.IList items = (System.Collections.IList)obj;
+
+                var collection = items.Cast<NodeFile>();
+
+                foreach (var item in collection)
+                {
+                    selectedList.Add(item as NodeFile);
+                }
+            });
+
+            List<string> fileUrisToAddList = new List<string>();
+
+            foreach (var item in selectedList)
+            {
+                if (!string.IsNullOrEmpty(item.OriginalFileUri))
+                    fileUrisToAddList.Add(item.OriginalFileUri);
+            }
+
+            if (fileUrisToAddList.Count == 0)
+                return;
+
+            songFilesListviewSelectedSongUriForPopup = fileUrisToAddList;
+
+            IsSongFilesSelectedSaveToPopupVisible = true;
+
+        }
+
+        public ICommand SongFilesListviewSaveSelectedToPopupCommand { get; }
+        public bool SongFilesListviewSaveSelectedToPopupCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (MusicEntries.Count == 0) return false;
+            return true;
+        }
+        public async void SongFilesListviewSaveSelectedToPopupCommand_Execute(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+                return;
+
+            if (songFilesListviewSelectedSongUriForPopup.Count < 1)
+                return;
+
+            await _mpc.MpdPlaylistAdd(playlistName, songFilesListviewSelectedSongUriForPopup);
+
+            songFilesListviewSelectedSongUriForPopup.Clear();
+
+            IsSongFilesSelectedSaveToPopupVisible = false;
+        }
+
+
+
+        #endregion
+
+        #region == Playlists ==
+
+        public ICommand ChangePlaylistCommand { get; set; }
+        public bool ChangePlaylistCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (_selecctedPlaylist == "") { return false; }
+            return true;
+        }
+        public async void ChangePlaylistCommand_ExecuteAsync()
+        {
+            if (_selecctedPlaylist == "")
+                return;
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Queue.Clear();
+            });
+
+            await _mpc.MpdChangePlaylist(_selecctedPlaylist);
+        }
+
+        public ICommand PlaylistListviewLeftDoubleClickCommand { get; set; }
+        public bool PlaylistListviewLeftDoubleClickCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            return true;
+        }
+        public async void PlaylistListviewLeftDoubleClickCommand_ExecuteAsync(String playlist)
+        {
+            await _mpc.MpdLoadPlaylist(playlist);
+        }
+
+        public ICommand PlaylistListviewEnterKeyCommand { get; set; }
+        public bool PlaylistListviewEnterKeyCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            return true;
+        }
+        public async void PlaylistListviewEnterKeyCommand_ExecuteAsync()
+        {
+            if (_selecctedPlaylist == "")
+                return;
+
+            await _mpc.MpdLoadPlaylist(_selecctedPlaylist);
+        }
+
+        public ICommand PlaylistListviewLoadPlaylistCommand { get; set; }
+        public bool PlaylistListviewLoadPlaylistCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            return true;
+        }
+        public async void PlaylistListviewLoadPlaylistCommand_ExecuteAsync()
+        {
+            if (_selecctedPlaylist == "")
+                return;
+
+            await _mpc.MpdLoadPlaylist(_selecctedPlaylist);
+        }
+
+        public ICommand PlaylistListviewClearLoadPlaylistCommand { get; set; }
+        public bool PlaylistListviewClearLoadPlaylistCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            return true;
+        }
+        public async void PlaylistListviewClearLoadPlaylistCommand_ExecuteAsync()
+        {
+            if (_selecctedPlaylist == "")
+                return;
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Queue.Clear();
+            });
+
+            await _mpc.MpdChangePlaylist(_selecctedPlaylist);
+        }
+
+        // TODO:
+        public ICommand PlaylistListviewRenamePlaylistCommand { get; set; }
+        public bool PlaylistListviewRenamePlaylistCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (string.IsNullOrEmpty(_selecctedPlaylist)) { return false; }
+            return true;
+        }
+        public void PlaylistListviewRenamePlaylistCommand_Execute(String playlist)
+        {
+            if (_selecctedPlaylist == "")
+                return;
+
+            /*
+            ResetDialog();
+            DialogTitle = MPDCtrl.Properties.Resources.Dialog_Input;
+            DialogMessage = MPDCtrl.Properties.Resources.Dialog_NewPlaylistName;
+            IsInputDialogShow = true;
+
+            DialogResultFunction = null;
+            DialogResultFunctionWith2Params = DoRenamePlaylist;
+            DialogResultFunctionParamString = _selecctedPlaylist;
+            */
+
+        }
+        public async void DoRenamePlaylist(String oldPlaylistName, String newPlaylistName)
+        {
+            /*
+            if (CheckPlaylistNameExists(newPlaylistName))
+            {
+                ResetDialog();
+                DialogTitle = MPDCtrl.Properties.Resources.Dialog_Information;
+                DialogMessage = MPDCtrl.Properties.Resources.Dialog_PlaylistNameAlreadyExists;
+                IsInformationDialogShow = true;
+
+                return false;
+            }
+            */
+            await _mpc.MpdRenamePlaylist(oldPlaylistName, newPlaylistName);
+        }
+
+        // TODO:
+        private bool CheckPlaylistNameExists(string playlistName)
+        {
+            bool match = false;
+
+            if (Playlists.Count > 0)
+            {
+
+                foreach (var hoge in Playlists)
+                {
+                    if (hoge.ToLower() == playlistName.ToLower())
+                    {
+                        match = true;
+                        break;
+                    }
+                }
+            }
+
+            return match;
+        }
+
+        public ICommand PlaylistListviewRemovePlaylistCommand { get; set; }
+        public bool PlaylistListviewRemovePlaylistCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (string.IsNullOrEmpty(_selecctedPlaylist)) { return false; }
+            return true;
+        }
+        public void PlaylistListviewRemovePlaylistCommand_Execute(String playlist)
+        {
+            if (_selecctedPlaylist == "")
+                return;
+
+            if (playlist != _selecctedPlaylist)
+                return;
+
+            IsConfirmDeletePlaylistPopupVisible = true;
+        }
+
+        public ICommand PlaylistListviewConfirmRemovePlaylistPopupCommand { get; set; }
+        public bool PlaylistListviewConfirmRemovePlaylistPopupCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            if (string.IsNullOrEmpty(_selecctedPlaylist)) { return false; }
+            return true;
+        }
+        public async void PlaylistListviewConfirmRemovePlaylistPopupCommand_Execute()
+        {
+            if (string.IsNullOrEmpty(_selecctedPlaylist))
+                return;
+
+            await _mpc.MpdRemovePlaylist(_selecctedPlaylist);
+
+            IsConfirmDeletePlaylistPopupVisible = false;
+        }
+
+        #endregion
+
+        #region == PlaylistItems ==
+
+        // プレイリストの中身をリロードするか確認後の処理
+        public ICommand PlaylistListviewConfirmUpdatePopupCommand { get; set; }
+        public bool PlaylistListviewConfirmUpdatePopupCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            return true;
+        }
+        public void PlaylistListviewConfirmUpdatePopupCommand_Execute()
+        {
+            if (SelectedNodeMenu is NodeMenuPlaylistItem)
+            {
+                if ((SelectedNodeMenu as NodeMenuPlaylistItem).IsUpdateRequied)
+                {
+                    GetPlaylistSongs((SelectedNodeMenu as NodeMenuPlaylistItem));
+                }
+            }
+
+            IsConfirmUpdatePlaylistSongsPopupVisible = false;
+        }
+
+        // プレイリストの中の曲を削除コマンド
+        public ICommand PlaylistListviewDeletePosCommand { get; set; }
+        public bool PlaylistListviewDeletePosCommand_CanExecute()
+        {
+            if (SelectedPlaylistSong == null) return false;
+            if (IsBusy) return false;
+            return true;
+        }
+        public void PlaylistListviewDeletePosCommand_Execute(object obj)
+        {
+            string playlistName = "";
+
+            if (SelectedNodeMenu is NodeMenuPlaylistItem)
+            {
+                if ((SelectedNodeMenu as NodeMenuPlaylistItem).IsUpdateRequied)
+                {
+                    return;
+                }
+                else
+                {
+                    playlistName = (SelectedNodeMenu as NodeMenuPlaylistItem).Name;
+                }
+            }
+            else
+            {
+                return;
+            }
+
+            if (obj == null) return;
+
+            System.Collections.IList items = (System.Collections.IList)obj;
+
+            if (items.Count > 1)
+            {
+                // not supported by MPD protocol error.
+                IsConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible = true;
+            }
+            else
+            {
+                if (items.Count == 1)
+                    IsConfirmDeletePlaylistSongPopupVisible = true;
+                    //await _mpc.MpdPlaylistDelete(playlistName, (items[0] as Song).Index);
+            }
+        }
+
+        // プレイリストの中の曲を削除で複数削除は未対応ダイアログを閉じる
+        public ICommand PlaylistListviewConfirmDeletePosNotSupportedPopupCommand { get; set; }
+        public bool PlaylistListviewConfirmDeletePosNotSupportedPopupCommand_CanExecute()
+        {
+            return true;
+        }
+        public void PlaylistListviewConfirmDeletePosNotSupportedPopupCommand_Execute()
+        {
+            IsConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible = false;
+        }
+
+        // プレイリストの中の曲を削除で確認後の処理
+        public ICommand PlaylistListviewDeletePosPopupCommand { get; set; }
+        public bool PlaylistListviewDeletePosPopupCommand_CanExecute()
+        {
+            if (SelectedPlaylistSong == null) return false;
+            if (IsBusy) return false;
+            return true;
+        }
+        public async void PlaylistListviewDeletePosPopupCommand_Execute()
+        {
+            string playlistName = "";
+
+            if (SelectedNodeMenu is NodeMenuPlaylistItem)
+            {
+                if ((SelectedNodeMenu as NodeMenuPlaylistItem).IsUpdateRequied)
+                {
+                    return;
+                }
+                else
+                {
+                    playlistName = (SelectedNodeMenu as NodeMenuPlaylistItem).Name;
+                }
+            }
+            else
+            {
+                return;
+            }
+
+            if (SelectedPlaylistSong == null)
+                return;
+
+            await _mpc.MpdPlaylistDelete(playlistName, SelectedPlaylistSong.Index);
+
+            IsConfirmDeletePlaylistSongPopupVisible = false;
+        }
+
+        // プレイリストの中身をクリアするコマンド
+        public ICommand PlaylistListviewClearCommand { get; set; }
+        public bool PlaylistListviewClearCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            return true;
+        }
+        public void PlaylistListviewClearCommand_Execute()
+        {
+            IsConfirmPlaylistClearPopupVisible = true;
+        }
+
+        public ICommand PlaylistListviewClearPopupCommand { get; set; }
+        public bool PlaylistListviewClearPopupCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            return true;
+        }
+        public async void PlaylistListviewClearPopupCommand_Execute()
+        {
+            string playlistName;
+
+            if (SelectedNodeMenu is NodeMenuPlaylistItem)
+            {
+                if ((SelectedNodeMenu as NodeMenuPlaylistItem).IsUpdateRequied)
+                {
+                    return;
+                }
+                else
+                {
+                    playlistName = (SelectedNodeMenu as NodeMenuPlaylistItem).Name;
+                }
+            }
+            else
+            {
+                return;
+            }
+
+            await _mpc.MpdPlaylistClear(playlistName);
+
+            IsConfirmPlaylistClearPopupVisible = false;
+        }
+
+        #endregion
+
+        #region == Search and PlaylistItems ==
+
+        public ICommand SongsListviewAddCommand { get; }
+        public bool SongsListviewAddCommand_CanExecute()
+        {
+            if (IsBusy) return false;
+            return true;
+        }
+        public async void SongsListviewAddCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            System.Collections.IList items = (System.Collections.IList)obj;
+
+            if (items.Count > 1)
+            {
+                var collection = items.Cast<Song>();
+
+                List<String> uriList = new List<String>();
+
+                foreach (var item in collection)
+                {
+                    uriList.Add((item as Song).file);
+                }
+
+                await _mpc.MpdAdd(uriList);
+            }
+            else
+            {
+                if (items.Count == 1)
+                    await _mpc.MpdAdd((items[0] as Song).file);
+            }
+        }
 
         #endregion
 
@@ -5066,6 +6139,7 @@ namespace MPDCtrl.ViewModels
         {
             if (IsConnecting) return;
 
+            // TODO:
             //ConnectionStatusMessage = "";
 
             if (IsSettingsShow)
@@ -5178,7 +6252,6 @@ namespace MPDCtrl.ViewModels
                 pro.IsDefault = true;
                 CurrentProfile = pro;
             }
-
         }
 
         public ICommand UpdateProfileCommand { get; }
@@ -5205,7 +6278,7 @@ namespace MPDCtrl.ViewModels
 
                 if (SelectedProfile == CurrentProfile)
                 {
-                    _mpc.MpdPassword = passwordBox.Password;
+                    //_mpc.MpdPassword = passwordBox.Password;
                 }
             }
 
@@ -5235,10 +6308,14 @@ namespace MPDCtrl.ViewModels
             SettingProfileEditMessage = MPDCtrl.Properties.Resources.Settings_ProfileUpdated;
         }
 
+        #endregion
+
+        #region == Connection ==
+
         public ICommand ChangeConnectionProfileCommand { get; }
         public bool ChangeConnectionProfileCommand_CanExecute()
         {
-            //if (SelectedProfile == null) return false;
+            if (IsBusy) return false;
             if (string.IsNullOrWhiteSpace(Host)) return false;
             if (String.IsNullOrEmpty(Host)) return false;
             if (IsConnecting) return false;
@@ -5247,7 +6324,6 @@ namespace MPDCtrl.ViewModels
         public async void ChangeConnectionProfileCommand_Execute(object obj)
         {
             if (obj == null) return;
-            //if (SelectedProfile == null) return;
             if (String.IsNullOrEmpty(Host)) return;
             if (string.IsNullOrWhiteSpace(Host)) return;
             if (_port == 0) return;
@@ -5257,7 +6333,11 @@ namespace MPDCtrl.ViewModels
             {
                 _mpc.MpdStop = true;
                 _mpc.MpdDisconnect();
+                _mpc.MpdStop = false;
             }
+
+            // Save volume.
+            CurrentProfile.Volume = Convert.ToInt32(Volume);
 
             // Validate Host input.
             if (Host == "")
@@ -5317,31 +6397,51 @@ namespace MPDCtrl.ViewModels
 
             Application.Current.Dispatcher.Invoke(() =>
             {
+                SelectedNodeMenu = null;
+
                 Queue.Clear();
-                LocalFiles.Clear();
+                _mpc.CurrentQueue.Clear();
+
+                if (_mainMenuItems.PlaylistsDirectory != null)
+                    _mainMenuItems.PlaylistsDirectory.Children.Clear();
+                
                 Playlists.Clear();
+                _mpc.Playlists.Clear();
+                SelectedPlaylist = "";
+
+                SelectedPlaylistSong = null;
+
+                //MusicDirectories.Clear();// Don't
+                MusicEntries.Clear();
+                //_mpc.LocalDirectories.Clear();// Don't
+                //_mpc.LocalFiles.Clear();// Don't
+                //SelectedNodeDirectory.Children.Clear();// Don't
+                FilterQuery = "";
+
+                SelectedSong = null;
+                CurrentSong = null;
+
+                SearchResult.Clear();
+                SearchQuery = "";
+
+                IsAlbumArtVisible = false;
+                AlbumArt = _albumArtDefault;
+
+                // TODO: more
             });
 
-            //
-            _mpc.MpdHost = _host;
-            _mpc.MpdPort = _port;
-            _mpc.MpdPassword = _password;
+            IsConnecting = true;
 
-            _mpc.MpdStop = false;
+            ///
+            ConnectionResult r = await _mpc.MpdIdleConnect(_host, _port);
 
-
-            IsConnecting = true; 
-            
-            ConnectionResult r = await StartConnection();
-
-            if (r.isSuccess)
+            if (r.IsSuccess)
             {
-                IsConnectionSettingShow = false;
                 IsSettingsShow = false;
 
                 if (CurrentProfile == null)
                 {
-                    //
+                    // Create new profile
                     Profile prof = new Profile();
                     prof.Name = _host + ":" + _port.ToString();
                     prof.Host = _host;
@@ -5354,8 +6454,9 @@ namespace MPDCtrl.ViewModels
 
                     Profiles.Add(prof);
 
-                    // 初回だからUpdateしておく。
-                    _mpc.MpdSendUpdate();
+                    // TODO:
+                    // 初回だからUpdateしておく?
+                    await _mpc.MpdSendUpdate();
                 }
                 else
                 {
@@ -5369,6 +6470,7 @@ namespace MPDCtrl.ViewModels
                         {
                             p.IsDefault = false;
                         }
+
                         SelectedProfile.IsDefault = true;
                     }
                     else
@@ -5381,24 +6483,222 @@ namespace MPDCtrl.ViewModels
                     CurrentProfile = SelectedProfile;
 
                 }
-
-                // Handled at OnMpdConnected.
-                /*
-                _mpc.MpdQueryCurrentQueue();
-                _mpc.MpdQueryStatus();
-                _mpc.MpdQueryPlaylists();
-                _mpc.MpdQueryListAll();
-                */
             }
-            else
+        }
+
+        private async void ChangeConnection(Profile prof)
+        {
+            if (IsConnecting) return;
+
+            IsBusy = true;
+
+            if (IsConnected)
             {
-                IsConnecting = false;
+                _mpc.MpdStop = true;
+                _mpc.MpdDisconnect();
+                _mpc.MpdStop = false;
             }
 
+            // Save volume.
+            CurrentProfile.Volume = Volume;
+
+            // Clear current...
+            if (CurrentSong != null)
+            {
+                CurrentSong.IsPlaying = false;
+                CurrentSong = null;
+            }
+            if (CurrentSong != null)
+            {
+                SelectedSong = null;
+            }
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                SelectedNodeMenu = null;
+
+                Queue.Clear();
+                _mpc.CurrentQueue.Clear();
+
+                if (_mainMenuItems.PlaylistsDirectory != null)
+                    _mainMenuItems.PlaylistsDirectory.Children.Clear();
+
+                Playlists.Clear();
+                _mpc.Playlists.Clear();
+                SelectedPlaylist = "";
+
+                SelectedPlaylistSong = null;
+
+                //MusicDirectories.Clear(); // Don't
+                MusicEntries.Clear();
+                //_mpc.LocalDirectories.Clear();// Don't
+                //_mpc.LocalFiles.Clear();// Don't
+                //SelectedNodeDirectory.Children.Clear();// Don't
+                FilterQuery = "";
+
+                SelectedSong = null;
+                CurrentSong = null;
+
+                SearchResult.Clear();
+                SearchQuery = "";
+
+                IsAlbumArtVisible = false;
+                AlbumArt = _albumArtDefault;
+
+                // TODO: more?
+            });
+
+
+            _volume = prof.Volume;
+            NotifyPropertyChanged("Volume");
+
+            Host = prof.Host;
+            _port = prof.Port;
+            Password = prof.Password;
+
+
+            IsConnecting = true;
+            ///
+            ConnectionResult r = await _mpc.MpdIdleConnect(_host, _port);
+
+            if (r.IsSuccess)
+            {
+                CurrentProfile = prof;
+
+                //SelectedNodeMenu = MainMenuItems[0];
+            }
+
+            IsBusy = false;
         }
 
         #endregion
 
+        // TODO: 使っていないのが含まれているので整理。
+        #region == Local Files ==
+
+        public ICommand ListAllCommand { get; }
+        public bool ListAllCommand_CanExecute()
+        {
+            if (_mpc == null) { return false; }
+            return true;
+        }
+        public async void ListAllCommand_ExecuteAsync()
+        {
+            // TODO: autoidline?
+            await _mpc.MpdQueryListAll();
+        }
+
+        public ICommand LocalfileListviewAddCommand { get; }
+        public bool LocalfileListviewAddCommand_CanExecute()
+        {
+            return true;
+        }
+        public async void LocalfileListviewAddCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            System.Collections.IList items = (System.Collections.IList)obj;
+
+            if (items.Count > 1)
+            {
+                var collection = items.Cast<NodeFile>();
+
+                List<String> uriList = new List<String>();
+
+                foreach (var item in collection)
+                {
+                    uriList.Add((item as NodeFile).OriginalFileUri);
+                }
+
+                await _mpc.MpdAdd(uriList);
+            }
+            else
+            {
+                if (items.Count == 1)
+                    await _mpc.MpdAdd((items[0] as NodeFile).OriginalFileUri);
+            }
+        }
+
+        public ICommand LocalfileListviewEnterKeyCommand { get; set; }
+        public bool LocalfileListviewEnterKeyCommand_CanExecute()
+        {
+            if (_mpc == null) { return false; }
+            return true;
+        }
+        public async void LocalfileListviewEnterKeyCommand_Execute(object obj)
+        {
+            if (obj == null) return;
+
+            System.Collections.IList items = (System.Collections.IList)obj;
+
+            if (items.Count > 1)
+            {
+                var collection = items.Cast<NodeFile>();
+
+                List<string> uriList = new List<string>();
+
+                foreach (var item in collection)
+                {
+                    uriList.Add((item as NodeFile).OriginalFileUri);
+                }
+
+                await _mpc.MpdAdd(uriList);
+            }
+            else
+            {
+                if (items.Count == 1)
+                    await _mpc.MpdAdd((items[0] as NodeFile).OriginalFileUri);
+            }
+        }
+
+        public ICommand LocalfileListviewLeftDoubleClickCommand { get; set; }
+        public bool LocalfileListviewLeftDoubleClickCommand_CanExecute()
+        {
+            if (_mpc == null) { return false; }
+            return true;
+        }
+        public void LocalfileListviewLeftDoubleClickCommand_Execute(object obj)
+        {
+            /*
+            if (obj == null) return;
+
+            System.Collections.IList items = (System.Collections.IList)obj;
+
+            if (items.Count > 1)
+            {
+                var collection = items.Cast<String>();
+
+                List<string> uriList = new List<string>();
+
+                foreach (var item in collection)
+                {
+                    uriList.Add(item);
+                }
+
+                _mpc.MpdAdd(uriList);
+            }
+            else
+            {
+                _mpc.MpdAdd(items[0] as string);
+            }
+            */
+        }
+
+        public ICommand FilterClearCommand { get; }
+        public bool FilterClearCommand_CanExecute()
+        {
+            if (string.IsNullOrEmpty(FilterQuery))
+                return false;
+            return true;
+        }
+        public void FilterClearCommand_Execute()
+        {
+            FilterQuery = "";
+        }
+
+        #endregion
+
+        // TODO: 整理
         #region == Dialogs ==
 
         public ICommand ComfirmationDialogOKCommand { get; }
@@ -5518,7 +6818,7 @@ namespace MPDCtrl.ViewModels
 
                     if (SelectedProfile == CurrentProfile)
                     {
-                        _mpc.MpdPassword = SelectedProfile.Password;
+                        //_mpc.MpdPassword = SelectedProfile.Password;
                     }
 
                     SettingProfileEditMessage = MPDCtrl.Properties.Resources.ChangePasswordDialog_PasswordUpdated;
@@ -5574,14 +6874,12 @@ namespace MPDCtrl.ViewModels
         {
             if (IsConnecting) return false;
             if (!IsConnected) return false;
-            if (!IsMainShow) return false;
             return true;
         }
         public void ShowFindCommand_Execute()
         {
             if (IsConnecting) return;
             if (!IsConnected) return;
-            if (!IsMainShow) return;
 
             if (IsSettingsShow) return;
             if (IsComfirmationDialogShow) return;
@@ -5639,7 +6937,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == QueueカラムヘッダーShow Hide ==
+        #region == QueueListview header colums Show/Hide ==
 
         public ICommand QueueColumnHeaderPositionShowHideCommand { get; }
         public bool QueueColumnHeaderPositionShowHideCommand_CanExecute()
@@ -5778,81 +7076,76 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == 検索画面 ==
+        #region == DebugWindow and AckWindow ==
 
-        public ICommand SearchExecCommand { get; }
-        public bool SearchExecCommand_CanExecute()
-        {
-            if (string.IsNullOrEmpty(SearchQuery)) 
-                return false;
-            return true;
-        }
-        public void SearchExecCommand_Execute()
-        {
-            if (string.IsNullOrEmpty(SearchQuery)) return;
-            string queryShiki = "contains";//"==";
-
-            _mpc.MpdSearch(SelectedSearchTags.ToString(), queryShiki, SearchQuery);
-
-        }
-
-        public ICommand SongFilesListviewAddCommand { get; }
-        public bool SongFilesListviewAddCommand_CanExecute()
+        public ICommand ClearDebugCommandTextCommand { get; }
+        public bool ClearDebugCommandTextCommand_CanExecute()
         {
             return true;
         }
-        public void SongFilesListviewAddCommand_Execute(object obj)
+        public void ClearDebugCommandTextCommand_Execute()
         {
-            if (obj == null) return;
-
-            System.Collections.IList items = (System.Collections.IList)obj;
-
-            if (items.Count > 0)
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                var collection = items.Cast<NodeEntry>();
-
-                List<String> uriList = new List<String>();
-
-                foreach (var item in collection)
-                {
-                    uriList.Add((item as NodeEntry).OriginalFileUri);
-                }
-
-                _mpc.MpdAdd(uriList);
-            }
+                DebugCommandClear?.Invoke();
+            });
         }
 
-        public ICommand SongsListviewAddCommand { get; }
-        public bool SongsListviewAddCommand_CanExecute()
+        public ICommand ClearDebugIdleTextCommand { get; }
+        public bool ClearDebugIdleTextCommand_CanExecute()
         {
             return true;
         }
-        public void SongsListviewAddCommand_Execute(object obj)
+        public void ClearDebugIdleTextCommand_Execute()
         {
-            if (obj == null) return;
-
-            System.Collections.IList items = (System.Collections.IList)obj;
-
-            if (items.Count > 0)
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                var collection = items.Cast<MPC.Song>();
+                DebugIdleClear?.Invoke();
+            });
+        }
 
-                List<String> uriList = new List<String>();
+        public ICommand ShowDebugWindowCommand { get; }
+        public bool ShowDebugWindowCommand_CanExecute()
+        {
+            return true;
+        }
+        public void ShowDebugWindowCommand_Execute()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                DebugWindowShowHide?.Invoke();
+            });
+        }
 
-                foreach (var item in collection)
-                {
-                    uriList.Add((item as MPC.Song).file);
-                }
+        public ICommand ClearAckTextCommand { get; }
+        public bool ClearAckTextCommand_CanExecute()
+        {
+            return true;
+        }
+        public void ClearAckTextCommand_Execute()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                AckWindowClear?.Invoke();
+            });
+        }
 
-                _mpc.MpdAdd(uriList);
-            }
+        public ICommand ShowAckWindowCommand { get; }
+        public bool ShowAckWindowCommand_CanExecute()
+        {
+            return true;
+        }
+        public void ShowAckWindowCommand_Execute()
+        {
+            if (IsShowAckWindow)
+                IsShowAckWindow = false;
+            else
+                IsShowAckWindow = true;
         }
 
         #endregion
 
-
         #endregion
-
     }
 
 }

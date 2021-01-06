@@ -40,12 +40,26 @@ namespace MPDCtrl.Views
             {
                 if (vm != null)
                 {
-                    vm.ScrollIntoView += (sender, arg) => { this.ScrollIntoViewTo(arg); };
+                    vm.ScrollIntoView += (sender, arg) => { this.OnScrollIntoView(arg); };
+
+                    vm.DebugWindowShowHide += () => OnDebugWindowShowHide();
+
+                    vm.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
+                    vm.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
+
+                    vm.DebugCommandClear += () => OnDebugCommandClear();
+                    vm.DebugIdleClear += () => OnDebugIdleClear();
+
+                    vm.AckWindowOutput += (sender, arg) => { this.OnAckWindowOutput(arg); };
+
+                    vm.AckWindowClear += () => OnAckWindowClear();
+
                 }
             }
+
         }
 
-        public void ScrollIntoViewTo(int arg)
+        public void OnScrollIntoView(int arg)
         {
             if (QueueListview.Items.Count > arg)
             {
@@ -54,8 +68,73 @@ namespace MPDCtrl.Views
                 ListViewItem lvi = QueueListview.ItemContainerGenerator.ContainerFromIndex(arg) as ListViewItem;
                 if (lvi != null)
                     lvi.Focus();
-
             }
+        }
+
+        public void OnDebugCommandOutput(string arg)
+        {
+            // AppendText() is much faster than data binding.
+            DebugCommandTextBox.AppendText(arg);
+
+            DebugCommandTextBox.CaretIndex = DebugCommandTextBox.Text.Length;
+            DebugCommandTextBox.ScrollToEnd();
+        }
+
+        public void OnDebugIdleOutput(string arg)
+        {
+            // AppendText() is much faster than data binding.
+            DebugIdleTextBox.AppendText(arg);
+
+            DebugIdleTextBox.CaretIndex = DebugIdleTextBox.Text.Length;
+            DebugIdleTextBox.ScrollToEnd();
+        }
+
+        public void OnDebugCommandClear()
+        {
+            DebugCommandTextBox.Clear();
+        }
+
+        public void OnDebugIdleClear()
+        {
+            DebugIdleTextBox.Clear();
+        }
+
+        public void OnDebugWindowShowHide()
+        {
+            if (DebugWindowGridSplitter.Visibility == Visibility.Visible)
+            {
+                LayoutGrid.RowDefinitions[2].Height = new GridLength(1, GridUnitType.Star);
+
+                LayoutGrid.RowDefinitions[3].Height = new GridLength(0);
+                LayoutGrid.RowDefinitions[4].Height = new GridLength(0);
+
+                DebugWindowGridSplitter.Visibility = Visibility.Collapsed;
+                DebugWindow.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                LayoutGrid.RowDefinitions[2].Height = new GridLength(3, GridUnitType.Star);
+
+                LayoutGrid.RowDefinitions[3].Height = new GridLength(8);
+                LayoutGrid.RowDefinitions[4].Height = new GridLength(1, GridUnitType.Star);
+
+                DebugWindowGridSplitter.Visibility = Visibility.Visible;
+                DebugWindow.Visibility = Visibility.Visible;
+            }
+        }
+
+        public void OnAckWindowOutput(string arg)
+        {
+            // AppendText() is much faster than data binding.
+            AckTextBox.AppendText(arg);
+
+            AckTextBox.CaretIndex = AckTextBox.Text.Length;
+            AckTextBox.ScrollToEnd();
+        }
+
+        public void OnAckWindowClear()
+        {
+            AckTextBox.Clear();
         }
 
         public void BringToForeground()
@@ -127,11 +206,13 @@ namespace MPDCtrl.Views
 
         private void DialogInputTextBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            /*
             if (DialogInputTextBox.Visibility == Visibility.Visible)
             {
                 DialogInputTextBox.Focus();
                 Keyboard.Focus(DialogInputTextBox);
             }
+            */
         }
 
         private void PasswordBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -152,11 +233,13 @@ namespace MPDCtrl.Views
                 }
             }
 
+            /*
             if (DialogInputTextBox.Visibility == Visibility.Visible)
             {
                 DialogInputTextBox.Focus();
                 Keyboard.Focus(DialogInputTextBox);
             }
+            */
         }
 
         private void DialogButton_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -189,6 +272,7 @@ namespace MPDCtrl.Views
             }
         }
 
+
         // リンクをクリックして、ブラウザ起動して表示
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
@@ -197,6 +281,8 @@ namespace MPDCtrl.Views
             Process.Start(psi);
             e.Handled = true;
         }
+
+
 
 
 

@@ -223,6 +223,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Connection has been terminated. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConnectionStatus_Disconnected {
+            get {
+                return ResourceManager.GetString("ConnectionStatus_Disconnected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Connection terminated. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string ConnectionStatus_DisconnectedByHost {
@@ -241,20 +250,20 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Disconnecting... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConnectionStatus_Disconnecting {
+            get {
+                return ResourceManager.GetString("ConnectionStatus_Disconnecting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Connection terminated. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string ConnectionStatus_NeverConnected {
             get {
                 return ResourceManager.GetString("ConnectionStatus_NeverConnected", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Connection terminated. Reconnecting... に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string ConnectionStatus_Reconnecting {
-            get {
-                return ResourceManager.GetString("ConnectionStatus_Reconnecting", resourceCulture);
             }
         }
         
@@ -493,7 +502,43 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   MPD Command Error に類似しているローカライズされた文字列を検索します。
+        ///   Browse に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuTreeItem_Browse {
+            get {
+                return ResourceManager.GetString("MenuTreeItem_Browse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Playlists に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuTreeItem_Playlists {
+            get {
+                return ResourceManager.GetString("MenuTreeItem_Playlists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Queue に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuTreeItem_Queue {
+            get {
+                return ResourceManager.GetString("MenuTreeItem_Queue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Search に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuTreeItem_Search {
+            get {
+                return ResourceManager.GetString("MenuTreeItem_Search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Command Response に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MPD_CommandError {
             get {
@@ -502,7 +547,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   MPD Status Error に類似しているローカライズされた文字列を検索します。
+        ///   Status Notification に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MPD_StatusError {
             get {
@@ -673,6 +718,186 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Playlists に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PlaylistsListviewColumnHeader_Playlists {
+            get {
+                return ResourceManager.GetString("PlaylistsListviewColumnHeader_Playlists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Remove From Playlist に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PlaylistSongsContextMenu_Remove {
+            get {
+                return ResourceManager.GetString("PlaylistSongsContextMenu_Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Confirm Clear Playlist に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_ConfirmClearPlaylist {
+            get {
+                return ResourceManager.GetString("Popup_ConfirmClearPlaylist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Clear Playlist? に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_ConfirmClearPlaylistQuestion {
+            get {
+                return ResourceManager.GetString("Popup_ConfirmClearPlaylistQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Confirm Clear Queue に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_ConfirmClearQueue {
+            get {
+                return ResourceManager.GetString("Popup_ConfirmClearQueue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Clear Queue? に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_ConfirmClearQueueQuestion {
+            get {
+                return ResourceManager.GetString("Popup_ConfirmClearQueueQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Reload Playlist? に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_ConfirmReloadPlaylistQuestion {
+            get {
+                return ResourceManager.GetString("Popup_ConfirmReloadPlaylistQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Confirm Remove Playlist に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_ConfirmRemovePlaylist {
+            get {
+                return ResourceManager.GetString("Popup_ConfirmRemovePlaylist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Remove Selected Playlist? に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_ConfirmRemovePlaylistQuestion {
+            get {
+                return ResourceManager.GetString("Popup_ConfirmRemovePlaylistQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Confirm Remove Selected に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_ConfirmRemoveSelected {
+            get {
+                return ResourceManager.GetString("Popup_ConfirmRemoveSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Remove Selected? に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_ConfirmRemoveSelectedQuestion {
+            get {
+                return ResourceManager.GetString("Popup_ConfirmRemoveSelectedQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Input New PlaylistName: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_InputNewPlaylistName {
+            get {
+                return ResourceManager.GetString("Popup_InputNewPlaylistName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Multiple Deletion Not Supported に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_MultipleDeletionNotSupported {
+            get {
+                return ResourceManager.GetString("Popup_MultipleDeletionNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Not Suppoted By MPD Protocol に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_NotSuppotedByMPDProtocol {
+            get {
+                return ResourceManager.GetString("Popup_NotSuppotedByMPDProtocol", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   OK に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_OK {
+            get {
+                return ResourceManager.GetString("Popup_OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Playlist Changed Nortification に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_PlaylistChangedNortification {
+            get {
+                return ResourceManager.GetString("Popup_PlaylistChangedNortification", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Save Queue As に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_SaveQueueAs {
+            get {
+                return ResourceManager.GetString("Popup_SaveQueueAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Save Selected As に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_SaveSelectedAs {
+            get {
+                return ResourceManager.GetString("Popup_SaveSelectedAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Save Selected To に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_SaveSelectedTo {
+            get {
+                return ResourceManager.GetString("Popup_SaveSelectedTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Select Playlist: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Popup_SelectPlaylist {
+            get {
+                return ResourceManager.GetString("Popup_SelectPlaylist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Port に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Port {
@@ -763,7 +988,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Save as playlist に類似しているローカライズされた文字列を検索します。
+        ///   Save As に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string QueueItemContextMenu_QueueSaveAsPlaylist {
             get {
@@ -781,11 +1006,20 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Save to に類似しているローカライズされた文字列を検索します。
+        ///   Save Selected As に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string QueueItemContextMenu_SaveToPlaylist {
+        public static string QueueItemContextMenu_SaveSelectedAs {
             get {
-                return ResourceManager.GetString("QueueItemContextMenu_SaveToPlaylist", resourceCulture);
+                return ResourceManager.GetString("QueueItemContextMenu_SaveSelectedAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Save Selected To... に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueItemContextMenu_SaveSelectedTo {
+            get {
+                return ResourceManager.GetString("QueueItemContextMenu_SaveSelectedTo", resourceCulture);
             }
         }
         
@@ -979,7 +1213,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Show Debug Widow (this may significantly slow down repoponsiveness) に類似しているローカライズされた文字列を検索します。
+        ///   Enable Debug Widow に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_Opts_ShowDebugWidow {
             get {
@@ -1042,7 +1276,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Add to Current Queue に類似しているローカライズされた文字列を検索します。
+        ///   (not used) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string SongFilesItemContextMenu_Add {
             get {
@@ -1069,7 +1303,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Add to Current Queue に類似しているローカライズされた文字列を検索します。
+        ///   Add to Queue に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string SongsItemContextMenu_Add {
             get {

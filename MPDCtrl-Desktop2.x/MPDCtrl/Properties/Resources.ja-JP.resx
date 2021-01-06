@@ -118,133 +118,130 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
-    <value>About</value>
+    <value>詳細</value>
   </data>
   <data name="Add" xml:space="preserve">
-    <value>Add</value>
+    <value>追加</value>
   </data>
   <data name="Application" xml:space="preserve">
-    <value>Application</value>
+    <value>アプリケーション</value>
   </data>
   <data name="Browse" xml:space="preserve">
-    <value>Browse</value>
+    <value>ブラウズ</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>キャンセル</value>
   </data>
   <data name="ChangePasswordDialog_ChangePassword" xml:space="preserve">
-    <value>Change Password</value>
+    <value>パスワード変更</value>
   </data>
   <data name="ChangePasswordDialog_CurrentPassword" xml:space="preserve">
-    <value>Current Password</value>
+    <value>現在のパスワード</value>
   </data>
   <data name="ChangePasswordDialog_CurrentPasswordMismatch" xml:space="preserve">
-    <value>Current Password did not match.</value>
+    <value>現在のパスワードが間違っています</value>
   </data>
   <data name="ChangePasswordDialog_NewPassword" xml:space="preserve">
-    <value>New Password</value>
+    <value>新しいパスワード</value>
   </data>
   <data name="ChangePasswordDialog_PasswordUpdated" xml:space="preserve">
-    <value>Password Updated.</value>
+    <value>パスワードが更新されました。</value>
   </data>
   <data name="Close" xml:space="preserve">
-    <value>Close</value>
+    <value>閉じる</value>
   </data>
   <data name="Connect" xml:space="preserve">
-    <value>Connect</value>
+    <value>接続</value>
   </data>
   <data name="Connection" xml:space="preserve">
-    <value>Connection</value>
+    <value>コネクション</value>
   </data>
   <data name="ConnectionStatus_Connected" xml:space="preserve">
-    <value>Connected.</value>
+    <value>接続済み</value>
   </data>
   <data name="ConnectionStatus_ConnectFail_Timeout" xml:space="preserve">
-    <value>Connection terminated. (ConnectFail_Timeout)</value>
+    <value>通信が遮断しました。（ConnectFail_Timeout）</value>
   </data>
   <data name="ConnectionStatus_Connecting" xml:space="preserve">
-    <value>Connecting...</value>
+    <value>接続中・・・</value>
   </data>
   <data name="ConnectionStatus_ConnectionError" xml:space="preserve">
-    <value>Connection Error</value>
+    <value>通信エラー</value>
   </data>
   <data name="ConnectionStatus_ConnectionErrorDetails" xml:space="preserve">
-    <value>Unable to connect to specified MPD server. Please check your connection settings or MPD server.</value>
-  </data>
-  <data name="ConnectionStatus_Disconnected" xml:space="preserve">
-    <value>Connection has been terminated.</value>
+    <value>指定されたMPDサーバーに接続できませんでした。通信接続設定を見直すか、MPDサーバーを確認してください。</value>
   </data>
   <data name="ConnectionStatus_DisconnectedByHost" xml:space="preserve">
-    <value>Connection terminated.</value>
+    <value>通信が遮断しました。（DisconnectedByHost）</value>
   </data>
   <data name="ConnectionStatus_DisconnectedByUser" xml:space="preserve">
-    <value>Connection terminated.</value>
-  </data>
-  <data name="ConnectionStatus_Disconnecting" xml:space="preserve">
-    <value>Disconnecting...</value>
+    <value>通信が遮断しました。（DisconnectedByUser）</value>
   </data>
   <data name="ConnectionStatus_NeverConnected" xml:space="preserve">
-    <value>Connection terminated.</value>
+    <value>未接続です。（NeverConnected）</value>
+  </data>
+  <data name="ConnectionStatus_Reconnecting" xml:space="preserve">
+    <value>通信が遮断しました。再接続中・・・</value>
   </data>
   <data name="ConnectionStatus_SendFail_NotConnected" xml:space="preserve">
-    <value>Connection terminated.</value>
+    <value>通信が遮断しました。（SendFail_NotConnected）</value>
   </data>
   <data name="ConnectionStatus_SendFail_Timeout" xml:space="preserve">
-    <value>Connection terminated.</value>
+    <value>通信が遮断しました。（SendFail_Timeout）</value>
   </data>
   <data name="Default" xml:space="preserve">
-    <value>Default</value>
+    <value>デフォルト</value>
   </data>
   <data name="Delete" xml:space="preserve">
-    <value>Delete</value>
+    <value>削除</value>
   </data>
   <data name="DeveloperMode" xml:space="preserve">
-    <value>Developer Mode</value>
+    <value>デベロッパーモード</value>
   </data>
   <data name="Dialog_CancelClose" xml:space="preserve">
-    <value>Close (Esc)</value>
+    <value>閉じる (Esc)</value>
   </data>
   <data name="Dialog_Comfirmation" xml:space="preserve">
-    <value>Comfirmation</value>
+    <value>確認</value>
   </data>
   <data name="Dialog_Information" xml:space="preserve">
-    <value>Information</value>
+    <value>情報</value>
   </data>
   <data name="Dialog_Input" xml:space="preserve">
-    <value>Input</value>
+    <value>入力</value>
   </data>
   <data name="Dialog_NewPlaylistName" xml:space="preserve">
-    <value>New Playlist Name:</value>
+    <value>新規プレイリスト名：</value>
   </data>
   <data name="Dialog_PlaylistNameAlreadyExists" xml:space="preserve">
-    <value>Playlist name already exists.</value>
+    <value>プレイリストに既に同じ名前が存在します。</value>
   </data>
   <data name="Dialog_PlaylistSelect_NewPlaylistName" xml:space="preserve">
-    <value>New Playlist</value>
+    <value>新規プレイリスト</value>
   </data>
   <data name="Dialog_PlaylistSelect_SaveSelectedTo" xml:space="preserve">
-    <value>Save Selected to</value>
+    <value>選択項目を以下のプレイリストに保存</value>
   </data>
   <data name="Dialog_PlaylistSelect_SelectPlaylist" xml:space="preserve">
-    <value>Select Playlist</value>
+    <value>プレイリストを選択</value>
   </data>
   <data name="Dialog_RemovePlaylistQ" xml:space="preserve">
-    <value>Remove selected playlist?</value>
+    <value>選択されたプレイリストを削除しますか？</value>
   </data>
   <data name="Filter" xml:space="preserve">
-    <value>Filter</value>
+    <value>絞り込み</value>
   </data>
   <data name="FilterClear" xml:space="preserve">
-    <value>Clear Filter</value>
+    <value>絞り込みをクリアする</value>
   </data>
   <data name="Host" xml:space="preserve">
-    <value>Host</value>
+    <value>ホスト</value>
   </data>
   <data name="Init_NewConnectionSetting" xml:space="preserve">
-    <value>New Connection Setting</value>
+    <value>新規のコネクション設定</value>
   </data>
   <data name="License" xml:space="preserve">
-    <value>License</value>
+    <value>ライセンス</value>
   </data>
   <data name="LicenseText" xml:space="preserve">
     <value>Copyright (c) 2020 torum
@@ -271,240 +268,222 @@ SOFTWARE.</value>
     <value>The MIT License</value>
   </data>
   <data name="LocalfileItemContextMenu_Add" xml:space="preserve">
-    <value>Add (Enter)</value>
+    <value>キューに追加する (Enter)</value>
   </data>
   <data name="LocalfileListviewColumnHeader_FileName" xml:space="preserve">
-    <value>File Name</value>
+    <value>ファイル名</value>
   </data>
   <data name="LocalfileListviewTabitemHeader_LocalFiles" xml:space="preserve">
-    <value>_Files</value>
-  </data>
-  <data name="MenuTreeItem_Browse" xml:space="preserve">
-    <value>Browse</value>
-  </data>
-  <data name="MenuTreeItem_Playlists" xml:space="preserve">
-    <value>Playlists</value>
-  </data>
-  <data name="MenuTreeItem_Queue" xml:space="preserve">
-    <value>Queue</value>
-  </data>
-  <data name="MenuTreeItem_Search" xml:space="preserve">
-    <value>Search</value>
+    <value>ファイル (_F)</value>
   </data>
   <data name="MPD_CommandError" xml:space="preserve">
-    <value>Command Response</value>
+    <value>MPD コマンドエラー</value>
   </data>
   <data name="MPD_StatusError" xml:space="preserve">
-    <value>Status Notification</value>
+    <value>MPD ステータスエラー</value>
   </data>
   <data name="New" xml:space="preserve">
-    <value>New</value>
+    <value>新規</value>
   </data>
   <data name="OK" xml:space="preserve">
     <value>OK</value>
   </data>
   <data name="Options" xml:space="preserve">
-    <value>Options</value>
+    <value>オプション</value>
   </data>
   <data name="Password" xml:space="preserve">
-    <value>Password</value>
+    <value>パスワード</value>
   </data>
   <data name="PlaybackOptions_Consume" xml:space="preserve">
-    <value>Consume</value>
+    <value>コンシューム</value>
   </data>
   <data name="PlaybackOptions_Repeat" xml:space="preserve">
-    <value>Repeat</value>
+    <value>リピート</value>
   </data>
   <data name="PlaybackOptions_Shuffle" xml:space="preserve">
-    <value>Shuffle</value>
+    <value>シャッフル</value>
   </data>
   <data name="PlaybackOptions_Single" xml:space="preserve">
-    <value>Single</value>
+    <value>シングル</value>
   </data>
   <data name="Playback_BackButton" xml:space="preserve">
-    <value>Back</value>
+    <value>戻る</value>
   </data>
   <data name="Playback_NextButton" xml:space="preserve">
-    <value>Next</value>
+    <value>次へ</value>
   </data>
   <data name="Playback_PlayPauseButton" xml:space="preserve">
-    <value>Play/Pause</value>
+    <value>再生・一時停止</value>
   </data>
   <data name="Playback_SliderSeek" xml:space="preserve">
-    <value>Seek</value>
+    <value>シーク</value>
   </data>
   <data name="Playback_SliderVolume" xml:space="preserve">
-    <value>Volume</value>
+    <value>ボリューム</value>
   </data>
   <data name="PlaylistItemContextMenu_ClearAndLoad" xml:space="preserve">
-    <value>Clear current queue and Load</value>
+    <value>キューをクリアして追加する</value>
   </data>
   <data name="PlaylistItemContextMenu_Load" xml:space="preserve">
-    <value>Load (Enter)</value>
+    <value>キューに追加する (Enter)</value>
   </data>
   <data name="PlaylistItemContextMenu_Remove" xml:space="preserve">
-    <value>Remove</value>
+    <value>プレイリストを削除する</value>
   </data>
   <data name="PlaylistItemContextMenu_Rename" xml:space="preserve">
-    <value>Rename</value>
+    <value>プレイリストの名前を変更する</value>
   </data>
   <data name="PlaylistListviewTabitemHeader_Playlists" xml:space="preserve">
-    <value>_Playlists</value>
-  </data>
-  <data name="PlaylistsListviewColumnHeader_Playlists" xml:space="preserve">
-    <value>Playlists</value>
-  </data>
-  <data name="PlaylistSongsContextMenu_Remove" xml:space="preserve">
-    <value>Remove From Playlist</value>
+    <value>プレイリスト (_P)</value>
   </data>
   <data name="Port" xml:space="preserve">
-    <value>Port</value>
+    <value>ポート</value>
   </data>
   <data name="PrivacyPolicy" xml:space="preserve">
-    <value>App Privacy Policy</value>
+    <value>プライバシーポリシー</value>
   </data>
   <data name="PrivacyPolicyText" xml:space="preserve">
-    <value>MPDCtrl app allows you to access your music player via IP address and optionaly user credentials. None of this data is transmitted anywhere besides your specified music player and your settings are stored on your device only. Optional user credentials are encrypted with a platform provided shceme.</value>
+    <value>MPDCtrl はIPアドレスとオプションの認証情報を利用してネットワーク上のMPDにアクセスします。これらの情報は指定しされたMPD以外、他へ一切送信されず、設定情報はローカルのデバイスのみに保存されます。オプションの認証情報はプラットフォーム提供のスキームにより暗号化されローカルに保存されます。</value>
   </data>
   <data name="Profile" xml:space="preserve">
-    <value>Profile</value>
+    <value>プロファイル</value>
   </data>
   <data name="Profiles" xml:space="preserve">
-    <value>Profiles</value>
+    <value>プロファイル</value>
   </data>
   <data name="QueueItemContextMenu_Move" xml:space="preserve">
-    <value>Move</value>
+    <value>移動</value>
   </data>
   <data name="QueueItemContextMenu_MoveDown" xml:space="preserve">
-    <value>Down (Ctrl+D)</value>
+    <value>下へ (Ctrl+D)</value>
   </data>
   <data name="QueueItemContextMenu_MoveUp" xml:space="preserve">
-    <value>Up (Ctrl+U)</value>
+    <value>上へ (Ctrl+U)</value>
   </data>
   <data name="QueueItemContextMenu_Queue" xml:space="preserve">
-    <value>Current Queue</value>
+    <value>現在のキュー</value>
   </data>
   <data name="QueueItemContextMenu_QueueClear" xml:space="preserve">
-    <value>Clear</value>
+    <value>キューをクリアする</value>
   </data>
   <data name="QueueItemContextMenu_QueueSaveAsPlaylist" xml:space="preserve">
-    <value>Save As</value>
+    <value>キューをプレイリストとして保存する</value>
   </data>
   <data name="QueueItemContextMenu_Remove" xml:space="preserve">
-    <value>Remove (Ctrl+Delete)</value>
+    <value>キューから削除 (Ctrl+Delete)</value>
   </data>
-  <data name="QueueItemContextMenu_SaveSelectedAs" xml:space="preserve">
-    <value>Save Selected As</value>
-  </data>
-  <data name="QueueItemContextMenu_SaveSelectedTo" xml:space="preserve">
-    <value>Save Selected To...</value>
+  <data name="QueueItemContextMenu_SaveToPlaylist" xml:space="preserve">
+    <value>プレイリストに保存</value>
   </data>
   <data name="QueueItemContextMenu_ScrollIntoNowPlaying" xml:space="preserve">
-    <value>Jump to Current Song (Ctrl+J)</value>
+    <value>現在の曲へジャンプ (Ctrl+J)</value>
   </data>
   <data name="QueueItemContextMenu_SelectedItems" xml:space="preserve">
-    <value>Selected Items</value>
+    <value>選択項目</value>
   </data>
   <data name="QueueListviewColumnHeader_Album" xml:space="preserve">
-    <value>Album</value>
+    <value>アルバム</value>
   </data>
   <data name="QueueListviewColumnHeader_Artist" xml:space="preserve">
-    <value>Artist</value>
+    <value>アーティスト</value>
   </data>
   <data name="QueueListviewColumnHeader_Genre" xml:space="preserve">
-    <value>Genre</value>
+    <value>ジャンル</value>
   </data>
   <data name="QueueListviewColumnHeader_LastModified" xml:space="preserve">
-    <value>Last Modified</value>
+    <value>最終更新日時</value>
   </data>
   <data name="QueueListviewColumnHeader_Position" xml:space="preserve">
-    <value>Position</value>
+    <value>曲順</value>
   </data>
   <data name="QueueListviewColumnHeader_Time" xml:space="preserve">
-    <value>Time</value>
+    <value>時間</value>
   </data>
   <data name="QueueListviewColumnHeader_Title" xml:space="preserve">
-    <value>Title</value>
+    <value>曲名</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Save</value>
+    <value>保存</value>
+  </data>
+  <data name="SavedProfiles" xml:space="preserve">
+    <value>保存済みプロファイル</value>
   </data>
   <data name="Search" xml:space="preserve">
-    <value>Search</value>
+    <value>検索</value>
   </data>
   <data name="Search_ToolTip" xml:space="preserve">
-    <value>Search (Ctrl+F)</value>
+    <value>検索 (Ctrl+F)</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>設定</value>
   </data>
   <data name="Settings_ErrorHostInvalidAddressFormat" xml:space="preserve">
-    <value>Invalid address format.</value>
+    <value>ホストアドレスの形式に間違いがあります。</value>
   </data>
   <data name="Settings_ErrorHostMustBeSpecified" xml:space="preserve">
-    <value>Host address is required.</value>
+    <value>ホストアドレスを入力してください。</value>
   </data>
   <data name="Settings_ErrorInvalidPortNaN" xml:space="preserve">
-    <value>Invalid Port number.</value>
+    <value>ポート番号に間違いがあります。</value>
   </data>
   <data name="Settings_ErrorPortMustBeSpecified" xml:space="preserve">
-    <value>Port number is required.</value>
+    <value>ポート番号を入力してください。</value>
   </data>
   <data name="Settings_Opts_AutoScrollToNowPlaying" xml:space="preserve">
-    <value>Auto Scroll To Current Song (NowPlaying)</value>
+    <value>現在の曲へ自動でジャンプする</value>
   </data>
   <data name="Settings_Opts_MPDDatabase" xml:space="preserve">
-    <value>MPD Database</value>
+    <value>MPDのデータベース</value>
   </data>
   <data name="Settings_Opts_Options" xml:space="preserve">
-    <value>Options</value>
+    <value>オプション</value>
   </data>
   <data name="Settings_Opts_SaveLog" xml:space="preserve">
-    <value>Save logs file (MPDCtrl__errors.txt) to desktop when unexpected error occured.</value>
+    <value>予期しないエラーが起きた際はログファイル（MPDCtrl__errors.txt）をデスクトップに保存する。</value>
   </data>
   <data name="Settings_Opts_ShowDebugWidow" xml:space="preserve">
-    <value>Enable Debug Widow</value>
+    <value>デバッグウィンドウの表示（アプリの応答が遅くなる場合があります）</value>
   </data>
   <data name="Settings_Opts_UpdateDatabaseOnStartup" xml:space="preserve">
-    <value>Update MPD Music Database on Startup. (It may take a while to update)</value>
+    <value>起動時にMPDサーバーの楽曲データベースを最新の状態に更新する (更新されるまで、しばらくかかる場合があります)</value>
   </data>
   <data name="Settings_ProfileDeleted" xml:space="preserve">
-    <value>Profile Deleted</value>
+    <value>プロファイルが削除されました。</value>
   </data>
   <data name="Settings_ProfileSaved" xml:space="preserve">
-    <value>Profile Saved.</value>
+    <value>プロファイルが保存されました。</value>
   </data>
   <data name="Settings_ProfileUpdated" xml:space="preserve">
-    <value>Profile Updated.</value>
+    <value>プロファイルが更新されました。</value>
   </data>
   <data name="Settings_ToolTip" xml:space="preserve">
-    <value>Settings (Ctrl+S)</value>
+    <value>設定 (Ctrl+S)</value>
   </data>
   <data name="Settings_UnlockAndChangePassword" xml:space="preserve">
-    <value>Unlock and Change Password</value>
+    <value>アンロックしてパスワードを変更する</value>
   </data>
   <data name="SongFilesItemContextMenu_Add" xml:space="preserve">
-    <value>(not used)</value>
+    <value>現在のキューに追加</value>
   </data>
   <data name="SongFilesListviewColumnHeader_File" xml:space="preserve">
-    <value>File</value>
+    <value>ファイル</value>
   </data>
   <data name="SongFilesListviewColumnHeader_Path" xml:space="preserve">
-    <value>Path</value>
+    <value>パス</value>
   </data>
   <data name="SongsItemContextMenu_Add" xml:space="preserve">
-    <value>Add to Queue</value>
+    <value>現在のキューに追加</value>
   </data>
   <data name="StatusMsg_UpdatingDb" xml:space="preserve">
-    <value>Updating db...</value>
+    <value>データベースを更新中・・・</value>
   </data>
   <data name="Update" xml:space="preserve">
-    <value>Update</value>
+    <value>更新</value>
   </data>
   <data name="Version" xml:space="preserve">
-    <value>Version</value>
+    <value>バージョン</value>
   </data>
   <data name="Website" xml:space="preserve">
-    <value>Website</value>
+    <value>ウェブサイト</value>
   </data>
 </root>

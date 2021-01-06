@@ -83,21 +83,6 @@ namespace MPDCtrl.ViewModels.Classes
             }
         }
 
-        private double _volume = 50;
-        public double Volume
-        {
-            get { return _volume; }
-            set
-            {
-                if (_volume == value)
-                    return;
-
-                _volume = value;
-
-                NotifyPropertyChanged("Volume");
-            }
-        }
-
     }
 
 }

@@ -2,57 +2,54 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
 
-    <Color x:Key="WindowTintColor">#CCCCCC</Color>
-    <Color x:Key="WindowFallbackColor">#dddddd</Color>
-    <Color x:Key="WindowBackgroundBaseColor">#FFFFFF</Color>
-    <Color x:Key="WindowBackgroundColor">#FFFFFF</Color>
+    <Color x:Key="WindowTintColor">#282828</Color>
+    <Color x:Key="WindowFallbackColor">#212121</Color>
+    <Color x:Key="WindowBackgroundBaseColor">#212121</Color>
+    <Color x:Key="WindowBackgroundColor">#212121</Color>
 
-    <Color x:Key="ControlForegroundColor">DimGray</Color>
-    <Color x:Key="ControlLightColor">DimGray</Color>
-    <Color x:Key="ControlMediumColor">Gray</Color>
-    <Color x:Key="ControlDarkColor">DarkGray</Color>
+    <Color x:Key="ControlForegroundColor">Gray</Color>
+    <Color x:Key="ControlLightColor">LightGray</Color>
+    <Color x:Key="ControlMediumColor">DarkGray</Color>
+    <Color x:Key="ControlDarkColor">DimGray</Color>
 
-    <Color x:Key="ControlMouseOverColor">Black</Color>
+    <Color x:Key="ControlMouseOverColor">White</Color>
     <Color x:Key="ControlMouseOverBackgroundColor">DarkGray</Color>
-    <Color x:Key="ControlPressedColor">#7d7d7d</Color>
-
-    <Color x:Key="ControlSelectBackGroundColor">Gainsboro</Color>
-    <Color x:Key="ControlSelectBackGroundInactiveColor">DarkGray</Color>
+    <Color x:Key="ControlPressedColor">Gainsboro</Color>
 
     <Color x:Key="DisabledControlDarkColor">Gray</Color>
     <Color x:Key="DisabledForegroundColor">#FF444444</Color>
 
-    <Color x:Key="BorderLightColor">#212121</Color>
-    <Color x:Key="BorderMediumColor">#6c6c6c</Color>
-    <Color x:Key="BorderDarkColor">#CCCCCC</Color>
+    <Color x:Key="BorderLightColor">#FFCCCCCC</Color>
+    <Color x:Key="BorderMediumColor">#FF888888</Color>
+    <Color x:Key="BorderDarkColor">#FF444444</Color>
 
-    <Color x:Key="NormalTextColor">#333631</Color>
-    <Color x:Key="TitleTextColor">#111111</Color>
+    <Color x:Key="NormalTextColor">#FFCCCCCC</Color>
+    <Color x:Key="TitleTextColor">LightGray</Color>
 
-    <Color x:Key="NormalTextBoxBackgroundColor">#fefefe</Color>
+    <Color x:Key="NormalTextBoxBackgroundColor">DarkGray</Color>
 
-    <Color x:Key="BoardBackgroundColor">#fcfcfc</Color>
+    <Color x:Key="BoardBackgroundColor">#191919</Color>
+    <!-- 1c1c1c 191919 121212 or 111111 -->
 
-    <Color x:Key="ListviewAlt0Color">#fbfbfb</Color>
-    <Color x:Key="ListviewAlt1Color">#f2f2f2</Color>
+    <Color x:Key="ListviewAlt0Color">#212121</Color>
+    <Color x:Key="ListviewAlt1Color">#282828</Color>
 
-    <Color x:Key="ListviewItemForegroundColor">#212121</Color>
-    <Color x:Key="ListviewItemMouseOverForegroundColor">#333631</Color>
-    <Color x:Key="ListviewItemSelectedForegroundColor">Black</Color>
+    <Color x:Key="ListviewItemForegroundColor">#FFCCCCCC</Color>
+    <Color x:Key="ListviewItemMouseOverForegroundColor">Gainsboro</Color>
+    <Color x:Key="ListviewItemSelectedForegroundColor">White</Color>
 
+    <Color x:Key="RadioButtonCheckedBackgroundColor">#232323</Color>
+    <Color x:Key="RadioButtonUnCheckedBackgroundColor">#212121</Color>
 
-    <Color x:Key="RadioButtonCheckedBackgroundColor">#fcfcfc</Color>
-    <Color x:Key="RadioButtonUnCheckedBackgroundColor">#fbfbfb</Color>
+    <Color x:Key="ChartVolumeColor">Yellow</Color>
 
-    <Color x:Key="ChartVolumeColor">DimGray</Color>
-
-    <Color x:Key="ShadowTabColor">Gainsboro</Color>
-    <Color x:Key="ShadowBoardColor">Gainsboro</Color>
+    <Color x:Key="ShadowTabColor">#1c1c1c</Color>
+    <Color x:Key="ShadowBoardColor">#1c1c1c</Color>
 
     <!-- クール系のアクセントカラー 明るい -->
     <Color x:Key="AccentCoolLightColor">Green</Color>
     <!-- クール系のアクセントカラー　暗め （リストビューのコラム選択背景） -->
-    <Color x:Key="AccentCoolDarkColor">#e7e7eb</Color>
+    <Color x:Key="AccentCoolDarkColor">#2c4f54</Color>
 
     <!-- 暖系のアクセントカラー  明るい -->
     <Color x:Key="AccentWarmLightColor">Orange</Color>
@@ -60,11 +57,11 @@
     <Color x:Key="AccentWarmDarkColor">#e0815e</Color>
 
     <!-- PriceUp Green Blue系 元Aqua -->
-    <SolidColorBrush x:Key="PriceUpColorBrush" Color="#00a1e9"/>
+    <SolidColorBrush x:Key="PriceUpColorBrush" Color="#a0d8ef"/>
     <!-- PriceDown Red Orange系 元Pink -->
-    <SolidColorBrush x:Key="PriceDownColorBrush" Color="#e4007f"/>
+    <SolidColorBrush x:Key="PriceDownColorBrush" Color="#e597b2"/>
     <!-- White系 -->
-    <SolidColorBrush x:Key="PriceNeutralColorBrush" Color="#6c6c6c"/>
+    <SolidColorBrush x:Key="PriceNeutralColorBrush" Color="DarkGray"/>
 
     <SolidColorBrush x:Key="Price24HColorBrush" Color="DarkTurquoise"/>
     <SolidColorBrush x:Key="PriceInitHColorBrush" Color="#a0d8ef"/>
@@ -72,24 +69,24 @@
     <SolidColorBrush x:Key="Price24LColorBrush" Color="#e597b2"/>
 
     <!-- 警告　Yellow系 -->
-    <SolidColorBrush x:Key="WarningColorBrush" Color="#FFFFBF49"/>
+    <SolidColorBrush x:Key="WarningColorBrush" Color="#FFDFD991"/>
 
-    <!-- スクロールバーの色 #66ffffff -->
-    <SolidColorBrush x:Key="ScrollBarColorBrush" Color="#DDDDDD" />
-    <SolidColorBrush x:Key="ScrollBarMouseOverColorBrush" Color="{DynamicResource ControlMouseOverBackgroundColor}"/>
+    <!-- スクロールバーの色 #66ffffff #212121 -->
+    <SolidColorBrush x:Key="ScrollBarColorBrush" Color="#ccc" Opacity="0.1"/>
     <!-- ボーダーの色 #66ffffff -->
     <SolidColorBrush x:Key="ScrollBarBorderBrush" Color="Transparent" />
     <!-- トラック（レーン）の色 #33ffffff -->
-    <SolidColorBrush x:Key="ScrollBarTrackBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="ScrollBarTrackBrush" Color="{DynamicResource WindowBackgroundColor}" />
     <!-- 三角の色 -->
-    <SolidColorBrush x:Key="ScrollBarHilightBrush" Color="DimGray" />
+    <SolidColorBrush x:Key="ScrollBarHilightBrush" Color="Gray" />
     <!-- ボタンを押した時の色 #99ffffff -->
-    <SolidColorBrush x:Key="ScrollBarPressedBrush" Color="#EEEEEE" />
+    <SolidColorBrush x:Key="ScrollBarPressedBrush" Color="#1a1a1a" />
     <!-- 使用不可の色 -->
-    <SolidColorBrush x:Key="ScrollBarDisabledBrush" Color="Gray" />
+    <SolidColorBrush x:Key="ScrollBarDisabledBrush" Color="#44ffffff" />
 
-    <SolidColorBrush x:Key="WindowBorderBrush" Color="#333333" />
-    <SolidColorBrush x:Key="WindowBorderInactiveBrush" Color="Gray" />
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="#121212" />
+    <SolidColorBrush x:Key="WindowBorderInactiveBrush" Color="#212121" />
+
 
     <SolidColorBrush x:Key="WindowBackgroundBaseColorBrush" Color="{DynamicResource WindowBackgroundBaseColor}"/>
     <SolidColorBrush x:Key="WindowBackgroundColorBrush" Color="{DynamicResource WindowBackgroundColor}"/>
@@ -131,38 +128,6 @@
     <SolidColorBrush x:Key="ListviewItemForegroundColorBrush" Color="{DynamicResource ListviewItemForegroundColor}"/>
     <SolidColorBrush x:Key="ListviewItemMouseOverForegroundColorBrush" Color="{DynamicResource ListviewItemMouseOverForegroundColor}"/>
     <SolidColorBrush x:Key="ListviewItemSelectedForegroundColorBrush" Color="{DynamicResource ListviewItemSelectedForegroundColor}"/>
-
-
-
-
-    <!-- new none white theme aware -->
-    <SolidColorBrush x:Key="ItemBackgroundColorBrush" Color="Transparent"/>
-    <Color x:Key="ItemAlt0Color">#212121</Color>
-    <SolidColorBrush x:Key="ItemBackgroundAlt0ColorBrush" Color="{DynamicResource ItemAlt0Color}"/>
-    <Color x:Key="ItemAlt1Color">#282828</Color>
-    <SolidColorBrush x:Key="ItemBackgroundAlt1ColorBrush" Color="{DynamicResource ItemAlt1Color}"/>
-
-    <Color x:Key="ItemSelectedBackgroundColor">DarkGray</Color>
-    <SolidColorBrush x:Key="ItemSelectedBackgroundColorBrush" Color="{DynamicResource ItemSelectedBackgroundColor}"/>
-
-    <Color x:Key="ItemSelectedNoneFocusedBackgroundColor">Gray</Color>
-    <SolidColorBrush x:Key="ItemSelectedNoneFocusedBackgroundColorBrush" Color="{DynamicResource ItemSelectedNoneFocusedBackgroundColor}"/>
-    <SolidColorBrush x:Key="ItemSelectedInactiveBackgroundColorBrush" Color="{DynamicResource ItemSelectedNoneFocusedBackgroundColor}"/>
-
-
-    <Color x:Key="ItemForegroundColor">#FFCCCCCC</Color>
-    <SolidColorBrush x:Key="ItemForegroundColorBrush" Color="{DynamicResource ItemForegroundColor}"/>
-
-    <Color x:Key="ItemSelectedForegroundColor">#191919</Color>
-    <SolidColorBrush x:Key="ItemSelectedForegroundColorBrush" Color="{DynamicResource ItemSelectedForegroundColor}"/>
-
-    <Color x:Key="ItemSelectedInactiveForegroundColor">#191919</Color>
-    <SolidColorBrush x:Key="ItemSelectedInactiveForegroundColorBrush" Color="{DynamicResource ItemSelectedInactiveForegroundColor}"/>
-
-
-    <Color x:Key="ItemMouseOverForegroundColor">Gainsboro</Color>
-    <SolidColorBrush x:Key="ItemMouseOverForegroundColorBrush" Color="{DynamicResource ItemMouseOverForegroundColor}"/>
-
 
 
 </ResourceDictionary>

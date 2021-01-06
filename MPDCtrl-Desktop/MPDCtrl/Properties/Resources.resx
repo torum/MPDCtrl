@@ -171,17 +171,20 @@
   <data name="ConnectionStatus_ConnectionErrorDetails" xml:space="preserve">
     <value>Unable to connect to specified MPD server. Please check your connection settings or MPD server.</value>
   </data>
+  <data name="ConnectionStatus_Disconnected" xml:space="preserve">
+    <value>Connection has been terminated.</value>
+  </data>
   <data name="ConnectionStatus_DisconnectedByHost" xml:space="preserve">
     <value>Connection terminated.</value>
   </data>
   <data name="ConnectionStatus_DisconnectedByUser" xml:space="preserve">
     <value>Connection terminated.</value>
   </data>
+  <data name="ConnectionStatus_Disconnecting" xml:space="preserve">
+    <value>Disconnecting...</value>
+  </data>
   <data name="ConnectionStatus_NeverConnected" xml:space="preserve">
     <value>Connection terminated.</value>
-  </data>
-  <data name="ConnectionStatus_Reconnecting" xml:space="preserve">
-    <value>Connection terminated. Reconnecting...</value>
   </data>
   <data name="ConnectionStatus_SendFail_NotConnected" xml:space="preserve">
     <value>Connection terminated.</value>
@@ -276,11 +279,23 @@ SOFTWARE.</value>
   <data name="LocalfileListviewTabitemHeader_LocalFiles" xml:space="preserve">
     <value>_Files</value>
   </data>
+  <data name="MenuTreeItem_Browse" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="MenuTreeItem_Playlists" xml:space="preserve">
+    <value>Playlists</value>
+  </data>
+  <data name="MenuTreeItem_Queue" xml:space="preserve">
+    <value>Queue</value>
+  </data>
+  <data name="MenuTreeItem_Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
   <data name="MPD_CommandError" xml:space="preserve">
-    <value>MPD Command Error</value>
+    <value>Command Response</value>
   </data>
   <data name="MPD_StatusError" xml:space="preserve">
-    <value>MPD Status Error</value>
+    <value>Status Notification</value>
   </data>
   <data name="New" xml:space="preserve">
     <value>New</value>
@@ -336,6 +351,66 @@ SOFTWARE.</value>
   <data name="PlaylistListviewTabitemHeader_Playlists" xml:space="preserve">
     <value>_Playlists</value>
   </data>
+  <data name="PlaylistsListviewColumnHeader_Playlists" xml:space="preserve">
+    <value>Playlists</value>
+  </data>
+  <data name="PlaylistSongsContextMenu_Remove" xml:space="preserve">
+    <value>Remove From Playlist</value>
+  </data>
+  <data name="Popup_ConfirmClearPlaylist" xml:space="preserve">
+    <value>Confirm Clear Playlist</value>
+  </data>
+  <data name="Popup_ConfirmClearPlaylistQuestion" xml:space="preserve">
+    <value>Clear Playlist?</value>
+  </data>
+  <data name="Popup_ConfirmClearQueue" xml:space="preserve">
+    <value>Confirm Clear Queue</value>
+  </data>
+  <data name="Popup_ConfirmClearQueueQuestion" xml:space="preserve">
+    <value>Clear Queue?</value>
+  </data>
+  <data name="Popup_ConfirmReloadPlaylistQuestion" xml:space="preserve">
+    <value>Reload Playlist?</value>
+  </data>
+  <data name="Popup_ConfirmRemovePlaylist" xml:space="preserve">
+    <value>Confirm Remove Playlist</value>
+  </data>
+  <data name="Popup_ConfirmRemovePlaylistQuestion" xml:space="preserve">
+    <value>Remove Selected Playlist?</value>
+  </data>
+  <data name="Popup_ConfirmRemoveSelected" xml:space="preserve">
+    <value>Confirm Remove Selected</value>
+  </data>
+  <data name="Popup_ConfirmRemoveSelectedQuestion" xml:space="preserve">
+    <value>Remove Selected?</value>
+  </data>
+  <data name="Popup_InputNewPlaylistName" xml:space="preserve">
+    <value>Input New PlaylistName:</value>
+  </data>
+  <data name="Popup_MultipleDeletionNotSupported" xml:space="preserve">
+    <value>Multiple Deletion Not Supported</value>
+  </data>
+  <data name="Popup_NotSuppotedByMPDProtocol" xml:space="preserve">
+    <value>Not Suppoted By MPD Protocol</value>
+  </data>
+  <data name="Popup_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Popup_PlaylistChangedNortification" xml:space="preserve">
+    <value>Playlist Changed Nortification</value>
+  </data>
+  <data name="Popup_SaveQueueAs" xml:space="preserve">
+    <value>Save Queue As</value>
+  </data>
+  <data name="Popup_SaveSelectedAs" xml:space="preserve">
+    <value>Save Selected As</value>
+  </data>
+  <data name="Popup_SaveSelectedTo" xml:space="preserve">
+    <value>Save Selected To</value>
+  </data>
+  <data name="Popup_SelectPlaylist" xml:space="preserve">
+    <value>Select Playlist:</value>
+  </data>
   <data name="Port" xml:space="preserve">
     <value>Port</value>
   </data>
@@ -367,13 +442,16 @@ SOFTWARE.</value>
     <value>Clear</value>
   </data>
   <data name="QueueItemContextMenu_QueueSaveAsPlaylist" xml:space="preserve">
-    <value>Save as playlist</value>
+    <value>Save As</value>
   </data>
   <data name="QueueItemContextMenu_Remove" xml:space="preserve">
     <value>Remove (Ctrl+Delete)</value>
   </data>
-  <data name="QueueItemContextMenu_SaveToPlaylist" xml:space="preserve">
-    <value>Save to</value>
+  <data name="QueueItemContextMenu_SaveSelectedAs" xml:space="preserve">
+    <value>Save Selected As</value>
+  </data>
+  <data name="QueueItemContextMenu_SaveSelectedTo" xml:space="preserve">
+    <value>Save Selected To...</value>
   </data>
   <data name="QueueItemContextMenu_ScrollIntoNowPlaying" xml:space="preserve">
     <value>Jump to Current Song (Ctrl+J)</value>
@@ -439,7 +517,7 @@ SOFTWARE.</value>
     <value>Save logs file (MPDCtrl__errors.txt) to desktop when unexpected error occured.</value>
   </data>
   <data name="Settings_Opts_ShowDebugWidow" xml:space="preserve">
-    <value>Show Debug Widow (this may significantly slow down repoponsiveness)</value>
+    <value>Enable Debug Widow</value>
   </data>
   <data name="Settings_Opts_UpdateDatabaseOnStartup" xml:space="preserve">
     <value>Update MPD Music Database on Startup. (It may take a while to update)</value>
@@ -460,7 +538,7 @@ SOFTWARE.</value>
     <value>Unlock and Change Password</value>
   </data>
   <data name="SongFilesItemContextMenu_Add" xml:space="preserve">
-    <value>Add to Current Queue</value>
+    <value>(not used)</value>
   </data>
   <data name="SongFilesListviewColumnHeader_File" xml:space="preserve">
     <value>File</value>
@@ -469,7 +547,7 @@ SOFTWARE.</value>
     <value>Path</value>
   </data>
   <data name="SongsItemContextMenu_Add" xml:space="preserve">
-    <value>Add to Current Queue</value>
+    <value>Add to Queue</value>
   </data>
   <data name="StatusMsg_UpdatingDb" xml:space="preserve">
     <value>Updating db...</value>

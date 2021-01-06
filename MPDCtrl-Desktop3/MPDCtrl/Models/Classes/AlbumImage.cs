@@ -14,6 +14,7 @@ namespace MPDCtrl.Models
     public class AlbumImage
     {
         public bool IsDownloading { get; set; }
+
         public bool IsSuccess { get; set; }
 
         public string SongFilePath { get; set; }

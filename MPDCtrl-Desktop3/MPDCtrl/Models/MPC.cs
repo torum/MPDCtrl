@@ -259,7 +259,27 @@ namespace MPDCtrl.Models
 
             try
             {
+
+                IsBusy?.Invoke(this, true);
+
                 await _idleConnection.ConnectAsync(_host, _port);
+
+                // TODO:
+                if (_idleConnection.Client == null)
+                {
+                    Debug.WriteLine("_idleConnection.Client == null. " + host + " " + port.ToString());
+
+                    result.ErrorMessage = "_idleConnection.Client == null";
+
+                    DebugCommandOutput?.Invoke(this, "TCP Idle Connection: Error while connecting. Fail to connect... "+ "\n" + "\n");
+
+                    ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                    ConnectionError?.Invoke(this, "TCP connection error...");
+
+                    IsBusy?.Invoke(this, false);
+                    return result;
+                }
 
                 if (_idleConnection.Client.Connected)
                 {
@@ -312,6 +332,18 @@ namespace MPDCtrl.Models
                     ConnectionError?.Invoke(this, "TCP Idle Connection: FAIL to established... Client not connected.");
                 }
             }
+            catch (SocketException e)
+            {
+                // TODO: Test.
+
+                //e.SocketErrorCode
+
+                DebugCommandOutput?.Invoke(this, "TCP Idle Connection: Error while connecting. Fail to connect: " + e.Message + "\n" + "\n");
+
+                ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                ConnectionError?.Invoke(this, "TCP connection error: " + e.Message);
+            }
             catch (Exception e)
             {
                 // TODO: Test.
@@ -323,6 +355,8 @@ namespace MPDCtrl.Models
                 ConnectionError?.Invoke(this, "TCP connection error: " + e.Message);
             }
 
+
+            IsBusy?.Invoke(this, false);
             return result;
         }
 
@@ -985,6 +1019,22 @@ namespace MPDCtrl.Models
             {
                 await _commandConnection.ConnectAsync(_host, _port);
 
+                // TODO:
+                if (_commandConnection.Client == null)
+                {
+                    Debug.WriteLine("_commandConnection.Client == null. " + host + " " + port.ToString());
+
+                    result.ErrorMessage = "_commandConnection.Client == null";
+
+                    DebugCommandOutput?.Invoke(this, "TCP Command Connection: Error while connecting. Fail to connect... " + "\n" + "\n");
+
+                    ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                    ConnectionError?.Invoke(this, "TCP connection error...");
+
+                    return result;
+                }
+
                 if (_commandConnection.Client.Connected)
                 {
                     DebugCommandOutput?.Invoke(this, "TCP Command Connection: Connection established." + "\n" + "\n");
@@ -1035,6 +1085,18 @@ namespace MPDCtrl.Models
 
                     ConnectionError?.Invoke(this, "TCP Command Connection: FAIL to established... Client not connected.");
                 }
+            }
+            catch (SocketException e)
+            {
+                // TODO: Test.
+
+                //e.SocketErrorCode
+
+                DebugCommandOutput?.Invoke(this, "TCP Command Connection: Error while connecting. Fail to connect: " + e.Message + "\n" + "\n");
+
+                ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                ConnectionError?.Invoke(this, "TCP connection error: " + e.Message);
             }
             catch (Exception e)
             {
@@ -1482,6 +1544,7 @@ namespace MPDCtrl.Models
 
         }
 
+        // TODO:
         private async Task<CommandBinaryResult> MpdCommandGetBinary(string cmd, bool isAutoIdling = false)
         {
             CommandBinaryResult ret = new CommandBinaryResult();
@@ -2063,6 +2126,52 @@ namespace MPDCtrl.Models
                 return f;
             }
 
+            BinaryDownloader hoge = new BinaryDownloader();
+
+            bool asdf = await hoge.MpdBinaryConnectionStart(MpdHost,MpdPort,MpdPassword);
+
+            CommandResult b = new CommandResult();
+
+            if (asdf)
+            {
+                b =  await hoge.MpdQueryAlbumArt(uri, isUsingReadpicture);
+
+                if (b.IsSuccess)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        _albumCover = hoge.AlbumCover;
+                    });
+
+                    //Debug.WriteLine("AlbumArt Donwloaded... ");
+
+                    MpdAlbumArtChanged?.Invoke(this);
+                }
+                else
+                {
+                    //Debug.WriteLine("why... " + b.ErrorMessage);
+                }
+            }
+            else
+            {
+                Debug.WriteLine("damn... ");
+            }
+
+            hoge.MpdBinaryConnectionDisconnect();
+
+            return b;
+        }
+        
+        /*
+        public async Task<CommandResult> MpdQueryAlbumArt(string uri, string songId, bool isUsingReadpicture)
+        {
+            if (string.IsNullOrEmpty(uri))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
             if (_albumCover.IsDownloading)
             {
                 //Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading. Ignoring.");
@@ -2190,10 +2299,18 @@ namespace MPDCtrl.Models
 
             return await MpdCommandGetBinary(cmd, true);
         }
+        */
 
         #endregion
 
         #region == Command Connection's MPD Commands with boolean result ==
+
+        public async Task<CommandResult> MpdSendUpdate()
+        {
+            CommandResult result = await MpdSendCommand("update", true);
+
+            return result;
+        }
 
         public async Task<CommandResult> MpdPlaybackPlay(int volume, string songId = "")
         {
@@ -2712,11 +2829,31 @@ namespace MPDCtrl.Models
             return result;
         }
         */
+ 
+        public async Task<CommandResult> MpdPlaylistClear(string playlistName)
+        {
+            if (string.IsNullOrEmpty(playlistName))
+            {
+                CommandResult f = new CommandResult();
+                f.IsSuccess = false;
+                return f;
+            }
+
+            playlistName = Regex.Escape(playlistName);
+
+            //playlistclear {NAME}
+            string cmd = "playlistclear \"" + playlistName + "\"";
+
+            CommandResult result = await MpdSendCommand(cmd, true);
+
+            return result;
+        }
 
         #endregion
 
         #region == Response parser methods ==
 
+        // TODO:
         #region == AlbumImage ==
 
         private CommandBinaryResult ParseAlbumImageData(byte[] data)
@@ -3088,7 +3225,7 @@ namespace MPDCtrl.Models
             }
         }
 
-        public static byte[] CombineByteArray(byte[] first, byte[] second)
+        private static byte[] CombineByteArray(byte[] first, byte[] second)
         {
             byte[] ret = new byte[first.Length + second.Length];
             Buffer.BlockCopy(first, 0, ret, 0, first.Length);
@@ -3096,7 +3233,7 @@ namespace MPDCtrl.Models
             return ret;
         }
 
-        public static BitmapSource BitmaSourceFromByteArray(byte[] buffer)
+        private static BitmapSource BitmaSourceFromByteArray(byte[] buffer)
         {
             using (var stream = new MemoryStream(buffer))
             {
@@ -4168,7 +4305,8 @@ namespace MPDCtrl.Models
 
                 ConnectionState = ConnectionStatus.Disconnecting;
 
-                _commandConnection.Client.Shutdown(SocketShutdown.Both);
+                if (_commandConnection.Client != null)
+                    _commandConnection.Client.Shutdown(SocketShutdown.Both);
                 _commandConnection.Close();
             }
             catch { }
@@ -4184,7 +4322,8 @@ namespace MPDCtrl.Models
 
                 ConnectionState = ConnectionStatus.Disconnecting;
 
-                _idleConnection.Client.Shutdown(SocketShutdown.Both);
+                if (_idleConnection.Client != null)
+                    _idleConnection.Client.Shutdown(SocketShutdown.Both);
                 _idleConnection.Close();
             }
             catch { }

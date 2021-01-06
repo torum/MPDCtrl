@@ -147,6 +147,15 @@ namespace MPDCtrl.Models
                 this.NotifyPropertyChanged("Index");
             }
         }
+
+        public int IndexPlusOne
+        {
+            get
+            {
+                return _index+1;
+            }
+        }
+
     }
 
     /// <summary>

@@ -45,7 +45,7 @@
         <Grid x:Name="LayoutGrid" Background="{DynamicResource BoardBackgroundColorBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="32"/>
-                <RowDefinition Height="98"/>
+                <RowDefinition Height="102"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="0"/>
                 <RowDefinition Height="0"/>
@@ -57,7 +57,7 @@
                 <ColumnDefinition Width="4*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- アプリタイトルバー -->
+            <!-- App title bar-->
             <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="32"/>
@@ -208,14 +208,14 @@
 
             </Grid>
 
-            <!-- Header grid -->
+            <!-- Header -->
             <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="4"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="12"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -225,8 +225,8 @@
 
                 <!-- Album cover -->
                 <Grid Grid.Row="1" Grid.Column="0">
-                    <Grid Width="86" Height="86" Margin="32 0 10 0" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                        <Image Source="{Binding AlbumArt, NotifyOnTargetUpdated=True}" Width="86" Height="86" Visibility="{Binding IsAlbumArtVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                    <Grid Width="86" Height="86" Margin="36 0 6 0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <Image Source="{Binding AlbumArt, NotifyOnTargetUpdated=True}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="86" Height="86" Visibility="{Binding IsAlbumArtVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                             <Image.Triggers>
                                 <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                     <BeginStoryboard>
@@ -320,7 +320,7 @@
                         </Button>
                     </Grid>
 
-                    <Grid Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0 0 16 0" Width="30">
+                    <Grid Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0 0 17 0" Width="30">
                         <Slider x:Name="SliderVol" ToolTip="{x:Static properties:Resources.Playback_SliderVolume}" Style="{DynamicResource CustomSliderStyle}" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Stretch" IsMoveToPointEnabled="True" Maximum="100" Value="{Binding Volume}">
                         </Slider>
                     </Grid>
@@ -328,7 +328,7 @@
 
             </Grid>
 
-            <!-- Left  -->
+            <!-- Left -->
             <Grid Grid.Row="2" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:SizeChange.IsEnabled="True" helpers:SizeChange.ActualWidth="{Binding MainLeftPainActualWidth, Mode=OneWayToSource}">
                 <TreeView Margin="0 1 0 0" Style="{DynamicResource TreeViewMenuStyle}" ItemsSource="{Binding MainMenuItems}"  helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeMenu, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <TreeView.Resources>
@@ -375,6 +375,7 @@
                 <Grid>
 
                     <Grid Visibility="{Binding IsQueueVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                        
                         <ListView x:Name="QueueListview" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedSong, Mode=TwoWay}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" SelectionChanged="QueueListview_SelectionChanged">
                             <ListView.InputBindings>
                                 <KeyBinding Key="Return" Command="{Binding Path=DataContext.QueueListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
@@ -689,7 +690,7 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock Text="{Binding Path=Pos}" Padding="3" />
+                                                    <TextBlock Text="{Binding Path=IndexPlusOne}" Padding="3" />
                                                 </StackPanel>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
@@ -841,7 +842,6 @@
                                 </GridView>
                             </ListView.View>
                         </ListView>
-
 
 
                         <Popup IsOpen="{Binding IsSaveAsPlaylistPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
@@ -996,9 +996,9 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
+                        <!-- 検索ボックス -->
                         <Grid Grid.Row="0" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
-
-                            <!-- 検索ボックス -->
+                            
                             <TextBox x:Name="SearchTextBox" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" KeyboardNavigation.TabNavigation="Local" Margin="0" Padding="3" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
                                 <TextBox.Style>
                                     <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource DefaultTextBoxStyle}">
@@ -1024,7 +1024,7 @@
                                                                 <RadioButton x:Name="SearchGenreRadioButton" GroupName="SearchTags" Margin="2 0 0 0" Content="{x:Static properties:Resources.QueueListviewColumnHeader_Genre}" Height="22" Width="80" IsChecked="{Binding Path=SelectedSearchTags, ConverterParameter={x:Static vms:SearchTags.Genre}, Converter={StaticResource EnumBooleanConverter}}" Style="{DynamicResource SelectionRadioButtonStyle}"/>
                                                             </StackPanel>
 
-                                                            <Button Grid.Column="2" Height="22" Width="22" Margin="2 0 0 0" ToolTip="{x:Static properties:Resources.Search}" Command="{Binding SearchExecCommand}" IsDefault="True" Content="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z">
+                                                            <Button Grid.Column="2" Height="22" Width="22" Margin="2 0 1 0" ToolTip="{x:Static properties:Resources.Search}" Command="{Binding SearchExecCommand}" IsDefault="True" Content="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z">
                                                                 <Button.Resources>
                                                                     <Style x:Key="ButtonIntextboxFocusVisual">
                                                                         <Setter Property="Control.Template">
@@ -1154,6 +1154,35 @@
                                             <ContentControl Template="{StaticResource PlusIcon}" />
                                         </MenuItem.Icon>
                                     </MenuItem>
+                                    <Separator />
+
+                                    <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_SaveSelectedAs}" Command="{Binding Path=DataContext.SearchResultListviewSaveSelectedAsCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                        <MenuItem.Resources>
+                                            <ControlTemplate x:Key="PlaylistPlusIcon">
+                                                <Canvas Background="Transparent" >
+                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M2,16H10V14H2M18,14V10H16V14H12V16H16V20H18V16H22V14M14,6H2V8H14M14,10H2V12H14V10Z" />
+                                                </Canvas>
+                                            </ControlTemplate>
+                                        </MenuItem.Resources>
+                                        <MenuItem.Icon>
+                                            <ContentControl Template="{StaticResource PlaylistPlusIcon}" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <Separator />
+
+                                    <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_SaveSelectedTo}" Command="{Binding Path=DataContext.SearchResultListviewSaveSelectedToCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                        <MenuItem.Resources>
+                                            <ControlTemplate x:Key="PlaylistCheckIcon">
+                                                <Canvas Background="Transparent" >
+                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M14,10H2V12H14V10M14,6H2V8H14V6M2,16H10V14H2V16M21.5,11.5L23,13L16,20L11.5,15.5L13,14L16,17L21.5,11.5Z" />
+                                                </Canvas>
+                                            </ControlTemplate>
+                                        </MenuItem.Resources>
+                                        <MenuItem.Icon>
+                                            <ContentControl Template="{StaticResource PlaylistCheckIcon}" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <Separator />
                                 </ContextMenu>
                                 <Style TargetType="{x:Type ScrollBar}">
                                     <Setter Property="Margin" Value="0,0,0,0" />
@@ -1322,6 +1351,66 @@
                             </ListView.ItemContainerStyle>
                         </ListView>
 
+
+                        <Popup IsOpen="{Binding IsSearchResultSelectedSaveAsPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SearchResultListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                                <StackPanel>
+
+                                    <Label Content="Save Selected as New Playlist" TextElement.FontWeight="Bold" />
+
+                                    <Grid Grid.Row="0" Grid.Column="0" Margin="3 12 3 3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="6"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Label Grid.Row="0" Grid.Column="1" Padding="3" VerticalAlignment="Bottom" Content="New Playlist Name:"></Label>
+                                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0 3 0 3">
+                                            <TextBox x:Name="NewPlaylistNameAtSelectedSaveAsAtSearchResult" Width="200" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Padding="3" IsVisibleChanged="TextBox_IsVisibleChanged"/>
+                                        </StackPanel>
+
+                                    </Grid>
+
+                                    <Button Content="Save" Command="{Binding SearchResultListviewSaveSelectedAsPopupCommand}" CommandParameter="{Binding ElementName=NewPlaylistNameAtSelectedSaveAsAtSearchResult, Path=Text}" IsDefault="True" Width="60" Margin="12" HorizontalAlignment="Right">
+                                    </Button>
+
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+
+                        <Popup IsOpen="{Binding IsSearchResultSelectedSaveToPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SearchResultListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                                <StackPanel>
+
+                                    <Label Content="Save Selected to" TextElement.FontWeight="Bold" />
+
+                                    <Grid Grid.Row="0" Grid.Column="0" Margin="3 12 3 3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="6"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Label Grid.Row="0" Grid.Column="1" Padding="3" VerticalAlignment="Bottom" Content="Select Playlist"></Label>
+                                        <ListView Grid.Row="1" Grid.Column="1" x:Name="PopupPlaylistSelectListviewAtSearchResult" ItemsSource="{Binding Playlists}" DisplayMemberPath=".">
+
+                                        </ListView>
+                                    </Grid>
+
+                                    <Button Content="OK" Command="{Binding SearchResultListviewSaveSelectedToPopupCommand}" CommandParameter="{Binding ElementName=PopupPlaylistSelectListviewAtSearchResult, Path=SelectedItem}" IsDefault="True" Width="60" Margin="12" HorizontalAlignment="Right">
+                                    </Button>
+
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+
                     </Grid>
 
                     <Grid Visibility="{Binding IsBrowseVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
@@ -1397,7 +1486,7 @@
                                                                 </Grid.ColumnDefinitions>
                                                                 <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
 
-                                                                <Button Grid.Column="1" Height="22" Width="22" Margin="2 0 0 0" ToolTip="{x:Static properties:Resources.FilterClear}" Command="{Binding FilterClearCommand}" IsDefault="false" Content="M14.76,20.83L17.6,18L14.76,15.17L16.17,13.76L19,16.57L21.83,13.76L23.24,15.17L20.43,18L23.24,20.83L21.83,22.24L19,19.4L16.17,22.24L14.76,20.83M12,12V19.88C12.04,20.18 11.94,20.5 11.71,20.71C11.32,21.1 10.69,21.1 10.3,20.71L8.29,18.7C8.06,18.47 7.96,18.16 8,17.87V12H7.97L2.21,4.62C1.87,4.19 1.95,3.56 2.38,3.22C2.57,3.08 2.78,3 3,3V3H17V3C17.22,3 17.43,3.08 17.62,3.22C18.05,3.56 18.13,4.19 17.79,4.62L12.03,12H12Z">
+                                                                <Button Grid.Column="1" Height="22" Width="22" Margin="2 0 1 0" ToolTip="{x:Static properties:Resources.FilterClear}" Command="{Binding FilterClearCommand}" IsDefault="false" Content="M14.76,20.83L17.6,18L14.76,15.17L16.17,13.76L19,16.57L21.83,13.76L23.24,15.17L20.43,18L23.24,20.83L21.83,22.24L19,19.4L16.17,22.24L14.76,20.83M12,12V19.88C12.04,20.18 11.94,20.5 11.71,20.71C11.32,21.1 10.69,21.1 10.3,20.71L8.29,18.7C8.06,18.47 7.96,18.16 8,17.87V12H7.97L2.21,4.62C1.87,4.19 1.95,3.56 2.38,3.22C2.57,3.08 2.78,3 3,3V3H17V3C17.22,3 17.43,3.08 17.62,3.22C18.05,3.56 18.13,4.19 17.79,4.62L12.03,12H12Z">
                                                                     <Button.Resources>
                                                                         <Style x:Key="ButtonIntextboxFocusVisual">
                                                                             <Setter Property="Control.Template">
@@ -1519,6 +1608,35 @@
                                                 <ContentControl Template="{StaticResource PlusIcon}" />
                                             </MenuItem.Icon>
                                         </MenuItem>
+                                        <Separator />
+
+                                        <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_SaveSelectedAs}" Command="{Binding Path=DataContext.SongFilesListviewSaveSelectedAsCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                            <MenuItem.Resources>
+                                                <ControlTemplate x:Key="PlaylistPlusIcon">
+                                                    <Canvas Background="Transparent" >
+                                                        <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M2,16H10V14H2M18,14V10H16V14H12V16H16V20H18V16H22V14M14,6H2V8H14M14,10H2V12H14V10Z" />
+                                                    </Canvas>
+                                                </ControlTemplate>
+                                            </MenuItem.Resources>
+                                            <MenuItem.Icon>
+                                                <ContentControl Template="{StaticResource PlaylistPlusIcon}" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <Separator />
+
+                                        <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_SaveSelectedTo}" Command="{Binding Path=DataContext.SongFilesListviewSaveSelectedToCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                            <MenuItem.Resources>
+                                                <ControlTemplate x:Key="PlaylistCheckIcon">
+                                                    <Canvas Background="Transparent" >
+                                                        <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M14,10H2V12H14V10M14,6H2V8H14V6M2,16H10V14H2V16M21.5,11.5L23,13L16,20L11.5,15.5L13,14L16,17L21.5,11.5Z" />
+                                                    </Canvas>
+                                                </ControlTemplate>
+                                            </MenuItem.Resources>
+                                            <MenuItem.Icon>
+                                                <ContentControl Template="{StaticResource PlaylistCheckIcon}" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <Separator />
                                     </ContextMenu>
                                     <Style TargetType="{x:Type ScrollBar}">
                                         <Setter Property="Margin" Value="0,0,0,0" />
@@ -1532,7 +1650,6 @@
                                         </Style.Triggers>
                                     </Style>
                                 </ListView.Resources>
-
                                 <ListView.View>
                                     <GridView>
                                         <GridView.ColumnHeaderContainerStyle>
@@ -1603,7 +1720,6 @@
                                         </GridViewColumn>
                                     </GridView>
                                 </ListView.View>
-
                                 <ListView.ItemContainerStyle>
                                     <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
                                         <Setter Property="ContextMenu" Value="{StaticResource SongFilesListviewItemContextMenu}" />
@@ -1624,8 +1740,67 @@
                                         </Setter>
                                     </Style>
                                 </ListView.ItemContainerStyle>
-
                             </ListView>
+
+
+                            <Popup IsOpen="{Binding IsSongFilesSelectedSaveAsPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SongFilesListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                                <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                                    <StackPanel>
+
+                                        <Label Content="Save Selected as New Playlist" TextElement.FontWeight="Bold" />
+
+                                        <Grid Grid.Row="0" Grid.Column="0" Margin="3 12 3 3">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="6"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Label Grid.Row="0" Grid.Column="1" Padding="3" VerticalAlignment="Bottom" Content="New Playlist Name:"></Label>
+                                            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0 3 0 3">
+                                                <TextBox x:Name="NewPlaylistNameAtSelectedSaveAsAtSongFiles" Width="200" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Padding="3" IsVisibleChanged="TextBox_IsVisibleChanged"/>
+                                            </StackPanel>
+
+                                        </Grid>
+
+                                        <Button Content="Save" Command="{Binding SongFilesListviewSaveSelectedAsPopupCommand}" CommandParameter="{Binding ElementName=NewPlaylistNameAtSelectedSaveAsAtSongFiles, Path=Text}" IsDefault="True" Width="60" Margin="12" HorizontalAlignment="Right">
+                                        </Button>
+
+                                    </StackPanel>
+                                </Border>
+                            </Popup>
+
+                            <Popup IsOpen="{Binding IsSongFilesSelectedSaveToPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SongFilesListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                                <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                                    <StackPanel>
+
+                                        <Label Content="Save Selected to" TextElement.FontWeight="Bold" />
+
+                                        <Grid Grid.Row="0" Grid.Column="0" Margin="3 12 3 3">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="6"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Label Grid.Row="0" Grid.Column="1" Padding="3" VerticalAlignment="Bottom" Content="Select Playlist"></Label>
+                                            <ListView Grid.Row="1" Grid.Column="1" x:Name="PopupPlaylistSelectListviewAtSongFiles" ItemsSource="{Binding Playlists}" DisplayMemberPath=".">
+
+                                            </ListView>
+                                        </Grid>
+
+                                        <Button Content="OK" Command="{Binding SongFilesListviewSaveSelectedToPopupCommand}" CommandParameter="{Binding ElementName=PopupPlaylistSelectListviewAtSongFiles, Path=SelectedItem}" IsDefault="True" Width="60" Margin="12" HorizontalAlignment="Right">
+                                        </Button>
+
+                                    </StackPanel>
+                                </Border>
+                            </Popup>
 
                         </Grid>
 
@@ -1753,7 +1928,7 @@
                                     </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding ElementName=PlaylistsListviewDummy2, Path=ActualWidth}" helpers:GridViewSort.PropertyName=".">
-                                        <GridViewColumnHeader Content="Playlists"/>
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.PlaylistsListviewColumnHeader_Playlists}"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
@@ -1823,7 +1998,7 @@
                     <Grid Visibility="{Binding IsPlaylistItemVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                         <Grid x:Name="PlaylistSongsListviewDummy" Visibility="Hidden" Margin="0 0 20 0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="0" />
+                                <ColumnDefinition Width="1*" />
                                 <ColumnDefinition Width="32" />
                                 <ColumnDefinition Width="5*" />
                                 <ColumnDefinition Width="62" />
@@ -1859,6 +2034,7 @@
                                             <ContentControl Template="{StaticResource PlusIcon}" />
                                         </MenuItem.Icon>
                                     </MenuItem>
+                                    <Separator/>
                                     <MenuItem Header="{x:Static properties:Resources.PlaylistSongsContextMenu_Remove}" Command="{Binding Path=DataContext.PlaylistListviewDeletePosCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                         <MenuItem.Resources>
                                             <ControlTemplate x:Key="PlaylistMinusIcon">
@@ -1869,6 +2045,19 @@
                                         </MenuItem.Resources>
                                         <MenuItem.Icon>
                                             <ContentControl Template="{StaticResource PlaylistMinusIcon}" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <Separator/>
+                                    <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_QueueClear}" Command="{Binding Path=DataContext.PlaylistListviewClearCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                        <MenuItem.Resources>
+                                            <ControlTemplate x:Key="DeleteEmptyOutline">
+                                                <Canvas Background="Transparent" >
+                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M20.37,8.91L19.37,10.64L7.24,3.64L8.24,1.91L11.28,3.66L12.64,3.29L16.97,5.79L17.34,7.16L20.37,8.91M6,19V7H11.07L18,11V19A2,2 0 0,1 16,21H8A2,2 0 0,1 6,19M8,19H16V12.2L10.46,9H8V19Z" />
+                                                </Canvas>
+                                            </ControlTemplate>
+                                        </MenuItem.Resources>
+                                        <MenuItem.Icon>
+                                            <ContentControl Template="{StaticResource DeleteEmptyOutline}" />
                                         </MenuItem.Icon>
                                     </MenuItem>
                                 </ContextMenu>
@@ -1884,7 +2073,6 @@
                                     </Style.Triggers>
                                 </Style>
                             </ListView.Resources>
-
                             <ListView.View>
                                 <GridView>
                                     <GridView.ColumnHeaderContainerStyle>
@@ -1893,12 +2081,12 @@
                                         </Style>
                                     </GridView.ColumnHeaderContainerStyle>
 
-                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy0, Path=ActualWidth}">
-                                        <GridViewColumnHeader Content=""/>
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy0, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Index">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Position}"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock Text="" Padding="3" />
+                                                    <TextBlock Text="{Binding Path=IndexPlusOne}" Padding="3" />
                                                 </StackPanel>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
@@ -2039,7 +2227,6 @@
                                     </Setter>
                                 </Style>
                             </ListView.ItemContainerStyle>
-
                         </ListView>
 
 
@@ -2069,7 +2256,7 @@
                             </Border>
                         </Popup>
 
-                        <Popup IsOpen="{Binding IsConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=PlaylistSongsListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
+                        <Popup IsOpen="{Binding IsConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=PlaylistSongsListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
                             <Border Background="#FFF15B" CornerRadius="4" Padding="6" Width="250">
                                 <StackPanel>
 
@@ -2115,6 +2302,32 @@
                                     </Grid>
 
                                     <Button Content="OK" Command="{Binding PlaylistListviewDeletePosPopupCommand}" IsDefault="True" Width="60" Margin="12" HorizontalAlignment="Right">
+                                    </Button>
+
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+
+                        <Popup IsOpen="{Binding IsConfirmPlaylistClearPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=PlaylistSongsListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                                <StackPanel>
+
+                                    <Label Content="Confirm Clear" TextElement.FontWeight="Bold" />
+
+                                    <Grid Grid.Row="0" Grid.Column="0" Margin="3 12 3 3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="6"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Label Grid.Row="0" Grid.Column="1" Padding="3" VerticalAlignment="Bottom" Content="Clear Playlist?"></Label>
+
+                                    </Grid>
+
+                                    <Button Content="OK" Command="{Binding PlaylistListviewClearPopupCommand}" IsDefault="True" Width="60" Margin="12" HorizontalAlignment="Right">
                                     </Button>
 
                                 </StackPanel>
@@ -2309,12 +2522,41 @@
                     </StackPanel>
                 </StatusBarItem>
 
+                <!-- MpdStatus Message  -->
                 <Separator Grid.Column="1" Background="#202020" Visibility="{Binding IsMpdStatusMessageContainsText, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}"/>
-
                 <StatusBarItem Grid.Column="2" Visibility="{Binding IsMpdStatusMessageContainsText, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 0 0" Visibility="{Binding IsConnected, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                         
-                        <!-- ACK Button to show on/off -->
+                        <!-- Status Error Icon -->
+                        <Viewbox Width="16" Height="16" Margin="0 0 4 0" Opacity="0.7">
+                            <Canvas Width="24" Height="24">
+                                <Path Fill="{DynamicResource ControlDarkColorBrush}" Data="{Binding MpdStatusButton}" />
+                            </Canvas>
+                        </Viewbox>
+                        
+                        <!-- Status Error Message -->
+                        <TextBlock Text="{Binding MpdStatusMessage}" Style="{DynamicResource DefaultTextBlockStyle}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
+
+                    </StackPanel>
+                </StatusBarItem>
+
+                <!-- Statusbar Message  -->
+                <Separator Grid.Column="3" Background="#202020"/>
+                <StatusBarItem Grid.Column="4" HorizontalContentAlignment="Left">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="6 0 6 0">
+
+                        <TextBlock Text="{Binding StatusBarMessage}" Style="{DynamicResource DefaultTextBlockStyle}" Foreground="{DynamicResource ControlDarkColorBrush}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
+
+                    </StackPanel>
+
+                </StatusBarItem>
+
+                <!-- Debug Window Icon  -->
+                <Separator Grid.Column="5" Background="#202020" />
+                <StatusBarItem Grid.Column="6" HorizontalContentAlignment="Right">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 0 0">
+
+                        <!-- ACK Button to show on/off 
                         <Button x:Name="InfoButton" Width="16" Height="16" Margin="0 0 16 0" Command="{Binding ShowAckWindowCommand}" VerticalAlignment="Center" ToolTip="" Opacity="0.7">
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}">
@@ -2385,37 +2627,9 @@
                                 M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z
                             </Button.Content>
                         </Button>
+                        -->
 
-                        <!-- Status Error Icon -->
-                        <Viewbox Width="16" Height="16" Margin="0 0 4 0" Opacity="0.7">
-                            <Canvas Width="24" Height="24">
-                                <Path Fill="{DynamicResource ControlDarkColorBrush}" Data="{Binding MpdStatusButton}" />
-                            </Canvas>
-                        </Viewbox>
-                        
-                        <!-- Status Error Message -->
-                        <TextBlock Text="{Binding MpdStatusMessage}" Style="{DynamicResource DefaultTextBlockStyle}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
-
-                    </StackPanel>
-                </StatusBarItem>
-
-                <Separator Grid.Column="3" Background="#202020"/>
-                
-                <StatusBarItem Grid.Column="4" HorizontalContentAlignment="Left">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="6 0 6 0">
-
-                        <TextBlock Text="{Binding StatusBarMessage}" Style="{DynamicResource DefaultTextBlockStyle}" Foreground="{DynamicResource ControlDarkColorBrush}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
-
-                    </StackPanel>
-
-                </StatusBarItem>
-
-                <Separator Grid.Column="5" Background="#202020" />
-                
-                <StatusBarItem Grid.Column="6" HorizontalContentAlignment="Right">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 0 0">
-                        
-                        <Button Width="16" Height="16" Margin="0 0 0 0" Command="{Binding ShowDebugWindowCommand}" VerticalAlignment="Center" ToolTip="{x:Static properties:Resources.Settings_Opts_ShowDebugWidow}" Opacity="0.7" Visibility="{Binding IsShowDebugWindow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                        <Button Width="16" Height="16" Margin="0 0 0 0" Command="{Binding ShowDebugWindowCommand}" VerticalAlignment="Center" ToolTip="Debug Window" Opacity="0.7" Visibility="{Binding IsShowDebugWindow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}">
                                     <Setter Property="OverridesDefaultStyle" Value="true" />

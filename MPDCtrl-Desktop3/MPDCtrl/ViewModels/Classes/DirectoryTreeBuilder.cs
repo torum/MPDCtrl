@@ -61,7 +61,7 @@ namespace MPDCtrl.ViewModels.Classes
     {
         public DirectoryTreeBuilder() { }
 
-        public void Load(List<String> dirs)
+        public async void Load(List<String> dirs)
         {
             if (dirs == null)
                 return;
@@ -76,6 +76,8 @@ namespace MPDCtrl.ViewModels.Classes
 
             foreach (var pathDir in dirs)
             {
+                await Task.Delay(10);
+
                 try
                 {
                     string[] ValuePair = pathDir.Split('/');
@@ -87,6 +89,9 @@ namespace MPDCtrl.ViewModels.Classes
                         foreach (var asdf in ValuePair)
                         {
                             if (String.IsNullOrEmpty(asdf)) continue;
+
+
+                            // TODO: USE LINQ
 
                             // check if already exists.
                             bool found = false;

@@ -502,6 +502,42 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Browse に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuTreeItem_Browse {
+            get {
+                return ResourceManager.GetString("MenuTreeItem_Browse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Playlists に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuTreeItem_Playlists {
+            get {
+                return ResourceManager.GetString("MenuTreeItem_Playlists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Queue に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuTreeItem_Queue {
+            get {
+                return ResourceManager.GetString("MenuTreeItem_Queue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Search に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuTreeItem_Search {
+            get {
+                return ResourceManager.GetString("MenuTreeItem_Search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Command Response に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MPD_CommandError {
@@ -678,6 +714,15 @@ namespace MPDCtrl.Properties {
         public static string PlaylistListviewTabitemHeader_Playlists {
             get {
                 return ResourceManager.GetString("PlaylistListviewTabitemHeader_Playlists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Playlists に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PlaylistsListviewColumnHeader_Playlists {
+            get {
+                return ResourceManager.GetString("PlaylistsListviewColumnHeader_Playlists", resourceCulture);
             }
         }
         
@@ -1006,7 +1051,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Enable Debug Widow (this may slow down repoponsiveness) に類似しているローカライズされた文字列を検索します。
+        ///   Enable Debug Widow に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_Opts_ShowDebugWidow {
             get {
@@ -1096,7 +1141,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Add to Current Queue に類似しているローカライズされた文字列を検索します。
+        ///   Add to Queue に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string SongsItemContextMenu_Add {
             get {

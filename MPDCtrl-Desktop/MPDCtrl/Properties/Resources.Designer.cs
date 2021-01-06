@@ -502,7 +502,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Browse に類似しているローカライズされた文字列を検索します。
+        ///   Library に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MenuTreeItem_Browse {
             get {
@@ -1186,6 +1186,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Enable AlbumArt に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_Opts_EnableAlbumArt {
+            get {
+                return ResourceManager.GetString("Settings_Opts_EnableAlbumArt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   MPD Database に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_Opts_MPDDatabase {
@@ -1227,6 +1236,15 @@ namespace MPDCtrl.Properties {
         public static string Settings_Opts_UpdateDatabaseOnStartup {
             get {
                 return ResourceManager.GetString("Settings_Opts_UpdateDatabaseOnStartup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Use &apos;readpicture&apos; command instead of &apos;albumart&apos;. (Applicable when MPD protocol version is 0.22.0 or up) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_Opts_UseReadPicture {
+            get {
+                return ResourceManager.GetString("Settings_Opts_UseReadPicture", resourceCulture);
             }
         }
         

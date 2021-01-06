@@ -26,27 +26,7 @@ namespace MPDCtrl.Models
         private int _port;
         private string _password;
 
-        private string _mpdVerText;
-        private string VerText
-        {
-            get { return _mpdVerText; }
-            set
-            {
-                if (value == _mpdVerText)
-                    return;
-
-                _mpdVerText = value;
-
-                string tmp = _mpdVerText;
-                tmp = tmp.Replace(".", "");
-                if (Int32.TryParse(tmp, out int i))
-                {
-                    MpdVersion = i;
-                }
-            }
-        }
-
-        public int MpdVersion { get; set; }
+        private string MpdVersion { get; set; }
 
         public BinaryDownloader()
         {
@@ -125,7 +105,7 @@ namespace MPDCtrl.Models
 
                     if (response.StartsWith("OK MPD "))
                     {
-                        VerText = response.Replace("OK MPD ", string.Empty).Trim();
+                        MpdVersion = response.Replace("OK MPD ", string.Empty).Trim();
 
                         //Debug.WriteLine("TCP Binary Connection: Connected. MPD " + VerText);
 
@@ -1298,7 +1278,7 @@ namespace MPDCtrl.Models
 
             string cmd = "albumart \"" + uri + "\" 0" + "\n";
             if (isUsingReadpicture)
-                if (MpdVersion >= 220)
+                if (CompareVersionString(MpdVersion,"0.22.0") >= 0)
                     cmd = "readpicture \"" + uri + "\" 0" + "\n";
 
             CommandBinaryResult result = await MpdBinarySendBinaryCommand(cmd, false);
@@ -1400,10 +1380,15 @@ namespace MPDCtrl.Models
 
             string cmd = "albumart \"" + uri + "\" " + offset.ToString() + "\n";
             if (isUsingReadpicture)
-                if (MpdVersion >= 220)
+                if (CompareVersionString(MpdVersion, "0.22.0") >= 0)
                     cmd = "readpicture \"" + uri + "\" " + offset.ToString() + "\n";
 
             return await MpdBinarySendBinaryCommand(cmd, false);
+        }
+
+        private static int CompareVersionString(string a, string b)
+        {
+            return (new System.Version(a)).CompareTo(new System.Version(b));
         }
 
         private static BitmapSource BitmaSourceFromByteArray(byte[] buffer)

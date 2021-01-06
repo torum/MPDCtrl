@@ -271,7 +271,7 @@ namespace MPDCtrl.Models
 
                     result.ErrorMessage = "_idleConnection.Client == null";
 
-                    DebugCommandOutput?.Invoke(this, "TCP Idle Connection: Error while connecting. Fail to connect... "+ "\n" + "\n");
+                    DebugIdleOutput?.Invoke(this, "TCP Idle Connection: Error while connecting. Fail to connect... "+ "\n" + "\n");
 
                     ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
@@ -338,7 +338,7 @@ namespace MPDCtrl.Models
 
                 //e.SocketErrorCode
 
-                DebugCommandOutput?.Invoke(this, "TCP Idle Connection: Error while connecting. Fail to connect: " + e.Message + "\n" + "\n");
+                DebugIdleOutput?.Invoke(this, "TCP Idle Connection: Error while connecting. Fail to connect: " + e.Message + "\n" + "\n");
 
                 ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
@@ -348,7 +348,7 @@ namespace MPDCtrl.Models
             {
                 // TODO: Test.
 
-                DebugCommandOutput?.Invoke(this, "TCP Idle Connection: Error while connecting. Fail to connect: " + e.Message + "\n" + "\n");
+                DebugIdleOutput?.Invoke(this, "TCP Idle Connection: Error while connecting. Fail to connect: " + e.Message + "\n" + "\n");
 
                 ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 

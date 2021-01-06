@@ -280,7 +280,7 @@ SOFTWARE.</value>
     <value>_Files</value>
   </data>
   <data name="MenuTreeItem_Browse" xml:space="preserve">
-    <value>Browse</value>
+    <value>Library</value>
   </data>
   <data name="MenuTreeItem_Playlists" xml:space="preserve">
     <value>Playlists</value>
@@ -507,6 +507,9 @@ SOFTWARE.</value>
   <data name="Settings_Opts_AutoScrollToNowPlaying" xml:space="preserve">
     <value>Auto Scroll To Current Song (NowPlaying)</value>
   </data>
+  <data name="Settings_Opts_EnableAlbumArt" xml:space="preserve">
+    <value>Enable AlbumArt</value>
+  </data>
   <data name="Settings_Opts_MPDDatabase" xml:space="preserve">
     <value>MPD Database</value>
   </data>
@@ -521,6 +524,9 @@ SOFTWARE.</value>
   </data>
   <data name="Settings_Opts_UpdateDatabaseOnStartup" xml:space="preserve">
     <value>Update MPD Music Database on Startup. (It may take a while to update)</value>
+  </data>
+  <data name="Settings_Opts_UseReadPicture" xml:space="preserve">
+    <value>Use 'readpicture' command instead of 'albumart'. (Applicable when MPD protocol version is 0.22.0 or up)</value>
   </data>
   <data name="Settings_ProfileDeleted" xml:space="preserve">
     <value>Profile Deleted</value>

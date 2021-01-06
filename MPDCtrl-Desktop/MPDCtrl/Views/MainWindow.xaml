@@ -3191,11 +3191,11 @@
                                         </Grid>
 
                                         <Grid Grid.Row="4" HorizontalAlignment="Left" Margin="0 12 0 0">
-                                            <CheckBox Content="Enable AlbumArt" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsDownloadAlbumArt}" Margin="0 12 0 0"></CheckBox>
+                                            <CheckBox Content="{x:Static properties:Resources.Settings_Opts_EnableAlbumArt}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsDownloadAlbumArt}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
                                         
                                         <Grid Grid.Row="5" HorizontalAlignment="Left" Margin="24 12 0 0">
-                                            <CheckBox Content="Use 'readpicture' command instead of 'albumart'. (Applicable when MPD protocol version is 0.22.0 or up) " IsEnabled="{Binding IsDownloadAlbumArt}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsDownloadAlbumArtEmbeddedUsingReadPicture}" Margin="0 12 0 0"></CheckBox>
+                                            <CheckBox Content="{x:Static properties:Resources.Settings_Opts_UseReadPicture}" IsEnabled="{Binding IsDownloadAlbumArt}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsDownloadAlbumArtEmbeddedUsingReadPicture}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
 
                                         

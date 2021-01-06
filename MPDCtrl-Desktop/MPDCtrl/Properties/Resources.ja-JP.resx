@@ -280,7 +280,7 @@ SOFTWARE.</value>
     <value>ファイル (_F)</value>
   </data>
   <data name="MenuTreeItem_Browse" xml:space="preserve">
-    <value>ブラウズ</value>
+    <value>ライブラリ</value>
   </data>
   <data name="MenuTreeItem_Playlists" xml:space="preserve">
     <value>プレイリスト</value>
@@ -510,6 +510,9 @@ SOFTWARE.</value>
   <data name="Settings_Opts_AutoScrollToNowPlaying" xml:space="preserve">
     <value>現在の曲へ自動でジャンプする</value>
   </data>
+  <data name="Settings_Opts_EnableAlbumArt" xml:space="preserve">
+    <value>アルバムカバーの取得</value>
+  </data>
   <data name="Settings_Opts_MPDDatabase" xml:space="preserve">
     <value>MPDのデータベース</value>
   </data>
@@ -524,6 +527,9 @@ SOFTWARE.</value>
   </data>
   <data name="Settings_Opts_UpdateDatabaseOnStartup" xml:space="preserve">
     <value>起動時にMPDサーバーの楽曲データベースを最新の状態に更新する (更新されるまで、しばらくかかる場合があります)</value>
+  </data>
+  <data name="Settings_Opts_UseReadPicture" xml:space="preserve">
+    <value>'albumart'の代わりに'readpicture' コマンドを使用する。 (MPD プロトコルのバージョンが0.22.0以上の時のみ)</value>
   </data>
   <data name="Settings_ProfileDeleted" xml:space="preserve">
     <value>プロファイルが削除されました。</value>

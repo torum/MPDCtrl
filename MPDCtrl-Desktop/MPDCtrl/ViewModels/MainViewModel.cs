@@ -33,10 +33,6 @@ namespace MPDCtrl.ViewModels
     /// 
     /// v3.0.0.x
     /// 
-    /// テスト。
-    /// 
-    /// ストア公開：Internatinalization (multi language support)、スクショ。
-    /// 
     /// 
     /// v3.0.1 以降
     /// 
@@ -64,10 +60,10 @@ namespace MPDCtrl.ViewModels
     /// 検索で、ExactかContainのオプション。
     /// スライダーの上でスクロールして音量変更。
     /// スライダーの変更時にブレる件。
-    /// ピクチャーインピクチャー？
 
 
     /// 更新履歴：
+    /// v3.0.0.  とりあえずひと段落したので、Store公開。
     /// v3.0.0.7 とりあえず、プレイリスト系は大体できた。
     /// v3.0.0.6 とりあえずAlbumArtの取得はできるようにしたけれど、Downloaderクラスが必要。
     /// v3.0.0.5 色々やり過ぎて覚えていない・・・
@@ -99,7 +95,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.0-pre9";
+        const string _appVer = "v3.0.0";
 
         public static string AppVer
         {

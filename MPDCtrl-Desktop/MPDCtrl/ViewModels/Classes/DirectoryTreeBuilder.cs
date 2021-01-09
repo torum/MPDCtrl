@@ -61,10 +61,14 @@ namespace MPDCtrl.ViewModels.Classes
     {
         public DirectoryTreeBuilder() { }
 
+        public bool IsCanceled { get; set; }
+
         public async void Load(List<String> dirs)
         {
             if (dirs == null)
                 return;
+
+            IsCanceled = false;
 
             Uri uri = new Uri(@"file:///./");
             NodeDirectory root = new NodeDirectory("/", uri);
@@ -76,7 +80,12 @@ namespace MPDCtrl.ViewModels.Classes
 
             foreach (var pathDir in dirs)
             {
+                // for responsivenesss.
                 await Task.Delay(10);
+
+                // changed profile etc.
+                if (IsCanceled)
+                    break;
 
                 try
                 {

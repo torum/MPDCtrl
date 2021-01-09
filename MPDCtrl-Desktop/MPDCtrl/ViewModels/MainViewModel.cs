@@ -31,21 +31,24 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// v3.0.0.x
+    /// v3.0.1.x
     /// 
-    /// 
-    /// v3.0.1 以降
-    /// 
-    /// 「プレイリストの名前変更」をインラインで。
     /// 
     /// Ctrl+Fをどうするか決める。
     /// キューの絞り込み検索が絶対欲しい。VSのようにキューの右上にするか。
     /// 
+    /// 
+    /// 
     /// TreeView menuのプレイリスト選択からコンテキストメニュー。
+    /// 
+    /// v3.0.2 以降
+    /// 
+    /// 「プレイリストの名前変更」をインラインで。
+    /// キューの順番変更をドラッグアンドドロップで。
     /// 
     /// UI：左ペインの幅を覚える件。
     /// 
-    /// Database: 設定画面でDBのUpdate。
+    /// Database: 設定画面でDBのupdateとrescan。
     /// イベントのidleからの"再読み込み"通知。
     /// 
     /// v3.1.0 以降
@@ -55,6 +58,7 @@ namespace MPDCtrl.ViewModels
     /// UI：テーマの切り替え
     /// 
     /// [未定]
+    /// 
     /// AlbumArt画像のキャッシュとアルバムビュー。
     /// "追加して再生"メニューを追加。　
     /// 検索で、ExactかContainのオプション。
@@ -63,6 +67,8 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v3.0.0.2 MPD protocol のバージョンが0.19.x以下だったらステータスバーにメッセージを出すようにした。Closeボタンの背景を赤にした。playlistのコンテキストメニューの文字変更。
+    /// v3.0.0.1 SysButtonの背景を変えた。接続シークエンスで諸々の情報取得を独立的に行うようにした（一つ失敗しても他はロードされるように）。LocalFilesが正しくClearされるようにした。
     /// v3.0.0.  とりあえずひと段落したので、Store公開。
     /// v3.0.0.7 とりあえず、プレイリスト系は大体できた。
     /// v3.0.0.6 とりあえずAlbumArtの取得はできるようにしたけれど、Downloaderクラスが必要。
@@ -95,7 +101,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.0";
+        const string _appVer = "v3.0.0.2";
 
         public static string AppVer
         {
@@ -4406,7 +4412,7 @@ namespace MPDCtrl.ViewModels
 
                     if (MusicDirectories.Count > 0)
                     {
-                        //SelectedNodeDirectory = MusicDirectories[0] as NodeDirectory;
+                        SelectedNodeDirectory = MusicDirectories[0] as NodeDirectory;
                     }
                 }
                 catch (Exception e)
@@ -4440,6 +4446,11 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private static int CompareVersionString(string a, string b)
+        {
+            return (new System.Version(a)).CompareTo(new System.Version(b));
+        }
+
         #endregion
 
         #region == イベント ==
@@ -4452,8 +4463,6 @@ namespace MPDCtrl.ViewModels
 
             MpdStatusButton = _pathMpdOkButton;
 
-            StatusBarMessage = "";
-
             IsBusy = true;
 
             // これしないとCurrentSongが表示されない。
@@ -4465,16 +4474,31 @@ namespace MPDCtrl.ViewModels
             {
                 bool r = await _mpc.MpdCommandConnectionStart(_mpc.MpdHost, _mpc.MpdPort, _mpc.MpdPassword);
 
-                if (IsUpdateOnStartup)
-                {
-                    await _mpc.MpdSendUpdate();
-                }
-
                 if (r)
                 {
-                    if (result.IsSuccess)
-                        result = await _mpc.MpdIdleQueryStatus();
+                    if (IsUpdateOnStartup)
+                    {
+                        await _mpc.MpdSendUpdate();
+                    }
 
+                    result = await _mpc.MpdIdleQueryStatus();
+
+                    if (result.IsSuccess)
+                    {
+                        UpdateStatus();
+
+                        await _mpc.MpdIdleQueryCurrentQueue();
+                        UpdateCurrentQueue();
+
+                        await _mpc.MpdIdleQueryPlaylists();
+                        UpdatePlaylists();
+
+                        await _mpc.MpdIdleQueryListAll();
+                        UpdateLocalFiles();
+                    }
+
+                    // Don't rely on one thing.
+                    /*
                     if (result.IsSuccess)
                     {
                         UpdateStatus();
@@ -4501,6 +4525,7 @@ namespace MPDCtrl.ViewModels
                     {
                         UpdateLocalFiles();
                     }
+                    */
 
                     _mpc.MpdIdleStart();
 
@@ -4508,6 +4533,16 @@ namespace MPDCtrl.ViewModels
             }
 
             IsBusy = false;
+            
+            // MPD protocol ver check.
+            if (CompareVersionString(_mpc.MpdVerText, "0.20.0") == -1)
+            {
+                StatusBarMessage = string.Format(MPDCtrl.Properties.Resources.StatusBarMsg_MPDVersionIsOld, _mpc.MpdVerText);
+            }
+            else
+            {
+                StatusBarMessage = "";
+            }
         }
 
         private void OnMpdPlayerStatusChanged(MPC sender)
@@ -6407,11 +6442,16 @@ namespace MPDCtrl.ViewModels
 
                 SelectedPlaylistSong = null;
 
-                //MusicDirectories.Clear();// Don't
                 MusicEntries.Clear();
+
+                //MusicDirectories.Clear();// Don't
                 //_mpc.LocalDirectories.Clear();// Don't
                 //_mpc.LocalFiles.Clear();// Don't
                 //SelectedNodeDirectory.Children.Clear();// Don't
+                _musicDirectories.IsCanceled = true;
+                if (_musicDirectories.Children.Count > 0)
+                    _musicDirectories.Children[0].Children.Clear();
+
                 FilterQuery = "";
 
                 SelectedSong = null;
@@ -6525,11 +6565,17 @@ namespace MPDCtrl.ViewModels
 
                 SelectedPlaylistSong = null;
 
-                //MusicDirectories.Clear(); // Don't
                 MusicEntries.Clear();
+
+                // TODO: not good when directory is being built.
+                //MusicDirectories.Clear(); // Don't
                 //_mpc.LocalDirectories.Clear();// Don't
                 //_mpc.LocalFiles.Clear();// Don't
                 //SelectedNodeDirectory.Children.Clear();// Don't
+                _musicDirectories.IsCanceled = true;
+                if (_musicDirectories.Children.Count > 0)
+                    _musicDirectories.Children[0].Children.Clear();
+
                 FilterQuery = "";
 
                 SelectedSong = null;

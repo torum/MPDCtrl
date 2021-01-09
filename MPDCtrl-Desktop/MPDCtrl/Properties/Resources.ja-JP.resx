@@ -354,6 +354,9 @@ SOFTWARE.</value>
   <data name="PlaylistsListviewColumnHeader_Playlists" xml:space="preserve">
     <value>プレイリスト</value>
   </data>
+  <data name="PlaylistSongsContextMenu_Clear" xml:space="preserve">
+    <value>プレイリストをクリアする</value>
+  </data>
   <data name="PlaylistSongsContextMenu_Remove" xml:space="preserve">
     <value>プレイリストから削除する</value>
   </data>
@@ -557,6 +560,9 @@ SOFTWARE.</value>
   </data>
   <data name="SongsItemContextMenu_Add" xml:space="preserve">
     <value>キューに追加する</value>
+  </data>
+  <data name="StatusBarMsg_MPDVersionIsOld" xml:space="preserve">
+    <value>MPD プロトコルのバージョン（{0}）が古いため、 幾つかの機能は正しく動作しない可能性があります。</value>
   </data>
   <data name="StatusMsg_UpdatingDb" xml:space="preserve">
     <value>データベースを更新中・・・</value>

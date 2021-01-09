@@ -56,16 +56,8 @@ namespace MPDCtrl.Models
 
                 _mpdVerText = value;
 
-                string tmp = _mpdVerText;
-                tmp = tmp.Replace(".","");
-                if (Int32.TryParse(tmp, out int i))
-                {
-                    MpdVersion = i;
-                }
             }
         }
-
-        public int MpdVersion { get; set; }
 
         private Status _status = new Status();
         public Status MpdStatus
@@ -1044,7 +1036,7 @@ namespace MPDCtrl.Models
                     var tcpStream = _commandConnection.GetStream();
                     //tcpStream.ReadTimeout = System.Threading.Timeout.Infinite;
                     //
-                    tcpStream.ReadTimeout = 3000;
+                    tcpStream.ReadTimeout = 2000;
 
                     _commandReader = new StreamReader(tcpStream);
                     _commandWriter = new StreamWriter(tcpStream);
@@ -1227,14 +1219,14 @@ namespace MPDCtrl.Models
                     DebugCommandOutput?.Invoke(this, string.Format("################ Error@{0}, Reason:{1}, Data:{2}, {3} Exception: {4} {5}", "WriteAsync@MpdSendCommand", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
 
                     // タイムアウトしていたらここで「も」エラーになる模様。
-                    
+
                     IsMpdCommandConnected = false;
 
                     DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
 
                     try
                     {
-                        _commandConnection.Client.Shutdown(SocketShutdown.Both);
+                        //_commandConnection.Client.Shutdown(SocketShutdown.Both);
                         _commandConnection.Close();
                     }
                     catch { }
@@ -1291,6 +1283,11 @@ namespace MPDCtrl.Models
                 }
 
                 IsBusy?.Invoke(this, false);
+                return ret;
+            }
+
+            if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
+            {
                 return ret;
             }
 
@@ -1389,13 +1386,19 @@ namespace MPDCtrl.Models
 
                     // タイムアウトしていたらここで「も」エラーになる模様。
 
+                    if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
+                    {
+                        IsBusy?.Invoke(this, false);
+                        return ret;
+                    }
+
                     IsMpdCommandConnected = false;
 
                     DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
 
                     try
                     {
-                        _commandConnection.Client.Shutdown(SocketShutdown.Both);
+                        //_commandConnection.Client.Shutdown(SocketShutdown.Both);
                         _commandConnection.Close();
                     }
                     catch { }
@@ -1491,7 +1494,7 @@ namespace MPDCtrl.Models
 
                     try
                     {
-                        _commandConnection.Client.Shutdown(SocketShutdown.Both);
+                        //_commandConnection.Client.Shutdown(SocketShutdown.Both);
                         _commandConnection.Close();
                     }
                     catch { }
@@ -1544,7 +1547,7 @@ namespace MPDCtrl.Models
 
         }
 
-        // TODO:
+        // TODO: not used. (moved to BinaryDownloader)
         private async Task<CommandBinaryResult> MpdCommandGetBinary(string cmd, bool isAutoIdling = false)
         {
             CommandBinaryResult ret = new CommandBinaryResult();

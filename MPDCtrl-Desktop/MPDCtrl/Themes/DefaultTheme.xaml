@@ -13,7 +13,7 @@
     <Color x:Key="ControlDarkColor">DimGray</Color>
 
     <Color x:Key="ControlMouseOverColor">White</Color>
-    <Color x:Key="ControlMouseOverBackgroundColor">DarkGray</Color>
+    <Color x:Key="ControlMouseOverBackgroundColor">#282828</Color>
     <Color x:Key="ControlPressedColor">Gainsboro</Color>
 
     <Color x:Key="ControlSelectBackGroundColor">Gainsboro</Color>

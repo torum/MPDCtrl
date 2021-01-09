@@ -354,6 +354,9 @@ SOFTWARE.</value>
   <data name="PlaylistsListviewColumnHeader_Playlists" xml:space="preserve">
     <value>Playlists</value>
   </data>
+  <data name="PlaylistSongsContextMenu_Clear" xml:space="preserve">
+    <value>Clear Playlist</value>
+  </data>
   <data name="PlaylistSongsContextMenu_Remove" xml:space="preserve">
     <value>Remove From Playlist</value>
   </data>
@@ -554,6 +557,9 @@ SOFTWARE.</value>
   </data>
   <data name="SongsItemContextMenu_Add" xml:space="preserve">
     <value>Add to Queue</value>
+  </data>
+  <data name="StatusBarMsg_MPDVersionIsOld" xml:space="preserve">
+    <value>The MPD protocol version {0} is old. Some of the functionalities may not work properly.</value>
   </data>
   <data name="StatusMsg_UpdatingDb" xml:space="preserve">
     <value>Updating db...</value>

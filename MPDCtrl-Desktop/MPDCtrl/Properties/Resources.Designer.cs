@@ -727,6 +727,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Clear Playlist に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PlaylistSongsContextMenu_Clear {
+            get {
+                return ResourceManager.GetString("PlaylistSongsContextMenu_Clear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Remove From Playlist に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string PlaylistSongsContextMenu_Remove {
@@ -1326,6 +1335,15 @@ namespace MPDCtrl.Properties {
         public static string SongsItemContextMenu_Add {
             get {
                 return ResourceManager.GetString("SongsItemContextMenu_Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   The MPD protocol version {0} is old. Some of the functionalities may not work properly. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string StatusBarMsg_MPDVersionIsOld {
+            get {
+                return ResourceManager.GetString("StatusBarMsg_MPDVersionIsOld", resourceCulture);
             }
         }
         

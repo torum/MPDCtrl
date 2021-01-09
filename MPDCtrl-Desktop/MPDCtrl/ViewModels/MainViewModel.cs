@@ -34,11 +34,6 @@ namespace MPDCtrl.ViewModels
     /// v3.0.1.x
     /// 
     /// 
-    /// Ctrl+Fをどうするか決める。
-    /// キューの絞り込み検索が絶対欲しい。VSのようにキューの右上にするか。
-    /// 
-    /// 
-    /// 
     /// TreeView menuのプレイリスト選択からコンテキストメニュー。
     /// 
     /// v3.0.2 以降
@@ -67,6 +62,7 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v3.0.0.3 Find is done.
     /// v3.0.0.2 MPD protocol のバージョンが0.19.x以下だったらステータスバーにメッセージを出すようにした。Closeボタンの背景を赤にした。playlistのコンテキストメニューの文字変更。
     /// v3.0.0.1 SysButtonの背景を変えた。接続シークエンスで諸々の情報取得を独立的に行うようにした（一つ失敗しても他はロードされるように）。LocalFilesが正しくClearされるようにした。
     /// v3.0.0.  とりあえずひと段落したので、Store公開。
@@ -101,7 +97,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.0.2";
+        const string _appVer = "v3.0.0.3";
 
         public static string AppVer
         {
@@ -1363,6 +1359,158 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        private bool _isQueueFindVisible;
+        public bool IsQueueFindVisible
+        {
+            get
+            {
+                return _isQueueFindVisible;
+            }
+            set
+            {
+                if (_isQueueFindVisible == value)
+                    return;
+
+                _isQueueFindVisible = value;
+                NotifyPropertyChanged("IsQueueFindVisible");
+            }
+        }
+
+        private ObservableCollection<SongInfo> _queueForFilter = new ObservableCollection<SongInfo>();
+        public ObservableCollection<SongInfo> QueueForFilter
+        {
+            get
+            {
+                return _queueForFilter;
+            }
+            set
+            {
+                if (_queueForFilter == value)
+                    return;
+
+                _queueForFilter = value;
+                NotifyPropertyChanged("QueueForFilter");
+            }
+        }
+
+        private SearchTags _selectedQueueFilterTags = SearchTags.Title;
+        public SearchTags SelectedQueueFilterTags
+        {
+            get
+            {
+                return _selectedQueueFilterTags;
+            }
+            set
+            {
+                if (_selectedQueueFilterTags == value)
+                    return;
+
+                _selectedQueueFilterTags = value;
+                NotifyPropertyChanged("SelectedQueueFilterTags");
+
+                if (_filterQueueQuery == "")
+                    return;
+
+                var collectionView = CollectionViewSource.GetDefaultView(_queueForFilter);
+                collectionView.Filter = x =>
+                {
+                    var entry = (SongInfo)x;
+
+                    if (SelectedQueueFilterTags == SearchTags.Title)
+                    {
+                        return entry.Title.Contains(_filterQueueQuery, StringComparison.CurrentCultureIgnoreCase);
+                    }
+                    else if (SelectedQueueFilterTags == SearchTags.Artist)
+                    {
+                        return entry.Artist.Contains(_filterQueueQuery, StringComparison.CurrentCultureIgnoreCase);
+                    }
+                    else if (SelectedQueueFilterTags == SearchTags.Album)
+                    {
+                        return entry.Album.Contains(_filterQueueQuery, StringComparison.CurrentCultureIgnoreCase);
+                    }
+                    else if (SelectedQueueFilterTags == SearchTags.Genre)
+                    {
+                        return entry.Genre.Contains(_filterQueueQuery, StringComparison.CurrentCultureIgnoreCase);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                };
+            }
+        }
+
+        private string _filterQueueQuery = "";
+        public string FilterQueueQuery
+        {
+            get
+            {
+                return _filterQueueQuery;
+            }
+            set
+            {
+                if (_filterQueueQuery == value)
+                    return;
+
+                _filterQueueQuery = value;
+                NotifyPropertyChanged("FilterQueueQuery");
+
+                var collectionView = CollectionViewSource.GetDefaultView(_queueForFilter);
+                collectionView.Filter = x =>
+                {
+                    if (_filterQueueQuery == "")
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        var entry = (SongInfo)x;
+
+                        if (SelectedQueueFilterTags == SearchTags.Title)
+                        {
+                            return entry.Title.Contains(_filterQueueQuery, StringComparison.CurrentCultureIgnoreCase);
+                        }
+                        else if (SelectedQueueFilterTags == SearchTags.Artist)
+                        {
+                            return entry.Artist.Contains(_filterQueueQuery, StringComparison.CurrentCultureIgnoreCase);
+                        }
+                        else if (SelectedQueueFilterTags == SearchTags.Album)
+                        {
+                            return entry.Album.Contains(_filterQueueQuery, StringComparison.CurrentCultureIgnoreCase);
+                        }
+                        else if (SelectedQueueFilterTags == SearchTags.Genre)
+                        {
+                            return entry.Genre.Contains(_filterQueueQuery, StringComparison.CurrentCultureIgnoreCase);
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                };
+
+                //collectionView.Refresh();
+
+            }
+        }
+
+        private SongInfo _selectedQueueFilterSong;
+        public SongInfo SelectedQueueFilterSong
+        {
+            get
+            {
+                return _selectedQueueFilterSong;
+            }
+            set
+            {
+                if (_selectedQueueFilterSong == value)
+                    return;
+
+                _selectedQueueFilterSong = value;
+                NotifyPropertyChanged("SelectedQueueFilterSong");
+            }
+        }
+
         #endregion
 
         #region == Browse ==
@@ -1430,9 +1578,9 @@ namespace MPDCtrl.ViewModels
                             if (filteringMode)
                             {
                                 // 絞り込みモード
-                                if (!string.IsNullOrEmpty(_filterQuery))
+                                if (!string.IsNullOrEmpty(FilterMusicEntriesQuery))
                                 {
-                                    return (filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                                    return (filename.Contains(FilterMusicEntriesQuery, StringComparison.CurrentCultureIgnoreCase));
                                 }
                                 else
                                 {
@@ -1444,9 +1592,9 @@ namespace MPDCtrl.ViewModels
                                 // マッチしたフォルダ内だけ
                                 path = path.Replace("/", "");
 
-                                if (!string.IsNullOrEmpty(_filterQuery))
+                                if (!string.IsNullOrEmpty(FilterMusicEntriesQuery))
                                 {
-                                    return ((path == filename) && filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                                    return ((path == filename) && filename.Contains(FilterMusicEntriesQuery, StringComparison.CurrentCultureIgnoreCase));
                                 }
                                 else
                                 {
@@ -1462,9 +1610,9 @@ namespace MPDCtrl.ViewModels
                             {
                                 // 絞り込みモード
 
-                                if (!string.IsNullOrEmpty(_filterQuery))
+                                if (!string.IsNullOrEmpty(FilterMusicEntriesQuery))
                                 {
-                                    return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath) && filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                                    return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath) && filename.Contains(FilterMusicEntriesQuery, StringComparison.CurrentCultureIgnoreCase));
                                 }
                                 else
                                 {
@@ -1474,9 +1622,9 @@ namespace MPDCtrl.ViewModels
                             else
                             {
                                 // マッチしたフォルダ内だけ
-                                if (!string.IsNullOrEmpty(_filterQuery))
+                                if (!string.IsNullOrEmpty(FilterMusicEntriesQuery))
                                 {
-                                    return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath) && filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                                    return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath) && filename.Contains(FilterMusicEntriesQuery, StringComparison.CurrentCultureIgnoreCase));
                                 }
                                 else
                                 {
@@ -1513,20 +1661,20 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private string _filterQuery = "";
-        public string FilterQuery
+        private string _filterMusicEntriesQuery = "";
+        public string FilterMusicEntriesQuery
         {
             get
             {
-                return _filterQuery;
+                return _filterMusicEntriesQuery;
             }
             set
             {
-                if (_filterQuery == value)
+                if (_filterMusicEntriesQuery == value)
                     return;
 
-                _filterQuery = value;
-                NotifyPropertyChanged("FilterQuery");
+                _filterMusicEntriesQuery = value;
+                NotifyPropertyChanged("FilterMusicEntriesQuery");
 
                 /*
                 var collectionView = CollectionViewSource.GetDefaultView(MusicEntries);
@@ -1567,9 +1715,9 @@ namespace MPDCtrl.ViewModels
                         if (filteringMode)
                         {
                             // 絞り込みモード
-                            if (FilterQuery != "")
+                            if (FilterMusicEntriesQuery != "")
                             {
-                                return (filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                                return (filename.Contains(_filterMusicEntriesQuery, StringComparison.CurrentCultureIgnoreCase));
                             }
                             else
                             {
@@ -1581,9 +1729,9 @@ namespace MPDCtrl.ViewModels
                             // マッチしたフォルダ内だけ
                             path = path.Replace("/", "");
 
-                            if (FilterQuery != "")
+                            if (FilterMusicEntriesQuery != "")
                             {
-                                return ((path == filename) && filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                                return ((path == filename) && filename.Contains(_filterMusicEntriesQuery, StringComparison.CurrentCultureIgnoreCase));
                             }
                             else
                             {
@@ -1599,9 +1747,9 @@ namespace MPDCtrl.ViewModels
                         {
                             // 絞り込みモード
 
-                            if (FilterQuery != "")
+                            if (FilterMusicEntriesQuery != "")
                             {
-                                return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath) && filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                                return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath) && filename.Contains(_filterMusicEntriesQuery, StringComparison.CurrentCultureIgnoreCase));
                             }
                             else
                             {
@@ -1611,9 +1759,9 @@ namespace MPDCtrl.ViewModels
                         else
                         {
                             // マッチしたフォルダ内だけ
-                            if (FilterQuery != "")
+                            if (FilterMusicEntriesQuery != "")
                             {
-                                return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath) && filename.Contains(_filterQuery, StringComparison.CurrentCultureIgnoreCase));
+                                return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath) && filename.Contains(_filterMusicEntriesQuery, StringComparison.CurrentCultureIgnoreCase));
                             }
                             else
                             {
@@ -2799,6 +2947,8 @@ namespace MPDCtrl.ViewModels
 
         // Queue listview ScrollIntoView
         public event EventHandler<int> ScrollIntoView;
+        // Queue listview ScrollIntoView
+        public event EventHandler<int> ScrollIntoViewAndSelect;
 
         #endregion
 
@@ -2912,8 +3062,13 @@ namespace MPDCtrl.ViewModels
             ShowFindCommand = new RelayCommand(ShowFindCommand_Execute, ShowFindCommand_CanExecute);
             ShowFindCancelCommand = new RelayCommand(ShowFindCancelCommand_Execute, ShowFindCancelCommand_CanExecute);
 
+
+            QueueFindShowHideCommand = new RelayCommand(QueueFindShowHideCommand_Execute, QueueFindShowHideCommand_CanExecute);
+
             SearchExecCommand = new RelayCommand(SearchExecCommand_Execute, SearchExecCommand_CanExecute);
-            FilterClearCommand = new RelayCommand(FilterClearCommand_Execute, FilterClearCommand_CanExecute);
+            FilterMusicEntriesClearCommand = new RelayCommand(FilterMusicEntriesClearCommand_Execute, FilterMusicEntriesClearCommand_CanExecute);
+
+            FilterQueueClearCommand = new RelayCommand(FilterQueueClearCommand_Execute, FilterQueueClearCommand_CanExecute);
 
             SearchResultListviewSaveSelectedAsCommand = new GenericRelayCommand<object>(param => SearchResultListviewSaveSelectedAsCommand_Execute(param), param => SearchResultListviewSaveSelectedAsCommand_CanExecute());
             SearchResultListviewSaveSelectedAsPopupCommand = new GenericRelayCommand<string>(param => SearchResultListviewSaveSelectedAsPopupCommand_Execute(param), param => SearchResultListviewSaveSelectedAsPopupCommand_CanExecute());
@@ -2942,6 +3097,8 @@ namespace MPDCtrl.ViewModels
             PlaylistListviewDeletePosCommand = new GenericRelayCommand<object>(param => PlaylistListviewDeletePosCommand_Execute(param), param => PlaylistListviewDeletePosCommand_CanExecute());
             PlaylistListviewDeletePosPopupCommand = new RelayCommand(PlaylistListviewDeletePosPopupCommand_Execute, PlaylistListviewDeletePosPopupCommand_CanExecute);
             PlaylistListviewConfirmDeletePosNotSupportedPopupCommand = new RelayCommand(PlaylistListviewConfirmDeletePosNotSupportedPopupCommand_Execute, PlaylistListviewConfirmDeletePosNotSupportedPopupCommand_CanExecute);
+
+            QueueFilterSelectCommand = new GenericRelayCommand<object>(param => QueueFilterSelectCommand_Execute(param), param => QueueFilterSelectCommand_CanExecute());
 
             #endregion
 
@@ -4163,6 +4320,8 @@ namespace MPDCtrl.ViewModels
         private async void UpdateCurrentQueue()
         {
             bool isAlbumArtChanged = false;
+
+            IsQueueFindVisible = false;
 
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -5452,6 +5611,45 @@ namespace MPDCtrl.ViewModels
 
         }
 
+        public ICommand FilterQueueClearCommand { get; }
+        public bool FilterQueueClearCommand_CanExecute()
+        {
+            if (string.IsNullOrEmpty(FilterQueueQuery))
+                return false;
+            return true;
+        }
+        public void FilterQueueClearCommand_Execute()
+        {
+            FilterQueueQuery = "";
+        }
+
+        public ICommand QueueFindShowHideCommand { get; }
+        public bool QueueFindShowHideCommand_CanExecute()
+        {
+            return true;
+        }
+        public void QueueFindShowHideCommand_Execute()
+        {
+            if (IsQueueFindVisible)
+            {
+                IsQueueFindVisible = false;
+            }
+            else
+            {
+                QueueForFilter.Clear();
+                QueueForFilter =  new ObservableCollection<SongInfo>(Queue);
+                
+                var collectionView = CollectionViewSource.GetDefaultView(QueueForFilter);
+                collectionView.Filter = x =>
+                {
+                    return false;
+                };
+                
+                FilterQueueQuery = "";
+
+                IsQueueFindVisible = true;
+            }
+        }
 
         #endregion
 
@@ -6452,7 +6650,7 @@ namespace MPDCtrl.ViewModels
                 if (_musicDirectories.Children.Count > 0)
                     _musicDirectories.Children[0].Children.Clear();
 
-                FilterQuery = "";
+                FilterMusicEntriesQuery = "";
 
                 SelectedSong = null;
                 CurrentSong = null;
@@ -6576,7 +6774,7 @@ namespace MPDCtrl.ViewModels
                 if (_musicDirectories.Children.Count > 0)
                     _musicDirectories.Children[0].Children.Clear();
 
-                FilterQuery = "";
+                FilterMusicEntriesQuery = "";
 
                 SelectedSong = null;
                 CurrentSong = null;
@@ -6726,16 +6924,16 @@ namespace MPDCtrl.ViewModels
             */
         }
 
-        public ICommand FilterClearCommand { get; }
-        public bool FilterClearCommand_CanExecute()
+        public ICommand FilterMusicEntriesClearCommand { get; }
+        public bool FilterMusicEntriesClearCommand_CanExecute()
         {
-            if (string.IsNullOrEmpty(FilterQuery))
+            if (string.IsNullOrEmpty(FilterMusicEntriesQuery))
                 return false;
             return true;
         }
-        public void FilterClearCommand_Execute()
+        public void FilterMusicEntriesClearCommand_Execute()
         {
-            FilterQuery = "";
+            FilterMusicEntriesQuery = "";
         }
 
         #endregion
@@ -6911,35 +7109,7 @@ namespace MPDCtrl.ViewModels
             IsPlaylistSelectDialogShow = false;
         }
 
-        public ICommand ShowFindCommand { get; }
-        public bool ShowFindCommand_CanExecute()
-        {
-            if (IsConnecting) return false;
-            if (!IsConnected) return false;
-            return true;
-        }
-        public void ShowFindCommand_Execute()
-        {
-            if (IsConnecting) return;
-            if (!IsConnected) return;
 
-            if (IsSettingsShow) return;
-            if (IsComfirmationDialogShow) return;
-            if (IsInformationDialogShow) return;
-            if (IsInputDialogShow) return;
-            if (IsChangePasswordDialogShow) return;
-            if (IsPlaylistSelectDialogShow) return;
-
-
-            if (IsFindDialogShow)
-            {
-                IsFindDialogShow = false;
-            }
-            else
-            {
-                IsFindDialogShow = true;
-            }
-        }
 
         public ICommand ShowFindCancelCommand { get; }
         public bool ShowFindCancelCommand_CanExecute()
@@ -6949,32 +7119,6 @@ namespace MPDCtrl.ViewModels
         public void ShowFindCancelCommand_Execute()
         {
             IsFindDialogShow = false;
-        }
-
-        public ICommand EscapeCommand { get; }
-        public bool EscapeCommand_CanExecute()
-        {
-            return true;
-        }
-        public void EscapeCommand_ExecuteAsync()
-        {
-            // 検索画面の上に他のダイアログが被る事があるので、Esc一発で全部閉じないように。
-            if (IsFindDialogShow)
-            {
-                if ((!IsComfirmationDialogShow) && (!IsInformationDialogShow) && (!IsInputDialogShow) && (!IsPlaylistSelectDialogShow))
-                {
-                    IsFindDialogShow = false;
-                }
-            }
-
-            IsSettingsShow = false;
-            IsComfirmationDialogShow = false;
-            IsInformationDialogShow = false;
-            IsInputDialogShow = false;
-            IsChangePasswordDialogShow = false;
-            IsPlaylistSelectDialogShow = false;
-
-
         }
 
         #endregion
@@ -7186,6 +7330,97 @@ namespace MPDCtrl.ViewModels
         }
 
         #endregion
+
+        #region == Find ==
+
+        public ICommand ShowFindCommand { get; }
+        public bool ShowFindCommand_CanExecute()
+        {
+            return true;
+        }
+        public void ShowFindCommand_Execute()
+        {
+            if (SelectedNodeMenu is NodeMenuQueue)
+            {
+                if (IsQueueFindVisible)
+                {
+                    IsQueueFindVisible = false;
+                }
+                else
+                {
+                    IsQueueFindVisible = true;
+                }
+
+            }
+            else if(SelectedNodeMenu is NodeMenuSearch)
+            {
+
+            }
+            else
+            {
+                SelectedNodeMenu = _mainMenuItems.SearchDirectory;
+
+                IsQueueFindVisible = false;
+            }
+
+
+
+            
+        }
+
+        public ICommand QueueFilterSelectCommand { get; set; }
+        public bool QueueFilterSelectCommand_CanExecute()
+        {
+            return true;
+        }
+        public void QueueFilterSelectCommand_Execute(object obj)
+        {
+            if (obj == null)
+                return;
+
+            if (obj != _selectedQueueFilterSong)
+                return;
+
+            IsQueueFindVisible = false;
+
+            if (_selectedQueueFilterSong != null)
+            {
+                ScrollIntoViewAndSelect?.Invoke(this, _selectedQueueFilterSong.Index);
+            }
+        }
+
+        #endregion
+
+        public ICommand EscapeCommand { get; }
+        public bool EscapeCommand_CanExecute()
+        {
+            return true;
+        }
+        public void EscapeCommand_ExecuteAsync()
+        {
+            /*
+            // 検索画面の上に他のダイアログが被る事があるので、Esc一発で全部閉じないように。
+            if (IsFindDialogShow)
+            {
+                if ((!IsComfirmationDialogShow) && (!IsInformationDialogShow) && (!IsInputDialogShow) && (!IsPlaylistSelectDialogShow))
+                {
+                    IsFindDialogShow = false;
+                }
+            }
+
+            IsSettingsShow = false;
+            IsComfirmationDialogShow = false;
+            IsInformationDialogShow = false;
+            IsInputDialogShow = false;
+            IsChangePasswordDialogShow = false;
+            IsPlaylistSelectDialogShow = false;
+
+            */
+
+
+            IsQueueFindVisible = false;
+        }
+
 
         #endregion
     }

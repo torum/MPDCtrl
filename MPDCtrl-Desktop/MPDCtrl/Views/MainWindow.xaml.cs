@@ -41,6 +41,7 @@ namespace MPDCtrl.Views
                 if (vm != null)
                 {
                     vm.ScrollIntoView += (sender, arg) => { this.OnScrollIntoView(arg); };
+                    vm.ScrollIntoViewAndSelect += (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
 
                     vm.DebugWindowShowHide += () => OnDebugWindowShowHide();
 
@@ -68,6 +69,24 @@ namespace MPDCtrl.Views
                 ListViewItem lvi = QueueListview.ItemContainerGenerator.ContainerFromIndex(arg) as ListViewItem;
                 if (lvi != null)
                     lvi.Focus();
+            }
+        }
+
+        public void OnScrollIntoViewAndSelect(int arg)
+        {
+            if (QueueListview.Items.Count > arg)
+            {
+                //QueueListview.ScrollIntoView(QueueListview.Items[arg]);
+
+                QueueListview.SelectedItems.Clear();
+
+                ListViewItem lvi = QueueListview.ItemContainerGenerator.ContainerFromIndex(arg) as ListViewItem;
+                if (lvi != null)
+                {
+                    QueueListview.ScrollIntoView(lvi);
+                    lvi.IsSelected = true;
+                    lvi.Focus();
+                }
             }
         }
 
@@ -203,6 +222,36 @@ namespace MPDCtrl.Views
                 }
             }
         }
+
+        private void QueueFilterComboBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (sender != null)
+            {
+                if (sender is ComboBox)
+                {
+                    ComboBox comboBox = (System.Windows.Controls.ComboBox)sender;
+
+                    if (comboBox.Visibility == Visibility.Visible)
+                    {
+                        Keyboard.Focus(comboBox);
+                        comboBox.Focus();
+
+                        comboBox.SelectedIndex = -1;
+                        comboBox.IsEditable = true;
+
+                        var textBox = comboBox.Template.FindName("PART_EditableTextBox", comboBox) as TextBox;
+                        if (textBox != null)
+                        {
+                            Keyboard.Focus(textBox);
+                            textBox.Focus();
+                            textBox.SelectionStart = textBox.Text.Length;
+                            Debug.WriteLine("asdfasdfasdfasdfasdf");
+                        }
+                    }
+                }
+            }
+        }
+
 
         private void DialogInputTextBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {

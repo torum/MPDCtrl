@@ -12,11 +12,11 @@ namespace MPDCtrl.Models
     /// </summary>
     public class Song : ViewModelBase
     {
-        public string file { get; set; }
-        public string Title { get; set; }
-        public string Track { get; set; }
-        public string Disc { get; set; }
-        public string Time { get; set; }
+        public string file { get; set; } = "";
+        public string Title { get; set; } = "";
+        public string Track { get; set; } = "";
+        public string Disc { get; set; } = "";
+        public string Time { get; set; } = "";
         public string TimeFormated
         {
             get
@@ -83,13 +83,13 @@ namespace MPDCtrl.Models
                 return dtime;
             }
         }
-        public string duration { get; set; }
-        public string Artist { get; set; }
-        public string Album { get; set; }
-        public string AlbumArtist { get; set; }
-        public string Composer { get; set; }
-        public string Date { get; set; }
-        public string Genre { get; set; }
+        public string duration { get; set; } = "";
+        public string Artist { get; set; } = "";
+        public string Album { get; set; } = "";
+        public string AlbumArtist { get; set; } = "";
+        public string Composer { get; set; } = "";
+        public string Date { get; set; } = "";
+        public string Genre { get; set; } = "";
 
         private string _lastModified;
         public string LastModified

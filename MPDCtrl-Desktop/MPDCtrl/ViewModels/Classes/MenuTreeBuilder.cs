@@ -82,6 +82,16 @@ namespace MPDCtrl.ViewModels.Classes
             }
         }
 
+        private NodeMenuSearch _searchDirectory;
+
+        public NodeMenuSearch SearchDirectory
+        {
+            get
+            {
+                return _searchDirectory;
+            }
+        }
+
         public MenuTreeBuilder()
         {
             NodeMenuQueue queue = new NodeMenuQueue(MPDCtrl.Properties.Resources.MenuTreeItem_Queue); 
@@ -98,6 +108,8 @@ namespace MPDCtrl.ViewModels.Classes
 
             search.Parent = this;
             this.Children.Add(search);
+
+            _searchDirectory = search;
 
 
             NodeMenuBrowse browse = new NodeMenuBrowse(MPDCtrl.Properties.Resources.MenuTreeItem_Browse);

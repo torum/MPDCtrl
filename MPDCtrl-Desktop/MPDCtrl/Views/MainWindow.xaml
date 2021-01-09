@@ -7,6 +7,7 @@
         xmlns:helpers="clr-namespace:MPDCtrl.Helpers"
         xmlns:vms="clr-namespace:MPDCtrl.ViewModels"
         xmlns:local="clr-namespace:MPDCtrl"
+        xmlns:mstheme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
         mc:Ignorable="d"
         WindowStyle="None"
         Background="{DynamicResource WindowBackgroundBaseColorBrush}"
@@ -14,7 +15,9 @@
         DataContext="{StaticResource MainViewModel}"
         Title="{Binding AppTitle}"
         Width="780" Height="480"
-        MinWidth="780" MinHeight="250">
+        MinWidth="780" MinHeight="250"
+    >
+
     <Window.Style>
         <Style TargetType="Window">
             <Style.Triggers>
@@ -375,14 +378,21 @@
                 <Grid>
 
                     <Grid Visibility="{Binding IsQueueVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
-                        
-                        <ListView x:Name="QueueListview" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedSong, Mode=TwoWay}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" SelectionChanged="QueueListview_SelectionChanged">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ListView x:Name="QueueListview" Grid.Row="1" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedSong, Mode=TwoWay}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" SelectionChanged="QueueListview_SelectionChanged">
                             <ListView.InputBindings>
                                 <KeyBinding Key="Return" Command="{Binding Path=DataContext.QueueListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                                 <KeyBinding Gesture="Ctrl+U" Command="{Binding Path=DataContext.QueueListviewMoveUpCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                                 <KeyBinding Gesture="Ctrl+D" Command="{Binding Path=DataContext.QueueListviewMoveDownCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                                 <KeyBinding Gesture="Ctrl+Delete" Command="{Binding Path=DataContext.QueueListviewDeleteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                                 <KeyBinding Gesture="Ctrl+J" Command="{Binding Path=DataContext.ScrollIntoNowPlayingCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"/>
+                                <KeyBinding Gesture="Ctrl+F" Command="{Binding Path=DataContext.QueueFindShowHideCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"/>
                             </ListView.InputBindings>
                             <!--
                             <ListView.ContextMenu>
@@ -842,6 +852,94 @@
                                 </GridView>
                             </ListView.View>
                         </ListView>
+
+
+                        <Border Grid.Row="0" Margin="0 32 23 0" Padding="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="580" Background="WhiteSmoke" CornerRadius="1" Visibility="{Binding IsQueueFindVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                            <StackPanel>
+                                <TextBox Text="{Binding FilterQueueQuery, UpdateSourceTrigger=PropertyChanged}" KeyboardNavigation.TabNavigation="Local" Margin="0" Padding="3" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" IsVisibleChanged="TextBox_IsVisibleChanged">
+                                    <TextBox.Style>
+                                        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource DefaultTextBoxStyle}">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type TextBox}">
+                                                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" SnapsToDevicePixels="True">
+                                                            <Grid>
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="*"/>
+                                                                </Grid.RowDefinitions>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                </Grid.ColumnDefinitions>
+                                                                <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+
+                                                                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0" VerticalAlignment="Bottom">
+                                                                    <RadioButton GroupName="FilterQueryTags" Margin="2 0 0 0" Content="{x:Static properties:Resources.QueueListviewColumnHeader_Title}" Height="22" Width="80" IsChecked="{Binding Path=SelectedQueueFilterTags, ConverterParameter={x:Static vms:SearchTags.Title}, Converter={StaticResource EnumBooleanConverter}}" Style="{DynamicResource SelectionRadioButtonStyle}"/>
+                                                                    <RadioButton GroupName="FilterQueryTags" Margin="2 0 0 0" Content="{x:Static properties:Resources.QueueListviewColumnHeader_Artist}" Height="22" Width="80" IsChecked="{Binding Path=SelectedQueueFilterTags, ConverterParameter={x:Static vms:SearchTags.Artist}, Converter={StaticResource EnumBooleanConverter}}" Style="{DynamicResource SelectionRadioButtonStyle}"/>
+                                                                    <RadioButton GroupName="FilterQueryTags" Margin="2 0 0 0" Content="{x:Static properties:Resources.QueueListviewColumnHeader_Album}" Height="22" Width="80" IsChecked="{Binding Path=SelectedQueueFilterTags, ConverterParameter={x:Static vms:SearchTags.Album}, Converter={StaticResource EnumBooleanConverter}}" Style="{DynamicResource SelectionRadioButtonStyle}"/>
+                                                                    <RadioButton GroupName="FilterQueryTags" Margin="2 0 0 0" Content="{x:Static properties:Resources.QueueListviewColumnHeader_Genre}" Height="22" Width="80" IsChecked="{Binding Path=SelectedQueueFilterTags, ConverterParameter={x:Static vms:SearchTags.Genre}, Converter={StaticResource EnumBooleanConverter}}" Style="{DynamicResource SelectionRadioButtonStyle}"/>
+                                                                </StackPanel>
+
+                                                            </Grid>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsEnabled" Value="false">
+                                                                <Setter Property="Opacity" TargetName="border" Value="0.56"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsMouseOver" Value="true">
+                                                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource ControlMouseOverColorBrush}"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsKeyboardFocused" Value="true">
+                                                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource ControlPressedColorBrush}"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Style.Triggers>
+                                                <MultiTrigger>
+                                                    <MultiTrigger.Conditions>
+                                                        <Condition Property="IsInactiveSelectionHighlightEnabled" Value="true"/>
+                                                        <Condition Property="IsSelectionActive" Value="false"/>
+                                                    </MultiTrigger.Conditions>
+                                                    <Setter Property="SelectionBrush" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"/>
+                                                </MultiTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                                <ListBox ItemsSource="{Binding QueueForFilter}" SelectedItem="{Binding SelectedQueueFilterSong}" MaxHeight="240" BorderThickness="0">
+                                    <ListBox.InputBindings>
+                                        <KeyBinding Key="Return" Command="{Binding Path=DataContext.QueueFilterSelectCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}}" />
+                                    </ListBox.InputBindings>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Background="WhiteSmoke" Width="548">
+                                                <Grid.InputBindings>
+                                                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Path=DataContext.QueueFilterSelectCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}}"/>
+                                                </Grid.InputBindings>
+                                                <StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock x:Name="filterListBoxTitle" Text="{Binding Path=Title, Mode=OneWay}" TextWrapping="Wrap" FontWeight="Bold" Margin="0" Padding="3 0 3 0" />
+                                                        <TextBlock x:Name="fitterListBoxAlbum" Text="{Binding Path=Album, Mode=OneWay}" TextWrapping="Wrap" FontStyle="Italic" Margin="0" Padding="3 0 3 0"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock x:Name="filterListBoxArtist" Text="{Binding Path=Artist, Mode=OneWay}" TextWrapping="Wrap" Margin="0" Padding="3 0 3 0"/>
+                                                        <TextBlock x:Name="fitterListBoxGenre" Text="{Binding Path=Genre, Mode=OneWay}" TextWrapping="Wrap" FontStyle="Italic" Margin="0" Padding="3 0 3 0"/>
+                                                    </StackPanel>
+                                                    <TextBlock x:Name="fitterListBoxNewsTimeStamp" Text="{Binding Path=LastModifiedFormated, Mode=OneWay}" Margin="0" Padding="3 0 3 0" HorizontalAlignment="Right"/>
+                                                </StackPanel>
+                                            </Grid>
+                                            <DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}" Value="True">
+                                                    <Setter TargetName="filterListBoxTitle" Property="TextElement.FontWeight" Value="Bold"/>
+                                                </DataTrigger>
+                                            </DataTemplate.Triggers>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </StackPanel>
+                        </Border>
 
 
                         <Popup IsOpen="{Binding IsSaveAsPlaylistPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
@@ -1466,9 +1564,10 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
+                            <!-- 絞り込みボックス -->
                             <Grid Grid.Row="0">
 
-                                <TextBox x:Name="FilterTextBox" Text="{Binding FilterQuery, UpdateSourceTrigger=PropertyChanged}" KeyboardNavigation.TabNavigation="Local" Padding="3" Margin="3 0 0 3" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+                                <TextBox x:Name="FilterTextBox" Text="{Binding FilterMusicEntriesQuery, UpdateSourceTrigger=PropertyChanged}" KeyboardNavigation.TabNavigation="Local" Padding="3" Margin="3 0 0 3" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
                                     <TextBox.Style>
                                         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource DefaultTextBoxStyle}">
                                             <Setter Property="Template">
@@ -1484,8 +1583,8 @@
                                                                     <ColumnDefinition Width="28"/>
                                                                 </Grid.ColumnDefinitions>
                                                                 <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
-                                                                
-                                                                <Button Grid.Column="1" Height="22" Width="22" Margin="0" HorizontalAlignment="Right" ToolTip="{x:Static properties:Resources.FilterClear}" Command="{Binding FilterClearCommand}" IsDefault="False" Content="M14.76,20.83L17.6,18L14.76,15.17L16.17,13.76L19,16.57L21.83,13.76L23.24,15.17L20.43,18L23.24,20.83L21.83,22.24L19,19.4L16.17,22.24L14.76,20.83M12,12V19.88C12.04,20.18 11.94,20.5 11.71,20.71C11.32,21.1 10.69,21.1 10.3,20.71L8.29,18.7C8.06,18.47 7.96,18.16 8,17.87V12H7.97L2.21,4.62C1.87,4.19 1.95,3.56 2.38,3.22C2.57,3.08 2.78,3 3,3V3H17V3C17.22,3 17.43,3.08 17.62,3.22C18.05,3.56 18.13,4.19 17.79,4.62L12.03,12H12Z">
+
+                                                                <Button Grid.Column="1" Height="22" Width="22" Margin="0" HorizontalAlignment="Right" ToolTip="{x:Static properties:Resources.FilterClear}" Command="{Binding FilterMusicEntriesClearCommand}" IsDefault="False" Content="M14.76,20.83L17.6,18L14.76,15.17L16.17,13.76L19,16.57L21.83,13.76L23.24,15.17L20.43,18L23.24,20.83L21.83,22.24L19,19.4L16.17,22.24L14.76,20.83M12,12V19.88C12.04,20.18 11.94,20.5 11.71,20.71C11.32,21.1 10.69,21.1 10.3,20.71L8.29,18.7C8.06,18.47 7.96,18.16 8,17.87V12H7.97L2.21,4.62C1.87,4.19 1.95,3.56 2.38,3.22C2.57,3.08 2.78,3 3,3V3H17V3C17.22,3 17.43,3.08 17.62,3.22C18.05,3.56 18.13,4.19 17.79,4.62L12.03,12H12Z">
                                                                     <Button.Resources>
                                                                         <Style x:Key="ButtonIntextboxFocusVisual">
                                                                             <Setter Property="Control.Template">
@@ -2336,7 +2435,6 @@
                     </Grid>
 
                 </Grid>
-
 
             </Grid>
 

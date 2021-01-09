@@ -3,11 +3,10 @@
 MPDCtrl is a client app for [MPD (Music player daemon)](http://www.musicpd.org/). 
   
 
-- Download:  
-MPDCtrl for Windows desktop -
+- MPDCtrl for Windows desktop :
 [Download from Micorsoft Store](https://www.microsoft.com/store/apps/9NV2BBJ82BRX)
   
-MPDCtrl for mobile and more - coming soon.
+- MPDCtrl for mobile and more : coming soon.
    
 
 ### MPDCtrl for desktop v3.x

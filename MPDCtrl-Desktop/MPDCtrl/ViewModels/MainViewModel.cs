@@ -62,6 +62,7 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v3.0.0.4 Queue listview Ctrl+F
     /// v3.0.0.3 Find is done.
     /// v3.0.0.2 MPD protocol のバージョンが0.19.x以下だったらステータスバーにメッセージを出すようにした。Closeボタンの背景を赤にした。playlistのコンテキストメニューの文字変更。
     /// v3.0.0.1 SysButtonの背景を変えた。接続シークエンスで諸々の情報取得を独立的に行うようにした（一つ失敗しても他はロードされるように）。LocalFilesが正しくClearされるようにした。
@@ -97,7 +98,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.0.3";
+        const string _appVer = "v3.0.0.4";
 
         public static string AppVer
         {
@@ -7342,15 +7343,7 @@ namespace MPDCtrl.ViewModels
         {
             if (SelectedNodeMenu is NodeMenuQueue)
             {
-                if (IsQueueFindVisible)
-                {
-                    IsQueueFindVisible = false;
-                }
-                else
-                {
-                    IsQueueFindVisible = true;
-                }
-
+                QueueFindShowHideCommand_Execute();
             }
             else if(SelectedNodeMenu is NodeMenuSearch)
             {
@@ -7362,10 +7355,6 @@ namespace MPDCtrl.ViewModels
 
                 IsQueueFindVisible = false;
             }
-
-
-
-            
         }
 
         public ICommand QueueFilterSelectCommand { get; set; }

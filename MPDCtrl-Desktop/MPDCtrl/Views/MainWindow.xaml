@@ -333,6 +333,63 @@
             <Grid Grid.Row="2" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:SizeChange.IsEnabled="True" helpers:SizeChange.ActualWidth="{Binding MainLeftPainActualWidth, Mode=OneWayToSource}">
                 <TreeView Margin="0 1 0 0" Style="{DynamicResource TreeViewMenuStyle}" ItemsSource="{Binding MainMenuItems}"  helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeMenu, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <TreeView.Resources>
+
+                        <ContextMenu x:Key="TreeviewMenuItemContextMenu">
+
+                            <MenuItem Header="{x:Static properties:Resources.TreeviewMenuItemContextMenu_Load}" Command="{Binding Path=DataContext.TreeviewMenuItemLoadPlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}}" Visibility="{Binding DataContext.IsPlaylistItemVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}}">
+                                <MenuItem.Resources>
+                                    <ControlTemplate x:Key="PlusIcon">
+                                        <Canvas Background="Transparent" >
+                                            <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                                        </Canvas>
+                                    </ControlTemplate>
+                                </MenuItem.Resources>
+                                <MenuItem.Icon>
+                                    <ContentControl Template="{StaticResource PlusIcon}" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="{x:Static properties:Resources.PlaylistItemContextMenu_ClearAndLoad}" Command="{Binding Path=DataContext.TreeviewMenuItemClearLoadPlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}}" Visibility="{Binding DataContext.IsPlaylistItemVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}}">
+                                <MenuItem.Resources>
+                                    <ControlTemplate x:Key="PlusThickIcon">
+                                        <Canvas Background="Transparent" >
+                                            <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z" />
+                                        </Canvas>
+                                    </ControlTemplate>
+                                </MenuItem.Resources>
+                                <MenuItem.Icon>
+                                    <ContentControl Template="{StaticResource PlusThickIcon}" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <Separator/>
+                            <!--
+                                    <MenuItem Header="{x:Static properties:Resources.PlaylistItemContextMenu_Rename}" Command="{Binding Path=DataContext.TreeviewMenuItemRenamePlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}}">
+                                        <MenuItem.Resources>
+                                            <ControlTemplate x:Key="PlaylistEditIcon">
+                                                <Canvas Background="Transparent" >
+                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M2,6V8H14V6H2M2,10V12H14V10H2M20.04,10.13C19.9,10.13 19.76,10.19 19.65,10.3L18.65,11.3L20.7,13.35L21.7,12.35C21.92,12.14 21.92,11.79 21.7,11.58L20.42,10.3C20.31,10.19 20.18,10.13 20.04,10.13M18.07,11.88L12,17.94V20H14.06L20.12,13.93L18.07,11.88M2,14V16H10V14H2Z" />
+                                                </Canvas>
+                                            </ControlTemplate>
+                                        </MenuItem.Resources>
+                                        <MenuItem.Icon>
+                                            <ContentControl Template="{StaticResource PlaylistEditIcon}" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    
+                            <MenuItem Header="{x:Static properties:Resources.PlaylistItemContextMenu_Remove}" Command="{Binding Path=DataContext.TreeviewMenuItemRemovePlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}}" Visibility="{Binding DataContext.IsPlaylistItemVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}}">
+                                <MenuItem.Resources>
+                                    <ControlTemplate x:Key="PlaylistRemoveIcon">
+                                        <Canvas Background="Transparent" >
+                                            <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M2,6V8H14V6H2M2,10V12H11V10H2M14.17,10.76L12.76,12.17L15.59,15L12.76,17.83L14.17,19.24L17,16.41L19.83,19.24L21.24,17.83L18.41,15L21.24,12.17L19.83,10.76L17,13.59L14.17,10.76M2,14V16H11V14H2Z" />
+                                        </Canvas>
+                                    </ControlTemplate>
+                                </MenuItem.Resources>
+                                <MenuItem.Icon>
+                                    <ContentControl Template="{StaticResource PlaylistRemoveIcon}" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            -->
+                        </ContextMenu>
+
                         <Style TargetType="{x:Type ScrollBar}">
                             <Setter Property="Margin" Value="0,0,0,0" />
                             <Setter Property="BorderThickness" Value="0" />
@@ -362,6 +419,7 @@
                             <Setter Property="OverridesDefaultStyle" Value="False" />
                             <Setter Property="IsExpanded" Value="{Binding Expanded, Mode=TwoWay}"/>
                             <Setter Property="IsSelected" Value="{Binding Selected, Mode=TwoWay}"/>
+                            <Setter Property="ContextMenu" Value="{StaticResource TreeviewMenuItemContextMenu}"/>
                         </Style>
                     </TreeView.ItemContainerStyle>
                 </TreeView>
@@ -445,6 +503,7 @@
                                             <ContentControl Template="{StaticResource NowPlayingIcon}" />
                                         </MenuItem.Icon>
                                     </MenuItem>
+                                    
                                     <Separator/>
                                     <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_SelectedItems}">
                                         <MenuItem.Resources>
@@ -537,6 +596,7 @@
                                             </MenuItem.Icon>
                                         </MenuItem>
                                     </MenuItem>
+                                    
                                     <Separator />
                                     <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_Queue}">
                                         <MenuItem.Resources>
@@ -549,6 +609,7 @@
                                         <MenuItem.Icon>
                                             <ContentControl Template="{StaticResource PlaylistPlay}" />
                                         </MenuItem.Icon>
+                                        
                                         <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_QueueSaveAsPlaylist}" Command="{Binding Path=DataContext.QueueListviewSaveAsCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
                                             <MenuItem.Resources>
                                                 <ControlTemplate x:Key="PlaylistPlusIcon">
@@ -1013,7 +1074,7 @@
                                         </Grid.ColumnDefinitions>
 
                                         <Label Grid.Row="0" Grid.Column="1" Padding="3" VerticalAlignment="Bottom" Content="{x:Static properties:Resources.Popup_SelectPlaylist}"></Label>
-                                        <ListView Grid.Row="1" Grid.Column="1" x:Name="PopupPlaylistSelectListview" ItemsSource="{Binding Playlists}" DisplayMemberPath=".">
+                                        <ListView Grid.Row="1" Grid.Column="1" x:Name="PopupPlaylistSelectListview" ItemsSource="{Binding Playlists}" DisplayMemberPath="Name">
                                             
                                         </ListView>
                                     </Grid>
@@ -1494,7 +1555,7 @@
                                         </Grid.ColumnDefinitions>
 
                                         <Label Grid.Row="0" Grid.Column="1" Padding="3" VerticalAlignment="Bottom" Content="{x:Static properties:Resources.Popup_SelectPlaylist}"></Label>
-                                        <ListView Grid.Row="1" Grid.Column="1" x:Name="PopupPlaylistSelectListviewAtSearchResult" ItemsSource="{Binding Playlists}" DisplayMemberPath=".">
+                                        <ListView Grid.Row="1" Grid.Column="1" x:Name="PopupPlaylistSelectListviewAtSearchResult" ItemsSource="{Binding Playlists}" DisplayMemberPath="Name">
 
                                         </ListView>
                                     </Grid>
@@ -1813,6 +1874,7 @@
                                                 </DataTemplate>
                                             </GridViewColumn.CellTemplate>
                                         </GridViewColumn>
+
                                     </GridView>
                                 </ListView.View>
                                 <ListView.ItemContainerStyle>
@@ -1885,7 +1947,7 @@
                                             </Grid.ColumnDefinitions>
 
                                             <Label Grid.Row="0" Grid.Column="1" Padding="3" VerticalAlignment="Bottom" Content="{x:Static properties:Resources.Popup_SelectPlaylist}"></Label>
-                                            <ListView Grid.Row="1" Grid.Column="1" x:Name="PopupPlaylistSelectListviewAtSongFiles" ItemsSource="{Binding Playlists}" DisplayMemberPath=".">
+                                            <ListView Grid.Row="1" Grid.Column="1" x:Name="PopupPlaylistSelectListviewAtSongFiles" ItemsSource="{Binding Playlists}" DisplayMemberPath="Name">
 
                                             </ListView>
                                         </Grid>
@@ -1906,6 +1968,7 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="0" />
                                 <ColumnDefinition Width="32" />
+                                <ColumnDefinition Width="2*" />
                                 <ColumnDefinition Width="1*" />
                             </Grid.ColumnDefinitions>
 
@@ -1913,6 +1976,7 @@
                             <Grid x:Name="PlaylistsListviewDummy0" Grid.Column="0" />
                             <Grid x:Name="PlaylistsListviewDummy1" Grid.Column="1" />
                             <Grid x:Name="PlaylistsListviewDummy2" Grid.Column="2" />
+                            <Grid x:Name="PlaylistsListviewDummy3" Grid.Column="3" />
                         </Grid>
 
                         <ListView x:Name="PlaylistsListview" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}" SelectionMode="Single" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True"  IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
@@ -2022,12 +2086,12 @@
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
-                                    <GridViewColumn Width="{Binding ElementName=PlaylistsListviewDummy2, Path=ActualWidth}" helpers:GridViewSort.PropertyName=".">
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistsListviewDummy2, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Name">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.PlaylistsListviewColumnHeader_Playlists}"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="PlaylistsListviewSongTitleListItemTextBlock" Text="{Binding }" Padding="3" />
+                                                    <TextBlock x:Name="PlaylistsListviewSongTitleListItemTextBlock" Text="{Binding Path=Name}" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
@@ -2038,6 +2102,22 @@
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistsListviewDummy3, Path=ActualWidth}" helpers:GridViewSort.PropertyName="LastModified">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_LastModified}"/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock x:Name="PlaylistsListviewLastModifiedListItemTextBlock" Text="{Binding Path=LastModifiedFormated}" Padding="3" />
+                                                </StackPanel>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="PlaylistsListviewLastModifiedListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    
                                 </GridView>
                             </ListView.View>
                             <ListView.ItemContainerStyle>
@@ -2118,43 +2198,69 @@
                         <ListView x:Name="PlaylistSongsListview" Grid.Row="1" ItemsSource="{Binding PlaylistSongs}" SelectedItem="{Binding SelectedPlaylistSong}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListView.Resources>
                                 <ContextMenu x:Key="PlaylistSongsListviewItemContextMenu">
-                                    <MenuItem Header="{x:Static properties:Resources.SongsItemContextMenu_Add}" Command="{Binding Path=DataContext.SongsListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                    <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_SelectedItems}">
                                         <MenuItem.Resources>
-                                            <ControlTemplate x:Key="PlusIcon">
+                                            <ControlTemplate x:Key="CheckUnderlineIcon">
                                                 <Canvas Background="Transparent" >
-                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M21,5L9,17L3.5,11.5L4.91,10.09L9,14.17L19.59,3.59L21,5M3,21V19H21V21H3Z" />
                                                 </Canvas>
                                             </ControlTemplate>
                                         </MenuItem.Resources>
                                         <MenuItem.Icon>
-                                            <ContentControl Template="{StaticResource PlusIcon}" />
+                                            <ContentControl Template="{StaticResource CheckUnderlineIcon}" />
                                         </MenuItem.Icon>
+                                        
+                                        <MenuItem Header="{x:Static properties:Resources.SongsItemContextMenu_Add}" Command="{Binding Path=DataContext.SongsListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                            <MenuItem.Resources>
+                                                <ControlTemplate x:Key="PlusIcon">
+                                                    <Canvas Background="Transparent" >
+                                                        <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                                                    </Canvas>
+                                                </ControlTemplate>
+                                            </MenuItem.Resources>
+                                            <MenuItem.Icon>
+                                                <ContentControl Template="{StaticResource PlusIcon}" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="{x:Static properties:Resources.PlaylistSongsContextMenu_Remove}" Command="{Binding Path=DataContext.PlaylistListviewDeletePosCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                            <MenuItem.Resources>
+                                                <ControlTemplate x:Key="PlaylistMinusIcon">
+                                                    <Canvas Background="Transparent" >
+                                                        <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M2,16H10V14H2M12,14V16H22V14M14,6H2V8H14M14,10H2V12H14V10Z" />
+                                                    </Canvas>
+                                                </ControlTemplate>
+                                            </MenuItem.Resources>
+                                            <MenuItem.Icon>
+                                                <ContentControl Template="{StaticResource PlaylistMinusIcon}" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
                                     </MenuItem>
+                                    
                                     <Separator/>
-                                    <MenuItem Header="{x:Static properties:Resources.PlaylistSongsContextMenu_Remove}" Command="{Binding Path=DataContext.PlaylistListviewDeletePosCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                    <MenuItem Header="{x:Static properties:Resources.PlaylistSongsContextMenu_Playlist}">
                                         <MenuItem.Resources>
-                                            <ControlTemplate x:Key="PlaylistMinusIcon">
+                                            <ControlTemplate x:Key="Playlist">
                                                 <Canvas Background="Transparent" >
-                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M2,16H10V14H2M12,14V16H22V14M14,6H2V8H14M14,10H2V12H14V10Z" />
+                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M15,6H3V8H15V6M15,10H3V12H15V10M3,16H11V14H3V16M17,6V14.18C16.69,14.07 16.35,14 16,14A3,3 0 0,0 13,17A3,3 0 0,0 16,20A3,3 0 0,0 19,17V8H22V6H17Z" />
                                                 </Canvas>
                                             </ControlTemplate>
                                         </MenuItem.Resources>
                                         <MenuItem.Icon>
-                                            <ContentControl Template="{StaticResource PlaylistMinusIcon}" />
+                                            <ContentControl Template="{StaticResource Playlist}" />
                                         </MenuItem.Icon>
-                                    </MenuItem>
-                                    <Separator/>
-                                    <MenuItem Header="{x:Static properties:Resources.PlaylistSongsContextMenu_Clear}" Command="{Binding Path=DataContext.PlaylistListviewClearCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
-                                        <MenuItem.Resources>
-                                            <ControlTemplate x:Key="DeleteEmptyOutline">
-                                                <Canvas Background="Transparent" >
-                                                    <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M20.37,8.91L19.37,10.64L7.24,3.64L8.24,1.91L11.28,3.66L12.64,3.29L16.97,5.79L17.34,7.16L20.37,8.91M6,19V7H11.07L18,11V19A2,2 0 0,1 16,21H8A2,2 0 0,1 6,19M8,19H16V12.2L10.46,9H8V19Z" />
-                                                </Canvas>
-                                            </ControlTemplate>
-                                        </MenuItem.Resources>
-                                        <MenuItem.Icon>
-                                            <ContentControl Template="{StaticResource DeleteEmptyOutline}" />
-                                        </MenuItem.Icon>
+
+                                        <MenuItem Header="{x:Static properties:Resources.PlaylistSongsContextMenu_Clear}" Command="{Binding Path=DataContext.PlaylistListviewClearCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
+                                            <MenuItem.Resources>
+                                                <ControlTemplate x:Key="DeleteEmptyOutline">
+                                                    <Canvas Background="Transparent" >
+                                                        <Path Fill="#373737" Width="14.3775" Height="14" Canvas.Left="0.311264" Canvas.Top="0.500005" Stretch="Uniform" Data="M20.37,8.91L19.37,10.64L7.24,3.64L8.24,1.91L11.28,3.66L12.64,3.29L16.97,5.79L17.34,7.16L20.37,8.91M6,19V7H11.07L18,11V19A2,2 0 0,1 16,21H8A2,2 0 0,1 6,19M8,19H16V12.2L10.46,9H8V19Z" />
+                                                    </Canvas>
+                                                </ControlTemplate>
+                                            </MenuItem.Resources>
+                                            <MenuItem.Icon>
+                                                <ContentControl Template="{StaticResource DeleteEmptyOutline}" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
                                     </MenuItem>
                                 </ContextMenu>
                                 <Style TargetType="{x:Type ScrollBar}">

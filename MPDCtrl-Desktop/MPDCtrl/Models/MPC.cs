@@ -85,14 +85,14 @@ namespace MPDCtrl.Models
             get { return _queue; }
         }
 
-        private ObservableCollection<String> _playLists = new ObservableCollection<String>();
-        public ObservableCollection<String> Playlists
+        private ObservableCollection<Playlist> _playLists = new ObservableCollection<Playlist>();
+        public ObservableCollection<Playlist> Playlists
         {
             get { return _playLists; }
         }
 
-        private ObservableCollection<String> _localFiles = new ObservableCollection<String>();
-        public ObservableCollection<String> LocalFiles
+        private ObservableCollection<SongFile> _localFiles = new ObservableCollection<SongFile>();
+        public ObservableCollection<SongFile> LocalFiles
         {
             get { return _localFiles; }
         }
@@ -3767,24 +3767,39 @@ namespace MPDCtrl.Models
                     Playlists.Clear();
 
                     // Tmp list for sorting.
-                    List<string> slTmp = new List<string>();
+                    //List<string> slTmp = new List<string>();
+
+                    Playlist pl = null;
 
                     foreach (string value in resultLines)
                     {
                         if (value.StartsWith("playlist:"))
                         {
+                            /*
                             if (value.Split(':').Length > 1)
                             {
                                 //slTmp.Add(value.Split(':')[1].Trim());
                                 slTmp.Add(value.Replace(value.Split(':')[0] + ": ", ""));
                             }
+                            */
+                            //slTmp.Add(value.Replace("playlist: ", ""));
+
+                            pl = new Playlist();
+                            pl.Name = value.Replace("playlist: ", "");
+
+                            Playlists.Add(pl);
                         }
-                        else if (value.StartsWith("Last-Modified: ") || (value.StartsWith("OK")))
+                        else if (value.StartsWith("Last-Modified: "))
                         {
-                            // Ignoring for now.
+                            if (pl != null)
+                                pl.LastModified = value.Replace("Last-Modified: ", "");
+                        }
+                        else if (value.StartsWith("OK"))
+                        {
+                            // Ignoring.
                         }
                     }
-
+                    /*
                     // Sort.
                     slTmp.Sort();
                     foreach (string v in slTmp)
@@ -3792,6 +3807,7 @@ namespace MPDCtrl.Models
                         Playlists.Add(v);
 
                     }
+                    */
                 });
             }
             catch (Exception e)
@@ -3829,6 +3845,8 @@ namespace MPDCtrl.Models
                     LocalDirectories.Clear();
                 });
 
+                SongFile song = null;
+
                 foreach (string value in resultLines)
                 {
                     if (value.StartsWith("directory:"))
@@ -3840,14 +3858,22 @@ namespace MPDCtrl.Models
                     }
                     else if (value.StartsWith("file:"))
                     {
+                        song = new SongFile();
+                        song.File = value.Replace("file: ", "");
+
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            LocalFiles.Add(value.Replace("file: ", ""));
+                            //LocalFiles.Add(value.Replace("file: ", ""));
+                            LocalFiles.Add(song);
                         });
                     }
                     else if ((value.StartsWith("OK")))
                     {
                         // Ignoring.
+                    }
+                    else
+                    {
+                        //Debug.WriteLine(value);
                     }
                 }
             }
@@ -3862,113 +3888,6 @@ namespace MPDCtrl.Models
                 IsBusy?.Invoke(this, false);
             }
 
-
-            return true;
-        }
-
-        // TODO: 不要？
-        private bool ParseSongResult(List<string> sl)
-        {
-            if (MpdStop) return false;
-            if (sl == null) return false;
-
-
-            // "listplaylist" .. songs containd in a playlist.
-            /*
-             file: Nina Simone/Cellular Soundtrack/Sinnerman (remix).mp3
-             Last-Modified: 2020-09-07T22:56:19Z
-             Artist: Nina Simone 
-             Album: Cellular Soundtrack
-             Title: Sinnerman (remix)
-             Genre: Soundtrack
-             Time: 274
-             duration: 274.364
-            */
-
-            // "find" search result
-            /*
-             file: 2Pac/Better Dayz/17 Better Dayz (Feat. Mr. Biggs).mp3
-             Last-Modified: 2011-02-27T14:20:18Z
-             Format: 44100:f:2
-             Time: 258
-             duration: 257.677
-             Artist: 2Pac
-             Album: Better Dayz
-             Title: Better Dayz (Feat. Mr. Biggs)
-             Track: 17
-             Genre: Rap
-             Date: 2002
-             */
-
-            try
-            {
-                if (Application.Current == null) { return false; }
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    SearchResult.Clear();
-                });
-
-                var comparer = StringComparer.OrdinalIgnoreCase;
-                Dictionary<string, string> SongValues = new Dictionary<string, string>(comparer);
-
-                int i = 0;
-
-                foreach (string line in sl)
-                {
-                    string[] ValuePair = line.Split(':');
-                    if (ValuePair.Length > 1)
-                    {
-                        if (SongValues.ContainsKey(ValuePair[0].Trim()))
-                        {
-                            // Contains means new one.
-
-                            // save old one and clear songvalues.
-                            if (SongValues.ContainsKey("file"))
-                            {
-                                SongInfo sng = FillSong(SongValues, i);
-
-                                i++;
-
-                                SongValues.Clear();
-
-                                Application.Current.Dispatcher.Invoke(() =>
-                                {
-                                    SearchResult.Add(sng);
-                                });
-
-                            }
-
-                            // start over
-                            SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
-                        }
-                        else
-                        {
-                            SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
-                        }
-
-                    }
-                }
-
-                // last one
-                if ((SongValues.Count > 0) && SongValues.ContainsKey("file"))
-                {
-                    SongInfo sng = FillSong(SongValues, i);
-
-                    SongValues.Clear();
-
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        SearchResult.Add(sng);
-                    });
-                }
-
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@ParseSongResult: " + ex.Message);
-
-                return false;
-            }
 
             return true;
         }
@@ -4041,7 +3960,7 @@ namespace MPDCtrl.Models
                             // save old one and clear songvalues.
                             if (SongValues.ContainsKey("file"))
                             {
-                                SongInfo sng = FillSong(SongValues, i);
+                                SongInfo sng = FillSongInfo(SongValues, i);
 
                                 i++;
 
@@ -4068,7 +3987,7 @@ namespace MPDCtrl.Models
                 // last one
                 if ((SongValues.Count > 0) && SongValues.ContainsKey("file"))
                 {
-                    SongInfo sng = FillSong(SongValues, i);
+                    SongInfo sng = FillSongInfo(SongValues, i);
 
                     SongValues.Clear();
 
@@ -4154,7 +4073,7 @@ namespace MPDCtrl.Models
                             // save old one and clear songvalues.
                             if (SongValues.ContainsKey("file"))
                             {
-                                SongInfo sng = FillSong(SongValues, i);
+                                SongInfo sng = FillSongInfo(SongValues, i);
 
                                 i++;
 
@@ -4180,7 +4099,7 @@ namespace MPDCtrl.Models
                 // last one
                 if ((SongValues.Count > 0) && SongValues.ContainsKey("file"))
                 {
-                    SongInfo sng = FillSong(SongValues, i);
+                    SongInfo sng = FillSongInfo(SongValues, i);
 
                     SongValues.Clear();
 
@@ -4201,7 +4120,7 @@ namespace MPDCtrl.Models
             return songList;
         }
 
-        private SongInfo FillSong(Dictionary<string, string> SongValues, int i)
+        private static SongInfo FillSongInfo(Dictionary<string, string> SongValues, int i)
         {
 
             SongInfo sng = new SongInfo();

@@ -355,7 +355,10 @@ SOFTWARE.</value>
     <value>Playlists</value>
   </data>
   <data name="PlaylistSongsContextMenu_Clear" xml:space="preserve">
-    <value>Clear Playlist</value>
+    <value>Clear</value>
+  </data>
+  <data name="PlaylistSongsContextMenu_Playlist" xml:space="preserve">
+    <value>Playlist</value>
   </data>
   <data name="PlaylistSongsContextMenu_Remove" xml:space="preserve">
     <value>Remove From Playlist</value>
@@ -439,7 +442,7 @@ SOFTWARE.</value>
     <value>Up (Ctrl+U)</value>
   </data>
   <data name="QueueItemContextMenu_Queue" xml:space="preserve">
-    <value>Current Queue</value>
+    <value>Queue</value>
   </data>
   <data name="QueueItemContextMenu_QueueClear" xml:space="preserve">
     <value>Clear</value>
@@ -563,6 +566,9 @@ SOFTWARE.</value>
   </data>
   <data name="StatusMsg_UpdatingDb" xml:space="preserve">
     <value>Updating db...</value>
+  </data>
+  <data name="TreeviewMenuItemContextMenu_Load" xml:space="preserve">
+    <value>Load</value>
   </data>
   <data name="Update" xml:space="preserve">
     <value>Update</value>

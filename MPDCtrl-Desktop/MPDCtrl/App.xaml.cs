@@ -86,6 +86,10 @@ namespace MPDCtrl
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
+        private StringBuilder Errortxt = new StringBuilder();
+        public bool IsSaveErrorLog;
+        public string LogFilePath;
+
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             var exception = e.Exception as Exception;
@@ -94,7 +98,9 @@ namespace MPDCtrl
 
             AppendErrorLog("App_DispatcherUnhandledException", exception.Message);
 
-            e.Handled = true;
+            SaveErrorLog();
+
+            e.Handled = false;
         }
 
         private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
@@ -104,6 +110,8 @@ namespace MPDCtrl
             System.Diagnostics.Debug.WriteLine("TaskScheduler_UnobservedTaskException: " + exception.Message);
 
             AppendErrorLog("TaskScheduler_UnobservedTaskException", exception.Message);
+            // save
+            SaveErrorLog();
 
             e.SetObserved();
         }
@@ -126,17 +134,13 @@ namespace MPDCtrl
                 AppendErrorLog("CurrentDomain_UnhandledException", exception.Message);
 
                 // save
-                if (IsSaveErrorLog)
-                    SaveErrorLog(System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl_errors.txt");
-
+                SaveErrorLog();
             }
 
             // TODO:
             //Environment.Exit(1);
         }
 
-        private StringBuilder Errortxt = new StringBuilder();
-        public bool IsSaveErrorLog;
 
         public void AppendErrorLog(string errorTxt, string kindTxt)
         {
@@ -146,11 +150,17 @@ namespace MPDCtrl
             Errortxt.AppendLine(nowString + " - " + kindTxt + " - " + errorTxt);
         }
 
-        public void SaveErrorLog(string logFilePath)
+        public void SaveErrorLog()
         {
+            if (!IsSaveErrorLog)
+                return;
+
+            if (string.IsNullOrEmpty(LogFilePath))
+                return;
+
             string s = Errortxt.ToString();
             if (!string.IsNullOrEmpty(s))
-                File.WriteAllText(logFilePath, s);
+                File.WriteAllText(LogFilePath, s);
         }
 
         // テーマ切替メソッド

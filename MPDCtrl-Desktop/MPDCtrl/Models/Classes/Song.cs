@@ -18,45 +18,6 @@ namespace MPDCtrl.Models
     {
         public string File { get; set; } = "";
 
-        private string _lastModified;
-        public string LastModified
-        {
-            get
-            {
-                return _lastModified;
-            }
-            set
-            {
-                if (_lastModified == value)
-                    return;
-
-                _lastModified = value;
-            }
-        }
-
-        public string LastModifiedFormated
-        {
-            get
-            {
-                DateTime _lastModifiedDateTime = default(DateTime); //new DateTime(1998,04,30)
-
-                if (!string.IsNullOrEmpty(_lastModified))
-                {
-                    try
-                    {
-                        _lastModifiedDateTime = DateTime.Parse(_lastModified, null, System.Globalization.DateTimeStyles.RoundtripKind);
-                    }
-                    catch
-                    {
-                        System.Diagnostics.Debug.WriteLine("Wrong LastModified timestamp format. " + _lastModified);
-                    }
-                }
-
-                var culture = System.Globalization.CultureInfo.CurrentCulture;
-                return _lastModifiedDateTime.ToString(culture);
-            }
-        }
-
     }
 
     /// <summary>
@@ -141,6 +102,45 @@ namespace MPDCtrl.Models
         public string Composer { get; set; } = "";
         public string Date { get; set; } = "";
         public string Genre { get; set; } = "";
+        
+        private string _lastModified;
+        public string LastModified
+        {
+            get
+            {
+                return _lastModified;
+            }
+            set
+            {
+                if (_lastModified == value)
+                    return;
+
+                _lastModified = value;
+            }
+        }
+
+        public string LastModifiedFormated
+        {
+            get
+            {
+                DateTime _lastModifiedDateTime = default(DateTime); //new DateTime(1998,04,30)
+
+                if (!string.IsNullOrEmpty(_lastModified))
+                {
+                    try
+                    {
+                        _lastModifiedDateTime = DateTime.Parse(_lastModified, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                    }
+                    catch
+                    {
+                        System.Diagnostics.Debug.WriteLine("Wrong LastModified timestamp format. " + _lastModified);
+                    }
+                }
+
+                var culture = System.Globalization.CultureInfo.CurrentCulture;
+                return _lastModifiedDateTime.ToString(culture);
+            }
+        }
 
         // for sorting and (playlist pos)
         private int _index;

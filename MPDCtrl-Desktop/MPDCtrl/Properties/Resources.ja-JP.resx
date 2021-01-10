@@ -355,7 +355,10 @@ SOFTWARE.</value>
     <value>プレイリスト</value>
   </data>
   <data name="PlaylistSongsContextMenu_Clear" xml:space="preserve">
-    <value>プレイリストをクリアする</value>
+    <value>クリアする</value>
+  </data>
+  <data name="PlaylistSongsContextMenu_Playlist" xml:space="preserve">
+    <value>プレイリスト</value>
   </data>
   <data name="PlaylistSongsContextMenu_Remove" xml:space="preserve">
     <value>プレイリストから削除する</value>
@@ -566,6 +569,9 @@ SOFTWARE.</value>
   </data>
   <data name="StatusMsg_UpdatingDb" xml:space="preserve">
     <value>データベースを更新中・・・</value>
+  </data>
+  <data name="TreeviewMenuItemContextMenu_Load" xml:space="preserve">
+    <value>キューに追加する</value>
   </data>
   <data name="Update" xml:space="preserve">
     <value>更新</value>

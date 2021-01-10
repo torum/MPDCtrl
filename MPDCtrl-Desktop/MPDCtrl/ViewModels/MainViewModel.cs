@@ -33,19 +33,12 @@ namespace MPDCtrl.ViewModels
     /// 
     /// v3.0.1.x
     /// 
-    /// 
-    /// TreeView menuのプレイリスト選択からキューに追加のコンテキストメニュー。
-    /// PlaylistItemのViewでコンテキストメニューをQueueと同じように、選択項目と全体とに分ける。「削除」も?
-    /// listall Last-updateが欲しい。
-    /// 
     /// v3.0.2 以降
     /// 
     /// 「プレイリストの名前変更」をインラインで。
     /// キューの順番変更をドラッグアンドドロップで。
     /// 
     /// UI：左ペインの幅を覚える件。
-    /// 
-    /// 
     /// 
     /// Database: 設定画面でDBのupdateとrescan。
     /// イベントのidleからの"再読み込み"通知。
@@ -66,7 +59,8 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
-    /// v3.0.0.5 Search iconを復活させた。背景にチラ見してたWindowを半透明化して隠した。キューのMoveが動いていなかった。パスワード変更ダイアログ消しちゃってた。ちょっとリファクタリング。
+    /// v3.0.0.6 パスワード変更ダイアログ消しちゃってた。ちょっとリファクタリング。playlistsに最終更新日を追加する為にString型からPlaylist型にした。TreeView menuのプレイリスト選択からキューに追加のコンテキストメニュー。ログの保存方法を少し変更。
+    /// v3.0.0.5 Search iconを復活させた。キューのMoveが動いていなかった。
     /// v3.0.0.4 Queue listview Ctrl+Fのコマンドが正しく指定されてなかった。
     /// v3.0.0.3 Find is done.
     /// v3.0.0.2 MPD protocol のバージョンが0.19.x以下だったらステータスバーにメッセージを出すようにした。Closeボタンの背景を赤にした。playlistのコンテキストメニューの文字変更。
@@ -103,7 +97,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.0.5";
+        const string _appVer = "v3.0.0.6";
 
         public static string AppVer
         {
@@ -962,10 +956,8 @@ namespace MPDCtrl.ViewModels
                         DebugWindowShowHide?.Invoke();
                     });
                 }
-                    
             }
         }
-        
 
         #endregion
 
@@ -1277,7 +1269,6 @@ namespace MPDCtrl.ViewModels
 
 
         #endregion
-
 
         #region == AlbumArt == 
 
@@ -1823,7 +1814,7 @@ namespace MPDCtrl.ViewModels
 
         #region == Playlists ==  
 
-        public ObservableCollection<string> Playlists
+        public ObservableCollection<Playlist> Playlists
         {
             get
             {
@@ -1838,8 +1829,8 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private string _selecctedPlaylist;
-        public string SelectedPlaylist
+        private Playlist _selecctedPlaylist;
+        public Playlist SelectedPlaylist
         {
             get
             {
@@ -1955,7 +1946,6 @@ namespace MPDCtrl.ViewModels
 
                     if ((PlaylistSongs.Count == 0) || (value as NodeMenuPlaylistItem).IsUpdateRequied)
                         GetPlaylistSongs(value as NodeMenuPlaylistItem);
-
                 }
                 else if (value is NodeMenuBrowse)
                 {
@@ -1989,10 +1979,8 @@ namespace MPDCtrl.ViewModels
                     throw new NotImplementedException();
                 }
 
-
             }
         }
-
 
         private bool _isQueueVisible = true;
         public bool IsQueueVisible
@@ -2989,12 +2977,12 @@ namespace MPDCtrl.ViewModels
             PlaylistListviewEnterKeyCommand = new RelayCommand(PlaylistListviewEnterKeyCommand_ExecuteAsync, PlaylistListviewEnterKeyCommand_CanExecute);
             PlaylistListviewLoadPlaylistCommand = new RelayCommand(PlaylistListviewLoadPlaylistCommand_ExecuteAsync, PlaylistListviewLoadPlaylistCommand_CanExecute);
             PlaylistListviewClearLoadPlaylistCommand = new RelayCommand(PlaylistListviewClearLoadPlaylistCommand_ExecuteAsync, PlaylistListviewClearLoadPlaylistCommand_CanExecute);
-            PlaylistListviewLeftDoubleClickCommand = new GenericRelayCommand<String>(param => PlaylistListviewLeftDoubleClickCommand_ExecuteAsync(param), param => PlaylistListviewLeftDoubleClickCommand_CanExecute());
+            PlaylistListviewLeftDoubleClickCommand = new GenericRelayCommand<Playlist>(param => PlaylistListviewLeftDoubleClickCommand_ExecuteAsync(param), param => PlaylistListviewLeftDoubleClickCommand_CanExecute());
             ChangePlaylistCommand = new RelayCommand(ChangePlaylistCommand_ExecuteAsync, ChangePlaylistCommand_CanExecute);
-            PlaylistListviewRemovePlaylistCommand = new GenericRelayCommand<String>(param => PlaylistListviewRemovePlaylistCommand_Execute(param), param => PlaylistListviewRemovePlaylistCommand_CanExecute());
+            PlaylistListviewRemovePlaylistCommand = new GenericRelayCommand<Playlist>(param => PlaylistListviewRemovePlaylistCommand_Execute(param), param => PlaylistListviewRemovePlaylistCommand_CanExecute());
 
             PlaylistListviewConfirmRemovePlaylistPopupCommand = new RelayCommand(PlaylistListviewConfirmRemovePlaylistPopupCommand_Execute, PlaylistListviewConfirmRemovePlaylistPopupCommand_CanExecute);
-            PlaylistListviewRenamePlaylistCommand = new GenericRelayCommand<String>(param => PlaylistListviewRenamePlaylistCommand_Execute(param), param => PlaylistListviewRenamePlaylistCommand_CanExecute());
+            PlaylistListviewRenamePlaylistCommand = new GenericRelayCommand<Playlist>(param => PlaylistListviewRenamePlaylistCommand_Execute(param), param => PlaylistListviewRenamePlaylistCommand_CanExecute());
 
             PlaylistListviewConfirmUpdatePopupCommand = new RelayCommand(PlaylistListviewConfirmUpdatePopupCommand_Execute, PlaylistListviewConfirmUpdatePopupCommand_CanExecute);
             PlaylistListviewClearCommand = new RelayCommand(PlaylistListviewClearCommand_Execute, PlaylistListviewClearCommand_CanExecute);
@@ -3013,15 +3001,15 @@ namespace MPDCtrl.ViewModels
             QueueListviewClearCommand = new RelayCommand(QueueListviewClearCommand_ExecuteAsync, QueueListviewClearCommand_CanExecute);
             QueueListviewConfirmClearPopupCommand = new RelayCommand(QueueListviewConfirmClearPopupCommand_Execute, QueueListviewConfirmClearPopupCommand_CanExecute);
             QueueListviewSaveAsCommand = new RelayCommand(QueueListviewSaveAsCommand_ExecuteAsync, QueueListviewSaveAsCommand_CanExecute);
-            QueueListviewSaveAsPopupCommand = new GenericRelayCommand<string>(param => QueueListviewSaveAsPopupCommand_Execute(param), param => QueueListviewSaveAsPopupCommand_CanExecute());
+            QueueListviewSaveAsPopupCommand = new GenericRelayCommand<String>(param => QueueListviewSaveAsPopupCommand_Execute(param), param => QueueListviewSaveAsPopupCommand_CanExecute());
             QueueListviewMoveUpCommand = new GenericRelayCommand<object>(param => QueueListviewMoveUpCommand_Execute(param), param => QueueListviewMoveUpCommand_CanExecute());
             QueueListviewMoveDownCommand = new GenericRelayCommand<object>(param => QueueListviewMoveDownCommand_Execute(param), param => QueueListviewMoveDownCommand_CanExecute());
 
             QueueListviewSaveSelectedAsCommand = new GenericRelayCommand<object>(param => QueueListviewSaveSelectedAsCommand_Execute(param), param => QueueListviewSaveSelectedAsCommand_CanExecute());
-            QueueListviewSaveSelectedAsPopupCommand = new GenericRelayCommand<string>(param => QueueListviewSaveSelectedAsPopupCommand_Execute(param), param => QueueListviewSaveSelectedAsPopupCommand_CanExecute());
+            QueueListviewSaveSelectedAsPopupCommand = new GenericRelayCommand<String>(param => QueueListviewSaveSelectedAsPopupCommand_Execute(param), param => QueueListviewSaveSelectedAsPopupCommand_CanExecute());
 
             QueueListviewSaveSelectedToCommand = new GenericRelayCommand<object>(param => QueueListviewSaveSelectedToCommand_Execute(param), param => QueueListviewSaveSelectedToCommand_CanExecute());
-            QueueListviewSaveSelectedToPopupCommand = new GenericRelayCommand<string>(param => QueueListviewSaveSelectedToPopupCommand_Execute(param), param => QueueListviewSaveSelectedToPopupCommand_CanExecute());
+            QueueListviewSaveSelectedToPopupCommand = new GenericRelayCommand<Playlist>(param => QueueListviewSaveSelectedToPopupCommand_Execute(param), param => QueueListviewSaveSelectedToPopupCommand_CanExecute());
 
             ShowSettingsCommand = new RelayCommand(ShowSettingsCommand_Execute, ShowSettingsCommand_CanExecute);
             SettingsOKCommand = new RelayCommand(SettingsOKCommand_Execute, SettingsOKCommand_CanExecute);
@@ -3070,7 +3058,7 @@ namespace MPDCtrl.ViewModels
             SearchResultListviewSaveSelectedAsCommand = new GenericRelayCommand<object>(param => SearchResultListviewSaveSelectedAsCommand_Execute(param), param => SearchResultListviewSaveSelectedAsCommand_CanExecute());
             SearchResultListviewSaveSelectedAsPopupCommand = new GenericRelayCommand<string>(param => SearchResultListviewSaveSelectedAsPopupCommand_Execute(param), param => SearchResultListviewSaveSelectedAsPopupCommand_CanExecute());
             SearchResultListviewSaveSelectedToCommand = new GenericRelayCommand<object>(param => SearchResultListviewSaveSelectedToCommand_Execute(param), param => SearchResultListviewSaveSelectedToCommand_CanExecute());
-            SearchResultListviewSaveSelectedToPopupCommand = new GenericRelayCommand<string>(param => SearchResultListviewSaveSelectedToPopupCommand_Execute(param), param => SearchResultListviewSaveSelectedToPopupCommand_CanExecute());
+            SearchResultListviewSaveSelectedToPopupCommand = new GenericRelayCommand<Playlist>(param => SearchResultListviewSaveSelectedToPopupCommand_Execute(param), param => SearchResultListviewSaveSelectedToPopupCommand_CanExecute());
 
 
             SongsListviewAddCommand = new GenericRelayCommand<object>(param => SongsListviewAddCommand_Execute(param), param => SongsListviewAddCommand_CanExecute());
@@ -3079,7 +3067,7 @@ namespace MPDCtrl.ViewModels
             SongFilesListviewSaveSelectedAsCommand = new GenericRelayCommand<object>(param => SongFilesListviewSaveSelectedAsCommand_Execute(param), param => SongFilesListviewSaveSelectedAsCommand_CanExecute());
             SongFilesListviewSaveSelectedAsPopupCommand = new GenericRelayCommand<string>(param => SongFilesListviewSaveSelectedAsPopupCommand_Execute(param), param => SongFilesListviewSaveSelectedAsPopupCommand_CanExecute());
             SongFilesListviewSaveSelectedToCommand = new GenericRelayCommand<object>(param => SongFilesListviewSaveSelectedToCommand_Execute(param), param => SongFilesListviewSaveSelectedToCommand_CanExecute());
-            SongFilesListviewSaveSelectedToPopupCommand = new GenericRelayCommand<string>(param => SongFilesListviewSaveSelectedToPopupCommand_Execute(param), param => SongFilesListviewSaveSelectedToPopupCommand_CanExecute());
+            SongFilesListviewSaveSelectedToPopupCommand = new GenericRelayCommand<Playlist>(param => SongFilesListviewSaveSelectedToPopupCommand_Execute(param), param => SongFilesListviewSaveSelectedToPopupCommand_CanExecute());
 
 
             ScrollIntoNowPlayingCommand = new RelayCommand(ScrollIntoNowPlayingCommand_Execute, ScrollIntoNowPlayingCommand_CanExecute);
@@ -3096,6 +3084,10 @@ namespace MPDCtrl.ViewModels
             PlaylistListviewConfirmDeletePosNotSupportedPopupCommand = new RelayCommand(PlaylistListviewConfirmDeletePosNotSupportedPopupCommand_Execute, PlaylistListviewConfirmDeletePosNotSupportedPopupCommand_CanExecute);
 
             QueueFilterSelectCommand = new GenericRelayCommand<object>(param => QueueFilterSelectCommand_Execute(param), param => QueueFilterSelectCommand_CanExecute());
+
+
+            TreeviewMenuItemLoadPlaylistCommand = new RelayCommand(TreeviewMenuItemLoadPlaylistCommand_Execute, TreeviewMenuItemLoadPlaylistCommand_CanExecute);
+            TreeviewMenuItemClearLoadPlaylistCommand = new RelayCommand(TreeviewMenuItemClearLoadPlaylistCommand_Execute, TreeviewMenuItemClearLoadPlaylistCommand_CanExecute);
 
             #endregion
 
@@ -3682,6 +3674,7 @@ namespace MPDCtrl.ViewModels
                 if (app != null)
                 {
                     app.IsSaveErrorLog = true;
+                    app.LogFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl_errors.txt";
                 }
             }
         }
@@ -4120,13 +4113,6 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            App app = App.Current as App;
-            if (app != null)
-            {
-                if (IsSaveLog)
-                    app.SaveErrorLog(System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl_errors.txt");
-            }
-
             try
             {
                 if (IsConnected)
@@ -4474,12 +4460,20 @@ namespace MPDCtrl.ViewModels
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-
                 NodeMenuPlaylists playlistDir = _mainMenuItems.PlaylistsDirectory;
 
                 if (playlistDir != null)
                 {
-                    foreach (var hoge in _mpc.Playlists)
+                    // Sort playlists.
+                    List<string> slTmp = new List<string>();
+
+                    foreach (var v in _mpc.Playlists)
+                    {
+                        slTmp.Add(v.Name);
+                    }
+                    slTmp.Sort();
+
+                    foreach (var hoge in slTmp)
                     {
                         var fuga = playlistDir.Children.FirstOrDefault(i => i.Name == hoge);
                         if (fuga == null)
@@ -4492,7 +4486,7 @@ namespace MPDCtrl.ViewModels
                     List<NodeTree> tobedeleted = new List<NodeTree>();
                     foreach (var hoge in playlistDir.Children)
                     {
-                        var fuga = _mpc.Playlists.FirstOrDefault(i => i == hoge.Name);
+                        var fuga = slTmp.FirstOrDefault(i => i == hoge.Name);
                         if (fuga == null)
                         {
                             tobedeleted.Add(hoge);
@@ -4523,7 +4517,7 @@ namespace MPDCtrl.ViewModels
             });
         }
 
-        private void UpdateLocalFiles()
+        private void UpdateLibrary()
         {
             IsBusy = true;
 
@@ -4533,17 +4527,17 @@ namespace MPDCtrl.ViewModels
 
                 foreach (var songfile in _mpc.LocalFiles)
                 {
-                    if (string.IsNullOrEmpty(songfile)) continue;
+                    if (string.IsNullOrEmpty(songfile.File)) continue;
 
                     try
                     {
                         IsBusy = true;
 
-                        Uri uri = new Uri(@"file:///" + songfile);
+                        Uri uri = new Uri(@"file:///" + songfile.File);
                         if (uri.IsFile)
                         {
-                            string filename = System.IO.Path.GetFileName(songfile);//System.IO.Path.GetFileName(uri.LocalPath);
-                            NodeFile hoge = new NodeFile(filename, uri, songfile);
+                            string filename = System.IO.Path.GetFileName(songfile.File);//System.IO.Path.GetFileName(uri.LocalPath);
+                            NodeFile hoge = new NodeFile(filename, uri, songfile.File);
 
                             MusicEntries.Add(hoge);
                         }
@@ -4650,7 +4644,7 @@ namespace MPDCtrl.ViewModels
                         UpdatePlaylists();
 
                         await _mpc.MpdIdleQueryListAll();
-                        UpdateLocalFiles();
+                        UpdateLibrary();
                     }
 
                     // Don't rely on one thing.
@@ -5527,15 +5521,18 @@ namespace MPDCtrl.ViewModels
             if (SelectedQueueSong == null) return false;
             return true;
         }
-        public async void QueueListviewSaveSelectedToPopupCommand_Execute(string playlistName)
+        public async void QueueListviewSaveSelectedToPopupCommand_Execute(Playlist playlist)
         {
-            if (string.IsNullOrEmpty(playlistName))
+            if (playlist == null)
+                return;
+
+            if (string.IsNullOrEmpty(playlist.Name))
                 return;
 
             if (queueListviewSelectedQueueSongIdsForPopup.Count < 1)
                 return;
 
-            await _mpc.MpdPlaylistAdd(playlistName, queueListviewSelectedQueueSongIdsForPopup);
+            await _mpc.MpdPlaylistAdd(playlist.Name, queueListviewSelectedQueueSongIdsForPopup);
 
             queueListviewSelectedQueueSongIdsForPopup.Clear();
 
@@ -5791,15 +5788,18 @@ namespace MPDCtrl.ViewModels
             if (SearchResult.Count == 0) return false;
             return true;
         }
-        public async void SearchResultListviewSaveSelectedToPopupCommand_Execute(string playlistName)
+        public async void SearchResultListviewSaveSelectedToPopupCommand_Execute(Playlist playlist)
         {
-            if (string.IsNullOrEmpty(playlistName))
+            if (playlist == null)
+                return;
+
+            if (string.IsNullOrEmpty(playlist.Name))
                 return;
 
             if (searchResultListviewSelectedQueueSongUriForPopup.Count < 1)
                 return;
 
-            await _mpc.MpdPlaylistAdd(playlistName, searchResultListviewSelectedQueueSongUriForPopup);
+            await _mpc.MpdPlaylistAdd(playlist.Name, searchResultListviewSelectedQueueSongUriForPopup);
 
             searchResultListviewSelectedQueueSongUriForPopup.Clear();
 
@@ -5961,21 +5961,23 @@ namespace MPDCtrl.ViewModels
             if (MusicEntries.Count == 0) return false;
             return true;
         }
-        public async void SongFilesListviewSaveSelectedToPopupCommand_Execute(string playlistName)
+        public async void SongFilesListviewSaveSelectedToPopupCommand_Execute(Playlist playlist)
         {
-            if (string.IsNullOrEmpty(playlistName))
+            if (playlist == null)
+                return;
+
+            if (string.IsNullOrEmpty(playlist.Name))
                 return;
 
             if (songFilesListviewSelectedQueueSongUriForPopup.Count < 1)
                 return;
 
-            await _mpc.MpdPlaylistAdd(playlistName, songFilesListviewSelectedQueueSongUriForPopup);
+            await _mpc.MpdPlaylistAdd(playlist.Name, songFilesListviewSelectedQueueSongUriForPopup);
 
             songFilesListviewSelectedQueueSongUriForPopup.Clear();
 
             IsSongFilesSelectedSaveToPopupVisible = false;
         }
-
 
         public ICommand FilterMusicEntriesClearCommand { get; }
         public bool FilterMusicEntriesClearCommand_CanExecute()
@@ -5997,12 +5999,17 @@ namespace MPDCtrl.ViewModels
         public bool ChangePlaylistCommand_CanExecute()
         {
             if (IsBusy) return false;
-            if (_selecctedPlaylist == "") { return false; }
+            if (_selecctedPlaylist == null)
+                return false;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
+                return false;
             return true;
         }
         public async void ChangePlaylistCommand_ExecuteAsync()
         {
-            if (_selecctedPlaylist == "")
+            if (_selecctedPlaylist == null)
+                return;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
                 return;
 
             Application.Current.Dispatcher.Invoke(() =>
@@ -6010,57 +6017,87 @@ namespace MPDCtrl.ViewModels
                 Queue.Clear();
             });
 
-            await _mpc.MpdChangePlaylist(_selecctedPlaylist);
+            await _mpc.MpdChangePlaylist(_selecctedPlaylist.Name);
         }
 
         public ICommand PlaylistListviewLeftDoubleClickCommand { get; set; }
         public bool PlaylistListviewLeftDoubleClickCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (_selecctedPlaylist == null)
+                return false;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
+                return false;
             return true;
         }
-        public async void PlaylistListviewLeftDoubleClickCommand_ExecuteAsync(String playlist)
+        public async void PlaylistListviewLeftDoubleClickCommand_ExecuteAsync(Playlist playlist)
         {
-            await _mpc.MpdLoadPlaylist(playlist);
+            if (_selecctedPlaylist == null)
+                return;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
+                return;
+
+            if (_selecctedPlaylist != playlist)
+                return;
+
+            await _mpc.MpdLoadPlaylist(playlist.Name);
         }
 
         public ICommand PlaylistListviewEnterKeyCommand { get; set; }
         public bool PlaylistListviewEnterKeyCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (_selecctedPlaylist == null)
+                return false;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
+                return false;
             return true;
         }
         public async void PlaylistListviewEnterKeyCommand_ExecuteAsync()
         {
-            if (_selecctedPlaylist == "")
+            if (_selecctedPlaylist == null)
+                return;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
                 return;
 
-            await _mpc.MpdLoadPlaylist(_selecctedPlaylist);
+            await _mpc.MpdLoadPlaylist(_selecctedPlaylist.Name);
         }
 
         public ICommand PlaylistListviewLoadPlaylistCommand { get; set; }
         public bool PlaylistListviewLoadPlaylistCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (_selecctedPlaylist == null)
+                return false;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
+                return false;
             return true;
         }
         public async void PlaylistListviewLoadPlaylistCommand_ExecuteAsync()
         {
-            if (_selecctedPlaylist == "")
+            if (_selecctedPlaylist == null)
+                return;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
                 return;
 
-            await _mpc.MpdLoadPlaylist(_selecctedPlaylist);
+            await _mpc.MpdLoadPlaylist(_selecctedPlaylist.Name);
         }
 
         public ICommand PlaylistListviewClearLoadPlaylistCommand { get; set; }
         public bool PlaylistListviewClearLoadPlaylistCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (_selecctedPlaylist == null)
+                return false;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
+                return false;
             return true;
         }
         public async void PlaylistListviewClearLoadPlaylistCommand_ExecuteAsync()
         {
-            if (_selecctedPlaylist == "")
+            if (_selecctedPlaylist == null)
+                return;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
                 return;
 
             Application.Current.Dispatcher.Invoke(() =>
@@ -6068,20 +6105,30 @@ namespace MPDCtrl.ViewModels
                 Queue.Clear();
             });
 
-            await _mpc.MpdChangePlaylist(_selecctedPlaylist);
+            await _mpc.MpdChangePlaylist(_selecctedPlaylist.Name);
         }
 
         // TODO:
         public ICommand PlaylistListviewRenamePlaylistCommand { get; set; }
         public bool PlaylistListviewRenamePlaylistCommand_CanExecute()
         {
-            if (IsBusy) return false;
-            if (string.IsNullOrEmpty(_selecctedPlaylist)) { return false; }
+            if (IsBusy) 
+                return false;
+            if (_selecctedPlaylist == null) 
+                return false;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
+                return false;
+
             return true;
         }
-        public void PlaylistListviewRenamePlaylistCommand_Execute(String playlist)
+        public void PlaylistListviewRenamePlaylistCommand_Execute(Playlist playlist)
         {
-            if (_selecctedPlaylist == "")
+            if (_selecctedPlaylist == null) 
+                return;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
+                return;
+
+            if (_selecctedPlaylist != playlist)
                 return;
 
             /*
@@ -6122,7 +6169,7 @@ namespace MPDCtrl.ViewModels
 
                 foreach (var hoge in Playlists)
                 {
-                    if (hoge.ToLower() == playlistName.ToLower())
+                    if (hoge.Name.ToLower() == playlistName.ToLower())
                     {
                         match = true;
                         break;
@@ -6137,15 +6184,20 @@ namespace MPDCtrl.ViewModels
         public bool PlaylistListviewRemovePlaylistCommand_CanExecute()
         {
             if (IsBusy) return false;
-            if (string.IsNullOrEmpty(_selecctedPlaylist)) { return false; }
+            if (_selecctedPlaylist == null)
+                return false;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
+                return false;
             return true;
         }
-        public void PlaylistListviewRemovePlaylistCommand_Execute(String playlist)
+        public void PlaylistListviewRemovePlaylistCommand_Execute(Playlist playlist)
         {
-            if (_selecctedPlaylist == "")
+            if (_selecctedPlaylist == null)
+                return;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
                 return;
 
-            if (playlist != _selecctedPlaylist)
+            if (_selecctedPlaylist != playlist)
                 return;
 
             IsConfirmDeletePlaylistPopupVisible = true;
@@ -6155,15 +6207,20 @@ namespace MPDCtrl.ViewModels
         public bool PlaylistListviewConfirmRemovePlaylistPopupCommand_CanExecute()
         {
             if (IsBusy) return false;
-            if (string.IsNullOrEmpty(_selecctedPlaylist)) { return false; }
+            if (_selecctedPlaylist == null)
+                return false;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
+                return false;
             return true;
         }
         public async void PlaylistListviewConfirmRemovePlaylistPopupCommand_Execute()
         {
-            if (string.IsNullOrEmpty(_selecctedPlaylist))
+            if (_selecctedPlaylist == null)
+                return;
+            if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
                 return;
 
-            await _mpc.MpdRemovePlaylist(_selecctedPlaylist);
+            await _mpc.MpdRemovePlaylist(_selecctedPlaylist.Name);
 
             IsConfirmDeletePlaylistPopupVisible = false;
         }
@@ -6202,17 +6259,11 @@ namespace MPDCtrl.ViewModels
         }
         public void PlaylistListviewDeletePosCommand_Execute(object obj)
         {
-            string playlistName = "";
-
             if (SelectedNodeMenu is NodeMenuPlaylistItem)
             {
                 if ((SelectedNodeMenu as NodeMenuPlaylistItem).IsUpdateRequied)
                 {
                     return;
-                }
-                else
-                {
-                    playlistName = (SelectedNodeMenu as NodeMenuPlaylistItem).Name;
                 }
             }
             else
@@ -6645,7 +6696,7 @@ namespace MPDCtrl.ViewModels
                 
                 Playlists.Clear();
                 _mpc.Playlists.Clear();
-                SelectedPlaylist = "";
+                SelectedPlaylist = null;
 
                 SelectedPlaylistSong = null;
 
@@ -6768,7 +6819,7 @@ namespace MPDCtrl.ViewModels
 
                 Playlists.Clear();
                 _mpc.Playlists.Clear();
-                SelectedPlaylist = "";
+                SelectedPlaylist = null;
 
                 SelectedPlaylistSong = null;
 
@@ -7336,6 +7387,62 @@ namespace MPDCtrl.ViewModels
             {
                 ScrollIntoViewAndSelect?.Invoke(this, _selectedQueueFilterSong.Index);
             }
+        }
+
+        #endregion
+
+        #region == TreeViewMenu ContextMenu ==
+
+        
+        public ICommand TreeviewMenuItemLoadPlaylistCommand { get; }
+        public bool TreeviewMenuItemLoadPlaylistCommand_CanExecute()
+        {
+            if (SelectedNodeMenu == null)
+                return false;
+            if (!(SelectedNodeMenu is NodeMenuPlaylistItem))
+                return false;
+            if (IsBusy) return false;
+
+            return true;
+        }
+        public async void TreeviewMenuItemLoadPlaylistCommand_Execute()
+        {
+            if (IsBusy)
+                return;
+            if (SelectedNodeMenu == null)
+                return;
+            if (!(SelectedNodeMenu is NodeMenuPlaylistItem))
+                return;
+            
+            await _mpc.MpdLoadPlaylist(SelectedNodeMenu.Name);
+        }
+
+        public ICommand TreeviewMenuItemClearLoadPlaylistCommand { get; }
+        public bool TreeviewMenuItemClearLoadPlaylistCommand_CanExecute()
+        {
+            if (SelectedNodeMenu == null)
+                return false;
+            if (!(SelectedNodeMenu is NodeMenuPlaylistItem))
+                return false;
+            if (IsBusy) return false;
+
+            return true;
+        }
+        public async void TreeviewMenuItemClearLoadPlaylistCommand_Execute()
+        {
+            if (IsBusy)
+                return;
+            if (SelectedNodeMenu == null)
+                return;
+            if (!(SelectedNodeMenu is NodeMenuPlaylistItem))
+                return;
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Queue.Clear();
+            });
+
+            await _mpc.MpdChangePlaylist(SelectedNodeMenu.Name);
         }
 
         #endregion

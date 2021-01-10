@@ -727,11 +727,20 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Clear Playlist に類似しているローカライズされた文字列を検索します。
+        ///   Clear に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string PlaylistSongsContextMenu_Clear {
             get {
                 return ResourceManager.GetString("PlaylistSongsContextMenu_Clear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Playlist に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string PlaylistSongsContextMenu_Playlist {
+            get {
+                return ResourceManager.GetString("PlaylistSongsContextMenu_Playlist", resourceCulture);
             }
         }
         
@@ -979,7 +988,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Current Queue に類似しているローカライズされた文字列を検索します。
+        ///   Queue に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string QueueItemContextMenu_Queue {
             get {
@@ -1353,6 +1362,15 @@ namespace MPDCtrl.Properties {
         public static string StatusMsg_UpdatingDb {
             get {
                 return ResourceManager.GetString("StatusMsg_UpdatingDb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Load に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string TreeviewMenuItemContextMenu_Load {
+            get {
+                return ResourceManager.GetString("TreeviewMenuItemContextMenu_Load", resourceCulture);
             }
         }
         

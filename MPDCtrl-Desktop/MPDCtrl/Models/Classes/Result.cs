@@ -48,13 +48,13 @@ namespace MPDCtrl.Models
     // for commands that return playlist songs.
     public class CommandPlaylistResult : CommandResult
     {
-        public ObservableCollection<Song> PlaylistSongs;
+        public ObservableCollection<SongInfo> PlaylistSongs;
     }
 
     // for commands that return search result.
     public class CommandSearchResult : CommandResult
     {
-        public ObservableCollection<Song> SearchResult;
+        public ObservableCollection<SongInfo> SearchResult;
     }
 
     // TODO: 不要？

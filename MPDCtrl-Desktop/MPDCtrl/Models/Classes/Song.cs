@@ -7,12 +7,63 @@ using MPDCtrl.Common;
 
 namespace MPDCtrl.Models
 {
+    //SongInfo > SongInfoEx
+    //Song > SongInfo
+    //SongFile
+
     /// <summary>
-    /// Generic song class. (for playlist or search result)
+    /// Generic song file class. (for listall)
     /// </summary>
-    public class Song : ViewModelBase
+    public class SongFile : ViewModelBase
     {
-        public string file { get; set; } = "";
+        public string File { get; set; } = "";
+
+        private string _lastModified;
+        public string LastModified
+        {
+            get
+            {
+                return _lastModified;
+            }
+            set
+            {
+                if (_lastModified == value)
+                    return;
+
+                _lastModified = value;
+            }
+        }
+
+        public string LastModifiedFormated
+        {
+            get
+            {
+                DateTime _lastModifiedDateTime = default(DateTime); //new DateTime(1998,04,30)
+
+                if (!string.IsNullOrEmpty(_lastModified))
+                {
+                    try
+                    {
+                        _lastModifiedDateTime = DateTime.Parse(_lastModified, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                    }
+                    catch
+                    {
+                        System.Diagnostics.Debug.WriteLine("Wrong LastModified timestamp format. " + _lastModified);
+                    }
+                }
+
+                var culture = System.Globalization.CultureInfo.CurrentCulture;
+                return _lastModifiedDateTime.ToString(culture);
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// SongInfo class. (for playlist or search result)
+    /// </summary>
+    public class SongInfo : SongFile
+    {
         public string Title { get; set; } = "";
         public string Track { get; set; } = "";
         public string Disc { get; set; } = "";
@@ -83,52 +134,13 @@ namespace MPDCtrl.Models
                 return dtime;
             }
         }
-        public string duration { get; set; } = "";
+        public string Duration { get; set; } = "";
         public string Artist { get; set; } = "";
         public string Album { get; set; } = "";
         public string AlbumArtist { get; set; } = "";
         public string Composer { get; set; } = "";
         public string Date { get; set; } = "";
         public string Genre { get; set; } = "";
-
-        private string _lastModified;
-        public string LastModified
-        {
-            get
-            {
-                return _lastModified;
-            }
-            set
-            {
-                if (_lastModified == value)
-                    return;
-
-                _lastModified = value;
-            }
-        }
-
-        public string LastModifiedFormated
-        {
-            get
-            {
-                DateTime _lastModifiedDateTime = default(DateTime); //new DateTime(1998,04,30)
-
-                if (!string.IsNullOrEmpty(_lastModified))
-                {
-                    try
-                    {
-                        _lastModifiedDateTime = DateTime.Parse(_lastModified, null, System.Globalization.DateTimeStyles.RoundtripKind);
-                    }
-                    catch
-                    {
-                        System.Diagnostics.Debug.WriteLine("Wrong LastModified timestamp format. " + _lastModified);
-                    }
-                }
-
-                var culture = System.Globalization.CultureInfo.CurrentCulture;
-                return _lastModifiedDateTime.ToString(culture);
-            }
-        }
 
         // for sorting and (playlist pos)
         private int _index;
@@ -161,7 +173,7 @@ namespace MPDCtrl.Models
     /// <summary>
     /// song class with some extra info. (for queue)
     /// </summary>
-    public class SongInfo : Song
+    public class SongInfoEx : SongInfo
     {
         // Queue specific
 

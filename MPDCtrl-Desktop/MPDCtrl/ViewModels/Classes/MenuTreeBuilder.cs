@@ -41,7 +41,7 @@ namespace MPDCtrl.ViewModels.Classes
     
     public class NodeMenuPlaylistItem : NodeMenu
     {
-        public ObservableCollection<Song> PlaylistSongs = new ObservableCollection<Song>();
+        public ObservableCollection<SongInfo> PlaylistSongs = new ObservableCollection<SongInfo>();
 
         public bool IsUpdateRequied { get; set; }
 

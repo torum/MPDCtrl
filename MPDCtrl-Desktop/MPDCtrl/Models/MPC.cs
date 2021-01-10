@@ -68,8 +68,8 @@ namespace MPDCtrl.Models
         public bool MpdStop { get; set; }
 
         // TODO:
-        private Song _currentSong;
-        public Song MpdCurrentSong
+        private SongInfo _currentSong;
+        public SongInfo MpdCurrentSong
         {
             // The Song object is currectly set only if
             // Playlist is received and song id is matched.
@@ -79,8 +79,8 @@ namespace MPDCtrl.Models
             }
         }
 
-        private ObservableCollection<SongInfo> _queue = new ObservableCollection<SongInfo>();
-        public ObservableCollection<SongInfo> CurrentQueue
+        private ObservableCollection<SongInfoEx> _queue = new ObservableCollection<SongInfoEx>();
+        public ObservableCollection<SongInfoEx> CurrentQueue
         {
             get { return _queue; }
         }
@@ -103,8 +103,8 @@ namespace MPDCtrl.Models
             get { return _localDirectories; }
         }
 
-        private ObservableCollection<Song> _searchResult = new ObservableCollection<Song>();
-        public ObservableCollection<Song> SearchResult
+        private ObservableCollection<SongInfo> _searchResult = new ObservableCollection<SongInfo>();
+        public ObservableCollection<SongInfo> SearchResult
         {
             get { return _searchResult; }
         }
@@ -3560,7 +3560,7 @@ namespace MPDCtrl.Models
                         {
                             if (SongValues.ContainsKey("Id"))
                             {
-                                SongInfo sng = FillSongInfo(SongValues, i);
+                                SongInfoEx sng = FillSongInfoEx(SongValues, i);
 
                                 if (sng != null)
                                 {
@@ -3587,7 +3587,7 @@ namespace MPDCtrl.Models
 
                 if ((SongValues.Count > 0) && SongValues.ContainsKey("Id"))
                 {
-                    SongInfo sng = FillSongInfo(SongValues, i);
+                    SongInfoEx sng = FillSongInfoEx(SongValues, i);
 
                     if (sng != null)
                     {
@@ -3614,11 +3614,11 @@ namespace MPDCtrl.Models
             return true;
         }
 
-        private SongInfo FillSongInfo(Dictionary<string, string> SongValues, int i)
+        private SongInfoEx FillSongInfoEx(Dictionary<string, string> SongValues, int i)
         {
             try
             {
-                SongInfo sng = new SongInfo();
+                SongInfoEx sng = new SongInfoEx();
 
                 if (SongValues.ContainsKey("Id"))
                 {
@@ -3703,7 +3703,7 @@ namespace MPDCtrl.Models
                 if (SongValues.ContainsKey("duration"))
                 {
                     sng.Time = SongValues["duration"];
-                    sng.duration = SongValues["duration"];
+                    sng.Duration = SongValues["duration"];
                 }
 
                 if (SongValues.ContainsKey("Pos"))
@@ -3713,7 +3713,7 @@ namespace MPDCtrl.Models
 
                 if (SongValues.ContainsKey("file"))
                 {
-                    sng.file = SongValues["file"];
+                    sng.File = SongValues["file"];
                 }
 
                 //
@@ -3729,7 +3729,7 @@ namespace MPDCtrl.Models
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("Error@FillSongInfo: " + e.ToString());
+                System.Diagnostics.Debug.WriteLine("Error@FillSongInfoEx: " + e.ToString());
                 return null;
             }
         }
@@ -3925,7 +3925,7 @@ namespace MPDCtrl.Models
                             // save old one and clear songvalues.
                             if (SongValues.ContainsKey("file"))
                             {
-                                Song sng = FillSong(SongValues, i);
+                                SongInfo sng = FillSong(SongValues, i);
 
                                 i++;
 
@@ -3952,7 +3952,7 @@ namespace MPDCtrl.Models
                 // last one
                 if ((SongValues.Count > 0) && SongValues.ContainsKey("file"))
                 {
-                    Song sng = FillSong(SongValues, i);
+                    SongInfo sng = FillSong(SongValues, i);
 
                     SongValues.Clear();
 
@@ -4041,7 +4041,7 @@ namespace MPDCtrl.Models
                             // save old one and clear songvalues.
                             if (SongValues.ContainsKey("file"))
                             {
-                                Song sng = FillSong(SongValues, i);
+                                SongInfo sng = FillSong(SongValues, i);
 
                                 i++;
 
@@ -4068,7 +4068,7 @@ namespace MPDCtrl.Models
                 // last one
                 if ((SongValues.Count > 0) && SongValues.ContainsKey("file"))
                 {
-                    Song sng = FillSong(SongValues, i);
+                    SongInfo sng = FillSong(SongValues, i);
 
                     SongValues.Clear();
 
@@ -4093,9 +4093,9 @@ namespace MPDCtrl.Models
             return true;
         }
 
-        private ObservableCollection<Song> ParsePlaylistSongsResult(string result)
+        private ObservableCollection<SongInfo> ParsePlaylistSongsResult(string result)
         {
-            ObservableCollection<Song> songList = new ObservableCollection<Song>();
+            ObservableCollection<SongInfo> songList = new ObservableCollection<SongInfo>();
 
             if (MpdStop) return songList;
 
@@ -4154,7 +4154,7 @@ namespace MPDCtrl.Models
                             // save old one and clear songvalues.
                             if (SongValues.ContainsKey("file"))
                             {
-                                Song sng = FillSong(SongValues, i);
+                                SongInfo sng = FillSong(SongValues, i);
 
                                 i++;
 
@@ -4180,7 +4180,7 @@ namespace MPDCtrl.Models
                 // last one
                 if ((SongValues.Count > 0) && SongValues.ContainsKey("file"))
                 {
-                    Song sng = FillSong(SongValues, i);
+                    SongInfo sng = FillSong(SongValues, i);
 
                     SongValues.Clear();
 
@@ -4201,10 +4201,10 @@ namespace MPDCtrl.Models
             return songList;
         }
 
-        private Song FillSong(Dictionary<string, string> SongValues, int i)
+        private SongInfo FillSong(Dictionary<string, string> SongValues, int i)
         {
 
-            Song sng = new Song();
+            SongInfo sng = new SongInfo();
 
             if (SongValues.ContainsKey("Title"))
             {
@@ -4284,12 +4284,12 @@ namespace MPDCtrl.Models
             if (SongValues.ContainsKey("duration"))
             {
                 sng.Time = SongValues["duration"];
-                sng.duration = SongValues["duration"];
+                sng.Duration = SongValues["duration"];
             }
 
             if (SongValues.ContainsKey("file"))
             {
-                sng.file = SongValues["file"];
+                sng.File = SongValues["file"];
             }
 
             // for sorting. (and playlist pos)

@@ -26,7 +26,9 @@ namespace MPDCtrl.ViewModels.Classes
     public class NodeFile : Node
     {
         public Uri FileUri { get; set; }
+
         public String OriginalFileUri { get; set; }
+
         public string FilePath
         {
             get
@@ -36,6 +38,7 @@ namespace MPDCtrl.ViewModels.Classes
                     string path = FileUri.LocalPath;
                     string filename = System.IO.Path.GetFileName(path);//System.IO.Path.GetFileName(uri.LocalPath);
                     path = path.Replace(filename, "");
+
                     return path;
                 }
                 else
@@ -81,7 +84,7 @@ namespace MPDCtrl.ViewModels.Classes
             foreach (var pathDir in dirs)
             {
                 // for responsivenesss.
-                await Task.Delay(10);
+                await Task.Delay(100);
 
                 // changed profile etc.
                 if (IsCanceled)

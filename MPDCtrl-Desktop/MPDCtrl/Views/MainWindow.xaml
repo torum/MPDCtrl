@@ -7,7 +7,6 @@
         xmlns:helpers="clr-namespace:MPDCtrl.Helpers"
         xmlns:vms="clr-namespace:MPDCtrl.ViewModels"
         xmlns:local="clr-namespace:MPDCtrl"
-        xmlns:mstheme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
         mc:Ignorable="d"
         WindowStyle="None"
         Background="{DynamicResource WindowBackgroundBaseColorBrush}"
@@ -17,7 +16,6 @@
         Width="780" Height="480"
         MinWidth="780" MinHeight="250"
     >
-
     <Window.Style>
         <Style TargetType="Window">
             <Style.Triggers>
@@ -317,7 +315,7 @@
                         </ToggleButton>
                     </StackPanel>
 
-                    <Grid Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0 0 14 0" Visibility="Collapsed">
+                    <Grid Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0 0 7 0" Visibility="{Binding IsQueueVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                         <Button Style="{DynamicResource PathButton}" Width="27" Height="27" Margin="0" Command="{Binding ShowFindCommand}" ToolTip="{x:Static properties:Resources.Search_ToolTip}"
                                 Content="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z">
                         </Button>
@@ -385,7 +383,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <ListView x:Name="QueueListview" Grid.Row="1" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedSong, Mode=TwoWay}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" SelectionChanged="QueueListview_SelectionChanged">
+                        <ListView x:Name="QueueListview" Grid.Row="1" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedQueueSong, Mode=TwoWay}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" SelectionChanged="QueueListview_SelectionChanged">
                             <ListView.InputBindings>
                                 <KeyBinding Key="Return" Command="{Binding Path=DataContext.QueueListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                                 <KeyBinding Gesture="Ctrl+U" Command="{Binding Path=DataContext.QueueListviewMoveUpCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
@@ -1510,7 +1508,7 @@
 
                     </Grid>
 
-                    <Grid Visibility="{Binding IsBrowseVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                    <Grid Visibility="{Binding IsLibraryVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*"/>
                             <ColumnDefinition Width="8"/>
@@ -3484,6 +3482,74 @@
                     </Border>
                 </Border>
 
+            </Grid>
+
+            <!-- Change Password screen -->
+            <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="3" Visibility="{Binding IsChangePasswordDialogShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="{DynamicResource WindowBackgroundBaseColorBrush}" Opacity="0.8"></Rectangle>
+
+                <Border Background="{DynamicResource BoardBackgroundColorBrush}" Style="{DynamicResource BoardStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                    <Grid Width="300" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Row="0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                            <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.ChangePasswordDialog_ChangePassword}" HorizontalAlignment="Left"/>
+                        </Border>
+                        <StackPanel Grid.Row="1" Margin="12">
+                            <TextBlock Text="{Binding ChangePasswordDialogMessage, NotifyOnTargetUpdated=True}" TextWrapping="Wrap" Style="{DynamicResource DefaultTextBlockStyle}" Margin="25 0 0 0">
+                                <TextBlock.Triggers>
+                                    <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
+                                                    <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="1"/>
+                                                </DoubleAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </TextBlock.Triggers>
+                            </TextBlock>
+
+                            <TextBlock Text="{x:Static properties:Resources.ChangePasswordDialog_CurrentPassword}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="25 12 0 0"></TextBlock>
+                            <PasswordBox x:Name="ChangeOldPasswordBox" Width="200" IsVisibleChanged="PasswordBox_IsVisibleChanged" Style="{DynamicResource DefaultPasswordBoxStyle}"></PasswordBox>
+
+                            <TextBlock Text="{x:Static properties:Resources.ChangePasswordDialog_NewPassword}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="25 12 0 0"></TextBlock>
+                            <PasswordBox x:Name="ChangeNewPasswordBox" Width="200" Style="{DynamicResource DefaultPasswordBoxStyle}"></PasswordBox>
+
+                        </StackPanel>
+                        <StackPanel Grid.Row="2" Margin="12 12 12 24">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 12 0 0">
+                                <Button Width="80" Content="{x:Static properties:Resources.OK}" Margin="15 0 15 0" Padding="3" IsDefault="True" Command="{Binding ChangePasswordDialogOKCommand}">
+                                    <Button.CommandParameter>
+                                        <MultiBinding Converter="{StaticResource MultipleCommandParameterConverter}">
+                                            <Binding ElementName="ChangeOldPasswordBox" />
+                                            <Binding ElementName="ChangeNewPasswordBox" />
+                                        </MultiBinding>
+                                    </Button.CommandParameter>
+                                </Button>
+                                <Button Width="80" Content="{x:Static properties:Resources.Cancel}" Margin="15 0 15 0" Padding="3" IsDefault="False" Command="{Binding ChangePasswordDialogCancelCommand}"></Button>
+                            </StackPanel>
+                        </StackPanel>
+
+                    </Grid>
+
+                </Border>
             </Grid>
 
         </Grid>

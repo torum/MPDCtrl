@@ -31,9 +31,7 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// v3.0.1.x
-    /// 
-    /// v3.0.2 以降
+    /// v3.0.1.x 以降
     /// 
     /// 「プレイリストの名前変更」をインラインで。
     /// キューの順番変更をドラッグアンドドロップで。
@@ -59,13 +57,14 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v3.0.1   MS Store 公開。
     /// v3.0.0.6 パスワード変更ダイアログ消しちゃってた。ちょっとリファクタリング。playlistsに最終更新日を追加する為にString型からPlaylist型にした。TreeView menuのプレイリスト選択からキューに追加のコンテキストメニュー。ログの保存方法を少し変更。
     /// v3.0.0.5 Search iconを復活させた。キューのMoveが動いていなかった。
     /// v3.0.0.4 Queue listview Ctrl+Fのコマンドが正しく指定されてなかった。
     /// v3.0.0.3 Find is done.
     /// v3.0.0.2 MPD protocol のバージョンが0.19.x以下だったらステータスバーにメッセージを出すようにした。Closeボタンの背景を赤にした。playlistのコンテキストメニューの文字変更。
     /// v3.0.0.1 SysButtonの背景を変えた。接続シークエンスで諸々の情報取得を独立的に行うようにした（一つ失敗しても他はロードされるように）。LocalFilesが正しくClearされるようにした。
-    /// v3.0.0.  とりあえずひと段落したので、Store公開。
+    /// v3.0.0.  とりあえずひと段落したので。
     /// v3.0.0.7 とりあえず、プレイリスト系は大体できた。
     /// v3.0.0.6 とりあえずAlbumArtの取得はできるようにしたけれど、Downloaderクラスが必要。
     /// v3.0.0.5 色々やり過ぎて覚えていない・・・
@@ -97,7 +96,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.0.6";
+        const string _appVer = "v3.0.1.0";
 
         public static string AppVer
         {

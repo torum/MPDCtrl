@@ -1258,7 +1258,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Use &apos;readpicture&apos; command instead of &apos;albumart&apos;. (Applicable when MPD protocol version is 0.22.0 or up) に類似しているローカライズされた文字列を検索します。
+        ///   Use &quot;readpicture&quot; command instead of &quot;albumart&quot;. (applicable when MPD protocol version is 0.22.0 or up) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_Opts_UseReadPicture {
             get {

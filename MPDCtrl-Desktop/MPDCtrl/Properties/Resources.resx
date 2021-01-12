@@ -532,7 +532,7 @@ SOFTWARE.</value>
     <value>Update MPD Music Database on Startup. (It may take a while to update)</value>
   </data>
   <data name="Settings_Opts_UseReadPicture" xml:space="preserve">
-    <value>Use 'readpicture' command instead of 'albumart'. (Applicable when MPD protocol version is 0.22.0 or up)</value>
+    <value>Use "readpicture" command instead of "albumart". (applicable when MPD protocol version is 0.22.0 or up)</value>
   </data>
   <data name="Settings_ProfileDeleted" xml:space="preserve">
     <value>Profile Deleted</value>

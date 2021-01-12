@@ -31,10 +31,12 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// v3.0.1.x 以降
+    /// v3.0.2.x 以降
     /// 
     /// 「プレイリストの名前変更」をインラインで。
     /// キューの順番変更をドラッグアンドドロップで。
+    /// 
+    /// TreeViewのポップアップメニューでゴミが表示される件。
     /// 
     /// UI：左ペインの幅を覚える件。
     /// 
@@ -57,6 +59,7 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v3.0.1.1 ReleaseビルドでDeveloperモードになってデバッグウィンドウが非表示になっていた。profile空の状態でテストしたらボロボロだった。
     /// v3.0.1   MS Store 公開。
     /// v3.0.0.6 パスワード変更ダイアログ消しちゃってた。ちょっとリファクタリング。playlistsに最終更新日を追加する為にString型からPlaylist型にした。TreeView menuのプレイリスト選択からキューに追加のコンテキストメニュー。ログの保存方法を少し変更。
     /// v3.0.0.5 Search iconを復活させた。キューのMoveが動いていなかった。
@@ -96,7 +99,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.1.0";
+        const string _appVer = "v3.0.2.0";
 
         public static string AppVer
         {
@@ -6625,7 +6628,8 @@ namespace MPDCtrl.ViewModels
             }
 
             // Save volume.
-            CurrentProfile.Volume = Convert.ToInt32(Volume);
+            if (CurrentProfile != null)
+                CurrentProfile.Volume = Convert.ToInt32(Volume);
 
             // Validate Host input.
             if (Host == "")
@@ -6747,9 +6751,9 @@ namespace MPDCtrl.ViewModels
 
                     Profiles.Add(prof);
 
-                    // TODO:
+                    // TODO: don't... before sending a password.
                     // 初回だからUpdateしておく?
-                    await _mpc.MpdSendUpdate();
+                    //await _mpc.MpdSendUpdate();
                 }
                 else
                 {

@@ -3407,11 +3407,11 @@
                                             <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.DeveloperMode}" HorizontalAlignment="Left"/>
                                         </Border>
 
-                                        <Grid Grid.Row="7" HorizontalAlignment="Left" Margin="0 12 0 0" Visibility="{Binding DeveloperMode, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                                        <Grid Grid.Row="7" HorizontalAlignment="Left" Margin="0 12 0 0">
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_ShowDebugWidow}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsShowDebugWindow}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
                                         
-                                        <Grid Grid.Row="8" HorizontalAlignment="Left" Margin="0 12 0 0" Visibility="{Binding DeveloperMode, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                                        <Grid Grid.Row="8" HorizontalAlignment="Left" Margin="0 12 0 0">
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_SaveLog}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsSaveLog}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
 

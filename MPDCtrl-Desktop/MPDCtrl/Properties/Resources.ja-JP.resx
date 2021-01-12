@@ -535,7 +535,7 @@ SOFTWARE.</value>
     <value>起動時にMPDサーバーの楽曲データベースを最新の状態に更新する (更新されるまで、しばらくかかる場合があります)</value>
   </data>
   <data name="Settings_Opts_UseReadPicture" xml:space="preserve">
-    <value>'albumart'の代わりに'readpicture' コマンドを使用する。 (MPD プロトコルのバージョンが0.22.0以上の時のみ)</value>
+    <value>"albumart"の代わりに"readpicture" コマンドを使用する。 (MPD プロトコルのバージョンが0.22.0以上の時のみ)</value>
   </data>
   <data name="Settings_ProfileDeleted" xml:space="preserve">
     <value>プロファイルが削除されました。</value>

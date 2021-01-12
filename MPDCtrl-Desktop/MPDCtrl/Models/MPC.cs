@@ -803,11 +803,13 @@ namespace MPDCtrl.Models
                 DebugIdleOutput?.Invoke(this, "<<<<" + result.Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
 
                 if (isAck)
+                {
                     MpdAckError?.Invoke(this, ackText + " (@idle)");
-
-                // Parse & Raise event and MpdIdle();
-                await ParseSubSystemsAndRaiseChangedEvent(result);
-
+                }
+                else
+                {
+                    await ParseSubSystemsAndRaiseChangedEvent(result);
+                }
             }
             catch (System.IO.IOException e)
             {

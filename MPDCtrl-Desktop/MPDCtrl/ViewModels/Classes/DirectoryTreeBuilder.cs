@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace MPDCtrl.ViewModels.Classes
 {
@@ -45,7 +46,6 @@ namespace MPDCtrl.ViewModels.Classes
                 {
                     return "";
                 }
-
             }
         }
 
@@ -79,12 +79,17 @@ namespace MPDCtrl.ViewModels.Classes
             root.Expanded = true;
 
             root.Parent = null;
-            this.Children.Add(root);
+            //this.Children.Add(root);
+            if (Application.Current == null) { return; }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                this.Children.Add(root);
+            });
 
             foreach (var pathDir in dirs)
             {
                 // for responsivenesss.
-                await Task.Delay(100);
+                await Task.Delay(1);
 
                 // changed profile etc.
                 if (IsCanceled)
@@ -102,9 +107,29 @@ namespace MPDCtrl.ViewModels.Classes
                         {
                             if (String.IsNullOrEmpty(asdf)) continue;
 
+                            // LINQ may be slower in this case.
+                            /*
+                            var fuga = parent.Children.FirstOrDefault(i => i.Name == asdf);
+                            if (fuga != null)
+                            {
+                                // set parent node
+                                parent = fuga as NodeDirectory;
+                                //break;
+                            }
+                            else
+                            {
+                                NodeDirectory hoge = new NodeDirectory(asdf.Trim(), new Uri(@"file:///" + pathDir.Trim()));
+                                hoge.Selected = false;
+                                hoge.Expanded = true;
 
-                            // TODO: USE LINQ
+                                hoge.Parent = parent;
+                                parent.Children.Add(hoge);
 
+                                // set parent node
+                                parent = hoge;
+                            }
+                            */
+                            
                             // check if already exists.
                             bool found = false;
                             foreach (var child in parent.Children)
@@ -125,11 +150,16 @@ namespace MPDCtrl.ViewModels.Classes
                                 hoge.Expanded = true;
 
                                 hoge.Parent = parent;
-                                parent.Children.Add(hoge);
-
+                                //parent.Children.Add(hoge);
+                                if (Application.Current == null) { return; }
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    parent.Children.Add(hoge);
+                                });
                                 // set parent node
                                 parent = hoge;
                             }
+                            
                         }
                     }
                     else if (ValuePair.Length == 1)
@@ -139,7 +169,12 @@ namespace MPDCtrl.ViewModels.Classes
                         hoge.Expanded = true;
 
                         hoge.Parent = root;
-                        root.Children.Add(hoge);
+                        //root.Children.Add(hoge);
+                        if (Application.Current == null) { return; }
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            root.Children.Add(hoge);
+                        });
                     }
                 }
                 catch (Exception ex)
@@ -150,8 +185,5 @@ namespace MPDCtrl.ViewModels.Classes
 
         }
 
-
     }
-
-
 }

@@ -14,13 +14,13 @@
         DataContext="{StaticResource MainViewModel}"
         Title="{Binding AppTitle}"
         Width="780" Height="480"
-        MinWidth="780" MinHeight="250"
+        MinWidth="768" MinHeight="134"
     >
     <Window.Style>
         <Style TargetType="Window">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsBusy}" Value="True">
-                    <Setter Property="Cursor" Value="Wait" />
+                    <Setter Property="Cursor" Value="AppStarting" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -360,8 +360,8 @@
                                     <ContentControl Template="{StaticResource PlusThickIcon}" />
                                 </MenuItem.Icon>
                             </MenuItem>
-                            <Separator/>
                             <!--
+                            <Separator/>
                                     <MenuItem Header="{x:Static properties:Resources.PlaylistItemContextMenu_Rename}" Command="{Binding Path=DataContext.TreeviewMenuItemRenamePlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}}">
                                         <MenuItem.Resources>
                                             <ControlTemplate x:Key="PlaylistEditIcon">
@@ -2703,7 +2703,7 @@
 <!--
                         <Label Content="{Binding CurrentProfile.Name}" Style="{DynamicResource DefaultLabelStyle}" Foreground="{DynamicResource ControlDarkColorBrush}" VerticalAlignment="Center" Margin="0 0 4 0" Padding="0" Opacity="0.7"></Label>
 -->
-                        <ComboBox Style="{StaticResource ComboBoxFlatStyle}" IsEnabled="{Binding IsNotConnecting}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedQuickProfile}" Foreground="{DynamicResource ControlDarkColorBrush}" HorizontalAlignment="Center" Tag="">
+                        <ComboBox Style="{StaticResource ComboBoxFlatStyle}" IsEnabled="{Binding IsProfileSwitchOK}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedQuickProfile}" Foreground="{DynamicResource ControlDarkColorBrush}" HorizontalAlignment="Center" Tag="">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">

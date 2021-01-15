@@ -60,6 +60,7 @@ namespace MPDCtrl.ViewModels.Classes
 
         protected void NotifyPropertyChanged(string propertyName)
         {
+            if (Application.Current == null) return;
             Application.Current.Dispatcher.Invoke(() =>
             {
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

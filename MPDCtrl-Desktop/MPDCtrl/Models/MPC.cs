@@ -424,7 +424,8 @@ namespace MPDCtrl.Models
             if (cmd.StartsWith("password "))
                 cmdDummy = "password ****";
 
-            DebugIdleOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n");
+            //DebugIdleOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n");
+            Task.Run(() => DebugIdleOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n"));
 
             try
             {
@@ -557,10 +558,10 @@ namespace MPDCtrl.Models
                     }
                 }
 
-                DebugIdleOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
-
+                Task.Run(() => DebugIdleOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n"));
+                
                 if (isAck)
-                    MpdAckError?.Invoke(this, stringBuilder.ToString() + " (@MISC)");
+                    Task.Run(() => MpdAckError?.Invoke(this, ackText + " (@MISC)")); 
 
                 ret.ResultText = stringBuilder.ToString();
                 
@@ -572,11 +573,11 @@ namespace MPDCtrl.Models
 
                 Debug.WriteLine("InvalidOperationException@MpdIdleSendCommand: " + cmd.Trim() + " ReadLineAsync ---- " + e.Message);
 
-                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdleSendCommand", "InvalidOperationException (Most likely the connection is overloaded)", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdleSendCommand", "InvalidOperationException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
 
                 //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
-                //ConnectionError?.Invoke(this, "The connection (command) has been terminated. Most likely the connection has been overloaded.");
+                //ConnectionError?.Invoke(this, "The connection (idle) has been terminated. Most likely the connection has been overloaded.");
 
 
                 //await _idleWriter.WriteAsync("noidle\n");
@@ -1186,7 +1187,8 @@ namespace MPDCtrl.Models
 
                 if (cmd.Trim().StartsWith("idle"))
                 {
-                    DebugCommandOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
+                    //DebugCommandOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
+                    Task.Run(() => DebugCommandOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n"));
 
                     await _commandWriter.WriteAsync(cmd.Trim() + "\n");
 
@@ -1207,9 +1209,11 @@ namespace MPDCtrl.Models
                     cmdDummy = cmdDummy.Trim().Replace("\n", "\n" + ">>>>");
 
                     if (isAutoIdling)
-                        DebugCommandOutput?.Invoke(this, ">>>>" + "noidle\n>>>>" + cmdDummy.Trim() + "\n>>>>idle player" + "\n" + "\n");
+                        //DebugCommandOutput?.Invoke(this, ">>>>" + "noidle\n>>>>" + cmdDummy.Trim() + "\n>>>>idle player" + "\n" + "\n");
+                        Task.Run(() => DebugCommandOutput?.Invoke(this, ">>>>" + "noidle\n>>>>" + cmdDummy.Trim() + "\n>>>>idle player" + "\n" + "\n"));
                     else
-                        DebugCommandOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n");
+                        //DebugCommandOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n");
+                        Task.Run(() => DebugCommandOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n"));
 
                     if (isAutoIdling)
                         await _commandWriter.WriteAsync("noidle\n" + cmd.Trim() + "\n" + "idle player\n");
@@ -1451,10 +1455,11 @@ namespace MPDCtrl.Models
                 }
                 else
                 {
-                    DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
+                    //DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
+                    Task.Run(() => DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n"));
 
                     if (isAck)
-                        MpdAckError?.Invoke(this, ackText + " (@MSC)");
+                        Task.Run(() => MpdAckError?.Invoke(this, ackText + " (@MSC)"));
 
                     ret.ResultText = stringBuilder.ToString();
 
@@ -3916,6 +3921,9 @@ namespace MPDCtrl.Models
                         //Debug.WriteLine(value);
                     }
                 }
+
+                MpcProgress?.Invoke(this, "");
+
             }
             catch (Exception e)
             {

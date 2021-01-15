@@ -863,7 +863,7 @@
                     </Style>
                 </ResourceDictionary>
 
-                <!-- CustomSliderStyle -->
+                <!-- CustomSliderStyle Volume -->
                 <ResourceDictionary>
 
                     <Style x:Key="RepeatButtonTransparent" TargetType="{x:Type RepeatButton}">
@@ -1829,11 +1829,51 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type Thumb}">
-                                    <Border x:Name="Border" CornerRadius="3" 
-                                            Background="{TemplateBinding Background}" 
-                                            BorderBrush="{TemplateBinding BorderBrush}" 
-                                            BorderThickness="{TemplateBinding BorderThickness}"/>
-
+                                    <Border x:Name="Border" CornerRadius="3" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                        <VisualStateManager.VisualStateGroups>
+                                            <VisualStateGroup x:Name="CommonStates">
+                                                <VisualState x:Name="Normal">
+                                                    <Storyboard>
+                                                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Border" >
+                                                            <EasingDoubleKeyFrame KeyTime="0" Value="0.7"/>
+                                                        </DoubleAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                                <VisualState x:Name="MouseOver">
+                                                    <Storyboard>
+                                                        <!--
+                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="Border">
+                                                            <EasingColorKeyFrame KeyTime="0" Value="#282828" />
+                                                        </ColorAnimationUsingKeyFrames>
+                                                        -->
+                                                        <DoubleAnimationUsingKeyFrames  Storyboard.TargetProperty="Opacity" Storyboard.TargetName="Border" >
+                                                            <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
+                                                        </DoubleAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                                <VisualState x:Name="Pressed">
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetName="Border" Storyboard.TargetProperty="Opacity" Duration="00:00:00.1" To="0.3"/>
+                                                        <!--
+                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="Border">
+                                                            <EasingColorKeyFrame KeyTime="0" Value="#212121" />
+                                                        </ColorAnimationUsingKeyFrames>
+                                                        -->
+                                                    </Storyboard>
+                                                </VisualState>
+                                                <!--
+                                                <VisualState x:Name="Disabled">
+                                                    <Storyboard>
+                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="Border">
+                                                            <EasingColorKeyFrame KeyTime="0" Value="#212121" />
+                                                        </ColorAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                                -->
+                                            </VisualStateGroup>
+                                        </VisualStateManager.VisualStateGroups>
+                                    </Border>
+                                    <!--
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="true">
                                             <Setter TargetName="Border" Property="Background" Value="{DynamicResource ScrollBarMouseOverColorBrush}" />
@@ -1842,7 +1882,7 @@
                                             <Setter TargetName="Border" Property="Background" Value="{DynamicResource ScrollBarDisabledBrush}"/>
                                         </Trigger>
                                     </ControlTemplate.Triggers>
-                                    
+                                    -->
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
@@ -1911,6 +1951,17 @@
                         </Setter>
                     </Style>
 
+                    <Style x:Key="ScrollBarTrackStyle" TargetType="{x:Type RepeatButton}">
+                        <Setter Property="Focusable" Value="False"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                    <Border Background="Transparent"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+
                     <ControlTemplate x:Key="VerticalScrollBar" TargetType="{x:Type ScrollBar}">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -1923,13 +1974,13 @@
                             <RepeatButton Grid.Row="0" Height="18" Command="ScrollBar.LineUpCommand" Content="M 0 4 L 8 4 L 4 0 Z" Style="{StaticResource RepeatButtonStyleInc}" IsTabStop="False"/>
                             <Track x:Name="PART_Track" Grid.Row="1" IsDirectionReversed="true">
                                 <Track.DecreaseRepeatButton>
-                                    <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource RepeatButtonStyleDec}" IsTabStop="False"/>
+                                    <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False"/>
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
-                                    <Thumb Style="{StaticResource ThumbStyle}" Margin="5,0,5,0"></Thumb>
+                                    <Thumb Style="{StaticResource ThumbStyle}" Margin="4,0,4,0"></Thumb>
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
-                                    <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource RepeatButtonStyleInc}" IsTabStop="False"/>
+                                    <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False"/>
                                 </Track.IncreaseRepeatButton>
                             </Track>
                             <RepeatButton Grid.Row="2" Height="18" Command="ScrollBar.LineDownCommand" Content="M 0 0 L 4 4 L 8 0 Z" Style="{StaticResource RepeatButtonStyleDec}" IsTabStop="False"/>
@@ -1948,13 +1999,13 @@
                             <RepeatButton Grid.Column="0" Style="{StaticResource RepeatButtonStyleInc}" Width="18" Command="ScrollBar.LineLeftCommand" Content="M 4 0 L 4 8 L 0 4 Z" IsTabStop="False" />
                             <Track x:Name="PART_Track" Grid.Column="1" IsDirectionReversed="False">
                                 <Track.DecreaseRepeatButton>
-                                    <RepeatButton Style="{StaticResource RepeatButtonStyleDec}" Command="ScrollBar.PageLeftCommand" IsTabStop="False" />
+                                    <RepeatButton Command="ScrollBar.PageLeftCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False" />
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
-                                    <Thumb Style="{StaticResource ThumbStyle}" Margin="0,5,0,5"></Thumb>
+                                    <Thumb Style="{StaticResource ThumbStyle}" Margin="0,4,0,4"></Thumb>
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
-                                    <RepeatButton Style="{StaticResource RepeatButtonStyleInc}" Command="ScrollBar.PageRightCommand" IsTabStop="False" />
+                                    <RepeatButton Command="ScrollBar.PageRightCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False" />
                                 </Track.IncreaseRepeatButton>
                             </Track>
                             <RepeatButton Grid.Column="2" Style="{StaticResource RepeatButtonStyleDec}" Width="18" Command="ScrollBar.LineRightCommand" Content="M 0 0 L 4 4 L 0 8 Z" IsTabStop="False" />
@@ -2678,7 +2729,7 @@
                                                 <RepeatButton Grid.Row="0" Style="{StaticResource ScrollBarRepeatButtonStyle}" Height="{StaticResource ScrollBarRepeatButtonSize}" Command="ScrollBar.LineUpCommand" Content="M 0 4 L 8 4 L 4 0 Z" />
                                                 <Track x:Name="PART_Track" Grid.Row="1" IsDirectionReversed="true">
                                                     <Track.DecreaseRepeatButton>
-                                                        <RepeatButton Style="{StaticResource ScrollBarTrackStyle}"  Command="ScrollBar.PageUpCommand" />
+                                                        <RepeatButton Style="{StaticResource ScrollBarTrackStyle}" Command="ScrollBar.PageUpCommand" />
                                                     </Track.DecreaseRepeatButton>
                                                     <Track.Thumb>
                                                         <Thumb Style="{StaticResource ScrollBarThumbStyle}" Margin="0,1,0,1"/>

@@ -1933,7 +1933,7 @@ namespace MPDCtrl.ViewModels
                     IsLibraryVisible = true;
                     IsSearchVisible = false;
 
-                    if ((MusicDirectories.Count <= 1 ) && (MusicEntries.Count == 0))
+                    if (!(value as NodeMenuLibrary).IsAcquired || (MusicDirectories.Count <= 1 ) && (MusicEntries.Count == 0))
                         GetLibrary(value as NodeMenuLibrary);
                 }
                 else if (value is NodeMenuSearch)
@@ -4772,6 +4772,9 @@ namespace MPDCtrl.ViewModels
             if (librarytNode == null)
                 return;
 
+            if (librarytNode.IsAcquired)
+                return;
+
             if (Application.Current == null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -4785,6 +4788,7 @@ namespace MPDCtrl.ViewModels
             CommandResult result = await _mpc.MpdQueryListAll();
             if (result.IsSuccess)
             {
+                librarytNode.IsAcquired = true;
                 UpdateLibrary();
             }
         }
@@ -6896,6 +6900,9 @@ namespace MPDCtrl.ViewModels
 
                 SelectedPlaylistSong = null;
 
+                if (_mainMenuItems.LibraryDirectory != null)
+                    _mainMenuItems.LibraryDirectory.IsAcquired = false;
+
                 MusicEntries.Clear();
 
                 //MusicDirectories.Clear();// Don't
@@ -7027,6 +7034,9 @@ namespace MPDCtrl.ViewModels
                 SelectedPlaylist = null;
 
                 SelectedPlaylistSong = null;
+
+                if (_mainMenuItems.LibraryDirectory != null)
+                    _mainMenuItems.LibraryDirectory.IsAcquired = false;
 
                 MusicEntries.Clear();
 

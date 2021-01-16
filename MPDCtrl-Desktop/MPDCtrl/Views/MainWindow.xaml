@@ -20,11 +20,14 @@
         <Style TargetType="Window">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsBusy}" Value="True">
+                    <Setter Property="Cursor" Value="Wait" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsWorking}" Value="True">
                     <Setter Property="Cursor" Value="AppStarting" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-    </Window.Style>
+    </Window.Style> 
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="32" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"/>
     </WindowChrome.WindowChrome>

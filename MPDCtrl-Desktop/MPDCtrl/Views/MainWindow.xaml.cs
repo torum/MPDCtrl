@@ -55,7 +55,7 @@ namespace MPDCtrl.Views
 
                     vm.AckWindowClear += () => OnAckWindowClear();
 
-                    vm.QueueSelectionClear += () => OnQueueSelectionClear();
+                    //vm.QueueSelectionClear += () => OnQueueSelectionClear();
                 }
             }
 
@@ -91,14 +91,14 @@ namespace MPDCtrl.Views
             }
         }
 
-        
+        /*
         public void OnQueueSelectionClear()
         {
             QueueListview.SelectedItem = null;
             QueueListview.SelectedItems.Clear();
             QueueListview.SelectedIndex = - 1;
         }
-        
+        */
         
         public void OnDebugCommandOutput(string arg)
         {

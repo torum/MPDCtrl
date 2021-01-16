@@ -65,6 +65,7 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v3.0.3.2 _mpc.CurrentQueueとQueueをロックするようにしてみた・・・けどダメだったのでIsWorkingでなんとかするように変更。
     /// v3.0.3.1 currentsong commandを使って、起動直後にqueueのロードを待たずとも曲情報を表示できるようにした。UpdateCurrentQueueで_mpc.CurrentQueueをループしてAddしている最中（IsWorking中」）にQueueにAddすると落ちてた。
     /// v3.0.3   MS Store 公開。
     /// v3.0.2.3 password間違いの際にエラーでてた。別スレッドにした関係でAckのメインスレッド実行が出来ていなかった。コマンド送信でInvokeする処理を待たないように一部変更（高速化）。listallを起動時にせず、as neededに変更。
@@ -111,7 +112,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.3.1";
+        const string _appVer = "v3.0.3.2";
 
         public static string AppVer
         {
@@ -2947,8 +2948,15 @@ namespace MPDCtrl.ViewModels
         // Queue listview ScrollIntoView and select (for filter)
         public event EventHandler<int> ScrollIntoViewAndSelect;
 
-        public delegate void QueueSelectionClearEventHandler();
-        public event QueueSelectionClearEventHandler QueueSelectionClear;
+        //public delegate void QueueSelectionClearEventHandler();
+        //public event QueueSelectionClearEventHandler QueueSelectionClear;
+
+        #endregion
+
+        #region == Lock objects ==
+        
+        private object lockQueueObject = new object();
+        private object lockCurrentQueueObject = new object();
 
         #endregion
 
@@ -3105,9 +3113,12 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            #region == 今の所あまり意味の無いこと == 
+            #region == 今の所あまり意味の無いLock関係のこと == 
 
-            BindingOperations.EnableCollectionSynchronization(Queue, new object());
+            BindingOperations.EnableCollectionSynchronization(Queue, lockQueueObject);
+            BindingOperations.EnableCollectionSynchronization(_mpc.CurrentQueue, lockCurrentQueueObject);
+            
+
             BindingOperations.EnableCollectionSynchronization(MusicDirectories, new object());
             BindingOperations.EnableCollectionSynchronization(MusicEntries, new object());
             BindingOperations.EnableCollectionSynchronization(SearchResult, new object());
@@ -4393,88 +4404,111 @@ namespace MPDCtrl.ViewModels
 
             if (Queue.Count > 0)
             {
-                IsBusy = true;
+                //IsBusy = true;
+                IsWorking = true;
+
+                try
+                {
+                    if (Application.Current == null) { return; }
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        // 削除する曲の一時リスト
+                        List<SongInfoEx> _tmpQueue = new List<SongInfoEx>();
+
+                        // 既存のリストの中で新しいリストにないものを削除
+                        foreach (var sng in Queue)
+                        {
+                            if (IsSwitchingProfile)
+                                return;
+
+                            //IsBusy = true;
+                            IsWorking = true;
+
+                            var queitem = _mpc.CurrentQueue.FirstOrDefault(i => i.Id == sng.Id);
+                            if (queitem == null)
+                            {
+                                // 削除リストに追加
+                                _tmpQueue.Add(sng);
+                            }
+                        }
+
+                        // 削除リストをループ
+                        foreach (var hoge in _tmpQueue)
+                        {
+                            if (IsSwitchingProfile)
+                                return;
+
+                            //IsBusy = true;
+                            IsWorking = true;
+
+                            Queue.Remove(hoge);
+                        }
+
+                    });
+
+                    if (Application.Current == null) { return; }
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        // 新しいリストの中から既存のリストにないものを追加または更新
+                        foreach (var sng in _mpc.CurrentQueue)
+                        {
+                            if (IsSwitchingProfile)
+                                return;
+
+                            //IsBusy = true;
+                            IsWorking = true;
+
+                            var fuga = Queue.FirstOrDefault(i => i.Id == sng.Id);
+                            if (fuga != null)
+                            {
+                                // TODO:
+                                fuga.Pos = sng.Pos;
+                                //fuga.Id = sng.Id; // 流石にIDは変わらないだろう。
+                                fuga.LastModified = sng.LastModified;
+                                //fuga.Time = sng.Time; // format exception が煩い。
+                                fuga.Title = sng.Title;
+                                fuga.Artist = sng.Artist;
+                                fuga.Album = sng.Album;
+                                fuga.AlbumArtist = sng.AlbumArtist;
+                                fuga.Composer = sng.Composer;
+                                fuga.Date = sng.Date;
+                                fuga.Duration = sng.Duration;
+                                fuga.File = sng.File;
+                                fuga.Genre = sng.Genre;
+                                fuga.Track = sng.Track;
+
+                                //Queue.Move(fuga.Index, sng.Index);
+                                fuga.Index = sng.Index;
+                            }
+                            else
+                            {
+                                //Queue.Insert(sng.Index, sng);
+                                Queue.Add(sng);
+                            }
+                        }
+
+                    });
+
+
+                }
+                catch(Exception e)
+                {
+                    Debug.WriteLine("Exception@UpdateCurrentQueue: " + e.Message);
+
+                    IsWorking = false;
+
+                    return;
+                }
+
+                if (IsSwitchingProfile)
+                    return;
+
+                //IsBusy = true;
                 IsWorking = true;
 
                 if (Application.Current == null) { return; }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    // 削除する曲の一時リスト
-                    List<SongInfoEx> _tmpQueue = new List<SongInfoEx>();
-
-                    // 既存のリストの中で新しいリストにないものを削除
-                    foreach (var sng in Queue)
-                    {
-                        if (IsSwitchingProfile)
-                            return;
-
-                        IsBusy = true;
-                        IsWorking = true;
-
-                        var queitem = _mpc.CurrentQueue.FirstOrDefault(i => i.Id == sng.Id);
-                        if (queitem == null)
-                        {
-                            // 削除リストに追加
-                            _tmpQueue.Add(sng);
-                        }
-                    }
-
-                    // 削除リストをループ
-                    foreach (var hoge in _tmpQueue)
-                    {
-                        if (IsSwitchingProfile)
-                            return;
-
-                        IsBusy = true;
-                        IsWorking = true;
-
-                        Queue.Remove(hoge);
-                    }
-
-                    // 新しいリストの中から既存のリストにないものを追加または更新
-                    foreach (var sng in _mpc.CurrentQueue)
-                    {
-                        if (IsSwitchingProfile)
-                            return;
-
-                        IsBusy = true;
-                        IsWorking = true;
-
-                        var fuga = Queue.FirstOrDefault(i => i.Id == sng.Id);
-                        if (fuga != null)
-                        {
-                            // TODO:
-                            fuga.Pos = sng.Pos;
-                            //fuga.Id = sng.Id; // 流石にIDは変わらないだろう。
-                            fuga.LastModified = sng.LastModified;
-                            //fuga.Time = sng.Time; // format exception が煩い。
-                            fuga.Title = sng.Title;
-                            fuga.Artist = sng.Artist;
-                            fuga.Album = sng.Album;
-                            fuga.AlbumArtist = sng.AlbumArtist;
-                            fuga.Composer = sng.Composer;
-                            fuga.Date = sng.Date;
-                            fuga.Duration = sng.Duration;
-                            fuga.File = sng.File;
-                            fuga.Genre = sng.Genre;
-                            fuga.Track = sng.Track;
-
-                            //Queue.Move(fuga.Index, sng.Index);
-                            fuga.Index = sng.Index;
-                        }
-                        else
-                        {
-                            Queue.Add(sng);
-                            //Queue.Insert(sng.Index, sng);
-                        }
-                    }
-
-                    if (IsSwitchingProfile)
-                        return;
-
-                    IsBusy = true;
-                    IsWorking = true;
-
                     // Set Current and NowPlaying.
                     var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
                     if (curitem != null)
@@ -4490,8 +4524,6 @@ namespace MPDCtrl.ViewModels
                         {
                             IsAlbumArtVisible = false;
                             AlbumArt = _albumArtDefault;
-
-                            //Debug.WriteLine("AlbumArt isCurrentQueue: " + CurrentSong.file);
 
                             if (!String.IsNullOrEmpty(CurrentSong.File))
                             {
@@ -4511,11 +4543,10 @@ namespace MPDCtrl.ViewModels
                     // 移動したりするとPosが変更されても順番が反映されないので、
                     var collectionView = CollectionViewSource.GetDefaultView(Queue);
                     collectionView.SortDescriptions.Add(new SortDescription("Index", ListSortDirection.Ascending));
-                    collectionView.Refresh();
-
+                    //collectionView.Refresh();
                 });
 
-                IsBusy = false;
+                //IsBusy = false;
                 IsWorking = false;
             }
             else
@@ -4523,35 +4554,58 @@ namespace MPDCtrl.ViewModels
                 //IsBusy = true;
                 IsWorking = true;
 
-                //Queue = _mpc.CurrentQueue;
-                foreach (var hoge in _mpc.CurrentQueue)
+                try
                 {
-                    await Task.Delay(1);
-                    
-                    if (IsSwitchingProfile)
-                        break;
+                    //Queue = _mpc.CurrentQueue;
 
-                    //IsBusy = true;
-                    IsWorking = true;
+                    foreach (var hoge in _mpc.CurrentQueue)
+                    {
+                        await Task.Delay(1);
 
+                        if (IsSwitchingProfile)
+                            break;
+
+                        //IsBusy = true;
+                        IsWorking = true;
+
+                        if (Application.Current == null) { return; }
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            Queue.Add(hoge);
+                        });
+
+                        if (IsSwitchingProfile)
+                            break;
+                    }
+
+                    /*
+                    // This is gonna freeze the UI...for seconds for older PCs.
+                    lock (lockCurrentQueueObject)
+                    {
+                        lock (lockQueueObject)
+                        {
+                            Queue = new ObservableCollection<SongInfoEx>(_mpc.CurrentQueue);
+                        }
+                    }
+                    */
+
+                    /*
+                    // This is gonna freeze the UI...for seconds for older PCs.
                     if (Application.Current == null) { return; }
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        Queue.Add(hoge);
+                        Queue = new ObservableCollection<SongInfoEx>(_mpc.CurrentQueue);
                     });
-
-                    if (IsSwitchingProfile)
-                        break;
+                    */
                 }
-
-                /*
-                // This is gonna freeze the UI...for seconds for older PCs.
-                if (Application.Current == null) { return; }
-                Application.Current.Dispatcher.Invoke(() =>
+                catch (Exception e)
                 {
-                    Queue = new ObservableCollection<SongInfoEx>(_mpc.CurrentQueue);
-                });
-                */
+                    Debug.WriteLine("Exception@UpdateCurrentQueue: " + e.Message);
+
+                    IsWorking = false;
+
+                    return;
+                }
 
                 if (IsSwitchingProfile)
                     return;
@@ -4646,7 +4700,11 @@ namespace MPDCtrl.ViewModels
 
         private void UpdatePlaylists()
         {
+            if (IsSwitchingProfile)
+                return;
+
             //IsBusy = true;
+            IsWorking = true;
 
             if (Application.Current == null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
@@ -4706,6 +4764,7 @@ namespace MPDCtrl.ViewModels
             });
 
             //IsBusy = false;
+            IsWorking = false;
         }
 
         private void UpdateLibrary()
@@ -4725,11 +4784,11 @@ namespace MPDCtrl.ViewModels
         {
             // Music files
 
-            //IsBusy = true;
-            //IsWorking = true;
-
             if (IsSwitchingProfile)
                 return;
+
+            //IsBusy = true;
+            IsWorking = true;
 
             if (Application.Current == null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
@@ -4750,7 +4809,7 @@ namespace MPDCtrl.ViewModels
                     break;
 
                 //IsBusy = true;
-                //IsWorking = true;
+                IsWorking = true;
 
                 if (string.IsNullOrEmpty(songfile.File)) continue;
 
@@ -4779,7 +4838,7 @@ namespace MPDCtrl.ViewModels
                     Debug.WriteLine(songfile + e.Message);
 
                     //IsBusy = false;
-                    //IsWorking = false;
+                    IsWorking = false;
                     
                     return;
                 }
@@ -4805,7 +4864,11 @@ namespace MPDCtrl.ViewModels
         {
             // Directories
 
+            if (IsSwitchingProfile)
+                return;
+
             //IsBusy = true;
+            IsWorking = true;
 
             if (Application.Current == null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
@@ -4815,7 +4878,6 @@ namespace MPDCtrl.ViewModels
 
             try
             {
-                
                 var tmpMusicDirectories = new DirectoryTreeBuilder();
                 /*
                 await Task.Run(() =>
@@ -4841,24 +4903,27 @@ namespace MPDCtrl.ViewModels
                     SelectedNodeDirectory = MusicDirectories[0] as NodeDirectory;
                 }
 
-                IsWorking = false;
-
                 //IsBusy = false;
+                IsWorking = false;
             }
             catch (Exception e)
             {
                 Debug.WriteLine("_musicDirectories.Load: " + e.Message);
 
                 //IsBusy = false;
+                IsWorking = false;
             }
 
             //IsBusy = false;
+            IsWorking = false;
         }
 
         private async void GetPlaylistSongs(NodeMenuPlaylistItem playlistNode)
         {
             if (playlistNode == null) 
                 return;
+
+            IsWorking = true;
 
             if (Application.Current == null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
@@ -4870,6 +4935,8 @@ namespace MPDCtrl.ViewModels
             CommandPlaylistResult result = await _mpc.MpdQueryPlaylistSongs(playlistNode.Name);
             if (result.IsSuccess)
             {
+                IsWorking = true;
+
                 playlistNode.PlaylistSongs = result.PlaylistSongs;
 
                 if (SelectedNodeMenu == playlistNode)
@@ -4877,6 +4944,8 @@ namespace MPDCtrl.ViewModels
 
                 playlistNode.IsUpdateRequied = false;
             }
+
+            IsWorking = false;
         }
 
         private async void GetLibrary(NodeMenuLibrary librarytNode)

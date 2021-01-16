@@ -3836,6 +3836,7 @@ namespace MPDCtrl.Models
 
                 // for sorting.
                 sng.Index = i;
+                /*
                 if (i < 0) 
                 { 
                     // -1 means we are not parsing queue but parsing currentsong.<Oppes currentsong does not return pos..
@@ -3850,6 +3851,7 @@ namespace MPDCtrl.Models
                         catch{}
                     }
                 }
+                */
 
                 //
                 if (sng.Id == _status.MpdSongID)

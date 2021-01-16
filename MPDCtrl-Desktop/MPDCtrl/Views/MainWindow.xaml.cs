@@ -55,7 +55,7 @@ namespace MPDCtrl.Views
 
                     vm.AckWindowClear += () => OnAckWindowClear();
 
-                    //vm.QueueSelectionClear += () => OnQueueSelectionClear();
+                    vm.QueueSelectionClear += () => OnQueueSelectionClear();
                 }
             }
 
@@ -63,7 +63,7 @@ namespace MPDCtrl.Views
 
         public void OnScrollIntoView(int arg)
         {
-            if (QueueListview.Items.Count > arg)
+            if ((QueueListview.Items.Count > arg) && (arg > -1))
             {
                 QueueListview.ScrollIntoView(QueueListview.Items[arg]);
 
@@ -75,7 +75,7 @@ namespace MPDCtrl.Views
 
         public void OnScrollIntoViewAndSelect(int arg)
         {
-            if (QueueListview.Items.Count > arg)
+            if ((QueueListview.Items.Count > arg) && (arg > -1))
             {
                 //QueueListview.ScrollIntoView(QueueListview.Items[arg]);
 
@@ -91,14 +91,14 @@ namespace MPDCtrl.Views
             }
         }
 
-        /*
+        
         public void OnQueueSelectionClear()
         {
             QueueListview.SelectedItem = null;
             QueueListview.SelectedItems.Clear();
             QueueListview.SelectedIndex = - 1;
         }
-        */
+        
         
         public void OnDebugCommandOutput(string arg)
         {

@@ -65,6 +65,7 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v3.0.3.1 currentsong commandを使って、起動直後にqueueのロードを待たずとも曲情報を表示できるようにした。UpdateCurrentQueueで_mpc.CurrentQueueをループしてAddしている最中（IsWorking中」）にQueueにAddすると落ちてた。
     /// v3.0.3   MS Store 公開。
     /// v3.0.2.3 password間違いの際にエラーでてた。別スレッドにした関係でAckのメインスレッド実行が出来ていなかった。コマンド送信でInvokeする処理を待たないように一部変更（高速化）。listallを起動時にせず、as neededに変更。
     /// v3.0.2.2 Listviewのつまみの色と幅を少し変えた。クリックでPageUp/Down出来ていなかった。
@@ -110,7 +111,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.3";
+        const string _appVer = "v3.0.3.1";
 
         public static string AppVer
         {
@@ -2946,8 +2947,8 @@ namespace MPDCtrl.ViewModels
         // Queue listview ScrollIntoView and select (for filter)
         public event EventHandler<int> ScrollIntoViewAndSelect;
 
-        //public delegate void QueueSelectionClearEventHandler();
-        //public event QueueSelectionClearEventHandler QueueSelectionClear;
+        public delegate void QueueSelectionClearEventHandler();
+        public event QueueSelectionClearEventHandler QueueSelectionClear;
 
         #endregion
 
@@ -3102,6 +3103,18 @@ namespace MPDCtrl.ViewModels
             TreeviewMenuItemLoadPlaylistCommand = new RelayCommand(TreeviewMenuItemLoadPlaylistCommand_Execute, TreeviewMenuItemLoadPlaylistCommand_CanExecute);
             TreeviewMenuItemClearLoadPlaylistCommand = new RelayCommand(TreeviewMenuItemClearLoadPlaylistCommand_Execute, TreeviewMenuItemClearLoadPlaylistCommand_CanExecute);
 
+            #endregion
+
+            #region == 今の所あまり意味の無いこと == 
+
+            BindingOperations.EnableCollectionSynchronization(Queue, new object());
+            BindingOperations.EnableCollectionSynchronization(MusicDirectories, new object());
+            BindingOperations.EnableCollectionSynchronization(MusicEntries, new object());
+            BindingOperations.EnableCollectionSynchronization(SearchResult, new object());
+            BindingOperations.EnableCollectionSynchronization(Playlists, new object());
+            BindingOperations.EnableCollectionSynchronization(PlaylistSongs, new object());
+            BindingOperations.EnableCollectionSynchronization(Profiles, new object());
+            
             #endregion
 
             #region == イベントへのサブスクライブ ==
@@ -4262,48 +4275,39 @@ namespace MPDCtrl.ViewModels
                     isCurrentSongWasNull = true;
                 }
 
-                // Sets Current Song
-                var item = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
-                if (item != null)
+                if (Queue.Count > 0)
                 {
-                    CurrentSong = (item as SongInfoEx);
-                    CurrentSong.IsPlaying = true;
-
-                    if (isSongChanged)
+                    if (isSongChanged || isCurrentSongWasNull)
                     {
-                        if (IsAutoScrollToNowPlaying)
-                            ScrollIntoView?.Invoke(this, CurrentSong.Index);
+                        // Sets Current Song
+                        var item = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
+                        if (item != null)
+                        {
+                            CurrentSong = (item as SongInfoEx);
+                            CurrentSong.IsPlaying = true;
 
-                        // AlbumArt
-                        if (!String.IsNullOrEmpty(CurrentSong.File))
-                        {
-                            //Debug.WriteLine("AlbumArt isPlayer: " + CurrentSong.file);
-                            isAlbumArtChanged = true;
-                        }
-                    }
-                    else
-                    {
-                        if (isCurrentSongWasNull)
-                        {
                             if (IsAutoScrollToNowPlaying)
                                 ScrollIntoView?.Invoke(this, CurrentSong.Index);
 
                             // AlbumArt
                             if (!String.IsNullOrEmpty(CurrentSong.File))
                             {
-                                //Debug.WriteLine("AlbumArt isPlayer: isCurrentSongWasNull");
-                                //_mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
                                 isAlbumArtChanged = true;
                             }
                         }
                         else
                         {
-                            //Debug.WriteLine("AlbumArt isPlayer: !isSongChanged.");
+                            // TODO:
+                            CurrentSong = null;
+
+                            IsAlbumArtVisible = false;
+                            AlbumArt = _albumArtDefault;
                         }
                     }
                 }
                 else
                 {
+                    // TODO:
                     CurrentSong = null;
 
                     IsAlbumArtVisible = false;
@@ -4312,8 +4316,70 @@ namespace MPDCtrl.ViewModels
             });
 
             if (IsDownloadAlbumArt)
-                if (isAlbumArtChanged)
-                    await _mpc.MpdQueryAlbumArt(CurrentSong.File, CurrentSong.Id, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                if (CurrentSong != null)
+                    if (isAlbumArtChanged)
+                        await _mpc.MpdQueryAlbumArt(CurrentSong.File, CurrentSong.Id, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+        }
+
+        private async void UpdateCurrentSong()
+        {
+            bool isAlbumArtChanged = false;
+
+            if (Application.Current == null) { return; }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                bool isSongChanged = false;
+                bool isCurrentSongWasNull = false;
+
+                if (CurrentSong != null)
+                {
+                    if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
+                    {
+                        isSongChanged = true;
+
+                        // Clear IsPlaying icon
+                        CurrentSong.IsPlaying = false;
+
+                        IsAlbumArtVisible = false;
+                        AlbumArt = _albumArtDefault;
+                    }
+                }
+                else
+                {
+                    isCurrentSongWasNull = true;
+                }
+
+                if (_mpc.MpdCurrentSong != null)
+                {
+                    if (_mpc.MpdCurrentSong.Id == _mpc.MpdStatus.MpdSongID)
+                    {
+                        CurrentSong = _mpc.MpdCurrentSong;
+                        CurrentSong.IsPlaying = true;
+
+                        if (isSongChanged || isCurrentSongWasNull)
+                        {
+                            /*
+                            if (Queue.Count > 0)
+                                if (IsAutoScrollToNowPlaying)
+                                    ScrollIntoView?.Invoke(this, CurrentSong.Index);
+                            */
+
+                            // AlbumArt
+                            if (!String.IsNullOrEmpty(CurrentSong.File))
+                            {
+                                isAlbumArtChanged = true;
+                            }
+                        }
+                    }
+                }
+
+            });
+
+            if (IsDownloadAlbumArt)
+                if (CurrentSong != null)
+                    if (isAlbumArtChanged)
+                        await _mpc.MpdQueryAlbumArt(CurrentSong.File, CurrentSong.Id, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+
         }
 
         private async void UpdateCurrentQueue()
@@ -4328,6 +4394,7 @@ namespace MPDCtrl.ViewModels
             if (Queue.Count > 0)
             {
                 IsBusy = true;
+                IsWorking = true;
 
                 if (Application.Current == null) { return; }
                 Application.Current.Dispatcher.Invoke(() =>
@@ -4342,6 +4409,7 @@ namespace MPDCtrl.ViewModels
                             return;
 
                         IsBusy = true;
+                        IsWorking = true;
 
                         var queitem = _mpc.CurrentQueue.FirstOrDefault(i => i.Id == sng.Id);
                         if (queitem == null)
@@ -4358,6 +4426,7 @@ namespace MPDCtrl.ViewModels
                             return;
 
                         IsBusy = true;
+                        IsWorking = true;
 
                         Queue.Remove(hoge);
                     }
@@ -4369,6 +4438,7 @@ namespace MPDCtrl.ViewModels
                             return;
 
                         IsBusy = true;
+                        IsWorking = true;
 
                         var fuga = Queue.FirstOrDefault(i => i.Id == sng.Id);
                         if (fuga != null)
@@ -4403,6 +4473,7 @@ namespace MPDCtrl.ViewModels
                         return;
 
                     IsBusy = true;
+                    IsWorking = true;
 
                     // Set Current and NowPlaying.
                     var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
@@ -4445,6 +4516,7 @@ namespace MPDCtrl.ViewModels
                 });
 
                 IsBusy = false;
+                IsWorking = false;
             }
             else
             {
@@ -4467,6 +4539,9 @@ namespace MPDCtrl.ViewModels
                     {
                         Queue.Add(hoge);
                     });
+
+                    if (IsSwitchingProfile)
+                        break;
                 }
 
                 /*
@@ -4487,38 +4562,75 @@ namespace MPDCtrl.ViewModels
                     if (IsSwitchingProfile)
                         return;
 
-                    // Set Current and NowPlaying.
-                    var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
-                    if (curitem != null)
+                    bool isNeedToFindCurrentSong = false;
+
+                    if (CurrentSong != null)
                     {
-                        CurrentSong = (curitem as SongInfoEx);
-                        CurrentSong.IsPlaying = true;
-
-                        if (IsAutoScrollToNowPlaying)
-                            ScrollIntoView?.Invoke(this, CurrentSong.Index);
-
-                        // AlbumArt
-                        if (_mpc.AlbumCover.SongFilePath != curitem.File)
+                        if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
                         {
-                            IsAlbumArtVisible = false;
-                            AlbumArt = _albumArtDefault;
-
-                            //Debug.WriteLine("AlbumArt isCurrentQueue from Clear: " + CurrentSong.file);
-                            if (!String.IsNullOrEmpty(CurrentSong.File))
+                            isNeedToFindCurrentSong = true;
+                        }
+                        else
+                        {
+                            if (_mpc.MpdCurrentSong != null)
                             {
-                                //_mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
-                                isAlbumArtChanged = true;
+                                // This means CurrentSong is already aquired by "currentsong" command.
+                                if (_mpc.MpdCurrentSong.Id == _mpc.MpdStatus.MpdSongID)
+                                {
+                                    // the reason not to use CurrentSong is that it points different instance (set by "currentsong" command and currentqueue). 
+                                    _mpc.MpdCurrentSong.IsPlaying = true;
+
+                                    // just in case.
+                                    CurrentSong.IsPlaying = true;
+                                    // currentsong command does not return pos, so it's needed to be set.
+                                    CurrentSong.Index = _mpc.MpdCurrentSong.Index;
+
+                                    if (IsAutoScrollToNowPlaying)
+                                        ScrollIntoView?.Invoke(this, CurrentSong.Index);
+                                }
                             }
                         }
                     }
                     else
                     {
-                        // just in case.
-                        CurrentSong = null;
-
-                        IsAlbumArtVisible = false;
-                        AlbumArt = _albumArtDefault;
+                        isNeedToFindCurrentSong = true;
                     }
+
+                    if (isNeedToFindCurrentSong)
+                    {
+                        // Set Current and NowPlaying.
+                        var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
+                        if (curitem != null)
+                        {
+                            CurrentSong = (curitem as SongInfoEx);
+                            CurrentSong.IsPlaying = true;
+
+                            if (IsAutoScrollToNowPlaying)
+                                ScrollIntoView?.Invoke(this, CurrentSong.Index);
+
+                            // AlbumArt
+                            if (_mpc.AlbumCover.SongFilePath != curitem.File)
+                            {
+                                IsAlbumArtVisible = false;
+                                AlbumArt = _albumArtDefault;
+
+                                if (!String.IsNullOrEmpty(CurrentSong.File))
+                                {
+                                    //_mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
+                                    isAlbumArtChanged = true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // just in case.
+                            CurrentSong = null;
+
+                            IsAlbumArtVisible = false;
+                            AlbumArt = _albumArtDefault;
+                        }
+                    }
+                   
                 });
 
                 //IsBusy = false;
@@ -4841,6 +4953,10 @@ namespace MPDCtrl.ViewModels
                         await Task.Delay(5);
                         UpdateStatus();
 
+                        await _mpc.MpdIdleQueryCurrentSong();
+                        await Task.Delay(5);
+                        UpdateCurrentSong();
+
                         await _mpc.MpdIdleQueryCurrentQueue();
                         await Task.Delay(5);
                         UpdateCurrentQueue();
@@ -4849,6 +4965,7 @@ namespace MPDCtrl.ViewModels
                         await Task.Delay(5);
                         UpdatePlaylists();
 
+                        // This no longer needed since it is aquired as needed basis.
                         //await _mpc.MpdIdleQueryListAll();
                         //await Task.Delay(5);
                         //UpdateLibrary();
@@ -5382,6 +5499,7 @@ namespace MPDCtrl.ViewModels
         public bool QueueListviewSaveAsCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (Queue.Count == 0) return false;
             return true;
         }
@@ -5394,6 +5512,7 @@ namespace MPDCtrl.ViewModels
         public bool QueueListviewSaveAsPopupCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (Queue.Count == 0) return false;
             return true;
         }
@@ -5411,6 +5530,7 @@ namespace MPDCtrl.ViewModels
         public bool QueueListviewEnterKeyCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (Queue.Count < 1) { return false; }
             if (_selectedQueueSong == null) { return false; }
             return true;
@@ -5424,6 +5544,7 @@ namespace MPDCtrl.ViewModels
         public bool QueueListviewLeftDoubleClickCommand_CanExecute()
         {
             if (IsBusy) return false;
+            //if (IsWorking) return false;
             if (Queue.Count < 1) { return false; }
             if (_selectedQueueSong == null) { return false; }
             return true;
@@ -5436,6 +5557,8 @@ namespace MPDCtrl.ViewModels
         public ICommand QueueListviewClearCommand { get; }
         public bool QueueListviewClearCommand_CanExecute()
         {
+            if (IsBusy) return false;
+            if (IsWorking) return false;
             if (Queue.Count == 0) { return false; }
             return true;
         }
@@ -5448,6 +5571,7 @@ namespace MPDCtrl.ViewModels
         public bool QueueListviewConfirmClearPopupCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (Queue.Count == 0) return false;
             return true;
         }
@@ -5462,6 +5586,7 @@ namespace MPDCtrl.ViewModels
         public bool QueueListviewDeleteCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (SelectedQueueSong == null) return false;
             return true;
         }
@@ -5503,6 +5628,7 @@ namespace MPDCtrl.ViewModels
         public bool QueueListviewConfirmDeletePopupCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (SelectedQueueSong == null) return false;
             if (Queue.Count == 0) return false;
             return true;
@@ -5526,6 +5652,7 @@ namespace MPDCtrl.ViewModels
         public bool QueueListviewMoveUpCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (Queue.Count == 0) return false;
             if (SelectedQueueSong == null) return false;
             return true;
@@ -5583,6 +5710,7 @@ namespace MPDCtrl.ViewModels
         public bool QueueListviewMoveDownCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (Queue.Count == 0) return false;
             if (SelectedQueueSong == null) return false;
             return true;
@@ -5639,6 +5767,7 @@ namespace MPDCtrl.ViewModels
         public bool QueueListviewSaveSelectedAsCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (Queue.Count == 0) return false;
             if (SelectedQueueSong == null) return false;
             return true;
@@ -5685,6 +5814,7 @@ namespace MPDCtrl.ViewModels
         public bool QueueListviewSaveSelectedAsPopupCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (Queue.Count == 0) return false;
             if (SelectedQueueSong == null) return false;
             return true;
@@ -5708,6 +5838,7 @@ namespace MPDCtrl.ViewModels
         public bool QueueListviewSaveSelectedToPopupCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (Queue.Count == 0) return false;
             if (SelectedQueueSong == null) return false;
             return true;
@@ -5734,6 +5865,7 @@ namespace MPDCtrl.ViewModels
         public bool QueueListviewSaveSelectedToCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (Queue.Count == 0) return false;
             if (SelectedQueueSong == null) return false;
             return true;
@@ -5780,6 +5912,7 @@ namespace MPDCtrl.ViewModels
         public bool ScrollIntoNowPlayingCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (Queue.Count == 0) { return false; }
             if (CurrentSong == null) { return false; }
             return true;
@@ -6005,6 +6138,7 @@ namespace MPDCtrl.ViewModels
         public bool SongFilesListviewAddCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (MusicEntries.Count == 0) return false;
             return true;
         }
@@ -6190,6 +6324,7 @@ namespace MPDCtrl.ViewModels
         public bool ChangePlaylistCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (_selecctedPlaylist == null)
                 return false;
             if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
@@ -6216,6 +6351,7 @@ namespace MPDCtrl.ViewModels
         public bool PlaylistListviewLeftDoubleClickCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (_selecctedPlaylist == null)
                 return false;
             if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
@@ -6239,6 +6375,7 @@ namespace MPDCtrl.ViewModels
         public bool PlaylistListviewEnterKeyCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (_selecctedPlaylist == null)
                 return false;
             if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
@@ -6259,6 +6396,7 @@ namespace MPDCtrl.ViewModels
         public bool PlaylistListviewLoadPlaylistCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (_selecctedPlaylist == null)
                 return false;
             if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
@@ -6279,6 +6417,7 @@ namespace MPDCtrl.ViewModels
         public bool PlaylistListviewClearLoadPlaylistCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             if (_selecctedPlaylist == null)
                 return false;
             if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
@@ -6307,6 +6446,7 @@ namespace MPDCtrl.ViewModels
         {
             if (IsBusy) 
                 return false;
+            if (IsWorking) return false;
             if (_selecctedPlaylist == null) 
                 return false;
             if (string.IsNullOrEmpty(_selecctedPlaylist.Name))
@@ -6579,6 +6719,7 @@ namespace MPDCtrl.ViewModels
         public bool SongsListviewAddCommand_CanExecute()
         {
             if (IsBusy) return false;
+            if (IsWorking) return false;
             return true;
         }
         public async void SongsListviewAddCommand_Execute(object obj)
@@ -6811,6 +6952,7 @@ namespace MPDCtrl.ViewModels
             if (_port == 0) return;
             if (IsConnecting) return;
             if (IsBusy) return;
+            if (IsWorking) return;
 
             IsSwitchingProfile = true;
 
@@ -6985,6 +7127,7 @@ namespace MPDCtrl.ViewModels
         {
             if (IsConnecting) return;
             if (IsBusy) return;
+            if (IsWorking) return;
 
             IsBusy = true;
             IsSwitchingProfile = true;
@@ -7021,10 +7164,12 @@ namespace MPDCtrl.ViewModels
 
                 _mpc.MpdStatus.Reset();
 
+                //test
+                //QueueSelectionClear?.Invoke();
+
                 Queue.Clear();
                 //Queue = new ObservableCollection<SongInfoEx>();
                 _mpc.CurrentQueue.Clear();
-                //QueueSelectionClear?.Invoke();
 
                 if (_mainMenuItems.PlaylistsDirectory != null)
                     _mainMenuItems.PlaylistsDirectory.Children.Clear();
@@ -7617,13 +7762,14 @@ namespace MPDCtrl.ViewModels
             if (!(SelectedNodeMenu is NodeMenuPlaylistItem))
                 return false;
             if (IsBusy) return false;
+            if (IsWorking) return false;
 
             return true;
         }
         public async void TreeviewMenuItemLoadPlaylistCommand_Execute()
         {
-            if (IsBusy)
-                return;
+            if (IsBusy) return;
+            if (IsWorking) return;
             if (SelectedNodeMenu == null)
                 return;
             if (!(SelectedNodeMenu is NodeMenuPlaylistItem))
@@ -7640,6 +7786,7 @@ namespace MPDCtrl.ViewModels
             if (!(SelectedNodeMenu is NodeMenuPlaylistItem))
                 return false;
             if (IsBusy) return false;
+            if (IsWorking) return false;
 
             return true;
         }
@@ -7647,6 +7794,7 @@ namespace MPDCtrl.ViewModels
         {
             if (IsBusy)
                 return;
+            if (IsWorking) return;
             if (SelectedNodeMenu == null)
                 return;
             if (!(SelectedNodeMenu is NodeMenuPlaylistItem))

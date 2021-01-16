@@ -67,12 +67,10 @@ namespace MPDCtrl.Models
 
         public bool MpdStop { get; set; }
 
-        // TODO:
-        private SongInfo _currentSong;
-        public SongInfo MpdCurrentSong
+        private SongInfoEx _currentSong;
+        public SongInfoEx MpdCurrentSong
         {
-            // The Song object is currectly set only if
-            // Playlist is received and song id is matched.
+            // You need to either get "status" and "queue" before hand, or "currentsong". 
             get
             {
                 return _currentSong;
@@ -612,6 +610,22 @@ namespace MPDCtrl.Models
             {
                 MpcProgress?.Invoke(this, "Parsing status...");
                 result.IsSuccess = await ParseStatus(result.ResultText);
+
+                MpcProgress?.Invoke(this, "");
+            }
+
+            return result;
+        }
+
+        public async Task<CommandResult> MpdIdleQueryCurrentSong()
+        {
+            MpcProgress?.Invoke(this, "Querying currentsong...");
+
+            CommandResult result = await MpdIdleSendCommand("currentsong");
+            if (result.IsSuccess)
+            {
+                MpcProgress?.Invoke(this, "Parsing currentsong...");
+                result.IsSuccess = await ParseCurrentSong(result.ResultText);
 
                 MpcProgress?.Invoke(this, "");
             }
@@ -2039,13 +2053,10 @@ namespace MPDCtrl.Models
 
         public async Task<CommandResult> MpdQueryCurrentSong(bool autoIdling = true)
         {
-            // TODO:
-            // Currently not used. So do nothing.
-
             CommandResult result = await MpdSendCommand("currentsong", autoIdling);
             if (result.IsSuccess)
             {
-                //
+                result.IsSuccess = await ParseCurrentSong(result.ResultText);
             }
 
             return result;
@@ -3511,6 +3522,81 @@ namespace MPDCtrl.Models
             return Task.FromResult(true);
         }
 
+        private Task<bool> ParseCurrentSong(string result)
+        {
+            if (MpdStop) return Task.FromResult(false);
+
+            bool isEmptyResult = false;
+
+            if (string.IsNullOrEmpty(result))
+                isEmptyResult = true;
+
+            if (result.Trim() == "OK")
+                isEmptyResult = true;
+
+            List<string> resultLines = result.Split('\n').ToList();
+            if (resultLines == null)
+                isEmptyResult = true;
+            if (resultLines.Count == 0)
+                isEmptyResult = true;
+
+            if (isEmptyResult)
+            {
+                return Task.FromResult(true);
+            }
+
+            IsBusy?.Invoke(this, true);
+
+            try
+            {
+                var comparer = StringComparer.OrdinalIgnoreCase;
+                Dictionary<string, string> SongValues = new Dictionary<string, string>(comparer);
+
+                foreach (string value in resultLines)
+                {
+                    string[] StatusValuePair = value.Trim().Split(':');
+                    if (StatusValuePair.Length > 1)
+                    {
+                        if (SongValues.ContainsKey(StatusValuePair[0].Trim()))
+                        {
+                            // Shouldn't be happening here.
+                            break;
+                        }
+                        else
+                        {
+                            SongValues.Add(StatusValuePair[0].Trim(), value.Replace(StatusValuePair[0].Trim() + ": ", ""));
+                        }
+                    }
+                }
+
+                if ((SongValues.Count > 0) && SongValues.ContainsKey("Id"))
+                {
+                    SongInfoEx sng = FillSongInfoEx(SongValues, -1);
+
+                    if (sng != null)
+                    {
+                        if (_currentSong.Id != sng.Id)
+                            _currentSong = sng;
+                    }
+
+                    SongValues.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error@ParseCurrentSong: " + ex.Message);
+
+                return Task.FromResult(false);
+            }
+            finally
+            {
+                IsBusy?.Invoke(this, false);
+            }
+
+            return Task.FromResult(true);
+        }
+
+
         private Task<bool> ParsePlaylistInfo(string result)
         {
             if (MpdStop) return Task.FromResult(false);
@@ -3748,14 +3834,28 @@ namespace MPDCtrl.Models
                     sng.File = SongValues["file"];
                 }
 
+                // for sorting.
+                sng.Index = i;
+                if (i < 0) 
+                { 
+                    // -1 means we are not parsing queue but parsing currentsong.<Oppes currentsong does not return pos..
+                    if (string.IsNullOrEmpty(sng.Pos))
+                    {
+                        int tmpi = -1;
+                        try
+                        {
+                            tmpi = Int32.Parse(sng.Pos);
+                            sng.Index = tmpi;
+                        }
+                        catch{}
+                    }
+                }
+
                 //
                 if (sng.Id == _status.MpdSongID)
                 {
                     _currentSong = sng;
                 }
-
-                // for sorting.
-                sng.Index = i;
 
                 return sng;
             }

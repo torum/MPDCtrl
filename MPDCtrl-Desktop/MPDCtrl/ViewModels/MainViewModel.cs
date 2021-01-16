@@ -65,6 +65,7 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v3.0.3.3 Startから別スレッドで。
     /// v3.0.3.2 _mpc.CurrentQueueとQueueをロックするようにしてみた・・・けどダメだったのでIsWorkingでなんとかするように変更。
     /// v3.0.3.1 currentsong commandを使って、起動直後にqueueのロードを待たずとも曲情報を表示できるようにした。UpdateCurrentQueueで_mpc.CurrentQueueをループしてAddしている最中（IsWorking中」）にQueueにAddすると落ちてた。
     /// v3.0.3   MS Store 公開。
@@ -112,7 +113,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.3.2";
+        const string _appVer = "v3.0.3.3";
 
         public static string AppVer
         {
@@ -4169,9 +4170,11 @@ namespace MPDCtrl.ViewModels
 
         #region == メソッド ==
 
-        private async void Start(string host, int port, string password)
+        private void Start(string host, int port, string password)
         {
-            await _mpc.MpdIdleConnect(host, port);
+            // 別スレッドで実行。
+            Task.Run(() => _mpc.MpdIdleConnect(host, port));
+            //await _mpc.MpdIdleConnect(host, port);
         }
 
         private void UpdateButtonStatus()

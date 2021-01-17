@@ -1,11 +1,4 @@
-﻿/// MPDCtrl
-/// https://github.com/torum/MPDCtrl
-/// 
-/// MPD Protocol
-/// https://www.musicpd.org/doc/html/protocol.html
-/// 
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;

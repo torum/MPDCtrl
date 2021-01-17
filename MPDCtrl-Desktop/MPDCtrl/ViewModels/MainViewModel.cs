@@ -62,6 +62,8 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v3.0.4.1 VirtualizingPanel.IsVirtualizing="True"
+    /// v3.0.4   MS Store 公開。
     /// v3.0.3.3 Startから別スレッドで。
     /// v3.0.3.2 _mpc.CurrentQueueとQueueをロックするようにしてみた・・・けどダメだったのでIsWorkingでなんとかするように変更。
     /// v3.0.3.1 currentsong commandを使って、起動直後にqueueのロードを待たずとも曲情報を表示できるようにした。UpdateCurrentQueueで_mpc.CurrentQueueをループしてAddしている最中（IsWorking中」）にQueueにAddすると落ちてた。
@@ -110,7 +112,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.4";
+        const string _appVer = "v3.0.4.1";
 
         public static string AppVer
         {
@@ -680,7 +682,6 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        // TODO: 整理
         #region == 画面表示切り替え系 ==  
 
         private bool _isConnected;
@@ -2599,7 +2600,6 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        // TODO: 整理
         #region == ダイアログ ==
 
         private string _changePasswordDialogMessage;
@@ -2615,60 +2615,6 @@ namespace MPDCtrl.ViewModels
                 NotifyPropertyChanged("ChangePasswordDialogMessage");
             }
         }
-
-
-        /*
-        private string _dialogTitle;
-        public string DialogTitle
-        {
-            get { return _dialogTitle; }
-            set
-            {
-                if (_dialogTitle == value)
-                    return;
-
-                _dialogTitle = value;
-                NotifyPropertyChanged("DialogTitle");
-            }
-        }
-
-
-
-        private string _dialogInputText;
-        public string DialogInputText
-        {
-            get { return _dialogInputText; }
-            set
-            {
-                if (_dialogInputText == value)
-                    return;
-
-                _dialogInputText = value;
-                NotifyPropertyChanged("DialogInputText");
-            }
-        }
-
-        public ObservableCollection<String> PlaylistNamesWithNew { get; set; } = new ObservableCollection<String>();
-
-        // Not smart...
-        public Func<string, bool> DialogResultFunction { get; set; }
-        public Func<string, string, bool> DialogResultFunctionWith2Params { get; set; }
-        public Func<string, List<string>, bool> DialogResultFunctionWith2ParamsWithObject { get; set; }
-        public string DialogResultFunctionParamString { get; set; }
-        public List<string> DialogResultFunctionParamObject { get; set; }
-
-        public void ResetDialog()
-        {
-            DialogTitle = "";
-            DialogMessage = "";
-            DialogInputText = "";
-            DialogResultFunction = null;
-            DialogResultFunctionWith2Params = null;
-            DialogResultFunctionWith2ParamsWithObject = null;
-            DialogResultFunctionParamString = "";
-            DialogResultFunctionParamObject = null;
-        }
-        */
 
         #endregion
 
@@ -2953,6 +2899,8 @@ namespace MPDCtrl.ViewModels
 
         #region == Lock objects ==
         
+        // TODO:
+
         private object lockQueueObject = new object();
         private object lockCurrentQueueObject = new object();
 
@@ -3007,11 +2955,7 @@ namespace MPDCtrl.ViewModels
             PlaylistListviewConfirmUpdatePopupCommand = new RelayCommand(PlaylistListviewConfirmUpdatePopupCommand_Execute, PlaylistListviewConfirmUpdatePopupCommand_CanExecute);
             PlaylistListviewClearCommand = new RelayCommand(PlaylistListviewClearCommand_Execute, PlaylistListviewClearCommand_CanExecute);
             PlaylistListviewClearPopupCommand = new RelayCommand(PlaylistListviewClearPopupCommand_Execute, PlaylistListviewClearPopupCommand_CanExecute);
-            /*
-            LocalfileListviewEnterKeyCommand = new GenericRelayCommand<object>(param => LocalfileListviewEnterKeyCommand_Execute(param), param => LocalfileListviewEnterKeyCommand_CanExecute());
-            LocalfileListviewAddCommand = new GenericRelayCommand<object>(param => LocalfileListviewAddCommand_Execute(param), param => LocalfileListviewAddCommand_CanExecute());
-            LocalfileListviewLeftDoubleClickCommand = new GenericRelayCommand<object>(param => LocalfileListviewLeftDoubleClickCommand_Execute(param), param => LocalfileListviewLeftDoubleClickCommand_CanExecute());
-            */
+
 
             QueueListviewEnterKeyCommand = new RelayCommand(QueueListviewEnterKeyCommand_ExecuteAsync, QueueListviewEnterKeyCommand_CanExecute);
             QueueListviewLeftDoubleClickCommand = new GenericRelayCommand<SongInfoEx>(param => QueueListviewLeftDoubleClickCommand_ExecuteAsync(param), param => QueueListviewLeftDoubleClickCommand_CanExecute());
@@ -3040,18 +2984,6 @@ namespace MPDCtrl.ViewModels
             UpdateProfileCommand = new GenericRelayCommand<object>(param => UpdateProfileCommand_Execute(param), param => UpdateProfileCommand_CanExecute());
             ChangeConnectionProfileCommand = new GenericRelayCommand<object>(param => ChangeConnectionProfileCommand_Execute(param), param => ChangeConnectionProfileCommand_CanExecute());
 
-            /*
-            ListAllCommand = new RelayCommand(ListAllCommand_ExecuteAsync, ListAllCommand_CanExecute);
-            ComfirmationDialogOKCommand = new RelayCommand(ComfirmationDialogOKCommand_Execute, ComfirmationDialogOKCommand_CanExecute);
-            ComfirmationDialogCancelCommand = new RelayCommand(ComfirmationDialogCancelCommand_Execute, ComfirmationDialogCancelCommand_CanExecute);
-            InformationDialogOKCommand = new RelayCommand(InformationDialogOKCommand_Execute, InformationDialogOKCommand_CanExecute);
-
-            InputDialogOKCommand = new RelayCommand(InputDialogOKCommand_Execute, InputDialogOKCommand_CanExecute);
-            InputDialogCancelCommand = new RelayCommand(InputDialogCancelCommand_Execute, InputDialogCancelCommand_CanExecute);
-
-            PlaylistSelectDialogOKCommand = new GenericRelayCommand<string>(param => PlaylistSelectDialogOKCommand_Execute(param), param => PlaylistSelectDialogOKCommand_CanExecute());
-            PlaylistSelectDialogCancelCommand = new RelayCommand(PlaylistSelectDialogCancelCommand_Execute, PlaylistSelectDialogCancelCommand_CanExecute);
-*/
             ShowChangePasswordDialogCommand = new GenericRelayCommand<object>(param => ShowChangePasswordDialogCommand_Execute(param), param => ShowChangePasswordDialogCommand_CanExecute());
             ChangePasswordDialogOKCommand = new GenericRelayCommand<object>(param => ChangePasswordDialogOKCommand_Execute(param), param => ChangePasswordDialogOKCommand_CanExecute());
             ChangePasswordDialogCancelCommand = new RelayCommand(ChangePasswordDialogCancelCommand_Execute, ChangePasswordDialogCancelCommand_CanExecute);
@@ -3112,11 +3044,11 @@ namespace MPDCtrl.ViewModels
             #endregion
 
             #region == 今の所あまり意味の無いLock関係のこと == 
+            //TODO;
 
             BindingOperations.EnableCollectionSynchronization(Queue, lockQueueObject);
             BindingOperations.EnableCollectionSynchronization(_mpc.CurrentQueue, lockCurrentQueueObject);
             
-
             BindingOperations.EnableCollectionSynchronization(MusicDirectories, new object());
             BindingOperations.EnableCollectionSynchronization(MusicEntries, new object());
             BindingOperations.EnableCollectionSynchronization(SearchResult, new object());
@@ -3686,10 +3618,13 @@ namespace MPDCtrl.ViewModels
             IsFullyLoaded = true;
 
             NotifyPropertyChanged("IsCurrentProfileSet");
+
             if (CurrentProfile == null)
             {
                 ConnectionStatusMessage = MPDCtrl.Properties.Resources.Init_NewConnectionSetting;
                 StatusButton = _pathNewConnectionButton;
+
+                // Show connection setting
                 IsConnectionSettingShow = true;
             }
             else
@@ -3700,10 +3635,11 @@ namespace MPDCtrl.ViewModels
                 _volume = CurrentProfile.Volume;
                 NotifyPropertyChanged("Volume");
 
+                // start the connection
                 Start(CurrentProfile.Host, CurrentProfile.Port, CurrentProfile.Password);
             }
 
-            // log
+            // error log
             if (IsSaveLog)
             {
                 App app = App.Current as App;
@@ -7299,87 +7235,6 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        // TODO: 整理
-        #region == Local Files ==
-
-        /*
-        public ICommand LocalfileListviewAddCommand { get; }
-        public bool LocalfileListviewAddCommand_CanExecute()
-        {
-            return true;
-        }
-        public async void LocalfileListviewAddCommand_Execute(object obj)
-        {
-            if (obj == null) return;
-
-            System.Collections.IList items = (System.Collections.IList)obj;
-
-            if (items.Count > 1)
-            {
-                var collection = items.Cast<NodeFile>();
-
-                List<String> uriList = new List<String>();
-
-                foreach (var item in collection)
-                {
-                    uriList.Add((item as NodeFile).OriginalFileUri);
-                }
-
-                await _mpc.MpdAdd(uriList);
-            }
-            else
-            {
-                if (items.Count == 1)
-                    await _mpc.MpdAdd((items[0] as NodeFile).OriginalFileUri);
-            }
-        }
-
-        public ICommand LocalfileListviewEnterKeyCommand { get; set; }
-        public bool LocalfileListviewEnterKeyCommand_CanExecute()
-        {
-            if (_mpc == null) { return false; }
-            return true;
-        }
-        public async void LocalfileListviewEnterKeyCommand_Execute(object obj)
-        {
-            if (obj == null) return;
-
-            System.Collections.IList items = (System.Collections.IList)obj;
-
-            if (items.Count > 1)
-            {
-                var collection = items.Cast<NodeFile>();
-
-                List<string> uriList = new List<string>();
-
-                foreach (var item in collection)
-                {
-                    uriList.Add((item as NodeFile).OriginalFileUri);
-                }
-
-                await _mpc.MpdAdd(uriList);
-            }
-            else
-            {
-                if (items.Count == 1)
-                    await _mpc.MpdAdd((items[0] as NodeFile).OriginalFileUri);
-            }
-        }
-
-        public ICommand LocalfileListviewLeftDoubleClickCommand { get; set; }
-        public bool LocalfileListviewLeftDoubleClickCommand_CanExecute()
-        {
-            if (_mpc == null) { return false; }
-            return true;
-        }
-        public void LocalfileListviewLeftDoubleClickCommand_Execute(object obj)
-        {
-
-        }
-        */
-
-        #endregion
-
         #region == Dialogs ==
 
         public ICommand ShowChangePasswordDialogCommand { get; }
@@ -7463,101 +7318,6 @@ namespace MPDCtrl.ViewModels
         {
             IsChangePasswordDialogShow = false;
         }
-
-        #endregion
-
-        // TODO: 整理
-        #region == Old Dialogs ==
-
-        /*
-
-        public ICommand ComfirmationDialogOKCommand { get; }
-        public bool ComfirmationDialogOKCommand_CanExecute()
-        {
-            return true;
-        }
-        public void ComfirmationDialogOKCommand_Execute()
-        {
-            DialogResultFunction(DialogResultFunctionParamString);
-
-            IsComfirmationDialogShow = false;
-        }
-
-        public ICommand ComfirmationDialogCancelCommand { get; }
-        public bool ComfirmationDialogCancelCommand_CanExecute()
-        {
-            return true;
-        }
-        public void ComfirmationDialogCancelCommand_Execute()
-        {
-            IsComfirmationDialogShow = false;
-        }
-
-        public ICommand InformationDialogOKCommand { get; }
-        public bool InformationDialogOKCommand_CanExecute()
-        {
-            return true;
-        }
-        public void InformationDialogOKCommand_Execute()
-        {
-            IsInformationDialogShow = false;
-        }
-
-        public ICommand InputDialogOKCommand { get; }
-        public bool InputDialogOKCommand_CanExecute()
-        {
-            return true;
-        }
-        public void InputDialogOKCommand_Execute()
-        {
-            if (DialogResultFunctionParamString != "")
-            {
-                DialogResultFunctionWith2Params(DialogResultFunctionParamString, DialogInputText);
-            }
-            else
-            {
-                DialogResultFunction(DialogInputText);
-            }
-
-            IsInputDialogShow = false;
-        }
-
-        public ICommand InputDialogCancelCommand { get; }
-        public bool InputDialogCancelCommand_CanExecute()
-        {
-            return true;
-        }
-        public void InputDialogCancelCommand_Execute()
-        {
-            IsInputDialogShow = false;
-        }
-
-
-        public ICommand PlaylistSelectDialogOKCommand { get; }
-        public bool PlaylistSelectDialogOKCommand_CanExecute()
-        {
-            return true;
-        }
-        public void PlaylistSelectDialogOKCommand_Execute(string playlistname)
-        {
-            if (string.IsNullOrEmpty(playlistname)) return;
-
-            // PlaylistAdd
-            DialogResultFunctionWith2ParamsWithObject(playlistname, DialogResultFunctionParamObject);
-
-            IsPlaylistSelectDialogShow = false;
-        }
-
-        public ICommand PlaylistSelectDialogCancelCommand { get; }
-        public bool PlaylistSelectDialogCancelCommand_CanExecute()
-        {
-            return true;
-        }
-        public void PlaylistSelectDialogCancelCommand_Execute()
-        {
-            IsPlaylistSelectDialogShow = false;
-        }
-        */
 
         #endregion
 

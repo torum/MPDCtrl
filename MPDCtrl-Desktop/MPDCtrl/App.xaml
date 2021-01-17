@@ -12,8 +12,6 @@
 
             <vms:MainViewModel x:Key="MainViewModel" />
             
-            <vms:DebugViewModel x:Key="DebugViewModel" />
-
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 
             <common:BooleanToVisibilityCollapsedConverter x:Key="BooleanToVisibilityCollapsedConverter" TrueValue="Visible" FalseValue="Collapsed" />
@@ -1541,6 +1539,8 @@
                         <Setter Property="BorderThickness" Value="0"/>
                         <Setter Property="Foreground" Value="{StaticResource ControlForegroundColorBrush}" />
                         <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}" />
+                        <Setter Property="HorizontalContentAlignment" Value="Left" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type TreeViewItem}">
@@ -1599,7 +1599,7 @@
                                         <ToggleButton x:Name="Expander" Style="{StaticResource ExpandCollapseToggleStyle}" ClickMode="Press" IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent},Mode=TwoWay}"/>
                                         
                                         <Border x:Name="Bd" Grid.Column="1" Background="{TemplateBinding Background}" TextBlock.Foreground="{TemplateBinding Foreground}" BorderBrush="{TemplateBinding BorderBrush}"  BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" Margin="{TemplateBinding Margin}" CornerRadius="2">
-                                            
+
                                             <ContentPresenter x:Name="PART_Header" ContentSource="Header" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
                                             <!--
                                             <Border.InputBindings>

@@ -444,7 +444,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <ListView x:Name="QueueListview" Grid.Row="1" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedQueueSong, Mode=TwoWay}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" SelectionChanged="QueueListview_SelectionChanged">
+                        <ListView x:Name="QueueListview" Grid.Row="1" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedQueueSong, Mode=TwoWay}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" SelectionChanged="QueueListview_SelectionChanged">
                             <ListView.InputBindings>
                                 <KeyBinding Key="Return" Command="{Binding Path=DataContext.QueueListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                                 <KeyBinding Gesture="Ctrl+U" Command="{Binding Path=DataContext.QueueListviewMoveUpCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
@@ -1299,7 +1299,7 @@
                             <Grid x:Name="SearchResultListviewDummy7" Grid.Column="7" />
                         </Grid>
 
-                        <ListView x:Name="SearchResultListview" Grid.Row="1" ItemsSource="{Binding SearchResult}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListView x:Name="SearchResultListview" Grid.Row="1" ItemsSource="{Binding SearchResult}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListView.Resources>
                                 <ContextMenu x:Key="SearchResultListviewItemContextMenu">
                                     <MenuItem Header="{x:Static properties:Resources.SongsItemContextMenu_Add}" Command="{Binding Path=DataContext.SongsListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
@@ -1579,7 +1579,7 @@
                             <ColumnDefinition Width="3*"/>
                         </Grid.ColumnDefinitions>
 
-                        <TreeView Grid.Row="0" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}" BorderThickness="0" ItemsSource="{Binding MusicDirectories}" helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeDirectory, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <TreeView Grid.Row="0" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}" BorderThickness="0" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" ItemsSource="{Binding MusicDirectories}" helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeDirectory, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <TreeView.Resources>
                                 <Style TargetType="{x:Type ScrollBar}">
                                     <Setter Property="Margin" Value="0,0,0,0" />
@@ -1753,7 +1753,7 @@
                                 <Grid x:Name="SongFilesListviewDummy3" Grid.Column="3" />
                             </Grid>
 
-                            <ListView x:Name="SongFilesListview" Grid.Row="1" ItemsSource="{Binding MusicEntries}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListView x:Name="SongFilesListview" Grid.Row="1" ItemsSource="{Binding MusicEntries}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                                 <ListView.Resources>
                                     <ContextMenu x:Key="SongFilesListviewItemContextMenu">
                                         <MenuItem Header="{x:Static properties:Resources.SongsItemContextMenu_Add}" Command="{Binding Path=DataContext.SongFilesListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
@@ -1982,7 +1982,7 @@
                             <Grid x:Name="PlaylistsListviewDummy3" Grid.Column="3" />
                         </Grid>
 
-                        <ListView x:Name="PlaylistsListview" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}" SelectionMode="Single" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True"  IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListView x:Name="PlaylistsListview" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}" SelectionMode="Single" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True"  IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListView.InputBindings>
                                 <KeyBinding Key="Return" Command="{Binding Path=DataContext.PlaylistListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                             </ListView.InputBindings>
@@ -2198,7 +2198,7 @@
                             <Grid x:Name="PlaylistSongsListviewDummy7" Grid.Column="7" />
                         </Grid>
 
-                        <ListView x:Name="PlaylistSongsListview" Grid.Row="1" ItemsSource="{Binding PlaylistSongs}" SelectedItem="{Binding SelectedPlaylistSong}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListView x:Name="PlaylistSongsListview" Grid.Row="1" ItemsSource="{Binding PlaylistSongs}" SelectedItem="{Binding SelectedPlaylistSong}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListView.Resources>
                                 <ContextMenu x:Key="PlaylistSongsListviewItemContextMenu">
                                     <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_SelectedItems}">

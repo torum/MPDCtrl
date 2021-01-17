@@ -33,14 +33,11 @@ namespace MPDCtrl.ViewModels
     /// Progress イベントの翻訳。
     /// profileを切り替えるとQueueとAlbumArtが奇妙な挙動をする件。
     /// 
-    /// v3.0.4.x 以降
-    /// 
     /// 設定画面でDBのupdateとrescan。
     /// 「プレイリストの名前変更」をインラインで。
     /// キューの順番変更をドラッグアンドドロップで。
     /// 
     /// シークやボリュームの進行度に合わせた背景色。
-    /// スクロールバーを押した際の色が見にくい。
     /// 
     /// Playlistの変更通知がウザい件。
     /// プレイリストのリストビューで、プレイリストを切り替える際に、選択などをクリアする。
@@ -113,7 +110,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.3.3";
+        const string _appVer = "v3.0.4";
 
         public static string AppVer
         {

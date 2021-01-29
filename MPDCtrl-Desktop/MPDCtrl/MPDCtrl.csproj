@@ -5,13 +5,14 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MPDCtrl2.ico</ApplicationIcon>
-    <Version>3.0.4</Version>
+    <Version>3.0.5</Version>
     <Authors>torum</Authors>
     <Company>Torum</Company>
     <Copyright>2021</Copyright>
     <Description>MPD Client.</Description>
     <PackageProjectUrl>https://torum.github.io/MPDCtrl/</PackageProjectUrl>
     <StartupObject>MPDCtrl.App</StartupObject>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

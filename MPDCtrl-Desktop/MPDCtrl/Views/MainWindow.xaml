@@ -2696,7 +2696,7 @@
                 </StatusBar.ItemsPanel>
 
                 <StatusBarItem Grid.Column="0">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 0 0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 0 0" Visibility="{Binding IsCurrentProfileSet, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
 
                         <Viewbox Width="16" Height="16" Margin="0 0 4 0" Opacity="0.7">
                             <Canvas Width="24" Height="24">

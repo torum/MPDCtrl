@@ -30,6 +30,8 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
+    /// 
+    /// DebugWindowをオフにした時、非表示に。
     /// Progress イベントの翻訳。
     /// profileを切り替えるとQueueとAlbumArtが奇妙な挙動をする件。
     /// 
@@ -62,7 +64,10 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
-    /// v3.0.4.1 VirtualizingPanel.IsVirtualizing="True"
+    /// v3.0.5   MS Store 公開。
+    /// v3.0.4.3 CurrentSongのIsNowPlayingがクリアされないシチュエーションがあった。profileが一つある状態で、もう一つ追加する際にデフォルトにするのオプションが強制される状態だった。
+    /// v3.0.4.2 新規で立ち上げた時、QuickSwitchを非表示に。
+    /// v3.0.4.1 VirtualizingPanel.IsVirtualizing="True"。コードを少しclieaning up.
     /// v3.0.4   MS Store 公開。
     /// v3.0.3.3 Startから別スレッドで。
     /// v3.0.3.2 _mpc.CurrentQueueとQueueをロックするようにしてみた・・・けどダメだったのでIsWorkingでなんとかするように変更。
@@ -112,7 +117,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.4.1";
+        const string _appVer = "v3.0.5";
 
         public static string AppVer
         {
@@ -143,7 +148,7 @@ namespace MPDCtrl.ViewModels
         // For the application config file folder
         const string _appDeveloper = "torum";
 
-        // もう使ってない気がする。
+        // TODO: no longer used.
         public static bool DeveloperMode
         {
             get
@@ -2492,14 +2497,6 @@ namespace MPDCtrl.ViewModels
                 if (_setIsDefault == value)
                     return;
 
-                if (value == false)
-                {
-                    if (Profiles.Count == 1)
-                    {
-                        return;
-                    }
-                }
-
                 _setIsDefault = value;
 
                 NotifyPropertyChanged("SetIsDefault");
@@ -3603,6 +3600,8 @@ namespace MPDCtrl.ViewModels
                     #endregion
 
                 }
+
+                IsFullyLoaded = true;
             }
             catch (System.IO.FileNotFoundException)
             {
@@ -3615,7 +3614,6 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            IsFullyLoaded = true;
 
             NotifyPropertyChanged("IsCurrentProfileSet");
 
@@ -3849,6 +3847,9 @@ namespace MPDCtrl.ViewModels
             XmlElement xProfile;
             XmlAttribute xAttrs;
 
+            if (Profiles.Count == 1)
+                Profiles[0].IsDefault = true;
+
             foreach (var p in Profiles)
             {
                 xProfile = doc.CreateElement(string.Empty, "Profile", string.Empty);
@@ -4080,7 +4081,7 @@ namespace MPDCtrl.ViewModels
             //catch (System.IO.FileNotFoundException) { }
             catch (Exception ex)
             {
-                Debug.WriteLine("■■■■■ Error  設定ファイルの保存中: " + ex + " while opening : " + _appConfigFilePath);
+                Debug.WriteLine("■■■■■ Error  設定ファイルの保存中: " + ex + " while saving : " + _appConfigFilePath);
             }
 
             #endregion
@@ -4212,6 +4213,12 @@ namespace MPDCtrl.ViewModels
 
                         // Clear IsPlaying icon
                         CurrentSong.IsPlaying = false;
+                        
+                        //
+                        if (_mpc.MpdCurrentSong != null)
+                        {
+                            _mpc.MpdCurrentSong.IsPlaying = false;
+                        }
 
                         IsAlbumArtVisible = false;
                         AlbumArt = _albumArtDefault;
@@ -6869,6 +6876,7 @@ namespace MPDCtrl.ViewModels
             pro.Name = Host + ":" + _port.ToString();
 
             Profiles.Add(pro);
+            NotifyPropertyChanged("IsCurrentProfileSet");
 
             SelectedProfile = pro;
 
@@ -7098,6 +7106,7 @@ namespace MPDCtrl.ViewModels
                     SelectedProfile = prof;
 
                     Profiles.Add(prof);
+                    NotifyPropertyChanged("IsCurrentProfileSet");
                 }
                 else
                 {

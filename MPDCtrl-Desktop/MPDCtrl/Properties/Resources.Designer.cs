@@ -70,6 +70,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Clear に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Ack_Window_Clear {
+            get {
+                return ResourceManager.GetString("Ack_Window_Clear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Add に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Add {
@@ -282,6 +291,15 @@ namespace MPDCtrl.Properties {
         public static string ConnectionStatus_SendFail_Timeout {
             get {
                 return ResourceManager.GetString("ConnectionStatus_SendFail_Timeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Clear に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Debug_Window_Clear {
+            get {
+                return ResourceManager.GetString("Debug_Window_Clear", resourceCulture);
             }
         }
         

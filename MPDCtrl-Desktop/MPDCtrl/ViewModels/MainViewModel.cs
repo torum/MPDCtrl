@@ -32,7 +32,6 @@ namespace MPDCtrl.ViewModels
     /// 
     /// 
     /// DebugWindowをオフにした時、非表示に。
-    /// Progress イベントの翻訳。
     /// profileを切り替えるとQueueとAlbumArtが奇妙な挙動をする件。
     /// 
     /// 設定画面でDBのupdateとrescan。
@@ -64,6 +63,7 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v3.0.5.1 TextBoxをRoundCorner化してみた。DebugWindowクリアするボタンにToolTipを付けた。AlbumArtの表示タイミングを少し遅らせてスムーズにした。IDEのメッセージに対処した。
     /// v3.0.5   MS Store 公開。
     /// v3.0.4.3 CurrentSongのIsNowPlayingがクリアされないシチュエーションがあった。profileが一つある状態で、もう一つ追加する際にデフォルトにするのオプションが強制される状態だった。
     /// v3.0.4.2 新規で立ち上げた時、QuickSwitchを非表示に。
@@ -117,7 +117,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.5";
+        const string _appVer = "v3.0.5.1";
 
         public static string AppVer
         {
@@ -165,7 +165,7 @@ namespace MPDCtrl.ViewModels
 
         #region == 設定フォルダ関連 ==  
 
-        private static string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        private static readonly string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         private static string _appDataFolder;
         private static string _appConfigFilePath;
 
@@ -182,7 +182,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isFullyLoaded = value;
-                this.NotifyPropertyChanged("IsFullyLoaded");
+                this.NotifyPropertyChanged(nameof(IsFullyLoaded));
             }
         }
 
@@ -199,7 +199,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isFullyRendered = value;
-                this.NotifyPropertyChanged("IsFullyRendered");
+                this.NotifyPropertyChanged(nameof(IsFullyRendered));
             }
         }
 
@@ -222,7 +222,7 @@ namespace MPDCtrl.ViewModels
 
                 _mainLeftPainActualWidth = value;
 
-                NotifyPropertyChanged("MainLeftPainActualWidth");
+                NotifyPropertyChanged(nameof(MainLeftPainActualWidth));
             }
         }
 
@@ -239,7 +239,7 @@ namespace MPDCtrl.ViewModels
 
                 _mainLeftPainWidth = value;
 
-                NotifyPropertyChanged("MainLeftPainWidth");
+                NotifyPropertyChanged(nameof(MainLeftPainWidth));
             }
         }
 
@@ -259,7 +259,7 @@ namespace MPDCtrl.ViewModels
 
                 _queueColumnHeaderPositionVisibility = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderPositionVisibility");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderPositionVisibility));
             }
         }
 
@@ -280,7 +280,7 @@ namespace MPDCtrl.ViewModels
                 if (value > 0)
                     QueueColumnHeaderPositionWidthRestore = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderPositionWidth");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderPositionWidth));
             }
         }
 
@@ -298,7 +298,7 @@ namespace MPDCtrl.ViewModels
 
                 _queueColumnHeaderPositionWidthUser = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderPositionWidthRestore");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderPositionWidthRestore));
             }
         }
 
@@ -316,7 +316,7 @@ namespace MPDCtrl.ViewModels
 
                 _queueColumnHeaderNowPlayingVisibility = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderNowPlayingVisibility");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderNowPlayingVisibility));
             }
         }
 
@@ -337,7 +337,7 @@ namespace MPDCtrl.ViewModels
                 if (value > 0)
                     QueueColumnHeaderNowPlayingWidthRestore = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderNowPlayingWidth");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderNowPlayingWidth));
             }
         }
 
@@ -355,7 +355,7 @@ namespace MPDCtrl.ViewModels
 
                 _queueColumnHeaderNowPlayingWidthUser = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderNowPlayingWidthRestore");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderNowPlayingWidthRestore));
             }
         }
 
@@ -376,7 +376,7 @@ namespace MPDCtrl.ViewModels
                 if (value > 0)
                     QueueColumnHeaderTitleWidthRestore = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderTitleWidth");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderTitleWidth));
             }
         }
 
@@ -394,7 +394,7 @@ namespace MPDCtrl.ViewModels
 
                 _queueColumnHeaderTitleWidthUser = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderTitleWidthRestore");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderTitleWidthRestore));
             }
         }
 
@@ -412,7 +412,7 @@ namespace MPDCtrl.ViewModels
 
                 _queueColumnHeaderTimeVisibility = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderTimeVisibility");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderTimeVisibility));
             }
         }
 
@@ -433,7 +433,7 @@ namespace MPDCtrl.ViewModels
                 if (value > 0)
                     QueueColumnHeaderTitleWidthRestore = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderTimeWidth");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderTimeWidth));
             }
         }
 
@@ -451,7 +451,7 @@ namespace MPDCtrl.ViewModels
 
                 _queueColumnHeaderTimeWidthUser = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderTimeWidthRestore");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderTimeWidthRestore));
             }
         }
 
@@ -469,7 +469,7 @@ namespace MPDCtrl.ViewModels
 
                 _queueColumnHeaderArtistVisibility = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderArtistVisibility");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderArtistVisibility));
             }
         }
 
@@ -490,7 +490,7 @@ namespace MPDCtrl.ViewModels
                 if (value > 0)
                     QueueColumnHeaderArtistWidthRestore = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderArtistWidth");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderArtistWidth));
             }
         }
 
@@ -508,7 +508,7 @@ namespace MPDCtrl.ViewModels
 
                 _queueColumnHeaderArtistWidthUser = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderArtistWidthRestore");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderArtistWidthRestore));
             }
         }
 
@@ -526,7 +526,7 @@ namespace MPDCtrl.ViewModels
 
                 _queueColumnHeaderAlbumVisibility = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderAlbumVisibility");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderAlbumVisibility));
             }
         }
 
@@ -547,7 +547,7 @@ namespace MPDCtrl.ViewModels
                 if (value > 0)
                     QueueColumnHeaderAlbumWidthRestore = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderAlbumWidth");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderAlbumWidth));
             }
         }
 
@@ -565,7 +565,7 @@ namespace MPDCtrl.ViewModels
 
                 _queueColumnHeaderAlbumWidthUser = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderAlbumWidthRestore");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderAlbumWidthRestore));
             }
         }
 
@@ -583,7 +583,7 @@ namespace MPDCtrl.ViewModels
 
                 _queueColumnHeaderGenreVisibility = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderGenreVisibility");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderGenreVisibility));
             }
         }
 
@@ -604,7 +604,7 @@ namespace MPDCtrl.ViewModels
                 if (value > 0)
                     QueueColumnHeaderGenreWidthRestore = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderGenreWidth");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderGenreWidth));
             }
         }
 
@@ -622,7 +622,7 @@ namespace MPDCtrl.ViewModels
 
                 _queueColumnHeaderGenreWidthUser = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderGenreWidthRestore");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderGenreWidthRestore));
             }
         }
 
@@ -640,7 +640,7 @@ namespace MPDCtrl.ViewModels
 
                 _queueColumnHeaderLastModifiedVisibility = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderLastModifiedVisibility");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderLastModifiedVisibility));
             }
         }
 
@@ -661,7 +661,7 @@ namespace MPDCtrl.ViewModels
                 if (value > 0)
                     QueueColumnHeaderLastModifiedWidthRestore = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderLastModifiedWidth");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderLastModifiedWidth));
             }
         }
 
@@ -679,7 +679,7 @@ namespace MPDCtrl.ViewModels
 
                 _queueColumnHeaderLastModifiedWidthUser = value;
 
-                NotifyPropertyChanged("QueueColumnHeaderLastModifiedWidthRestore");
+                NotifyPropertyChanged(nameof(QueueColumnHeaderLastModifiedWidthRestore));
             }
         }
 
@@ -702,7 +702,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isConnected = value;
-                NotifyPropertyChanged("IsConnected");
+                NotifyPropertyChanged(nameof(IsConnected));
             }
         }
 
@@ -719,10 +719,10 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isConnecting = value;
-                NotifyPropertyChanged("IsConnecting");
-                NotifyPropertyChanged("IsNotConnecting");
+                NotifyPropertyChanged(nameof(IsConnecting));
+                NotifyPropertyChanged(nameof(IsNotConnecting));
 
-                NotifyPropertyChanged("IsProfileSwitchOK");
+                NotifyPropertyChanged(nameof(IsProfileSwitchOK));
             }
         }
 
@@ -739,7 +739,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isNotConnectingNorConnected = value;
-                NotifyPropertyChanged("IsNotConnectingNorConnected");
+                NotifyPropertyChanged(nameof(IsNotConnectingNorConnected));
             }
         }
 
@@ -788,7 +788,7 @@ namespace MPDCtrl.ViewModels
                     }
                 }
 
-                NotifyPropertyChanged("IsSettingsShow");
+                NotifyPropertyChanged(nameof(IsSettingsShow));
 
             }
         }
@@ -803,7 +803,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isConnectionSettingShow = value;
-                NotifyPropertyChanged("IsConnectionSettingShow");
+                NotifyPropertyChanged(nameof(IsConnectionSettingShow));
             }
         }
 
@@ -820,7 +820,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isChangePasswordDialogShow = value;
-                NotifyPropertyChanged("IsChangePasswordDialogShow");
+                NotifyPropertyChanged(nameof(IsChangePasswordDialogShow));
             }
         }
 
@@ -848,7 +848,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isAlbumArtVisible = value;
-                NotifyPropertyChanged("IsAlbumArtVisible");
+                NotifyPropertyChanged(nameof(IsAlbumArtVisible));
             }
         }
 
@@ -865,9 +865,9 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isBusy = value;
-                NotifyPropertyChanged("IsBusy");
+                NotifyPropertyChanged(nameof(IsBusy));
 
-                NotifyPropertyChanged("IsProfileSwitchOK");
+                NotifyPropertyChanged(nameof(IsProfileSwitchOK));
 
                 if (Application.Current == null) { return; }
                 Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
@@ -887,9 +887,9 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isWorking = value;
-                NotifyPropertyChanged("IsWorking");
+                NotifyPropertyChanged(nameof(IsWorking));
 
-                NotifyPropertyChanged("IsProfileSwitchOK");
+                NotifyPropertyChanged(nameof(IsProfileSwitchOK));
 
                 if (Application.Current == null) { return; }
                 Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
@@ -909,7 +909,7 @@ namespace MPDCtrl.ViewModels
 
                 _isShowAckWindow = value;
 
-                NotifyPropertyChanged("IsShowAckWindow");
+                NotifyPropertyChanged(nameof(IsShowAckWindow));
             }
         }
 
@@ -925,7 +925,7 @@ namespace MPDCtrl.ViewModels
 
                 _isShowDebugWindow = value;
 
-                NotifyPropertyChanged("IsShowDebugWindow");
+                NotifyPropertyChanged(nameof(IsShowDebugWindow));
 
                 if (_isShowDebugWindow)
                 {
@@ -955,10 +955,10 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _currentSong = value;
-                NotifyPropertyChanged("CurrentSong");
-                NotifyPropertyChanged("CurrentSongTitle");
-                NotifyPropertyChanged("CurrentSongArtist");
-                NotifyPropertyChanged("CurrentSongAlbum");
+                NotifyPropertyChanged(nameof(CurrentSong));
+                NotifyPropertyChanged(nameof(CurrentSongTitle));
+                NotifyPropertyChanged(nameof(CurrentSongArtist));
+                NotifyPropertyChanged(nameof(CurrentSongAlbum));
 
                 if (value == null)
                     _elapsedTimer.Stop();
@@ -1018,8 +1018,8 @@ namespace MPDCtrl.ViewModels
 
         #region == Playback ==  
 
-        private static string _pathPlayButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
-        private static string _pathPauseButton = "M15,16H13V8H15M11,16H9V8H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
+        private static readonly string _pathPlayButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
+        private static readonly string _pathPauseButton = "M15,16H13V8H15M11,16H9V8H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         //private static string _pathStopButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
         private string _playButton = _pathPlayButton;
         public string PlayButton
@@ -1034,7 +1034,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _playButton = value;
-                NotifyPropertyChanged("PlayButton");
+                NotifyPropertyChanged(nameof(PlayButton));
             }
         }
 
@@ -1050,7 +1050,7 @@ namespace MPDCtrl.ViewModels
                 if (_volume != value)
                 {
                     _volume = value;
-                    NotifyPropertyChanged("Volume");
+                    NotifyPropertyChanged(nameof(Volume));
 
                     if (_mpc != null)
                     {
@@ -1064,12 +1064,14 @@ namespace MPDCtrl.ViewModels
                             //System.Diagnostics.Debug.WriteLine("Volume value is still changing. Skipping.");
 
                             // we always create a new instance of DispatcherTimer
-                            _volumeDelayTimer = new System.Timers.Timer();
-                            _volumeDelayTimer.AutoReset = false;
+                            _volumeDelayTimer = new System.Timers.Timer
+                            {
+                                AutoReset = false,
 
-                            // if one second passes, that means our user has stopped interacting with the slider
-                            // we do real event
-                            _volumeDelayTimer.Interval = (double)1000;
+                                // if one second passes, that means our user has stopped interacting with the slider
+                                // we do real event
+                                Interval = (double)1000
+                            };
                             _volumeDelayTimer.Elapsed += new System.Timers.ElapsedEventHandler(DoChangeVolume);
 
                             _volumeDelayTimer.Start();
@@ -1101,7 +1103,7 @@ namespace MPDCtrl.ViewModels
             set
             {
                 _repeat = value;
-                NotifyPropertyChanged("Repeat");
+                NotifyPropertyChanged(nameof(Repeat));
 
                 if (_mpc != null)
                 {
@@ -1123,7 +1125,7 @@ namespace MPDCtrl.ViewModels
             set
             {
                 _random = value;
-                NotifyPropertyChanged("Random");
+                NotifyPropertyChanged(nameof(Random));
 
                 if (_mpc != null)
                 {
@@ -1145,7 +1147,7 @@ namespace MPDCtrl.ViewModels
             set
             {
                 _consume = value;
-                NotifyPropertyChanged("Consume");
+                NotifyPropertyChanged(nameof(Consume));
 
                 if (_mpc != null)
                 {
@@ -1167,7 +1169,7 @@ namespace MPDCtrl.ViewModels
             set
             {
                 _single = value;
-                NotifyPropertyChanged("Single");
+                NotifyPropertyChanged(nameof(Single));
 
                 if (_mpc != null)
                 {
@@ -1192,7 +1194,7 @@ namespace MPDCtrl.ViewModels
             set
             {
                 _time = value;
-                NotifyPropertyChanged("Time");
+                NotifyPropertyChanged(nameof(Time));
             }
         }
 
@@ -1208,7 +1210,7 @@ namespace MPDCtrl.ViewModels
                 if ((value < _time) && _elapsed != value)
                 {
                     _elapsed = value;
-                    NotifyPropertyChanged("Elapsed");
+                    NotifyPropertyChanged(nameof(Elapsed));
 
                     // If we have a timer and we are in this event handler, a user is still interact with the slider
                     // we stop the timer
@@ -1218,12 +1220,14 @@ namespace MPDCtrl.ViewModels
                     //System.Diagnostics.Debug.WriteLine("Elapsed value is still changing. Skipping.");
 
                     // we always create a new instance of DispatcherTimer
-                    _elapsedDelayTimer = new System.Timers.Timer();
-                    _elapsedDelayTimer.AutoReset = false;
+                    _elapsedDelayTimer = new System.Timers.Timer
+                    {
+                        AutoReset = false,
 
-                    // if one second passes, that means our user has stopped interacting with the slider
-                    // we do real event
-                    _elapsedDelayTimer.Interval = (double)1000;
+                        // if one second passes, that means our user has stopped interacting with the slider
+                        // we do real event
+                        Interval = (double)1000
+                    };
                     _elapsedDelayTimer.Elapsed += new System.Timers.ElapsedEventHandler(DoChangeElapsed);
 
                     _elapsedDelayTimer.Start();
@@ -1251,7 +1255,7 @@ namespace MPDCtrl.ViewModels
 
         #region == AlbumArt == 
 
-        private ImageSource _albumArtDefault = null;
+        private readonly ImageSource _albumArtDefault = null;
         private ImageSource _albumArt;
         public ImageSource AlbumArt
         {
@@ -1265,7 +1269,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _albumArt = value;
-                NotifyPropertyChanged("AlbumArt");
+                NotifyPropertyChanged(nameof(AlbumArt));
             }
         }
 
@@ -1277,7 +1281,7 @@ namespace MPDCtrl.ViewModels
 
         #region == Queue ==  
 
-        private ObservableCollection<SongInfoEx> _queue = new ObservableCollection<SongInfoEx>();
+        private ObservableCollection<SongInfoEx> _queue = new();
         public ObservableCollection<SongInfoEx> Queue
         {
             get
@@ -1298,7 +1302,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _queue = value;
-                NotifyPropertyChanged("Queue");
+                NotifyPropertyChanged(nameof(Queue));
             }
         }
 
@@ -1315,7 +1319,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _selectedQueueSong = value;
-                NotifyPropertyChanged("SelectedQueueSong");
+                NotifyPropertyChanged(nameof(SelectedQueueSong));
             }
         }
 
@@ -1332,11 +1336,11 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isQueueFindVisible = value;
-                NotifyPropertyChanged("IsQueueFindVisible");
+                NotifyPropertyChanged(nameof(IsQueueFindVisible));
             }
         }
 
-        private ObservableCollection<SongInfoEx> _queueForFilter = new ObservableCollection<SongInfoEx>();
+        private ObservableCollection<SongInfoEx> _queueForFilter = new();
         public ObservableCollection<SongInfoEx> QueueForFilter
         {
             get
@@ -1349,7 +1353,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _queueForFilter = value;
-                NotifyPropertyChanged("QueueForFilter");
+                NotifyPropertyChanged(nameof(QueueForFilter));
             }
         }
 
@@ -1366,7 +1370,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _selectedQueueFilterTags = value;
-                NotifyPropertyChanged("SelectedQueueFilterTags");
+                NotifyPropertyChanged(nameof(SelectedQueueFilterTags));
 
                 if (_filterQueueQuery == "")
                     return;
@@ -1413,7 +1417,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _filterQueueQuery = value;
-                NotifyPropertyChanged("FilterQueueQuery");
+                NotifyPropertyChanged(nameof(FilterQueueQuery));
 
                 var collectionView = CollectionViewSource.GetDefaultView(_queueForFilter);
                 collectionView.Filter = x =>
@@ -1467,7 +1471,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _selectedQueueFilterSong = value;
-                NotifyPropertyChanged("SelectedQueueFilterSong");
+                NotifyPropertyChanged(nameof(SelectedQueueFilterSong));
             }
         }
 
@@ -1475,7 +1479,7 @@ namespace MPDCtrl.ViewModels
 
         #region == Library ==
 
-        private DirectoryTreeBuilder _musicDirectories = new DirectoryTreeBuilder();
+        private readonly DirectoryTreeBuilder _musicDirectories = new();
         public ObservableCollection<NodeTree> MusicDirectories
         {
             get { return _musicDirectories.Children; }
@@ -1603,7 +1607,7 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private ObservableCollection<NodeFile> _musicEntries = new ObservableCollection<NodeFile>();
+        private ObservableCollection<NodeFile> _musicEntries = new();
         public ObservableCollection<NodeFile> MusicEntries
         {
             get
@@ -1634,7 +1638,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _filterMusicEntriesQuery = value;
-                NotifyPropertyChanged("FilterMusicEntriesQuery");
+                NotifyPropertyChanged(nameof(FilterMusicEntriesQuery));
 
                 /*
                 var collectionView = CollectionViewSource.GetDefaultView(MusicEntries);
@@ -1768,7 +1772,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _selectedSearchTags = value;
-                NotifyPropertyChanged("SelectedSearchTags");
+                NotifyPropertyChanged(nameof(SelectedSearchTags));
             }
         }
 
@@ -1785,7 +1789,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _searchQuery = value;
-                NotifyPropertyChanged("SearchQuery");
+                NotifyPropertyChanged(nameof(SearchQuery));
             }
         }
 
@@ -1820,7 +1824,7 @@ namespace MPDCtrl.ViewModels
                 if (_selecctedPlaylist != value)
                 {
                     _selecctedPlaylist = value;
-                    NotifyPropertyChanged("SelectedPlaylist");
+                    NotifyPropertyChanged(nameof(SelectedPlaylist));
                 }
             }
         }
@@ -1829,7 +1833,7 @@ namespace MPDCtrl.ViewModels
 
         #region == Playlist Items ==
 
-        private ObservableCollection<SongInfo> _playlistSongs = new ObservableCollection<SongInfo>();
+        private ObservableCollection<SongInfo> _playlistSongs = new();
         public ObservableCollection<SongInfo> PlaylistSongs
         {
             get
@@ -1841,7 +1845,7 @@ namespace MPDCtrl.ViewModels
                 if (_playlistSongs != value)
                 {
                     _playlistSongs = value;
-                    NotifyPropertyChanged("PlaylistSongs");
+                    NotifyPropertyChanged(nameof(PlaylistSongs));
                 }
             }
         }
@@ -1858,7 +1862,7 @@ namespace MPDCtrl.ViewModels
                 if (_selecctedPlaylistSong != value)
                 {
                     _selecctedPlaylistSong = value;
-                    NotifyPropertyChanged("SelectedPlaylistSong");
+                    NotifyPropertyChanged(nameof(SelectedPlaylistSong));
                 }
             }
         }
@@ -1867,7 +1871,7 @@ namespace MPDCtrl.ViewModels
 
         #region == MenuTree ==
 
-        private MenuTreeBuilder _mainMenuItems = new MenuTreeBuilder();
+        private readonly MenuTreeBuilder _mainMenuItems = new();
         public ObservableCollection<NodeTree> MainMenuItems
         {
             get { return _mainMenuItems.Children; }
@@ -1979,7 +1983,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isQueueVisible = value;
-                NotifyPropertyChanged("IsQueueVisible");
+                NotifyPropertyChanged(nameof(IsQueueVisible));
             }
         }
 
@@ -1993,7 +1997,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isPlaylistsVisible = value;
-                NotifyPropertyChanged("IsPlaylistsVisible");
+                NotifyPropertyChanged(nameof(IsPlaylistsVisible));
             }
         }
 
@@ -2007,7 +2011,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isPlaylistItemVisible = value;
-                NotifyPropertyChanged("IsPlaylistItemVisible");
+                NotifyPropertyChanged(nameof(IsPlaylistItemVisible));
             }
         }
 
@@ -2021,7 +2025,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isLibraryVisible = value;
-                NotifyPropertyChanged("IsLibraryVisible");
+                NotifyPropertyChanged(nameof(IsLibraryVisible));
             }
         }
 
@@ -2035,7 +2039,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isSearchVisible = value;
-                NotifyPropertyChanged("IsSearchVisible");
+                NotifyPropertyChanged(nameof(IsSearchVisible));
             }
         }
 
@@ -2055,7 +2059,7 @@ namespace MPDCtrl.ViewModels
             set
             {
                 _statusBarMessage = value;
-                NotifyPropertyChanged("StatusBarMessage");
+                NotifyPropertyChanged(nameof(StatusBarMessage));
             }
         }
 
@@ -2069,7 +2073,7 @@ namespace MPDCtrl.ViewModels
             set
             {
                 _connectionStatusMessage = value;
-                NotifyPropertyChanged("ConnectionStatusMessage");
+                NotifyPropertyChanged(nameof(ConnectionStatusMessage));
             }
         }
 
@@ -2083,13 +2087,13 @@ namespace MPDCtrl.ViewModels
             set
             {
                 _mpdStatusMessage = value;
-                NotifyPropertyChanged("MpdStatusMessage");
+                NotifyPropertyChanged(nameof(MpdStatusMessage));
 
                 if (_mpdStatusMessage != "")
                     _isMpdStatusMessageContainsText = true;
                 else
                     _isMpdStatusMessageContainsText = false;
-                NotifyPropertyChanged("IsMpdStatusMessageContainsText");
+                NotifyPropertyChanged(nameof(IsMpdStatusMessageContainsText));
             }
         }
 
@@ -2102,15 +2106,15 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private static string _pathDefaultNoneButton = "";
-        private static string _pathDisconnectedButton = "M4,1C2.89,1 2,1.89 2,3V7C2,8.11 2.89,9 4,9H1V11H13V9H10C11.11,9 12,8.11 12,7V3C12,1.89 11.11,1 10,1H4M4,3H10V7H4V3M14,13C12.89,13 12,13.89 12,15V19C12,20.11 12.89,21 14,21H11V23H23V21H20C21.11,21 22,20.11 22,19V15C22,13.89 21.11,13 20,13H14M3.88,13.46L2.46,14.88L4.59,17L2.46,19.12L3.88,20.54L6,18.41L8.12,20.54L9.54,19.12L7.41,17L9.54,14.88L8.12,13.46L6,15.59L3.88,13.46M14,15H20V19H14V15Z";
+        private static readonly string _pathDefaultNoneButton = "";
+        private static readonly string _pathDisconnectedButton = "M4,1C2.89,1 2,1.89 2,3V7C2,8.11 2.89,9 4,9H1V11H13V9H10C11.11,9 12,8.11 12,7V3C12,1.89 11.11,1 10,1H4M4,3H10V7H4V3M14,13C12.89,13 12,13.89 12,15V19C12,20.11 12.89,21 14,21H11V23H23V21H20C21.11,21 22,20.11 22,19V15C22,13.89 21.11,13 20,13H14M3.88,13.46L2.46,14.88L4.59,17L2.46,19.12L3.88,20.54L6,18.41L8.12,20.54L9.54,19.12L7.41,17L9.54,14.88L8.12,13.46L6,15.59L3.88,13.46M14,15H20V19H14V15Z";
 
-        private static string _pathConnectingButton = "M11 14H9C9 9.03 13.03 5 18 5V7C14.13 7 11 10.13 11 14M18 11V9C15.24 9 13 11.24 13 14H15C15 12.34 16.34 11 18 11M7 4C7 2.89 6.11 2 5 2S3 2.89 3 4 3.89 6 5 6 7 5.11 7 4M11.45 4.5H9.45C9.21 5.92 8 7 6.5 7H3.5C2.67 7 2 7.67 2 8.5V11H8V8.74C9.86 8.15 11.25 6.5 11.45 4.5M19 17C20.11 17 21 16.11 21 15S20.11 13 19 13 17 13.89 17 15 17.89 17 19 17M20.5 18H17.5C16 18 14.79 16.92 14.55 15.5H12.55C12.75 17.5 14.14 19.15 16 19.74V22H22V19.5C22 18.67 21.33 18 20.5 18Z";
-        private static string _pathConnectedButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
+        private static readonly string _pathConnectingButton = "M11 14H9C9 9.03 13.03 5 18 5V7C14.13 7 11 10.13 11 14M18 11V9C15.24 9 13 11.24 13 14H15C15 12.34 16.34 11 18 11M7 4C7 2.89 6.11 2 5 2S3 2.89 3 4 3.89 6 5 6 7 5.11 7 4M11.45 4.5H9.45C9.21 5.92 8 7 6.5 7H3.5C2.67 7 2 7.67 2 8.5V11H8V8.74C9.86 8.15 11.25 6.5 11.45 4.5M19 17C20.11 17 21 16.11 21 15S20.11 13 19 13 17 13.89 17 15 17.89 17 19 17M20.5 18H17.5C16 18 14.79 16.92 14.55 15.5H12.55C12.75 17.5 14.14 19.15 16 19.74V22H22V19.5C22 18.67 21.33 18 20.5 18Z";
+        private static readonly string _pathConnectedButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
         //private static string _pathConnectedButton = "";
         //private static string _pathDisconnectedButton = "";
-        private static string _pathNewConnectionButton = "M20,4C21.11,4 22,4.89 22,6V18C22,19.11 21.11,20 20,20H4C2.89,20 2,19.11 2,18V6C2,4.89 2.89,4 4,4H20M8.5,15V9H7.25V12.5L4.75,9H3.5V15H4.75V11.5L7.3,15H8.5M13.5,10.26V9H9.5V15H13.5V13.75H11V12.64H13.5V11.38H11V10.26H13.5M20.5,14V9H19.25V13.5H18.13V10H16.88V13.5H15.75V9H14.5V14A1,1 0 0,0 15.5,15H19.5A1,1 0 0,0 20.5,14Z";
-        private static string _pathErrorInfoButton = "M23,12L20.56,14.78L20.9,18.46L17.29,19.28L15.4,22.46L12,21L8.6,22.47L6.71,19.29L3.1,18.47L3.44,14.78L1,12L3.44,9.21L3.1,5.53L6.71,4.72L8.6,1.54L12,3L15.4,1.54L17.29,4.72L20.9,5.54L20.56,9.22L23,12M20.33,12L18.5,9.89L18.74,7.1L16,6.5L14.58,4.07L12,5.18L9.42,4.07L8,6.5L5.26,7.09L5.5,9.88L3.67,12L5.5,14.1L5.26,16.9L8,17.5L9.42,19.93L12,18.81L14.58,19.92L16,17.5L18.74,16.89L18.5,14.1L20.33,12M11,15H13V17H11V15M11,7H13V13H11V7";
+        private static readonly string _pathNewConnectionButton = "M20,4C21.11,4 22,4.89 22,6V18C22,19.11 21.11,20 20,20H4C2.89,20 2,19.11 2,18V6C2,4.89 2.89,4 4,4H20M8.5,15V9H7.25V12.5L4.75,9H3.5V15H4.75V11.5L7.3,15H8.5M13.5,10.26V9H9.5V15H13.5V13.75H11V12.64H13.5V11.38H11V10.26H13.5M20.5,14V9H19.25V13.5H18.13V10H16.88V13.5H15.75V9H14.5V14A1,1 0 0,0 15.5,15H19.5A1,1 0 0,0 20.5,14Z";
+        private static readonly string _pathErrorInfoButton = "M23,12L20.56,14.78L20.9,18.46L17.29,19.28L15.4,22.46L12,21L8.6,22.47L6.71,19.29L3.1,18.47L3.44,14.78L1,12L3.44,9.21L3.1,5.53L6.71,4.72L8.6,1.54L12,3L15.4,1.54L17.29,4.72L20.9,5.54L20.56,9.22L23,12M20.33,12L18.5,9.89L18.74,7.1L16,6.5L14.58,4.07L12,5.18L9.42,4.07L8,6.5L5.26,7.09L5.5,9.88L3.67,12L5.5,14.1L5.26,16.9L8,17.5L9.42,19.93L12,18.81L14.58,19.92L16,17.5L18.74,16.89L18.5,14.1L20.33,12M11,15H13V17H11V15M11,7H13V13H11V7";
 
         private string _statusButton = _pathDefaultNoneButton;
         public string StatusButton
@@ -2125,13 +2129,13 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _statusButton = value;
-                NotifyPropertyChanged("StatusButton");
+                NotifyPropertyChanged(nameof(StatusButton));
             }
         }
 
-        private static string _pathMpdOkButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
+        private static readonly string _pathMpdOkButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
 
-        private static string _pathMpdAckErrorButton = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z";
+        private static readonly string _pathMpdAckErrorButton = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z";
 
         private string _mpdStatusButton = _pathMpdOkButton;
         public string MpdStatusButton
@@ -2146,7 +2150,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _mpdStatusButton = value;
-                NotifyPropertyChanged("MpdStatusButton");
+                NotifyPropertyChanged(nameof(MpdStatusButton));
             }
         }
 
@@ -2160,7 +2164,7 @@ namespace MPDCtrl.ViewModels
             set
             {
                 _isUpdatingMpdDb = value;
-                NotifyPropertyChanged("IsUpdatingMpdDb");
+                NotifyPropertyChanged(nameof(IsUpdatingMpdDb));
             }
         }
 
@@ -2181,7 +2185,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _mpdVersion = value;
-                NotifyPropertyChanged("MpdVersion");
+                NotifyPropertyChanged(nameof(MpdVersion));
             }
         }
 
@@ -2189,7 +2193,7 @@ namespace MPDCtrl.ViewModels
 
         #region == Profileと設定画面 ==
 
-        private ObservableCollection<Profile> _profiles = new ObservableCollection<Profile>();
+        private readonly ObservableCollection<Profile> _profiles = new();
         public ObservableCollection<Profile> Profiles
         {
             get { return _profiles; }
@@ -2206,12 +2210,12 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _currentProfile = value;
-                NotifyPropertyChanged("CurrentProfile");
+                NotifyPropertyChanged(nameof(CurrentProfile));
 
                 SelectedProfile = _currentProfile;
 
                 _volume = _currentProfile.Volume;
-                NotifyPropertyChanged("Volume");
+                NotifyPropertyChanged(nameof(Volume));
             }
         }
 
@@ -2231,8 +2235,8 @@ namespace MPDCtrl.ViewModels
 
                 if (_selectedProfile != null)
                 {
-                    ClearErrror("Host");
-                    ClearErrror("Port");
+                    ClearErrror(nameof(Host));
+                    ClearErrror(nameof(Port));
                     Host = SelectedProfile.Host;
                     Port = SelectedProfile.Port.ToString();
                     Password = SelectedProfile.Password;
@@ -2240,18 +2244,18 @@ namespace MPDCtrl.ViewModels
                 }
                 else
                 {
-                    ClearErrror("Host");
-                    ClearErrror("Port");
+                    ClearErrror(nameof(Host));
+                    ClearErrror(nameof(Port));
                     Host = "";
                     Port = "6600";
                     Password = "";
                 }
 
-                NotifyPropertyChanged("SelectedProfile");
+                NotifyPropertyChanged(nameof(SelectedProfile));
 
                 // "quietly"
                 _selectedQuickProfile = _selectedProfile;
-                NotifyPropertyChanged("SelectedQuickProfile");
+                NotifyPropertyChanged(nameof(SelectedQuickProfile));
 
             }
         }
@@ -2292,7 +2296,7 @@ namespace MPDCtrl.ViewModels
                     }
                 }
 
-                NotifyPropertyChanged("SelectedQuickProfile");
+                NotifyPropertyChanged(nameof(SelectedQuickProfile));
             }
         }
 
@@ -2302,13 +2306,13 @@ namespace MPDCtrl.ViewModels
             get { return _host; }
             set
             {
-                ClearErrror("Host");
+                ClearErrror(nameof(Host));
                 _host = value;
 
                 // Validate input.
                 if (value == "")
                 {
-                    SetError("Host", MPDCtrl.Properties.Resources.Settings_ErrorHostMustBeSpecified);
+                    SetError(nameof(Host), MPDCtrl.Properties.Resources.Settings_ErrorHostMustBeSpecified);
 
                 }
                 else if (value == "localhost")
@@ -2317,7 +2321,7 @@ namespace MPDCtrl.ViewModels
                 }
                 else
                 {
-                    IPAddress ipAddress = null;
+                    IPAddress ipAddress;
                     try
                     {
                         ipAddress = IPAddress.Parse(value);
@@ -2329,11 +2333,11 @@ namespace MPDCtrl.ViewModels
                     catch
                     {
                         //System.FormatException
-                        SetError("Host", MPDCtrl.Properties.Resources.Settings_ErrorHostInvalidAddressFormat);
+                        SetError(nameof(Host), MPDCtrl.Properties.Resources.Settings_ErrorHostInvalidAddressFormat);
                     }
                 }
 
-                NotifyPropertyChanged("Host");
+                NotifyPropertyChanged(nameof(Host));
             }
         }
 
@@ -2343,11 +2347,11 @@ namespace MPDCtrl.ViewModels
             get { return _port.ToString(); }
             set
             {
-                ClearErrror("Port");
+                ClearErrror(nameof(Port));
 
                 if (value == "")
                 {
-                    SetError("Port", MPDCtrl.Properties.Resources.Settings_ErrorPortMustBeSpecified);
+                    SetError(nameof(Port), MPDCtrl.Properties.Resources.Settings_ErrorPortMustBeSpecified);
                     _port = 0;
                 }
                 else
@@ -2358,16 +2362,16 @@ namespace MPDCtrl.ViewModels
                         //Int32.TryParse(value, out _defaultPort)
                         // Change the value only when test was successfull.
                         _port = i;
-                        ClearErrror("Port");
+                        ClearErrror(nameof(Port));
                     }
                     else
                     {
-                        SetError("Port", MPDCtrl.Properties.Resources.Settings_ErrorInvalidPortNaN);
+                        SetError(nameof(Port), MPDCtrl.Properties.Resources.Settings_ErrorInvalidPortNaN);
                         _port = 0;
                     }
                 }
 
-                NotifyPropertyChanged("Port");
+                NotifyPropertyChanged(nameof(Port));
             }
         }
 
@@ -2384,13 +2388,13 @@ namespace MPDCtrl.ViewModels
 
                 _password = value;
 
-                NotifyPropertyChanged("IsNotPasswordSet");
-                NotifyPropertyChanged("IsPasswordSet");
-                NotifyPropertyChanged("Password");
+                NotifyPropertyChanged(nameof(IsNotPasswordSet));
+                NotifyPropertyChanged(nameof(IsPasswordSet));
+                NotifyPropertyChanged(nameof(Password));
             }
         }
 
-        private string Encrypt(string s)
+        private static string Encrypt(string s)
         {
             if (String.IsNullOrEmpty(s)) { return ""; }
 
@@ -2410,7 +2414,7 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private string Decrypt(string s)
+        private static string Decrypt(string s)
         {
             if (String.IsNullOrEmpty(s)) { return ""; }
 
@@ -2430,13 +2434,13 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private string DummyPassword(string s)
+        private static string DummyPassword(string s)
         {
             if (String.IsNullOrEmpty(s)) { return ""; }
             string e = "";
             for (int i = 1; i <= s.Length; i++)
             {
-                e = e + "*";
+                e += "*";
             }
             return e;
         }
@@ -2451,7 +2455,7 @@ namespace MPDCtrl.ViewModels
             set
             {
                 _settingProfileEditMessage = value;
-                NotifyPropertyChanged("SettingProfileEditMessage");
+                NotifyPropertyChanged(nameof(SettingProfileEditMessage));
             }
         }
 
@@ -2499,7 +2503,7 @@ namespace MPDCtrl.ViewModels
 
                 _setIsDefault = value;
 
-                NotifyPropertyChanged("SetIsDefault");
+                NotifyPropertyChanged(nameof(SetIsDefault));
             }
         }
 
@@ -2514,7 +2518,7 @@ namespace MPDCtrl.ViewModels
 
                 _isUpdateOnStartup = value;
 
-                NotifyPropertyChanged("IsUpdateOnStartup");
+                NotifyPropertyChanged(nameof(IsUpdateOnStartup));
             }
         }
 
@@ -2529,7 +2533,7 @@ namespace MPDCtrl.ViewModels
 
                 _isAutoScrollToNowPlaying = value;
 
-                NotifyPropertyChanged("IsAutoScrollToNowPlaying");
+                NotifyPropertyChanged(nameof(IsAutoScrollToNowPlaying));
             }
         }
 
@@ -2544,7 +2548,7 @@ namespace MPDCtrl.ViewModels
 
                 _isSaveLog = value;
 
-                NotifyPropertyChanged("IsSaveLog");
+                NotifyPropertyChanged(nameof(IsSaveLog));
             }
         }
 
@@ -2559,7 +2563,7 @@ namespace MPDCtrl.ViewModels
 
                 _isDownloadAlbumArt = value;
 
-                NotifyPropertyChanged("IsDownloadAlbumArt");
+                NotifyPropertyChanged(nameof(IsDownloadAlbumArt));
             }
         }
 
@@ -2574,7 +2578,7 @@ namespace MPDCtrl.ViewModels
 
                 _isDownloadAlbumArtEmbeddedUsingReadPicture = value;
 
-                NotifyPropertyChanged("IsDownloadAlbumArtEmbeddedUsingReadPicture");
+                NotifyPropertyChanged(nameof(IsDownloadAlbumArtEmbeddedUsingReadPicture));
             }
         }
 
@@ -2591,7 +2595,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isSwitchingProfile = value;
-                NotifyPropertyChanged("IsSwitchingProfile");
+                NotifyPropertyChanged(nameof(IsSwitchingProfile));
             }
         }
 
@@ -2609,7 +2613,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _changePasswordDialogMessage = value;
-                NotifyPropertyChanged("ChangePasswordDialogMessage");
+                NotifyPropertyChanged(nameof(ChangePasswordDialogMessage));
             }
         }
 
@@ -2617,9 +2621,9 @@ namespace MPDCtrl.ViewModels
 
         #region == Popup ==
 
-        private List<string> queueListviewSelectedQueueSongIdsForPopup = new List<string>();
-        private List<string> searchResultListviewSelectedQueueSongUriForPopup = new List<string>();
-        private List<string> songFilesListviewSelectedQueueSongUriForPopup = new List<string>();
+        private List<string> queueListviewSelectedQueueSongIdsForPopup = new();
+        private List<string> searchResultListviewSelectedQueueSongUriForPopup = new();
+        private List<string> songFilesListviewSelectedQueueSongUriForPopup = new();
 
         private bool _isSaveAsPlaylistPopupVisible;
         public bool IsSaveAsPlaylistPopupVisible
@@ -2634,7 +2638,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isSaveAsPlaylistPopupVisible = value;
-                NotifyPropertyChanged("IsSaveAsPlaylistPopupVisible");
+                NotifyPropertyChanged(nameof(IsSaveAsPlaylistPopupVisible));
             }
         }
 
@@ -2651,7 +2655,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isConfirmClearQueuePopupVisible = value;
-                NotifyPropertyChanged("IsConfirmClearQueuePopupVisible");
+                NotifyPropertyChanged(nameof(IsConfirmClearQueuePopupVisible));
             }
         }
 
@@ -2668,7 +2672,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isSelectedSaveToPopupVisible = value;
-                NotifyPropertyChanged("IsSelectedSaveToPopupVisible");
+                NotifyPropertyChanged(nameof(IsSelectedSaveToPopupVisible));
             }
         }
 
@@ -2685,7 +2689,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isSelectedSaveAsPopupVisible = value;
-                NotifyPropertyChanged("IsSelectedSaveAsPopupVisible");
+                NotifyPropertyChanged(nameof(IsSelectedSaveAsPopupVisible));
             }
         }
 
@@ -2702,7 +2706,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isConfirmDeleteQueuePopupVisible = value;
-                NotifyPropertyChanged("IsConfirmDeleteQueuePopupVisible");
+                NotifyPropertyChanged(nameof(IsConfirmDeleteQueuePopupVisible));
             }
         }
 
@@ -2719,7 +2723,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isConfirmDeletePlaylistPopupVisible = value;
-                NotifyPropertyChanged("IsConfirmDeletePlaylistPopupVisible");
+                NotifyPropertyChanged(nameof(IsConfirmDeletePlaylistPopupVisible));
             }
         }
 
@@ -2736,7 +2740,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isConfirmUpdatePlaylistSongsPopupVisible = value;
-                NotifyPropertyChanged("IsConfirmUpdatePlaylistSongsPopupVisible");
+                NotifyPropertyChanged(nameof(IsConfirmUpdatePlaylistSongsPopupVisible));
             }
         }
 
@@ -2753,7 +2757,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible = value;
-                NotifyPropertyChanged("IsConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible");
+                NotifyPropertyChanged(nameof(IsConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible));
             }
         }
 
@@ -2770,7 +2774,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isConfirmDeletePlaylistSongPopupVisible = value;
-                NotifyPropertyChanged("IsConfirmDeletePlaylistSongPopupVisible");
+                NotifyPropertyChanged(nameof(IsConfirmDeletePlaylistSongPopupVisible));
             }
         }
 
@@ -2787,7 +2791,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isConfirmPlaylistClearPopupVisible = value;
-                NotifyPropertyChanged("IsConfirmPlaylistClearPopupVisible");
+                NotifyPropertyChanged(nameof(IsConfirmPlaylistClearPopupVisible));
             }
         }
 
@@ -2804,7 +2808,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isSearchResultSelectedSaveAsPopupVisible = value;
-                NotifyPropertyChanged("IsSearchResultSelectedSaveAsPopupVisible");
+                NotifyPropertyChanged(nameof(IsSearchResultSelectedSaveAsPopupVisible));
             }
         }
 
@@ -2821,7 +2825,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isSearchResultSelectedSaveToPopupVisible = value;
-                NotifyPropertyChanged("IsSearchResultSelectedSaveToPopupVisible");
+                NotifyPropertyChanged(nameof(IsSearchResultSelectedSaveToPopupVisible));
             }
         }
 
@@ -2838,7 +2842,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _sSongFilesSelectedSaveAsPopupVisible = value;
-                NotifyPropertyChanged("IsSongFilesSelectedSaveAsPopupVisible");
+                NotifyPropertyChanged(nameof(IsSongFilesSelectedSaveAsPopupVisible));
             }
         }
 
@@ -2855,7 +2859,7 @@ namespace MPDCtrl.ViewModels
                     return;
 
                 _isSongFilesSelectedSaveToPopupVisible = value;
-                NotifyPropertyChanged("IsSongFilesSelectedSaveToPopupVisible");
+                NotifyPropertyChanged(nameof(IsSongFilesSelectedSaveToPopupVisible));
             }
         }
 
@@ -2898,12 +2902,12 @@ namespace MPDCtrl.ViewModels
         
         // TODO:
 
-        private object lockQueueObject = new object();
-        private object lockCurrentQueueObject = new object();
+        private readonly object lockQueueObject = new();
+        private readonly object lockCurrentQueueObject = new();
 
         #endregion
 
-        private MPC _mpc = new MPC();
+        private readonly MPC _mpc = new();
 
         public MainViewModel()
         {
@@ -3259,7 +3263,7 @@ namespace MPDCtrl.ViewModels
 
                         foreach (var p in profileList)
                         {
-                            Profile pro = new Profile();
+                            Profile pro = new();
 
                             if (p.Attribute("Name") != null)
                             {
@@ -3615,7 +3619,7 @@ namespace MPDCtrl.ViewModels
             #endregion
 
 
-            NotifyPropertyChanged("IsCurrentProfileSet");
+            NotifyPropertyChanged(nameof(IsCurrentProfileSet));
 
             if (CurrentProfile == null)
             {
@@ -3631,18 +3635,19 @@ namespace MPDCtrl.ViewModels
 
                 // set this "quietly"
                 _volume = CurrentProfile.Volume;
-                NotifyPropertyChanged("Volume");
+                NotifyPropertyChanged(nameof(Volume));
 
                 // start the connection
-                Start(CurrentProfile.Host, CurrentProfile.Port, CurrentProfile.Password);
+                Start(CurrentProfile.Host, CurrentProfile.Port);
             }
 
             // error log
             if (IsSaveLog)
             {
-                App app = App.Current as App;
-                if (app != null)
+                
+                if (App.Current != null)
                 {
+                    App app = App.Current as App;
                     app.IsSaveErrorLog = true;
                     app.LogFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl_errors.txt";
                 }
@@ -3667,7 +3672,7 @@ namespace MPDCtrl.ViewModels
             #region == アプリ設定の保存 ==
 
             // 設定ファイル用のXMLオブジェクト
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
             doc.InsertBefore(xmlDeclaration, doc.DocumentElement);
 
@@ -4104,7 +4109,7 @@ namespace MPDCtrl.ViewModels
 
         #region == メソッド ==
 
-        private void Start(string host, int port, string password)
+        private void Start(string host, int port)
         {
             // 別スレッドで実行。
             Task.Run(() => _mpc.MpdIdleConnect(host, port));
@@ -4147,21 +4152,21 @@ namespace MPDCtrl.ViewModels
                         {
                             // "quietly" update.
                             _volume = tmpVol;
-                            NotifyPropertyChanged("Volume");
+                            NotifyPropertyChanged(nameof(Volume));
                         }
                     }
 
                     _random = _mpc.MpdStatus.MpdRandom;
-                    NotifyPropertyChanged("Random");
+                    NotifyPropertyChanged(nameof(Random));
 
                     _repeat = _mpc.MpdStatus.MpdRepeat;
-                    NotifyPropertyChanged("Repeat");
+                    NotifyPropertyChanged(nameof(Repeat));
 
                     _consume = _mpc.MpdStatus.MpdConsume;
-                    NotifyPropertyChanged("Consume");
+                    NotifyPropertyChanged(nameof(Consume));
 
                     _single = _mpc.MpdStatus.MpdSingle;
-                    NotifyPropertyChanged("Single");
+                    NotifyPropertyChanged(nameof(Single));
 
                     // no need to care about "double" updates for time.
                     Time = _mpc.MpdStatus.MpdSongTime;
@@ -4272,7 +4277,7 @@ namespace MPDCtrl.ViewModels
             if (IsDownloadAlbumArt)
                 if (CurrentSong != null)
                     if (isAlbumArtChanged)
-                        await _mpc.MpdQueryAlbumArt(CurrentSong.File, CurrentSong.Id, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                        await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
         }
 
         private async void UpdateCurrentSong()
@@ -4332,7 +4337,7 @@ namespace MPDCtrl.ViewModels
             if (IsDownloadAlbumArt)
                 if (CurrentSong != null)
                     if (isAlbumArtChanged)
-                        await _mpc.MpdQueryAlbumArt(CurrentSong.File, CurrentSong.Id, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                        await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
 
         }
 
@@ -4356,7 +4361,7 @@ namespace MPDCtrl.ViewModels
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         // 削除する曲の一時リスト
-                        List<SongInfoEx> _tmpQueue = new List<SongInfoEx>();
+                        List<SongInfoEx> _tmpQueue = new();
 
                         // 既存のリストの中で新しいリストにないものを削除
                         foreach (var sng in Queue)
@@ -4637,7 +4642,7 @@ namespace MPDCtrl.ViewModels
             if (CurrentSong != null)
                 if (IsDownloadAlbumArt)
                     if (isAlbumArtChanged)
-                        await _mpc.MpdQueryAlbumArt(CurrentSong.File, CurrentSong.Id, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                        await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
 
         }
 
@@ -4657,7 +4662,7 @@ namespace MPDCtrl.ViewModels
                 if (playlistDir != null)
                 {
                     // Sort playlists.
-                    List<string> slTmp = new List<string>();
+                    List<string> slTmp = new();
 
                     foreach (var v in _mpc.Playlists)
                     {
@@ -4670,12 +4675,12 @@ namespace MPDCtrl.ViewModels
                         var fuga = playlistDir.Children.FirstOrDefault(i => i.Name == hoge);
                         if (fuga == null)
                         {
-                            NodeMenuPlaylistItem playlistNode = new NodeMenuPlaylistItem(hoge);
+                            NodeMenuPlaylistItem playlistNode = new(hoge);
                             playlistDir.Children.Add(playlistNode);
                         }
                     }
 
-                    List<NodeTree> tobedeleted = new List<NodeTree>();
+                    List<NodeTree> tobedeleted = new();
                     foreach (var hoge in playlistDir.Children)
                     {
                         var fuga = slTmp.FirstOrDefault(i => i == hoge.Name);
@@ -4748,8 +4753,8 @@ namespace MPDCtrl.ViewModels
 
                 //await Task.Delay(5);
 
-                if (IsSwitchingProfile)
-                    break;
+                //if (IsSwitchingProfile)
+                //    break;
 
                 //IsBusy = true;
                 IsWorking = true;
@@ -4758,11 +4763,11 @@ namespace MPDCtrl.ViewModels
 
                 try
                 {
-                    Uri uri = new Uri(@"file:///" + songfile.File);
+                    Uri uri = new(@"file:///" + songfile.File);
                     if (uri.IsFile)
                     {
                         string filename = System.IO.Path.GetFileName(songfile.File);//System.IO.Path.GetFileName(uri.LocalPath);
-                        NodeFile hoge = new NodeFile(filename, uri, songfile.File);
+                        NodeFile hoge = new(filename, uri, songfile.File);
                         /*
                         if (Application.Current == null) { return; }
                         Application.Current.Dispatcher.Invoke(() =>
@@ -5279,13 +5284,13 @@ namespace MPDCtrl.ViewModels
 
         #region == タイマー ==
 
-        private System.Timers.Timer _elapsedTimer;
+        private readonly System.Timers.Timer _elapsedTimer;
         private void ElapsedTimer(object sender, System.Timers.ElapsedEventArgs e)
         {
             if ((_elapsed < _time) && (_mpc.MpdStatus.MpdState == Status.MpdPlayState.Play))
             {
                 _elapsed += 0.5;
-                NotifyPropertyChanged("Elapsed");
+                NotifyPropertyChanged(nameof(Elapsed));
             }
             else
             {
@@ -5607,7 +5612,7 @@ namespace MPDCtrl.ViewModels
             if (obj == null) return;
 
             // 選択アイテム保持用
-            List<SongInfoEx> selectedList = new List<SongInfoEx>();
+            List<SongInfoEx> selectedList = new();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -5623,7 +5628,7 @@ namespace MPDCtrl.ViewModels
                 }
             });
 
-            List<string> deleteIdList = new List<string>();
+            List<string> deleteIdList = new();
 
             foreach (var item in selectedList)
             {
@@ -5677,7 +5682,7 @@ namespace MPDCtrl.ViewModels
                 return;
 
             // 選択アイテム保持用
-            List<SongInfoEx> selectedList = new List<SongInfoEx>();
+            List<SongInfoEx> selectedList = new();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -5693,7 +5698,7 @@ namespace MPDCtrl.ViewModels
                 }
             });
 
-            Dictionary<string, string> IdToNewPos = new Dictionary<string, string>();
+            Dictionary<string, string> IdToNewPos = new();
 
             foreach (var item in selectedList)
             {
@@ -5735,7 +5740,7 @@ namespace MPDCtrl.ViewModels
                 return;
 
             // 選択アイテム保持用
-            List<SongInfoEx> selectedList = new List<SongInfoEx>();
+            List<SongInfoEx> selectedList = new();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -5751,7 +5756,7 @@ namespace MPDCtrl.ViewModels
                 }
             });
 
-            Dictionary<string, string> IdToNewPos = new Dictionary<string, string>();
+            Dictionary<string, string> IdToNewPos = new();
 
             foreach (var item in selectedList)
             {
@@ -5789,7 +5794,7 @@ namespace MPDCtrl.ViewModels
             if (obj == null) return;
 
             // 選択アイテム保持用
-            List<SongInfoEx> selectedList = new List<SongInfoEx>();
+            List<SongInfoEx> selectedList = new();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -5805,7 +5810,7 @@ namespace MPDCtrl.ViewModels
                 }
             });
 
-            List<string> fileUrisToAddList = new List<string>();
+            List<string> fileUrisToAddList = new();
 
             foreach (var item in selectedList)
             {
@@ -5887,7 +5892,7 @@ namespace MPDCtrl.ViewModels
             if (obj == null) return;
 
             // 選択アイテム保持用
-            List<SongInfoEx> selectedList = new List<SongInfoEx>();
+            List<SongInfoEx> selectedList = new();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -5903,7 +5908,7 @@ namespace MPDCtrl.ViewModels
                 }
             });
 
-            List<string> fileUrisToAddList = new List<string>();
+            List<string> fileUrisToAddList = new();
 
             foreach (var item in selectedList)
             {
@@ -5955,7 +5960,7 @@ namespace MPDCtrl.ViewModels
         }
 
         public ICommand QueueFindShowHideCommand { get; }
-        public bool QueueFindShowHideCommand_CanExecute()
+        public static bool QueueFindShowHideCommand_CanExecute()
         {
             return true;
         }
@@ -6018,7 +6023,7 @@ namespace MPDCtrl.ViewModels
             if (obj == null) return;
 
             // 選択アイテム保持用
-            List<SongInfo> selectedList = new List<SongInfo>();
+            List<SongInfo> selectedList = new();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -6034,7 +6039,7 @@ namespace MPDCtrl.ViewModels
                 }
             });
 
-            List<string> fileUrisToAddList = new List<string>();
+            List<string> fileUrisToAddList = new();
 
             foreach (var item in selectedList)
             {
@@ -6084,7 +6089,7 @@ namespace MPDCtrl.ViewModels
             if (obj == null) return;
 
             // 選択アイテム保持用
-            List<SongInfo> selectedList = new List<SongInfo>();
+            List<SongInfo> selectedList = new();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -6100,7 +6105,7 @@ namespace MPDCtrl.ViewModels
                 }
             });
 
-            List<string> fileUrisToAddList = new List<string>();
+            List<string> fileUrisToAddList = new();
 
             foreach (var item in selectedList)
             {
@@ -6164,7 +6169,7 @@ namespace MPDCtrl.ViewModels
             {
                 var collection = items.Cast<NodeFile>();
 
-                List<String> uriList = new List<String>();
+                List<String> uriList = new();
 
                 foreach (var item in collection)
                 {
@@ -6192,7 +6197,7 @@ namespace MPDCtrl.ViewModels
             if (obj == null) return;
 
             // 選択アイテム保持用
-            List<NodeFile> selectedList = new List<NodeFile>();
+            List<NodeFile> selectedList = new();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -6208,7 +6213,7 @@ namespace MPDCtrl.ViewModels
                 }
             });
 
-            List<string> fileUrisToAddList = new List<string>();
+            List<string> fileUrisToAddList = new();
 
             foreach (var item in selectedList)
             {
@@ -6258,7 +6263,7 @@ namespace MPDCtrl.ViewModels
             if (obj == null) return;
 
             // 選択アイテム保持用
-            List<NodeFile> selectedList = new List<NodeFile>();
+            List<NodeFile> selectedList = new();
 
             // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
@@ -6274,7 +6279,7 @@ namespace MPDCtrl.ViewModels
                 }
             });
 
-            List<string> fileUrisToAddList = new List<string>();
+            List<string> fileUrisToAddList = new();
 
             foreach (var item in selectedList)
             {
@@ -6505,6 +6510,7 @@ namespace MPDCtrl.ViewModels
         }
 
         // TODO:
+        /*
         private bool CheckPlaylistNameExists(string playlistName)
         {
             bool match = false;
@@ -6524,6 +6530,7 @@ namespace MPDCtrl.ViewModels
 
             return match;
         }
+        */
 
         public ICommand PlaylistListviewRemovePlaylistCommand { get; set; }
         public bool PlaylistListviewRemovePlaylistCommand_CanExecute()
@@ -6635,7 +6642,7 @@ namespace MPDCtrl.ViewModels
 
         // プレイリストの中の曲を削除で複数削除は未対応ダイアログを閉じる
         public ICommand PlaylistListviewConfirmDeletePosNotSupportedPopupCommand { get; set; }
-        public bool PlaylistListviewConfirmDeletePosNotSupportedPopupCommand_CanExecute()
+        public static bool PlaylistListviewConfirmDeletePosNotSupportedPopupCommand_CanExecute()
         {
             return true;
         }
@@ -6654,7 +6661,7 @@ namespace MPDCtrl.ViewModels
         }
         public async void PlaylistListviewDeletePosPopupCommand_Execute()
         {
-            string playlistName = "";
+            string playlistName;
 
             if (SelectedNodeMenu is NodeMenuPlaylistItem)
             {
@@ -6744,7 +6751,7 @@ namespace MPDCtrl.ViewModels
             {
                 var collection = items.Cast<SongInfo>();
 
-                List<String> uriList = new List<String>();
+                List<String> uriList = new();
 
                 foreach (var item in collection)
                 {
@@ -6788,7 +6795,7 @@ namespace MPDCtrl.ViewModels
         }
 
         public ICommand SettingsOKCommand { get; }
-        public bool SettingsOKCommand_CanExecute()
+        public static bool SettingsOKCommand_CanExecute()
         {
             return true;
         }
@@ -6849,7 +6856,7 @@ namespace MPDCtrl.ViewModels
             if (String.IsNullOrEmpty(Host)) return;
             if (_port == 0) return;
 
-            Profile pro = new Profile();
+            Profile pro = new();
             pro.Host = _host;
             pro.Port = _port;
 
@@ -6876,7 +6883,7 @@ namespace MPDCtrl.ViewModels
             pro.Name = Host + ":" + _port.ToString();
 
             Profiles.Add(pro);
-            NotifyPropertyChanged("IsCurrentProfileSet");
+            NotifyPropertyChanged(nameof(IsCurrentProfileSet));
 
             SelectedProfile = pro;
 
@@ -6983,8 +6990,8 @@ namespace MPDCtrl.ViewModels
             // Validate Host input.
             if (Host == "")
             {
-                SetError("Host", "Error: Host must be epecified."); //TODO: translate
-                NotifyPropertyChanged("Host");
+                SetError(nameof(Host), "Error: Host must be epecified."); //TODO: translate
+                NotifyPropertyChanged(nameof(Host));
                 return;
             }
             else
@@ -7000,13 +7007,13 @@ namespace MPDCtrl.ViewModels
                     ipAddress = IPAddress.Parse(Host);
                     if (ipAddress != null)
                     {
-                        ClearErrror("Host");
+                        ClearErrror(nameof(Host));
                     }
                 }
                 catch
                 {
                     //System.FormatException
-                    SetError("Host", "Error: Invalid address format."); //TODO: translate
+                    SetError(nameof(Host), "Error: Invalid address format."); //TODO: translate
 
                     return;
                 }
@@ -7014,7 +7021,7 @@ namespace MPDCtrl.ViewModels
 
             if (_port == 0)
             {
-                SetError("Port", "Error: Port must be epecified."); //TODO: translate.
+                SetError(nameof(Port), "Error: Port must be epecified."); //TODO: translate.
                 return;
             }
 
@@ -7095,18 +7102,20 @@ namespace MPDCtrl.ViewModels
                 if (CurrentProfile == null)
                 {
                     // Create new profile
-                    Profile prof = new Profile();
-                    prof.Name = _host + ":" + _port.ToString();
-                    prof.Host = _host;
-                    prof.Port = _port;
-                    prof.Password = _password;
-                    prof.IsDefault = true;
+                    Profile prof = new()
+                    {
+                        Name = _host + ":" + _port.ToString(),
+                        Host = _host,
+                        Port = _port,
+                        Password = _password,
+                        IsDefault = true
+                    };
 
                     CurrentProfile = prof;
                     SelectedProfile = prof;
 
                     Profiles.Add(prof);
-                    NotifyPropertyChanged("IsCurrentProfileSet");
+                    NotifyPropertyChanged(nameof(IsCurrentProfileSet));
                 }
                 else
                 {
@@ -7221,7 +7230,7 @@ namespace MPDCtrl.ViewModels
             });
 
             _volume = prof.Volume;
-            NotifyPropertyChanged("Volume");
+            NotifyPropertyChanged(nameof(Volume));
 
             Host = prof.Host;
             _port = prof.Port;
@@ -7294,8 +7303,8 @@ namespace MPDCtrl.ViewModels
                     SelectedProfile.Password = (values[1] as PasswordBox).Password; //allow empty string.
 
                     Password = SelectedProfile.Password;
-                    NotifyPropertyChanged("IsPasswordSet");
-                    NotifyPropertyChanged("IsNotPasswordSet");
+                    NotifyPropertyChanged(nameof(IsPasswordSet));
+                    NotifyPropertyChanged(nameof(IsNotPasswordSet));
 
                     (values[0] as PasswordBox).Password = "";
                     (values[1] as PasswordBox).Password = "";
@@ -7319,7 +7328,7 @@ namespace MPDCtrl.ViewModels
         }
 
         public ICommand ChangePasswordDialogCancelCommand { get; }
-        public bool ChangePasswordDialogCancelCommand_CanExecute()
+        public static bool ChangePasswordDialogCancelCommand_CanExecute()
         {
             return true;
         }
@@ -7333,7 +7342,7 @@ namespace MPDCtrl.ViewModels
         #region == QueueListview header colums Show/Hide ==
 
         public ICommand QueueColumnHeaderPositionShowHideCommand { get; }
-        public bool QueueColumnHeaderPositionShowHideCommand_CanExecute()
+        public static bool QueueColumnHeaderPositionShowHideCommand_CanExecute()
         {
             return true;
         }
@@ -7352,7 +7361,7 @@ namespace MPDCtrl.ViewModels
         }
 
         public ICommand QueueColumnHeaderNowPlayingShowHideCommand { get; }
-        public bool QueueColumnHeaderNowPlayingShowHideCommand_CanExecute()
+        public static bool QueueColumnHeaderNowPlayingShowHideCommand_CanExecute()
         {
             return true;
         }
@@ -7371,7 +7380,7 @@ namespace MPDCtrl.ViewModels
         }
 
         public ICommand QueueColumnHeaderTimeShowHideCommand { get; }
-        public bool QueueColumnHeaderTimeShowHideCommand_CanExecute()
+        public static bool QueueColumnHeaderTimeShowHideCommand_CanExecute()
         {
             return true;
         }
@@ -7391,7 +7400,7 @@ namespace MPDCtrl.ViewModels
         }
 
         public ICommand QueueColumnHeaderArtistShowHideCommand { get; }
-        public bool QueueColumnHeaderArtistShowHideCommand_CanExecute()
+        public static bool QueueColumnHeaderArtistShowHideCommand_CanExecute()
         {
             return true;
         }
@@ -7410,7 +7419,7 @@ namespace MPDCtrl.ViewModels
         }
 
         public ICommand QueueColumnHeaderAlbumShowHideCommand { get; }
-        public bool QueueColumnHeaderAlbumShowHideCommand_CanExecute()
+        public static bool QueueColumnHeaderAlbumShowHideCommand_CanExecute()
         {
             return true;
         }
@@ -7429,7 +7438,7 @@ namespace MPDCtrl.ViewModels
         }
 
         public ICommand QueueColumnHeaderGenreShowHideCommand { get; }
-        public bool QueueColumnHeaderGenreShowHideCommand_CanExecute()
+        public static bool QueueColumnHeaderGenreShowHideCommand_CanExecute()
         {
             return true;
         }
@@ -7448,7 +7457,7 @@ namespace MPDCtrl.ViewModels
         }
 
         public ICommand QueueColumnHeaderLastModifiedShowHideCommand { get; }
-        public bool QueueColumnHeaderLastModifiedShowHideCommand_CanExecute()
+        public static bool QueueColumnHeaderLastModifiedShowHideCommand_CanExecute()
         {
             return true;
         }
@@ -7472,7 +7481,7 @@ namespace MPDCtrl.ViewModels
         #region == DebugWindow and AckWindow ==
 
         public ICommand ClearDebugCommandTextCommand { get; }
-        public bool ClearDebugCommandTextCommand_CanExecute()
+        public static bool ClearDebugCommandTextCommand_CanExecute()
         {
             return true;
         }
@@ -7486,7 +7495,7 @@ namespace MPDCtrl.ViewModels
         }
 
         public ICommand ClearDebugIdleTextCommand { get; }
-        public bool ClearDebugIdleTextCommand_CanExecute()
+        public static bool ClearDebugIdleTextCommand_CanExecute()
         {
             return true;
         }
@@ -7500,7 +7509,7 @@ namespace MPDCtrl.ViewModels
         }
 
         public ICommand ShowDebugWindowCommand { get; }
-        public bool ShowDebugWindowCommand_CanExecute()
+        public static bool ShowDebugWindowCommand_CanExecute()
         {
             return true;
         }
@@ -7514,7 +7523,7 @@ namespace MPDCtrl.ViewModels
         }
 
         public ICommand ClearAckTextCommand { get; }
-        public bool ClearAckTextCommand_CanExecute()
+        public static bool ClearAckTextCommand_CanExecute()
         {
             return true;
         }
@@ -7528,7 +7537,7 @@ namespace MPDCtrl.ViewModels
         }
 
         public ICommand ShowAckWindowCommand { get; }
-        public bool ShowAckWindowCommand_CanExecute()
+        public static bool ShowAckWindowCommand_CanExecute()
         {
             return true;
         }
@@ -7545,7 +7554,7 @@ namespace MPDCtrl.ViewModels
         #region == Find ==
 
         public ICommand ShowFindCommand { get; }
-        public bool ShowFindCommand_CanExecute()
+        public static bool ShowFindCommand_CanExecute()
         {
             return true;
         }
@@ -7568,7 +7577,7 @@ namespace MPDCtrl.ViewModels
         }
 
         public ICommand QueueFilterSelectCommand { get; set; }
-        public bool QueueFilterSelectCommand_CanExecute()
+        public static bool QueueFilterSelectCommand_CanExecute()
         {
             return true;
         }
@@ -7649,7 +7658,7 @@ namespace MPDCtrl.ViewModels
         #endregion
 
         public ICommand EscapeCommand { get; }
-        public bool EscapeCommand_CanExecute()
+        public static bool EscapeCommand_CanExecute()
         {
             return true;
         }

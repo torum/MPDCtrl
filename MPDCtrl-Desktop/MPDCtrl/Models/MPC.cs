@@ -52,7 +52,7 @@ namespace MPDCtrl.Models
             }
         }
 
-        private Status _status = new Status();
+        private readonly Status _status = new();
         public Status MpdStatus
         {
             get { return _status; }
@@ -70,38 +70,38 @@ namespace MPDCtrl.Models
             }
         }
 
-        private ObservableCollection<SongInfoEx> _queue = new ObservableCollection<SongInfoEx>();
+        private readonly ObservableCollection<SongInfoEx> _queue = new();
         public ObservableCollection<SongInfoEx> CurrentQueue
         {
             get { return _queue; }
         }
 
-        private ObservableCollection<Playlist> _playLists = new ObservableCollection<Playlist>();
+        private readonly ObservableCollection<Playlist> _playLists = new();
         public ObservableCollection<Playlist> Playlists
         {
             get { return _playLists; }
         }
 
-        private ObservableCollection<SongFile> _localFiles = new ObservableCollection<SongFile>();
+        private readonly ObservableCollection<SongFile> _localFiles = new();
         public ObservableCollection<SongFile> LocalFiles
         {
             get { return _localFiles; }
         }
 
-        private ObservableCollection<String> _localDirectories = new ObservableCollection<String>();
+        private readonly ObservableCollection<String> _localDirectories = new();
         public ObservableCollection<String> LocalDirectories
         {
             get { return _localDirectories; }
         }
 
-        private ObservableCollection<SongInfo> _searchResult = new ObservableCollection<SongInfo>();
+        private readonly ObservableCollection<SongInfo> _searchResult = new();
         public ObservableCollection<SongInfo> SearchResult
         {
             get { return _searchResult; }
         }
 
         // TODO:
-        private AlbumImage _albumCover = new AlbumImage();
+        private AlbumImage _albumCover = new();
         public AlbumImage AlbumCover
         {
             get { return _albumCover; }
@@ -111,11 +111,11 @@ namespace MPDCtrl.Models
 
         #region == Connections ==
 
-        private static TcpClient _commandConnection = new TcpClient();
+        private static TcpClient _commandConnection = new();
         private StreamReader _commandReader;
         private StreamWriter _commandWriter;
 
-        private static TcpClient _idleConnection = new TcpClient();
+        private static TcpClient _idleConnection = new();
         private static StreamReader _idleReader;
         private static StreamWriter _idleWriter;
 
@@ -230,7 +230,7 @@ namespace MPDCtrl.Models
 
         public async Task<ConnectionResult> MpdIdleConnect(string host, int port)
         {
-            ConnectionResult result = new ConnectionResult();
+            ConnectionResult result = new();
 
             IsMpdIdleConnected = false;
 
@@ -278,8 +278,10 @@ namespace MPDCtrl.Models
                     tcpStream.ReadTimeout = System.Threading.Timeout.Infinite;
 
                     _idleReader = new StreamReader(tcpStream);
-                    _idleWriter = new StreamWriter(tcpStream);
-                    _idleWriter.AutoFlush = true;
+                    _idleWriter = new StreamWriter(tcpStream)
+                    {
+                        AutoFlush = true
+                    };
 
                     string response = await _idleReader.ReadLineAsync();
 
@@ -354,7 +356,7 @@ namespace MPDCtrl.Models
 
             _password = password;
 
-            CommandResult ret = new CommandResult();
+            CommandResult ret = new();
 
             if (string.IsNullOrEmpty(password))
             {
@@ -373,7 +375,7 @@ namespace MPDCtrl.Models
 
         private async Task<CommandResult> MpdIdleSendCommand(string cmd)
         {
-            CommandResult ret = new CommandResult();
+            CommandResult ret = new();
 
             if (_idleConnection.Client == null)
             {
@@ -416,7 +418,7 @@ namespace MPDCtrl.Models
                 cmdDummy = "password ****";
 
             //DebugIdleOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n");
-            Task.Run(() => DebugIdleOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n"));
+            Task nowait = Task.Run(() => DebugIdleOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n"));
 
             try
             {
@@ -480,7 +482,7 @@ namespace MPDCtrl.Models
 
             try
             {
-                StringBuilder stringBuilder = new StringBuilder();
+                StringBuilder stringBuilder = new();
 
                 bool isAck = false;
                 string ackText = "";
@@ -549,10 +551,10 @@ namespace MPDCtrl.Models
                     }
                 }
 
-                Task.Run(() => DebugIdleOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n"));
+                nowait = Task.Run(() => DebugIdleOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n"));
                 
                 if (isAck)
-                    Task.Run(() => MpdAckError?.Invoke(this, ackText + " (@MISC)")); 
+                    nowait = Task.Run(() => MpdAckError?.Invoke(this, ackText + " (@MISC)")); 
 
                 ret.ResultText = stringBuilder.ToString();
                 
@@ -750,7 +752,7 @@ namespace MPDCtrl.Models
 
             try
             {
-                StringBuilder stringBuilder = new StringBuilder();
+                StringBuilder stringBuilder = new();
 
                 bool isAck = false;
                 string ackText = "";
@@ -1016,7 +1018,7 @@ namespace MPDCtrl.Models
 
         public async Task<ConnectionResult> MpdCommandConnect(string host, int port)
         {
-            ConnectionResult result = new ConnectionResult();
+            ConnectionResult result = new();
 
             IsMpdCommandConnected = false;
 
@@ -1062,8 +1064,10 @@ namespace MPDCtrl.Models
                     tcpStream.ReadTimeout = 2000;
 
                     _commandReader = new StreamReader(tcpStream);
-                    _commandWriter = new StreamWriter(tcpStream);
-                    _commandWriter.AutoFlush = true;
+                    _commandWriter = new StreamWriter(tcpStream)
+                    {
+                        AutoFlush = true
+                    };
 
                     string response = await _commandReader.ReadLineAsync();
 
@@ -1129,7 +1133,7 @@ namespace MPDCtrl.Models
         {
             _password = password;
 
-            CommandResult ret = new CommandResult();
+            CommandResult ret = new();
 
             if (string.IsNullOrEmpty(password))
             {
@@ -1149,7 +1153,7 @@ namespace MPDCtrl.Models
         // TODO: Rename MpdSendCommand to MpdCommandSendCommand
         private async Task<CommandResult> MpdSendCommand(string cmd, bool isAutoIdling = false)
         {
-            CommandResult ret = new CommandResult();
+            CommandResult ret = new();
 
             if (_commandConnection.Client == null)
             {
@@ -1195,7 +1199,7 @@ namespace MPDCtrl.Models
                 if (cmd.Trim().StartsWith("idle"))
                 {
                     //DebugCommandOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
-                    Task.Run(() => DebugCommandOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n"));
+                    Task nowait = Task.Run(() => DebugCommandOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n"));
 
                     await _commandWriter.WriteAsync(cmd.Trim() + "\n");
 
@@ -1215,12 +1219,13 @@ namespace MPDCtrl.Models
 
                     cmdDummy = cmdDummy.Trim().Replace("\n", "\n" + ">>>>");
 
+                    Task nowait;
                     if (isAutoIdling)
                         //DebugCommandOutput?.Invoke(this, ">>>>" + "noidle\n>>>>" + cmdDummy.Trim() + "\n>>>>idle player" + "\n" + "\n");
-                        Task.Run(() => DebugCommandOutput?.Invoke(this, ">>>>" + "noidle\n>>>>" + cmdDummy.Trim() + "\n>>>>idle player" + "\n" + "\n"));
+                        nowait = Task.Run(() => DebugCommandOutput?.Invoke(this, ">>>>" + "noidle\n>>>>" + cmdDummy.Trim() + "\n>>>>idle player" + "\n" + "\n"));
                     else
                         //DebugCommandOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n");
-                        Task.Run(() => DebugCommandOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n"));
+                        nowait = Task.Run(() => DebugCommandOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n"));
 
                     if (isAutoIdling)
                         await _commandWriter.WriteAsync("noidle\n" + cmd.Trim() + "\n" + "idle player\n");
@@ -1322,7 +1327,7 @@ namespace MPDCtrl.Models
             {
                 IsBusy?.Invoke(this, true);
 
-                StringBuilder stringBuilder = new StringBuilder();
+                StringBuilder stringBuilder = new();
 
                 bool isDoubleOk = false;
                 bool isAck = false;
@@ -1463,10 +1468,10 @@ namespace MPDCtrl.Models
                 else
                 {
                     //DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
-                    Task.Run(() => DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n"));
+                    Task nowait = Task.Run(() => DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n"));
 
                     if (isAck)
-                        Task.Run(() => MpdAckError?.Invoke(this, ackText + " (@MSC)"));
+                        nowait = Task.Run(() => MpdAckError?.Invoke(this, ackText + " (@MSC)"));
 
                     ret.ResultText = stringBuilder.ToString();
 
@@ -1574,451 +1579,6 @@ namespace MPDCtrl.Models
 
         }
 
-        // TODO: not used. (moved to BinaryDownloader)
-        private async Task<CommandBinaryResult> MpdCommandGetBinary(string cmd, bool isAutoIdling = false)
-        {
-            CommandBinaryResult ret = new CommandBinaryResult();
-
-            if (_commandConnection.Client == null)
-            {
-                Debug.WriteLine("@MpdCommandGetBinary: " + "TcpClient.Client == null");
-
-                ret.IsSuccess = false;
-                ret.ErrorMessage = "TcpClient.Client == null";
-
-                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdCommandGetBinary", "TcpClient.Client == null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
-
-                return ret;
-            }
-
-            if ((_commandWriter == null) || (_commandReader == null))
-            {
-                Debug.WriteLine("@MpdCommandGetBinary: " + "_commandWriter or _commandReader is null");
-
-                ret.IsSuccess = false;
-                ret.ErrorMessage = "_commandWriter or _commandReader is null";
-
-                DebugCommandOutput?.Invoke(this, string.Format("################ Error :@{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdCommandGetBinary", "_commandWriter or _commandReader is null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
-
-                return ret;
-            }
-
-            if (!_commandConnection.Client.Connected)
-            {
-                Debug.WriteLine("@MpdCommandGetBinary: " + "NOT IsMpdCommandConnected");
-
-                ret.IsSuccess = false;
-                ret.ErrorMessage = "NOT IsMpdCommandConnected";
-
-                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdCommandGetBinary", "!CommandConnection.Client.Connected", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
-
-                return ret;
-            }
-
-            // WriteAsync
-            try
-            {
-                if (cmd.Trim().StartsWith("idle"))
-                {
-                    DebugCommandOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
-
-                    await _commandWriter.WriteAsync(cmd.Trim() + "\n");
-
-                    if (!isAutoIdling)
-                        return ret;
-                }
-                else
-                {
-                    string cmdDummy = cmd;
-                    if (cmd.StartsWith("password "))
-                        cmdDummy = "password ****";
-
-                    cmdDummy = cmdDummy.Trim().Replace("\n", "\n" + ">>>>");
-
-                    if (isAutoIdling)
-                        DebugCommandOutput?.Invoke(this, ">>>>" + "noidle\n>>>>" + cmdDummy.Trim() + "\n>>>>idle player" + "\n" + "\n");
-                    else
-                        DebugCommandOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n");
-
-                    if (isAutoIdling)
-                        await _commandWriter.WriteAsync("noidle\n" + cmd.Trim() + "\n" + "idle player\n");
-                    else
-                        await _commandWriter.WriteAsync(cmd.Trim() + "\n");
-                }
-            }
-            catch (System.IO.IOException e)
-            {
-                // IOException : Unable to write data to the transport connection: 確立された接続がホスト コンピューターのソウトウェアによって中止されました。
-
-                ret.IsSuccess = false;
-                ret.ErrorMessage = e.Message;
-
-                // Could be application shutdopwn.
-                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
-                {
-
-                }
-                else
-                {
-                    DebugCommandOutput?.Invoke(this, string.Format("################ Error@{0}, Reason:{1}, Data:{2}, {3} Exception: {4} {5}", "WriteAsync@MpdCommandGetBinary", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
-
-                    // タイムアウトしていたらここで「も」エラーになる模様。
-
-                    IsMpdCommandConnected = false;
-
-                    DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
-
-                    _commandConnection.Close();
-
-                    ConnectionResult newCon = await MpdCommandConnect(_host, _port);
-
-                    if (newCon.IsSuccess)
-                    {
-                        CommandResult d = await MpdCommandSendPassword(_password);
-
-                        if (d.IsSuccess)
-                        {
-                            DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. " + Environment.NewLine + Environment.NewLine));
-
-                            ret = await MpdCommandGetBinary(cmd, isAutoIdling);
-                        }
-                    }
-                    else
-                    {
-                        DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Failed. " + Environment.NewLine + Environment.NewLine));
-
-                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                        ConnectionError?.Invoke(this, "The connection (command) has been terminated (IOException): " + e.Message);
-                    }
-                }
-
-                return ret;
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine("Exception@MpdCommandGetBinary: " + cmd.Trim() + " WriteAsync " + e.Message);
-
-                ret.IsSuccess = false;
-                ret.ErrorMessage = e.Message;
-
-                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
-                {
-
-                }
-                else
-                {
-                    DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "WriteAsync@MpdCommandGetBinary", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
-
-                    //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                    //ConnectionError?.Invoke(this, "The connection (command) has been terminated (Exception): " + e.Message);
-                }
-
-                return ret;
-            }
-
-            // ReadAsync
-            try
-            {
-                StringBuilder stringBuilder = new StringBuilder();
-
-                byte[] bin = new byte[0];
-
-                bool isDoubleOk = false;
-                bool isAck = false;
-                string ackText = "";
-                bool isNullReturn = false;
-                bool isBinaryFound = false;
-
-                bool isWaitForOK = true;
-
-                while (isWaitForOK)
-                {
-
-                    int readSize = 0;
-                    int bufferSize = 5000;
-                    byte[] buffer = new byte[bufferSize];
-                    byte[] bindata = new byte[0];
-
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        while ((readSize = await _commandReader.BaseStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                        {
-                            ms.Write(buffer, 0, readSize);
-
-                            //Debug.WriteLine("ms.Write:" + readSize.ToString());
-
-                            if (readSize < bufferSize)
-                            {
-                                //Debug.WriteLine("done ReadAsync");
-
-                                break;
-                            }
-                        }
-
-                        bindata = ms.ToArray();
-                    }
-
-                    if (bindata.Length == 0)
-                    {
-                        isNullReturn = true;
-
-                        isWaitForOK = false;
-                    }
-                    else
-                    {
-
-                        bin = CombineByteArray(bin, bindata);
-
-                        //Debug.WriteLine("Done .Write:" + bin.Length.ToString());
-
-                        string res = Encoding.Default.GetString(bindata, 0, bindata.Length);
-
-                        List<string> values = res.Split("\n").ToList();
-
-                        foreach (var line in values)
-                        {
-                            if (line != null)
-                            {
-                                if (line.StartsWith("ACK"))
-                                {
-                                    //Debug.WriteLine("ACK line @MpdCommandGetBinary: " + cmd.Trim() + " and " + line);
-
-                                    if (!string.IsNullOrEmpty(line))
-                                        stringBuilder.Append(line + "\n");
-
-                                    ret.ErrorMessage = line;
-                                    ackText = line;
-                                    isAck = true;
-
-                                    isWaitForOK = false;
-
-                                    break;
-                                }
-                                else if (line.StartsWith("changed: "))
-                                {
-                                    // noidleでついてくるかもしれないchanged. idleConnectionで見ているからここでは無視したいが・・・。
-
-                                    if (!string.IsNullOrEmpty(line))
-                                        stringBuilder.Append(line + "\n");
-                                }
-                                else if (line.StartsWith("size: "))
-                                {
-                                    if (!string.IsNullOrEmpty(line))
-                                        stringBuilder.Append(line + "\n");
-
-                                    List<string> s = line.Split(':').ToList();
-                                    if (s.Count > 1)
-                                    {
-                                        if (Int32.TryParse(s[1], out int i))
-                                        {
-                                            ret.WholeSize = i;
-                                        }
-                                    }
-                                }
-                                else if (line.StartsWith("type: "))
-                                {
-                                    if (!string.IsNullOrEmpty(line))
-                                        stringBuilder.Append(line + "\n");
-
-                                    List<string> s = line.Split(':').ToList();
-                                    if (s.Count > 1)
-                                    {
-                                        ret.Type = s[1].Trim();
-                                    }
-                                }
-                                else if (line.StartsWith("binary: "))
-                                {
-                                    isBinaryFound = true;
-
-                                    if (!string.IsNullOrEmpty(line))
-                                        stringBuilder.Append(line + "\n");
-
-                                    stringBuilder.Append("{binary data}" + "\n");
-
-                                    List<string> s = line.Split(':').ToList();
-                                    if (s.Count > 1)
-                                    {
-                                        if (Int32.TryParse(s[1], out int i))
-                                        {
-                                            ret.ChunkSize = i;
-                                        }
-                                    }
-
-                                }
-                                else if (line == "OK") // ==
-                                {
-                                    if (isAutoIdling)
-                                    {
-                                        if (isDoubleOk)
-                                        {
-                                            if (!string.IsNullOrEmpty(line))
-                                                stringBuilder.Append(line + "\n");
-
-                                            ret.IsSuccess = true;
-
-                                            isWaitForOK = false;
-                                            break;
-                                        }
-
-                                        if (!string.IsNullOrEmpty(line))
-                                            stringBuilder.Append(line + "\n");
-
-                                        isDoubleOk = true;
-
-                                    }
-                                    else
-                                    {
-                                        ret.IsSuccess = true;
-
-                                        if (!string.IsNullOrEmpty(line))
-                                            stringBuilder.Append(line + "\n");
-
-                                        isWaitForOK = false;
-                                        break;
-                                    }
-                                }
-                                else
-                                {
-                                    // This should be binary data if not reading correctly above.
-
-                                    //Debug.WriteLine(line);
-                                }
-                            }
-                            else
-                            {
-                                isNullReturn = true;
-
-                                isWaitForOK = false;
-                                break;
-                            }
-                        }
-
-                    }
-                }
-
-                if (isNullReturn)
-                {
-                    Debug.WriteLine("@MpdCommandGetBinary ReadAsync isNullReturn");
-
-                    DebugCommandOutput?.Invoke(this, string.Format("################ Error @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadAsync@MpdCommandGetBinary", "ReadLineAsync received null data", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
-
-                    ret.ErrorMessage = "ReadAsync@MpdCommandGetBinary received null data";
-
-                    return ret;
-                }
-                else
-                {
-                    DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
-
-                    if (isAck)
-                    {
-                        // とりあえず今の所、アルバムカバーのfile not existsは無視するようにしている。
-                        //MpdAckError?.Invoke(this, ackText + " (@MCGB)");
-
-                        return ret;
-                    }
-                    else if (isBinaryFound)
-                    {
-                        //return ret;
-                        //return ParseAlbumArtResponse(bin);
-                        return ParseAlbumImageData(bin);
-                    }
-                    else
-                    {
-                        //Debug.WriteLine("No binary data(size) found. Could be a readpicture command?");
-
-                        // TODO: 
-
-                        DebugCommandOutput?.Invoke(this, "No binary data(size) found. Could be a readpicture command?" + "\n" + "\n");
-
-                        return ret;
-                    }
-                }
-            }
-            catch (System.InvalidOperationException e)
-            {
-                // The stream is currently in use by a previous operation on the stream.
-
-                Debug.WriteLine("InvalidOperationException@MpdCommandGetBinary: " + cmd.Trim() + " ReadAsync ---- " + e.Message);
-
-                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadAsync@MpdCommandGetBinary", "InvalidOperationException (Most likely the connection is overloaded)", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
-
-                //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                //ConnectionError?.Invoke(this, "The connection (command) has been terminated. Most likely the connection has been overloaded.");
-
-                ret.IsSuccess = false;
-                ret.ErrorMessage = e.Message;
-
-                return ret;
-            }
-            catch (System.IO.IOException e)
-            {
-                // IOException : Unable to write data to the transport connection: 確立された接続がホスト コンピューターのソウトウェアによって中止されました。
-
-                ret.IsSuccess = false;
-                ret.ErrorMessage = e.Message;
-
-                // Could be application shutdopwn.
-                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
-                {
-
-                }
-                else
-                {
-                    DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadAsync@MpdCommandGetBinary", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
-
-                    // タイムアウトしていたらここで「も」エラーになる模様。
-
-                    IsMpdCommandConnected = false;
-
-                    DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
-
-                    _commandConnection.Close();
-
-                    ConnectionResult newCon = await MpdCommandConnect(_host, _port);
-
-                    if (newCon.IsSuccess)
-                    {
-                        CommandResult d = await MpdCommandSendPassword(_password);
-
-                        if (d.IsSuccess)
-                        {
-                            DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. " + Environment.NewLine + Environment.NewLine));
-
-                            ret = await MpdCommandGetBinary(cmd, isAutoIdling);
-                        }
-                    }
-                    else
-                    {
-                        // Unable to read data from the transport connection: 既に接続済みのソケットに対して接続を要求しました。.
-
-                        DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Failed. " + Environment.NewLine + Environment.NewLine));
-
-                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                        ConnectionError?.Invoke(this, "The connection (command) has been terminated (IOException): " + e.Message);
-                    }
-                }
-
-                return ret;
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine("Exception@MpdCommandGetBinary: " + cmd.Trim() + " ReadAsync ---- " + e.Message);
-
-                ret.IsSuccess = false;
-                ret.ErrorMessage = e.Message;
-
-                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadAsync@MpdCommandGetBinary", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
-
-                return ret;
-            }
-
-        }
-
         #endregion
 
         #region == Command Connection's MPD Commands with results other than OK == 
@@ -2090,7 +1650,7 @@ namespace MPDCtrl.Models
 
         public async Task<CommandSearchResult> MpdSearch(string queryTag, string queryShiki, string queryValue, bool autoIdling = true)
         {
-            CommandSearchResult result = new CommandSearchResult();
+            CommandSearchResult result = new();
 
             if (Application.Current == null) { return result; }
             Application.Current.Dispatcher.Invoke(() =>
@@ -2124,7 +1684,7 @@ namespace MPDCtrl.Models
 
         public async Task<CommandPlaylistResult> MpdQueryPlaylistSongs(string playlistName, bool autoIdling = true)
         {
-            CommandPlaylistResult result = new CommandPlaylistResult();
+            CommandPlaylistResult result = new();
 
             if (string.IsNullOrEmpty(playlistName))
             {
@@ -2145,20 +1705,20 @@ namespace MPDCtrl.Models
             return result;
         }
 
-        public async Task<CommandResult> MpdQueryAlbumArt(string uri, string songId, bool isUsingReadpicture)
+        public async Task<CommandResult> MpdQueryAlbumArt(string uri, bool isUsingReadpicture)
         {
-            CommandResult f = new CommandResult();
+            CommandResult f = new();
             if (string.IsNullOrEmpty(uri))
             {
                 f.IsSuccess = false;
                 return f;
             }
 
-            BinaryDownloader hoge = new BinaryDownloader();
+            BinaryDownloader hoge = new();
 
             bool asdf = await hoge.MpdBinaryConnectionStart(MpdHost,MpdPort,MpdPassword);
 
-            CommandResult b = new CommandResult();
+            CommandResult b = new();
 
             if (asdf)
             {
@@ -2171,6 +1731,8 @@ namespace MPDCtrl.Models
                     {
                         _albumCover = hoge.AlbumCover;
                     });
+
+                    await Task.Delay(1300);
 
                     //Debug.WriteLine("AlbumArt Donwloaded... ");
 
@@ -2191,145 +1753,6 @@ namespace MPDCtrl.Models
             return b;
         }
         
-        /*
-        public async Task<CommandResult> MpdQueryAlbumArt(string uri, string songId, bool isUsingReadpicture)
-        {
-            if (string.IsNullOrEmpty(uri))
-            {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-
-            if (_albumCover.IsDownloading)
-            {
-                //Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading. Ignoring.");
-                //return;
-            }
-
-            if (_albumCover.SongFilePath == uri)
-            {
-                //Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.SongFilePath == uri. Ignoring.");
-                //return;
-            }
-
-            if (songId != MpdStatus.MpdSongID)
-            {
-                // probably you clicked on "Next" too farst or double clicked.
-                Debug.WriteLine("Error@MpdQueryAlbumArt: songId != MpdStatus.MpdSongID. Ignoring.");
-
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                _albumCover = new AlbumImage();
-                _albumCover.IsDownloading = true;
-                _albumCover.SongFilePath = uri;
-                _albumCover.AlbumImageSource = null;
-                _albumCover.BinaryData = new byte[0];
-                _albumCover.BinarySize = 0;
-            });
-
-            uri = Regex.Escape(uri);
-
-            string cmd = "albumart \"" + uri + "\" 0" + "\n";
-            if (isUsingReadpicture)
-                if (MpdVersion >= 220)
-                    cmd = "readpicture \"" + uri + "\" 0" + "\n";
-
-            CommandBinaryResult result = await MpdCommandGetBinary(cmd, true);
-
-            if (result.IsSuccess)
-            {
-                _albumCover.BinaryData = result.BinaryData;
-
-                if ((result.WholeSize != 0) && (result.WholeSize == result.ChunkSize))
-                {
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
-                        _albumCover.IsSuccess = true;
-                        _albumCover.IsDownloading = false;
-
-                        MpdAlbumArtChanged?.Invoke(this);
-                    });
-                }
-                else
-                {
-                    if ((result.WholeSize != 0) && (result.WholeSize > result.ChunkSize))
-                    {
-                        while ((result.WholeSize > _albumCover.BinaryData.Length) && result.IsSuccess)
-                        {
-                            result = await MpdReQueryAlbumArt(_albumCover.SongFilePath, _albumCover.BinaryData.Length, isUsingReadpicture);
-
-                            if (result.IsSuccess && (result.BinaryData != null))
-                                _albumCover.BinaryData = CombineByteArray(_albumCover.BinaryData, result.BinaryData);
-                        }
-
-                        if (result.IsSuccess && (result.BinaryData != null))
-                        {
-                            Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
-                                _albumCover.IsSuccess = true;
-                                _albumCover.IsDownloading = false;
-
-                                MpdAlbumArtChanged?.Invoke(this);
-                            });
-                        }
-                    }
-                }
-            }
-
-            CommandResult b = new CommandResult();
-            b.IsSuccess = result.IsSuccess;
-
-            return b;
-        }
-
-        private async Task<CommandBinaryResult> MpdReQueryAlbumArt(string uri, int offset, bool isUsingReadpicture)
-        {
-            if (string.IsNullOrEmpty(uri))
-            {
-                CommandBinaryResult f = new CommandBinaryResult();
-                f.IsSuccess = false;
-                return f;
-            }
-
-            if (!_albumCover.IsDownloading)
-            {
-                Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading == false. Ignoring.");
-
-                CommandBinaryResult f = new CommandBinaryResult();
-                f.IsSuccess = false;
-                return f;
-            }
-
-            if (_albumCover.SongFilePath != uri)
-            {
-                Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.SongFilePath != uri. Ignoring.");
-
-                _albumCover.IsDownloading = false;
-
-                CommandBinaryResult f = new CommandBinaryResult();
-                f.IsSuccess = false;
-                return f;
-            }
-
-            uri = Regex.Escape(uri);
-
-            string cmd = "albumart \"" + uri + "\" " + offset.ToString() + "\n";
-            if (isUsingReadpicture)
-                if (MpdVersion >= 220)
-                    cmd = "readpicture \"" + uri + "\" " + offset.ToString() + "\n";
-
-            return await MpdCommandGetBinary(cmd, true);
-        }
-        */
-
         #endregion
 
         #region == Command Connection's MPD Commands with boolean result ==
@@ -2387,7 +1810,7 @@ namespace MPDCtrl.Models
             else
             {
                 string cmd = "command_list_begin" + "\n";
-                cmd = cmd + "pause 0\n";
+                cmd += "pause 0\n";
                 cmd = cmd + "setvol " + volume.ToString() + "\n";
                 cmd = cmd + "command_list_end" + "\n";
 
@@ -2415,7 +1838,7 @@ namespace MPDCtrl.Models
             else
             {
                 string cmd = "command_list_begin" + "\n";
-                cmd = cmd + "next\n";
+                cmd += "next\n";
                 cmd = cmd + "setvol " + volume.ToString() + "\n";
                 cmd = cmd + "command_list_end" + "\n";
 
@@ -2436,7 +1859,7 @@ namespace MPDCtrl.Models
             else
             {
                 string cmd = "command_list_begin" + "\n";
-                cmd = cmd + "previous\n";
+                cmd += "previous\n";
                 cmd = cmd + "setvol " + volume.ToString() + "\n";
                 cmd = cmd + "command_list_end" + "\n";
 
@@ -2450,8 +1873,10 @@ namespace MPDCtrl.Models
         {
             if (v == _status.MpdVolume) 
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = true;
+                CommandResult f = new()
+                {
+                    IsSuccess = true
+                };
                 return f;
             }
 
@@ -2464,8 +1889,10 @@ namespace MPDCtrl.Models
         {
             if ((songId == "") || (seekTime == 0)) 
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = true;
+                CommandResult f = new()
+                {
+                    IsSuccess = true
+                };
                 return f;
             }
 
@@ -2478,12 +1905,14 @@ namespace MPDCtrl.Models
         {
             if (_status.MpdRepeat == on)
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = true;
+                CommandResult f = new()
+                {
+                    IsSuccess = true
+                };
                 return f;
             }
 
-            string cmd = "";
+            string cmd;
             if (on)
             {
                 cmd = "repeat 1";
@@ -2502,12 +1931,14 @@ namespace MPDCtrl.Models
         {
             if (_status.MpdRandom == on)
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = true;
+                CommandResult f = new()
+                {
+                    IsSuccess = true
+                };
                 return f;
             }
 
-            string cmd = "";
+            string cmd;
             if (on)
             {
                 cmd = "random 1";
@@ -2526,12 +1957,14 @@ namespace MPDCtrl.Models
         {
             if (_status.MpdConsume == on)
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = true;
+                CommandResult f = new()
+                {
+                    IsSuccess = true
+                };
                 return f;
             }
 
-            string cmd = "";
+            string cmd;
             if (on)
             {
                 cmd = "consume 1";
@@ -2550,12 +1983,14 @@ namespace MPDCtrl.Models
         {
             if (_status.MpdSingle == on)
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = true;
+                CommandResult f = new()
+                {
+                    IsSuccess = true
+                };
                 return f;
             }
 
-            string cmd = "";
+            string cmd;
             if (on)
             {
                 cmd = "single 1";
@@ -2581,8 +2016,10 @@ namespace MPDCtrl.Models
         {
             if (string.IsNullOrEmpty(playlistName))
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -2597,8 +2034,10 @@ namespace MPDCtrl.Models
         {
             if (string.IsNullOrEmpty(uri))
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -2613,8 +2052,10 @@ namespace MPDCtrl.Models
         {
             if (uris.Count < 1)
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -2635,8 +2076,10 @@ namespace MPDCtrl.Models
         {
             if (ids.Count < 1)
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -2654,8 +2097,10 @@ namespace MPDCtrl.Models
         {
             if (string.IsNullOrEmpty(id))
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -2668,14 +2113,18 @@ namespace MPDCtrl.Models
         {
             if (IdToNewPosPair == null)
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
             if (IdToNewPosPair.Count < 1)
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -2695,8 +2144,10 @@ namespace MPDCtrl.Models
         {
             if (string.IsNullOrEmpty(playlistName))
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -2716,8 +2167,10 @@ namespace MPDCtrl.Models
         {
             if (string.IsNullOrEmpty(playlistName))
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -2734,8 +2187,10 @@ namespace MPDCtrl.Models
         {
             if (string.IsNullOrEmpty(playlistName) || string.IsNullOrEmpty(newPlaylistName))
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -2753,8 +2208,10 @@ namespace MPDCtrl.Models
         {
             if (string.IsNullOrEmpty(playlistName))
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -2771,20 +2228,26 @@ namespace MPDCtrl.Models
         {
             if (string.IsNullOrEmpty(playlistName))
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
             if (uris == null)
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
             if (uris.Count < 1)
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -2807,8 +2270,10 @@ namespace MPDCtrl.Models
         {
             if (string.IsNullOrEmpty(playlistName))
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -2863,8 +2328,10 @@ namespace MPDCtrl.Models
         {
             if (string.IsNullOrEmpty(playlistName))
             {
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -2881,396 +2348,6 @@ namespace MPDCtrl.Models
         #endregion
 
         #region == Response parser methods ==
-
-        // TODO:
-        #region == AlbumImage ==
-
-        private CommandBinaryResult ParseAlbumImageData(byte[] data)
-        {
-            CommandBinaryResult r = new CommandBinaryResult();
-
-            if (MpdStop) return r;
-
-            if (data.Length > 1000000) //2000000000
-            {
-                Debug.WriteLine("**ParseAlbumImageData: binary file size too big: " + data.Length.ToString());
-
-                _albumCover.IsDownloading = false;
-                return r;
-            }
-
-            if (string.IsNullOrEmpty(_albumCover.SongFilePath))
-            {
-                Debug.WriteLine("**ParseAlbumImageData: File path is not set.");
-
-                _albumCover.IsDownloading = false;
-                return r;
-            }
-
-            if (!_albumCover.IsDownloading)
-            {
-                Debug.WriteLine("**ParseAlbumImageData: IsDownloading = false. Downloading canceld? .");
-
-                _albumCover.IsDownloading = false;
-                return r;
-            }
-
-            try
-            {
-                //int gabStart = gabPre;
-                //int gabEnd = gabAfter;
-                int gabStart = 0;
-                int gabEnd = 0;
-
-                string res = Encoding.Default.GetString(data, 0, data.Length);
-
-                int binSize = 0;
-                int binResSize = 0;
-
-                List<string> values = res.Split('\n').ToList();
-
-                bool found = false;
-                foreach (var val in values)
-                {
-                    if (val.StartsWith("size: "))
-                    {
-                        found = true;
-
-                        gabStart = gabStart + val.Length + 1;
-
-                        List<string> s = val.Split(':').ToList();
-                        if (s.Count > 1)
-                        {
-                            if (Int32.TryParse(s[1], out int i))
-                            {
-                                binSize = i;
-
-                                r.WholeSize = i;
-                            }
-                        }
-
-                    }
-                    else if (val.StartsWith("type: "))
-                    {
-                        gabStart = gabStart + val.Length + 1;
-
-                        List<string> s = val.Split(':').ToList();
-                        if (s.Count > 1)
-                        {
-                            r.Type = s[1];
-                        }
-
-                    }
-                    else if (val.StartsWith("binary: "))
-                    {
-                        gabStart = gabStart + val.Length + 1;
-
-                        List<string> s = val.Split(':').ToList();
-                        if (s.Count > 1)
-                        {
-                            if (Int32.TryParse(s[1], out int i))
-                            {
-                                binResSize = i;
-
-                                r.ChunkSize = binResSize;
-                            }
-                        }
-
-                    }
-                    else if (val == "OK") // ==
-                    {
-                        //gabEnd = gabEnd + val.Length + 1;
-                        if (found)
-                        {
-                            gabEnd = gabEnd + val.Length + 1;
-                            //System.Diagnostics.Debug.WriteLine("OK:after " + val);
-                        }
-                        else
-                        {
-                            gabStart = gabStart + val.Length + 1;
-                            //System.Diagnostics.Debug.WriteLine("OK:before " + val);
-                        }
-
-                    }
-                    else if(val.StartsWith("ACK"))
-                    {
-                        // ACK 応答はここまで到達しないはず。
-
-                        if (found)
-                        {
-                            gabEnd = gabEnd + val.Length + 1;
-                            //System.Diagnostics.Debug.WriteLine("changed:after " + val);
-                        }
-                        else
-                        {
-                            gabStart = gabStart + val.Length + 1;
-                            //System.Diagnostics.Debug.WriteLine("changed:before " + val);
-                        }
-                    }
-                    else if (val.StartsWith("changed:"))
-                    {
-                        // Song is changed...so should skip ??
-                        //DataReceived_ParseData(val);
-
-                        if (found)
-                        {
-                            gabEnd = gabEnd + val.Length + 1;
-                            //System.Diagnostics.Debug.WriteLine("changed:after " + val);
-                        }
-                        else
-                        {
-                            gabStart = gabStart + val.Length + 1;
-                            //System.Diagnostics.Debug.WriteLine("changed:before " + val);
-                        }
-
-                    }
-                    else
-                    {
-                        // should be binary...
-                    }
-                }
-
-                gabEnd = gabEnd + 1; //
-
-                // test
-                //gabEnd = 4; // \n O K \n
-
-
-                if (binSize > 1000000)
-                {
-                    Debug.WriteLine("binary file too big: " + binSize.ToString());
-
-                    DebugCommandOutput?.Invoke(this, "binary file too big: " + binSize.ToString() + "\n" + "\n");
-
-                    _albumCover.IsDownloading = false;
-
-                    return r;
-                }
-
-                if ((binSize == 0))
-                {
-                    Debug.WriteLine("binary file size is Zero: " + binSize.ToString() + ", " + binResSize.ToString() + ", " + data.Length.ToString());
-
-                    _albumCover.IsDownloading = false;
-
-                    return r;
-                }
-
-                if (binResSize != ((data.Length - gabStart) - gabEnd))
-                {
-                    Debug.WriteLine("binary file size mismatch: " + binSize.ToString() + ", [" + binResSize.ToString() + ", " + (data.Length - gabStart - gabEnd) + "], " + data.Length.ToString());
-
-                    DebugCommandOutput?.Invoke(this, "binary file size mismatch." + "\n" + "\n");
-
-                    //DebugCommandOutput?.Invoke(this, "raw text data:\n" + res  + "\n" + "\n");
-
-                    _albumCover.IsDownloading = false;
-
-                    return r;
-                }
-
-                r.WholeSize = binSize;
-                r.ChunkSize = binResSize;
-                
-                // 今回受け取ったバイナリ用にバイトアレイをイニシャライズ
-                byte[] resBinary = new byte[data.Length - gabStart - gabEnd];
-                // 今回受け取ったバイナリをresBinaryへコピー
-                Array.Copy(data, gabStart, resBinary, 0, resBinary.Length);
-
-                r.BinaryData = resBinary;
-                
-                r.IsSuccess = true;
-
-                return r;
-                
-                /*
-                if ((binSize != 0) && (binSize == binResSize))
-                {
-                    // 小さいサイズの画像で一発で来た。
-
-                    // 今回受け取ったバイナリ用にバイトアレイをイニシャライズ
-                    byte[] resBinary = new byte[data.Length - gabStart - gabEnd];
-                    try
-                    {
-                        // 今回受け取ったバイナリをresBinaryへコピー
-                        Array.Copy(data, gabStart, resBinary, 0, resBinary.Length);
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived: " + ex.Message);
-
-                        _albumCover.IsDownloading = false;
-                        return r;
-                    }
-
-                    _albumCover.BinaryData = resBinary;
-
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        _albumCover.AlbumImageSource = BitmaSourceFromByteArray(resBinary);
-                        _albumCover.IsSuccess = true;
-                        _albumCover.IsDownloading = false;
-
-                        //MpdAlbumArtChanged?.Invoke(this);
-                    });
-
-
-                    //await Task.Run(() => { StatusUpdate?.Invoke(this, "isAlbumart"); });
-
-                    r.IsSuccess = true;
-                    r.WholeSize = binSize;
-                    r.ChunkSize = binResSize;
-                    r.BinaryData = resBinary;
-
-                    return r;
-                }
-                else if (binSize > _albumCover.BinaryData.Length)
-                {
-                    if (_albumCover.BinarySize == 0)
-                    {
-                        _albumCover.BinarySize = binSize;
-                    }
-                    else
-                    {
-                        if (_albumCover.BinarySize != binSize)
-                        {
-                            System.Diagnostics.Debug.WriteLine("binary file size mismatch: Maybe different download? This should not be happening.");
-
-                            _albumCover.IsDownloading = false;
-                            return r;
-                        }
-                    }
-
-                    try
-                    {
-                        try
-                        {
-                            // 今回受け取ったバイナリ用にバイトアレイをイニシャライズ
-                            byte[] resBinary = new byte[data.Length - gabStart - gabEnd];
-                            // 今回受け取ったバイナリをresBinaryへコピー
-                            Array.Copy(data, gabStart, resBinary, 0, resBinary.Length);
-
-                            _albumCover.BinaryData = CombineByteArray(_albumCover.BinaryData, resBinary);
-
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived (a): " + ex.Message);
-
-                            _albumCover.IsDownloading = false;
-                            return r;
-                        }
-
-                        if (binSize > _albumCover.BinaryData.Length)
-                        {
-                            System.Diagnostics.Debug.WriteLine("Trying again for the rest of binary data.");
-
-                            //CommandResult r = await MpdReQueryAlbumArt(_albumCover.SongFilePath, _albumCover.BinaryData.Length);
-
-                            //return r.IsSuccess;
-                        }
-                        else
-                        {
-                            if (binSize == _albumCover.BinaryData.Length)
-                            {
-                                try
-                                {
-                                    Application.Current.Dispatcher.Invoke(() =>
-                                    {
-                                        _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
-                                        _albumCover.IsSuccess = true;
-                                        _albumCover.IsDownloading = false;
-
-                                        MpdAlbumArtChanged?.Invoke(this);
-                                    });
-
-                                    r.IsSuccess = true;
-                                    r.WholeSize = binSize;
-                                    r.ChunkSize = binResSize;
-                                    r.BinaryData = _albumCover.BinaryData;
-
-                                    return r;
-                                }
-                                catch (Exception ex)
-                                {
-                                    System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived (b): " + ex.Message);
-
-                                    _albumCover.IsDownloading = false;
-                                    return r;
-                                }
-                            }
-                            else
-                            {
-                                System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived (something is wrong) ");
-                                return r;
-                            }
-                        }
-
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived (e): " + ex.Message);
-
-                        _albumCover.IsDownloading = false;
-                        return r;
-                    }
-
-                }
-                else if ((binResSize == 0) && (binSize == _albumCover.BinaryData.Length))
-                {
-                    // this should not happen anymore
-
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
-                        _albumCover.IsSuccess = true;
-                        _albumCover.IsDownloading = false;
-
-                        MpdAlbumArtChanged?.Invoke(this);
-                    });
-
-                    r.IsSuccess = true;
-                    r.WholeSize = binSize;
-                    r.ChunkSize = binResSize;
-                    r.BinaryData = _albumCover.BinaryData;
-
-                    return r;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("binary file download : Somehow, things went bad.");
-
-                    _albumCover.IsDownloading = false;
-                    return r;
-                }
-                */
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Error@TCPClient_DataBinaryReceived (l): " + ex.Message);
-
-                _albumCover.IsDownloading = false;
-                return r;
-            }
-        }
-
-        private static byte[] CombineByteArray(byte[] first, byte[] second)
-        {
-            byte[] ret = new byte[first.Length + second.Length];
-            Buffer.BlockCopy(first, 0, ret, 0, first.Length);
-            Buffer.BlockCopy(second, 0, ret, first.Length, second.Length);
-            return ret;
-        }
-
-        private static BitmapSource BitmaSourceFromByteArray(byte[] buffer)
-        {
-            using (var stream = new MemoryStream(buffer))
-            {
-                return BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
-            }
-        }
-
-        #endregion
 
         private Task<bool> ParseStatus(string result)
         {
@@ -3292,7 +2369,7 @@ namespace MPDCtrl.Models
             if (resultLines.Count == 0) return Task.FromResult(false);
 
             var comparer = StringComparer.OrdinalIgnoreCase;
-            Dictionary<string, string> MpdStatusValues = new Dictionary<string, string>(comparer);
+            Dictionary<string, string> MpdStatusValues = new(comparer);
 
             try
             {
@@ -3543,7 +2620,7 @@ namespace MPDCtrl.Models
             try
             {
                 var comparer = StringComparer.OrdinalIgnoreCase;
-                Dictionary<string, string> SongValues = new Dictionary<string, string>(comparer);
+                Dictionary<string, string> SongValues = new(comparer);
 
                 foreach (string value in resultLines)
                 {
@@ -3588,7 +2665,6 @@ namespace MPDCtrl.Models
 
             return Task.FromResult(true);
         }
-
 
         private Task<bool> ParsePlaylistInfo(string result)
         {
@@ -3649,7 +2725,7 @@ namespace MPDCtrl.Models
                 });
 
                 var comparer = StringComparer.OrdinalIgnoreCase;
-                Dictionary<string, string> SongValues = new Dictionary<string, string>(comparer);
+                Dictionary<string, string> SongValues = new(comparer);
 
                 int i = 0;
 
@@ -3729,7 +2805,7 @@ namespace MPDCtrl.Models
         {
             try
             {
-                SongInfoEx sng = new SongInfoEx();
+                SongInfoEx sng = new();
 
                 if (SongValues.ContainsKey("Id"))
                 {
@@ -3911,8 +2987,10 @@ namespace MPDCtrl.Models
                             */
                             //slTmp.Add(value.Replace("playlist: ", ""));
 
-                            pl = new Playlist();
-                            pl.Name = value.Replace("playlist: ", "");
+                            pl = new Playlist
+                            {
+                                Name = value.Replace("playlist: ", "")
+                            };
 
                             Playlists.Add(pl);
                         }
@@ -3992,8 +3070,10 @@ namespace MPDCtrl.Models
                     }
                     else if (value.StartsWith("file:"))
                     {
-                        song = new SongFile();
-                        song.File = value.Replace("file: ", "");
+                        song = new SongFile
+                        {
+                            File = value.Replace("file: ", "")
+                        };
 
                         if (Application.Current == null) { return Task.FromResult(false); }
                         Application.Current.Dispatcher.Invoke(() =>
@@ -4086,7 +3166,7 @@ namespace MPDCtrl.Models
                 IsBusy?.Invoke(this, true);
 
                 var comparer = StringComparer.OrdinalIgnoreCase;
-                Dictionary<string, string> SongValues = new Dictionary<string, string>(comparer);
+                Dictionary<string, string> SongValues = new(comparer);
 
                 int i = 0;
 
@@ -4158,7 +3238,7 @@ namespace MPDCtrl.Models
 
         private ObservableCollection<SongInfo> ParsePlaylistSongsResult(string result)
         {
-            ObservableCollection<SongInfo> songList = new ObservableCollection<SongInfo>();
+            ObservableCollection<SongInfo> songList = new();
 
             if (MpdStop) return songList;
 
@@ -4201,7 +3281,7 @@ namespace MPDCtrl.Models
             try
             {
                 var comparer = StringComparer.OrdinalIgnoreCase;
-                Dictionary<string, string> SongValues = new Dictionary<string, string>(comparer);
+                Dictionary<string, string> SongValues = new(comparer);
 
                 int i = 0;
 
@@ -4269,7 +3349,7 @@ namespace MPDCtrl.Models
         private static SongInfo FillSongInfo(Dictionary<string, string> SongValues, int i)
         {
 
-            SongInfo sng = new SongInfo();
+            SongInfo sng = new();
 
             if (SongValues.ContainsKey("Title"))
             {

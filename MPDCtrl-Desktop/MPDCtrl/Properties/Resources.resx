@@ -120,6 +120,9 @@
   <data name="About" xml:space="preserve">
     <value>About</value>
   </data>
+  <data name="Ack_Window_Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
   <data name="Add" xml:space="preserve">
     <value>Add</value>
   </data>
@@ -191,6 +194,9 @@
   </data>
   <data name="ConnectionStatus_SendFail_Timeout" xml:space="preserve">
     <value>Connection terminated.</value>
+  </data>
+  <data name="Debug_Window_Clear" xml:space="preserve">
+    <value>Clear</value>
   </data>
   <data name="Default" xml:space="preserve">
     <value>Default</value>

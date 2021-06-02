@@ -120,6 +120,9 @@
   <data name="About" xml:space="preserve">
     <value>詳細</value>
   </data>
+  <data name="Ack_Window_Clear" xml:space="preserve">
+    <value>クリアする</value>
+  </data>
   <data name="Add" xml:space="preserve">
     <value>追加</value>
   </data>
@@ -191,6 +194,9 @@
   </data>
   <data name="ConnectionStatus_SendFail_Timeout" xml:space="preserve">
     <value>通信が遮断しました。（SendFail_Timeout）</value>
+  </data>
+  <data name="Debug_Window_Clear" xml:space="preserve">
+    <value>クリアする</value>
   </data>
   <data name="Default" xml:space="preserve">
     <value>デフォルト</value>

@@ -5,7 +5,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MPDCtrl2.ico</ApplicationIcon>
-    <Version>3.0.5</Version>
+    <Version>3.0.6.0</Version>
     <Authors>torum</Authors>
     <Company>Torum</Company>
     <Copyright>2021</Copyright>
@@ -18,6 +18,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>x86</PlatformTarget>
     <Optimize>true</Optimize>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
 
   <ItemGroup>

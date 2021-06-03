@@ -61,6 +61,7 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v3.0.6   MS Store 公開。
     /// v3.0.5.2 Github issue #4 "Incomplete rendering of tracks" fix. Exceptionをログにちゃんと保存するようにした。Progress updateをステータスバーにちゃんと表示するようにした。 
     /// v3.0.5.1 TextBoxをRoundCorner化してみた。DebugWindowクリアするボタンにToolTipを付けた。AlbumArtの表示タイミングを少し遅らせてスムーズにした。IDEのメッセージに対処した。
     /// v3.0.5   MS Store 公開。
@@ -116,7 +117,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.5.2";
+        const string _appVer = "v3.0.6.0";
 
         public static string AppVer
         {

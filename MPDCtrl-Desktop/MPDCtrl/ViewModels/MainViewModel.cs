@@ -61,8 +61,9 @@ namespace MPDCtrl.ViewModels
 
 
     /// 更新履歴：
+    /// v3.0.7   MS Store 公開。Github issue #4 "Incomplete rendering of tracks" fix (multiple "Genre" key/tag). Exceptionをログにちゃんと保存するようにした。
     /// v3.0.6   MS Store 公開。
-    /// v3.0.5.2 Github issue #4 "Incomplete rendering of tracks" fix. Exceptionをログにちゃんと保存するようにした。Progress updateをステータスバーにちゃんと表示するようにした。 
+    /// v3.0.5.2 Fixed Queue update conflicts when consume mode is on. Progress updateをステータスバーにちゃんと表示するようにした。 
     /// v3.0.5.1 TextBoxをRoundCorner化してみた。DebugWindowクリアするボタンにToolTipを付けた。AlbumArtの表示タイミングを少し遅らせてスムーズにした。IDEのメッセージに対処した。
     /// v3.0.5   MS Store 公開。
     /// v3.0.4.3 CurrentSongのIsNowPlayingがクリアされないシチュエーションがあった。profileが一つある状態で、もう一つ追加する際にデフォルトにするのオプションが強制される状態だった。
@@ -117,7 +118,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.6.0";
+        const string _appVer = "v3.0.7.0";
 
         public static string AppVer
         {
@@ -4166,6 +4167,15 @@ namespace MPDCtrl.ViewModels
             }
             catch { }
 
+            // Save error logs.
+            if (Application.Current != null)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    App app = App.Current as App;
+                    app.SaveErrorLog();
+                });
+            }
         }
 
         #endregion

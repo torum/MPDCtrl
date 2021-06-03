@@ -5,6 +5,7 @@ using System.Threading;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 using System.Globalization;
 using MPDCtrl.ViewModels;
 using MPDCtrl.ViewModels.Classes;

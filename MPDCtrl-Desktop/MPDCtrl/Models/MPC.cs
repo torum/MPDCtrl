@@ -2655,8 +2655,11 @@ namespace MPDCtrl.Models
                     {
                         if (SongValues.ContainsKey(StatusValuePair[0].Trim()))
                         {
-                            // Shouldn't be happening here.
-                            break;
+                            // Shouldn't be happening here except "Genre"
+                            if (StatusValuePair[0].Trim() == "Genre")
+                            {
+                                SongValues["Genre"] = SongValues["Genre"] + "/" + value.Replace(StatusValuePair[0].Trim() + ": ", "");
+                            }
                         }
                         else
                         {
@@ -2749,6 +2752,46 @@ namespace MPDCtrl.Models
             Id: 22637
             */
 
+            /*
+            try
+            {
+
+                resultLines.Clear();
+                resultLines.Add("file: Slamhaus/Slamwave/06 The Trial.flac");
+                resultLines.Add("Last-Modified: 2021-05-27T19:20:50Z");
+                resultLines.Add("Title: The Trial");
+                resultLines.Add("Artist: Slamhaus");
+                resultLines.Add("Date: 2021");
+                resultLines.Add("Comment: Visit https://slamhaus.bandcamp.com");
+                resultLines.Add("Album: Slamwave");
+                resultLines.Add("Track: 6");
+                resultLines.Add("AlbumArtist: Slamhaus");
+                resultLines.Add("Time: 340");
+                resultLines.Add("duration: 339.504");
+                resultLines.Add("Pos: 5");
+                resultLines.Add("Id: 1438");
+                resultLines.Add("file: Harris Heller/Synthwave/Sunset/01 - Zig the Zag.flac");
+                resultLines.Add("Last-Modified: 2021-06-03T16:52:10Z");
+                resultLines.Add("Album: Sunset");
+                resultLines.Add("AlbumArtist: Harris Heller");
+                resultLines.Add("Artist: Harris Heller");
+                resultLines.Add("Date: 2021-03-05");
+                resultLines.Add("Disc: 1");
+                resultLines.Add("Genre: Electro");
+                resultLines.Add("Genre: Dance");
+                resultLines.Add("Title: Zig the Zag");
+                resultLines.Add("Track: 1");
+                resultLines.Add("Time: 126");
+                resultLines.Add("duration: 126.250");
+                resultLines.Add("Pos: 6");
+                resultLines.Add("Id: 1439");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error@ParsePlaylistInfo: " + ex.Message);
+            }
+            */
+
             try
             {
                 IsBusy?.Invoke(this, true);
@@ -2797,12 +2840,31 @@ namespace MPDCtrl.Models
                                     SongValues.Clear();
                                 }
                             }
+                            /*
+                            if (!SongValues.ContainsKey(StatusValuePair[0].Trim()))
+                            {
+                                SongValues.Add(StatusValuePair[0].Trim(), value.Replace(StatusValuePair[0].Trim() + ": ", ""));
+                            }
+                            else
+                            {
+                                if (StatusValuePair[0].Trim() == "Genre")
+                                {
+                                    SongValues["Genre"] = SongValues["Genre"] + "/" + value.Replace(StatusValuePair[0].Trim() + ": ", "");
+                                } 
+                            }
+                            */
+                        }
 
+                        if (!SongValues.ContainsKey(StatusValuePair[0].Trim()))
+                        {
                             SongValues.Add(StatusValuePair[0].Trim(), value.Replace(StatusValuePair[0].Trim() + ": ", ""));
                         }
                         else
                         {
-                            SongValues.Add(StatusValuePair[0].Trim(), value.Replace(StatusValuePair[0].Trim() + ": ", ""));
+                            if (StatusValuePair[0].Trim() == "Genre")
+                            {
+                                SongValues["Genre"] = SongValues["Genre"] + "/" + value.Replace(StatusValuePair[0].Trim() + ": ", "");
+                            }
                         }
                     }
                 }
@@ -2842,7 +2904,7 @@ namespace MPDCtrl.Models
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Error@ParsePlaylistInfo: " + ex.Message);
+                Debug.WriteLine("Exception@ParsePlaylistInfo: " + ex.Message);
 
                 if (Application.Current != null)
                 {
@@ -3308,13 +3370,25 @@ namespace MPDCtrl.Models
                             }
 
                             // start over
-                            SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
+                            //SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
                         }
+                        /*
                         else
                         {
                             SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
                         }
-
+                        */
+                        if (!SongValues.ContainsKey(ValuePair[0].Trim()))
+                        {
+                            SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
+                        }
+                        else
+                        {
+                            if (ValuePair[0].Trim() == "Genre")
+                            {
+                                SongValues["Genre"] = SongValues["Genre"] + "/" + line.Replace(ValuePair[0].Trim() + ": ", "");
+                            }
+                        }
                     }
                 }
 
@@ -3438,13 +3512,25 @@ namespace MPDCtrl.Models
                             }
 
                             // start over
-                            SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
+                            //SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
                         }
+                        /*
                         else
                         {
                             SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
                         }
-
+                        */
+                        if (!SongValues.ContainsKey(ValuePair[0].Trim()))
+                        {
+                            SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
+                        }
+                        else
+                        {
+                            if (ValuePair[0].Trim() == "Genre")
+                            {
+                                SongValues["Genre"] = SongValues["Genre"] + "/" + line.Replace(ValuePair[0].Trim() + ": ", "");
+                            }
+                        }
                     }
                 }
 

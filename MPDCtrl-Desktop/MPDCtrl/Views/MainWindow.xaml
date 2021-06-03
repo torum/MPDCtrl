@@ -3384,8 +3384,6 @@
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_UpdateDatabaseOnStartup}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsUpdateOnStartup}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
 
-                                        
-                                        
                                         <!-- Options -->
                                         <Border Grid.Row="2" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
                                             <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.Settings_Opts_Options}" HorizontalAlignment="Left"/>
@@ -3403,8 +3401,6 @@
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_UseReadPicture}" IsEnabled="{Binding IsDownloadAlbumArt}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsDownloadAlbumArtEmbeddedUsingReadPicture}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
 
-                                        
-                                        
                                         <!-- Developer Mode -->
                                         <Border Grid.Row="6" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
                                             <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.DeveloperMode}" HorizontalAlignment="Left"/>

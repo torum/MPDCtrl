@@ -44,6 +44,7 @@ namespace MPDCtrl.Views
                     vm.ScrollIntoViewAndSelect += (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
 
                     vm.DebugWindowShowHide += () => OnDebugWindowShowHide();
+                    vm.DebugWindowShowHide2 += (sender, arg) => OnDebugWindowShowHide2(arg);
 
                     vm.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
                     vm.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
@@ -149,6 +150,30 @@ namespace MPDCtrl.Views
 
                 DebugWindowGridSplitter.Visibility = Visibility.Visible;
                 DebugWindow.Visibility = Visibility.Visible;
+            }
+        }
+
+        public void OnDebugWindowShowHide2(bool on)
+        {
+            if (on)
+            {
+                LayoutGrid.RowDefinitions[2].Height = new GridLength(3, GridUnitType.Star);
+
+                LayoutGrid.RowDefinitions[3].Height = new GridLength(8);
+                LayoutGrid.RowDefinitions[4].Height = new GridLength(1, GridUnitType.Star);
+
+                DebugWindowGridSplitter.Visibility = Visibility.Visible;
+                DebugWindow.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                LayoutGrid.RowDefinitions[2].Height = new GridLength(1, GridUnitType.Star);
+
+                LayoutGrid.RowDefinitions[3].Height = new GridLength(0);
+                LayoutGrid.RowDefinitions[4].Height = new GridLength(0);
+
+                DebugWindowGridSplitter.Visibility = Visibility.Collapsed;
+                DebugWindow.Visibility = Visibility.Collapsed;
             }
         }
 

@@ -70,16 +70,16 @@ namespace MPDCtrl.Models
             }
         }
 
-        private readonly ObservableCollection<SongInfoEx> _queue = new();
+        private ObservableCollection<SongInfoEx> _queue = new();
         public ObservableCollection<SongInfoEx> CurrentQueue
         {
             get { return _queue; }
         }
 
-        private readonly ObservableCollection<Playlist> _playLists = new();
+        private ObservableCollection<Playlist> _playlists = new();
         public ObservableCollection<Playlist> Playlists
         {
-            get { return _playLists; }
+            get { return _playlists; }
         }
 
         private readonly ObservableCollection<SongFile> _localFiles = new();
@@ -598,15 +598,15 @@ namespace MPDCtrl.Models
 
         public async Task<CommandResult> MpdIdleQueryStatus()
         {
-            MpcProgress?.Invoke(this, "Querying status...");
+            MpcProgress?.Invoke(this, "[Background] Querying status...");
 
             CommandResult result = await MpdIdleSendCommand("status");
             if (result.IsSuccess)
             {
-                MpcProgress?.Invoke(this, "Parsing status...");
+                MpcProgress?.Invoke(this, "[Background] Parsing status...");
                 result.IsSuccess = await ParseStatus(result.ResultText);
 
-                MpcProgress?.Invoke(this, "");
+                MpcProgress?.Invoke(this, "[Background] Status updated.");
             }
 
             return result;
@@ -614,15 +614,15 @@ namespace MPDCtrl.Models
 
         public async Task<CommandResult> MpdIdleQueryCurrentSong()
         {
-            MpcProgress?.Invoke(this, "Querying currentsong...");
+            MpcProgress?.Invoke(this, "[Background] Querying current song info...");
 
             CommandResult result = await MpdIdleSendCommand("currentsong");
             if (result.IsSuccess)
             {
-                MpcProgress?.Invoke(this, "Parsing currentsong...");
+                MpcProgress?.Invoke(this, "[Background] Parsing current song info...");
                 result.IsSuccess = await ParseCurrentSong(result.ResultText);
 
-                MpcProgress?.Invoke(this, "");
+                MpcProgress?.Invoke(this, "[Background] Current song info updated.");
             }
 
             return result;
@@ -630,15 +630,15 @@ namespace MPDCtrl.Models
 
         public async Task<CommandResult> MpdIdleQueryCurrentQueue()
         {
-            MpcProgress?.Invoke(this, "Querying current queue...");
+            MpcProgress?.Invoke(this, "[Background] Querying queue...");
 
             CommandResult result = await MpdIdleSendCommand("playlistinfo");
             if (result.IsSuccess)
             {
-                MpcProgress?.Invoke(this, "Parsing current queue...");
+                MpcProgress?.Invoke(this, "[Background] Parsing queue...");
                 result.IsSuccess = await ParsePlaylistInfo(result.ResultText);
 
-                MpcProgress?.Invoke(this, "");
+                MpcProgress?.Invoke(this, "[Background] Queue updated.");
             }
 
             return result;
@@ -646,15 +646,15 @@ namespace MPDCtrl.Models
 
         public async Task<CommandResult> MpdIdleQueryPlaylists()
         {
-            MpcProgress?.Invoke(this, "Querying playlists...");
+            MpcProgress?.Invoke(this, "[Background] Querying playlists...");
 
             CommandResult result = await MpdIdleSendCommand("listplaylists");
             if (result.IsSuccess)
             {
-                MpcProgress?.Invoke(this, "Parsing playlists...");
+                MpcProgress?.Invoke(this, "[Background] Parsing playlists...");
                 result.IsSuccess = await ParsePlaylists(result.ResultText);
 
-                MpcProgress?.Invoke(this, "");
+                MpcProgress?.Invoke(this, "[Background] Playlists updated.");
             }
 
             return result;
@@ -662,15 +662,15 @@ namespace MPDCtrl.Models
 
         public async Task<CommandResult> MpdIdleQueryListAll()
         {
-            MpcProgress?.Invoke(this, "Querying files and directories...");
+            MpcProgress?.Invoke(this, "[Background] Querying files and directories...");
 
             CommandResult result = await MpdIdleSendCommand("listall");
             if (result.IsSuccess)
             {
-                MpcProgress?.Invoke(this, "Parsing files and directories...");
+                MpcProgress?.Invoke(this, "[Background] Parsing files and directories...");
                 result.IsSuccess = await ParseListAll(result.ResultText);
 
-                MpcProgress?.Invoke(this, "");
+                MpcProgress?.Invoke(this, "[Background] Files and directories updated.");
             }
 
             return result;
@@ -678,7 +678,7 @@ namespace MPDCtrl.Models
 
         public void MpdIdleStart()
         {
-            MpcProgress?.Invoke(this, "");
+            //MpcProgress?.Invoke(this, "");
 
             MpdIdle();
         }
@@ -977,6 +977,8 @@ namespace MPDCtrl.Models
                         MpdPlaylistsChanged?.Invoke(this);
                     }
                 }
+
+                //MpcProgress?.Invoke(this, "");
 
                 // start over.
                 MpdIdle();
@@ -1505,6 +1507,7 @@ namespace MPDCtrl.Models
             catch (System.IO.IOException e)
             {
                 // IOException : Unable to write data to the transport connection: 確立された接続がホスト コンピューターのソウトウェアによって中止されました。
+                Debug.WriteLine("IOException@MpdSendCommand: " + cmd.Trim() + " ReadLineAsync ---- " + e.Message);
 
                 ret.IsSuccess = false;
                 ret.ErrorMessage = e.Message;
@@ -1639,10 +1642,14 @@ namespace MPDCtrl.Models
 
         public async Task<CommandResult> MpdQueryListAll(bool autoIdling = true)
         {
+            MpcProgress?.Invoke(this, "[Background] Querying files and directories...");
+
             CommandResult result = await MpdSendCommand("listall", autoIdling);
             if (result.IsSuccess)
             {
+                MpcProgress?.Invoke(this, "[Background] Parsing files and directories...");
                 result.IsSuccess = await ParseListAll(result.ResultText);
+                MpcProgress?.Invoke(this, "[Background] Files and directories updated.");
             }
 
             return result;
@@ -1650,6 +1657,8 @@ namespace MPDCtrl.Models
 
         public async Task<CommandSearchResult> MpdSearch(string queryTag, string queryShiki, string queryValue, bool autoIdling = true)
         {
+            MpcProgress?.Invoke(this, "[Background] Searching...");
+
             CommandSearchResult result = new();
 
             if (Application.Current == null) { return result; }
@@ -1671,11 +1680,14 @@ namespace MPDCtrl.Models
             CommandResult cm = await MpdSendCommand(cmd, autoIdling);
             if (cm.IsSuccess)
             {
+                MpcProgress?.Invoke(this, "[Background] Parsing search result...");
                 if (await ParseSearchResult(cm.ResultText))
                 {
                     result.IsSuccess = true;
 
                     result.SearchResult = this.SearchResult;
+
+                    MpcProgress?.Invoke(this, "[Background] Search result updated.");
                 }
             }
 
@@ -1692,14 +1704,19 @@ namespace MPDCtrl.Models
                 return result;
             }
 
+            MpcProgress?.Invoke(this, "[Background] Querying playlist info...");
+
             playlistName = Regex.Escape(playlistName);
 
             CommandResult cm = await MpdSendCommand("listplaylistinfo \"" + playlistName + "\"", autoIdling);
             if (cm.IsSuccess)
             {
+                MpcProgress?.Invoke(this, "[Background] Parsing playlist info...");
+
                 result.IsSuccess = cm.IsSuccess;
                 result.PlaylistSongs = ParsePlaylistSongsResult(cm.ResultText);
 
+                MpcProgress?.Invoke(this, "[Background] Playlist info is updated.");
             }
 
             return result;
@@ -2579,7 +2596,16 @@ namespace MPDCtrl.Models
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Error@ParseStatusResponse:" + ex.Message);
+                Debug.WriteLine("Exception@ParseStatus:" + ex.Message);
+
+                if (Application.Current != null)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        App app = App.Current as App;
+                        app.AppendErrorLog("Exception@MPC@ParseStatus", ex.Message);
+                    });
+                }
 
                 IsBusy?.Invoke(this, false);
                 return Task.FromResult(false);
@@ -2656,6 +2682,15 @@ namespace MPDCtrl.Models
             {
                 Debug.WriteLine("Error@ParseCurrentSong: " + ex.Message);
 
+                if (Application.Current != null)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        App app = App.Current as App;
+                        app.AppendErrorLog("Exception@MPC@ParseCurrentSong", ex.Message);
+                    });
+                }
+
                 return Task.FromResult(false);
             }
             finally
@@ -2718,11 +2753,14 @@ namespace MPDCtrl.Models
             {
                 IsBusy?.Invoke(this, true);
 
+                ObservableCollection<SongInfoEx> tmpQueue = new();
+                /*
                 if (Application.Current == null) { return Task.FromResult(false); }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     CurrentQueue.Clear();
                 });
+                */
 
                 var comparer = StringComparer.OrdinalIgnoreCase;
                 Dictionary<string, string> SongValues = new(comparer);
@@ -2742,17 +2780,19 @@ namespace MPDCtrl.Models
 
                                 if (sng != null)
                                 {
+                                    /*
                                     if (Application.Current == null) { return Task.FromResult(false); }
                                     Application.Current.Dispatcher.Invoke(() =>
                                     {
                                         CurrentQueue.Add(sng);
                                     });
-                                    
+                                    */
                                     //CurrentQueue.Add(sng);
+                                    tmpQueue.Add(sng);
 
                                     i++;
 
-                                    MpcProgress?.Invoke(this, string.Format("Parsing queue item ({0})...",i));
+                                    MpcProgress?.Invoke(this, string.Format("[Background] Parsing queue item... ({0})", i));
 
                                     SongValues.Clear();
                                 }
@@ -2774,23 +2814,45 @@ namespace MPDCtrl.Models
                     if (sng != null)
                     {
                         SongValues.Clear();
-
+                        /*
                         if (Application.Current == null) { return Task.FromResult(false); }
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             CurrentQueue.Add(sng);
                         });
-
+                        */
                         //CurrentQueue.Add(sng);
+                        tmpQueue.Add(sng);
 
-                        MpcProgress?.Invoke(this, string.Format("Parsing queue item ({0})...", i+1));
+                        MpcProgress?.Invoke(this, string.Format("[Background] Parsing queue item... ({0})", i+1));
                     }
                 }
+
+                // test
+                MpcProgress?.Invoke(this, "[Background] Updating internal queue list...");
+                if (Application.Current == null) { return Task.FromResult(false); }
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    //CurrentQueue.Clear();
+                    //_queue = tmpQueue;
+                    _queue = new ObservableCollection<SongInfoEx>(tmpQueue);
+                });
+                MpcProgress?.Invoke(this, "[Background] Internal queue list is updated.");
+
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Error@ParsePlaylistInfo: " + ex.Message);
-                
+
+                if (Application.Current != null)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        App app = App.Current as App;
+                        app.AppendErrorLog("Exception@MPC@ParsePlaylistInfo", ex.Message);
+                    });
+                }
+
                 return Task.FromResult(false);
             }
             finally
@@ -2932,7 +2994,17 @@ namespace MPDCtrl.Models
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("Error@FillSongInfoEx: " + e.ToString());
+                Debug.WriteLine("Error@FillSongInfoEx: " + e.ToString());
+
+                if (Application.Current != null)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        App app = App.Current as App;
+                        app.AppendErrorLog("Exception@MPC@FillSongInfoEx", e.Message);
+                    });
+                }
+
                 return null;
             }
         }
@@ -2964,6 +3036,40 @@ namespace MPDCtrl.Models
             {
                 IsBusy?.Invoke(this, true);
 
+                ObservableCollection<Playlist> tmpPlaylists = new();
+
+                Playlist pl = null;
+
+                foreach (string value in resultLines)
+                {
+                    if (value.StartsWith("playlist:"))
+                    {
+
+                        pl = new Playlist
+                        {
+                            Name = value.Replace("playlist: ", "")
+                        };
+
+                        tmpPlaylists.Add(pl);
+                    }
+                    else if (value.StartsWith("Last-Modified: "))
+                    {
+                        if (pl != null)
+                            pl.LastModified = value.Replace("Last-Modified: ", "");
+                    }
+                    else if (value.StartsWith("OK"))
+                    {
+                        // Ignoring.
+                    }
+                }
+
+                if (Application.Current == null) { return Task.FromResult(false); }
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    _playlists = new ObservableCollection<Playlist>(tmpPlaylists);
+                });
+
+                /*
                 if (Application.Current == null) { return Task.FromResult(false); }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -2978,14 +3084,6 @@ namespace MPDCtrl.Models
                     {
                         if (value.StartsWith("playlist:"))
                         {
-                            /*
-                            if (value.Split(':').Length > 1)
-                            {
-                                //slTmp.Add(value.Split(':')[1].Trim());
-                                slTmp.Add(value.Replace(value.Split(':')[0] + ": ", ""));
-                            }
-                            */
-                            //slTmp.Add(value.Replace("playlist: ", ""));
 
                             pl = new Playlist
                             {
@@ -3004,20 +3102,22 @@ namespace MPDCtrl.Models
                             // Ignoring.
                         }
                     }
-                    /*
-                    // Sort.
-                    slTmp.Sort();
-                    foreach (string v in slTmp)
-                    {
-                        Playlists.Add(v);
-
-                    }
-                    */
                 });
+                */
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("Error@ParsePlaylists: " + e.ToString());
+                Debug.WriteLine("Error@ParsePlaylists: " + e.ToString());
+
+                if (Application.Current != null)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        App app = App.Current as App;
+                        app.AppendErrorLog("Exception@MPC@ParsePlaylists", e.Message);
+                    });
+                }
+
                 IsBusy?.Invoke(this, false);
                 return Task.FromResult(false);
             }
@@ -3066,7 +3166,7 @@ namespace MPDCtrl.Models
 
                         //LocalDirectories.Add(value.Replace("directory: ", ""));
 
-                        MpcProgress?.Invoke(this, string.Format("Parsing files and directories ({0})...", i));
+                        MpcProgress?.Invoke(this, string.Format("[Background] Parsing files and directories ({0})...", i));
                     }
                     else if (value.StartsWith("file:"))
                     {
@@ -3085,7 +3185,7 @@ namespace MPDCtrl.Models
 
                         i++;
 
-                        MpcProgress?.Invoke(this, string.Format("Parsing files and directories ({0})...", i));
+                        MpcProgress?.Invoke(this, string.Format("[Background] Parsing files and directories ({0})...", i));
                     }
                     else if ((value.StartsWith("OK")))
                     {
@@ -3097,12 +3197,22 @@ namespace MPDCtrl.Models
                     }
                 }
 
-                MpcProgress?.Invoke(this, "");
+                MpcProgress?.Invoke(this, "[Background] Parsing files and directories is done.");
 
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("Error@ParseListAll: " + e.ToString());
+                Debug.WriteLine("Error@ParseListAll: " + e.ToString());
+
+                if (Application.Current != null)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        App app = App.Current as App;
+                        app.AppendErrorLog("Exception@MPC@ParseListAll", e.Message);
+                    });
+                }
+
                 IsBusy?.Invoke(this, false);
                 return Task.FromResult(false); ;
             }
@@ -3194,6 +3304,7 @@ namespace MPDCtrl.Models
                                     SearchResult.Add(sng);
                                 });
 
+                                MpcProgress?.Invoke(this, string.Format("[Background] Parsing search result item... ({0})", i));
                             }
 
                             // start over
@@ -3219,18 +3330,32 @@ namespace MPDCtrl.Models
                     {
                         SearchResult.Add(sng);
                     });
+
+                    MpcProgress?.Invoke(this, string.Format("[Background] Parsing search result item... ({0})", i+1));
                 }
 
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Error@ParseSearchResult: " + ex.Message);
+
+                if (Application.Current != null)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        App app = App.Current as App;
+                        app.AppendErrorLog("Exception@MPC@ParseSearchResult", ex.Message);
+                    });
+                }
+
                 IsBusy?.Invoke(this, false);
                 return Task.FromResult(false);
             }
             finally
             {
                 IsBusy?.Invoke(this, false);
+
+                MpcProgress?.Invoke(this, "[Background] Search result loaded.");
             }
 
             return Task.FromResult(true);
@@ -3303,11 +3428,13 @@ namespace MPDCtrl.Models
 
                                 SongValues.Clear();
 
-                                if (Application.Current == null) { return songList; }
-                                Application.Current.Dispatcher.Invoke(() =>
-                                {
+                                //if (Application.Current == null) { return songList; }
+                                //Application.Current.Dispatcher.Invoke(() =>
+                                //{
                                     songList.Add(sng);
-                                });
+                                //});
+
+                                MpcProgress?.Invoke(this, string.Format("[Background] Parsing playlist item... ({0})", i));
                             }
 
                             // start over
@@ -3328,17 +3455,27 @@ namespace MPDCtrl.Models
 
                     SongValues.Clear();
 
-                    if (Application.Current == null) { return songList; }
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
+                    //if (Application.Current == null) { return songList; }
+                    //Application.Current.Dispatcher.Invoke(() =>
+                    //{
                         songList.Add(sng);
-                    });
+                    //});
+                    MpcProgress?.Invoke(this, string.Format("[Background] Parsing playlist item... ({0})", i+1));
                 }
 
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Error@ParseSearchResult: " + ex.Message);
+                Debug.WriteLine("Error@ParsePlaylistSongsResult: " + ex.Message);
+
+                if (Application.Current != null)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        App app = App.Current as App;
+                        app.AppendErrorLog("Exception@MPC@ParsePlaylistSongsResult", ex.Message);
+                    });
+                }
 
                 return songList;
             }

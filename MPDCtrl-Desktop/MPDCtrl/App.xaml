@@ -100,17 +100,22 @@
                     </Style>
 
                     <Style x:Key="DefaultTextBoxStyle" TargetType="{x:Type TextBox}">
+                        <Style.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3" />
+                            </Style>
+                        </Style.Resources>
+                        <Setter Property="Padding" Value="3"/>
                         <Setter Property="Margin" Value="1"/>
-                        <Setter Property="Padding" Value="2"/>
                         <Setter Property="HorizontalAlignment" Value="Left"/>
                         <Setter Property="VerticalAlignment" Value="Center"/>
                         <Setter Property="Background" Value="{DynamicResource NormalTextBoxBackgroundColorBrush}" />
                         <Style.Triggers>
                             <Trigger Property="IsKeyboardFocusWithin" Value="true">
-                                <Setter Property="Background" Value="White" />
+                                <Setter Property="Background" Value="Gainsboro" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="Background" Value="Gainsboro" />
+                                <Setter Property="Background" Value="White" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Foreground" Value="{DynamicResource NormalTextBoxBackgroundColorBrush}" />
@@ -119,6 +124,12 @@
                     </Style>
 
                     <Style x:Key="DefaultPasswordBoxStyle" TargetType="{x:Type PasswordBox}">
+                        <Style.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3" />
+                            </Style>
+                        </Style.Resources>
+                        <Setter Property="Padding" Value="3"/>
                         <Setter Property="Margin" Value="1"/>
                         <Setter Property="HorizontalAlignment" Value="Left"/>
                         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -283,6 +294,18 @@
                                             <Setter Property="Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}"/>
                                             <Setter TargetName="Bd" Property="TextElement.FontWeight" Value="Bold"/>
                                         </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource ItemMouseOverForegroundColorBrush}" />
+                                        </Trigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="true"/>
+                                                <Condition Property="IsMouseOver" Value="True"/>
+                                            </MultiTrigger.Conditions>
+                                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ItemSelectedBackgroundColorBrush}"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource ItemSelectedInactiveForegroundColorBrush}"/>
+                                            <Setter TargetName="Bd" Property="TextElement.FontWeight" Value="Bold"/>
+                                        </MultiTrigger>
                                         <MultiTrigger>
                                             <MultiTrigger.Conditions>
                                                 <Condition Property="IsSelected" Value="true"/>
@@ -1254,8 +1277,9 @@
                                     <Grid Background="{TemplateBinding Background}">
                                         <ToggleButton Name="ToggleButton" Grid.Column="2" ClickMode="Press" Focusable="False" IsChecked="{Binding Path=IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" Template="{StaticResource ComboBoxToggleButtonTemplate}" />
 
-                                        <ContentPresenter Name="ContentSite" Margin="5, 3, 23, 3" IsHitTestVisible="False" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" VerticalAlignment="Center" Content="{TemplateBinding ComboBox.SelectionBoxItem}" ContentTemplate="{TemplateBinding ComboBox.SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"/>
-                                        <TextBox Name="PART_EditableTextBox" Margin="3, 3, 23, 3" IsReadOnly="{TemplateBinding IsReadOnly}" Visibility="Hidden" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="True" >
+                                        <ContentPresenter Name="ContentSite" Margin="0, 0, 23, 0" IsHitTestVisible="False" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" VerticalAlignment="Center" Content="{TemplateBinding ComboBox.SelectionBoxItem}" ContentTemplate="{TemplateBinding ComboBox.SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"/>
+                                        
+                                        <TextBox Name="PART_EditableTextBox" Margin="0, 0, 23, 0" IsReadOnly="{TemplateBinding IsReadOnly}" Visibility="Hidden" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="True" >
                                             <TextBox.Template>
                                                 <ControlTemplate TargetType="TextBox" >
                                                     <Border Name="PART_ContentHost" Focusable="False" />
@@ -1637,28 +1661,29 @@
                                             <Setter TargetName="PART_Header" Property="MinHeight" Value="19" />
                                         </MultiTrigger>
 
-
-                                        <!--<MultiTrigger>
+                                        <!-- <MultiTrigger>
                                             <MultiTrigger.Conditions>
                                                 <Condition Property="IsMouseOver" Value="True" />
                                                 <Condition Property="IsSelected" Value="True" />
                                             </MultiTrigger.Conditions>
                                             <Setter TargetName="PART_Header" Property="TextBlock.Foreground" Value="White" />
-                                        </MultiTrigger>-->
-
-                                        <!--  -->
+                                        </MultiTrigger>
+                                        -->
+                                        
                                         <Trigger Property="IsSelected" Value="True">
                                             <Setter TargetName="PART_Header" Property="TextElement.FontWeight" Value="Bold"/>
                                             <Setter TargetName="PART_Header" Property="Control.Foreground" Value="{DynamicResource ControlLightColorBrush}" />
                                         </Trigger>
 
-                                        <!--<MultiTrigger>
+                                        <MultiTrigger>
                                             <MultiTrigger.Conditions>
                                                 <Condition Property="IsMouseOver" Value="True" />
                                                 <Condition Property="IsSelected" Value="False" />
                                             </MultiTrigger.Conditions>
                                             <Setter TargetName="PART_Header" Property="TextBlock.Foreground" Value="White" />
-                                        </MultiTrigger>-->
+                                        </MultiTrigger>
+                                        <!--
+                                        -->
 
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>

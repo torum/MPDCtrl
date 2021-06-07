@@ -234,7 +234,7 @@
                                 <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                     <BeginStoryboard>
                                         <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1.0" Duration="0:0:1.8">
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1.0" Duration="0:0:1">
                                             </DoubleAnimation>
                                         </Storyboard>
                                     </BeginStoryboard>
@@ -914,16 +914,17 @@
                             </ListView.View>
                         </ListView>
 
-
-                        <Border Grid.Row="0" Margin="0 32 23 0" Padding="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="580" Background="WhiteSmoke" CornerRadius="1" Visibility="{Binding IsQueueFindVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                        <!-- Filterボックス -->
+                        <Border Grid.Row="0" Margin="0 32 23 0" Padding="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="580" Background="WhiteSmoke" CornerRadius="3" Visibility="{Binding IsQueueFindVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                             <StackPanel>
                                 <TextBox Text="{Binding FilterQueueQuery, UpdateSourceTrigger=PropertyChanged}" KeyboardNavigation.TabNavigation="Local" Margin="0" Padding="3" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" IsVisibleChanged="TextBox_IsVisibleChanged">
                                     <TextBox.Style>
                                         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource DefaultTextBoxStyle}">
+                                            <Setter Property="Padding" Value="3" />
                                             <Setter Property="Template">
                                                 <Setter.Value>
                                                     <ControlTemplate TargetType="{x:Type TextBox}">
-                                                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" SnapsToDevicePixels="True">
+                                                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" SnapsToDevicePixels="True" CornerRadius="3">
                                                             <Grid>
                                                                 <Grid.RowDefinitions>
                                                                     <RowDefinition Height="*"/>
@@ -1001,7 +1002,6 @@
                                 </ListBox>
                             </StackPanel>
                         </Border>
-
 
                         <Popup IsOpen="{Binding IsSaveAsPlaylistPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
                             <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
@@ -1158,9 +1158,10 @@
                         <!-- 検索ボックス -->
                         <Grid Grid.Row="0" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
 
-                            <TextBox x:Name="SearchTextBox" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" KeyboardNavigation.TabNavigation="Local" Margin="3 0 0 3" Padding="3" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+                            <TextBox x:Name="SearchTextBox" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" KeyboardNavigation.TabNavigation="Local" Margin="3 0 0 3" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
                                 <TextBox.Style>
                                     <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource DefaultTextBoxStyle}">
+                                        <Setter Property="Padding" Value="3" />
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="{x:Type TextBox}">
@@ -1508,7 +1509,6 @@
                                 </Style>
                             </ListView.ItemContainerStyle>
                         </ListView>
-
 
                         <Popup IsOpen="{Binding IsSearchResultSelectedSaveAsPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SearchResultListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
                             <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
@@ -1900,7 +1900,6 @@
                                     </Style>
                                 </ListView.ItemContainerStyle>
                             </ListView>
-
 
                             <Popup IsOpen="{Binding IsSongFilesSelectedSaveAsPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SongFilesListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
                                 <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
@@ -2561,7 +2560,7 @@
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Style="{StaticResource PathButton}" Width="30" Height="30" Margin="0 0 0 0" HorizontalAlignment="Right" VerticalAlignment="Center" Content="M19,3H16.3H7.7H5A2,2 0 0,0 3,5V7.7V16.4V19A2,2 0 0,0 5,21H7.7H16.4H19A2,2 0 0,0 21,19V16.3V7.7V5A2,2 0 0,0 19,3M15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4L13.4,12L17,15.6L15.6,17Z" Command="{Binding ShowDebugWindowCommand}"></Button>
+                    <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" ToolTip="{x:Static properties:Resources.Debug_Window_Close}" Style="{StaticResource PathButton}" Width="30" Height="30" Margin="0 0 0 0" HorizontalAlignment="Right" VerticalAlignment="Center" Content="M19,3H16.3H7.7H5A2,2 0 0,0 3,5V7.7V16.4V19A2,2 0 0,0 5,21H7.7H16.4H19A2,2 0 0,0 21,19V16.3V7.7V5A2,2 0 0,0 19,3M15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4L13.4,12L17,15.6L15.6,17Z" Command="{Binding ShowDebugWindowCommand}"></Button>
 
                     <Grid Grid.Row="1" Grid.Column="0">
 
@@ -2695,10 +2694,11 @@
                     </ItemsPanelTemplate>
                 </StatusBar.ItemsPanel>
 
+                <!-- Status icon and quick profile change combobox  -->
                 <StatusBarItem Grid.Column="0">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 0 0" Visibility="{Binding IsCurrentProfileSet, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
 
-                        <Viewbox Width="16" Height="16" Margin="0 0 4 0" Opacity="0.7">
+                        <Viewbox Width="16" Height="16" Margin="2 0 4 0" Opacity="0.7">
                             <Canvas Width="24" Height="24">
                                 <Path Fill="{DynamicResource ControlDarkColorBrush}" Data="{Binding StatusButton}" />
                             </Canvas>
@@ -2726,10 +2726,11 @@
                     </StackPanel>
                 </StatusBarItem>
 
-                <!-- MpdStatus Message  -->
                 <Separator Grid.Column="1" Background="#202020" Visibility="{Binding IsMpdStatusMessageContainsText, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}"/>
+
+                <!-- MpdStatus Message  -->
                 <StatusBarItem Grid.Column="2" Visibility="{Binding IsMpdStatusMessageContainsText, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 0 0" Visibility="{Binding IsConnected, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 2 0" Visibility="{Binding IsConnected, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                         
                         <!-- Status Error Icon -->
                         <Viewbox Width="16" Height="16" Margin="0 0 4 0" Opacity="0.7">
@@ -2744,19 +2745,20 @@
                     </StackPanel>
                 </StatusBarItem>
 
-                <!-- Statusbar Message  -->
                 <Separator Grid.Column="3" Background="#202020"/>
-                <StatusBarItem Grid.Column="4" HorizontalContentAlignment="Left">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="6 0 6 0">
+                
+                <!-- Statusbar Message  -->
+                <StatusBarItem Grid.Column="4" HorizontalContentAlignment="Left" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="6 0 6 2">
 
                         <TextBlock Text="{Binding StatusBarMessage}" Style="{DynamicResource DefaultTextBlockStyle}" Foreground="{DynamicResource ControlDarkColorBrush}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
 
                     </StackPanel>
-
                 </StatusBarItem>
 
-                <!-- Debug Window Icon  -->
                 <Separator Grid.Column="5" Background="#202020" />
+                
+                <!-- Debug Window Icon  -->
                 <StatusBarItem Grid.Column="6" HorizontalContentAlignment="Right">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 0 0">
 
@@ -3209,6 +3211,7 @@
                                 </Style>
                             </TabControl.Resources>
 
+                            <!-- Profiles -->
                             <TabItem Style="{DynamicResource LicenseTabItemStyle}">
                                 <TabItem.Header>
                                     <Label Content="{x:Static properties:Resources.Connection}" Style="{DynamicResource SectionTitle}" Padding="6" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Label>
@@ -3278,7 +3281,7 @@
 
                                                 </StackPanel>
 
-                                                <TextBlock Text="{x:Static properties:Resources.Host}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
+                                                <TextBlock Text="{x:Static properties:Resources.Host}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 3"></TextBlock>
                                                 <TextBox Text="{Binding Host, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240">
                                                     <TextBox.Style>
                                                         <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
@@ -3291,7 +3294,7 @@
                                                     </TextBox.Style>
                                                 </TextBox>
 
-                                                <TextBlock Text="{x:Static properties:Resources.Port}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
+                                                <TextBlock Text="{x:Static properties:Resources.Port}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 3"></TextBlock>
                                                 <TextBox Text="{Binding Port, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240">
                                                     <TextBox.Style>
                                                         <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
@@ -3304,18 +3307,18 @@
                                                     </TextBox.Style>
                                                 </TextBox>
 
-                                                <TextBlock Text="{x:Static properties:Resources.Password}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
+                                                <TextBlock Text="{x:Static properties:Resources.Password}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 3"></TextBlock>
                                                 
                                                 <StackPanel Visibility="{Binding IsNotPasswordSet, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                                                     <PasswordBox x:Name="PasswordBox" Style="{StaticResource DefaultPasswordBoxStyle}" PasswordChar="*" Width="240"></PasswordBox>
                                                 </StackPanel>
                                                 
                                                 <StackPanel Visibility="{Binding IsPasswordSet, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding Password}" Width="198" HorizontalAlignment="Left" VerticalAlignment="Center" Style="{DynamicResource DefaultTextBlockStyle}" Padding="1" Margin="1"></TextBlock>
+                                                    <TextBlock Text="{Binding Password}" Width="198" HorizontalAlignment="Left" VerticalAlignment="Center" Style="{DynamicResource DefaultTextBlockStyle}" Padding="1" Margin="1 1 1 3"></TextBlock>
                                                     <Button Margin="12 -14 0 0" Width="30" Height="30" Style="{DynamicResource PathButton}" Command="{Binding ShowChangePasswordDialogCommand}" CommandParameter="{Binding ElementName=PasswordBox}" ToolTip="{x:Static properties:Resources.Settings_UnlockAndChangePassword}" Content="M12,17C10.89,17 10,16.1 10,15C10,13.89 10.89,13 12,13A2,2 0 0,1 14,15A2,2 0 0,1 12,17M18,20V10H6V20H18M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10C4,8.89 4.89,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"></Button>
                                                 </StackPanel>
-                                                
-                                                <CheckBox Content="{x:Static properties:Resources.Default}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding SetIsDefault}" Margin="0 12 0 0"></CheckBox>
+
+                                                <CheckBox Content="{x:Static properties:Resources.Default}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding SetIsDefault}" Margin="0 12 0 3"></CheckBox>
 
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0 12 0 0">
                                                     <Button Content="{x:Static properties:Resources.Update}" Command="{Binding UpdateProfileCommand}" CommandParameter="{Binding ElementName=PasswordBox}" Padding="4" Margin="0 0 0 0" Width="100" IsDefault="False"></Button>
@@ -3579,7 +3582,7 @@
 
                 </TabControl>
 
-                <Border Grid.Row="2" Height="62" Margin="-1 -1 -1 0" Background="{DynamicResource BoardBackgroundColorBrush}">
+                <Border Grid.Row="2" Height="62" Margin="0" Background="{DynamicResource BoardBackgroundColorBrush}">
                     <Border  BorderThickness="0 0.5 0 0" BorderBrush="{DynamicResource ControlMediumColorBrush}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 12 0 0">
                             <Button Width="80" Content="{x:Static properties:Resources.Close}" Margin="0 0 32 0" Padding="3" IsDefault="False" Command="{Binding SettingsOKCommand}"></Button>
@@ -3609,14 +3612,17 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <Border Grid.Row="0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
                             <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.ChangePasswordDialog_ChangePassword}" HorizontalAlignment="Left"/>
                         </Border>
-                        <StackPanel Grid.Row="1" Margin="12">
-                            <TextBlock Text="{Binding ChangePasswordDialogMessage, NotifyOnTargetUpdated=True}" TextWrapping="Wrap" Style="{DynamicResource DefaultTextBlockStyle}" Margin="25 0 0 0">
+                        
+                        <StackPanel Grid.Row="1" Grid.Column="1" Margin="12" Width="250">
+                            <TextBlock Text="{Binding ChangePasswordDialogMessage, NotifyOnTargetUpdated=True}" TextWrapping="Wrap" Style="{DynamicResource DefaultTextBlockStyle}" Margin="5 0 0 0">
                                 <TextBlock.Triggers>
                                     <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                         <BeginStoryboard>
@@ -3631,14 +3637,14 @@
                                 </TextBlock.Triggers>
                             </TextBlock>
 
-                            <TextBlock Text="{x:Static properties:Resources.ChangePasswordDialog_CurrentPassword}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="25 12 0 0"></TextBlock>
-                            <PasswordBox x:Name="ChangeOldPasswordBox" Width="200" IsVisibleChanged="PasswordBox_IsVisibleChanged" Style="{DynamicResource DefaultPasswordBoxStyle}"></PasswordBox>
+                            <TextBlock Text="{x:Static properties:Resources.ChangePasswordDialog_CurrentPassword}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="5 12 0 6"></TextBlock>
+                            <PasswordBox x:Name="ChangeOldPasswordBox" Width="250" IsVisibleChanged="PasswordBox_IsVisibleChanged" Style="{DynamicResource DefaultPasswordBoxStyle}"></PasswordBox>
 
-                            <TextBlock Text="{x:Static properties:Resources.ChangePasswordDialog_NewPassword}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="25 12 0 0"></TextBlock>
-                            <PasswordBox x:Name="ChangeNewPasswordBox" Width="200" Style="{DynamicResource DefaultPasswordBoxStyle}"></PasswordBox>
+                            <TextBlock Text="{x:Static properties:Resources.ChangePasswordDialog_NewPassword}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="5 12 0 6"></TextBlock>
+                            <PasswordBox x:Name="ChangeNewPasswordBox" Width="250" Style="{DynamicResource DefaultPasswordBoxStyle}"></PasswordBox>
 
                         </StackPanel>
-                        <StackPanel Grid.Row="2" Margin="12 12 12 24">
+                        <StackPanel Grid.Row="2" Grid.Column="1" Margin="12 12 12 24">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 12 0 0">
                                 <Button Width="80" Content="{x:Static properties:Resources.OK}" Margin="15 0 15 0" Padding="3" IsDefault="True" Command="{Binding ChangePasswordDialogOKCommand}">
                                     <Button.CommandParameter>

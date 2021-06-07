@@ -198,6 +198,9 @@
   <data name="Debug_Window_Clear" xml:space="preserve">
     <value>Clear</value>
   </data>
+  <data name="Debug_Window_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
   <data name="Default" xml:space="preserve">
     <value>Default</value>
   </data>

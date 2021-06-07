@@ -304,6 +304,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Close に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Debug_Window_Close {
+            get {
+                return ResourceManager.GetString("Debug_Window_Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Default に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Default {

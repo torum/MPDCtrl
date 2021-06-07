@@ -30,37 +30,33 @@ namespace MPDCtrl.ViewModels
 {
     /// TODO: 
     /// 
-    /// profileを切り替えるとQueueとAlbumArtが奇妙な挙動をする件。
+    /// [Bug] Directryの絞り込みで"/Hoge/Hoge" and "/Hoge/Hoge2" を区別しないABBA問題。
     /// 
-    /// 設定画面でDBのupdateとrescan。
-    /// 「プレイリストの名前変更」をインラインで。
-    /// キューの順番変更をドラッグアンドドロップで。
-    /// 
-    /// シークやボリュームの進行度に合わせた背景色。
-    /// 
-    /// Playlistの変更通知がウザい件。
-    /// プレイリストのリストビューで、プレイリストを切り替える際に、選択などをクリアする。
-    /// TreeViewのポップアップメニューでゴミが表示される件。
-    /// 左ペインの幅を覚える件。
-    /// 
-    /// イベントのidleからの"再読み込み"通知。
+    /// [Enhancement] 設定画面でDBのupdateとrescan。
+    /// [Enhancement]「プレイリストの名前変更」をインラインで。
+    /// [Enhancement] キューの順番変更をドラッグアンドドロップで。
+    /// [Enhancement] シークやボリュームの進行度に合わせた背景色。
+    /// [Enhancement] Playlistの変更通知がウザい件。
+    /// [Enhancement] プレイリストのリストビューで、プレイリストを切り替える際に、選択などをクリアする。
+    /// [Enhancement] TreeViewのポップアップメニューでゴミが表示される件。
+    /// [Enhancement] 左ペインの幅を覚える件。
     /// 
     /// v3.1.0 以降
     /// 
+    /// "追加して再生（Play Next）"メニューを追加。　
     /// リソース系：翻訳やスタイル、名前の整理と見直し。
-    /// 
     /// UI：テーマの切り替え
     /// 
     /// [未定]
     /// localhost に自動でつなげる?
     /// AlbumArt画像のキャッシュとアルバムビュー。
-    /// "追加して再生"メニューを追加。　
     /// 検索で、ExactかContainのオプション。
-    /// スライダーの上でスクロールして音量変更。
     /// スライダーの変更時にブレる件。
 
 
     /// 更新履歴：
+    /// v3.0.7.2 Minor UI improvements.
+    /// v3.0.7.1 Minor UI improvements. Quick Profile switch Combobox visibility, StatusBar text clear, Listview & TreeView's mouse over text color.
     /// v3.0.7   MS Store 公開。Github issue #4 "Incomplete rendering of tracks" fix (multiple "Genre" key/tag). Exceptionをログにちゃんと保存するようにした。
     /// v3.0.6   MS Store 公開。
     /// v3.0.5.2 Fixed Queue update conflicts when consume mode is on. Progress updateをステータスバーにちゃんと表示するようにした。 
@@ -118,7 +114,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.7.0";
+        const string _appVer = "v3.0.7.2";
 
         public static string AppVer
         {
@@ -829,7 +825,7 @@ namespace MPDCtrl.ViewModels
         {
             get
             {
-                if (Profiles.Count > 1)
+                if (Profiles.Count > 0)
                     return true;
                 else
                     return false;
@@ -1591,6 +1587,7 @@ namespace MPDCtrl.ViewModels
                                 }
                                 else
                                 {
+                                    // TODO: this is not enough. eg. "/Hoge/Hoge" and /Hoge/Hoge2
                                     return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath));
                                 }
                             }
@@ -2296,7 +2293,7 @@ namespace MPDCtrl.ViewModels
         {
             get
             {
-                if (IsBusy || IsConnecting || IsWorking)
+                if (IsBusy || IsConnecting || IsWorking || (Profiles.Count <= 1))
                     return false;
                 else
                     return true;
@@ -4349,7 +4346,7 @@ namespace MPDCtrl.ViewModels
                 }
             });
 
-            UpdateProgress?.Invoke(this, "[UI] Status updated.");
+            UpdateProgress?.Invoke(this, "");
 
             if (IsDownloadAlbumArt)
                 if (CurrentSong != null)
@@ -4429,22 +4426,23 @@ namespace MPDCtrl.ViewModels
 
             if (Queue.Count > 0)
             {
+                UpdateProgress?.Invoke(this, "[UI] Loading the queue...");
+                await Task.Delay(20);
+
                 //IsBusy = true;
                 IsWorking = true;
 
                 try
                 {
-                    UpdateProgress?.Invoke(this, "[UI] Queue is loading...");
-                    await Task.Delay(10);
+                    UpdateProgress?.Invoke(this, "[UI] Loading the queue...");
 
                     if (Application.Current == null) { return; }
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        UpdateProgress?.Invoke(this, "[UI] Queue is loading...");
                         Queue = new ObservableCollection<SongInfoEx>(_mpc.CurrentQueue);
-                        UpdateProgress?.Invoke(this, "[UI] Queue loaded.");
                     });
-                    
+                    UpdateProgress?.Invoke(this, "");
+
                     /*
                     if (Application.Current == null) { return; }
                     Application.Current.Dispatcher.Invoke(() =>
@@ -4624,21 +4622,23 @@ namespace MPDCtrl.ViewModels
             }
             else
             {
+                UpdateProgress?.Invoke(this, "[UI] Loading the queue...");
+                await Task.Delay(20);
+
                 //IsBusy = true;
                 IsWorking = true;
 
                 try
                 {
-                    UpdateProgress?.Invoke(this, "[UI] Queue is loading...");
-                    await Task.Delay(10);
+                    UpdateProgress?.Invoke(this, "[UI] Loading the queue...");
 
                     if (Application.Current == null) { return; }
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        UpdateProgress?.Invoke(this, "[UI] Queue is loading...");
                         Queue = new ObservableCollection<SongInfoEx>(_mpc.CurrentQueue);
-                        UpdateProgress?.Invoke(this, "[UI] Queue loaded.");
                     });
+
+                    UpdateProgress?.Invoke(this, "");
 
                     /*
                     int i = 1;
@@ -4827,7 +4827,7 @@ namespace MPDCtrl.ViewModels
 
                 UpdateProgress?.Invoke(this, "[UI] Playlists loading...");
                 Playlists = new ObservableCollection<Playlist>(_mpc.Playlists);
-                UpdateProgress?.Invoke(this, "[UI] Playlists loaded.");
+                UpdateProgress?.Invoke(this, "");
 
                 NodeMenuPlaylists playlistDir = _mainMenuItems.PlaylistsDirectory;
 
@@ -4986,7 +4986,7 @@ namespace MPDCtrl.ViewModels
             {
                 UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
                 MusicEntries = tmpMusicEntries;
-                UpdateProgress?.Invoke(this, "[UI] Library songs loaded.");
+                UpdateProgress?.Invoke(this, "");
             });
             
             //IsBusy = false;
@@ -5030,7 +5030,7 @@ namespace MPDCtrl.ViewModels
                 {
                     UpdateProgress?.Invoke(this, "[UI] Library directories loading...");
                     MusicDirectories = tmpMusicDirectories.Children;
-                    UpdateProgress?.Invoke(this, "[UI] Library directories loaded.");
+                    UpdateProgress?.Invoke(this, "");
                 });
                 
                 //_musicDirectories.Load(_mpc.LocalDirectories.ToList<String>());
@@ -5093,7 +5093,7 @@ namespace MPDCtrl.ViewModels
                         UpdateProgress?.Invoke(this, "[UI] Playlist loading...");
                         //PlaylistSongs = playlistNode.PlaylistSongs;
                         PlaylistSongs = new ObservableCollection<SongInfo>(playlistNode.PlaylistSongs);
-                        UpdateProgress?.Invoke(this, "[UI] Playlist loaded.");
+                        UpdateProgress?.Invoke(this, "");
                     }
 
                     playlistNode.IsUpdateRequied = false;
@@ -5214,6 +5214,7 @@ namespace MPDCtrl.ViewModels
             {
                 if (CompareVersionString(_mpc.MpdVerText, "0.20.0") == -1)
                 {
+                    MpdStatusButton = _pathMpdAckErrorButton;
                     //StatusBarMessage = string.Format(MPDCtrl.Properties.Resources.StatusBarMsg_MPDVersionIsOld, _mpc.MpdVerText);
                     MpdStatusMessage = string.Format(MPDCtrl.Properties.Resources.StatusBarMsg_MPDVersionIsOld, _mpc.MpdVerText);
                 }
@@ -6228,7 +6229,7 @@ namespace MPDCtrl.ViewModels
 
             await _mpc.MpdSearch(SelectedSearchTags.ToString(), queryShiki, SearchQuery);
 
-            UpdateProgress?.Invoke(this, "[UI] Search result loaded.");
+            UpdateProgress?.Invoke(this, "");
         }
 
         public ICommand SearchResultListviewSaveSelectedAsCommand { get; }

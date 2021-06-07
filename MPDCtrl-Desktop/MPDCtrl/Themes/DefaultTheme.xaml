@@ -88,7 +88,8 @@
     <!-- 使用不可の色 -->
     <SolidColorBrush x:Key="ScrollBarDisabledBrush" Color="Transparent" />
 
-    <SolidColorBrush x:Key="WindowBorderBrush" Color="#121212" />
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="#FF333333" />
+    <!--  #121212 -->
     <SolidColorBrush x:Key="WindowBorderInactiveBrush" Color="#212121" />
 
 
@@ -157,8 +158,8 @@
     <Color x:Key="ItemSelectedInactiveForegroundColor">#191919</Color>
     <SolidColorBrush x:Key="ItemSelectedInactiveForegroundColorBrush" Color="{DynamicResource ItemSelectedInactiveForegroundColor}"/>
 
-    
-    <Color x:Key="ItemMouseOverForegroundColor">Gainsboro</Color>
+
+    <Color x:Key="ItemMouseOverForegroundColor">White</Color>
     <SolidColorBrush x:Key="ItemMouseOverForegroundColorBrush" Color="{DynamicResource ItemMouseOverForegroundColor}"/>
 
 

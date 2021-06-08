@@ -29,32 +29,23 @@ using MPDCtrl.ViewModels.Classes;
 namespace MPDCtrl.ViewModels
 {
     /// TODO: 
+    /// [Enhancement] Add "Play Next" menu item in playlists and search result.　
+    /// [Enhancement] Add "update" and "rescan" button in Setting's page.
+    /// [Enhancement] Add inline renaming in the TreeView popup menu.
+    /// [Enhancement] Queue reorder with drag and drop.
+    /// [Enhancement] Surpress or fix "Playlist has changed, do you want update" nortification.
+    /// [Enhancement] Remove some garbage in the TreeView's popup menu.
+    /// [Enhancement] Remember left pain's width.
+    /// [Internal] organize and clean up resourses such as translation and styles.
+    /// [Enhancement] Theme selection.
     /// 
-    /// [Bug] Directryの絞り込みで"/Hoge/Hoge" and "/Hoge/Hoge2" を区別しないABBA問題。
+    /// Ideas:
+    /// Auto connect to localhost?
+    /// Cache CashAlbumArt and Album view?
+    /// Add Search option "Exact" or "Contain".
     /// 
-    /// [Enhancement] 設定画面でDBのupdateとrescan。
-    /// [Enhancement]「プレイリストの名前変更」をインラインで。
-    /// [Enhancement] キューの順番変更をドラッグアンドドロップで。
-    /// [Enhancement] シークやボリュームの進行度に合わせた背景色。
-    /// [Enhancement] Playlistの変更通知がウザい件。
-    /// [Enhancement] プレイリストのリストビューで、プレイリストを切り替える際に、選択などをクリアする。
-    /// [Enhancement] TreeViewのポップアップメニューでゴミが表示される件。
-    /// [Enhancement] 左ペインの幅を覚える件。
-    /// 
-    /// v3.1.0 以降
-    /// 
-    /// "追加して再生（Play Next）"メニューを追加。　
-    /// リソース系：翻訳やスタイル、名前の整理と見直し。
-    /// UI：テーマの切り替え
-    /// 
-    /// [未定]
-    /// localhost に自動でつなげる?
-    /// AlbumArt画像のキャッシュとアルバムビュー。
-    /// 検索で、ExactかContainのオプション。
-    /// スライダーの変更時にブレる件。
-
-
-    /// 更新履歴：
+    /// Version history：
+    /// v3.0.7.3 [Bug] Directryの絞り込みで"/Hoge/Hoge" and "/Hoge/Hoge2" を区別しない問題を修正。
     /// v3.0.7.2 Minor UI improvements.
     /// v3.0.7.1 Minor UI improvements. Quick Profile switch Combobox visibility, StatusBar text clear, Listview & TreeView's mouse over text color.
     /// v3.0.7   MS Store 公開。Github issue #4 "Incomplete rendering of tracks" fix (multiple "Genre" key/tag). Exceptionをログにちゃんと保存するようにした。
@@ -91,8 +82,8 @@ namespace MPDCtrl.ViewModels
     /// v3.0.2 MPCを作り直し中。とりあえず接続とデータ取得まで。
     /// v3.0.1 MPCを作り直し中。 
     /// v3.0.0 v2.1.2から分岐。レイアウトを見直し。
-
-
+    /// 
+    /// Memo:
     /// Key Gestures:
     /// Ctrl+S Show Settings
     /// Ctrl+F Show Find 
@@ -114,7 +105,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.7.2";
+        const string _appVer = "v3.0.7.3";
 
         public static string AppVer
         {
@@ -1581,14 +1572,21 @@ namespace MPDCtrl.ViewModels
                             {
                                 // 絞り込みモード
 
+                                // testing (adding "/")
+                                path = path + "/";
+
                                 if (!string.IsNullOrEmpty(FilterMusicEntriesQuery))
                                 {
-                                    return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath) && filename.Contains(FilterMusicEntriesQuery, StringComparison.CurrentCultureIgnoreCase));
+                                    // testing (adding "/")
+                                    return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath + "/") && filename.Contains(FilterMusicEntriesQuery, StringComparison.CurrentCultureIgnoreCase));
                                 }
                                 else
                                 {
-                                    // TODO: this is not enough. eg. "/Hoge/Hoge" and /Hoge/Hoge2
-                                    return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath));
+                                    // This is not enough. eg. "/Hoge/Hoge" and /Hoge/Hoge2
+                                    //return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath));
+
+                                    // testing (adding "/")
+                                    return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath + "/"));
                                 }
                             }
                             else

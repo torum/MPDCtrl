@@ -22,7 +22,7 @@ namespace MPDCtrl.Helpers
         private static void OnLoaded(DependencyObject dependencyObject,
             DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
-            var uiElement = dependencyObject as UIElement;
+            UIElement uiElement = dependencyObject as UIElement;
             if (uiElement == null || (dependencyPropertyChangedEventArgs.NewValue is bool) == false)
             {
                 return;
@@ -40,7 +40,7 @@ namespace MPDCtrl.Helpers
 
         private static void UIElementMouseLeftButtonDown(object sender, MouseButtonEventArgs mouseEventArgs)
         {
-            var uiElement = sender as UIElement;
+            UIElement uiElement = sender as UIElement;
             if (uiElement != null)
             {
                 if (mouseEventArgs.ClickCount == 2)

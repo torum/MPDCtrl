@@ -258,6 +258,7 @@ namespace MPDCtrl.Views
             }
         }
 
+        /*
         private void QueueFilterComboBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (sender != null)
@@ -286,18 +287,18 @@ namespace MPDCtrl.Views
                 }
             }
         }
+        */
 
-
+        /*
         private void DialogInputTextBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            /*
             if (DialogInputTextBox.Visibility == Visibility.Visible)
             {
                 DialogInputTextBox.Focus();
                 Keyboard.Focus(DialogInputTextBox);
             }
-            */
         }
+        */
 
         private void PasswordBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
@@ -326,6 +327,7 @@ namespace MPDCtrl.Views
             */
         }
 
+        /*
         private void DialogButton_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (sender != null)
@@ -340,7 +342,9 @@ namespace MPDCtrl.Views
                 }
             }
         }
+        */
 
+        /*
         private void PlaylistNameWithNewComboBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (sender != null)
@@ -355,22 +359,18 @@ namespace MPDCtrl.Views
                 }
             }
         }
+        */
 
-
-        // リンクをクリックして、ブラウザ起動して表示
+        // launch browser and display 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            ProcessStartInfo psi = new ProcessStartInfo(e.Uri.AbsoluteUri);
+            ProcessStartInfo psi = new(e.Uri.AbsoluteUri);
             psi.UseShellExecute = true;
             Process.Start(psi);
             e.Handled = true;
         }
 
-
-
-
-
-        #region == MAXIMIZE時のタスクバー被りのFix ==
+        #region == Size fix on window maximize ==
         // https://engy.us/blog/2020/01/01/implementing-a-custom-window-title-bar-in-wpf/
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -392,7 +392,7 @@ namespace MPDCtrl.Views
 
                 if (monitor != IntPtr.Zero)
                 {
-                    MONITORINFO monitorInfo = new MONITORINFO();
+                    MONITORINFO monitorInfo = new();
                     monitorInfo.cbSize = Marshal.SizeOf(typeof(MONITORINFO));
                     GetMonitorInfo(monitor, ref monitorInfo);
                     RECT rcWorkArea = monitorInfo.rcWork;

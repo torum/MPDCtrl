@@ -36,7 +36,7 @@ namespace MPDCtrl.Common
 
         #region == IDataErrorInfo ==
 
-        private Dictionary<string, string> _ErrorMessages = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> _ErrorMessages = new();
 
         string IDataErrorInfo.Error
         {
@@ -54,12 +54,12 @@ namespace MPDCtrl.Common
             }
         }
 
-        protected void SetError(string propertyName, string ErrorMessage)
+        protected static void SetError(string propertyName, string ErrorMessage)
         {
             _ErrorMessages[propertyName] = ErrorMessage;
         }
 
-        protected void ClearErrror(string propertyName)
+        protected static void ClearError(string propertyName)
         {
             if (_ErrorMessages.ContainsKey(propertyName))
                 //_ErrorMessages.Remove(propertyName);

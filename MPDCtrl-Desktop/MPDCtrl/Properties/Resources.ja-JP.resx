@@ -433,7 +433,8 @@ SOFTWARE.</value>
     <value>プライバシーポリシー</value>
   </data>
   <data name="PrivacyPolicyText" xml:space="preserve">
-    <value>MPDCtrl はIPアドレスとオプションの認証情報を利用してネットワーク上のMPDにアクセスします。これらの情報は指定しされたMPD以外、他へ一切送信されず、設定情報はローカルのデバイスのみに保存されます。オプションの認証情報はプラットフォーム提供のスキームにより暗号化されローカルに保存されます。</value>
+    <value>MPDCtrlは、指定されたIPアドレスとオプションの認証情報を利用してネットワーク上のMPDにアクセスします。
+情報は、指定されたMPD以外、他へ一切送信されることは無く、設定情報はローカルのデバイスのみに保存されます。オプションの認証情報はプラットフォーム提供のスキームにより暗号化されます。</value>
   </data>
   <data name="Profile" xml:space="preserve">
     <value>プロファイル</value>

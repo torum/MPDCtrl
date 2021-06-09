@@ -14,7 +14,7 @@ namespace MPDCtrl.Helpers
 
     public class TreeViewHelper
     {
-        private static Dictionary<DependencyObject, TreeViewSelectedItemBehavior> behaviors = new Dictionary<DependencyObject, TreeViewSelectedItemBehavior>();
+        private static Dictionary<DependencyObject, TreeViewSelectedItemBehavior> behaviors = new();
 
         public static object GetSelectedItem(DependencyObject obj)
         {

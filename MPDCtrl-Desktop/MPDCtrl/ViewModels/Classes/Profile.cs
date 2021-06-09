@@ -22,7 +22,7 @@ namespace MPDCtrl.ViewModels.Classes
                     return;
 
                 _host = value;
-                NotifyPropertyChanged("Host");
+                NotifyPropertyChanged(nameof(Host));
             }
         }
 
@@ -36,7 +36,7 @@ namespace MPDCtrl.ViewModels.Classes
                     return;
 
                 _port = value;
-                NotifyPropertyChanged("Port");
+                NotifyPropertyChanged(nameof(Port));
             }
         }
 
@@ -50,7 +50,7 @@ namespace MPDCtrl.ViewModels.Classes
                     return;
 
                 _password = value;
-                NotifyPropertyChanged("Password");
+                NotifyPropertyChanged(nameof(Password));
             }
         }
 
@@ -64,7 +64,7 @@ namespace MPDCtrl.ViewModels.Classes
                     return;
 
                 _name = value;
-                NotifyPropertyChanged("Name");
+                NotifyPropertyChanged(nameof(Name));
             }
         }
 
@@ -79,7 +79,7 @@ namespace MPDCtrl.ViewModels.Classes
 
                 _isDefault = value;
 
-                NotifyPropertyChanged("IsDefault");
+                NotifyPropertyChanged(nameof(IsDefault));
             }
         }
 
@@ -94,7 +94,7 @@ namespace MPDCtrl.ViewModels.Classes
 
                 _volume = value;
 
-                NotifyPropertyChanged("Volume");
+                NotifyPropertyChanged(nameof(Volume));
             }
         }
 

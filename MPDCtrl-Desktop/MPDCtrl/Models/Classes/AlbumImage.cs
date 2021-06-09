@@ -19,7 +19,7 @@ namespace MPDCtrl.Models
 
         public string SongFilePath { get; set; }
 
-        public byte[] BinaryData { get; set; } = new byte[0];
+        public byte[] BinaryData { get; set; } = Array.Empty<byte>();
 
         public int BinarySize { get; set; }
 

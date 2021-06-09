@@ -346,7 +346,7 @@ SOFTWARE.</value>
     <value>Volume</value>
   </data>
   <data name="PlaylistItemContextMenu_ClearAndLoad" xml:space="preserve">
-    <value>Clear current queue and Load</value>
+    <value>Clear Queue and Load</value>
   </data>
   <data name="PlaylistItemContextMenu_Load" xml:space="preserve">
     <value>Load (Enter)</value>
@@ -400,7 +400,7 @@ SOFTWARE.</value>
     <value>Remove Selected?</value>
   </data>
   <data name="Popup_InputNewPlaylistName" xml:space="preserve">
-    <value>Input New PlaylistName:</value>
+    <value>Input New Playlist Name:</value>
   </data>
   <data name="Popup_MultipleDeletionNotSupported" xml:space="preserve">
     <value>Multiple Deletion Not Supported</value>
@@ -433,7 +433,7 @@ SOFTWARE.</value>
     <value>App Privacy Policy</value>
   </data>
   <data name="PrivacyPolicyText" xml:space="preserve">
-    <value>MPDCtrl app allows you to access your music player via IP address and optionaly user credentials. None of this data is transmitted anywhere besides your specified music player and your settings are stored on your device only. Optional user credentials are encrypted with a platform provided shceme.</value>
+    <value>MPDCtrl allows you to access your music player via specified IP address with optional user credentials. None of the data is transmitted anywhere besides your specified music player and your settings are stored on your device only. Optional user credentials are encrypted with a platform provided shceme.</value>
   </data>
   <data name="Profile" xml:space="preserve">
     <value>Profile</value>
@@ -514,16 +514,16 @@ SOFTWARE.</value>
     <value>Host address is required.</value>
   </data>
   <data name="Settings_ErrorInvalidPortNaN" xml:space="preserve">
-    <value>Invalid Port number.</value>
+    <value>Invalid port number.</value>
   </data>
   <data name="Settings_ErrorPortMustBeSpecified" xml:space="preserve">
     <value>Port number is required.</value>
   </data>
   <data name="Settings_Opts_AutoScrollToNowPlaying" xml:space="preserve">
-    <value>Auto Scroll To Current Song (NowPlaying)</value>
+    <value>Auto scroll to current song.</value>
   </data>
   <data name="Settings_Opts_EnableAlbumArt" xml:space="preserve">
-    <value>Enable AlbumArt</value>
+    <value>Enable AlbumArt.</value>
   </data>
   <data name="Settings_Opts_MPDDatabase" xml:space="preserve">
     <value>MPD Database</value>
@@ -532,31 +532,31 @@ SOFTWARE.</value>
     <value>Options</value>
   </data>
   <data name="Settings_Opts_SaveLog" xml:space="preserve">
-    <value>Save logs file (MPDCtrl__errors.txt) to desktop when unexpected error occured.</value>
+    <value>Save log file (MPDCtrl__errors.txt) to desktop when an unexpected error occured.</value>
   </data>
   <data name="Settings_Opts_ShowDebugWidow" xml:space="preserve">
-    <value>Enable Debug Widow</value>
+    <value>Enable debug widow.</value>
   </data>
   <data name="Settings_Opts_UpdateDatabaseOnStartup" xml:space="preserve">
-    <value>Update MPD Music Database on Startup. (It may take a while to update)</value>
+    <value>Update MPD database on startup. (It may take a while to update)</value>
   </data>
   <data name="Settings_Opts_UseReadPicture" xml:space="preserve">
     <value>Use "readpicture" command instead of "albumart". (applicable when MPD protocol version is 0.22.0 or up)</value>
   </data>
   <data name="Settings_ProfileDeleted" xml:space="preserve">
-    <value>Profile Deleted</value>
+    <value>Profile deleted</value>
   </data>
   <data name="Settings_ProfileSaved" xml:space="preserve">
-    <value>Profile Saved.</value>
+    <value>Profile saved.</value>
   </data>
   <data name="Settings_ProfileUpdated" xml:space="preserve">
-    <value>Profile Updated.</value>
+    <value>Profile updated.</value>
   </data>
   <data name="Settings_ToolTip" xml:space="preserve">
     <value>Settings (Ctrl+S)</value>
   </data>
   <data name="Settings_UnlockAndChangePassword" xml:space="preserve">
-    <value>Unlock and Change Password</value>
+    <value>Unlock and change password</value>
   </data>
   <data name="SongFilesItemContextMenu_Add" xml:space="preserve">
     <value>(not used)</value>
@@ -574,7 +574,7 @@ SOFTWARE.</value>
     <value>The MPD protocol version {0} is old. Some of the functionalities may not work properly.</value>
   </data>
   <data name="StatusMsg_UpdatingDb" xml:space="preserve">
-    <value>Updating db...</value>
+    <value>Updating database...</value>
   </data>
   <data name="TreeviewMenuItemContextMenu_Load" xml:space="preserve">
     <value>Load</value>

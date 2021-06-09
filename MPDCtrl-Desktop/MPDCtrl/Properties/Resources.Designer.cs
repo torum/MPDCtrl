@@ -700,7 +700,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Clear current queue and Load に類似しているローカライズされた文字列を検索します。
+        ///   Clear Queue and Load に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string PlaylistItemContextMenu_ClearAndLoad {
             get {
@@ -862,7 +862,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Input New PlaylistName: に類似しているローカライズされた文字列を検索します。
+        ///   Input New Playlist Name: に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Popup_InputNewPlaylistName {
             get {
@@ -961,7 +961,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   MPDCtrl app allows you to access your music player via IP address and optionaly user credentials. None of this data is transmitted anywhere besides your specified music player and your settings are stored on your device only. Optional user credentials are encrypted with a platform provided shceme. に類似しているローカライズされた文字列を検索します。
+        ///   MPDCtrl allows you to access your music player via specified IP address with optional user credentials. None of the data is transmitted anywhere besides your specified music player and your settings are stored on your device only. Optional user credentials are encrypted with a platform provided shceme. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string PrivacyPolicyText {
             get {
@@ -1204,7 +1204,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Invalid Port number. に類似しているローカライズされた文字列を検索します。
+        ///   Invalid port number. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_ErrorInvalidPortNaN {
             get {
@@ -1222,7 +1222,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Auto Scroll To Current Song (NowPlaying) に類似しているローカライズされた文字列を検索します。
+        ///   Auto scroll to current song. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_Opts_AutoScrollToNowPlaying {
             get {
@@ -1231,7 +1231,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Enable AlbumArt に類似しているローカライズされた文字列を検索します。
+        ///   Enable AlbumArt. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_Opts_EnableAlbumArt {
             get {
@@ -1258,7 +1258,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Save logs file (MPDCtrl__errors.txt) to desktop when unexpected error occured. に類似しているローカライズされた文字列を検索します。
+        ///   Save log file (MPDCtrl__errors.txt) to desktop when an unexpected error occured. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_Opts_SaveLog {
             get {
@@ -1267,7 +1267,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Enable Debug Widow に類似しているローカライズされた文字列を検索します。
+        ///   Enable debug widow. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_Opts_ShowDebugWidow {
             get {
@@ -1276,7 +1276,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Update MPD Music Database on Startup. (It may take a while to update) に類似しているローカライズされた文字列を検索します。
+        ///   Update MPD database on startup. (It may take a while to update) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_Opts_UpdateDatabaseOnStartup {
             get {
@@ -1294,7 +1294,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Profile Deleted に類似しているローカライズされた文字列を検索します。
+        ///   Profile deleted に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_ProfileDeleted {
             get {
@@ -1303,7 +1303,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Profile Saved. に類似しているローカライズされた文字列を検索します。
+        ///   Profile saved. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_ProfileSaved {
             get {
@@ -1312,7 +1312,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Profile Updated. に類似しているローカライズされた文字列を検索します。
+        ///   Profile updated. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_ProfileUpdated {
             get {
@@ -1330,7 +1330,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Unlock and Change Password に類似しているローカライズされた文字列を検索します。
+        ///   Unlock and change password に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Settings_UnlockAndChangePassword {
             get {
@@ -1384,7 +1384,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Updating db... に類似しているローカライズされた文字列を検索します。
+        ///   Updating database... に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string StatusMsg_UpdatingDb {
             get {

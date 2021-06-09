@@ -268,14 +268,12 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- タブ移動等々の関係で上に持ってくる -->
-                        <Button x:Name="PlayButton" ToolTip="{x:Static properties:Resources.Playback_PlayPauseButton}" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="62" Width="62" Background="Transparent" Foreground="White" Style="{StaticResource PathButton}" Command="{Binding PlayCommand}" Content="{Binding PlayButton}">
-                        </Button>
+                        <!-- "Play" should be top so that it gets the first keyboard focus -->
+                        <Button x:Name="PlayButton" ToolTip="{x:Static properties:Resources.Playback_PlayPauseButton}" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="62" Width="62" Background="Transparent" Foreground="White" Style="{StaticResource PathButton}" Command="{Binding PlayCommand}" Content="{Binding PlayButton}"></Button>
+
+                        <Button x:Name="BackButton" ToolTip="{x:Static properties:Resources.Playback_BackButton}" Grid.Column="0" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8H10V16H8M16,8V16L11,12" Style="{StaticResource PathButton}" Command="{Binding PlayPrevCommand}" ></Button>
                         
-                        <Button x:Name="BackButton" ToolTip="{x:Static properties:Resources.Playback_BackButton}" Grid.Column="0" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8H10V16H8M16,8V16L11,12" Style="{StaticResource PathButton}" Command="{Binding PlayPrevCommand}" >
-                        </Button>
-                        <Button x:Name="NextButton" ToolTip="{x:Static properties:Resources.Playback_NextButton}" Grid.Column="2" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8L13,12L8,16M14,8H16V16H14" Style="{StaticResource PathButton}" Command="{Binding PlayNextCommand}" >
-                        </Button>
+                        <Button x:Name="NextButton" ToolTip="{x:Static properties:Resources.Playback_NextButton}" Grid.Column="2" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8L13,12L8,16M14,8H16V16H14" Style="{StaticResource PathButton}" Command="{Binding PlayNextCommand}" ></Button>
 
                     </Grid>
 
@@ -287,8 +285,7 @@
                             <ColumnDefinition Width="24"/>
                         </Grid.ColumnDefinitions>
 
-                        <Slider x:Name="SliderSeek" ToolTip="{x:Static properties:Resources.Playback_SliderSeek}" Style="{DynamicResource SliderHorizontalStyle}" Grid.Column="1" VerticalAlignment="Center" Margin="6 6 6 0" IsMoveToPointEnabled="True" Minimum="0" Maximum="{Binding Mode=TwoWay,Path=Time}" Value="{Binding Mode=TwoWay,Path=Elapsed}">
-                        </Slider>
+                        <Slider x:Name="SliderSeek" ToolTip="{x:Static properties:Resources.Playback_SliderSeek}" Style="{DynamicResource SliderHorizontalStyle}" Grid.Column="1" VerticalAlignment="Center" Margin="6 6 6 0" IsMoveToPointEnabled="True" Minimum="0" Maximum="{Binding Mode=TwoWay,Path=Time}" Value="{Binding Mode=TwoWay,Path=Elapsed}"></Slider>
 
                     </Grid>
 
@@ -331,7 +328,7 @@
 
             </Grid>
 
-            <!-- Left -->
+            <!-- Left pane -->
             <Grid Grid.Row="2" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:SizeChange.IsEnabled="True" helpers:SizeChange.ActualWidth="{Binding MainLeftPainActualWidth, Mode=OneWayToSource}">
                 <TreeView Margin="0 1 0 0" Style="{DynamicResource TreeViewMenuStyle}" ItemsSource="{Binding MainMenuItems}"  helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeMenu, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <TreeView.Resources>
@@ -430,7 +427,7 @@
             <!-- GridSplitter -->
             <GridSplitter Grid.Row="2" Grid.Column="1" ResizeDirection="Columns" Style="{StaticResource GridSplitterStyle}"></GridSplitter>
 
-            <!-- Right -->
+            <!-- Right pane -->
             <Grid Grid.Row="2" Grid.Column="2">
 
                 <Grid>
@@ -1003,7 +1000,7 @@
                             </StackPanel>
                         </Border>
 
-                        <Popup IsOpen="{Binding IsSaveAsPlaylistPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                        <Popup IsOpen="{Binding IsSaveAsPlaylistPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
                             <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
                                 <StackPanel>
 
@@ -1033,7 +1030,7 @@
                             </Border>
                         </Popup>
 
-                        <Popup IsOpen="{Binding IsConfirmClearQueuePopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                        <Popup IsOpen="{Binding IsConfirmClearQueuePopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
                             <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
                                 <StackPanel>
 
@@ -1059,7 +1056,7 @@
                             </Border>
                         </Popup>
 
-                        <Popup IsOpen="{Binding IsSelectedSaveToPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                        <Popup IsOpen="{Binding IsSelectedSaveToPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
                             <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
                                 <StackPanel>
 
@@ -1088,7 +1085,7 @@
                             </Border>
                         </Popup>
 
-                        <Popup IsOpen="{Binding IsSelectedSaveAsPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                        <Popup IsOpen="{Binding IsSelectedSaveAsPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
                             <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
                                 <StackPanel>
 
@@ -1118,7 +1115,7 @@
                             </Border>
                         </Popup>
 
-                        <Popup IsOpen="{Binding IsConfirmDeleteQueuePopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                        <Popup IsOpen="{Binding IsConfirmDeleteQueuePopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
                             <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
                                 <StackPanel>
 
@@ -1510,7 +1507,7 @@
                             </ListView.ItemContainerStyle>
                         </ListView>
 
-                        <Popup IsOpen="{Binding IsSearchResultSelectedSaveAsPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SearchResultListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                        <Popup IsOpen="{Binding IsSearchResultSelectedSaveAsPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SearchResultListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
                             <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
                                 <StackPanel>
 
@@ -1540,7 +1537,7 @@
                             </Border>
                         </Popup>
 
-                        <Popup IsOpen="{Binding IsSearchResultSelectedSaveToPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SearchResultListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                        <Popup IsOpen="{Binding IsSearchResultSelectedSaveToPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SearchResultListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
                             <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
                                 <StackPanel>
 
@@ -1901,7 +1898,7 @@
                                 </ListView.ItemContainerStyle>
                             </ListView>
 
-                            <Popup IsOpen="{Binding IsSongFilesSelectedSaveAsPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SongFilesListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                            <Popup IsOpen="{Binding IsSongFilesSelectedSaveAsPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SongFilesListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
                                 <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
                                     <StackPanel>
 
@@ -1931,7 +1928,7 @@
                                 </Border>
                             </Popup>
 
-                            <Popup IsOpen="{Binding IsSongFilesSelectedSaveToPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SongFilesListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                            <Popup IsOpen="{Binding IsSongFilesSelectedSaveToPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SongFilesListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
                                 <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
                                     <StackPanel>
 
@@ -2459,7 +2456,7 @@
                             </Border>
                         </Popup>
 
-                        <Popup IsOpen="{Binding IsConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=PlaylistSongsListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                        <Popup IsOpen="{Binding IsConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=PlaylistSongsListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
                             <Border Background="#FFF15B" CornerRadius="4" Padding="6" Width="250">
                                 <StackPanel>
 
@@ -2485,7 +2482,7 @@
                             </Border>
                         </Popup>
 
-                        <Popup IsOpen="{Binding IsConfirmDeletePlaylistSongPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=PlaylistSongsListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                        <Popup IsOpen="{Binding IsConfirmDeletePlaylistSongPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=PlaylistSongsListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
                             <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
                                 <StackPanel>
 
@@ -2511,7 +2508,7 @@
                             </Border>
                         </Popup>
 
-                        <Popup IsOpen="{Binding IsConfirmPlaylistClearPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=PlaylistSongsListview}" Placement="Mouse" AllowsTransparency="True" PopupAnimation="Fade">
+                        <Popup IsOpen="{Binding IsConfirmPlaylistClearPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=PlaylistSongsListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
                             <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
                                 <StackPanel>
 
@@ -3005,7 +3002,7 @@
                 </Grid>
             </Grid>
 
-            <!-- 初期設定兼再接続画面 -->
+            <!-- Init setting / Re-connect screen -->
             <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}" Visibility="{Binding IsConnectionSettingShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="0"/>
@@ -3134,7 +3131,7 @@
 
             </Grid>
 
-            <!-- 設定画面 -->
+            <!-- Setting screen -->
             <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="3" Visibility="{Binding IsSettingsShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="0"/>
@@ -3147,7 +3144,7 @@
 
                 <TabControl Grid.Row="1" TabStripPlacement="Left" Background="{DynamicResource WindowBackgroundColorBrush}" BorderThickness="0" Margin="0" Style="{DynamicResource SettingsTabControlStyle}">
 
-                    <!-- 設定 -->
+                    <!-- Setting -->
                     <TabItem Width="100" Height="48" Style="{DynamicResource SettingsTabItemStyle}" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TabItem.Header>
                             <Label Content="{x:Static properties:Resources.Settings}" Foreground="{Binding RelativeSource={RelativeSource AncestorType=TabItem}, Path=Foreground}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Label>

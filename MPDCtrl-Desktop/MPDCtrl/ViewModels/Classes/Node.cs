@@ -26,7 +26,7 @@ namespace MPDCtrl.ViewModels.Classes
 
                 _name = value;
 
-                NotifyPropertyChanged("Name");
+                NotifyPropertyChanged(nameof(Name));
             }
         }
 
@@ -43,7 +43,7 @@ namespace MPDCtrl.ViewModels.Classes
                     return;
                 _pathData = value;
 
-                NotifyPropertyChanged("PathIcon");
+                NotifyPropertyChanged(nameof(PathIcon));
             }
         }
 
@@ -91,7 +91,7 @@ namespace MPDCtrl.ViewModels.Classes
 
                 _expanded = value;
 
-                NotifyPropertyChanged("Expanded");
+                NotifyPropertyChanged(nameof(Expanded));
             }
         }
 
@@ -111,11 +111,11 @@ namespace MPDCtrl.ViewModels.Classes
 
                 _parent = value;
 
-                NotifyPropertyChanged("Parent");
+                NotifyPropertyChanged(nameof(Parent));
             }
         }
 
-        private ObservableCollection<NodeTree> _children = new ObservableCollection<NodeTree>();
+        private ObservableCollection<NodeTree> _children = new();
         public ObservableCollection<NodeTree> Children
         {
             get
@@ -126,7 +126,7 @@ namespace MPDCtrl.ViewModels.Classes
             {
                 _children = value;
 
-                NotifyPropertyChanged("Children");
+                NotifyPropertyChanged(nameof(Children));
             }
         }
 

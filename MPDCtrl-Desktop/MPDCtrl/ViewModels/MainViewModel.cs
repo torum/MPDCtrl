@@ -35,16 +35,21 @@ namespace MPDCtrl.ViewModels
     /// [Enhancement] Queue reorder with drag and drop.
     /// [Enhancement] Surpress or fix "Playlist has changed, do you want update" nortification.
     /// [Enhancement] Remove some garbage in the TreeView's popup menu.
-    /// [Enhancement] Remember left pain's width.
+    /// [Enhancement] Remember left pane's width.
     /// [Internal] organize and clean up resourses such as translation and styles.
     /// [Enhancement] Theme selection.
     /// 
     /// Ideas:
+    /// Alarm & Timers!
     /// Auto connect to localhost?
     /// Cache CashAlbumArt and Album view?
     /// Add Search option "Exact" or "Contain".
     /// 
     /// Version history：
+    /// v3.0.8.3 Removed none English comments in the source code as much as possible. Little bit of clean up.
+    /// v3.0.8.2 Fixed some typo and translations.
+    /// v3.0.8.1 Changed Popup's Placement="Mouse" to "Center".
+    /// v3.0.8   MS Store 公開。
     /// v3.0.7.3 [Bug] Directryの絞り込みで"/Hoge/Hoge" and "/Hoge/Hoge2" を区別しない問題を修正。
     /// v3.0.7.2 Minor UI improvements.
     /// v3.0.7.1 Minor UI improvements. Quick Profile switch Combobox visibility, StatusBar text clear, Listview & TreeView's mouse over text color.
@@ -105,7 +110,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.7.3";
+        const string _appVer = "v3.0.8.3";
 
         public static string AppVer
         {
@@ -151,7 +156,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == 設定フォルダ関連 ==  
+        #region == Config file load & save ==  
 
         private static readonly string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         private static string _appDataFolder;
@@ -193,10 +198,9 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == レイアウト関連 ==
+        #region == Layout related ==
 
-        // TODO:現在のレイアウトでは無効
-
+        // TODO: no longer used...
         private double _mainLeftPainActualWidth = 241;
         public double MainLeftPainActualWidth
         {
@@ -214,6 +218,7 @@ namespace MPDCtrl.ViewModels
             }
         }
 
+        // TODO: no longer used...
         private double _mainLeftPainWidth = 241;
         public double MainLeftPainWidth
         {
@@ -231,7 +236,7 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        #region == Queueカラムヘッダー ==
+        #region == Queue column headers ==
 
         private bool _queueColumnHeaderPositionVisibility = true;
         public bool QueueColumnHeaderPositionVisibility
@@ -675,7 +680,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == 画面表示切り替え系 ==  
+        #region == Status and Visibility switch flags ==  
 
         private bool _isConnected;
         public bool IsConnected
@@ -938,7 +943,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == コントロール関連 ==  
+        #region == CurrentSong, Playback controls, AlbumArt ==  
 
         private SongInfoEx _currentSong;
         public SongInfoEx CurrentSong
@@ -1275,7 +1280,183 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == メイン画面のメニューと各画面の機能 ==
+        #region == TreeView Menu (Queue, Library, Search, Playlists, Playlist) ==
+
+        #region == MenuTree ==
+
+        private readonly MenuTreeBuilder _mainMenuItems = new();
+        public ObservableCollection<NodeTree> MainMenuItems
+        {
+            get { return _mainMenuItems.Children; }
+            set
+            {
+                _mainMenuItems.Children = value;
+                NotifyPropertyChanged(nameof(MainMenuItems));
+            }
+        }
+
+        private NodeTree _selectedNodeMenu = new NodeMenu("root");
+        public NodeTree SelectedNodeMenu
+        {
+            get { return _selectedNodeMenu; }
+            set
+            {
+                if (_selectedNodeMenu == value)
+                    return;
+
+                if (value == null)
+                {
+                    //Debug.WriteLine("selectedNodeMenu is null");
+                    return;
+                }
+
+                _selectedNodeMenu = value;
+                NotifyPropertyChanged(nameof(SelectedNodeMenu));
+
+                if (value is NodeMenuQueue)
+                {
+                    IsQueueVisible = true;
+                    IsPlaylistsVisible = false;
+                    IsPlaylistItemVisible = false;
+                    IsLibraryVisible = false;
+                    IsSearchVisible = false;
+                }
+                else if (value is NodeMenuPlaylists)
+                {
+                    IsQueueVisible = false;
+                    IsPlaylistsVisible = true;
+                    IsPlaylistItemVisible = false;
+                    IsLibraryVisible = false;
+                    IsSearchVisible = false;
+                }
+                else if (value is NodeMenuPlaylistItem)
+                {
+                    //Debug.WriteLine("selectedNodeMenu is NodeMenuPlaylistItem");
+                    IsQueueVisible = false;
+                    IsPlaylistsVisible = false;
+                    IsPlaylistItemVisible = true;
+                    IsLibraryVisible = false;
+                    IsSearchVisible = false;
+
+                    if (Application.Current == null) { return; }
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        PlaylistSongs = new ObservableCollection<SongInfo>(); // Don't Clear();
+                        PlaylistSongs = (value as NodeMenuPlaylistItem).PlaylistSongs;
+                    });
+
+                    if (((value as NodeMenuPlaylistItem).PlaylistSongs.Count == 0) || (value as NodeMenuPlaylistItem).IsUpdateRequied)
+                        GetPlaylistSongs(value as NodeMenuPlaylistItem);
+                }
+                else if (value is NodeMenuLibrary)
+                {
+                    IsQueueVisible = false;
+                    IsPlaylistsVisible = false;
+                    IsPlaylistItemVisible = false;
+                    IsLibraryVisible = true;
+                    IsSearchVisible = false;
+
+                    if (!(value as NodeMenuLibrary).IsAcquired || (MusicDirectories.Count <= 1) && (MusicEntries.Count == 0))
+                        GetLibrary(value as NodeMenuLibrary);
+                }
+                else if (value is NodeMenuSearch)
+                {
+                    IsQueueVisible = false;
+                    IsPlaylistsVisible = false;
+                    IsPlaylistItemVisible = false;
+                    IsLibraryVisible = false;
+                    IsSearchVisible = true;
+                }
+                else if (value is NodeMenu)
+                {
+                    //Debug.WriteLine("selectedNodeMenu is NodeMenu ...unknown:" + _selectedNodeMenu.Name);
+
+                    if (value.Name != "root")
+                        throw new NotImplementedException();
+
+                    IsQueueVisible = true;
+                }
+                else
+                {
+                    //Debug.WriteLine(value.Name);
+
+                    throw new NotImplementedException();
+                }
+
+            }
+        }
+
+        private bool _isQueueVisible = true;
+        public bool IsQueueVisible
+        {
+            get { return _isQueueVisible; }
+            set
+            {
+                if (_isQueueVisible == value)
+                    return;
+
+                _isQueueVisible = value;
+                NotifyPropertyChanged(nameof(IsQueueVisible));
+            }
+        }
+
+        private bool _isPlaylistsVisible = true;
+        public bool IsPlaylistsVisible
+        {
+            get { return _isPlaylistsVisible; }
+            set
+            {
+                if (_isPlaylistsVisible == value)
+                    return;
+
+                _isPlaylistsVisible = value;
+                NotifyPropertyChanged(nameof(IsPlaylistsVisible));
+            }
+        }
+
+        private bool _isPlaylistItemVisible = true;
+        public bool IsPlaylistItemVisible
+        {
+            get { return _isPlaylistItemVisible; }
+            set
+            {
+                if (_isPlaylistItemVisible == value)
+                    return;
+
+                _isPlaylistItemVisible = value;
+                NotifyPropertyChanged(nameof(IsPlaylistItemVisible));
+            }
+        }
+
+        private bool _isLibraryVisible = true;
+        public bool IsLibraryVisible
+        {
+            get { return _isLibraryVisible; }
+            set
+            {
+                if (_isLibraryVisible == value)
+                    return;
+
+                _isLibraryVisible = value;
+                NotifyPropertyChanged(nameof(IsLibraryVisible));
+            }
+        }
+
+        private bool _isSearchVisible = true;
+        public bool IsSearchVisible
+        {
+            get { return _isSearchVisible; }
+            set
+            {
+                if (_isSearchVisible == value)
+                    return;
+
+                _isSearchVisible = value;
+                NotifyPropertyChanged(nameof(IsSearchVisible));
+            }
+        }
+
+        #endregion
 
         #region == Queue ==  
 
@@ -1573,7 +1754,7 @@ namespace MPDCtrl.ViewModels
                                 // 絞り込みモード
 
                                 // testing (adding "/")
-                                path = path + "/";
+                                path += "/";
 
                                 if (!string.IsNullOrEmpty(FilterMusicEntriesQuery))
                                 {
@@ -1896,186 +2077,10 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == MenuTree ==
-
-        private readonly MenuTreeBuilder _mainMenuItems = new();
-        public ObservableCollection<NodeTree> MainMenuItems
-        {
-            get { return _mainMenuItems.Children; }
-            set
-            {
-                _mainMenuItems.Children = value;
-                NotifyPropertyChanged(nameof(MainMenuItems));
-            }
-        }
-
-        private NodeTree _selectedNodeMenu = new NodeMenu("root");
-        public NodeTree SelectedNodeMenu
-        {
-            get { return _selectedNodeMenu; }
-            set
-            {
-                if (_selectedNodeMenu == value)
-                    return;
-
-                if (value == null)
-                {
-                    //Debug.WriteLine("selectedNodeMenu is null");
-                    return;
-                }
-
-                _selectedNodeMenu = value;
-                NotifyPropertyChanged(nameof(SelectedNodeMenu));
-
-                if (value is NodeMenuQueue)
-                {
-                    IsQueueVisible = true;
-                    IsPlaylistsVisible = false;
-                    IsPlaylistItemVisible = false;
-                    IsLibraryVisible = false;
-                    IsSearchVisible = false;
-                }
-                else if (value is NodeMenuPlaylists)
-                {
-                    IsQueueVisible = false;
-                    IsPlaylistsVisible = true;
-                    IsPlaylistItemVisible = false;
-                    IsLibraryVisible = false;
-                    IsSearchVisible = false;
-                }
-                else if (value is NodeMenuPlaylistItem)
-                {
-                    //Debug.WriteLine("selectedNodeMenu is NodeMenuPlaylistItem");
-                    IsQueueVisible = false;
-                    IsPlaylistsVisible = false;
-                    IsPlaylistItemVisible = true;
-                    IsLibraryVisible = false;
-                    IsSearchVisible = false;
-
-                    if (Application.Current == null) { return; }
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        PlaylistSongs = new ObservableCollection<SongInfo>(); // Don't Clear();
-                        PlaylistSongs = (value as NodeMenuPlaylistItem).PlaylistSongs;
-                    });
-
-                    if (((value as NodeMenuPlaylistItem).PlaylistSongs.Count == 0) || (value as NodeMenuPlaylistItem).IsUpdateRequied)
-                        GetPlaylistSongs(value as NodeMenuPlaylistItem);
-                }
-                else if (value is NodeMenuLibrary)
-                {
-                    IsQueueVisible = false;
-                    IsPlaylistsVisible = false;
-                    IsPlaylistItemVisible = false;
-                    IsLibraryVisible = true;
-                    IsSearchVisible = false;
-
-                    if (!(value as NodeMenuLibrary).IsAcquired || (MusicDirectories.Count <= 1 ) && (MusicEntries.Count == 0))
-                        GetLibrary(value as NodeMenuLibrary);
-                }
-                else if (value is NodeMenuSearch)
-                {
-                    IsQueueVisible = false;
-                    IsPlaylistsVisible = false;
-                    IsPlaylistItemVisible = false;
-                    IsLibraryVisible = false;
-                    IsSearchVisible = true;
-                }
-                else if (value is NodeMenu)
-                {
-                    //Debug.WriteLine("selectedNodeMenu is NodeMenu ...unknown:" + _selectedNodeMenu.Name);
-
-                    if (value.Name != "root")
-                        throw new NotImplementedException();
-
-                    IsQueueVisible = true;
-                }
-                else
-                {
-                    //Debug.WriteLine(value.Name);
-
-                    throw new NotImplementedException();
-                }
-
-            }
-        }
-
-        private bool _isQueueVisible = true;
-        public bool IsQueueVisible
-        {
-            get { return _isQueueVisible; }
-            set
-            {
-                if (_isQueueVisible == value)
-                    return;
-
-                _isQueueVisible = value;
-                NotifyPropertyChanged(nameof(IsQueueVisible));
-            }
-        }
-
-        private bool _isPlaylistsVisible = true;
-        public bool IsPlaylistsVisible
-        {
-            get { return _isPlaylistsVisible; }
-            set
-            {
-                if (_isPlaylistsVisible == value)
-                    return;
-
-                _isPlaylistsVisible = value;
-                NotifyPropertyChanged(nameof(IsPlaylistsVisible));
-            }
-        }
-
-        private bool _isPlaylistItemVisible = true;
-        public bool IsPlaylistItemVisible
-        {
-            get { return _isPlaylistItemVisible; }
-            set
-            {
-                if (_isPlaylistItemVisible == value)
-                    return;
-
-                _isPlaylistItemVisible = value;
-                NotifyPropertyChanged(nameof(IsPlaylistItemVisible));
-            }
-        }
-
-        private bool _isLibraryVisible = true;
-        public  bool IsLibraryVisible
-        {
-            get { return _isLibraryVisible; }
-            set
-            {
-                if (_isLibraryVisible == value)
-                    return;
-
-                _isLibraryVisible = value;
-                NotifyPropertyChanged(nameof(IsLibraryVisible));
-            }
-        }
-
-        private bool _isSearchVisible = true;
-        public bool IsSearchVisible
-        {
-            get { return _isSearchVisible; }
-            set
-            {
-                if (_isSearchVisible == value)
-                    return;
-
-                _isSearchVisible = value;
-                NotifyPropertyChanged(nameof(IsSearchVisible));
-            }
-        }
-
         #endregion
 
-        #endregion
+        #region == Status Messages == 
 
-        #region == ステータス系 == 
-        
         private string _statusBarMessage;
         public string StatusBarMessage
         {
@@ -2218,7 +2223,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == Profileと設定画面 ==
+        #region == Profile and Settings ==
 
         private readonly ObservableCollection<Profile> _profiles = new();
         public ObservableCollection<Profile> Profiles
@@ -2262,8 +2267,8 @@ namespace MPDCtrl.ViewModels
 
                 if (_selectedProfile != null)
                 {
-                    ClearErrror(nameof(Host));
-                    ClearErrror(nameof(Port));
+                    ClearError(nameof(Host));
+                    ClearError(nameof(Port));
                     Host = SelectedProfile.Host;
                     Port = SelectedProfile.Port.ToString();
                     Password = SelectedProfile.Password;
@@ -2271,8 +2276,8 @@ namespace MPDCtrl.ViewModels
                 }
                 else
                 {
-                    ClearErrror(nameof(Host));
-                    ClearErrror(nameof(Port));
+                    ClearError(nameof(Host));
+                    ClearError(nameof(Port));
                     Host = "";
                     Port = "6600";
                     Password = "";
@@ -2333,7 +2338,7 @@ namespace MPDCtrl.ViewModels
             get { return _host; }
             set
             {
-                ClearErrror(nameof(Host));
+                ClearError(nameof(Host));
                 _host = value;
 
                 // Validate input.
@@ -2374,7 +2379,7 @@ namespace MPDCtrl.ViewModels
             get { return _port.ToString(); }
             set
             {
-                ClearErrror(nameof(Port));
+                ClearError(nameof(Port));
 
                 if (value == "")
                 {
@@ -2389,7 +2394,7 @@ namespace MPDCtrl.ViewModels
                         //Int32.TryParse(value, out _defaultPort)
                         // Change the value only when test was successfull.
                         _port = i;
-                        ClearErrror(nameof(Port));
+                        ClearError(nameof(Port));
                     }
                     else
                     {
@@ -2626,9 +2631,6 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        #endregion
-
-        #region == ダイアログ ==
 
         private string _changePasswordDialogMessage;
         public string ChangePasswordDialogMessage
@@ -2646,7 +2648,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == Popup ==
+        #region == Popups ==
 
         private List<string> queueListviewSelectedQueueSongIdsForPopup = new();
         private List<string> searchResultListviewSelectedQueueSongUriForPopup = new();
@@ -2892,7 +2894,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == イベント ==
+        #region == Events ==
 
         // DebugWindow
         public delegate void DebugWindowShowHideEventHandler();
@@ -2931,7 +2933,7 @@ namespace MPDCtrl.ViewModels
 
         #region == Lock objects ==
 
-        // TODO:
+        // TODO: not used
 
         private readonly object lockQueueObject = new();
         private readonly object lockCurrentQueueObject = new();
@@ -2942,7 +2944,7 @@ namespace MPDCtrl.ViewModels
 
         public MainViewModel()
         {
-            #region == データ保存フォルダ ==
+            #region == Init config folder and file path ==
 
             // データ保存フォルダの取得
             _appDataFolder = _envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
@@ -2953,7 +2955,7 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            #region == コマンドの初期化 ==
+            #region == Init commands ==
 
             PlayCommand = new RelayCommand(PlayCommand_ExecuteAsync, PlayCommand_CanExecute);
             PlayStopCommand = new RelayCommand(PlayStopCommand_Execute, PlayStopCommand_CanExecute);
@@ -3075,8 +3077,9 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            #region == 今の所あまり意味の無いLock関係のこと == 
-            //TODO;
+            #region == Locks == 
+            
+            //TODO; not used
 
             BindingOperations.EnableCollectionSynchronization(Queue, lockQueueObject);
             BindingOperations.EnableCollectionSynchronization(_mpc.CurrentQueue, lockCurrentQueueObject);
@@ -3090,7 +3093,7 @@ namespace MPDCtrl.ViewModels
             
             #endregion
 
-            #region == イベントへのサブスクライブ ==
+            #region == Subscribe to events ==
 
             _mpc.IsBusy += new MPC.IsBusyEvent(OnMpcIsBusy);
 
@@ -3118,7 +3121,7 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            #region == タイマー ==  
+            #region == Init Song's time elapsed timer. ==  
 
             // Init Song's time elapsed timer.
             _elapsedTimer = new System.Timers.Timer(500);
@@ -3130,7 +3133,7 @@ namespace MPDCtrl.ViewModels
 
         #region == Startup and Shutdown ==
 
-        // 起動時の処理
+        // Startup
         public void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
             #region == アプリ設定のロード  ==
@@ -3704,13 +3707,13 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        // 起動後画面が描画された時の処理
+        // On window's content rendered
         public void OnContentRendered(object sender, EventArgs e)
         {
             IsFullyRendered = true;
         }
 
-        // 終了時の処理
+        // Closing
         public void OnWindowClosing(object sender, CancelEventArgs e)
         {
             // 二重起動とか途中でシャットダウンした時にデータが消えないように。
@@ -4175,7 +4178,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == メソッド ==
+        #region == Methods ==
 
         private void Start(string host, int port)
         {
@@ -5134,7 +5137,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == イベント ==
+        #region == Events ==
 
         private void OnMpdIdleConnected(MPC sender)
         {
@@ -5499,7 +5502,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == タイマー ==
+        #region == Timers ==
 
         private readonly System.Timers.Timer _elapsedTimer;
         private void ElapsedTimer(object sender, System.Timers.ElapsedEventArgs e)
@@ -5517,7 +5520,7 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        #region == コマンド ==
+        #region == Commands ==
 
         #region == Playback play ==
 
@@ -7226,7 +7229,7 @@ namespace MPDCtrl.ViewModels
                     ipAddress = IPAddress.Parse(Host);
                     if (ipAddress != null)
                     {
-                        ClearErrror(nameof(Host));
+                        ClearError(nameof(Host));
                     }
                 }
                 catch

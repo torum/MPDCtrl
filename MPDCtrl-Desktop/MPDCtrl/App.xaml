@@ -24,10 +24,10 @@
 
             <ResourceDictionary.MergedDictionaries>
 
-                <!-- デフォルトテーマ 差し替え用 -->
+                <!-- Default theme (for theme switch) -->
                 <ResourceDictionary Source="pack://application:,,,/Themes/DefaultTheme.xaml" x:Name="DefaultTheme"/>
 
-                <!-- 基本 -->
+                <!-- Basics -->
                 <ResourceDictionary>
 
                     <Style TargetType="{x:Type TextBox}">
@@ -326,7 +326,7 @@
 
                 </ResourceDictionary>
                 
-                <!-- 検索ボックス -->
+                <!-- Search Box -->
                 <ResourceDictionary>
                     <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
                     <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/>

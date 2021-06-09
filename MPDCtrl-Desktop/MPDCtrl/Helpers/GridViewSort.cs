@@ -287,9 +287,9 @@ namespace MPDCtrl.Helpers
 
         private class SortGlyphAdorner : Adorner
         {
-            private GridViewColumnHeader _columnHeader;
-            private ListSortDirection _direction;
-            private ImageSource _sortGlyph;
+            private readonly GridViewColumnHeader _columnHeader;
+            private readonly ListSortDirection _direction;
+            private readonly ImageSource _sortGlyph;
 
             public SortGlyphAdorner(GridViewColumnHeader columnHeader, ListSortDirection direction, ImageSource sortGlyph)
                 : base(columnHeader)
@@ -314,19 +314,19 @@ namespace MPDCtrl.Helpers
                     y2 = tmp;
                 }
 
-                PathSegmentCollection pathSegmentCollection = new PathSegmentCollection();
+                PathSegmentCollection pathSegmentCollection = new();
                 pathSegmentCollection.Add(new LineSegment(new Point(x2, y1), true));
                 pathSegmentCollection.Add(new LineSegment(new Point(x3, y2), true));
 
-                PathFigure pathFigure = new PathFigure(
+                PathFigure pathFigure = new(
                     new Point(x1, y1),
                     pathSegmentCollection,
                     true);
 
-                PathFigureCollection pathFigureCollection = new PathFigureCollection();
+                PathFigureCollection pathFigureCollection = new();
                 pathFigureCollection.Add(pathFigure);
 
-                PathGeometry pathGeometry = new PathGeometry(pathFigureCollection);
+                PathGeometry pathGeometry = new(pathFigureCollection);
                 return pathGeometry;
             }
 
@@ -338,7 +338,7 @@ namespace MPDCtrl.Helpers
                 {
                     double x = _columnHeader.ActualWidth - 13;
                     double y = _columnHeader.ActualHeight / 2 - 5;
-                    Rect rect = new Rect(x, y, 10, 10);
+                    Rect rect = new(x, y, 10, 10);
                     drawingContext.DrawImage(_sortGlyph, rect);
                 }
                 else

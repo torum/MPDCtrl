@@ -15,16 +15,16 @@ namespace MPDCtrl.Models
 {
     public class BinaryDownloader
     {
-        private static TcpClient _binaryConnection = new TcpClient();
+        private static TcpClient _binaryConnection = new();
         private StreamReader _binaryReader;
         private StreamWriter _binaryWriter;
 
-        private AlbumImage _albumCover = new AlbumImage();
+        private AlbumImage _albumCover = new();
         public AlbumImage AlbumCover { get => _albumCover; }
 
         private string _host;
         private int _port;
-        private string _password;
+        //private string _password;
 
         private string MpdVersion { get; set; }
 
@@ -58,7 +58,7 @@ namespace MPDCtrl.Models
 
         private async Task<ConnectionResult> MpdBinaryConnect(string host, int port)
         {
-            ConnectionResult result = new ConnectionResult();
+            ConnectionResult result = new();
 
             //IsMpdCommandConnected = false;
 
@@ -97,8 +97,8 @@ namespace MPDCtrl.Models
                     //
                     tcpStream.ReadTimeout = 3000;
 
-                    _binaryReader = new StreamReader(tcpStream);
-                    _binaryWriter = new StreamWriter(tcpStream);
+                    _binaryReader = new(tcpStream);
+                    _binaryWriter = new(tcpStream);
                     _binaryWriter.AutoFlush = true;
 
                     string response = await _binaryReader.ReadLineAsync();
@@ -156,9 +156,9 @@ namespace MPDCtrl.Models
 
         private async Task<CommandResult> MpdBinarySendPassword(string password = "")
         {
-            _password = password;
+            //_password = password;
 
-            CommandResult ret = new CommandResult();
+            CommandResult ret = new();
 
             if (string.IsNullOrEmpty(password))
             {
@@ -177,7 +177,7 @@ namespace MPDCtrl.Models
 
         private async Task<CommandResult> MpdBinarySendCommand(string cmd, bool isAutoIdling = false)
         {
-            CommandResult ret = new CommandResult();
+            CommandResult ret = new();
 
             if (_binaryConnection.Client == null)
             {
@@ -336,7 +336,7 @@ namespace MPDCtrl.Models
             {
                 //IsBusy?.Invoke(this, true);
 
-                StringBuilder stringBuilder = new StringBuilder();
+                StringBuilder stringBuilder = new();
 
                 bool isDoubleOk = false;
                 //bool isAck = false;
@@ -577,7 +577,7 @@ namespace MPDCtrl.Models
 
         private async Task<CommandBinaryResult> MpdBinarySendBinaryCommand(string cmd, bool isAutoIdling = false)
         {
-            CommandBinaryResult ret = new CommandBinaryResult();
+            CommandBinaryResult ret = new();
 
             if (_binaryConnection.Client == null)
             {
@@ -723,9 +723,9 @@ namespace MPDCtrl.Models
             // ReadAsync
             try
             {
-                StringBuilder stringBuilder = new StringBuilder();
+                StringBuilder stringBuilder = new();
 
-                byte[] bin = new byte[0];
+                byte[] bin = Array.Empty<byte>();
 
                 bool isDoubleOk = false;
                 bool isAck = false;
@@ -741,9 +741,9 @@ namespace MPDCtrl.Models
                     int readSize = 0;
                     int bufferSize = 5000;
                     byte[] buffer = new byte[bufferSize];
-                    byte[] bindata = new byte[0];
+                    byte[] bindata = Array.Empty<byte>();
 
-                    using (MemoryStream ms = new MemoryStream())
+                    using (MemoryStream ms = new())
                     {
                         while ((readSize = await _binaryReader.BaseStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                         {
@@ -1021,7 +1021,7 @@ namespace MPDCtrl.Models
 
         private CommandBinaryResult ParseAlbumImageData(byte[] data)
         {
-            CommandBinaryResult r = new CommandBinaryResult();
+            CommandBinaryResult r = new();
 
             //if (MpdStop) return r;
 
@@ -1164,7 +1164,7 @@ namespace MPDCtrl.Models
                     }
                 }
 
-                gabEnd = gabEnd + 1; //
+                gabEnd++; //
 
                 // test
                 //gabEnd = 4; // \n O K \n
@@ -1239,7 +1239,7 @@ namespace MPDCtrl.Models
         {
             if (string.IsNullOrEmpty(uri))
             {
-                CommandResult f = new CommandResult();
+                CommandResult f = new();
                 f.ErrorMessage = "IsNullOrEmpty(uri)";
                 f.IsSuccess = false;
                 return f;
@@ -1336,7 +1336,7 @@ namespace MPDCtrl.Models
                 }
             }
 
-            CommandResult b = new CommandResult();
+            CommandResult b = new();
             b.IsSuccess = r;
             if (!r)
             {
@@ -1350,7 +1350,7 @@ namespace MPDCtrl.Models
         {
             if (string.IsNullOrEmpty(uri))
             {
-                CommandBinaryResult f = new CommandBinaryResult();
+                CommandBinaryResult f = new();
                 f.ErrorMessage = "IsNullOrEmpty(uri)";
                 f.IsSuccess = false;
                 return f;
@@ -1360,7 +1360,7 @@ namespace MPDCtrl.Models
             {
                 Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading == false. Ignoring.");
 
-                CommandBinaryResult f = new CommandBinaryResult();
+                CommandBinaryResult f = new();
                 f.IsSuccess = false;
                 return f;
             }
@@ -1371,7 +1371,7 @@ namespace MPDCtrl.Models
 
                 _albumCover.IsDownloading = false;
 
-                CommandBinaryResult f = new CommandBinaryResult();
+                CommandBinaryResult f = new();
                 f.IsSuccess = false;
                 return f;
             }
@@ -1393,10 +1393,8 @@ namespace MPDCtrl.Models
 
         private static BitmapSource BitmaSourceFromByteArray(byte[] buffer)
         {
-            using (var stream = new MemoryStream(buffer))
-            {
-                return BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
-            }
+            using var stream = new MemoryStream(buffer);
+            return BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
         }
 
         public void MpdBinaryConnectionDisconnect()

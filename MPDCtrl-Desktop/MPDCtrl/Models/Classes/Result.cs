@@ -32,19 +32,6 @@ namespace MPDCtrl.Models
         public byte[] BinaryData;
     }
 
-    /*
-    // for commands that return nothing but "OK" or "ACK".
-    public class CommandBoolResult : CommandResult
-    {
-    }
-
-    // for commands that return something but ignore it and wait for idle event.
-    public class CommandEventWaitResult : CommandResult
-    {
-        
-    }
-    */
-
     // for commands that return playlist songs.
     public class CommandPlaylistResult : CommandResult
     {
@@ -57,10 +44,9 @@ namespace MPDCtrl.Models
         public ObservableCollection<SongInfo> SearchResult;
     }
 
-    // TODO: 不要？
+    // TODO: Not used?
     public class IdleResult : CommandResult
     {
 
     }
-
 }

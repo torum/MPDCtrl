@@ -123,7 +123,7 @@ namespace MPDCtrl.Helpers
             // The given object must be a FrameworkElement instance,
             // because we add an event handler to SizeChanged event
             // of it.
-            var element = obj as FrameworkElement;
+            FrameworkElement element = obj as FrameworkElement;
 
             if (element == null)
             {
@@ -162,7 +162,7 @@ namespace MPDCtrl.Helpers
         // An event handler invoked when SizeChanged event is raised.
         private static void HandleSizeChanged(object sender, SizeChangedEventArgs args)
         {
-            var element = sender as FrameworkElement;
+            FrameworkElement element = sender as FrameworkElement;
 
             if (element == null)
             {

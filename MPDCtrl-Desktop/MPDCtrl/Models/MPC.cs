@@ -208,7 +208,7 @@ namespace MPDCtrl.Models
 
         public async Task<bool> MpdIdleConnectionStart(string host, int port, string password)
         {
-            // 現在、使ってない。
+            // TODO: not used for now.
 
             ConnectionResult r = await MpdIdleConnect(host, port);
 
@@ -1008,7 +1008,6 @@ namespace MPDCtrl.Models
                     // ここでIdleにして、以降はnoidle + cmd + idleの組み合わせでやる。
                     // ただし、実際にはidleのあとReadしていないからタイムアウトで切断されてしまう模様。
 
-                    // awaitが必要だった。
                     d = await MpdSendIdle();
 
                     return d.IsSuccess;
@@ -1140,7 +1139,7 @@ namespace MPDCtrl.Models
             if (string.IsNullOrEmpty(password))
             {
                 ret.IsSuccess = true;
-                ret.ResultText = "OK";//Or OK
+                ret.ResultText = "OK";
                 ret.ErrorMessage = "";
 
                 return ret;

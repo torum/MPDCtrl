@@ -30,7 +30,7 @@ namespace MPDCtrl.Models
         {
             get
             {
-                DateTime _lastModifiedDateTime = default(DateTime); //new DateTime(1998,04,30)
+                DateTime _lastModifiedDateTime = default; //new DateTime(1998,04,30)
 
                 if (!string.IsNullOrEmpty(_lastModified))
                 {

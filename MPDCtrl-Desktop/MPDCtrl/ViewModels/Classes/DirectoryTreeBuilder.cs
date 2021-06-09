@@ -73,8 +73,8 @@ namespace MPDCtrl.ViewModels.Classes
 
             IsCanceled = false;
 
-            Uri uri = new Uri(@"file:///./");
-            NodeDirectory root = new NodeDirectory("/", uri);
+            Uri uri = new(@"file:///./");
+            NodeDirectory root = new("/", uri);
             root.Selected = true;
             root.Expanded = true;
 
@@ -145,7 +145,7 @@ namespace MPDCtrl.ViewModels.Classes
 
                             if (!found)
                             {
-                                NodeDirectory hoge = new NodeDirectory(asdf.Trim(), new Uri(@"file:///" + pathDir.Trim()));
+                                NodeDirectory hoge = new(asdf.Trim(), new Uri(@"file:///" + pathDir.Trim()));
                                 hoge.Selected = false;
                                 hoge.Expanded = true;
 
@@ -164,7 +164,7 @@ namespace MPDCtrl.ViewModels.Classes
                     }
                     else if (ValuePair.Length == 1)
                     {
-                        NodeDirectory hoge = new NodeDirectory(ValuePair[0].Trim(), new Uri(@"file:///" + pathDir.Trim()));
+                        NodeDirectory hoge = new(ValuePair[0].Trim(), new Uri(@"file:///" + pathDir.Trim()));
                         hoge.Selected = false;
                         hoge.Expanded = true;
 

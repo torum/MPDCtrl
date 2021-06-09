@@ -7,9 +7,7 @@ using MPDCtrl.Common;
 
 namespace MPDCtrl.Models
 {
-    //SongInfo > SongInfoEx
-    //Song > SongInfo
-    //SongFile
+    // SongFile > SongInfo > SongInfoEx
 
     /// <summary>
     /// Generic song file class. (for listall)
@@ -47,7 +45,7 @@ namespace MPDCtrl.Models
                         min = sec / 60;
                         s = sec % 60;
                         hour = min / 60;
-                        min = min % 60;
+                        min %= 60;
 
                         if ((hour == 0) && min == 0)
                         {
@@ -123,7 +121,7 @@ namespace MPDCtrl.Models
         {
             get
             {
-                DateTime _lastModifiedDateTime = default(DateTime); //new DateTime(1998,04,30)
+                DateTime _lastModifiedDateTime = default; //new DateTime(1998,04,30)
 
                 if (!string.IsNullOrEmpty(_lastModified))
                 {
@@ -156,7 +154,7 @@ namespace MPDCtrl.Models
                     return;
 
                 _index = value;
-                this.NotifyPropertyChanged("Index");
+                this.NotifyPropertyChanged(nameof(Index));
             }
         }
 
@@ -192,7 +190,7 @@ namespace MPDCtrl.Models
                     return;
 
                 _pos = value;
-                this.NotifyPropertyChanged("Pos");
+                this.NotifyPropertyChanged(nameof(Pos));
             }
         }
 
@@ -209,9 +207,8 @@ namespace MPDCtrl.Models
                     return;
 
                 _isPlaying = value;
-                this.NotifyPropertyChanged("IsPlaying");
+                this.NotifyPropertyChanged(nameof(IsPlaying));
             }
         }
     }
-
 }

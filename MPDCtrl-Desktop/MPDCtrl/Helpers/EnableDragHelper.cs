@@ -23,7 +23,7 @@ namespace MPDCtrl.Helpers
         private static void OnLoaded(DependencyObject dependencyObject,
             DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
-            var uiElement = dependencyObject as UIElement;
+            UIElement uiElement = dependencyObject as UIElement;
             if (uiElement == null || (dependencyPropertyChangedEventArgs.NewValue is bool) == false)
             {
                 return;
@@ -41,7 +41,7 @@ namespace MPDCtrl.Helpers
 
         private static void UiElementOnMouseMove(object sender, MouseEventArgs mouseEventArgs)
         {
-            var uiElement = sender as UIElement;
+            UIElement uiElement = sender as UIElement;
             if (uiElement != null && mouseEventArgs.LeftButton == MouseButtonState.Pressed)
             {
                 DependencyObject parent = uiElement;

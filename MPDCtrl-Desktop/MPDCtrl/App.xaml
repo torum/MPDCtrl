@@ -1815,8 +1815,8 @@
                                             -->
                                         </Trigger>
                                         <Trigger Property="IsMouseOver" Value="true">
-                                            
-                                            <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="white" />
+
+                                            <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="#444" />
                                             <!-- ヘッダークリック可の場合削除
                                             -->
                                         </Trigger>

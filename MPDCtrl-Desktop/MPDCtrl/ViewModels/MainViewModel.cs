@@ -31,7 +31,7 @@ namespace MPDCtrl.ViewModels
     /// TODO: 
     /// [Enhancement] Add "Play Next" menu item in playlists and search result.　
     /// [Enhancement] Add "update" and "rescan" button in Setting's page.
-    /// [Enhancement] Add inline renaming in the TreeView popup menu.
+    /// [Enhancement] Add inline renaming in the TreeView popup menu. (and right click select)
     /// [Enhancement] Queue reorder with drag and drop.
     /// [Enhancement] Surpress or fix "Playlist has changed, do you want update" nortification.
     /// [Enhancement] Remove some garbage in the TreeView's popup menu.
@@ -46,6 +46,7 @@ namespace MPDCtrl.ViewModels
     /// Add Search option "Exact" or "Contain".
     /// 
     /// Version history：
+    /// v3.0.9   Store release. Bundle x86 and x64.
     /// v3.0.8.3 Removed none English comments in the source code as much as possible. Little bit of clean up.
     /// v3.0.8.2 Fixed some typo and translations.
     /// v3.0.8.1 Changed Popup's Placement="Mouse" to "Center".
@@ -110,7 +111,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.8.3";
+        const string _appVer = "v3.0.9.0";
 
         public static string AppVer
         {

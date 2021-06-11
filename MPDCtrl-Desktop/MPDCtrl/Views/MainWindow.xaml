@@ -911,7 +911,7 @@
                             </ListView.View>
                         </ListView>
 
-                        <!-- Filterボックス -->
+                        <!-- Filter box -->
                         <Border Grid.Row="0" Margin="0 32 23 0" Padding="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="580" Background="WhiteSmoke" CornerRadius="3" Visibility="{Binding IsQueueFindVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                             <StackPanel>
                                 <TextBox Text="{Binding FilterQueueQuery, UpdateSourceTrigger=PropertyChanged}" KeyboardNavigation.TabNavigation="Local" Margin="0" Padding="3" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" IsVisibleChanged="TextBox_IsVisibleChanged">

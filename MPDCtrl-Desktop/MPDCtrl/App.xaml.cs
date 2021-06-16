@@ -142,7 +142,6 @@ namespace MPDCtrl
             //Environment.Exit(1);
         }
 
-
         public void AppendErrorLog(string errorTxt, string kindTxt)
         {
             DateTime dt = DateTime.Now;

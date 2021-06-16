@@ -43,6 +43,8 @@ namespace MPDCtrl.Views
                     vm.ScrollIntoView += (sender, arg) => { this.OnScrollIntoView(arg); };
                     vm.ScrollIntoViewAndSelect += (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
 
+                    vm.ScrollIntoViewPlaylistSongs += (sender, arg) => { this.OnScrollIntoViewPlaylistSongs(arg); };
+
                     vm.DebugWindowShowHide += () => OnDebugWindowShowHide();
                     vm.DebugWindowShowHide2 += (sender, arg) => OnDebugWindowShowHide2(arg);
 
@@ -78,17 +80,29 @@ namespace MPDCtrl.Views
         {
             if ((QueueListview.Items.Count > arg) && (arg > -1))
             {
-                //QueueListview.ScrollIntoView(QueueListview.Items[arg]);
-
                 QueueListview.SelectedItems.Clear();
+
+                QueueListview.ScrollIntoView(QueueListview.Items[arg]);
 
                 ListViewItem lvi = QueueListview.ItemContainerGenerator.ContainerFromIndex(arg) as ListViewItem;
                 if (lvi != null)
                 {
-                    QueueListview.ScrollIntoView(lvi);
-                    lvi.IsSelected = true;
+                    //QueueListview.ScrollIntoView(lvi);
                     lvi.Focus();
+                    lvi.IsSelected = true;
                 }
+            }
+        }
+
+        public void OnScrollIntoViewPlaylistSongs(int arg)
+        {
+            if ((PlaylistSongsListview.Items.Count > arg) && (arg > -1))
+            {
+                PlaylistSongsListview.ScrollIntoView(PlaylistSongsListview.Items[arg]);
+
+                ListViewItem lvi = PlaylistSongsListview.ItemContainerGenerator.ContainerFromIndex(arg) as ListViewItem;
+                if (lvi != null)
+                    lvi.Focus();
             }
         }
 
@@ -100,7 +114,7 @@ namespace MPDCtrl.Views
             QueueListview.SelectedIndex = - 1;
         }
         */
-        
+
         public void OnDebugCommandOutput(string arg)
         {
             // AppendText() is much faster than data binding.
@@ -209,11 +223,15 @@ namespace MPDCtrl.Views
             {
                 RestoreButton.Visibility = Visibility.Collapsed;
                 MaxButton.Visibility = Visibility.Visible;
+
+                //LayoutGrid.Margin = new Thickness(0);
             }
             else if (this.WindowState == WindowState.Maximized)
             {
                 RestoreButton.Visibility = Visibility.Visible;
                 MaxButton.Visibility = Visibility.Collapsed;
+
+                //LayoutGrid.Margin = new Thickness(8,4,8,8);
             }
         }
 
@@ -241,6 +259,14 @@ namespace MPDCtrl.Views
         {
             // Not really good especially when multiple items are selected
             //QueueListview.ScrollIntoView(QueueListview.SelectedItem);
+        }
+
+        private void PlaylistSongsListview_TargetUpdated(object sender, DataTransferEventArgs e)
+        {
+            if (PlaylistSongsListview.Items.Count > 0)
+            {
+                PlaylistSongsListview.ScrollIntoView(PlaylistSongsListview.Items[0]);
+            }
         }
 
         private void TextBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -371,8 +397,9 @@ namespace MPDCtrl.Views
         }
 
         #region == Size fix on window maximize ==
-        // https://engy.us/blog/2020/01/01/implementing-a-custom-window-title-bar-in-wpf/
 
+        // https://engy.us/blog/2020/01/01/implementing-a-custom-window-title-bar-in-wpf/
+        
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
@@ -469,8 +496,6 @@ namespace MPDCtrl.Views
             public POINT ptMinTrackSize;
             public POINT ptMaxTrackSize;
         }
-
-
         #endregion
 
     }

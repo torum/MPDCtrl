@@ -158,6 +158,24 @@ namespace MPDCtrl.Models
             }
         }
 
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get
+            {
+                return _isSelected;
+            }
+            set
+            {
+                if (_isSelected == value)
+                    return;
+
+                _isSelected = value;
+
+                NotifyPropertyChanged("IsSelected");
+            }
+        }
+
         public int IndexPlusOne
         {
             get
@@ -165,7 +183,6 @@ namespace MPDCtrl.Models
                 return _index+1;
             }
         }
-
     }
 
     /// <summary>

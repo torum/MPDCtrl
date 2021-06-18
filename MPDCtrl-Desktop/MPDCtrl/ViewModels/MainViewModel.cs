@@ -48,6 +48,7 @@ namespace MPDCtrl.ViewModels
     /// Add Search option "Exact" or "Contain".
     /// 
     /// Version history：
+    /// v3.0.12 MS Store release.
     /// v3.0.11.3 minor ui improvements.
     /// v3.0.11.2 Little clean up and queue update tweak. 
     /// v3.0.11.1 PlaylistSongsListview: clear selection and "bring to top" when items source changed.
@@ -117,7 +118,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.11.3";
+        const string _appVer = "v3.0.12.0";
 
         public static string AppVer
         {
@@ -2925,7 +2926,7 @@ namespace MPDCtrl.ViewModels
         public event EventHandler<int> ScrollIntoViewAndSelect;
 
         // PlaylistSongsListview ScrollIntoView
-        public event EventHandler<int> ScrollIntoViewPlaylistSongs;
+        //public event EventHandler<int> ScrollIntoViewPlaylistSongs;
 
         //public delegate void QueueSelectionClearEventHandler();
         //public event QueueSelectionClearEventHandler QueueSelectionClear;

@@ -43,7 +43,7 @@ namespace MPDCtrl.Views
                     vm.ScrollIntoView += (sender, arg) => { this.OnScrollIntoView(arg); };
                     vm.ScrollIntoViewAndSelect += (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
 
-                    vm.ScrollIntoViewPlaylistSongs += (sender, arg) => { this.OnScrollIntoViewPlaylistSongs(arg); };
+                    //vm.ScrollIntoViewPlaylistSongs += (sender, arg) => { this.OnScrollIntoViewPlaylistSongs(arg); };
 
                     vm.DebugWindowShowHide += () => OnDebugWindowShowHide();
                     vm.DebugWindowShowHide2 += (sender, arg) => OnDebugWindowShowHide2(arg);
@@ -92,6 +92,7 @@ namespace MPDCtrl.Views
             }
         }
 
+        /*
         public void OnScrollIntoViewPlaylistSongs(int arg)
         {
             if ((PlaylistSongsListview.Items.Count > arg) && (arg > -1))
@@ -103,6 +104,7 @@ namespace MPDCtrl.Views
                     lvi.Focus();
             }
         }
+        */
 
         public void OnDebugCommandOutput(string arg)
         {

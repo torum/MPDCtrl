@@ -29,7 +29,7 @@ using MPDCtrl.ViewModels.Classes;
 namespace MPDCtrl.ViewModels
 {
     /// TODO: 
-    /// [Bug] Queue reorder(move) with multiple items selection.
+    /// [Bug] Queue reorder(move) when multiple items selected.
     /// 
     /// [Enhancement] Add "Play Next" menu item in playlists and search result.　
     /// [Enhancement] Add "update" and "rescan" button in Setting's page.
@@ -48,8 +48,10 @@ namespace MPDCtrl.ViewModels
     /// Add Search option "Exact" or "Contain".
     /// 
     /// Version history：
+    /// v3.0.11.3 minor ui improvements.
+    /// v3.0.11.2 Little clean up and queue update tweak. 
     /// v3.0.11.1 PlaylistSongsListview: clear selection and "bring to top" when items source changed.
-    /// v3.0.11   Store release.  It wasn't workig > v3.0.10 Bundle x86 and x64.
+    /// v3.0.11   Store release. (x86 only)  It wasn't workig > v3.0.10 Bundle x86 and x64.
     /// v3.0.10   Store release.  It wasn't workig > v3.0.9 Bundle x86 and x64.
     /// v3.0.8.3 Removed none English comments in the source code as much as possible. Little bit of clean up.
     /// v3.0.8.2 Fixed some typo and translations.
@@ -115,7 +117,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.11.1";
+        const string _appVer = "v3.0.11.3";
 
         public static string AppVer
         {
@@ -4436,15 +4438,15 @@ namespace MPDCtrl.ViewModels
 
                 try
                 {
-                    // A simplest way, but all the selections and listview position will be cleared. Kind of annoying when moving items.
+                    // The simplest way, but all the selections and listview position will be cleared. Kind of annoying when moving items.
                     /*
+                    UpdateProgress?.Invoke(this, "[UI] Loading the queue...");
                     if (Application.Current == null) { return; }
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         Queue = new ObservableCollection<SongInfoEx>(_mpc.CurrentQueue);
                     });
                     UpdateProgress?.Invoke(this, "");
-                    }
                     */
                     
                     if (Application.Current == null) { return; }
@@ -4453,9 +4455,6 @@ namespace MPDCtrl.ViewModels
                         IsWorking = true;
 
                         UpdateProgress?.Invoke(this, "[UI] Updating the queue...");
-
-                        // tmp list for selections
-                        //List<SongInfoEx> _selQueue = new();
 
                         // tmp list of deletion
                         List<SongInfoEx> _tmpQueue = new();
@@ -4520,24 +4519,22 @@ namespace MPDCtrl.ViewModels
 
                         UpdateProgress?.Invoke(this, "");
 
-                        
                         // Sorting.
                         // Sort here because Queue list may have been re-ordered.
                         UpdateProgress?.Invoke(this, "[UI] Queue list sorting...");
                         var collectionView = CollectionViewSource.GetDefaultView(Queue);
+                        // no need to add because It's been added when "loading".
                         //collectionView.SortDescriptions.Add(new SortDescription("Index", ListSortDirection.Ascending));
                         collectionView.Refresh();
                         UpdateProgress?.Invoke(this, "");
                         
-
                         // Sorting.
                         // This is not good because all the selections will be cleared.
-                        /*
-                        UpdateProgress?.Invoke(this, "[UI] Queue list sorting...");
-                        Queue = new ObservableCollection<SongInfoEx>(Queue.OrderBy(n => n.Index));
-                        UpdateProgress?.Invoke(this, "");
-                        */
-
+                        //
+                        //UpdateProgress?.Invoke(this, "[UI] Queue list sorting...");
+                        //Queue = new ObservableCollection<SongInfoEx>(Queue.OrderBy(n => n.Index));
+                        //UpdateProgress?.Invoke(this, "");
+                        
                         UpdateProgress?.Invoke(this, "[UI] Checking current song after Queue update.");
 
                         // Set Current and NowPlaying.

@@ -165,8 +165,8 @@
                 <ResourceDictionary>
                     <Style x:Key="TreeViewMenuStyle" TargetType="{x:Type TreeView}">
                         <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="BorderBrush" Value="Transparent"/>
-                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="BorderBrush" Value="#121212"/>
+                        <Setter Property="BorderThickness" Value="0 0 0 0.5"/>
                         <Setter Property="Padding" Value="1"/>
                         <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
                         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
@@ -1319,6 +1319,7 @@
                                         </Trigger>
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter Property="TextElement.Foreground" TargetName="SelectMessage" Value="{DynamicResource ControlMouseOverColorBrush}"/>
+                                            <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{DynamicResource ControlMouseOverColorBrush}"/>
                                             <Setter Property="TextElement.Foreground" Value="{DynamicResource ControlMouseOverColorBrush}"/>
                                             <Setter Property="Foreground" Value="{DynamicResource ControlMouseOverColorBrush}"/>
                                         </Trigger>
@@ -1729,7 +1730,7 @@
                         <Setter Property="Padding" Value="0 0 0 0" />
                         <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
                         <Setter Property="TextElement.FontWeight" Value="Normal" />
-                        <Setter Property="TextElement.Foreground" Value="{DynamicResource ControlLightColorBrush}" />
+                        <Setter Property="TextElement.Foreground" Value="{DynamicResource ControlForegroundColorBrush}" />
                         <Setter Property="HorizontalContentAlignment" Value="Left"/>
                         <Setter Property="VerticalContentAlignment" Value="Center"/>
                         <Setter Property="Template">
@@ -1737,7 +1738,7 @@
                                 <ControlTemplate TargetType="GridViewColumnHeader">
                                     <Grid>
                                         <Border Name="HeaderBorder" Padding="12 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0.5" Background="{TemplateBinding Background}">
-                                            <ContentPresenter Name="HeaderContent" Margin="0,0,0,4" RecognizesAccessKey="True" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                            <ContentPresenter Name="HeaderContent" Margin="0,0,0,1" RecognizesAccessKey="True" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                         </Border>
                                         <!-- disable colum header resize by removing this. -->
                                         <Thumb x:Name="PART_HeaderGripper" Style="{StaticResource GridViewColumnHeaderGripperStyle}" HorizontalAlignment="Right" Margin="0,0,0,0" />
@@ -1747,7 +1748,6 @@
                                             <!-- ヘッダークリック可の場合
                                             <Setter TargetName="HeaderContent" Property="Margin" Value="0,1,0,0" />
                                             -->
-                                            <Setter TargetName="HeaderContent" Property="Margin" Value="0,0,0,4" />
                                         </Trigger>
                                         <Trigger Property="IsMouseOver" Value="true">
                                             <!-- ヘッダークリック可の場合
@@ -1793,7 +1793,7 @@
                         <Setter Property="Padding" Value="0 0 0 0" />
                         <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
                         <Setter Property="TextElement.FontWeight" Value="Normal" />
-                        <Setter Property="TextElement.Foreground" Value="{DynamicResource ControlLightColorBrush}" />
+                        <Setter Property="TextElement.Foreground" Value="{DynamicResource ControlForegroundColorBrush}" />
                         <Setter Property="HorizontalContentAlignment" Value="Left"/>
                         <Setter Property="VerticalContentAlignment" Value="Center"/>
                         <Setter Property="Template">
@@ -1801,7 +1801,7 @@
                                 <ControlTemplate TargetType="GridViewColumnHeader">
                                     <Grid>
                                         <Border Name="HeaderBorder" Padding="12 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0.5" Background="{TemplateBinding Background}">
-                                            <ContentPresenter Name="HeaderContent" Margin="0,0,0,4" RecognizesAccessKey="True" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                            <ContentPresenter Name="HeaderContent" Margin="0,0,0,1" RecognizesAccessKey="True" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                         </Border>
                                         <!-- disable colum header resize by removing this. -->
                                         <Thumb x:Name="PART_HeaderGripper" Style="{StaticResource GridViewColumnHeaderGripperStyle}" HorizontalAlignment="Right" Margin="0,0,0,0" />
@@ -1815,8 +1815,8 @@
                                             -->
                                         </Trigger>
                                         <Trigger Property="IsMouseOver" Value="true">
-
-                                            <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="#444" />
+                                            <Setter TargetName="HeaderContent" Property="TextElement.Foreground" Value="{DynamicResource ControlLightColorBrush}" />
+                                            <!-- <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="#444" /> -->
                                             <!-- ヘッダークリック可の場合削除
                                             -->
                                         </Trigger>

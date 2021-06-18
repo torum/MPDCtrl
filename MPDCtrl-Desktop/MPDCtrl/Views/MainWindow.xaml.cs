@@ -35,7 +35,7 @@ namespace MPDCtrl.Views
             RestoreButton.Visibility = Visibility.Collapsed;
             MaxButton.Visibility = Visibility.Visible;
 
-
+            // Subscribe to VM's events.
             if (this.DataContext is MainViewModel vm)
             {
                 if (vm != null)
@@ -58,10 +58,8 @@ namespace MPDCtrl.Views
 
                     vm.AckWindowClear += () => OnAckWindowClear();
 
-                    //vm.QueueSelectionClear += () => OnQueueSelectionClear();
                 }
             }
-
         }
 
         public void OnScrollIntoView(int arg)
@@ -105,15 +103,6 @@ namespace MPDCtrl.Views
                     lvi.Focus();
             }
         }
-
-        /*
-        public void OnQueueSelectionClear()
-        {
-            QueueListview.SelectedItem = null;
-            QueueListview.SelectedItems.Clear();
-            QueueListview.SelectedIndex = - 1;
-        }
-        */
 
         public void OnDebugCommandOutput(string arg)
         {
@@ -284,48 +273,6 @@ namespace MPDCtrl.Views
             }
         }
 
-        /*
-        private void QueueFilterComboBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (sender != null)
-            {
-                if (sender is ComboBox)
-                {
-                    ComboBox comboBox = (System.Windows.Controls.ComboBox)sender;
-
-                    if (comboBox.Visibility == Visibility.Visible)
-                    {
-                        Keyboard.Focus(comboBox);
-                        comboBox.Focus();
-
-                        comboBox.SelectedIndex = -1;
-                        comboBox.IsEditable = true;
-
-                        var textBox = comboBox.Template.FindName("PART_EditableTextBox", comboBox) as TextBox;
-                        if (textBox != null)
-                        {
-                            Keyboard.Focus(textBox);
-                            textBox.Focus();
-                            textBox.SelectionStart = textBox.Text.Length;
-                            Debug.WriteLine("asdfasdfasdfasdfasdf");
-                        }
-                    }
-                }
-            }
-        }
-        */
-
-        /*
-        private void DialogInputTextBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (DialogInputTextBox.Visibility == Visibility.Visible)
-            {
-                DialogInputTextBox.Focus();
-                Keyboard.Focus(DialogInputTextBox);
-            }
-        }
-        */
-
         private void PasswordBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (sender != null)
@@ -353,41 +300,6 @@ namespace MPDCtrl.Views
             */
         }
 
-        /*
-        private void DialogButton_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (sender != null)
-            {
-                if (sender is Button)
-                {
-                    if ((sender as Button).Visibility == Visibility.Visible)
-                    {
-                        (sender as Button).Focus();
-                        Keyboard.Focus((sender as Button));
-                    }
-                }
-            }
-        }
-        */
-
-        /*
-        private void PlaylistNameWithNewComboBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (sender != null)
-            {
-                if (sender is ComboBox)
-                {
-                    if ((sender as ComboBox).Visibility == Visibility.Visible)
-                    {
-                        (sender as ComboBox).Focus();
-                        Keyboard.Focus((sender as ComboBox));
-                    }
-                }
-            }
-        }
-        */
-
-        // launch browser and display 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             ProcessStartInfo psi = new(e.Uri.AbsoluteUri);

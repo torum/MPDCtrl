@@ -66,7 +66,7 @@ namespace MPDCtrl.ViewModels.Classes
 
         public bool IsCanceled { get; set; }
 
-        public async void Load(List<String> dirs)
+        public void Load(List<String> dirs)
         {
             if (dirs == null)
                 return;
@@ -89,7 +89,7 @@ namespace MPDCtrl.ViewModels.Classes
             foreach (var pathDir in dirs)
             {
                 // for responsivenesss.
-                await Task.Delay(1);
+                //await Task.Delay(1);
 
                 // changed profile etc.
                 if (IsCanceled)

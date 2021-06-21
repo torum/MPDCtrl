@@ -1726,7 +1726,7 @@
                     <Style x:Key="GridViewColumnHeaderStyle" TargetType="GridViewColumnHeader">
                         <Setter Property="OverridesDefaultStyle" Value="True"/>
                         <Setter Property="Height" Value="27" />
-                        <Setter Property="Margin" Value="-2 1 0 0" />
+                        <Setter Property="Margin" Value="-1 1 0 0" />
                         <Setter Property="Padding" Value="0 0 0 0" />
                         <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
                         <Setter Property="TextElement.FontWeight" Value="Normal" />
@@ -1789,7 +1789,7 @@
                     <Style x:Key="GridViewColumnHeaderClickStyle" TargetType="GridViewColumnHeader">
                         <Setter Property="OverridesDefaultStyle" Value="True"/>
                         <Setter Property="Height" Value="27" />
-                        <Setter Property="Margin" Value="-2 1 0 0" />
+                        <Setter Property="Margin" Value="-2 0 0 0" />
                         <Setter Property="Padding" Value="0 0 0 0" />
                         <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
                         <Setter Property="TextElement.FontWeight" Value="Normal" />

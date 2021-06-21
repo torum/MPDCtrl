@@ -48,7 +48,10 @@ namespace MPDCtrl.ViewModels
     /// Add Search option "Exact" or "Contain".
     /// 
     /// Version history：
-    /// v3.0.12 MS Store release.
+    /// v3.0.12.3 Fixed bug : Move to NowPlaying was not working after queue list update. 
+    /// v3.0.12.2 Fixed listview column header margin.
+    /// v3.0.12.1 MS Store release.listview virtualization fix.
+    /// v3.0.12   --MS Store release.
     /// v3.0.11.3 minor ui improvements.
     /// v3.0.11.2 Little clean up and queue update tweak. 
     /// v3.0.11.1 PlaylistSongsListview: clear selection and "bring to top" when items source changed.
@@ -118,7 +121,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.12.0";
+        const string _appVer = "v3.0.12.3";
 
         public static string AppVer
         {
@@ -4435,21 +4438,77 @@ namespace MPDCtrl.ViewModels
                 UpdateProgress?.Invoke(this, "[UI] Updating the queue...");
                 await Task.Delay(20);
 
+                if (IsSwitchingProfile)
+                    return;
+
                 IsWorking = true;
 
                 try
                 {
                     // The simplest way, but all the selections and listview position will be cleared. Kind of annoying when moving items.
-                    /*
+                    
                     UpdateProgress?.Invoke(this, "[UI] Loading the queue...");
                     if (Application.Current == null) { return; }
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         Queue = new ObservableCollection<SongInfoEx>(_mpc.CurrentQueue);
+
+                        UpdateProgress?.Invoke(this, "[UI] Checking current song after Queue update.");
+
+                        // Set Current and NowPlaying.
+                        var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
+                        if (curitem != null)
+                        {
+                            if (CurrentSong != null)
+                            {
+                                if (CurrentSong.Id != curitem.Id)
+                                {
+                                    CurrentSong = curitem;
+                                    CurrentSong.IsPlaying = true;
+
+                                    if (IsAutoScrollToNowPlaying)
+                                        // ScrollIntoView while don't change the selection 
+                                        ScrollIntoView?.Invoke(this, CurrentSong.Index);
+
+                                    // AlbumArt
+                                    if (_mpc.AlbumCover.SongFilePath != curitem.File)
+                                    {
+                                        IsAlbumArtVisible = false;
+                                        AlbumArt = _albumArtDefault;
+
+                                        if (!String.IsNullOrEmpty(CurrentSong.File))
+                                        {
+                                            //_mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
+                                            isAlbumArtChanged = true;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    curitem.IsPlaying = true;
+
+                                    if (IsAutoScrollToNowPlaying)
+                                        // ScrollIntoView while don't change the selection 
+                                        ScrollIntoView?.Invoke(this, curitem.Index);
+
+                                }
+                            }
+                        }
+                        else
+                        {
+                            CurrentSong = null;
+
+                            IsAlbumArtVisible = false;
+                            AlbumArt = _albumArtDefault;
+                        }
+
+                        UpdateProgress?.Invoke(this, "");
+
+                        IsWorking = false;
                     });
                     UpdateProgress?.Invoke(this, "");
-                    */
                     
+                    /*
                     if (Application.Current == null) { return; }
                     Application.Current.Dispatcher.Invoke(() =>
                     {
@@ -4580,6 +4639,7 @@ namespace MPDCtrl.ViewModels
 
                         IsWorking = false;
                     });
+                    */
                 }
                 catch (Exception e)
                 {
@@ -4607,6 +4667,9 @@ namespace MPDCtrl.ViewModels
             {
                 UpdateProgress?.Invoke(this, "[UI] Loading the queue...");
                 await Task.Delay(20);
+
+                if (IsSwitchingProfile)
+                    return;
 
                 IsWorking = true;
 

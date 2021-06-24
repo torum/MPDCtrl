@@ -29,26 +29,25 @@ using MPDCtrl.ViewModels.Classes;
 namespace MPDCtrl.ViewModels
 {
     /// TODO: 
-    /// [Bug] Queue reorder(move) when multiple items selected.
-    /// 
-    /// [Enhancement] Add "Play Next" menu item in playlists and search result.　
-    /// [Enhancement] Add "update" and "rescan" button in Setting's page.
-    /// [Enhancement] Add inline renaming in the TreeView popup menu. (and right click select)
-    /// [Enhancement] Queue reorder with drag and drop.
-    /// [Enhancement] Surpress or fix "Playlist has changed, do you want update" nortification.
-    /// [Enhancement] Remove some garbage in the TreeView's popup menu.
-    /// [Enhancement] Remember left pane's width.
-    /// [Internal] organize and clean up resourses such as translation and styles.
-    /// [Enhancement] Theme selection.
+    /// Queue: multiple items reorder.
+    /// Add "Play Next" menu item in playlists and search result.　
+    /// Add "update" and "rescan" button in Setting's page.
+    /// Add inline renaming in the TreeView popup menu. (and right click select)
+    /// Queue reorder with drag and drop.
+    /// Surpress or fix "Playlist has changed, do you want update" nortification.
+    /// Remove some garbage in the TreeView's popup menu.
+    /// Remember left pane's width.
+    /// organize and clean up resourses such as translation and styles.
+    /// Theme selection.
     /// 
     /// Ideas:
-    /// Alarm & Timers!
     /// Auto connect to localhost?
     /// Cache CashAlbumArt and Album view?
     /// Add Search option "Exact" or "Contain".
     /// 
     /// Version history：
-    /// v3.0.12.3 Fixed bug : Move to NowPlaying was not working after queue list update. 
+    /// v3.0.13   MS Store release.
+    /// v3.0.12.3 Fixed bug : Move to NowPlaying after queue update was not working . 
     /// v3.0.12.2 Fixed listview column header margin.
     /// v3.0.12.1 MS Store release.listview virtualization fix.
     /// v3.0.12   --MS Store release.
@@ -121,7 +120,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.12.3";
+        const string _appVer = "v3.0.13.0";
 
         public static string AppVer
         {

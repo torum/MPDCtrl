@@ -138,5 +138,4 @@ namespace MPDCtrl.ViewModels.Classes
         }
 
     }
-
 }

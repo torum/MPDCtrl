@@ -24,6 +24,5 @@ namespace MPDCtrl.Models
         public int BinarySize { get; set; }
 
         public ImageSource AlbumImageSource { get; set; }
-
     }
 }

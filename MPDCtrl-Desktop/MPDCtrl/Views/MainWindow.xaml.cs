@@ -28,30 +28,41 @@ namespace MPDCtrl.Views
         {
             InitializeComponent();
 
-            Loaded += (this.DataContext as MainViewModel).OnWindowLoaded;
-            ContentRendered += (this.DataContext as MainViewModel).OnContentRendered;
-            Closing += (this.DataContext as MainViewModel).OnWindowClosing;
+            // Set initial visibility for Window's system buttoms.
 
             RestoreButton.Visibility = Visibility.Collapsed;
+
             MaxButton.Visibility = Visibility.Visible;
 
-            // Subscribe to VM's events.
+            // Event subscriptions
             if (this.DataContext is MainViewModel vm)
             {
                 if (vm != null)
                 {
+                    // Subscribe to Window events.
+
+                    Loaded += vm.OnWindowLoaded;
+
+                    ContentRendered += vm.OnContentRendered;
+                    
+                    Closing += vm.OnWindowClosing;
+
+                    // Subscribe to ViewModel events.
+
                     vm.ScrollIntoView += (sender, arg) => { this.OnScrollIntoView(arg); };
+
                     vm.ScrollIntoViewAndSelect += (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
 
-                    //vm.ScrollIntoViewPlaylistSongs += (sender, arg) => { this.OnScrollIntoViewPlaylistSongs(arg); };
-
                     vm.DebugWindowShowHide += () => OnDebugWindowShowHide();
+
                     vm.DebugWindowShowHide2 += (sender, arg) => OnDebugWindowShowHide2(arg);
 
                     vm.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
+
                     vm.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
 
                     vm.DebugCommandClear += () => OnDebugCommandClear();
+
                     vm.DebugIdleClear += () => OnDebugIdleClear();
 
                     vm.AckWindowOutput += (sender, arg) => { this.OnAckWindowOutput(arg); };
@@ -91,20 +102,6 @@ namespace MPDCtrl.Views
                 }
             }
         }
-
-        /*
-        public void OnScrollIntoViewPlaylistSongs(int arg)
-        {
-            if ((PlaylistSongsListview.Items.Count > arg) && (arg > -1))
-            {
-                PlaylistSongsListview.ScrollIntoView(PlaylistSongsListview.Items[arg]);
-
-                ListViewItem lvi = PlaylistSongsListview.ItemContainerGenerator.ContainerFromIndex(arg) as ListViewItem;
-                if (lvi != null)
-                    lvi.Focus();
-            }
-        }
-        */
 
         public void OnDebugCommandOutput(string arg)
         {

@@ -7,19 +7,16 @@ using MPDCtrl.Common;
 
 namespace MPDCtrl.Models
 {
-    // SongFile > SongInfo > SongInfoEx
-
     /// <summary>
     /// Generic song file class. (for listall)
     /// </summary>
     public class SongFile : ViewModelBase
     {
         public string File { get; set; } = "";
-
     }
 
     /// <summary>
-    /// SongInfo class. (for playlist or search result)
+    /// SongInfo class. Extends SongFile. (for playlist or search result)
     /// </summary>
     public class SongInfo : SongFile
     {
@@ -186,7 +183,7 @@ namespace MPDCtrl.Models
     }
 
     /// <summary>
-    /// song class with some extra info. (for queue)
+    /// Song class with some extra info. Extends SongInfo. (for queue)
     /// </summary>
     public class SongInfoEx : SongInfo
     {

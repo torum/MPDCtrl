@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MPDCtrl", "MPDCtrl\MPDCtrl.csproj", "{72A81192-4291-42D0-ABBD-9B3FC27B0B54}"
 EndProject
-Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "MSStorePackageProject", "MSStorePackageProject\MSStorePackageProject.wapproj", "{DA98EE48-EFF6-420F-85F4-F0EBCE56576D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

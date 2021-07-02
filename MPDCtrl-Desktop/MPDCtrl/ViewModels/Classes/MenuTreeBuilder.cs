@@ -52,7 +52,6 @@ namespace MPDCtrl.ViewModels.Classes
         public NodeMenuPlaylists(string name) : base(name)
         {
             PathIcon = "M20,18H4V8H20M20,6H12L10,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8A2,2 0 0,0 20,6M15,16H6V14H15V16M18,12H6V10H18V12Z";
-            
         }
     }
     
@@ -65,7 +64,6 @@ namespace MPDCtrl.ViewModels.Classes
         public NodeMenuPlaylistItem(string name) : base(name)
         {
             PathIcon = "M15,6H3V8H15V6M15,10H3V12H15V10M3,16H11V14H3V16M17,6V14.18C16.69,14.07 16.35,14 16,14A3,3 0 0,0 13,17A3,3 0 0,0 16,20A3,3 0 0,0 19,17V8H22V6H17Z";
-            //PathIcon = "";
         }
     }
 
@@ -136,16 +134,6 @@ namespace MPDCtrl.ViewModels.Classes
             this.Children.Add(playlists);
 
             _playlistsDirectory = playlists;
-
-            /*
-            NodeMenuPlaylistItem playlistItem = new("Playlist A");
-            playlistItem.Selected = false;
-            playlistItem.Expanded = false;
-
-            playlists.Parent = playlists;
-            playlists.Children.Add(playlistItem);
-            */
-
         }
     }
 }

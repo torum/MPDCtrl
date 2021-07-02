@@ -15,7 +15,7 @@ namespace MPDCtrl
 {
     public partial class App : Application
     {
-        // 二重起動防止 on/offフラグ
+        // Prevent multiple instances.
         private bool _mutexOn = true;
 
         /// <summary>The event mutex name.</summary>
@@ -33,7 +33,7 @@ namespace MPDCtrl
         /// <summary> Check and bring to front if already exists.</summary>
         private void AppOnStartup(object sender, StartupEventArgs e)
         {
-            // テスト用
+            // For testing.
             //ChangeTheme("DefaultTheme");
             //ChangeTheme("LightTheme");
 
@@ -78,12 +78,8 @@ namespace MPDCtrl
 
         public App()
         {
-            // 未処理例外の処理
-            // UI スレッドで実行されているコードで処理されなかったら発生する（.NET 3.0 より）
             DispatcherUnhandledException += App_DispatcherUnhandledException;
-            // バックグラウンドタスク内で処理されなかったら発生する（.NET 4.0 より）
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
-            // 例外が処理されなかったら発生する（.NET 1.0 より）
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
@@ -111,6 +107,7 @@ namespace MPDCtrl
             System.Diagnostics.Debug.WriteLine("TaskScheduler_UnobservedTaskException: " + exception.Message);
 
             AppendErrorLog("TaskScheduler_UnobservedTaskException", exception.Message);
+            
             // save
             SaveErrorLog();
 
@@ -138,7 +135,7 @@ namespace MPDCtrl
                 SaveErrorLog();
             }
 
-            // TODO:
+            // TODO: Exit?
             //Environment.Exit(1);
         }
 
@@ -163,7 +160,6 @@ namespace MPDCtrl
                 File.WriteAllText(LogFilePath, s);
         }
 
-        // テーマ切替メソッド
         public void ChangeTheme(string themeName)
         {
             ResourceDictionary _themeDict = Application.Current.Resources.MergedDictionaries.FirstOrDefault(x => x.Source == new Uri("pack://application:,,,/Themes/DefaultTheme.xaml"));
@@ -182,6 +178,5 @@ namespace MPDCtrl
             string themeUri = String.Format("pack://application:,,,/Themes/{0}.xaml", themeName);
             _themeDict.Source = new Uri(themeUri);
         }
-
     }
 }

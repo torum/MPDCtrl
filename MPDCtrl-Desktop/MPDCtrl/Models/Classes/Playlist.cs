@@ -48,6 +48,5 @@ namespace MPDCtrl.Models
                 return _lastModifiedDateTime.ToString(culture);
             }
         }
-
     }
 }

@@ -46,6 +46,7 @@ namespace MPDCtrl.ViewModels
     /// Add Search option "Exact" or "Contain".
     /// 
     /// Version history：
+    /// v3.0.13.1 Little cleanup.
     /// v3.0.13   MS Store release.
     /// v3.0.12.3 Fixed bug : Move to NowPlaying after queue update was not working . 
     /// v3.0.12.2 Fixed listview column header margin.
@@ -120,7 +121,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.13.0";
+        const string _appVer = "v3.0.13.1";
 
         public static string AppVer
         {
@@ -1646,7 +1647,6 @@ namespace MPDCtrl.ViewModels
                 };
 
                 //collectionView.Refresh();
-
             }
         }
 
@@ -1702,10 +1702,9 @@ namespace MPDCtrl.ViewModels
                 if (MusicEntries.Count == 0)
                     return;
 
-                // TODO: 絞り込みモードか、マッチしたフォルダ内だけかの切り替え
+                // TODO: Make the selection option > Filtering mode or matching mode.
                 bool filteringMode = true;
 
-                // Treeview で選択ノードが変更されたのでListview でフィルターを掛ける。
                 var collectionView = CollectionViewSource.GetDefaultView(MusicEntries);
                 if (collectionView == null)
                     return;
@@ -1733,7 +1732,6 @@ namespace MPDCtrl.ViewModels
                         {
                             if (filteringMode)
                             {
-                                // 絞り込みモード
                                 if (!string.IsNullOrEmpty(FilterMusicEntriesQuery))
                                 {
                                     return (filename.Contains(FilterMusicEntriesQuery, StringComparison.CurrentCultureIgnoreCase));
@@ -1745,7 +1743,7 @@ namespace MPDCtrl.ViewModels
                             }
                             else
                             {
-                                // マッチしたフォルダ内だけ
+                                // Only the matched(in the folder) items
                                 path = path.Replace("/", "");
 
                                 if (!string.IsNullOrEmpty(FilterMusicEntriesQuery))
@@ -1764,8 +1762,6 @@ namespace MPDCtrl.ViewModels
 
                             if (filteringMode)
                             {
-                                // 絞り込みモード
-
                                 // testing (adding "/")
                                 path += "/";
 
@@ -1785,7 +1781,6 @@ namespace MPDCtrl.ViewModels
                             }
                             else
                             {
-                                // マッチしたフォルダ内だけ
                                 if (!string.IsNullOrEmpty(FilterMusicEntriesQuery))
                                 {
                                     return (path.StartsWith((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath) && filename.Contains(FilterMusicEntriesQuery, StringComparison.CurrentCultureIgnoreCase));
@@ -2952,11 +2947,8 @@ namespace MPDCtrl.ViewModels
         {
             #region == Init config folder and file path ==
 
-            // データ保存フォルダの取得
             _appDataFolder = _envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
-            // 設定ファイルのパス
             _appConfigFilePath = _appDataFolder + System.IO.Path.DirectorySeparatorChar + _appName + ".config";
-            // 存在していなかったら作成
             System.IO.Directory.CreateDirectory(_appDataFolder);
 
             #endregion
@@ -3142,16 +3134,16 @@ namespace MPDCtrl.ViewModels
         // Startup
         public void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
-            #region == アプリ設定のロード  ==
+            #region == Load app setting  ==
 
             try
             {
-                // アプリ設定情報の読み込み
+                // Load config file.
                 if (File.Exists(_appConfigFilePath))
                 {
                     XDocument xdoc = XDocument.Load(_appConfigFilePath);
 
-                    #region == ウィンドウ関連 ==
+                    #region == Window setting ==
 
                     if (sender is Window)
                     {
@@ -3202,11 +3194,9 @@ namespace MPDCtrl.ViewModels
                         }
                     }
 
-
-
                     #endregion
 
-                    #region == オプション設定 ==
+                    #region == Options ==
 
                     var opts = xdoc.Root.Element("Options");
                     if (opts != null)
@@ -3296,7 +3286,7 @@ namespace MPDCtrl.ViewModels
 
                     #endregion
 
-                    #region == プロファイル設定  ==
+                    #region == Profiles  ==
 
                     var xProfiles = xdoc.Root.Element("Profiles");
                     if (xProfiles != null)
@@ -3369,7 +3359,7 @@ namespace MPDCtrl.ViewModels
                     }
                     #endregion
 
-                    #region == ヘッダーカラム設定 ==
+                    #region == Header columns ==
 
                     var Headers = xdoc.Root.Element("Headers");///Queue/Position
                     if (Headers != null)
@@ -3618,7 +3608,7 @@ namespace MPDCtrl.ViewModels
 
                     #endregion
 
-                    #region == レイアウト ==
+                    #region == Layout ==
 
                     var lay = xdoc.Root.Element("Layout");
                     if (lay != null)
@@ -3651,8 +3641,6 @@ namespace MPDCtrl.ViewModels
             }
             catch (System.IO.FileNotFoundException ex)
             {
-                Debug.WriteLine("■■■■■ Error  設定ファイルのロード中 - FileNotFoundException : " + _appConfigFilePath);
-
                 if (Application.Current != null)
                 {
                     Application.Current.Dispatcher.Invoke(() =>
@@ -3664,8 +3652,6 @@ namespace MPDCtrl.ViewModels
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("■■■■■ Error  設定ファイルのロード中: " + ex + " while opening : " + _appConfigFilePath);
-
                 if (Application.Current != null)
                 {
                     Application.Current.Dispatcher.Invoke(() =>
@@ -3677,7 +3663,6 @@ namespace MPDCtrl.ViewModels
             }
 
             #endregion
-
 
             NotifyPropertyChanged(nameof(IsCurrentProfileSet));
 
@@ -3743,7 +3728,7 @@ namespace MPDCtrl.ViewModels
             attrs.Value = _appVer;
             root.SetAttributeNode(attrs);
 
-            #region == ウィンドウ関連 ==
+            #region == Window settings ==
 
             // MainWindow
             if (sender is Window)
@@ -3823,7 +3808,7 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            #region == オプション設定の保存 ==
+            #region == Options ==
 
             XmlElement opts = doc.CreateElement(string.Empty, "Options", string.Empty);
 
@@ -3904,7 +3889,7 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            #region == プロファイル設定  ==
+            #region == Profiles  ==
 
             XmlElement xProfiles = doc.CreateElement(string.Empty, "Profiles", string.Empty);
 
@@ -3960,7 +3945,7 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            #region == ヘッダーカラム設定の保存 ==
+            #region == Header columns ==
 
             XmlElement headers = doc.CreateElement(string.Empty, "Headers", string.Empty);
 
@@ -4103,7 +4088,7 @@ namespace MPDCtrl.ViewModels
 
             #endregion
 
-            #region == レイアウトの保存 (使ってない、というか無効) ==
+            #region == Layout - not using right now ==
 
             XmlElement lay = doc.CreateElement(string.Empty, "Layout", string.Empty);
 
@@ -4139,14 +4124,11 @@ namespace MPDCtrl.ViewModels
 
             try
             {
-                // 設定ファイルの保存
                 doc.Save(_appConfigFilePath);
             }
             //catch (System.IO.FileNotFoundException) { }
             catch (Exception ex)
             {
-                Debug.WriteLine("■■■■■ Error  設定ファイルの保存中: " + ex + " while saving : " + _appConfigFilePath);
-
                 if (Application.Current != null)
                 {
                     Application.Current.Dispatcher.Invoke(() =>
@@ -4165,7 +4147,7 @@ namespace MPDCtrl.ViewModels
                 {
                     _mpc.MpdStop = true;
 
-                    // TODO: this causes anoying exception in the dev environment. Although it's a good thing to close...
+                    // TODO: Although it's a good thing to close...this causes anoying exception in the debug output. 
                     _mpc.MpdDisconnect();
                 }
             }
@@ -4263,15 +4245,12 @@ namespace MPDCtrl.ViewModels
 
                     //if (Application.Current == null) { return; }
                     //Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
-
                 }
                 catch
                 {
                     Debug.WriteLine("Error@UpdateButtonStatus");
                 }
-
             });
-
         }
 
         private async void UpdateStatus()
@@ -5140,10 +5119,10 @@ namespace MPDCtrl.ViewModels
 
             MpdStatusButton = _pathMpdOkButton;
 
-            // これしないとCurrentSongが表示されない。
+            // Need this to show CurrentSong.
             IsConnected = true;
 
-            // 別スレッドで実行。
+            // Run in a background thread.
             Task.Run(() => LoadInitialData());
         }
 
@@ -5172,18 +5151,25 @@ namespace MPDCtrl.ViewModels
                     {
                         await Task.Delay(5);
                         UpdateStatus();
+
                         await Task.Delay(5);
                         await _mpc.MpdIdleQueryCurrentSong();
+
                         await Task.Delay(5);
                         UpdateCurrentSong();
+
                         await Task.Delay(5);
                         await _mpc.MpdIdleQueryPlaylists();
+
                         await Task.Delay(5);
                         UpdatePlaylists();
+
                         await Task.Delay(5);
                         await _mpc.MpdIdleQueryCurrentQueue();
+
                         await Task.Delay(5);
                         UpdateCurrentQueue();
+
                         await Task.Delay(5);
 
                         // This no longer needed since it is aquired as needed basis.
@@ -5211,10 +5197,6 @@ namespace MPDCtrl.ViewModels
                     MpdStatusButton = _pathMpdAckErrorButton;
                     //StatusBarMessage = string.Format(MPDCtrl.Properties.Resources.StatusBarMsg_MPDVersionIsOld, _mpc.MpdVerText);
                     MpdStatusMessage = string.Format(MPDCtrl.Properties.Resources.StatusBarMsg_MPDVersionIsOld, _mpc.MpdVerText);
-                }
-                else
-                {
-                    //StatusBarMessage = "";
                 }
             }
         }
@@ -5320,8 +5302,6 @@ namespace MPDCtrl.ViewModels
 
                 ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_NeverConnected;
                 StatusButton = _pathDisconnectedButton;
-
-                //StatusBarMessage = "";
             }
             else if (status == MPC.ConnectionStatus.Connected)
             {
@@ -5330,11 +5310,8 @@ namespace MPDCtrl.ViewModels
                 IsNotConnectingNorConnected = false;
                 IsConnectionSettingShow = false;
 
-                //Debug.WriteLine("ConnectionStatus_Connected");
                 ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connected;
                 StatusButton = _pathConnectedButton;
-
-                //StatusBarMessage = "";
             }
             else if (status == MPC.ConnectionStatus.Connecting)
             {
@@ -5343,7 +5320,6 @@ namespace MPDCtrl.ViewModels
                 IsNotConnectingNorConnected = false;
                 //IsConnectionSettingShow = true;
 
-                //Debug.WriteLine("ConnectionStatus_Connecting");
                 ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connecting;
                 StatusButton = _pathConnectingButton;
 
@@ -5370,9 +5346,7 @@ namespace MPDCtrl.ViewModels
                 IsConnectionSettingShow = true;
 
                 Debug.WriteLine("ConnectionStatus_SeeConnectionErrorEvent");
-                //ConnectionStatusMessage = "";
                 StatusButton = _pathErrorInfoButton;
-
             }
             else if (status == MPC.ConnectionStatus.Disconnected)
             {
@@ -5409,7 +5383,6 @@ namespace MPDCtrl.ViewModels
                 IsNotConnectingNorConnected = false;
                 //IsConnectionSettingShow = true;
 
-                //Debug.WriteLine("ConnectionStatus_Disconnecting");
                 ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Disconnecting;
                 StatusButton = _pathConnectingButton;
 
@@ -5466,9 +5439,7 @@ namespace MPDCtrl.ViewModels
             s = System.Text.RegularExpressions.Regex.Replace(s, patternStr, string.Empty);
             s = s.Replace("ACK ", string.Empty);
             s = s.Replace("{} ", string.Empty);
-            //s = s.Replace("[] ", string.Empty);
 
-            //AckWindowOutput?.Invoke(this, MpdVersion + ": " + MPDCtrl.Properties.Resources.MPD_CommandError + " - " + s + Environment.NewLine);
             if (Application.Current == null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -5824,10 +5795,8 @@ namespace MPDCtrl.ViewModels
         {
             if (obj == null) return;
 
-            // 選択アイテム保持用
             List<SongInfoEx> selectedList = new();
 
-            // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -5851,7 +5820,6 @@ namespace MPDCtrl.ViewModels
             queueListviewSelectedQueueSongIdsForPopup = deleteIdList;
 
             IsConfirmDeleteQueuePopupVisible = true;
-
         }
 
         public ICommand QueueListviewConfirmDeletePopupCommand { get; }
@@ -5894,10 +5862,8 @@ namespace MPDCtrl.ViewModels
             if (Queue.Count <= 1)
                 return;
 
-            // 選択アイテム保持用
             List<SongInfoEx> selectedList = new();
 
-            // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -5924,7 +5890,6 @@ namespace MPDCtrl.ViewModels
 
                     i -= 1;
 
-                    //Debug.WriteLine("asdf");
                     IdToNewPos.Add(item.Id, i.ToString());
                 }
                 catch
@@ -5952,10 +5917,8 @@ namespace MPDCtrl.ViewModels
             if (Queue.Count <= 1)
                 return;
 
-            // 選択アイテム保持用
             List<SongInfoEx> selectedList = new();
 
-            // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -6006,10 +5969,8 @@ namespace MPDCtrl.ViewModels
         {
             if (obj == null) return;
 
-            // 選択アイテム保持用
             List<SongInfoEx> selectedList = new();
 
-            // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -6104,10 +6065,8 @@ namespace MPDCtrl.ViewModels
         {
             if (obj == null) return;
 
-            // 選択アイテム保持用
             List<SongInfoEx> selectedList = new();
 
-            // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -6157,7 +6116,6 @@ namespace MPDCtrl.ViewModels
             //SelectedQueueSong = CurrentSong;
 
             ScrollIntoView?.Invoke(this, CurrentSong.Index);
-
         }
 
         public ICommand FilterQueueClearCommand { get; }
@@ -6216,7 +6174,7 @@ namespace MPDCtrl.ViewModels
         {
             if (string.IsNullOrEmpty(SearchQuery)) return;
 
-            // TODO: Make this an option.
+            // TODO: Make "==" an option in search.
             //"==";
 
             string queryShiki = "contains";
@@ -6237,10 +6195,8 @@ namespace MPDCtrl.ViewModels
         {
             if (obj == null) return;
 
-            // 選択アイテム保持用
             List<SongInfo> selectedList = new();
 
-            // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -6303,10 +6259,8 @@ namespace MPDCtrl.ViewModels
         {
             if (obj == null) return;
 
-            // 選択アイテム保持用
             List<SongInfo> selectedList = new();
 
-            // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -6411,10 +6365,8 @@ namespace MPDCtrl.ViewModels
         {
             if (obj == null) return;
 
-            // 選択アイテム保持用
             List<NodeFile> selectedList = new();
 
-            // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -6477,10 +6429,8 @@ namespace MPDCtrl.ViewModels
         {
             if (obj == null) return;
 
-            // 選択アイテム保持用
             List<NodeFile> selectedList = new();
 
-            // 念のため、UIスレッドで。
             if (Application.Current == null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -6672,7 +6622,7 @@ namespace MPDCtrl.ViewModels
             await _mpc.MpdChangePlaylist(_selectedPlaylist.Name);
         }
 
-        // TODO:
+        // TODO: Rename playlists.
         public ICommand PlaylistListviewRenamePlaylistCommand { get; set; }
         public bool PlaylistListviewRenamePlaylistCommand_CanExecute()
         {
@@ -6695,36 +6645,13 @@ namespace MPDCtrl.ViewModels
 
             if (_selectedPlaylist != playlist)
                 return;
-
-            /*
-            ResetDialog();
-            DialogTitle = MPDCtrl.Properties.Resources.Dialog_Input;
-            DialogMessage = MPDCtrl.Properties.Resources.Dialog_NewPlaylistName;
-            IsInputDialogShow = true;
-
-            DialogResultFunction = null;
-            DialogResultFunctionWith2Params = DoRenamePlaylist;
-            DialogResultFunctionParamString = _selectedPlaylist;
-            */
-
         }
         public async void DoRenamePlaylist(String oldPlaylistName, String newPlaylistName)
         {
-            /*
-            if (CheckPlaylistNameExists(newPlaylistName))
-            {
-                ResetDialog();
-                DialogTitle = MPDCtrl.Properties.Resources.Dialog_Information;
-                DialogMessage = MPDCtrl.Properties.Resources.Dialog_PlaylistNameAlreadyExists;
-                IsInformationDialogShow = true;
-
-                return false;
-            }
-            */
             await _mpc.MpdRenamePlaylist(oldPlaylistName, newPlaylistName);
         }
 
-        // TODO:
+        // TODO: CheckPlaylistNameExists when Rename playlists.
         /*
         private bool CheckPlaylistNameExists(string playlistName)
         {
@@ -6796,7 +6723,7 @@ namespace MPDCtrl.ViewModels
 
         #region == PlaylistItems ==
 
-        // プレイリストの中身をリロードするか確認後の処理
+        // Do reload after confirming to reload playlist.
         public ICommand PlaylistListviewConfirmUpdatePopupCommand { get; set; }
         public bool PlaylistListviewConfirmUpdatePopupCommand_CanExecute()
         {
@@ -6816,7 +6743,7 @@ namespace MPDCtrl.ViewModels
             IsConfirmUpdatePlaylistSongsPopupVisible = false;
         }
 
-        // プレイリストの中の曲を削除コマンド
+        // Deletes song in a playlist.
         public ICommand PlaylistListviewDeletePosCommand { get; set; }
         public bool PlaylistListviewDeletePosCommand_CanExecute()
         {
@@ -6855,7 +6782,7 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        // プレイリストの中の曲を削除で複数削除は未対応ダイアログを閉じる
+        // 
         public ICommand PlaylistListviewConfirmDeletePosNotSupportedPopupCommand { get; set; }
         public static bool PlaylistListviewConfirmDeletePosNotSupportedPopupCommand_CanExecute()
         {
@@ -6866,7 +6793,7 @@ namespace MPDCtrl.ViewModels
             IsConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible = false;
         }
 
-        // プレイリストの中の曲を削除で確認後の処理
+        // 
         public ICommand PlaylistListviewDeletePosPopupCommand { get; set; }
         public bool PlaylistListviewDeletePosPopupCommand_CanExecute()
         {
@@ -6902,7 +6829,7 @@ namespace MPDCtrl.ViewModels
             IsConfirmDeletePlaylistSongPopupVisible = false;
         }
 
-        // プレイリストの中身をクリアするコマンド
+        // 
         public ICommand PlaylistListviewClearCommand { get; set; }
         public bool PlaylistListviewClearCommand_CanExecute()
         {
@@ -6995,9 +6922,6 @@ namespace MPDCtrl.ViewModels
         public void ShowSettingsCommand_Execute()
         {
             if (IsConnecting) return;
-
-            // TODO:
-            //ConnectionStatusMessage = "";
 
             if (IsSettingsShow)
             {
@@ -7127,6 +7051,7 @@ namespace MPDCtrl.ViewModels
 
             SelectedProfile.Host = _host;
             SelectedProfile.Port = _port;
+
             // for Unbindable PasswordBox.
             var passwordBox = obj as PasswordBox;
             if (!String.IsNullOrEmpty(passwordBox.Password))
@@ -7136,6 +7061,7 @@ namespace MPDCtrl.ViewModels
 
                 if (SelectedProfile == CurrentProfile)
                 {
+                    // No need since _mpc uses password when it connects.
                     //_mpc.MpdPassword = passwordBox.Password;
                 }
             }
@@ -7402,11 +7328,7 @@ namespace MPDCtrl.ViewModels
 
                 _mpc.MpdStatus.Reset();
 
-                //test
-                //QueueSelectionClear?.Invoke();
-
                 Queue.Clear();
-                //Queue = new ObservableCollection<SongInfoEx>();
                 _mpc.CurrentQueue.Clear();
 
                 if (_mainMenuItems.PlaylistsDirectory != null)
@@ -7491,7 +7413,6 @@ namespace MPDCtrl.ViewModels
                 var passwordBox = obj as PasswordBox;
                 passwordBox.Password = "";
 
-                //ResetDialog();
                 IsChangePasswordDialogShow = true;
             }
         }
@@ -7508,7 +7429,7 @@ namespace MPDCtrl.ViewModels
         {
             if (obj == null) return;
 
-            // MultipleCommandParameterConverter で複数のパラメータを可能にしている。
+            // MultipleCommandParameterConverter!
             var values = (object[])obj;
 
             if ((values[0] is PasswordBox) && (values[1] is PasswordBox))
@@ -7879,14 +7800,12 @@ namespace MPDCtrl.ViewModels
         }
         public void EscapeCommand_ExecuteAsync()
         {
-
             IsChangePasswordDialogShow = false;
 
             //IsSettingsShow = false; //Don't.
 
             IsQueueFindVisible = false;
         }
-
 
         #endregion
     }

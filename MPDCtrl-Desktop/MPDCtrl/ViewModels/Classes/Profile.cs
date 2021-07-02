@@ -97,7 +97,5 @@ namespace MPDCtrl.ViewModels.Classes
                 NotifyPropertyChanged(nameof(Volume));
             }
         }
-
     }
-
 }

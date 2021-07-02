@@ -24,7 +24,6 @@ namespace MPDCtrl.Models
 
         private string _host;
         private int _port;
-        //private string _password;
 
         private string MpdVersion { get; set; }
 
@@ -60,18 +59,10 @@ namespace MPDCtrl.Models
         {
             ConnectionResult result = new();
 
-            //IsMpdCommandConnected = false;
-
             _binaryConnection = new TcpClient();
 
             _host = host;
             _port = port;
-
-            //DebugCommandOutput?.Invoke(this, "TCP Command Connection: Connecting." + "\n" + "\n");
-
-            //ConnectionState = ConnectionStatus.Connecting;
-
-            //Debug.WriteLine("TCP Binary Connection: Connecting. " + host + " " + port.ToString());
 
             try
             {
@@ -88,13 +79,8 @@ namespace MPDCtrl.Models
 
                 if (_binaryConnection.Client.Connected)
                 {
-                    //DebugCommandOutput?.Invoke(this, "TCP Command Connection: Connection established." + "\n" + "\n");
-
-                    //ConnectionState = ConnectionStatus.Connected;
-
                     var tcpStream = _binaryConnection.GetStream();
-                    //tcpStream.ReadTimeout = System.Threading.Timeout.Infinite;
-                    //
+
                     tcpStream.ReadTimeout = 3000;
 
                     _binaryReader = new(tcpStream);
@@ -107,12 +93,6 @@ namespace MPDCtrl.Models
                     {
                         MpdVersion = response.Replace("OK MPD ", string.Empty).Trim();
 
-                        //Debug.WriteLine("TCP Binary Connection: Connected. MPD " + VerText);
-
-                        //DebugCommandOutput?.Invoke(this, "<<<<" + response.Trim() + "\n" + "\n");
-
-                        //IsMpdCommandConnected = true;
-
                         result.IsSuccess = true;
 
                         // Done for now.
@@ -120,35 +100,16 @@ namespace MPDCtrl.Models
                     else
                     {
                         Debug.WriteLine("**** TCP Binary Connection: MPD did not respond with proper respose@MpdBinaryConnect");
-
-                        //DebugCommandOutput?.Invoke(this, "TCP Command Connection: MPD did not respond with proper respose." + "\n" + "\n");
-
-                        //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                        //ConnectionError?.Invoke(this, "TCP connection error: MPD did not respond with proper respose.");
                     }
                 }
                 else
                 {
-                    //?
-
                     Debug.WriteLine("**** !client.Client.Connected@MpdBinaryConnect");
-
-                    //DebugCommandOutput?.Invoke(this, "TCP Command Connection: FAIL to established... Client not connected." + "\n" + "\n");
-
-                    //ConnectionState = ConnectionStatus.NeverConnected;
-
-                    //ConnectionError?.Invoke(this, "TCP Command Connection: FAIL to established... Client not connected.");
                 }
             }
             catch (Exception e)
             {
                 Debug.WriteLine("**** Exception@MpdBinaryConnect: " + e.Message);
-                //DebugCommandOutput?.Invoke(this, "TCP Command Connection: Error while connecting. Fail to connect (Exception): " + e.Message + "\n" + "\n");
-
-                //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                //ConnectionError?.Invoke(this, "TCP connection error: " + e.Message);
             }
 
             return result;
@@ -156,14 +117,12 @@ namespace MPDCtrl.Models
 
         private async Task<CommandResult> MpdBinarySendPassword(string password = "")
         {
-            //_password = password;
-
             CommandResult ret = new();
 
             if (string.IsNullOrEmpty(password))
             {
                 ret.IsSuccess = true;
-                ret.ResultText = "OK";//Or OK
+                ret.ResultText = "OK";
                 ret.ErrorMessage = "";
 
                 return ret;
@@ -172,7 +131,6 @@ namespace MPDCtrl.Models
             string cmd = "password " + password + "\n";
 
             return await MpdBinarySendCommand(cmd);
-
         }
 
         private async Task<CommandResult> MpdBinarySendCommand(string cmd, bool isAutoIdling = false)
@@ -188,22 +146,12 @@ namespace MPDCtrl.Models
             {
                 Debug.WriteLine("@MpdBinarySendCommand: " + "_commandWriter or _commandReader is null");
 
-                //ret.IsSuccess = false;
-                //ret.ErrorMessage = "_commandWriter or _commandReader is null";
-
-                //DebugCommandOutput?.Invoke(this, string.Format("################ Error :@{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdSendCommand", "_commandWriter or _commandReader is null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
-
                 return ret;
             }
 
             if (!_binaryConnection.Client.Connected)
             {
                 Debug.WriteLine("@MpdBinarySendCommand: " + "NOT IsMpdCommandConnected");
-
-                //ret.IsSuccess = false;
-                //ret.ErrorMessage = "NOT IsMpdCommandConnected";
-
-                //DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdSendCommand", "!CommandConnection.Client.Connected", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
 
                 return ret;
             }
@@ -215,8 +163,6 @@ namespace MPDCtrl.Models
 
                 if (cmd.Trim().StartsWith("idle"))
                 {
-                    //DebugCommandOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
-
                     await _binaryWriter.WriteAsync(cmd.Trim() + "\n");
 
                     if (!isAutoIdling)
@@ -235,11 +181,6 @@ namespace MPDCtrl.Models
 
                     cmdDummy = cmdDummy.Trim().Replace("\n", "\n" + ">>>>");
 
-                    //if (isAutoIdling)
-                    //DebugCommandOutput?.Invoke(this, ">>>>" + "noidle\n>>>>" + cmdDummy.Trim() + "\n>>>>idle player" + "\n" + "\n");
-                    //else
-                    //DebugCommandOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n");
-
                     if (isAutoIdling)
                         await _binaryWriter.WriteAsync("noidle\n" + cmd.Trim() + "\n" + "idle player\n");
                     else
@@ -248,61 +189,9 @@ namespace MPDCtrl.Models
             }
             catch (System.IO.IOException e)
             {
-                // IOException : Unable to write data to the transport connection: 確立された接続がホスト コンピューターのソウトウェアによって中止されました。
-
+                // IOException : Unable to write data to the transport connection
                 ret.IsSuccess = false;
                 ret.ErrorMessage = e.Message;
-                /*
-                // Could be application shutdopwn.
-                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
-                {
-
-                }
-                else
-                {
-                    DebugCommandOutput?.Invoke(this, string.Format("################ Error@{0}, Reason:{1}, Data:{2}, {3} Exception: {4} {5}", "WriteAsync@MpdSendCommand", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
-
-                    // タイムアウトしていたらここで「も」エラーになる模様。
-
-                    IsMpdCommandConnected = false;
-
-                    DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
-
-                    try
-                    {
-                        _commandConnection.Client.Shutdown(SocketShutdown.Both);
-                        _commandConnection.Close();
-                    }
-                    catch { }
-
-                    ConnectionResult newCon = await MpdCommandConnect(_host, _port);
-
-                    if (newCon.IsSuccess)
-                    {
-                        CommandResult d = await MpdCommandSendPassword(_password);
-
-                        if (d.IsSuccess)
-                        {
-                            d = await MpdSendCommand("idle player");
-
-                            if (d.IsSuccess)
-                            {
-                                DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. @IOExceptionOfWriteAsync" + Environment.NewLine + Environment.NewLine));
-
-                                ret = await MpdSendCommand(cmd, isAutoIdling);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Failed. " + Environment.NewLine + Environment.NewLine));
-
-                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                        ConnectionError?.Invoke(this, "The connection (command) has been terminated (IOException): " + e.Message);
-                    }
-                }
-                */
 
                 //IsBusy?.Invoke(this, false);
                 return ret;
@@ -313,20 +202,7 @@ namespace MPDCtrl.Models
 
                 ret.IsSuccess = false;
                 ret.ErrorMessage = e.Message;
-                /*
-                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
-                {
 
-                }
-                else
-                {
-                    DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "WriteAsync@MpdSendCommand", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
-
-                    //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                    //ConnectionError?.Invoke(this, "The connection (command) has been terminated (Exception): " + e.Message);
-                }
-                */
                 //IsBusy?.Invoke(this, false);
                 return ret;
             }
@@ -339,7 +215,6 @@ namespace MPDCtrl.Models
                 StringBuilder stringBuilder = new();
 
                 bool isDoubleOk = false;
-                //bool isAck = false;
                 string ackText = "";
                 bool isNullReturn = false;
 
@@ -394,8 +269,6 @@ namespace MPDCtrl.Models
                         }
                         else if (line.StartsWith("changed: "))
                         {
-                            // noidleでついてくるかもしれないchanged. idleConnectionで見ているからここでは無視したいが・・・。
-
                             if (!string.IsNullOrEmpty(line))
                                 stringBuilder.Append(line + "\n");
                         }
@@ -418,63 +291,12 @@ namespace MPDCtrl.Models
                 if (isNullReturn)
                 {
                     Debug.WriteLine("@MpdBinarySendCommand ReadLineAsync isNullReturn");
-                    /*
-                    DebugCommandOutput?.Invoke(this, string.Format("################ Error @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "ReadLineAsync received null data", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
 
-                    ret.ResultText = stringBuilder.ToString();
-                    ret.ErrorMessage = "ReadLineAsync@MpdSendCommand received null data";
-
-                    // タイムアウトしていたらここで「も」エラーになる模様。
-
-                    IsMpdCommandConnected = false;
-
-                    DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
-
-                    try
-                    {
-                        _commandConnection.Client.Shutdown(SocketShutdown.Both);
-                        _commandConnection.Close();
-                    }
-                    catch { }
-
-                    ConnectionResult newCon = await MpdCommandConnect(_host, _port);
-
-                    if (newCon.IsSuccess)
-                    {
-                        CommandResult d = await MpdCommandSendPassword(_password);
-
-                        if (d.IsSuccess)
-                        {
-                            d = await MpdSendCommand("idle player");
-
-                            if (d.IsSuccess)
-                            {
-                                DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. @isNullReturn" + Environment.NewLine + Environment.NewLine));
-
-                                ret = await MpdSendCommand(cmd, isAutoIdling);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // 
-                        DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Failed. " + Environment.NewLine + Environment.NewLine));
-
-                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                        ConnectionError?.Invoke(this, "The connection (command) has been terminated (null return).");
-                    }
-                    */
                     //IsBusy?.Invoke(this, false);
                     return ret;
                 }
                 else
                 {
-                    //DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
-
-                    //if (isAck)
-                    //    MpdAckError?.Invoke(this, ackText + " (@MSC)");
-
                     ret.ResultText = stringBuilder.ToString();
 
                     //IsBusy?.Invoke(this, false);
@@ -488,8 +310,6 @@ namespace MPDCtrl.Models
 
                 Debug.WriteLine("InvalidOperationException@MpdBinarySendCommand: " + cmd.Trim() + " ReadLineAsync ---- " + e.Message);
 
-                //DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "InvalidOperationException (Most likely the connection is overloaded)", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
-
                 ret.IsSuccess = false;
                 ret.ErrorMessage = e.Message;
 
@@ -498,65 +318,13 @@ namespace MPDCtrl.Models
             }
             catch (System.IO.IOException e)
             {
-                // IOException : Unable to write data to the transport connection: 確立された接続がホスト コンピューターのソウトウェアによって中止されました。
+                // IOException : Unable to write data to the transport connection
 
                 Debug.WriteLine("IOException@MpdBinarySendCommand: " + cmd.Trim() + " ReadLineAsync ---- " + e.Message);
 
                 ret.IsSuccess = false;
                 ret.ErrorMessage = e.Message;
-                /*
-                // Could be application shutdopwn.
-                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
-                {
 
-                }
-                else
-                {
-                    DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
-
-                    // タイムアウトしていたらここで「も」エラーになる模様。
-
-                    IsMpdCommandConnected = false;
-
-                    DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
-
-                    try
-                    {
-                        _commandConnection.Client.Shutdown(SocketShutdown.Both);
-                        _commandConnection.Close();
-                    }
-                    catch { }
-
-                    ConnectionResult newCon = await MpdCommandConnect(_host, _port);
-
-                    if (newCon.IsSuccess)
-                    {
-                        CommandResult d = await MpdCommandSendPassword(_password);
-
-                        if (d.IsSuccess)
-                        {
-                            d = await MpdSendCommand("idle player");
-
-                            if (d.IsSuccess)
-                            {
-                                DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. @IOExceptionOfReadLineAsync" + Environment.NewLine + Environment.NewLine));
-
-                                ret = await MpdSendCommand(cmd, isAutoIdling);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // Unable to read data from the transport connection: 既に接続済みのソケットに対して接続を要求しました。.
-
-                        DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Failed. " + Environment.NewLine + Environment.NewLine));
-
-                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                        ConnectionError?.Invoke(this, "The connection (command) has been terminated (IOException): " + e.Message);
-                    }
-                }
-                */
                 //IsBusy?.Invoke(this, false);
                 return ret;
             }
@@ -566,8 +334,6 @@ namespace MPDCtrl.Models
 
                 ret.IsSuccess = false;
                 ret.ErrorMessage = e.Message;
-
-                //DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
 
                 //IsBusy?.Invoke(this, false);
                 return ret;
@@ -586,8 +352,6 @@ namespace MPDCtrl.Models
                 ret.IsSuccess = false;
                 ret.ErrorMessage = "TcpClient.Client == null";
 
-                //DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdCommandGetBinary", "TcpClient.Client == null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
-
                 return ret;
             }
 
@@ -597,8 +361,6 @@ namespace MPDCtrl.Models
 
                 ret.IsSuccess = false;
                 ret.ErrorMessage = "_binaryWriter or _binaryReader is null";
-
-                //DebugCommandOutput?.Invoke(this, string.Format("################ Error :@{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdCommandGetBinary", "_commandWriter or _commandReader is null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
 
                 return ret;
             }
@@ -610,8 +372,6 @@ namespace MPDCtrl.Models
                 ret.IsSuccess = false;
                 ret.ErrorMessage = "NOT IsMpdCommandConnected";
 
-                //DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdCommandGetBinary", "!CommandConnection.Client.Connected", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
-
                 return ret;
             }
 
@@ -620,8 +380,6 @@ namespace MPDCtrl.Models
             {
                 if (cmd.Trim().StartsWith("idle"))
                 {
-                    //DebugCommandOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
-
                     await _binaryWriter.WriteAsync(cmd.Trim() + "\n");
 
                     if (!isAutoIdling)
@@ -635,11 +393,6 @@ namespace MPDCtrl.Models
 
                     cmdDummy = cmdDummy.Trim().Replace("\n", "\n" + ">>>>");
 
-                    //if (isAutoIdling)
-                    //    DebugCommandOutput?.Invoke(this, ">>>>" + "noidle\n>>>>" + cmdDummy.Trim() + "\n>>>>idle player" + "\n" + "\n");
-                    //else
-                    //    DebugCommandOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n");
-
                     if (isAutoIdling)
                         await _binaryWriter.WriteAsync("noidle\n" + cmd.Trim() + "\n" + "idle player\n");
                     else
@@ -648,53 +401,13 @@ namespace MPDCtrl.Models
             }
             catch (System.IO.IOException e)
             {
-                // IOException : Unable to write data to the transport connection: 確立された接続がホスト コンピューターのソウトウェアによって中止されました。
+                // IOException : Unable to write data to the transport connection
 
                 Debug.WriteLine("Exception@MpdBinarySendBinaryCommand: " + cmd.Trim() + " WriteAsync " + e.Message);
 
                 ret.IsSuccess = false;
                 ret.ErrorMessage = e.Message;
-                /*
-                // Could be application shutdopwn.
-                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
-                {
 
-                }
-                else
-                {
-                    DebugCommandOutput?.Invoke(this, string.Format("################ Error@{0}, Reason:{1}, Data:{2}, {3} Exception: {4} {5}", "WriteAsync@MpdCommandGetBinary", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
-
-                    // タイムアウトしていたらここで「も」エラーになる模様。
-
-                    IsMpdCommandConnected = false;
-
-                    DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
-
-                    _commandConnection.Close();
-
-                    ConnectionResult newCon = await MpdCommandConnect(_host, _port);
-
-                    if (newCon.IsSuccess)
-                    {
-                        CommandResult d = await MpdCommandSendPassword(_password);
-
-                        if (d.IsSuccess)
-                        {
-                            DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. " + Environment.NewLine + Environment.NewLine));
-
-                            ret = await MpdCommandGetBinary(cmd, isAutoIdling);
-                        }
-                    }
-                    else
-                    {
-                        DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Failed. " + Environment.NewLine + Environment.NewLine));
-
-                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                        ConnectionError?.Invoke(this, "The connection (command) has been terminated (IOException): " + e.Message);
-                    }
-                }
-                */
                 return ret;
             }
             catch (Exception e)
@@ -703,20 +416,7 @@ namespace MPDCtrl.Models
 
                 ret.IsSuccess = false;
                 ret.ErrorMessage = e.Message;
-                /*
-                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
-                {
 
-                }
-                else
-                {
-                    DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "WriteAsync@MpdCommandGetBinary", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
-
-                    //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                    //ConnectionError?.Invoke(this, "The connection (command) has been terminated (Exception): " + e.Message);
-                }
-                */
                 return ret;
             }
 
@@ -737,7 +437,6 @@ namespace MPDCtrl.Models
 
                 while (isWaitForOK)
                 {
-
                     int readSize = 0;
                     int bufferSize = 5000;
                     byte[] buffer = new byte[bufferSize];
@@ -766,10 +465,7 @@ namespace MPDCtrl.Models
                     }
                     else
                     {
-
                         bin = CombineByteArray(bin, bindata);
-
-                        //Debug.WriteLine("Done .Write:" + bin.Length.ToString());
 
                         string res = Encoding.Default.GetString(bindata, 0, bindata.Length);
 
@@ -781,8 +477,6 @@ namespace MPDCtrl.Models
                             {
                                 if (line.StartsWith("ACK"))
                                 {
-                                    //Debug.WriteLine("ACK line @MpdCommandGetBinary: " + cmd.Trim() + " and " + line);
-
                                     if (!string.IsNullOrEmpty(line))
                                         stringBuilder.Append(line + "\n");
 
@@ -796,8 +490,6 @@ namespace MPDCtrl.Models
                                 }
                                 else if (line.StartsWith("changed: "))
                                 {
-                                    // noidleでついてくるかもしれないchanged. idleConnectionで見ているからここでは無視したいが・・・。
-
                                     if (!string.IsNullOrEmpty(line))
                                         stringBuilder.Append(line + "\n");
                                 }
@@ -843,9 +535,8 @@ namespace MPDCtrl.Models
                                             ret.ChunkSize = i;
                                         }
                                     }
-
                                 }
-                                else if (line == "OK") // ==
+                                else if (line == "OK") 
                                 {
                                     if (isAutoIdling)
                                     {
@@ -880,8 +571,6 @@ namespace MPDCtrl.Models
                                 else
                                 {
                                     // This should be binary data if not reading correctly above.
-
-                                    //Debug.WriteLine(line);
                                 }
                             }
                             else
@@ -892,7 +581,6 @@ namespace MPDCtrl.Models
                                 break;
                             }
                         }
-
                     }
                 }
 
@@ -900,19 +588,15 @@ namespace MPDCtrl.Models
                 {
                     Debug.WriteLine("@MpdBinarySendBinaryCommand ReadAsync isNullReturn");
 
-                    //DebugCommandOutput?.Invoke(this, string.Format("################ Error @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadAsync@MpdCommandGetBinary", "ReadLineAsync received null data", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
-
                     ret.ErrorMessage = "ReadAsync@MpdBinarySendBinaryCommand received null data";
 
                     return ret;
                 }
                 else
                 {
-                    //DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
-
                     if (isAck)
                     {
-                        // とりあえず今の所、アルバムカバーのfile not existsは無視するようにしている。
+                        // Ignore "file not exists" for now.
                         //MpdAckError?.Invoke(this, ackText + " (@MCGB)");
 
                         ret.ErrorMessage = ackText + " (@MpdBinarySendBinaryCommand)";
@@ -921,18 +605,10 @@ namespace MPDCtrl.Models
                     }
                     else if (isBinaryFound)
                     {
-                        //return ret;
-                        //return ParseAlbumArtResponse(bin);
                         return ParseAlbumImageData(bin);
                     }
                     else
                     {
-                        //Debug.WriteLine("No binary data(size) found. Could be a readpicture command?");
-
-                        // TODO: 
-
-                        //DebugCommandOutput?.Invoke(this, "No binary data(size) found. Could be a readpicture command?" + "\n" + "\n");
-
                         ret.ErrorMessage = "No binary data(size) found. Could be a readpicture command? (@MpdBinarySendBinaryCommand)";
 
                         return ret;
@@ -945,8 +621,6 @@ namespace MPDCtrl.Models
 
                 Debug.WriteLine("InvalidOperationException@MpdBinarySendBinaryCommand: " + cmd.Trim() + " ReadAsync ---- " + e.Message);
 
-                //DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadAsync@MpdCommandGetBinary", "InvalidOperationException (Most likely the connection is overloaded)", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
-
                 ret.IsSuccess = false;
                 ret.ErrorMessage = e.Message;
 
@@ -954,55 +628,13 @@ namespace MPDCtrl.Models
             }
             catch (System.IO.IOException e)
             {
-                // IOException : Unable to write data to the transport connection: 確立された接続がホスト コンピューターのソウトウェアによって中止されました。
+                // IOException : Unable to write data to the transport connection
 
                 Debug.WriteLine("IOException@MpdBinarySendBinaryCommand: " + cmd.Trim() + " ReadAsync ---- " + e.Message);
 
                 ret.IsSuccess = false;
                 ret.ErrorMessage = e.Message;
-                /*
-                // Could be application shutdopwn.
-                if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
-                {
 
-                }
-                else
-                {
-                    DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadAsync@MpdCommandGetBinary", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
-
-                    // タイムアウトしていたらここで「も」エラーになる模様。
-
-                    IsMpdCommandConnected = false;
-
-                    DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
-
-                    _commandConnection.Close();
-
-                    ConnectionResult newCon = await MpdCommandConnect(_host, _port);
-
-                    if (newCon.IsSuccess)
-                    {
-                        CommandResult d = await MpdCommandSendPassword(_password);
-
-                        if (d.IsSuccess)
-                        {
-                            DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. " + Environment.NewLine + Environment.NewLine));
-
-                            ret = await MpdCommandGetBinary(cmd, isAutoIdling);
-                        }
-                    }
-                    else
-                    {
-                        // Unable to read data from the transport connection: 既に接続済みのソケットに対して接続を要求しました。.
-
-                        DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Failed. " + Environment.NewLine + Environment.NewLine));
-
-                        ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
-
-                        ConnectionError?.Invoke(this, "The connection (command) has been terminated (IOException): " + e.Message);
-                    }
-                }
-                */
                 return ret;
             }
             catch (Exception e)
@@ -1012,11 +644,8 @@ namespace MPDCtrl.Models
                 ret.IsSuccess = false;
                 ret.ErrorMessage = e.Message;
 
-                //DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadAsync@MpdCommandGetBinary", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
-
                 return ret;
             }
-
         }
 
         private CommandBinaryResult ParseAlbumImageData(byte[] data)
@@ -1051,8 +680,6 @@ namespace MPDCtrl.Models
 
             try
             {
-                //int gabStart = gabPre;
-                //int gabEnd = gabAfter;
                 int gabStart = 0;
                 int gabEnd = 0;
 
@@ -1082,7 +709,6 @@ namespace MPDCtrl.Models
                                 r.WholeSize = i;
                             }
                         }
-
                     }
                     else if (val.StartsWith("type: "))
                     {
@@ -1109,54 +735,41 @@ namespace MPDCtrl.Models
                                 r.ChunkSize = binResSize;
                             }
                         }
-
                     }
-                    else if (val == "OK") // ==
+                    else if (val == "OK")
                     {
-                        //gabEnd = gabEnd + val.Length + 1;
                         if (found)
                         {
                             gabEnd = gabEnd + val.Length + 1;
-                            //System.Diagnostics.Debug.WriteLine("OK:after " + val);
                         }
                         else
                         {
                             gabStart = gabStart + val.Length + 1;
-                            //System.Diagnostics.Debug.WriteLine("OK:before " + val);
                         }
-
                     }
                     else if (val.StartsWith("ACK"))
                     {
-                        // ACK 応答はここまで到達しないはず。
+                        // ACK shouldn't be here.
 
                         if (found)
                         {
                             gabEnd = gabEnd + val.Length + 1;
-                            //System.Diagnostics.Debug.WriteLine("changed:after " + val);
                         }
                         else
                         {
                             gabStart = gabStart + val.Length + 1;
-                            //System.Diagnostics.Debug.WriteLine("changed:before " + val);
                         }
                     }
                     else if (val.StartsWith("changed:"))
                     {
-                        // Song is changed...so should skip ??
-                        //DataReceived_ParseData(val);
-
                         if (found)
                         {
                             gabEnd = gabEnd + val.Length + 1;
-                            //System.Diagnostics.Debug.WriteLine("changed:after " + val);
                         }
                         else
                         {
                             gabStart = gabStart + val.Length + 1;
-                            //System.Diagnostics.Debug.WriteLine("changed:before " + val);
                         }
-
                     }
                     else
                     {
@@ -1164,17 +777,11 @@ namespace MPDCtrl.Models
                     }
                 }
 
-                gabEnd++; //
-
-                // test
-                //gabEnd = 4; // \n O K \n
-
+                gabEnd++; 
 
                 if (binSize > 1000000)
                 {
                     Debug.WriteLine("binary file too big: " + binSize.ToString());
-
-                    //DebugCommandOutput?.Invoke(this, "binary file too big: " + binSize.ToString() + "\n" + "\n");
 
                     _albumCover.IsDownloading = false;
 
@@ -1194,10 +801,6 @@ namespace MPDCtrl.Models
                 {
                     Debug.WriteLine("binary file size mismatch: " + binSize.ToString() + ", [" + binResSize.ToString() + ", " + (data.Length - gabStart - gabEnd) + "], " + data.Length.ToString());
 
-                    //DebugCommandOutput?.Invoke(this, "binary file size mismatch." + "\n" + "\n");
-
-                    //DebugCommandOutput?.Invoke(this, "raw text data:\n" + res  + "\n" + "\n");
-
                     _albumCover.IsDownloading = false;
 
                     return r;
@@ -1206,9 +809,7 @@ namespace MPDCtrl.Models
                 r.WholeSize = binSize;
                 r.ChunkSize = binResSize;
 
-                // 今回受け取ったバイナリ用にバイトアレイをイニシャライズ
                 byte[] resBinary = new byte[data.Length - gabStart - gabEnd];
-                // 今回受け取ったバイナリをresBinaryへコピー
                 Array.Copy(data, gabStart, resBinary, 0, resBinary.Length);
 
                 r.BinaryData = resBinary;
@@ -1220,7 +821,7 @@ namespace MPDCtrl.Models
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("Error@ParseAlbumImageData (l): " + ex.Message);
+                Debug.WriteLine("Error@ParseAlbumImageData (l): " + ex.Message);
 
                 _albumCover.IsDownloading = false;
                 return r;
@@ -1245,34 +846,8 @@ namespace MPDCtrl.Models
                 return f;
             }
 
-
-            /*
-            if (songId != MpdStatus.MpdSongID)
-            {
-                // probably you clicked on "Next" too farst or double clicked.
-                Debug.WriteLine("Error@MpdQueryAlbumArt: songId != MpdStatus.MpdSongID. Ignoring.");
-
-                CommandResult f = new CommandResult();
-                f.IsSuccess = false;
-                return f;
-            }
-            */
-
-            //Debug.WriteLine("Downloading..." + uri);
-
             _albumCover.SongFilePath = uri;
             _albumCover.IsDownloading = true;
-            /*
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                _albumCover = new AlbumImage();
-                _albumCover.IsDownloading = true;
-                _albumCover.SongFilePath = uri;
-                _albumCover.AlbumImageSource = null;
-                _albumCover.BinaryData = new byte[0];
-                _albumCover.BinarySize = 0;
-            });
-            */
 
             uri = Regex.Escape(uri);
 
@@ -1296,17 +871,12 @@ namespace MPDCtrl.Models
                         _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
                         _albumCover.IsSuccess = true;
                         _albumCover.IsDownloading = false;
-
-                        //MpdAlbumArtChanged?.Invoke(this);
                     });
 
                     r = true;
-                    //Debug.WriteLine("一発できた");
                 }
                 else
                 {
-                    //Debug.WriteLine("何回かみにいくみたい");
-
                     if ((result.WholeSize != 0) && (result.WholeSize > result.ChunkSize))
                     {
                         while ((result.WholeSize > _albumCover.BinaryData.Length) && result.IsSuccess)
@@ -1317,8 +887,6 @@ namespace MPDCtrl.Models
                                 _albumCover.BinaryData = CombineByteArray(_albumCover.BinaryData, result.BinaryData);
                         }
 
-                        //Debug.WriteLine("何回かできた");
-
                         if (result.IsSuccess && (_albumCover.BinaryData != null))
                         {
                             Application.Current.Dispatcher.Invoke(() =>
@@ -1326,8 +894,6 @@ namespace MPDCtrl.Models
                                 _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
                                 _albumCover.IsSuccess = true;
                                 _albumCover.IsDownloading = false;
-
-                                //MpdAlbumArtChanged?.Invoke(this);
                             });
 
                             r = true;
@@ -1399,8 +965,6 @@ namespace MPDCtrl.Models
 
         public void MpdBinaryConnectionDisconnect()
         {
-            //Debug.WriteLine("TCP Binary Connection: Disconnecting.");
-
             try
             {
                 if (_binaryConnection.Client != null)
@@ -1408,8 +972,6 @@ namespace MPDCtrl.Models
                 _binaryConnection.Close();
             }
             catch { }
-
         }
-
     }
 }

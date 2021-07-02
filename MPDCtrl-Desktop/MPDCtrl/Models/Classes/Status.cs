@@ -134,6 +134,5 @@ namespace MPDCtrl.Models
             _songElapsed = 0;
             _error = "";
         }
-
     }
 }

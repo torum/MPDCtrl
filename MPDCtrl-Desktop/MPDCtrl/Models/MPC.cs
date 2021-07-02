@@ -153,7 +153,7 @@ namespace MPDCtrl.Models
             }
         }
 
-        // TODO:ちゃんと使っていないので利用するか削除すべきか。
+        // TODO: Not really used...
         public bool IsMpdCommandConnected { get; set; }
         public bool IsMpdIdleConnected { get; set; }
 
@@ -678,8 +678,6 @@ namespace MPDCtrl.Models
 
         public void MpdIdleStart()
         {
-            //MpcProgress?.Invoke(this, "");
-
             MpdIdle();
         }
 

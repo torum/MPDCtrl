@@ -14,7 +14,7 @@ title: MPDCtrl
 
 # MPDCtrl
 
-MPDCtrl is a Windows client app for [MPD (Music player daemon)](http://www.musicpd.org/). 
+MPDCtrl is a client app for [MPD (Music player daemon)](http://www.musicpd.org/). 
    
 - Requirement:  
 MPDCtrl for desktop - 

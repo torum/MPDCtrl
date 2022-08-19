@@ -924,8 +924,6 @@ namespace MPDCtrl.Models
 
             if (!_albumCover.IsDownloading)
             {
-                Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.IsDownloading == false. Ignoring.");
-
                 CommandBinaryResult f = new();
                 f.IsSuccess = false;
                 return f;
@@ -933,8 +931,6 @@ namespace MPDCtrl.Models
 
             if (_albumCover.SongFilePath != uri)
             {
-                Debug.WriteLine("Error@MpdQueryAlbumArt: _albumCover.SongFilePath != uri. Ignoring.");
-
                 _albumCover.IsDownloading = false;
 
                 CommandBinaryResult f = new();
@@ -959,8 +955,24 @@ namespace MPDCtrl.Models
 
         private static BitmapSource BitmaSourceFromByteArray(byte[] buffer)
         {
-            using var stream = new MemoryStream(buffer);
-            return BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+            // Bug in MPD 0.23.5 
+            if (buffer?.Length > 0)
+            {
+                using var stream = new MemoryStream(buffer);
+                try
+                {
+                    return BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public void MpdBinaryConnectionDisconnect()

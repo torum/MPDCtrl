@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MPDCtrl2.ico</ApplicationIcon>
-    <Version>3.0.13.0</Version>
+    <Version>3.0.14.0</Version>
     <Authors>torum</Authors>
     <Company>Torum</Company>
-    <Copyright>2021</Copyright>
+    <Copyright></Copyright>
     <Description>MPD Client.</Description>
     <PackageProjectUrl>https://torum.github.io/MPDCtrl/</PackageProjectUrl>
     <StartupObject>MPDCtrl.App</StartupObject>

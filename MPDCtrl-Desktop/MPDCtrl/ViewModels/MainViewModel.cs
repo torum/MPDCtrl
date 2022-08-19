@@ -1,30 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Text;
-using System.Windows.Data;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Media;
-using System.Diagnostics;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Controls;
-using System.Xml;
-using System.Xml.Linq;
-using System.Windows.Input;
-using System.IO;
-using System.ComponentModel;
-using System.Windows.Threading;
-using System.Globalization;
-using System.Net;
-using System.Text.RegularExpressions;
-using System.Windows.Media.Imaging;
-using MPDCtrl.Common;
-using MPDCtrl.Views;
+﻿using MPDCtrl.Common;
 using MPDCtrl.Models;
 using MPDCtrl.ViewModels.Classes;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace MPDCtrl.ViewModels
 {
@@ -46,6 +39,8 @@ namespace MPDCtrl.ViewModels
     /// Add Search option "Exact" or "Contain".
     /// 
     /// Version history：
+    /// v3.0.14   MS Store release.
+    /// v3.0.13.2 Moved to Windows11 PC and .NET6 environment. Fixed a bug caused by a bug in MPD 0.23.5(included in Ubuntu 22.04.1 LTS).
     /// v3.0.13.1 Little cleanup.
     /// v3.0.13   MS Store release.
     /// v3.0.12.3 Fixed bug : Move to NowPlaying after queue update was not working . 
@@ -121,7 +116,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.13.1";
+        const string _appVer = "v3.0.14";
 
         public static string AppVer
         {
@@ -157,11 +152,11 @@ namespace MPDCtrl.ViewModels
         {
             get
             {
-#if DEBUG
+                #if DEBUG
                 return true;
-#else
+                #else
                 return false; 
-#endif
+                #endif
             }
         }
 
@@ -7809,5 +7804,4 @@ namespace MPDCtrl.ViewModels
 
         #endregion
     }
-
 }

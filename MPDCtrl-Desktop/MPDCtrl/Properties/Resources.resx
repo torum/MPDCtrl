@@ -537,6 +537,15 @@ SOFTWARE.</value>
   <data name="Settings_Opts_ShowDebugWidow" xml:space="preserve">
     <value>Enable debug widow.</value>
   </data>
+  <data name="Settings_Opts_Themes" xml:space="preserve">
+    <value>Themes</value>
+  </data>
+  <data name="Settings_Opts_Themes_Dark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Settings_Opts_Themes_Light" xml:space="preserve">
+    <value>Light</value>
+  </data>
   <data name="Settings_Opts_UpdateDatabaseOnStartup" xml:space="preserve">
     <value>Update MPD database on startup. (It may take a while to update)</value>
   </data>

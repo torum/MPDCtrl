@@ -36,6 +36,7 @@ namespace MPDCtrl
             // For testing.
             //ChangeTheme("DefaultTheme");
             //ChangeTheme("LightTheme");
+            //ChangeTheme("DarkTheme");
 
             // For testing only. Don't forget to comment this out if you uncomment.
             //MPDCtrl.Properties.Resources.Culture = CultureInfo.GetCultureInfo("en-US"); //or ja-JP etc

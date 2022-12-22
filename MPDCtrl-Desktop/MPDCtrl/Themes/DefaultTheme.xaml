@@ -22,9 +22,9 @@
     <Color x:Key="DisabledControlDarkColor">Gray</Color>
     <Color x:Key="DisabledForegroundColor">#FF444444</Color>
 
-    <Color x:Key="BorderLightColor">#FFCCCCCC</Color>
-    <Color x:Key="BorderMediumColor">#FF888888</Color>
-    <Color x:Key="BorderDarkColor">#FF444444</Color>
+    <Color x:Key="BorderLightColor">#141414</Color>
+    <Color x:Key="BorderMediumColor">#131313</Color>
+    <Color x:Key="BorderDarkColor">#121212</Color>
 
     <Color x:Key="NormalTextColor">#FFCCCCCC</Color>
     <Color x:Key="TitleTextColor">LightGray</Color>
@@ -84,7 +84,7 @@
     <!-- 三角の色 -->
     <SolidColorBrush x:Key="ScrollBarHilightBrush" Color="Gray" />
     <!-- ボタンを押した時の色 #99ffffff -->
-    <SolidColorBrush x:Key="ScrollBarPressedBrush" Color="#1a1a1a" />
+    <SolidColorBrush x:Key="ScrollBarPressedBrush" Color="Gray" />
     <!-- 使用不可の色 -->
     <SolidColorBrush x:Key="ScrollBarDisabledBrush" Color="Transparent" />
 
@@ -120,8 +120,6 @@
     <SolidColorBrush x:Key="AccentWarmDarkColorBrush" Color="{DynamicResource AccentWarmDarkColor}"/>
     <SolidColorBrush x:Key="AccentWarmLightColorBrush" Color="{DynamicResource AccentWarmLightColor}"/>
 
-    <SolidColorBrush x:Key="BorderDarkColorBrush" Color="{DynamicResource BorderDarkColor}"/>
-
     <SolidColorBrush x:Key="ListviewAlt0ColorBrush" Color="{DynamicResource ListviewAlt0Color}"/>
     <SolidColorBrush x:Key="ListviewAlt1ColorBrush" Color="{DynamicResource ListviewAlt1Color}"/>
 
@@ -148,7 +146,7 @@
     <SolidColorBrush x:Key="ItemSelectedNoneFocusedBackgroundColorBrush" Color="{DynamicResource ItemSelectedNoneFocusedBackgroundColor}"/>
     <SolidColorBrush x:Key="ItemSelectedInactiveBackgroundColorBrush" Color="{DynamicResource ItemSelectedNoneFocusedBackgroundColor}"/>
 
-    
+
     <Color x:Key="ItemForegroundColor">#FFCCCCCC</Color>
     <SolidColorBrush x:Key="ItemForegroundColorBrush" Color="{DynamicResource ItemForegroundColor}"/>
 
@@ -162,7 +160,13 @@
     <Color x:Key="ItemMouseOverForegroundColor">White</Color>
     <SolidColorBrush x:Key="ItemMouseOverForegroundColorBrush" Color="{DynamicResource ItemMouseOverForegroundColor}"/>
 
+    <SolidColorBrush x:Key="TextStrongColorBrush" Color="White"/>
+
+    <SolidColorBrush x:Key="BorderLightColorBrush" Color="{DynamicResource BorderLightColor}"/>
+    <SolidColorBrush x:Key="BorderMediumColorBrush" Color="{DynamicResource BorderMediumColor}"/>
+    <SolidColorBrush x:Key="BorderDarkColorBrush" Color="{DynamicResource BorderDarkColor}"/>
 
 
+    <SolidColorBrush x:Key="PopupBorderColorBrush" Color="WhiteSmoke"/>
 
 </ResourceDictionary>

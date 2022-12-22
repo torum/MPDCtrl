@@ -541,6 +541,15 @@ SOFTWARE.</value>
   <data name="Settings_Opts_ShowDebugWidow" xml:space="preserve">
     <value>デバッグウィンドウの有効化</value>
   </data>
+  <data name="Settings_Opts_Themes" xml:space="preserve">
+    <value>テーマ</value>
+  </data>
+  <data name="Settings_Opts_Themes_Dark" xml:space="preserve">
+    <value>ダーク</value>
+  </data>
+  <data name="Settings_Opts_Themes_Light" xml:space="preserve">
+    <value>ライト</value>
+  </data>
   <data name="Settings_Opts_UpdateDatabaseOnStartup" xml:space="preserve">
     <value>起動時にMPDサーバーの楽曲データベースを最新の状態に更新する (更新されるまで、しばらくかかる場合があります)</value>
   </data>

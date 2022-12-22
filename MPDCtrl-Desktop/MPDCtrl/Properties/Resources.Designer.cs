@@ -19,7 +19,7 @@ namespace MPDCtrl.Properties {
     // または Visual Studio のようなツールを使用して自動生成されました。
     // メンバーを追加または削除するには、.ResX ファイルを編集して、/str オプションと共に
     // ResGen を実行し直すか、または VS プロジェクトをビルドし直します。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -1272,6 +1272,33 @@ namespace MPDCtrl.Properties {
         public static string Settings_Opts_ShowDebugWidow {
             get {
                 return ResourceManager.GetString("Settings_Opts_ShowDebugWidow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Themes に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_Opts_Themes {
+            get {
+                return ResourceManager.GetString("Settings_Opts_Themes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Dark に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_Opts_Themes_Dark {
+            get {
+                return ResourceManager.GetString("Settings_Opts_Themes_Dark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Light に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Settings_Opts_Themes_Light {
+            get {
+                return ResourceManager.GetString("Settings_Opts_Themes_Light", resourceCulture);
             }
         }
         

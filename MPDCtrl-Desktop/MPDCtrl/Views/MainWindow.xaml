@@ -212,7 +212,6 @@
             </Grid>
 
             <!-- Header -->
-
             <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0.5">
                 <Grid Background="{DynamicResource BoardBackgroundColorBrush}">
                     <Grid.RowDefinitions>
@@ -231,18 +230,26 @@
                     <!-- Album cover -->
                     <Grid Grid.Row="1" Grid.Column="0">
                         <Grid Width="86" Height="86" Margin="36 0 6 0" HorizontalAlignment="Left" VerticalAlignment="Top">
-                            <Image Source="{Binding AlbumArt, NotifyOnTargetUpdated=True}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="86" Height="86" Visibility="{Binding IsAlbumArtVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
-                                <Image.Triggers>
-                                    <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1.0" Duration="0:0:1">
-                                                </DoubleAnimation>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                </Image.Triggers>
-                            </Image>
+                            <!--  Add rounded corners here  -->
+                            <Border Name="PicPrevMask" Margin="-5" Background="{DynamicResource BoardBackgroundColorBrush}" CornerRadius="4" BorderThickness="2" />
+                            <Grid>
+                                <Grid.OpacityMask>
+                                    <VisualBrush Visual="{Binding ElementName=PicPrevMask}" />
+                                </Grid.OpacityMask>
+                                <Image Source="{Binding AlbumArt, NotifyOnTargetUpdated=True}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="86" Height="86" Visibility="{Binding IsAlbumArtVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                                    <Image.Triggers>
+                                        <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1.0" Duration="0:0:1">
+                                                    </DoubleAnimation>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Image.Triggers>
+                                </Image>
+                            </Grid>
+
                         </Grid>
                     </Grid>
 
@@ -302,27 +309,27 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0 0 0 0">
-                            <ToggleButton x:Name="RepeatButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Repeat}" IsChecked="{Binding Mode=TwoWay,Path=Repeat}" Style="{DynamicResource PathToggleButton}"  Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
+                            <ToggleButton x:Name="RepeatButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Repeat}" IsChecked="{Binding Mode=TwoWay,Path=Repeat}" Style="{DynamicResource PathToggleButton}"  Width="18" Height="18" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
                                   Content="M17,17H7V14L3,18L7,22V19H19V13H17M7,7H17V10L21,6L17,2V5H5V11H7V7Z">
                             </ToggleButton>
-                            <ToggleButton x:Name="SingleButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Single}" IsChecked="{Binding Mode=TwoWay,Path=Single}" Style="{DynamicResource PathToggleButton}" Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
+                            <ToggleButton x:Name="SingleButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Single}" IsChecked="{Binding Mode=TwoWay,Path=Single}" Style="{DynamicResource PathToggleButton}" Width="18" Height="18" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
                                   Content="M13,15V9H12L10,10V11H11.5V15M17,17H7V14L3,18L7,22V19H19V13H17M7,7H17V10L21,6L17,2V5H5V11H7V7Z">
                             </ToggleButton>
-                            <ToggleButton x:Name="ShuffleButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Shuffle}" IsChecked="{Binding Mode=TwoWay,Path=Random}" Style="{DynamicResource PathToggleButton}" Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
+                            <ToggleButton x:Name="ShuffleButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Shuffle}" IsChecked="{Binding Mode=TwoWay,Path=Random}" Style="{DynamicResource PathToggleButton}" Width="18" Height="18" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
                                   Content="M17,3L22.25,7.5L17,12L22.25,16.5L17,21V18H14.26L11.44,15.18L13.56,13.06L15.5,15H17V12L17,9H15.5L6.5,18H2V15H5.26L14.26,6H17V3M2,6H6.5L9.32,8.82L7.2,10.94L5.26,9H2V6Z">
                             </ToggleButton>
-                            <ToggleButton x:Name="ConsumeButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Consume}" IsChecked="{Binding Mode=TwoWay,Path=Consume}" Style="{DynamicResource PathToggleButton}" Width="16" Height="16" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
+                            <ToggleButton x:Name="ConsumeButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Consume}" IsChecked="{Binding Mode=TwoWay,Path=Consume}" Style="{DynamicResource PathToggleButton}" Width="18" Height="18" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
                                   Content="M2,16H10V14H2M12,14V16H22V14M14,6H2V8H14M14,10H2V12H14V10Z">
                             </ToggleButton>
                         </StackPanel>
 
                         <Grid Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0 0 7 0" Visibility="{Binding IsQueueVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
-                            <Button Style="{DynamicResource PathButton}" Width="27" Height="27" Margin="0" Command="{Binding ShowFindCommand}" ToolTip="{x:Static properties:Resources.Search_ToolTip}"
+                            <Button Style="{DynamicResource PathButton}" Width="30" Height="30" Margin="0" Command="{Binding ShowFindCommand}" ToolTip="{x:Static properties:Resources.Search_ToolTip}"
                                 Content="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z">
                             </Button>
                         </Grid>
 
-                        <Grid Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0 0 17 0" Width="30">
+                        <Grid Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0 6 16 6" Width="30">
                             <Slider x:Name="SliderVol" ToolTip="{x:Static properties:Resources.Playback_SliderVolume}" Style="{DynamicResource CustomSliderStyle}" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Stretch" IsMoveToPointEnabled="True" Maximum="100" Value="{Binding Volume}">
                             </Slider>
                         </Grid>
@@ -331,9 +338,10 @@
                 </Grid>
 
             </Border>
+            
             <!-- Left pane -->
             <Grid Grid.Row="2" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:SizeChange.IsEnabled="True" helpers:SizeChange.ActualWidth="{Binding MainLeftPainActualWidth, Mode=OneWayToSource}">
-                <TreeView Margin="0 1 0 0" Style="{DynamicResource TreeViewMenuStyle}" ItemsSource="{Binding MainMenuItems}"  helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeMenu, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <TreeView Margin="0 0 0 0" Style="{DynamicResource TreeViewMenuStyle}" ItemsSource="{Binding MainMenuItems}"  helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeMenu, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <TreeView.Resources>
 
                         <ContextMenu x:Key="TreeviewMenuItemContextMenu">
@@ -443,7 +451,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <ListView x:Name="QueueListview" Grid.Row="1" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedQueueSong, Mode=TwoWay}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" SelectionChanged="QueueListview_SelectionChanged">
+                        <ListView x:Name="QueueListview" Grid.Row="1" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedQueueSong, Mode=TwoWay}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" VirtualizingPanel.VirtualizationMode="Standard" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" SelectionChanged="QueueListview_SelectionChanged">
                             <ListView.InputBindings>
                                 <KeyBinding Key="Return" Command="{Binding Path=DataContext.QueueListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                                 <KeyBinding Gesture="Ctrl+U" Command="{Binding Path=DataContext.QueueListviewMoveUpCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
@@ -804,7 +812,7 @@
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
-                                                        <Setter TargetName="SongTitleListItemTextBlock" Property="TextBlock.Foreground" Value="White" />
+                                                        <Setter TargetName="SongTitleListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource TextStrongColorBrush}" />
                                                         <Setter TargetName="SongTitleListItemTextBlock" Property="TextBlock.FontWeight" Value="ExtraBold" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
@@ -824,7 +832,7 @@
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
-                                                        <Setter TargetName="TimeListItemTextBlock" Property="TextBlock.Foreground" Value="White" />
+                                                        <Setter TargetName="TimeListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource TextStrongColorBrush}" />
                                                         <Setter TargetName="TimeListItemTextBlock" Property="TextBlock.FontWeight" Value="ExtraBold" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
@@ -844,7 +852,7 @@
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
-                                                        <Setter TargetName="ArtistListItemTextBlock" Property="TextBlock.Foreground" Value="White" />
+                                                        <Setter TargetName="ArtistListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource TextStrongColorBrush}" />
                                                         <Setter TargetName="ArtistListItemTextBlock" Property="TextBlock.FontWeight" Value="ExtraBold" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
@@ -864,7 +872,7 @@
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
-                                                        <Setter TargetName="AlbumListItemTextBlock" Property="TextBlock.Foreground" Value="White" />
+                                                        <Setter TargetName="AlbumListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource TextStrongColorBrush}" />
                                                         <Setter TargetName="AlbumListItemTextBlock" Property="TextBlock.FontWeight" Value="ExtraBold" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
@@ -884,7 +892,7 @@
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
-                                                        <Setter TargetName="GenreListItemTextBlock" Property="TextBlock.Foreground" Value="White" />
+                                                        <Setter TargetName="GenreListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource TextStrongColorBrush}" />
                                                         <Setter TargetName="GenreListItemTextBlock" Property="TextBlock.FontWeight" Value="ExtraBold" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
@@ -904,7 +912,7 @@
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
-                                                        <Setter TargetName="LastModifiedListItemTextBlock" Property="TextBlock.Foreground" Value="White" />
+                                                        <Setter TargetName="LastModifiedListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource TextStrongColorBrush}" />
                                                         <Setter TargetName="LastModifiedListItemTextBlock" Property="TextBlock.FontWeight" Value="ExtraBold" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
@@ -1014,7 +1022,7 @@
                         </Border>
 
                         <Popup IsOpen="{Binding IsSaveAsPlaylistPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
-                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250" BorderThickness="1" BorderBrush="{DynamicResource PopupBorderColorBrush}">
                                 <StackPanel>
 
                                     <Label Content="{x:Static properties:Resources.Popup_SaveQueueAs}" TextElement.FontWeight="Bold" />
@@ -1044,7 +1052,7 @@
                         </Popup>
 
                         <Popup IsOpen="{Binding IsConfirmClearQueuePopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
-                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250" BorderThickness="1" BorderBrush="{DynamicResource PopupBorderColorBrush}">
                                 <StackPanel>
 
                                     <Label Content="{x:Static properties:Resources.Popup_ConfirmClearQueue}" TextElement.FontWeight="Bold" />
@@ -1070,7 +1078,7 @@
                         </Popup>
 
                         <Popup IsOpen="{Binding IsSelectedSaveToPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
-                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250" BorderThickness="1" BorderBrush="{DynamicResource PopupBorderColorBrush}">
                                 <StackPanel>
 
                                     <Label Content="{x:Static properties:Resources.Popup_SaveSelectedTo}" TextElement.FontWeight="Bold" />
@@ -1099,7 +1107,7 @@
                         </Popup>
 
                         <Popup IsOpen="{Binding IsSelectedSaveAsPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
-                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250" BorderThickness="1" BorderBrush="{DynamicResource PopupBorderColorBrush}">
                                 <StackPanel>
 
                                     <Label Content="{x:Static properties:Resources.Popup_SaveSelectedAs}" TextElement.FontWeight="Bold" />
@@ -1129,7 +1137,7 @@
                         </Popup>
 
                         <Popup IsOpen="{Binding IsConfirmDeleteQueuePopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=QueueListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
-                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250" BorderThickness="1" BorderBrush="{DynamicResource PopupBorderColorBrush}">
                                 <StackPanel>
 
                                     <Label Content="{x:Static properties:Resources.Popup_ConfirmRemoveSelected}" TextElement.FontWeight="Bold" />
@@ -1521,7 +1529,7 @@
                         </ListView>
 
                         <Popup IsOpen="{Binding IsSearchResultSelectedSaveAsPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SearchResultListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
-                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250" BorderThickness="1" BorderBrush="{DynamicResource PopupBorderColorBrush}">
                                 <StackPanel>
 
                                     <Label Content="{x:Static properties:Resources.Popup_SaveSelectedAs}" TextElement.FontWeight="Bold" />
@@ -1551,7 +1559,7 @@
                         </Popup>
 
                         <Popup IsOpen="{Binding IsSearchResultSelectedSaveToPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SearchResultListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
-                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250" BorderThickness="1" BorderBrush="{DynamicResource PopupBorderColorBrush}">
                                 <StackPanel>
 
                                     <Label Content="{x:Static properties:Resources.Popup_SaveSelectedTo}" TextElement.FontWeight="Bold" />
@@ -1588,7 +1596,7 @@
                             <ColumnDefinition Width="3*"/>
                         </Grid.ColumnDefinitions>
 
-                        <TreeView Grid.Row="0" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}" BorderBrush="#121212" BorderThickness="0 0 0 0.5" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" ItemsSource="{Binding MusicDirectories}" helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeDirectory, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <TreeView Grid.Row="0" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}" BorderBrush="#121212" BorderThickness="0 0 0 0" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" ItemsSource="{Binding MusicDirectories}" helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeDirectory, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <TreeView.Resources>
                                 <Style TargetType="{x:Type ScrollBar}">
                                     <Setter Property="Margin" Value="0,0,0,0" />
@@ -1762,7 +1770,7 @@
                                 <Grid x:Name="SongFilesListviewDummy3" Grid.Column="3" />
                             </Grid>
 
-                            <ListView x:Name="SongFilesListview" Grid.Row="1" ItemsSource="{Binding MusicEntries}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderBrush="#121212" BorderThickness="0 0 0 0.5" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
+                            <ListView x:Name="SongFilesListview" Grid.Row="1" ItemsSource="{Binding MusicEntries}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderBrush="#121212" BorderThickness="0 0 0 0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
                                 <ListView.Resources>
                                     <ContextMenu x:Key="SongFilesListviewItemContextMenu">
                                         <MenuItem Header="{x:Static properties:Resources.SongsItemContextMenu_Add}" Command="{Binding Path=DataContext.SongFilesListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
@@ -1917,7 +1925,7 @@
                             </ListView>
 
                             <Popup IsOpen="{Binding IsSongFilesSelectedSaveAsPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SongFilesListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
-                                <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                                <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250" BorderThickness="1" BorderBrush="{DynamicResource PopupBorderColorBrush}">
                                     <StackPanel>
 
                                         <Label Content="{x:Static properties:Resources.Popup_SaveSelectedAs}" TextElement.FontWeight="Bold" />
@@ -1947,7 +1955,7 @@
                             </Popup>
 
                             <Popup IsOpen="{Binding IsSongFilesSelectedSaveToPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=SongFilesListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
-                                <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                                <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250" BorderThickness="1" BorderBrush="{DynamicResource PopupBorderColorBrush}">
                                     <StackPanel>
 
                                         <Label Content="{x:Static properties:Resources.Popup_SaveSelectedTo}" TextElement.FontWeight="Bold" />
@@ -2155,9 +2163,8 @@
                             </ListView.ItemContainerStyle>
                         </ListView>
 
-
                         <Popup IsOpen="{Binding IsConfirmDeletePlaylistPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=PlaylistsListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
-                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250" BorderThickness="1" BorderBrush="{DynamicResource PopupBorderColorBrush}">
                                 <StackPanel>
 
                                     <Label Content="{x:Static properties:Resources.Popup_ConfirmRemovePlaylist}" TextElement.FontWeight="Bold" />
@@ -2450,9 +2457,8 @@
                             </ListView.ItemsPanel>
                         </ListView>
 
-
                         <Popup IsOpen="{Binding IsConfirmUpdatePlaylistSongsPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=PlaylistSongsListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
-                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250" BorderThickness="1" BorderBrush="{DynamicResource PopupBorderColorBrush}">
                                 <StackPanel>
 
                                     <Label Content="{x:Static properties:Resources.Popup_PlaylistChangedNortification}" TextElement.FontWeight="Bold" />
@@ -2478,7 +2484,7 @@
                         </Popup>
 
                         <Popup IsOpen="{Binding IsConfirmMultipleDeletePlaylistSongsNotSupportedPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=PlaylistSongsListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
-                            <Border Background="#FFF15B" CornerRadius="4" Padding="6" Width="250">
+                            <Border Background="#FFF15B" CornerRadius="4" Padding="6" Width="250" BorderThickness="1" BorderBrush="{DynamicResource PopupBorderColorBrush}">
                                 <StackPanel>
 
                                     <Label Content="{x:Static properties:Resources.Popup_MultipleDeletionNotSupported}" TextElement.FontWeight="Bold" />
@@ -2504,7 +2510,7 @@
                         </Popup>
 
                         <Popup IsOpen="{Binding IsConfirmDeletePlaylistSongPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=PlaylistSongsListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
-                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250" BorderThickness="1" BorderBrush="{DynamicResource PopupBorderColorBrush}">
                                 <StackPanel>
 
                                     <Label Content="{x:Static properties:Resources.Popup_ConfirmRemoveSelected}" TextElement.FontWeight="Bold" />
@@ -2530,7 +2536,7 @@
                         </Popup>
 
                         <Popup IsOpen="{Binding IsConfirmPlaylistClearPopupVisible}" StaysOpen="False" PlacementTarget="{Binding ElementName=PlaylistSongsListview}" Placement="Center" AllowsTransparency="True" PopupAnimation="Fade">
-                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250">
+                            <Border Background="WhiteSmoke" CornerRadius="4" Padding="6" Width="250" BorderThickness="1" BorderBrush="{DynamicResource PopupBorderColorBrush}">
                                 <StackPanel>
 
                                     <Label Content="{x:Static properties:Resources.Popup_ConfirmClearPlaylist}" TextElement.FontWeight="Bold" />
@@ -2744,7 +2750,7 @@
                     </StackPanel>
                 </StatusBarItem>
 
-                <Separator Grid.Column="1" Background="#202020" Visibility="{Binding IsMpdStatusMessageContainsText, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}"/>
+                <Separator Grid.Column="1" Background="{DynamicResource BorderLightColorBrush}" Visibility="{Binding IsMpdStatusMessageContainsText, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}"/>
 
                 <!-- MpdStatus Message  -->
                 <StatusBarItem Grid.Column="2" Visibility="{Binding IsMpdStatusMessageContainsText, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
@@ -2763,7 +2769,7 @@
                     </StackPanel>
                 </StatusBarItem>
 
-                <Separator Grid.Column="3" Background="#202020"/>
+                <Separator Grid.Column="3" Background="{DynamicResource BorderLightColorBrush}"/>
                 
                 <!-- Statusbar Message  -->
                 <StatusBarItem Grid.Column="4" HorizontalContentAlignment="Left" VerticalAlignment="Center">
@@ -2774,7 +2780,7 @@
                     </StackPanel>
                 </StatusBarItem>
 
-                <Separator Grid.Column="5" Background="#202020" />
+                <Separator Grid.Column="5" Background="{DynamicResource BorderLightColorBrush}" />
                 
                 <!-- Debug Window Icon  -->
                 <StatusBarItem Grid.Column="6" HorizontalContentAlignment="Right">
@@ -3344,7 +3350,7 @@
                                                 </StackPanel>
 
                                                 <StackPanel Orientation="Horizontal" Margin="0 12 0 0" HorizontalAlignment="Left">
-                                                    <TextBlock Width="240" Text="{Binding ConnectionStatusMessage, NotifyOnTargetUpdated=True}" TextElement.Foreground="WhiteSmoke" TextAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextElement.FontWeight="Bold" TextWrapping="WrapWithOverflow">
+                                                    <TextBlock Width="240" Text="{Binding ConnectionStatusMessage, NotifyOnTargetUpdated=True}" TextElement.Foreground="{DynamicResource NormalTextColorBrush}" TextAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextElement.FontWeight="Bold" TextWrapping="WrapWithOverflow">
                                                         <TextBlock.Triggers>
                                                             <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                                                 <BeginStoryboard>
@@ -3393,6 +3399,8 @@
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
 
@@ -3405,33 +3413,59 @@
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_UpdateDatabaseOnStartup}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsUpdateOnStartup}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
 
-                                        <!-- Options -->
+                                        <!-- Themes -->
+
                                         <Border Grid.Row="2" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
-                                            <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.Settings_Opts_Options}" HorizontalAlignment="Left"/>
+                                            <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.Settings_Opts_Themes}" HorizontalAlignment="Left"/>
                                         </Border>
 
                                         <Grid Grid.Row="3" HorizontalAlignment="Left" Margin="0 12 0 0">
+                                            
+                                            <StackPanel Orientation="Horizontal">
+                                                <ComboBox x:Name="ThemeComboBox" ItemsSource="{Binding Themes}" SelectedItem="{Binding CurrentTheme}" VerticalAlignment="Center" Margin="0" Padding="4 3 4 3" Background="Transparent">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <Canvas Background="Transparent" Margin="4 3 4 3" Width="12" Height="12" ToolTip="{Binding Path=Label, Mode=OneWay}">
+                                                                    <Path Fill="{Binding RelativeSource={RelativeSource AncestorType=ComboBox}, Path=Foreground}" Width="12" Height="12" Stretch="Uniform" Data="{Binding Path=IconData, Mode=OneWay}" />
+                                                                </Canvas>
+                                                                <TextBlock Text="{Binding Path=Label, Mode=OneWay}" Margin="4 3 4 3"></TextBlock>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <!-- Options -->
+                                        <Border Grid.Row="4" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                            <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.Settings_Opts_Options}" HorizontalAlignment="Left"/>
+                                        </Border>
+
+                                        <Grid Grid.Row="5" HorizontalAlignment="Left" Margin="0 12 0 0">
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_AutoScrollToNowPlaying}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsAutoScrollToNowPlaying}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
 
-                                        <Grid Grid.Row="4" HorizontalAlignment="Left" Margin="0 12 0 0">
+                                        <Grid Grid.Row="6" HorizontalAlignment="Left" Margin="0 12 0 0">
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_EnableAlbumArt}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsDownloadAlbumArt}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
                                         
-                                        <Grid Grid.Row="5" HorizontalAlignment="Left" Margin="24 12 0 0">
+                                        <Grid Grid.Row="7" HorizontalAlignment="Left" Margin="24 12 0 0">
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_UseReadPicture}" IsEnabled="{Binding IsDownloadAlbumArt}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsDownloadAlbumArtEmbeddedUsingReadPicture}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
 
+
+
                                         <!-- Developer Mode -->
-                                        <Border Grid.Row="6" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                        <Border Grid.Row="8" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
                                             <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.DeveloperMode}" HorizontalAlignment="Left"/>
                                         </Border>
 
-                                        <Grid Grid.Row="7" HorizontalAlignment="Left" Margin="0 12 0 0">
+                                        <Grid Grid.Row="9" HorizontalAlignment="Left" Margin="0 12 0 0">
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_ShowDebugWidow}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsShowDebugWindow}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
                                         
-                                        <Grid Grid.Row="8" HorizontalAlignment="Left" Margin="0 12 0 0">
+                                        <Grid Grid.Row="10" HorizontalAlignment="Left" Margin="0 12 0 0">
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_SaveLog}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsSaveLog}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
 
@@ -3600,9 +3634,9 @@
 
                 </TabControl>
 
-                <Border Grid.Row="2" Height="62" Margin="0" Background="{DynamicResource BoardBackgroundColorBrush}">
-                    <Border  BorderThickness="0 0.5 0 0" BorderBrush="{DynamicResource ControlMediumColorBrush}">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 12 0 0">
+                <Border Grid.Row="2" Height="48" Margin="0" Background="{DynamicResource BoardBackgroundColorBrush}">
+                    <Border  BorderThickness="0 1 0 0" BorderBrush="{DynamicResource ControlDarkColorBrush}">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 12 12 12">
                             <Button Width="80" Content="{x:Static properties:Resources.Close}" Margin="0 0 32 0" Padding="3" IsDefault="False" Command="{Binding SettingsOKCommand}"></Button>
                         </StackPanel>
                     </Border>

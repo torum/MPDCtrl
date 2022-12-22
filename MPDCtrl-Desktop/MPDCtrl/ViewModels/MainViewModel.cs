@@ -23,6 +23,7 @@ using System.Xml.Linq;
 namespace MPDCtrl.ViewModels
 {
     /// TODO: 
+    /// DNS name resolution.
     /// Queue: multiple items reorder.
     /// Add "Play Next" menu item in playlists and search result.　
     /// Add "update" and "rescan" button in Setting's page.
@@ -32,7 +33,6 @@ namespace MPDCtrl.ViewModels
     /// Remove some garbage in the TreeView's popup menu.
     /// Remember left pane's width.
     /// organize and clean up resourses such as translation and styles.
-    /// Theme selection.
     /// 
     /// Ideas:
     /// Auto connect to localhost?
@@ -40,6 +40,7 @@ namespace MPDCtrl.ViewModels
     /// Add Search option "Exact" or "Contain".
     /// 
     /// Version history：
+    /// v3.0.14.3 fixed a few issues of LightTheme mainly combobox and scrollviewer's thumb.
     /// v3.0.14.2 Tweaked and refined LightTheme. Remember the selection and change Theme on startup.
     /// v3.0.14.1 Fixed little lisetview selection bug. (use ScrollIntoViewAndSelect instead of ScrollIntoView when "UpdateStatus") 
     /// v3.0.14   MS Store release.
@@ -119,7 +120,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.14.2";
+        const string _appVer = "v3.0.14.3";
 
         public static string AppVer
         {

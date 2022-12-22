@@ -30,6 +30,8 @@
     <Color x:Key="TitleTextColor">LightGray</Color>
 
     <Color x:Key="NormalTextBoxBackgroundColor">DarkGray</Color>
+    <Color x:Key="NormalTextBoxBackgroundFocusedColor">Gainsboro</Color>
+    <Color x:Key="NormalTextBoxBackgroundMouseOverColor">#ffffff</Color>
 
     <Color x:Key="BoardBackgroundColor">#191919</Color>
     <!-- 1c1c1c 191919 121212 or 111111 -->
@@ -76,7 +78,7 @@
 
     <!-- スクロールバーの色 #66ffffff #212121 -->
     <SolidColorBrush x:Key="ScrollBarColorBrush" Color="{DynamicResource ControlDarkColor}"/>
-    <SolidColorBrush x:Key="ScrollBarMouseOverColorBrush" Color="{DynamicResource ControlMouseOverBackgroundColor}"/>
+    <SolidColorBrush x:Key="ScrollBarMouseOverColorBrush" Color="#aaa"/>
     <!-- ボーダーの色 #66ffffff -->
     <SolidColorBrush x:Key="ScrollBarBorderBrush" Color="Transparent" />
     <!-- トラック（レーン）の色 #33ffffff -->
@@ -111,6 +113,8 @@
     <SolidColorBrush x:Key="TitleTextColorBrush" Color="{DynamicResource TitleTextColor}"/>
 
     <SolidColorBrush x:Key="NormalTextBoxBackgroundColorBrush" Color="{DynamicResource NormalTextBoxBackgroundColor}"/>
+    <SolidColorBrush x:Key="NormalTextBoxBackgroundColorFocuedBrush" Color="{DynamicResource NormalTextBoxBackgroundFocusedColor}"/>
+    <SolidColorBrush x:Key="NormalTextBoxBackgroundColorMouseOverBrush" Color="{DynamicResource NormalTextBoxBackgroundMouseOverColor}"/>
 
     <SolidColorBrush x:Key="BoardBackgroundColorBrush" Color="{DynamicResource BoardBackgroundColor}"/>
 
@@ -168,5 +172,15 @@
 
 
     <SolidColorBrush x:Key="PopupBorderColorBrush" Color="WhiteSmoke"/>
+
+
+
+    <SolidColorBrush x:Key="ComboBoxNormalBorderBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="ComboBoxNormalBackgroundBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="ComboBoxPullDownMenuBackgroundBrush" Color="#333" />
+    <SolidColorBrush x:Key="ComboBoxPullDownMenuBorderBrush" Color="Gray" />
+    <SolidColorBrush x:Key="ComboBoxDisabledForegroundBrush" Color="#888" />
+    <SolidColorBrush x:Key="ComboBoxDisabledBackgroundBrush" Color="#eee" />
+    <SolidColorBrush x:Key="ComboBoxDisabledBorderBrush" Color="#888" />
 
 </ResourceDictionary>

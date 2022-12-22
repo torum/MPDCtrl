@@ -80,14 +80,14 @@
                     </Style>
                     <Style TargetType="{x:Type Hyperlink}">
                         <Setter Property="FocusVisualStyle" Value="{StaticResource HyperlinkFocusVisual}"/>
-                        <Setter Property="TextBlock.TextDecorations" Value="" />
+                        <Setter Property="TextBlock.TextDecorations" Value="None" />
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="true">
                                 <Setter Property="TextBlock.TextDecorations" Value="Underline" />
                                 <Setter Property="Foreground" Value="LightBlue" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="False">
-                                <Setter Property="TextBlock.TextDecorations" Value="" />
+                                <Setter Property="TextBlock.TextDecorations" Value="None" />
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -112,10 +112,10 @@
                         <Setter Property="Background" Value="{DynamicResource NormalTextBoxBackgroundColorBrush}" />
                         <Style.Triggers>
                             <Trigger Property="IsKeyboardFocusWithin" Value="true">
-                                <Setter Property="Background" Value="Gainsboro" />
+                                <Setter Property="Background" Value="{DynamicResource NormalTextBoxBackgroundFocusedColorBrush}" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="Background" Value="White" />
+                                <Setter Property="Background" Value="{DynamicResource NormalTextBoxBackgroundMouseOverColorBrush}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Foreground" Value="{DynamicResource NormalTextBoxBackgroundColorBrush}" />
@@ -1225,22 +1225,14 @@
                 <!-- Flat ComboBox -->
                 <ResourceDictionary>
 
-                    <SolidColorBrush x:Key="ComboBoxNormalBorderBrush" Color="Transparent" />
-                    <SolidColorBrush x:Key="ComboBoxNormalBackgroundBrush" Color="Transparent" />
-                    <SolidColorBrush x:Key="ComboBoxPullDownMenuBackgroundBrush" Color="#333" />
-                    <SolidColorBrush x:Key="ComboBoxPullDownMenuBorderBrush" Color="Gray" />
-                    <SolidColorBrush x:Key="ComboBoxDisabledForegroundBrush" Color="#888" />
-                    <SolidColorBrush x:Key="ComboBoxDisabledBackgroundBrush" Color="#eee" />
-                    <SolidColorBrush x:Key="ComboBoxDisabledBorderBrush" Color="#888" />
-
                     <ControlTemplate TargetType="ToggleButton" x:Key="ComboBoxToggleButtonTemplate">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
                                 <ColumnDefinition Width="18" />
                             </Grid.ColumnDefinitions>
-                            <Border Name="Border" Grid.ColumnSpan="2" BorderBrush="Gray" CornerRadius="0" BorderThickness="0" Background="{StaticResource ComboBoxNormalBackgroundBrush}" />
-                            <Border Name="ButtonBorder" Grid.Column="1" CornerRadius="0" BorderThickness="0 0 0 0" BorderBrush="Transparent" Margin="1 1 1 0" Background="{StaticResource ComboBoxNormalBackgroundBrush}" >
+                            <Border Name="Border" Grid.ColumnSpan="2" BorderBrush="Gray" CornerRadius="0" BorderThickness="0" Background="{DynamicResource ComboBoxNormalBackgroundBrush}" />
+                            <Border Name="ButtonBorder" Grid.Column="1" CornerRadius="0" BorderThickness="0 0 0 0" BorderBrush="Transparent" Margin="1 1 1 0" Background="{DynamicResource ComboBoxNormalBackgroundBrush}" >
                                 <Path Name="Arrow" Data="M0,0 L0,2 L4,6 L8,2 L8,0 L4,4 z" HorizontalAlignment="Center" Fill="Gray" VerticalAlignment="Center"/>
                             </Border>
                         </Grid>
@@ -1257,21 +1249,21 @@
                             <Trigger Property="UIElement.IsEnabled" Value="False">
                                 <Setter Property="Panel.Background" TargetName="Border" Value="Transparent"/>
                                 <Setter Property="Panel.Background" TargetName="ButtonBorder" Value="Transparent"/>
-                                <Setter Property="Border.BorderBrush" TargetName="ButtonBorder" Value="{StaticResource ComboBoxDisabledBorderBrush}"/>
-                                <Setter Property="TextElement.Foreground" Value="{StaticResource ComboBoxDisabledForegroundBrush}"/>
+                                <Setter Property="Border.BorderBrush" TargetName="ButtonBorder" Value="{DynamicResource ComboBoxDisabledBorderBrush}"/>
+                                <Setter Property="TextElement.Foreground" Value="{DynamicResource ComboBoxDisabledForegroundBrush}"/>
                                 <Setter Property="Shape.Fill" TargetName="Arrow" Value="Transparent"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
 
-                    <Style x:Key="ComboBoxFlatStyle"  TargetType="{x:Type ComboBox}">
+                    <Style x:Key="ComboBoxFlatStyle" TargetType="{x:Type ComboBox}">
                         <Setter Property="UIElement.SnapsToDevicePixels" Value="True"/>
                         <Setter Property="FrameworkElement.OverridesDefaultStyle" Value="True"/>
                         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
                         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
                         <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
                         <Setter Property="TextElement.Foreground" Value="{DynamicResource NormalTextColorBrush}"/>
-                        <Setter Property="Foreground" Value="{DynamicResource ControlLightColorBrush}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource NormalTextColorBrush}"/>
                         <Setter Property="Control.Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="ComboBox">
@@ -1291,9 +1283,9 @@
                                         <TextBlock x:Name="SelectMessage" HorizontalAlignment="Center" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag}" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"  Visibility="Collapsed" IsHitTestVisible="False" TextElement.Foreground="White" />
 
                                         <!-- Popup showing items -->
-                                        <Popup Name="Popup" Placement="Bottom" Focusable="False" AllowsTransparency="True" IsOpen="{TemplateBinding ComboBox.IsDropDownOpen}" PopupAnimation="Slide" Margin="0">
+                                        <Popup Name="Popup" Placement="Bottom" Focusable="False" AllowsTransparency="True" IsOpen="{TemplateBinding ComboBox.IsDropDownOpen}" PopupAnimation="Slide" Margin="0" TextElement.Foreground="{DynamicResource NormalTextColorBrush}">
                                             <Grid Name="DropDown" SnapsToDevicePixels="True" MinWidth="{TemplateBinding FrameworkElement.ActualWidth}" MaxHeight="{TemplateBinding ComboBox.MaxDropDownHeight}">
-                                                <Border Name="DropDownBorder" Background="{DynamicResource ComboBoxPullDownMenuBackgroundBrush}" Margin="0, 0, 0, 0" CornerRadius="0" BorderThickness="0" BorderBrush="{DynamicResource ComboBoxPullDownMenuBorderBrush}"/>
+                                                <Border Name="DropDownBorder" Background="{DynamicResource ComboBoxPullDownMenuBackgroundBrush}" TextElement.Foreground="{DynamicResource NormalTextColorBrush}" Margin="0, 0, 0, 0" CornerRadius="0" BorderThickness="0" BorderBrush="{DynamicResource ComboBoxPullDownMenuBorderBrush}"/>
                                                 <ScrollViewer Margin="4" SnapsToDevicePixels="True">
                                                     <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
                                                 </ScrollViewer>
@@ -1319,10 +1311,10 @@
                                             <Setter Property="Visibility" TargetName="SelectMessage" Value="Visible"/>
                                         </Trigger>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="TextElement.Foreground" TargetName="SelectMessage" Value="{DynamicResource ControlMouseOverColorBrush}"/>
-                                            <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{DynamicResource ControlMouseOverColorBrush}"/>
-                                            <Setter Property="TextElement.Foreground" Value="{DynamicResource ControlMouseOverColorBrush}"/>
-                                            <Setter Property="Foreground" Value="{DynamicResource ControlMouseOverColorBrush}"/>
+                                            <Setter Property="TextElement.Foreground" TargetName="SelectMessage" Value="{DynamicResource NormalTextColorBrush}"/>
+                                            <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="{DynamicResource NormalTextColorBrush}"/>
+                                            <Setter Property="TextElement.Foreground" Value="{DynamicResource NormalTextColorBrush}"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource NormalTextColorBrush}"/>
                                         </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
@@ -2686,7 +2678,7 @@
                                     <Border x:Name="CustamThumb" CornerRadius="0" Background="{DynamicResource ScrollBarColorBrush}" BorderBrush="{DynamicResource ScrollBarBorderBrush}" BorderThickness="1" Margin="1"/>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="CustamThumb" Property="Background" Value="{DynamicResource ControlDarkColorBrush}"/>
+                                            <Setter TargetName="CustamThumb" Property="Background" Value="{DynamicResource ScrollBarMouseOverColorBrush}"/>
                                         </Trigger>
                                         <Trigger Property="IsDragging" Value="True">
                                             <Setter TargetName="CustamThumb" Property="Background" Value="{DynamicResource ScrollBarPressedBrush}"/>

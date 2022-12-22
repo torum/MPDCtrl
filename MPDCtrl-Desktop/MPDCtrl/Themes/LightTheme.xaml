@@ -29,7 +29,9 @@
     <Color x:Key="NormalTextColor">#222222</Color>
     <Color x:Key="TitleTextColor">#111111</Color>
 
-    <Color x:Key="NormalTextBoxBackgroundColor">#fefefe</Color>
+    <Color x:Key="NormalTextBoxBackgroundColor">#fbfbfb</Color>
+    <Color x:Key="NormalTextBoxBackgroundFocusedColor">#ffffff</Color>
+    <Color x:Key="NormalTextBoxBackgroundMouseOverColor">#ffffff</Color>
 
     <Color x:Key="BoardBackgroundColor">#dfdfdf</Color>
 
@@ -111,6 +113,8 @@
     <SolidColorBrush x:Key="TitleTextColorBrush" Color="{DynamicResource TitleTextColor}"/>
 
     <SolidColorBrush x:Key="NormalTextBoxBackgroundColorBrush" Color="{DynamicResource NormalTextBoxBackgroundColor}"/>
+    <SolidColorBrush x:Key="NormalTextBoxBackgroundColorFocuedBrush" Color="{DynamicResource NormalTextBoxBackgroundFocusedColor}"/>
+    <SolidColorBrush x:Key="NormalTextBoxBackgroundColorMouseOverBrush" Color="{DynamicResource NormalTextBoxBackgroundMouseOverColor}"/>
 
     <SolidColorBrush x:Key="BoardBackgroundColorBrush" Color="{DynamicResource BoardBackgroundColor}"/>
 
@@ -170,5 +174,15 @@
     <SolidColorBrush x:Key="BorderDarkColorBrush" Color="{DynamicResource BorderDarkColor}"/>
 
     <SolidColorBrush x:Key="PopupBorderColorBrush" Color="#444"/>
+
+
+
+    <SolidColorBrush x:Key="ComboBoxNormalBorderBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="ComboBoxNormalBackgroundBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="ComboBoxPullDownMenuBackgroundBrush" Color="#eeeeee" />
+    <SolidColorBrush x:Key="ComboBoxPullDownMenuBorderBrush" Color="Gray" />
+    <SolidColorBrush x:Key="ComboBoxDisabledForegroundBrush" Color="#888" />
+    <SolidColorBrush x:Key="ComboBoxDisabledBackgroundBrush" Color="#eee" />
+    <SolidColorBrush x:Key="ComboBoxDisabledBorderBrush" Color="#888" />
 
 </ResourceDictionary>

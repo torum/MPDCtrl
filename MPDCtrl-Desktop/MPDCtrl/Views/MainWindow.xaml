@@ -2724,13 +2724,13 @@
 
                         <Viewbox Width="16" Height="16" Margin="2 0 4 0" Opacity="0.7">
                             <Canvas Width="24" Height="24">
-                                <Path Fill="{DynamicResource ControlDarkColorBrush}" Data="{Binding StatusButton}" />
+                                <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding StatusButton}" />
                             </Canvas>
                         </Viewbox>
 <!--
                         <Label Content="{Binding CurrentProfile.Name}" Style="{DynamicResource DefaultLabelStyle}" Foreground="{DynamicResource ControlDarkColorBrush}" VerticalAlignment="Center" Margin="0 0 4 0" Padding="0" Opacity="0.7"></Label>
 -->
-                        <ComboBox Style="{StaticResource ComboBoxFlatStyle}" IsEnabled="{Binding IsProfileSwitchOK}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedQuickProfile}" Foreground="{DynamicResource ControlDarkColorBrush}" HorizontalAlignment="Center" Tag="">
+                        <ComboBox Style="{StaticResource ComboBoxFlatStyle}" IsEnabled="{Binding IsProfileSwitchOK}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedQuickProfile}" Foreground="{DynamicResource ControlForegroundColorBrush}" HorizontalAlignment="Center" Tag="">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
@@ -3066,7 +3066,7 @@
                         </Canvas>
                     </Viewbox>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding ConnectionStatusMessage, NotifyOnTargetUpdated=True}" TextElement.Foreground="WhiteSmoke" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextElement.FontWeight="Bold" TextWrapping="WrapWithOverflow">
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding ConnectionStatusMessage, NotifyOnTargetUpdated=True}" TextElement.Foreground="{DynamicResource NormalTextColorBrush}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextElement.FontWeight="Bold" TextWrapping="WrapWithOverflow">
                         <TextBlock.Triggers>
                             <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                 <BeginStoryboard>
@@ -3103,7 +3103,7 @@
                     <TextBlock Text="{x:Static properties:Resources.Host}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
                     <TextBox x:Name="NewHost_TextBox" Text="{Binding Host, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240" IsVisibleChanged="TextBox_IsVisibleChanged">
                         <TextBox.Style>
-                            <Style TargetType="TextBox">
+                            <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
                                 <Style.Triggers>
                                     <Trigger Property="Validation.HasError" Value="true">
                                         <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)/ErrorContent}" />
@@ -3116,7 +3116,7 @@
                     <TextBlock Text="{x:Static properties:Resources.Port}" Style="{DynamicResource DefaultTextBlockStyle}" Margin="0 12 0 0"></TextBlock>
                     <TextBox Text="{Binding Port, ValidatesOnDataErrors=True, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240">
                         <TextBox.Style>
-                            <Style TargetType="TextBox">
+                            <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
                                 <Style.Triggers>
                                     <Trigger Property="Validation.HasError" Value="true">
                                         <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)/ErrorContent}" />

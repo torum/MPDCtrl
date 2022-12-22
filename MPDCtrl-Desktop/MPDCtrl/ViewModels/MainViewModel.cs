@@ -40,6 +40,7 @@ namespace MPDCtrl.ViewModels
     /// Add Search option "Exact" or "Contain".
     /// 
     /// Version history：
+    /// v3.0.15   MS Store release.
     /// v3.0.14.3 fixed a few issues of LightTheme mainly combobox and scrollviewer's thumb.
     /// v3.0.14.2 Tweaked and refined LightTheme. Remember the selection and change Theme on startup.
     /// v3.0.14.1 Fixed little lisetview selection bug. (use ScrollIntoViewAndSelect instead of ScrollIntoView when "UpdateStatus") 
@@ -120,7 +121,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.14.3";
+        const string _appVer = "v3.0.15.0";
 
         public static string AppVer
         {

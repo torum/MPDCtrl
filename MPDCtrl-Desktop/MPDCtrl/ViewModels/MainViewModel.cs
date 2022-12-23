@@ -40,6 +40,7 @@ namespace MPDCtrl.ViewModels
     /// Add Search option "Exact" or "Contain".
     /// 
     /// Version history：
+    /// v3.0.16   Fixed and tweaked light theme mainly slider.
     /// v3.0.15   MS Store release.
     /// v3.0.14.3 fixed a few issues of LightTheme mainly combobox and scrollviewer's thumb.
     /// v3.0.14.2 Tweaked and refined LightTheme. Remember the selection and change Theme on startup.

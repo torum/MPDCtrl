@@ -183,19 +183,4 @@
     <SolidColorBrush x:Key="ComboBoxDisabledBackgroundBrush" Color="#eee" />
     <SolidColorBrush x:Key="ComboBoxDisabledBorderBrush" Color="#888" />
 
-    <SolidColorBrush x:Key="SliderThumb.Static.Foreground" Color="#FFE5E5E5"/>
-    <SolidColorBrush x:Key="SliderThumb.MouseOver.Background" Color="#FFDCECFC"/>
-    <SolidColorBrush x:Key="SliderThumb.MouseOver.Border" Color="#FF7Eb4EA"/>
-    <!-- #FFDAECFC -->
-    <SolidColorBrush x:Key="SliderThumb.Pressed.Background" Color="{DynamicResource ControlPressedColor}"/>
-    <SolidColorBrush x:Key="SliderThumb.Pressed.Border" Color="#FF569DE5"/>
-    <SolidColorBrush x:Key="SliderThumb.Disabled.Background" Color="#FFF0F0F0"/>
-    <SolidColorBrush x:Key="SliderThumb.Disabled.Border" Color="#FFD9D9D9"/>
-    <!-- #FFF0F0F0 -->
-    <SolidColorBrush x:Key="SliderThumb.Static.Background" Color="{DynamicResource ControlForegroundColor}"/>
-    <!-- #FFACACAC -->
-    <SolidColorBrush x:Key="SliderThumb.Static.Border" Color="Transparent"/>
-    <SolidColorBrush x:Key="SliderThumb.Track.Border" Color="#313131"/>
-    <SolidColorBrush x:Key="SliderThumb.Track.Background" Color="Black"/>
-
 </ResourceDictionary>

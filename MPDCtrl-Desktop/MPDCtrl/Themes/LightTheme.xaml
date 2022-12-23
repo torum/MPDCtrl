@@ -12,7 +12,7 @@
     <Color x:Key="ControlMediumColor">Gray</Color>
     <Color x:Key="ControlDarkColor">DarkGray</Color>
 
-    <Color x:Key="ControlMouseOverColor">Black</Color>
+    <Color x:Key="ControlMouseOverColor">#313131</Color>
     <Color x:Key="ControlMouseOverBackgroundColor">DarkGray</Color>
     <Color x:Key="ControlPressedColor">#7d7d7d</Color>
 
@@ -184,5 +184,19 @@
     <SolidColorBrush x:Key="ComboBoxDisabledForegroundBrush" Color="#888" />
     <SolidColorBrush x:Key="ComboBoxDisabledBackgroundBrush" Color="#eee" />
     <SolidColorBrush x:Key="ComboBoxDisabledBorderBrush" Color="#888" />
+
+
+    <SolidColorBrush x:Key="SliderThumb.Static.Foreground" Color="#FFE5E5E5"/>
+    <SolidColorBrush x:Key="SliderThumb.MouseOver.Background" Color="{DynamicResource ControlDarkColor}"/>
+    <SolidColorBrush x:Key="SliderThumb.MouseOver.Border" Color="{DynamicResource ControlDarkColor}"/>
+    <SolidColorBrush x:Key="SliderThumb.Pressed.Background" Color="{DynamicResource ControlMediumColor}"/>
+    <SolidColorBrush x:Key="SliderThumb.Pressed.Border" Color="#FF569DE5"/>
+    <SolidColorBrush x:Key="SliderThumb.Disabled.Background" Color="#FFF0F0F0"/>
+    <SolidColorBrush x:Key="SliderThumb.Disabled.Border" Color="#FFD9D9D9"/>
+    <!-- #FFF0F0F0 -->
+    <SolidColorBrush x:Key="SliderThumb.Static.Background" Color="{DynamicResource ControlDarkColor}"/>
+    <SolidColorBrush x:Key="SliderThumb.Static.Border" Color="#FFACACAC"/>
+    <SolidColorBrush x:Key="SliderThumb.Track.Border" Color="{DynamicResource ControlDarkColor}"/>
+    <SolidColorBrush x:Key="SliderThumb.Track.Background" Color="{DynamicResource WindowBackgroundBaseColor}"/>
 
 </ResourceDictionary>

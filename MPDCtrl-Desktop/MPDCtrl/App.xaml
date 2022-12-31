@@ -1257,7 +1257,7 @@
                                             </TextBox.Template>
                                         </TextBox>
 
-                                        <TextBlock x:Name="SelectMessage" HorizontalAlignment="Center" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag}" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"  Visibility="Collapsed" IsHitTestVisible="False" TextElement.Foreground="White" />
+                                        <TextBlock x:Name="SelectMessage" HorizontalAlignment="Center" Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag}" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"  Visibility="Collapsed" IsHitTestVisible="False" TextElement.Foreground="{DynamicResource NormalTextColorBrush}" />
 
                                         <!-- Popup showing items -->
                                         <Popup Name="Popup" Placement="Bottom" Focusable="False" AllowsTransparency="True" IsOpen="{TemplateBinding ComboBox.IsDropDownOpen}" PopupAnimation="Slide" Margin="0" TextElement.Foreground="{DynamicResource NormalTextColorBrush}">
@@ -1342,7 +1342,7 @@
                         <Setter Property="FocusVisualStyle" Value="{StaticResource CheckBoxFocusVisual}"/>
                         <Setter Property="Background" Value="{StaticResource OptionMark.Static.Background}"/>
                         <Setter Property="BorderBrush" Value="{StaticResource OptionMark.Static.Border}"/>
-                        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource NormalTextColorBrush}"/>
                         <Setter Property="BorderThickness" Value="1"/>
                         <Setter Property="Template">
                             <Setter.Value>
@@ -1399,7 +1399,7 @@
 
 
                     <Style x:Key="DefaultCheckBoxStyle" TargetType="{x:Type CheckBox}" BasedOn="{StaticResource CustomCheckBoxStyle}">
-                        <Setter Property="Foreground" Value="{StaticResource ControlMediumColorBrush}" />
+                        <Setter Property="Foreground" Value="{StaticResource NormalTextColorBrush}" />
                         <Setter Property="Background" Value="{DynamicResource NormalTextBoxBackgroundColorBrush}"/>
                         <Setter Property="FontSize" Value="12" />
                         <Setter Property="FontStyle" Value="Normal" />

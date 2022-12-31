@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.17763.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MPDCtrl2.ico</ApplicationIcon>
     <Version>3.0.15.0</Version>
@@ -13,7 +13,7 @@
     <PackageProjectUrl>https://torum.github.io/MPDCtrl/</PackageProjectUrl>
     <StartupObject>MPDCtrl.App</StartupObject>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Platforms>x86;x64</Platforms>
+    <Platforms>x86;x64;ARM64;AnyCPU</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

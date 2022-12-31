@@ -3085,7 +3085,7 @@
 
                 <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="top">
 
-                    <ComboBox Style="{StaticResource ComboBoxFlatStyle}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" HorizontalAlignment="Center" Tag="New Profile" Visibility="{Binding IsCurrentProfileSet, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                    <ComboBox Style="{StaticResource ComboBoxFlatStyle}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" HorizontalAlignment="Center" Tag="{x:Static properties:Resources.Profile_NewProfile}" Visibility="{Binding IsCurrentProfileSet, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -3285,7 +3285,7 @@
                                                 </StackPanel>
 
                                                 <StackPanel Orientation="Horizontal" Margin="0 12 0 0">
-                                                    <ComboBox Style="{StaticResource ComboBoxFlatStyle}" HorizontalAlignment="Left" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Tag="New Profile" Width="170">
+                                                    <ComboBox Style="{StaticResource ComboBoxFlatStyle}" HorizontalAlignment="Left" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Tag="{x:Static properties:Resources.Profile_NewProfile}" Width="170">
                                                         <ComboBox.ItemTemplate>
                                                             <DataTemplate>
                                                                 <StackPanel Orientation="Horizontal">

@@ -979,6 +979,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   New Profile に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Profile_NewProfile {
+            get {
+                return ResourceManager.GetString("Profile_NewProfile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Profiles に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Profiles {

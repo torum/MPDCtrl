@@ -442,6 +442,9 @@ SOFTWARE.</value>
   <data name="Profiles" xml:space="preserve">
     <value>プロファイル</value>
   </data>
+  <data name="Profile_NewProfile" xml:space="preserve">
+    <value>新しいプロファイル</value>
+  </data>
   <data name="QueueItemContextMenu_Move" xml:space="preserve">
     <value>移動</value>
   </data>

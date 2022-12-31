@@ -40,7 +40,9 @@ namespace MPDCtrl.ViewModels
     /// Add Search option "Exact" or "Contain".
     /// 
     /// Version history：
-    /// v3.0.16   Fixed and tweaked light theme mainly slider.
+    /// v3.0.16
+    /// v3.0.15.2 tweaked the light theme (mainly setting > connection profile combobox and checkbox).
+    /// v3.0.15.1 tweaked the light theme (mainly sliders).
     /// v3.0.15   MS Store release.
     /// v3.0.14.3 fixed a few issues of LightTheme mainly combobox and scrollviewer's thumb.
     /// v3.0.14.2 Tweaked and refined LightTheme. Remember the selection and change Theme on startup.
@@ -122,7 +124,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.15.0";
+        const string _appVer = "v3.0.16.0";
 
         public static string AppVer
         {

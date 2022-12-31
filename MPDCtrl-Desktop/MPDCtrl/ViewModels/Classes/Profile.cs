@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using MPDCtrl.Common;
@@ -23,6 +24,20 @@ namespace MPDCtrl.ViewModels.Classes
 
                 _host = value;
                 NotifyPropertyChanged(nameof(Host));
+            }
+        }
+
+        private IPAddress _hostIpAddress;
+        public IPAddress HostIpAddress
+        {
+            get { return _hostIpAddress; }
+            set
+            {
+                if (_hostIpAddress == value)
+                    return;
+
+                _hostIpAddress = value;
+                NotifyPropertyChanged(nameof(HostIpAddress));
             }
         }
 

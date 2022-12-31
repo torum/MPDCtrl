@@ -19,6 +19,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
 using System.Xml.Linq;
+using Windows.Networking;
 
 namespace MPDCtrl.ViewModels
 {
@@ -40,7 +41,8 @@ namespace MPDCtrl.ViewModels
     /// Add Search option "Exact" or "Contain".
     /// 
     /// Version history：
-    /// v3.0.16
+    /// v3.0.17   Allow hostname input removing ip address input restriction.  
+    /// v3.0.16   Store release.
     /// v3.0.15.2 tweaked the light theme (mainly setting > connection profile combobox and checkbox).
     /// v3.0.15.1 tweaked the light theme (mainly sliders).
     /// v3.0.15   MS Store release.
@@ -124,7 +126,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.16.0";
+        const string _appVer = "v3.0.17.0";
 
         public static string AppVer
         {
@@ -2377,6 +2379,7 @@ namespace MPDCtrl.ViewModels
                     SetError(nameof(Host), MPDCtrl.Properties.Resources.Settings_ErrorHostMustBeSpecified);
 
                 }
+                /*
                 else if (value == "localhost")
                 {
                     _host = "127.0.0.1";
@@ -2398,8 +2401,24 @@ namespace MPDCtrl.ViewModels
                         SetError(nameof(Host), MPDCtrl.Properties.Resources.Settings_ErrorHostInvalidAddressFormat);
                     }
                 }
+                */
 
                 NotifyPropertyChanged(nameof(Host));
+            }
+        }
+
+        private IPAddress _hostIpAddress;
+        public IPAddress HostIpAddress
+        {
+            get { return _hostIpAddress; }
+            set
+            {
+                if (_hostIpAddress == value)
+                    return;
+
+                    _hostIpAddress = value;
+
+                NotifyPropertyChanged(nameof(HostIpAddress));
             }
         }
 
@@ -4244,10 +4263,34 @@ namespace MPDCtrl.ViewModels
 
         #region == Methods ==
 
-        private void Start(string host, int port)
+        private async void Start(string host, int port)
         {
+            HostIpAddress = null;
+            try
+            {
+                var addresses = await Dns.GetHostAddressesAsync(host);
+                if (addresses.Count() > 0)
+                {
+                    HostIpAddress = addresses[0];
+                }
+                else
+                {
+                    // TODO::
+                    ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
+                    StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                // TODO::
+                ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
+                StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
+                return;
+            }
+
             // Start MPD connection.
-            Task.Run(() => _mpc.MpdIdleConnect(host, port));
+            _=Task.Run(() => _mpc.MpdIdleConnect(HostIpAddress.ToString(), port));
         }
 
         private void UpdateButtonStatus()
@@ -7207,12 +7250,13 @@ namespace MPDCtrl.ViewModels
             // Validate Host input.
             if (Host == "")
             {
-                SetError(nameof(Host), "Error: Host must be epecified."); //TODO: translate
+                SetError(nameof(Host), "Error: Host must be specified."); //TODO: translate
                 NotifyPropertyChanged(nameof(Host));
                 return;
             }
             else
             {
+                /*
                 if (Host == "localhost")
                 {
                     Host = "127.0.0.1";
@@ -7234,11 +7278,41 @@ namespace MPDCtrl.ViewModels
 
                     return;
                 }
+                */
+            }
+
+            HostIpAddress = null;
+            try
+            {
+                var addresses = await Dns.GetHostAddressesAsync(Host);
+                if (addresses.Count() > 0)
+                {
+                    HostIpAddress = addresses[0];
+                }
+                else
+                {
+                    //TODO: translate.
+                    SetError(nameof(Host), "Error: Could not retrive IP Address from the hostname."); 
+                    // TODO::
+                    ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
+                    StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
+                    return;
+                }
+            }
+            catch(Exception ex)
+            {
+                //TODO: translate.
+                SetError(nameof(Host), "Error: Could not retrive IP Address from the hostname. (SocketException)"); 
+                // TODO::
+                ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
+                StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
+                return;
             }
 
             if (_port == 0)
             {
-                SetError(nameof(Port), "Error: Port must be epecified."); //TODO: translate.
+                //TODO: translate.
+                SetError(nameof(Port), "Error: Port must be specified."); 
                 return;
             }
 
@@ -7309,8 +7383,9 @@ namespace MPDCtrl.ViewModels
 
             IsConnecting = true;
 
-            ///
-            ConnectionResult r = await _mpc.MpdIdleConnect(_host, _port);
+            if (HostIpAddress == null) return;
+            //ConnectionResult r = await _mpc.MpdIdleConnect(_host, _port);
+            ConnectionResult r = await _mpc.MpdIdleConnect(HostIpAddress.ToString(), _port);
 
             if (r.IsSuccess)
             {
@@ -7323,6 +7398,7 @@ namespace MPDCtrl.ViewModels
                     {
                         Name = _host + ":" + _port.ToString(),
                         Host = _host,
+                        HostIpAddress = _hostIpAddress,
                         Port = _port,
                         Password = _password,
                         IsDefault = true
@@ -7337,6 +7413,7 @@ namespace MPDCtrl.ViewModels
                 else
                 {
                     SelectedProfile.Host = _host;
+                    SelectedProfile.HostIpAddress = _hostIpAddress;
                     SelectedProfile.Port = _port;
                     SelectedProfile.Password = _password;
 
@@ -7439,19 +7516,55 @@ namespace MPDCtrl.ViewModels
                 IsAlbumArtVisible = false;
                 AlbumArt = _albumArtDefault;
 
+                HostIpAddress = null;
+
                 // TODO: more?
             });
 
             _volume = prof.Volume;
             NotifyPropertyChanged(nameof(Volume));
 
+
             Host = prof.Host;
+
+            HostIpAddress = null;
+
+            try
+            {
+                var addresses = await Dns.GetHostAddressesAsync(Host);
+                if (addresses.Count() > 0)
+                {
+                    HostIpAddress = addresses[0];
+                }
+                else
+                {
+                    SetError(nameof(Host), "Error: Could not retrive IP Address from the hostname."); //TODO: translate.
+
+                    // TODO:::::::
+                    ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
+                    StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                SetError(nameof(Host), "Error: Could not retrive IP Address from the hostname. (SocketException)"); //TODO: translate.
+
+                // TODO:::::::
+                ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
+                StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
+
+                return;
+            }
+
             _port = prof.Port;
             Password = prof.Password;
 
             IsConnecting = true;
-            ///
-            ConnectionResult r = await _mpc.MpdIdleConnect(_host, _port);
+
+            if (HostIpAddress == null) return;
+            //ConnectionResult r = await _mpc.MpdIdleConnect(_host, _port);
+            ConnectionResult r = await _mpc.MpdIdleConnect(HostIpAddress.ToString(), _port);
 
             if (r.IsSuccess)
             {

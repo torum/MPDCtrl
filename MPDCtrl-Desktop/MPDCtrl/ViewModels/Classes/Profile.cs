@@ -27,6 +27,7 @@ namespace MPDCtrl.ViewModels.Classes
             }
         }
 
+        /*
         private IPAddress _hostIpAddress;
         public IPAddress HostIpAddress
         {
@@ -40,6 +41,7 @@ namespace MPDCtrl.ViewModels.Classes
                 NotifyPropertyChanged(nameof(HostIpAddress));
             }
         }
+        */
 
         private int _port;
         public int Port

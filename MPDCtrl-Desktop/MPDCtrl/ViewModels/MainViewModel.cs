@@ -7222,6 +7222,7 @@ namespace MPDCtrl.ViewModels
             if (string.IsNullOrWhiteSpace(Host)) return false;
             if (String.IsNullOrEmpty(Host)) return false;
             if (IsConnecting) return false;
+            if ((SelectedProfile != null) && CurrentProfile == null) return false;
             return true;
         }
         public async void ChangeConnectionProfileCommand_Execute(object obj)
@@ -7292,7 +7293,8 @@ namespace MPDCtrl.ViewModels
                 else
                 {
                     //TODO: translate.
-                    SetError(nameof(Host), "Error: Could not retrive IP Address from the hostname."); 
+                    SetError(nameof(Host), "Error: Could not retrive IP Address from the hostname.");
+                    NotifyPropertyChanged(nameof(Host));
                     // TODO::
                     ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
                     StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
@@ -7302,7 +7304,8 @@ namespace MPDCtrl.ViewModels
             catch(Exception ex)
             {
                 //TODO: translate.
-                SetError(nameof(Host), "Error: Could not retrive IP Address from the hostname. (SocketException)"); 
+                SetError(nameof(Host), "Error: Could not retrive IP Address from the hostname. (SocketException)");
+                NotifyPropertyChanged(nameof(Host));
                 // TODO::
                 ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
                 StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
@@ -7312,7 +7315,8 @@ namespace MPDCtrl.ViewModels
             if (_port == 0)
             {
                 //TODO: translate.
-                SetError(nameof(Port), "Error: Port must be specified."); 
+                SetError(nameof(Port), "Error: Port must be specified.");
+                NotifyPropertyChanged(nameof(Host));
                 return;
             }
 
@@ -7398,7 +7402,7 @@ namespace MPDCtrl.ViewModels
                     {
                         Name = _host + ":" + _port.ToString(),
                         Host = _host,
-                        HostIpAddress = _hostIpAddress,
+                        //HostIpAddress = _hostIpAddress,
                         Port = _port,
                         Password = _password,
                         IsDefault = true
@@ -7412,8 +7416,9 @@ namespace MPDCtrl.ViewModels
                 }
                 else
                 {
+                    //SelectedProfile = new Profile();
                     SelectedProfile.Host = _host;
-                    SelectedProfile.HostIpAddress = _hostIpAddress;
+                    //SelectedProfile.HostIpAddress = _hostIpAddress;
                     SelectedProfile.Port = _port;
                     SelectedProfile.Password = _password;
 

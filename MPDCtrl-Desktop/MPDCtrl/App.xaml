@@ -1541,7 +1541,7 @@
                         <Setter Property="Padding" Value="0 0 0 1" />
                         <Setter Property="Margin" Value="0"/>
                         <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="Foreground" Value="{DynamicResource NormalTextColorBrush}" />
+                        <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}" />
                         <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}" />
                         <Setter Property="HorizontalContentAlignment" Value="Left" />
                         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -1566,7 +1566,7 @@
                                                             <EasingColorKeyFrame KeyTime="0" Value="{DynamicResource ControlLightColor}" />
                                                         </ColorAnimationUsingKeyFrames>
                                                         <ColorAnimationUsingKeyFrames Storyboard.TargetName="Bd" Storyboard.TargetProperty="(Control.Foreground).(SolidColorBrush.Color)">
-                                                            <EasingColorKeyFrame KeyTime="0" Value="{DynamicResource ControlLightColor}" />
+                                                            <EasingColorKeyFrame KeyTime="0" Value="{DynamicResource ControlForegroundColor}" />
                                                         </ColorAnimationUsingKeyFrames>
                                                     </Storyboard>
                                                 </VisualState>
@@ -1631,27 +1631,28 @@
                                             </MultiTrigger.Conditions>
                                             <Setter TargetName="PART_Header" Property="MinHeight" Value="19" />
                                         </MultiTrigger>
-
-                                        <!-- <MultiTrigger>
+                                        <!--
+                                        <MultiTrigger>
                                             <MultiTrigger.Conditions>
-                                                <Condition Property="IsMouseOver" Value="True" />
+                                                <Condition Property="IsMouseOver" Value="False" />
                                                 <Condition Property="IsSelected" Value="True" />
                                             </MultiTrigger.Conditions>
-                                            <Setter TargetName="PART_Header" Property="TextBlock.Foreground" Value="White" />
+                                            <Setter TargetName="PART_Header" Property="TextBlock.Foreground" Value="{StaticResource ControlForegroundColor}" />
                                         </MultiTrigger>
                                         -->
                                         
                                         <Trigger Property="IsSelected" Value="True">
                                             <Setter TargetName="PART_Header" Property="TextElement.FontWeight" Value="Bold"/>
-                                            <Setter TargetName="PART_Header" Property="Control.Foreground" Value="{DynamicResource TextStrongColorBrush}" />
+                                            <Setter TargetName="PART_Header" Property="TextElement.Foreground" Value="{DynamicResource ControlLightColorBrush}" />
                                         </Trigger>
+                                        
 
                                         <MultiTrigger>
                                             <MultiTrigger.Conditions>
                                                 <Condition Property="IsMouseOver" Value="True" />
                                                 <Condition Property="IsSelected" Value="False" />
                                             </MultiTrigger.Conditions>
-                                            <Setter TargetName="PART_Header" Property="TextBlock.Foreground" Value="{DynamicResource TextStrongColorBrush}" />
+                                            <Setter TargetName="PART_Header" Property="TextBlock.Foreground" Value="{DynamicResource ControlLightColorBrush}" />
                                         </MultiTrigger>
                                         <!--
                                         -->

@@ -9,7 +9,9 @@
         xmlns:local="clr-namespace:MPDCtrl"
         mc:Ignorable="d"
         WindowStyle="None"
-        Background="{DynamicResource WindowBackgroundBaseColorBrush}"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="CanResize"
         StateChanged="Window_StateChanged"
         DataContext="{StaticResource MainViewModel}"
         Title="{Binding AppTitle}"
@@ -26,9 +28,9 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-    </Window.Style> 
+    </Window.Style>
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="32" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"/>
+        <WindowChrome CaptionHeight="32" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}" CornerRadius="8"/>
     </WindowChrome.WindowChrome>
     <Window.InputBindings>
         <KeyBinding Command="{Binding PlayCommand}" Key="Play" />
@@ -44,8 +46,8 @@
         <KeyBinding Command="{Binding ShowSettingsCommand}" Modifiers="Ctrl" Key="S"/>
         <KeyBinding Command="{Binding ShowFindCommand}" Modifiers="Ctrl" Key="F"/>
     </Window.InputBindings>
-    <Border Style="{StaticResource WindowMainPanelStyle}" UseLayoutRounding="True">
-        <Grid x:Name="LayoutGrid" Background="{DynamicResource BoardBackgroundColorBrush}">
+    <Border Style="{StaticResource WindowMainPanelStyle}" UseLayoutRounding="True" Background="{DynamicResource BoardBackgroundColorBrush}" CornerRadius="8">
+        <Grid x:Name="LayoutGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="32"/>
                 <RowDefinition Height="102"/>
@@ -77,19 +79,19 @@
                         <Button.Style>
                             <Style TargetType="{x:Type Button}">
                                 <Setter Property="OverridesDefaultStyle" Value="true" />
-                                <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
+                                <Setter Property="Background" Value="Transparent" />
                                 <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
                                 <!--
                                 <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                                 -->
                                 <Setter Property="Focusable" Value="False" />
                                 <Setter Property="BorderThickness" Value="0" />
-                                <Setter Property="Margin" Value="0" />
+                                <Setter Property="Margin" Value="3,0,0,0" />
                                 <Setter Property="Padding" Value="0" />
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="Button">
-                                            <Border x:Name="Border" CornerRadius="0" BorderThickness="0" Background="{TemplateBinding Background}">
+                                            <Border x:Name="Border" CornerRadius="8" BorderThickness="0" Background="{TemplateBinding Background}">
                                                 <Viewbox Width="16" Height="16" Margin="6 0 6 0">
                                                     <Canvas Width="101.52757" Height="101.52314">
                                                         <Canvas.RenderTransform>
@@ -436,7 +438,7 @@
             </Grid>
 
             <!-- GridSplitter -->
-            <GridSplitter Grid.Row="2" Grid.Column="1" ResizeDirection="Columns" Style="{StaticResource GridSplitterStyle}"></GridSplitter>
+            <GridSplitter Grid.Row="2" Grid.Column="1" ResizeDirection="Columns" Style="{StaticResource GridSplitterStyle}" Background="{DynamicResource BoardBackgroundColorBrush}"></GridSplitter>
 
             <!-- Right pane -->
             <Grid Grid.Row="2" Grid.Column="2">
@@ -2750,7 +2752,7 @@
                     </StackPanel>
                 </StatusBarItem>
 
-                <Separator Grid.Column="1" Background="{DynamicResource BorderLightColorBrush}" Visibility="{Binding IsMpdStatusMessageContainsText, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}"/>
+                <Separator Grid.Column="1" Opacity="0.3" Background="{DynamicResource BorderLightColorBrush}" Visibility="{Binding IsMpdStatusMessageContainsText, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}"/>
 
                 <!-- MpdStatus Message  -->
                 <StatusBarItem Grid.Column="2" Visibility="{Binding IsMpdStatusMessageContainsText, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
@@ -2769,7 +2771,7 @@
                     </StackPanel>
                 </StatusBarItem>
 
-                <Separator Grid.Column="3" Background="{DynamicResource BorderLightColorBrush}"/>
+                <Separator Grid.Column="3" Opacity="0.3" Background="{DynamicResource BorderLightColorBrush}"/>
                 
                 <!-- Statusbar Message  -->
                 <StatusBarItem Grid.Column="4" HorizontalContentAlignment="Left" VerticalAlignment="Center">

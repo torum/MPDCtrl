@@ -623,7 +623,7 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="Button">
-                                    <Border x:Name="Border" TextBlock.Foreground="{DynamicResource ControlForegroundColorBrush}" Background="{TemplateBinding Background}" CornerRadius="0" BorderThickness="0">
+                                    <Border x:Name="Border" TextBlock.Foreground="{DynamicResource ControlForegroundColorBrush}" Background="{TemplateBinding Background}" CornerRadius="0,6,0,0" BorderThickness="0">
                                         <Border.BorderBrush>
                                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                                                 <LinearGradientBrush.GradientStops>

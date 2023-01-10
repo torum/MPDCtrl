@@ -19,6 +19,7 @@ using System.Globalization;
 using System.Diagnostics;
 using MPDCtrl.ViewModels;
 using MPDCtrl.Views;
+using MPDCtrl.Helpers;
 
 namespace MPDCtrl.Views
 {
@@ -27,6 +28,9 @@ namespace MPDCtrl.Views
         public MainWindow()
         {
             InitializeComponent();
+
+            //this.Background = Brushes.Transparent;
+            //WindowBlur.SetIsEnabled(this, true);
 
             // Set initial visibility for Window's system buttoms.
 

@@ -46,7 +46,7 @@
         <KeyBinding Command="{Binding ShowSettingsCommand}" Modifiers="Ctrl" Key="S"/>
         <KeyBinding Command="{Binding ShowFindCommand}" Modifiers="Ctrl" Key="F"/>
     </Window.InputBindings>
-    <Border Style="{StaticResource WindowMainPanelStyle}" UseLayoutRounding="True" Background="{DynamicResource BoardBackgroundColorBrush}" CornerRadius="8">
+    <Border Style="{StaticResource WindowMainPanelStyle}" UseLayoutRounding="True" Background="{DynamicResource BoardBackgroundColorBrush}">
         <Grid x:Name="LayoutGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="32"/>

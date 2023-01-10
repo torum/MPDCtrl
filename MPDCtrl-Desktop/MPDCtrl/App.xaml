@@ -139,9 +139,11 @@
                     <Style x:Key="WindowMainPanelStyle" TargetType="{x:Type Border}">
                         <Setter Property="BorderBrush" Value="{DynamicResource WindowBorderBrush}" />
                         <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="CornerRadius" Value="8" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=WindowState}" Value="Maximized">
                                 <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="CornerRadius" Value="0" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="False">
                                 <Setter Property="BorderBrush" Value="{DynamicResource WindowBorderInactiveBrush}" />

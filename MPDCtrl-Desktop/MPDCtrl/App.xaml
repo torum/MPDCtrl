@@ -1673,10 +1673,10 @@
                         <Setter Property="OverridesDefaultStyle" Value="False"/>
                         <Setter Property="Background">
                             <Setter.Value>
-                                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0,0.5" Opacity="0.2">
+                                <LinearGradientBrush StartPoint="1,0" EndPoint="0,1" Opacity="0.5">
                                     <LinearGradientBrush.GradientStops>
                                         <GradientStopCollection>
-                                            <GradientStop Offset="0.0" Color="{DynamicResource BorderMediumColor}" />
+                                            <GradientStop Offset="0.0" Color="{DynamicResource BorderDarkColor}" />
                                             <GradientStop Offset="1.0" Color="{DynamicResource BorderDarkColor}" />
                                         </GradientStopCollection>
                                     </LinearGradientBrush.GradientStops>
@@ -1686,8 +1686,8 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type Thumb}">
-                                    <Border Background="{DynamicResource BorderLightColorBrush}" BorderBrush="{DynamicResource BorderMediumColorBrush}" BorderThickness="0.5">
-                                        <Rectangle HorizontalAlignment="Center" Width="1" Fill="{TemplateBinding Background}" />
+                                    <Border Background="{DynamicResource BorderLightColorBrush}" BorderBrush="{DynamicResource BorderMediumColorBrush}" BorderThickness="1" Opacity="0.5">
+                                        <Rectangle HorizontalAlignment="Center" Width="0.5" Fill="{TemplateBinding Background}"/>
                                     </Border>
                                 </ControlTemplate>
                             </Setter.Value>
@@ -1712,7 +1712,7 @@
                                             <ContentPresenter Name="HeaderContent" Margin="0,0,0,1" RecognizesAccessKey="True" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                         </Border>
                                         <!-- disable colum header resize by removing this. -->
-                                        <Thumb x:Name="PART_HeaderGripper" Style="{StaticResource GridViewColumnHeaderGripperStyle}" HorizontalAlignment="Right" Margin="0,0,0,0" />
+                                        <Thumb x:Name="PART_HeaderGripper" Style="{StaticResource GridViewColumnHeaderGripperStyle}" HorizontalAlignment="Right" Margin="0,0,0,0"/>
                                     </Grid>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsPressed" Value="true">

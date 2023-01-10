@@ -31,7 +31,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.17.0";
+        const string _appVer = "v3.0.17.2";
 
         public static string AppVer
         {

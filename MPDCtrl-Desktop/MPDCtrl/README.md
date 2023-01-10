@@ -37,6 +37,8 @@ https://github.com/torum/MPDCtrl
 
 ## Change log
  
+* v3.0.17.2 Fixed libraly reeview's selected item color issue. Minor UI tweaks like listview's header glipper and sort glyph's pos.
+* v3.0.17.1 Tweaked transparent background to fix white background flashing at startup.
 * v3.0.17   (2023/1/3) App Store release. 
 * v3.0.16   Allow hostname input removing ip address input restriction.
 * v3.0.15.2 tweaked the light theme (mainly setting > connection profile combobox and checkbox).

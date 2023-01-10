@@ -301,7 +301,7 @@ namespace MPDCtrl.Helpers
 
             private Geometry GetDefaultGlyph()
             {
-                double x1 = _columnHeader.ActualWidth - 13;
+                double x1 = _columnHeader.ActualWidth-20;// - 13;
                 double x2 = x1 + 10;
                 double x3 = x1 + 5;
                 double y1 = _columnHeader.ActualHeight / 2 - 3;

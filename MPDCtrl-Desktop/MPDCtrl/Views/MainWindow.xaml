@@ -1298,7 +1298,6 @@
 
                         <Grid x:Name="SearchResultListviewDummy" Visibility="Hidden" Margin="0 0 20 0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="0" />
                                 <ColumnDefinition Width="32" />
                                 <ColumnDefinition Width="5*" />
                                 <ColumnDefinition Width="62" />
@@ -1309,14 +1308,13 @@
                             </Grid.ColumnDefinitions>
 
                             <!--  This is the hidden helper Field which is used to bind to, using the "Fill" column of the helper grid  -->
-                            <Grid x:Name="SearchResultListviewDummy0" Grid.Column="0" />
-                            <Grid x:Name="SearchResultListviewDummy1" Grid.Column="1" />
-                            <Grid x:Name="SearchResultListviewDummy2" Grid.Column="2" />
-                            <Grid x:Name="SearchResultListviewDummy3" Grid.Column="3" />
-                            <Grid x:Name="SearchResultListviewDummy4" Grid.Column="4" />
-                            <Grid x:Name="SearchResultListviewDummy5" Grid.Column="5" />
-                            <Grid x:Name="SearchResultListviewDummy6" Grid.Column="6" />
-                            <Grid x:Name="SearchResultListviewDummy7" Grid.Column="7" />
+                            <Grid x:Name="SearchResultListviewDummy1" Grid.Column="0" />
+                            <Grid x:Name="SearchResultListviewDummy2" Grid.Column="1" />
+                            <Grid x:Name="SearchResultListviewDummy3" Grid.Column="2" />
+                            <Grid x:Name="SearchResultListviewDummy4" Grid.Column="3" />
+                            <Grid x:Name="SearchResultListviewDummy5" Grid.Column="4" />
+                            <Grid x:Name="SearchResultListviewDummy6" Grid.Column="5" />
+                            <Grid x:Name="SearchResultListviewDummy7" Grid.Column="6" />
                         </Grid>
 
                         <ListView x:Name="SearchResultListview" Grid.Row="1" ItemsSource="{Binding SearchResult}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" Padding="0" BorderBrush="#121212" BorderThickness="0 0 0 0.5" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
@@ -1382,23 +1380,13 @@
                                             <Setter Property="Visibility" Value="Visible" />
                                         </Style>
                                     </GridView.ColumnHeaderContainerStyle>
-                                    <GridViewColumn Width="{Binding ElementName=SearchResultListviewDummy0, Path=ActualWidth}">
-                                        <GridViewColumnHeader Content=""/>
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <StackPanel>
-                                                    <TextBlock Text="" Padding="3" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding ElementName=SearchResultListviewDummy1, Path=ActualWidth}">
                                         <GridViewColumnHeader Content="">
                                         </GridViewColumnHeader>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Viewbox Width="16" Height="16">
+                                                <Viewbox Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center">
                                                     <Canvas Width="24" Height="24">
                                                         <Path x:Name="MusicFileIcon" Fill="{DynamicResource ControlMediumColorBrush}" Canvas.Top="0" Stretch="Uniform" Data="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,13H11V18A2,2 0 0,1 9,20A2,2 0 0,1 7,18A2,2 0 0,1 9,16C9.4,16 9.7,16.1 10,16.3V11H13V13M13,9V3.5L18.5,9H13Z" />
                                                     </Canvas>
@@ -1759,17 +1747,15 @@
 
                             <Grid x:Name="SongFilesListviewDummy" Grid.Row="1" Visibility="Hidden" Margin="0 0 20 0">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="0" />
                                     <ColumnDefinition Width="32" />
                                     <ColumnDefinition Width="1*" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
                                 <!--  This is the hidden helper Field which is used to bind to, using the "Fill" column of the helper grid  -->
-                                <Grid x:Name="SongFilesListviewDummy0" Grid.Column="0" />
-                                <Grid x:Name="SongFilesListviewDummy1" Grid.Column="1" />
-                                <Grid x:Name="SongFilesListviewDummy2" Grid.Column="2" />
-                                <Grid x:Name="SongFilesListviewDummy3" Grid.Column="3" />
+                                <Grid x:Name="SongFilesListviewDummy1" Grid.Column="0" />
+                                <Grid x:Name="SongFilesListviewDummy2" Grid.Column="1" />
+                                <Grid x:Name="SongFilesListviewDummy3" Grid.Column="2" />
                             </Grid>
 
                             <ListView x:Name="SongFilesListview" Grid.Row="1" ItemsSource="{Binding MusicEntries}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderBrush="#121212" BorderThickness="0 0 0 0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
@@ -1836,22 +1822,11 @@
                                             </Style>
                                         </GridView.ColumnHeaderContainerStyle>
 
-                                        <GridViewColumn Width="{Binding ElementName=SongFilesListviewDummy0, Path=ActualWidth}">
-                                            <GridViewColumnHeader Content=""/>
-                                            <GridViewColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <StackPanel>
-                                                        <TextBlock Padding="3" />
-                                                    </StackPanel>
-                                                </DataTemplate>
-                                            </GridViewColumn.CellTemplate>
-                                        </GridViewColumn>
-
                                         <GridViewColumn Width="{Binding ElementName=SongFilesListviewDummy1, Path=ActualWidth}">
                                             <GridViewColumnHeader Content=""/>
                                             <GridViewColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Viewbox Width="16" Height="16">
+                                                    <Viewbox Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center">
                                                         <Canvas Width="24" Height="24">
                                                             <Path x:Name="MusicFileIcon" Fill="{DynamicResource ControlMediumColorBrush}" Canvas.Top="0" Stretch="Uniform" Data="{Binding PathIcon}" />
                                                         </Canvas>
@@ -1992,17 +1967,15 @@
                     <Grid Visibility="{Binding IsPlaylistsVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                         <Grid x:Name="PlaylistsListviewDummy" Grid.Row="1" Visibility="Hidden" Margin="0 0 20 0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="0" />
                                 <ColumnDefinition Width="32" />
                                 <ColumnDefinition Width="2*" />
                                 <ColumnDefinition Width="1*" />
                             </Grid.ColumnDefinitions>
 
                             <!--  This is the hidden helper Field which is used to bind to, using the "Fill" column of the helper grid  -->
-                            <Grid x:Name="PlaylistsListviewDummy0" Grid.Column="0" />
-                            <Grid x:Name="PlaylistsListviewDummy1" Grid.Column="1" />
-                            <Grid x:Name="PlaylistsListviewDummy2" Grid.Column="2" />
-                            <Grid x:Name="PlaylistsListviewDummy3" Grid.Column="3" />
+                            <Grid x:Name="PlaylistsListviewDummy1" Grid.Column="0" />
+                            <Grid x:Name="PlaylistsListviewDummy2" Grid.Column="1" />
+                            <Grid x:Name="PlaylistsListviewDummy3" Grid.Column="2" />
                         </Grid>
 
                         <ListView x:Name="PlaylistsListview" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}" SelectionMode="Single" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True"  IsSynchronizedWithCurrentItem="True" BorderBrush="#121212" BorderThickness="0 0 0 0.5" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
@@ -2083,16 +2056,6 @@
                                         </Style>
                                     </GridView.ColumnHeaderContainerStyle>
 
-                                    <GridViewColumn Width="{Binding ElementName=PlaylistsListviewDummy0, Path=ActualWidth}">
-                                        <GridViewColumnHeader Content=""/>
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <StackPanel>
-                                                    <TextBlock Padding="3" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
 
                                     <GridViewColumn Width="{Binding ElementName=PlaylistsListviewDummy1, Path=ActualWidth}">
                                         <GridViewColumnHeader Content=""/>
@@ -2321,7 +2284,7 @@
                                         </GridViewColumnHeader>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Viewbox Width="16" Height="16">
+                                                <Viewbox Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center">
                                                     <Canvas Width="24" Height="24">
                                                         <Path x:Name="MusicFileIcon" Fill="{DynamicResource ControlMediumColorBrush}" Canvas.Top="0" Stretch="Uniform" Data="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,13H11V18A2,2 0 0,1 9,20A2,2 0 0,1 7,18A2,2 0 0,1 9,16C9.4,16 9.7,16.1 10,16.3V11H13V13M13,9V3.5L18.5,9H13Z" />
                                                     </Canvas>

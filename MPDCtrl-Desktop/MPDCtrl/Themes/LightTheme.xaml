@@ -4,8 +4,9 @@
 
     <Color x:Key="WindowTintColor">#CCCCCC</Color>
     <Color x:Key="WindowFallbackColor">#dddddd</Color>
-    <Color x:Key="WindowBackgroundBaseColor">#f3f3f3</Color>
-    <Color x:Key="WindowBackgroundColor">#eee</Color>
+    <Color x:Key="WindowBackgroundBaseColor">#FBF9F7</Color>
+    <Color x:Key="WindowBackgroundColor">#FBF9F7</Color>
+    <!-- eee f3f3f3-->
 
     <Color x:Key="ControlForegroundColor">#666</Color>
     <Color x:Key="ControlLightColor">DimGray</Color>
@@ -33,7 +34,8 @@
     <Color x:Key="NormalTextBoxBackgroundFocusedColor">#ffffff</Color>
     <Color x:Key="NormalTextBoxBackgroundMouseOverColor">#ffffff</Color>
 
-    <Color x:Key="BoardBackgroundColor">#dfdfdf</Color>
+    <Color x:Key="BoardBackgroundColor">#F4F3F2</Color>
+    <!-- dfdfdf -->
 
     <Color x:Key="ListviewAlt0Color">#fbfbfb</Color>
     <Color x:Key="ListviewAlt1Color">#f2f2f2</Color>

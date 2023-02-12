@@ -36,7 +36,8 @@ https://github.com/torum/MPDCtrl
 - [ ] 
 
 ## Change log
- 
+
+* v3.0.19   (2023/1/11) App Store release. 
 * v3.0.18.1 When maximize, CourneRradius needed to be reset.
 * v3.0.18   (2023/1/11) App Store release. 
 * v3.0.17.2 Fixed libraly treeview's selected item color issue. Minor UI tweaks like listview's header gripper and sort glyph's pos.

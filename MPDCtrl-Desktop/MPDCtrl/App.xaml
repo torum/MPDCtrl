@@ -1688,8 +1688,8 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type Thumb}">
-                                    <Border Background="{DynamicResource BorderLightColorBrush}" BorderBrush="{DynamicResource BorderMediumColorBrush}" BorderThickness="1" Opacity="0.5">
-                                        <Rectangle HorizontalAlignment="Center" Width="0.5" Fill="{TemplateBinding Background}"/>
+                                    <Border Background="{DynamicResource BorderLightColorBrush}" BorderBrush="{DynamicResource BorderMediumColorBrush}" BorderThickness="0.5" Opacity="0.5">
+                                        <Rectangle HorizontalAlignment="Center" Width="0.7" Fill="{TemplateBinding Background}"/>
                                     </Border>
                                 </ControlTemplate>
                             </Setter.Value>
@@ -1762,7 +1762,7 @@
                     <Style x:Key="GridViewColumnHeaderClickStyle" TargetType="GridViewColumnHeader">
                         <Setter Property="OverridesDefaultStyle" Value="True"/>
                         <Setter Property="Height" Value="27" />
-                        <Setter Property="Margin" Value="-2 0 0 0" />
+                        <Setter Property="Margin" Value="-1 0 0 0" />
                         <Setter Property="Padding" Value="0 0 0 0" />
                         <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
                         <Setter Property="TextElement.FontWeight" Value="Normal" />
@@ -1941,7 +1941,7 @@
                                     <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False"/>
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
-                                    <Thumb Style="{StaticResource ThumbStyle}" Margin="4,0,4,0"></Thumb>
+                                    <Thumb Style="{StaticResource ThumbStyle}" Margin="5,0,5,0"></Thumb>
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
                                     <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False"/>
@@ -1966,7 +1966,7 @@
                                     <RepeatButton Command="ScrollBar.PageLeftCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False" />
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
-                                    <Thumb Style="{StaticResource ThumbStyle}" Margin="0,4,0,4"></Thumb>
+                                    <Thumb Style="{StaticResource ThumbStyle}" Margin="0,5,0,5"></Thumb>
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
                                     <RepeatButton Command="ScrollBar.PageRightCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False" />
@@ -2600,9 +2600,9 @@
                 <ResourceDictionary>
 
                     <!-- スクロールバーの幅 -->
-                    <sys:Double x:Key="ScrollBarSize">16</sys:Double>
+                    <sys:Double x:Key="ScrollBarSize">14</sys:Double>
                     <!-- ボタンの長さ -->
-                    <sys:Double x:Key="ScrollBarRepeatButtonSize">16</sys:Double>
+                    <sys:Double x:Key="ScrollBarRepeatButtonSize">14</sys:Double>
                     <!-- スクロールバーのマージン -->
                     <sys:Double x:Key="ScrollBarMarginSize">0</sys:Double>
 

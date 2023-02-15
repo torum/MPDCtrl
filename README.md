@@ -1,16 +1,12 @@
 # MPDCtrl
 
-MPDCtrl is a client app for [MPD (Music player daemon)](http://www.musicpd.org/). 
+MPDCtrl is a desktop client app for [MPD (Music player daemon)](http://www.musicpd.org/).  
   
-
+## Download  
 - for Windows desktop :
-[Download from Microsoft Store](https://apps.microsoft.com/store/detail/mpdctrl/9NV2BBJ82BRX)
+Download and install via [Microsoft Store](https://apps.microsoft.com/store/detail/mpdctrl/9NV2BBJ82BRX)
   
-- for mobile and more : Sometime in the furture (hopefully...).
-   
-
-### MPDCtrl for desktop v3.x
-
+## Screenshots
 
 ![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v3/Main.png?raw=true) 
 
@@ -24,9 +20,25 @@ MPDCtrl is a client app for [MPD (Music player daemon)](http://www.musicpd.org/)
 
 ![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v3/Debug.png?raw=true) 
 
-  
-### MPDCtrl for mobile
-sometime in the near future...
+## Contributing
+Feel free to open issues and send PRs. 
+
+## Technologies & Frameworks
+* [.NET 6](https://github.com/dotnet/runtime)  
+* [WPF (Windows Presentation Foundation)](https://github.com/dotnet/wpf)  
+
+## Getting Started
+
+### Requirements
+* Windows 10.0.19041.0 or higher
+
+### Building
+1. Visual Studio 2022 with support for .NET Desktop App development
+2. Clone this repository
+3. Open solution in Visual Studio and run
+
+## MPDCtrl for mobile
+sometime in the near future... (hopefully).  
 
 ![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/mobile/iOS-v0.0.0.1-screnshot.png?raw=true) 
 

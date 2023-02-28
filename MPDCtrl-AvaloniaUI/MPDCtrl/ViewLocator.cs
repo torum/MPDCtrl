@@ -10,9 +10,13 @@ namespace MPDCtrl
 #if (AvaloniaStableChosen)
     public IControl Build(object data)
 #else
-        public Control Build(object data)
+        public Control Build(object? data)
 #endif
         {
+            if (data is null)
+                return new TextBlock { Text = ""};
+
+
             var name = data.GetType().FullName!.Replace("ViewModel", "View");
             var type = Type.GetType(name);
 
@@ -24,7 +28,7 @@ namespace MPDCtrl
             return new TextBlock { Text = "Not Found: " + name };
         }
 
-        public bool Match(object data)
+        public bool Match(object? data)
         {
             return data is ViewModelBase;
         }

@@ -1,0 +1,603 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="Ack_Window_Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Application" xml:space="preserve">
+    <value>Application</value>
+  </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="ChangePasswordDialog_ChangePassword" xml:space="preserve">
+    <value>Change Password</value>
+  </data>
+  <data name="ChangePasswordDialog_CurrentPassword" xml:space="preserve">
+    <value>Current Password</value>
+  </data>
+  <data name="ChangePasswordDialog_CurrentPasswordMismatch" xml:space="preserve">
+    <value>Current Password did not match.</value>
+  </data>
+  <data name="ChangePasswordDialog_NewPassword" xml:space="preserve">
+    <value>New Password</value>
+  </data>
+  <data name="ChangePasswordDialog_PasswordUpdated" xml:space="preserve">
+    <value>Password Updated.</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Connect" xml:space="preserve">
+    <value>Connect</value>
+  </data>
+  <data name="Connection" xml:space="preserve">
+    <value>Connection</value>
+  </data>
+  <data name="ConnectionStatus_Connected" xml:space="preserve">
+    <value>Connected.</value>
+  </data>
+  <data name="ConnectionStatus_ConnectFail_Timeout" xml:space="preserve">
+    <value>Connection terminated. (ConnectFail_Timeout)</value>
+  </data>
+  <data name="ConnectionStatus_Connecting" xml:space="preserve">
+    <value>Connecting...</value>
+  </data>
+  <data name="ConnectionStatus_ConnectionError" xml:space="preserve">
+    <value>Connection Error</value>
+  </data>
+  <data name="ConnectionStatus_ConnectionErrorDetails" xml:space="preserve">
+    <value>Unable to connect to specified MPD server. Please check your connection settings or MPD server.</value>
+  </data>
+  <data name="ConnectionStatus_Disconnected" xml:space="preserve">
+    <value>Connection has been terminated.</value>
+  </data>
+  <data name="ConnectionStatus_DisconnectedByHost" xml:space="preserve">
+    <value>Connection terminated.</value>
+  </data>
+  <data name="ConnectionStatus_DisconnectedByUser" xml:space="preserve">
+    <value>Connection terminated.</value>
+  </data>
+  <data name="ConnectionStatus_Disconnecting" xml:space="preserve">
+    <value>Disconnecting...</value>
+  </data>
+  <data name="ConnectionStatus_NeverConnected" xml:space="preserve">
+    <value>Connection terminated.</value>
+  </data>
+  <data name="ConnectionStatus_SendFail_NotConnected" xml:space="preserve">
+    <value>Connection terminated.</value>
+  </data>
+  <data name="ConnectionStatus_SendFail_Timeout" xml:space="preserve">
+    <value>Connection terminated.</value>
+  </data>
+  <data name="Debug_Window_Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="Debug_Window_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Default" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeveloperMode" xml:space="preserve">
+    <value>Developer Mode</value>
+  </data>
+  <data name="Dialog_CancelClose" xml:space="preserve">
+    <value>Close (Esc)</value>
+  </data>
+  <data name="Dialog_Comfirmation" xml:space="preserve">
+    <value>Comfirmation</value>
+  </data>
+  <data name="Dialog_Information" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="Dialog_Input" xml:space="preserve">
+    <value>Input</value>
+  </data>
+  <data name="Dialog_NewPlaylistName" xml:space="preserve">
+    <value>New Playlist Name:</value>
+  </data>
+  <data name="Dialog_PlaylistNameAlreadyExists" xml:space="preserve">
+    <value>Playlist name already exists.</value>
+  </data>
+  <data name="Dialog_PlaylistSelect_NewPlaylistName" xml:space="preserve">
+    <value>New Playlist</value>
+  </data>
+  <data name="Dialog_PlaylistSelect_SaveSelectedTo" xml:space="preserve">
+    <value>Save Selected to</value>
+  </data>
+  <data name="Dialog_PlaylistSelect_SelectPlaylist" xml:space="preserve">
+    <value>Select Playlist</value>
+  </data>
+  <data name="Dialog_RemovePlaylistQ" xml:space="preserve">
+    <value>Remove selected playlist?</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="FilterClear" xml:space="preserve">
+    <value>Clear Filter</value>
+  </data>
+  <data name="Host" xml:space="preserve">
+    <value>Host</value>
+  </data>
+  <data name="Init_NewConnectionSetting" xml:space="preserve">
+    <value>New Connection Setting</value>
+  </data>
+  <data name="License" xml:space="preserve">
+    <value>License</value>
+  </data>
+  <data name="LicenseText" xml:space="preserve">
+    <value>Copyright (c) 2020 torum
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</value>
+  </data>
+  <data name="LicenseTitle" xml:space="preserve">
+    <value>The MIT License</value>
+  </data>
+  <data name="LocalfileItemContextMenu_Add" xml:space="preserve">
+    <value>Add (Enter)</value>
+  </data>
+  <data name="LocalfileListviewColumnHeader_FileName" xml:space="preserve">
+    <value>File Name</value>
+  </data>
+  <data name="LocalfileListviewTabitemHeader_LocalFiles" xml:space="preserve">
+    <value>_Files</value>
+  </data>
+  <data name="MenuTreeItem_Browse" xml:space="preserve">
+    <value>Library</value>
+  </data>
+  <data name="MenuTreeItem_Playlists" xml:space="preserve">
+    <value>Playlists</value>
+  </data>
+  <data name="MenuTreeItem_Queue" xml:space="preserve">
+    <value>Queue</value>
+  </data>
+  <data name="MenuTreeItem_Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="MPD_CommandError" xml:space="preserve">
+    <value>Command Response</value>
+  </data>
+  <data name="MPD_StatusError" xml:space="preserve">
+    <value>Status Notification</value>
+  </data>
+  <data name="New" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="PlaybackOptions_Consume" xml:space="preserve">
+    <value>Consume</value>
+  </data>
+  <data name="PlaybackOptions_Repeat" xml:space="preserve">
+    <value>Repeat</value>
+  </data>
+  <data name="PlaybackOptions_Shuffle" xml:space="preserve">
+    <value>Shuffle</value>
+  </data>
+  <data name="PlaybackOptions_Single" xml:space="preserve">
+    <value>Single</value>
+  </data>
+  <data name="Playback_BackButton" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="Playback_NextButton" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="Playback_PlayPauseButton" xml:space="preserve">
+    <value>Play/Pause</value>
+  </data>
+  <data name="Playback_SliderSeek" xml:space="preserve">
+    <value>Seek</value>
+  </data>
+  <data name="Playback_SliderVolume" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="PlaylistItemContextMenu_ClearAndLoad" xml:space="preserve">
+    <value>Clear Queue and Load</value>
+  </data>
+  <data name="PlaylistItemContextMenu_Load" xml:space="preserve">
+    <value>Load (Enter)</value>
+  </data>
+  <data name="PlaylistItemContextMenu_Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="PlaylistItemContextMenu_Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="PlaylistListviewTabitemHeader_Playlists" xml:space="preserve">
+    <value>_Playlists</value>
+  </data>
+  <data name="PlaylistsListviewColumnHeader_Playlists" xml:space="preserve">
+    <value>Playlists</value>
+  </data>
+  <data name="PlaylistSongsContextMenu_Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="PlaylistSongsContextMenu_Playlist" xml:space="preserve">
+    <value>Playlist</value>
+  </data>
+  <data name="PlaylistSongsContextMenu_Remove" xml:space="preserve">
+    <value>Remove From Playlist</value>
+  </data>
+  <data name="Popup_ConfirmClearPlaylist" xml:space="preserve">
+    <value>Confirm Clear Playlist</value>
+  </data>
+  <data name="Popup_ConfirmClearPlaylistQuestion" xml:space="preserve">
+    <value>Clear Playlist?</value>
+  </data>
+  <data name="Popup_ConfirmClearQueue" xml:space="preserve">
+    <value>Confirm Clear Queue</value>
+  </data>
+  <data name="Popup_ConfirmClearQueueQuestion" xml:space="preserve">
+    <value>Clear Queue?</value>
+  </data>
+  <data name="Popup_ConfirmReloadPlaylistQuestion" xml:space="preserve">
+    <value>Reload Playlist?</value>
+  </data>
+  <data name="Popup_ConfirmRemovePlaylist" xml:space="preserve">
+    <value>Confirm Remove Playlist</value>
+  </data>
+  <data name="Popup_ConfirmRemovePlaylistQuestion" xml:space="preserve">
+    <value>Remove Selected Playlist?</value>
+  </data>
+  <data name="Popup_ConfirmRemoveSelected" xml:space="preserve">
+    <value>Confirm Remove Selected</value>
+  </data>
+  <data name="Popup_ConfirmRemoveSelectedQuestion" xml:space="preserve">
+    <value>Remove Selected?</value>
+  </data>
+  <data name="Popup_InputNewPlaylistName" xml:space="preserve">
+    <value>Input New Playlist Name:</value>
+  </data>
+  <data name="Popup_MultipleDeletionNotSupported" xml:space="preserve">
+    <value>Multiple Deletion Not Supported</value>
+  </data>
+  <data name="Popup_NotSuppotedByMPDProtocol" xml:space="preserve">
+    <value>Not Suppoted By MPD Protocol</value>
+  </data>
+  <data name="Popup_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Popup_PlaylistChangedNortification" xml:space="preserve">
+    <value>Playlist Changed Nortification</value>
+  </data>
+  <data name="Popup_SaveQueueAs" xml:space="preserve">
+    <value>Save Queue As</value>
+  </data>
+  <data name="Popup_SaveSelectedAs" xml:space="preserve">
+    <value>Save Selected As</value>
+  </data>
+  <data name="Popup_SaveSelectedTo" xml:space="preserve">
+    <value>Save Selected To</value>
+  </data>
+  <data name="Popup_SelectPlaylist" xml:space="preserve">
+    <value>Select Playlist:</value>
+  </data>
+  <data name="Port" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="PrivacyPolicy" xml:space="preserve">
+    <value>App Privacy Policy</value>
+  </data>
+  <data name="PrivacyPolicyText" xml:space="preserve">
+    <value>MPDCtrl allows you to access your music player via specified IP address with optional user credentials. None of the data is transmitted anywhere besides your specified music player and your settings are stored on your device only. Optional user credentials are encrypted with a platform provided shceme.</value>
+  </data>
+  <data name="Profile" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="Profiles" xml:space="preserve">
+    <value>Profiles</value>
+  </data>
+  <data name="Profile_NewProfile" xml:space="preserve">
+    <value>New Profile</value>
+  </data>
+  <data name="QueueItemContextMenu_Move" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="QueueItemContextMenu_MoveDown" xml:space="preserve">
+    <value>Down (Ctrl+D)</value>
+  </data>
+  <data name="QueueItemContextMenu_MoveUp" xml:space="preserve">
+    <value>Up (Ctrl+U)</value>
+  </data>
+  <data name="QueueItemContextMenu_Queue" xml:space="preserve">
+    <value>Queue</value>
+  </data>
+  <data name="QueueItemContextMenu_QueueClear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="QueueItemContextMenu_QueueSaveAsPlaylist" xml:space="preserve">
+    <value>Save As</value>
+  </data>
+  <data name="QueueItemContextMenu_Remove" xml:space="preserve">
+    <value>Remove (Ctrl+Delete)</value>
+  </data>
+  <data name="QueueItemContextMenu_SaveSelectedAs" xml:space="preserve">
+    <value>Save Selected As</value>
+  </data>
+  <data name="QueueItemContextMenu_SaveSelectedTo" xml:space="preserve">
+    <value>Save Selected To...</value>
+  </data>
+  <data name="QueueItemContextMenu_ScrollIntoNowPlaying" xml:space="preserve">
+    <value>Jump to Current Song (Ctrl+J)</value>
+  </data>
+  <data name="QueueItemContextMenu_SelectedItems" xml:space="preserve">
+    <value>Selected Items</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Album" xml:space="preserve">
+    <value>Album</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Artist" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Genre" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+  <data name="QueueListviewColumnHeader_LastModified" xml:space="preserve">
+    <value>Last Modified</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Position" xml:space="preserve">
+    <value>Position</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Time" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Title" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Search_ToolTip" xml:space="preserve">
+    <value>Search (Ctrl+F)</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Settings_ErrorHostInvalidAddressFormat" xml:space="preserve">
+    <value>Invalid address format.</value>
+  </data>
+  <data name="Settings_ErrorHostMustBeSpecified" xml:space="preserve">
+    <value>Host address is required.</value>
+  </data>
+  <data name="Settings_ErrorInvalidPortNaN" xml:space="preserve">
+    <value>Invalid port number.</value>
+  </data>
+  <data name="Settings_ErrorPortMustBeSpecified" xml:space="preserve">
+    <value>Port number is required.</value>
+  </data>
+  <data name="Settings_Opts_AutoScrollToNowPlaying" xml:space="preserve">
+    <value>Auto scroll to current song.</value>
+  </data>
+  <data name="Settings_Opts_EnableAlbumArt" xml:space="preserve">
+    <value>Enable AlbumArt.</value>
+  </data>
+  <data name="Settings_Opts_MPDDatabase" xml:space="preserve">
+    <value>MPD Database</value>
+  </data>
+  <data name="Settings_Opts_Options" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="Settings_Opts_SaveLog" xml:space="preserve">
+    <value>Save log file (MPDCtrl__errors.txt) to desktop when an unexpected error occured.</value>
+  </data>
+  <data name="Settings_Opts_ShowDebugWidow" xml:space="preserve">
+    <value>Enable debug widow.</value>
+  </data>
+  <data name="Settings_Opts_Themes" xml:space="preserve">
+    <value>Themes</value>
+  </data>
+  <data name="Settings_Opts_Themes_Dark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Settings_Opts_Themes_Light" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="Settings_Opts_UpdateDatabaseOnStartup" xml:space="preserve">
+    <value>Update MPD database on startup. (It may take a while to update)</value>
+  </data>
+  <data name="Settings_Opts_UseReadPicture" xml:space="preserve">
+    <value>Use "readpicture" command instead of "albumart". (applicable when MPD protocol version is 0.22.0 or up)</value>
+  </data>
+  <data name="Settings_ProfileDeleted" xml:space="preserve">
+    <value>Profile deleted</value>
+  </data>
+  <data name="Settings_ProfileSaved" xml:space="preserve">
+    <value>Profile saved.</value>
+  </data>
+  <data name="Settings_ProfileUpdated" xml:space="preserve">
+    <value>Profile updated.</value>
+  </data>
+  <data name="Settings_ToolTip" xml:space="preserve">
+    <value>Settings (Ctrl+S)</value>
+  </data>
+  <data name="Settings_UnlockAndChangePassword" xml:space="preserve">
+    <value>Unlock and change password</value>
+  </data>
+  <data name="SongFilesItemContextMenu_Add" xml:space="preserve">
+    <value>(not used)</value>
+  </data>
+  <data name="SongFilesListviewColumnHeader_File" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="SongFilesListviewColumnHeader_Path" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="SongsItemContextMenu_Add" xml:space="preserve">
+    <value>Add to Queue</value>
+  </data>
+  <data name="StatusBarMsg_MPDVersionIsOld" xml:space="preserve">
+    <value>The MPD protocol version {0} is old. Some of the functionalities may not work properly.</value>
+  </data>
+  <data name="StatusMsg_UpdatingDb" xml:space="preserve">
+    <value>Updating database...</value>
+  </data>
+  <data name="TreeviewMenuItemContextMenu_Load" xml:space="preserve">
+    <value>Load</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="Website" xml:space="preserve">
+    <value>Website</value>
+  </data>
+</root>

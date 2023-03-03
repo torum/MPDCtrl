@@ -9,8 +9,15 @@ https://github.com/torum/MPDCtrl
 
  [Download from Microsoft Store](https://www.microsoft.com/store/apps/9NCC3NTG9DP3)
  
+
 ## TODO
 
+### Things that currentry working on
+
+- Refactoring. (DI and Nullable, etc)
+
+### Planning
+*  Better keyboard bindings.
 *  Add "Play Next" menu item in playlists and search result.　
 *  Add "update" and "rescan" button in Setting's page.
 *  Add inline renaming in the TreeView popup menu. (and right click select)
@@ -26,17 +33,9 @@ https://github.com/torum/MPDCtrl
 *  Cache CashAlbumArt and Album view?
 *  Add Search option "Exact" or "Contain".
 
-### Things that currentry working on
-
-- [ ] 
-
-
-### Planning
-
-- [ ] 
 
 ## Change log
-
+* v3.0.20.0 (2023/2.29) Implemented dependency injection using Generic host. Nullable enabled. Needs a lot of work. 
 * v3.0.19   (2023/1/11) App Store release. 
 * v3.0.18.1 When maximize, CourneRradius needed to be reset.
 * v3.0.18   (2023/1/11) App Store release. 

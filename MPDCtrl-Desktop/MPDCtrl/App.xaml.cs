@@ -1,21 +1,25 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Threading;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using MPDCtrl.Contracts;
+using MPDCtrl.Services;
+using MPDCtrl.ViewModels;
+using MPDCtrl.Views;
+using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.IO;
-using System.Diagnostics;
-using System.Globalization;
-using MPDCtrl.ViewModels;
-using MPDCtrl.ViewModels.Classes;
-using MPDCtrl.Views;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using Windows.System;
+using Windows.UI;
 
 namespace MPDCtrl
 {
     public partial class App : Application
     {
-        // Prevent multiple instances.
+        // Mutex to prevent multiple instances.
         private bool _mutexOn = true;
 
         /// <summary>The event mutex name.</summary>
@@ -25,21 +29,43 @@ namespace MPDCtrl
         private const string UniqueMutexName = "{fcf95901-d7f3-42da-bcbe-87a3dbd13b8b}";
 
         /// <summary>The event wait handle.</summary>
-        private EventWaitHandle eventWaitHandle;
+        private EventWaitHandle? eventWaitHandle;
 
         /// <summary>The mutex.</summary>
-        private Mutex mutex;
+        private Mutex? mutex;
 
-        /// <summary> Check and bring to front if already exists.</summary>
+        //public static MainWindow? MainWin { get; private set; }
+
         private void AppOnStartup(object sender, StartupEventArgs e)
         {
-            // For testing.
-            //ChangeTheme("DefaultTheme");
-            //ChangeTheme("LightTheme");
-            //ChangeTheme("DarkTheme");
 
-            // For testing only. Don't forget to comment this out if you uncomment.
-            //MPDCtrl.Properties.Resources.Culture = CultureInfo.GetCultureInfo("en-US"); //or ja-JP etc
+        }
+
+        public IHost AppHost { get; private set; }
+
+        public static T GetService<T>()
+            where T : class
+        {
+            if ((App.Current as App)!.AppHost!.Services.GetService(typeof(T)) is not T service)
+            {
+                throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
+            }
+
+            return service;
+        }
+
+        public App()
+        {
+            AppHost = Microsoft.Extensions.Hosting.Host
+                    .CreateDefaultBuilder()
+                    .UseContentRoot(AppContext.BaseDirectory)
+                    .ConfigureServices((context, services) =>
+                    {
+                        services.AddSingleton<MainWindow>();
+                        services.AddSingleton<MainViewModel>();
+                        services.AddSingleton<IMpcService, MpcService>();
+                    })
+                    .Build();
 
             if (_mutexOn)
             {
@@ -75,18 +101,42 @@ namespace MPDCtrl
                 // Terminate this instance.
                 this.Shutdown();
             }
-        }
 
-        public App()
-        {
             DispatcherUnhandledException += App_DispatcherUnhandledException;
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
-        private StringBuilder Errortxt = new StringBuilder();
+        protected override async void OnStartup(StartupEventArgs e)
+        {
+            await AppHost!.StartAsync();
+
+            var mainWindow = AppHost.Services.GetRequiredService<MainWindow>();
+
+            // For testing.
+            //ChangeTheme("DefaultTheme");
+            //ChangeTheme("LightTheme");
+            //ChangeTheme("DarkTheme");
+
+            // For testing only. Don't forget to comment this out if you uncomment.
+            //MPDCtrl.Properties.Resources.Culture = CultureInfo.GetCultureInfo("en-US"); //or ja-JP etc
+
+            mainWindow.Show();
+            mainWindow.Activate();
+
+            base.OnStartup(e);
+        }
+
+        protected override async void OnExit(ExitEventArgs e)
+        {
+            await AppHost!.StopAsync();
+
+            base.OnExit(e);
+        }
+
+        private readonly StringBuilder _errortxt = new StringBuilder();
         public bool IsSaveErrorLog;
-        public string LogFilePath;
+        public string? LogFilePath;
 
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
@@ -101,16 +151,19 @@ namespace MPDCtrl
             e.Handled = false;
         }
 
-        private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
         {
-            var exception = e.Exception.InnerException as Exception;
+            if (e.Exception.InnerException != null)
+            {
+                var exception = e.Exception.InnerException as Exception;
 
-            System.Diagnostics.Debug.WriteLine("TaskScheduler_UnobservedTaskException: " + exception.Message);
+                System.Diagnostics.Debug.WriteLine("TaskScheduler_UnobservedTaskException: " + exception?.Message);
 
-            AppendErrorLog("TaskScheduler_UnobservedTaskException", exception.Message);
-            
-            // save
-            SaveErrorLog();
+                AppendErrorLog("TaskScheduler_UnobservedTaskException", exception?.Message);
+
+                // save
+                SaveErrorLog();
+            }
 
             e.SetObserved();
         }
@@ -119,18 +172,18 @@ namespace MPDCtrl
         {
             var exception = e.ExceptionObject as Exception;
 
-            if (exception is TaskCanceledException)
+            if (exception is TaskCanceledException exp)
             {
                 // can ignore.
-                System.Diagnostics.Debug.WriteLine("CurrentDomain_UnhandledException (TaskCanceledException): " + exception.Message);
+                System.Diagnostics.Debug.WriteLine("CurrentDomain_UnhandledException (TaskCanceledException): " + exp.Message);
 
-                AppendErrorLog("CurrentDomain_UnhandledException (TaskCanceledException)", exception.Message);
+                AppendErrorLog("CurrentDomain_UnhandledException (TaskCanceledException)", exp.Message);
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("CurrentDomain_UnhandledException: " + exception.Message);
+                System.Diagnostics.Debug.WriteLine("CurrentDomain_UnhandledException: " + exception?.Message);
 
-                AppendErrorLog("CurrentDomain_UnhandledException", exception.Message);
+                AppendErrorLog("CurrentDomain_UnhandledException", exception?.Message);
 
                 // save
                 SaveErrorLog();
@@ -140,12 +193,12 @@ namespace MPDCtrl
             //Environment.Exit(1);
         }
 
-        public void AppendErrorLog(string errorTxt, string kindTxt)
+        public void AppendErrorLog(string exceptionKind, string? exceptionMessage)
         {
             DateTime dt = DateTime.Now;
             string nowString = dt.ToString("yyyy/MM/dd HH:mm:ss");
 
-            Errortxt.AppendLine(nowString + " - " + kindTxt + " - " + errorTxt);
+            _errortxt.AppendLine(nowString + " - " + exceptionMessage + " - " + exceptionKind);
         }
 
         public void SaveErrorLog()
@@ -156,12 +209,12 @@ namespace MPDCtrl
             if (string.IsNullOrEmpty(LogFilePath))
                 return;
 
-            string s = Errortxt.ToString();
+            string s = _errortxt.ToString();
             if (!string.IsNullOrEmpty(s))
                 File.WriteAllText(LogFilePath, s);
         }
 
-        public void ChangeTheme(string themeName)
+        public static void ChangeTheme(string themeName)
         {
             ResourceDictionary _themeDict = Application.Current.Resources.MergedDictionaries.FirstOrDefault(x => x.Source == new Uri("pack://application:,,,/Themes/DefaultTheme.xaml"));
             if (_themeDict != null)

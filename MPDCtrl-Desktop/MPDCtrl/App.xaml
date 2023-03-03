@@ -4,13 +4,16 @@
              xmlns:local="clr-namespace:MPDCtrl"
              xmlns:vms="clr-namespace:MPDCtrl.ViewModels"
              xmlns:common="clr-namespace:MPDCtrl.Common"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- 
              StartupUri="Views\MainWindow.xaml"
-             Startup="AppOnStartup">
+             Startup="AppOnStartup" -->
     <Application.Resources>
         <ResourceDictionary>
-
+            <!--
             <vms:MainViewModel x:Key="MainViewModel" />
+            -->
             
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 

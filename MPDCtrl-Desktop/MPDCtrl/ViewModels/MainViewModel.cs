@@ -1,6 +1,8 @@
 ﻿using MPDCtrl.Common;
+using MPDCtrl.Contracts;
 using MPDCtrl.Models;
 using MPDCtrl.Models.Classes;
+using MPDCtrl.Services;
 using MPDCtrl.ViewModels.Classes;
 using System;
 using System.Collections.Generic;
@@ -19,7 +21,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
 using System.Xml.Linq;
-using Windows.Networking;
 
 namespace MPDCtrl.ViewModels
 {
@@ -31,7 +32,7 @@ namespace MPDCtrl.ViewModels
         const string _appName = "MPDCtrl";
 
         // Application version
-        const string _appVer = "v3.0.19.0";
+        const string _appVer = "v3.0.20.0";
 
         public static string AppVer
         {
@@ -624,7 +625,7 @@ namespace MPDCtrl.ViewModels
                 _currentTheme = value;
                 this.NotifyPropertyChanged("CurrentTheme");
 
-                (Application.Current as App).ChangeTheme(_currentTheme.Name);
+                App.ChangeTheme(_currentTheme.Name);
             }
         }
 
@@ -2897,10 +2898,13 @@ namespace MPDCtrl.ViewModels
 
         #endregion
 
-        private readonly MPC _mpc = new();
+        //private readonly MPC _mpc = new();
+        private readonly IMpcService _mpc;
 
-        public MainViewModel()
+        public MainViewModel(IMpcService mpcService)
         {
+            _mpc = mpcService;
+
             #region == Init config folder and file path ==
 
             _appDataFolder = _envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
@@ -3063,27 +3067,27 @@ namespace MPDCtrl.ViewModels
 
             #region == Subscribe to events ==
 
-            _mpc.IsBusy += new MPC.IsBusyEvent(OnMpcIsBusy);
+            _mpc.IsBusy += new MpcService.IsBusyEvent(OnMpcIsBusy);
 
-            _mpc.MpdIdleConnected += new MPC.IsMpdIdleConnectedEvent(OnMpdIdleConnected);
+            _mpc.MpdIdleConnected += new MpcService.IsMpdIdleConnectedEvent(OnMpdIdleConnected);
 
-            _mpc.DebugCommandOutput += new MPC.DebugCommandOutputEvent(OnDebugCommandOutput);
-            _mpc.DebugIdleOutput += new MPC.DebugIdleOutputEvent(OnDebugIdleOutput);
+            _mpc.DebugCommandOutput += new MpcService.DebugCommandOutputEvent(OnDebugCommandOutput);
+            _mpc.DebugIdleOutput += new MpcService.DebugIdleOutputEvent(OnDebugIdleOutput);
 
-            _mpc.ConnectionStatusChanged += new MPC.ConnectionStatusChangedEvent(OnConnectionStatusChanged);
-            _mpc.ConnectionError += new MPC.ConnectionErrorEvent(OnConnectionError);
+            _mpc.ConnectionStatusChanged += new MpcService.ConnectionStatusChangedEvent(OnConnectionStatusChanged);
+            _mpc.ConnectionError += new MpcService.ConnectionErrorEvent(OnConnectionError);
 
-            _mpc.MpdPlayerStatusChanged += new MPC.MpdPlayerStatusChangedEvent(OnMpdPlayerStatusChanged);
-            _mpc.MpdCurrentQueueChanged += new MPC.MpdCurrentQueueChangedEvent(OnMpdCurrentQueueChanged);
-            _mpc.MpdPlaylistsChanged += new MPC.MpdPlaylistsChangedEvent(OnMpdPlaylistsChanged);
+            _mpc.MpdPlayerStatusChanged += new MpcService.MpdPlayerStatusChangedEvent(OnMpdPlayerStatusChanged);
+            _mpc.MpdCurrentQueueChanged += new MpcService.MpdCurrentQueueChangedEvent(OnMpdCurrentQueueChanged);
+            _mpc.MpdPlaylistsChanged += new MpcService.MpdPlaylistsChangedEvent(OnMpdPlaylistsChanged);
 
-            _mpc.MpdAckError += new MPC.MpdAckErrorEvent(OnMpdAckError);
+            _mpc.MpdAckError += new MpcService.MpdAckErrorEvent(OnMpdAckError);
 
-            _mpc.MpdAlbumArtChanged += new MPC.MpdAlbumArtChangedEvent(OnAlbumArtChanged);
+            _mpc.MpdAlbumArtChanged += new MpcService.MpdAlbumArtChangedEvent(OnAlbumArtChanged);
 
-            //_mpc.MpcInfo += new MPC.MpcInfoEvent(OnMpcInfoEvent);
+            //_mpc.MpcInfo += new MpcService.MpcInfoEvent(OnMpcInfoEvent);
 
-            _mpc.MpcProgress += new MPC.MpcProgressEvent(OnMpcProgress);
+            _mpc.MpcProgress += new MpcService.MpcProgressEvent(OnMpcProgress);
 
             this.UpdateProgress += (sender, arg) => { this.OnUpdateProgress(arg); };
 
@@ -3692,7 +3696,7 @@ namespace MPDCtrl.ViewModels
         }
 
         // Closing
-        public void OnWindowClosing(object sender, CancelEventArgs e)
+        public void OnWindowClosing(object sender)//, CancelEventArgs e
         {
             // Make sure Window and settings have been fully loaded and not overriding with empty data.
             if (!IsFullyLoaded)
@@ -5135,7 +5139,7 @@ namespace MPDCtrl.ViewModels
 
         #region == Events ==
 
-        private void OnMpdIdleConnected(MPC sender)
+        private void OnMpdIdleConnected(MpcService sender)
         {
             Debug.WriteLine("OK MPD " + _mpc.MpdVerText + " @OnMpdConnected");
 
@@ -5225,7 +5229,7 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private void OnMpdPlayerStatusChanged(MPC sender)
+        private void OnMpdPlayerStatusChanged(MpcService sender)
         {
             if (_mpc.MpdStatus.MpdError != "")
             {
@@ -5241,17 +5245,17 @@ namespace MPDCtrl.ViewModels
             UpdateStatus();
         }
 
-        private void OnMpdCurrentQueueChanged(MPC sender)
+        private void OnMpdCurrentQueueChanged(MpcService sender)
         {
             UpdateCurrentQueue();
         }
 
-        private void OnMpdPlaylistsChanged(MPC sender)
+        private void OnMpdPlaylistsChanged(MpcService sender)
         {
             UpdatePlaylists();
         }
 
-        private void OnAlbumArtChanged(MPC sender)
+        private void OnAlbumArtChanged(MpcService sender)
         {
             // AlbumArt
             if (Application.Current == null) { return; }
@@ -5275,7 +5279,7 @@ namespace MPDCtrl.ViewModels
             });
         }
 
-        private void OnDebugCommandOutput(MPC sender, string data)
+        private void OnDebugCommandOutput(MpcService sender, string data)
         {
             if (IsShowDebugWindow)
             {
@@ -5287,7 +5291,7 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private void OnDebugIdleOutput(MPC sender, string data)
+        private void OnDebugIdleOutput(MpcService sender, string data)
         {
             if (IsShowDebugWindow)
             {
@@ -5299,7 +5303,7 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private void OnConnectionError(MPC sender, string msg)
+        private void OnConnectionError(MpcService sender, string msg)
         {
             if (string.IsNullOrEmpty(msg))
                 return;
@@ -5314,10 +5318,10 @@ namespace MPDCtrl.ViewModels
             StatusBarMessage = ConnectionStatusMessage;
         }
 
-        private void OnConnectionStatusChanged(MPC sender, MPC.ConnectionStatus status)
+        private void OnConnectionStatusChanged(MpcService sender, MpcService.ConnectionStatus status)
         {
 
-            if (status == MPC.ConnectionStatus.NeverConnected)
+            if (status == MpcService.ConnectionStatus.NeverConnected)
             {
                 IsConnected = false;
                 IsConnecting = false;
@@ -5327,7 +5331,7 @@ namespace MPDCtrl.ViewModels
                 ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_NeverConnected;
                 StatusButton = _pathDisconnectedButton;
             }
-            else if (status == MPC.ConnectionStatus.Connected)
+            else if (status == MpcService.ConnectionStatus.Connected)
             {
                 IsConnected = true;
                 IsConnecting = false;
@@ -5337,7 +5341,7 @@ namespace MPDCtrl.ViewModels
                 ConnectionStatusMessage = MPDCtrl.Properties.Resources.ConnectionStatus_Connected;
                 StatusButton = _pathConnectedButton;
             }
-            else if (status == MPC.ConnectionStatus.Connecting)
+            else if (status == MpcService.ConnectionStatus.Connecting)
             {
                 IsConnected = false;
                 IsConnecting = true;
@@ -5349,7 +5353,7 @@ namespace MPDCtrl.ViewModels
 
                 StatusBarMessage = ConnectionStatusMessage;
             }
-            else if (status == MPC.ConnectionStatus.ConnectFail_Timeout)
+            else if (status == MpcService.ConnectionStatus.ConnectFail_Timeout)
             {
                 IsConnected = false;
                 IsConnecting = false;
@@ -5362,7 +5366,7 @@ namespace MPDCtrl.ViewModels
 
                 StatusBarMessage = ConnectionStatusMessage;
             }
-            else if (status == MPC.ConnectionStatus.SeeConnectionErrorEvent)
+            else if (status == MpcService.ConnectionStatus.SeeConnectionErrorEvent)
             {
                 IsConnected = false;
                 IsConnecting = false;
@@ -5372,7 +5376,7 @@ namespace MPDCtrl.ViewModels
                 Debug.WriteLine("ConnectionStatus_SeeConnectionErrorEvent");
                 StatusButton = _pathErrorInfoButton;
             }
-            else if (status == MPC.ConnectionStatus.Disconnected)
+            else if (status == MpcService.ConnectionStatus.Disconnected)
             {
                 IsConnected = false;
                 IsConnecting = false;
@@ -5385,7 +5389,7 @@ namespace MPDCtrl.ViewModels
 
                 StatusBarMessage = ConnectionStatusMessage;
             }
-            else if (status == MPC.ConnectionStatus.DisconnectedByHost)
+            else if (status == MpcService.ConnectionStatus.DisconnectedByHost)
             {
                 // TODO: not really usued now...
 
@@ -5400,7 +5404,7 @@ namespace MPDCtrl.ViewModels
 
                 StatusBarMessage = ConnectionStatusMessage;
             }
-            else if (status == MPC.ConnectionStatus.Disconnecting)
+            else if (status == MpcService.ConnectionStatus.Disconnecting)
             {
                 IsConnected = false;
                 IsConnecting = false;
@@ -5412,7 +5416,7 @@ namespace MPDCtrl.ViewModels
 
                 StatusBarMessage = ConnectionStatusMessage;
             }
-            else if (status == MPC.ConnectionStatus.DisconnectedByUser)
+            else if (status == MpcService.ConnectionStatus.DisconnectedByUser)
             {
                 IsConnected = false;
                 IsConnecting = false;
@@ -5425,7 +5429,7 @@ namespace MPDCtrl.ViewModels
 
                 StatusBarMessage = ConnectionStatusMessage;
             }
-            else if (status == MPC.ConnectionStatus.SendFail_NotConnected)
+            else if (status == MpcService.ConnectionStatus.SendFail_NotConnected)
             {
                 IsConnected = false;
                 IsConnecting = false;
@@ -5438,7 +5442,7 @@ namespace MPDCtrl.ViewModels
 
                 StatusBarMessage = ConnectionStatusMessage;
             }
-            else if (status == MPC.ConnectionStatus.SendFail_Timeout)
+            else if (status == MpcService.ConnectionStatus.SendFail_Timeout)
             {
                 IsConnected = false;
                 IsConnecting = false;
@@ -5453,7 +5457,7 @@ namespace MPDCtrl.ViewModels
             }
         }
 
-        private void OnMpdAckError(MPC sender, string ackMsg)
+        private void OnMpdAckError(MpcService sender, string ackMsg)
         {
             if (string.IsNullOrEmpty(ackMsg))
                 return;
@@ -5473,7 +5477,7 @@ namespace MPDCtrl.ViewModels
             IsShowAckWindow = true;
         }
 
-        private void OnMpcProgress(MPC sender, string msg)
+        private void OnMpcProgress(MpcService sender, string msg)
         {
             StatusBarMessage = msg;
         }
@@ -5483,7 +5487,7 @@ namespace MPDCtrl.ViewModels
             StatusBarMessage = msg;
         }
 
-        private void OnMpcIsBusy(MPC sender, bool on)
+        private void OnMpcIsBusy(MpcService sender, bool on)
         {
             this.IsBusy = on;
         }

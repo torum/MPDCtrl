@@ -1,23 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 using System.Windows;
 
 namespace MPDCtrl.Common
 {
-    /// <summary>
-    /// A base class for bindable ViewModels.
-    /// Implements INotifyPropertyChanged and IDataErrorInfo.
-    /// </summary>
     public abstract class ViewModelBase : INotifyPropertyChanged, IDataErrorInfo
     {
-
-        public ViewModelBase() { }
-
         #region == INotifyPropertyChanged ==
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void NotifyPropertyChanged(string propertyName)
         {
@@ -38,10 +29,7 @@ namespace MPDCtrl.Common
 
         private static readonly Dictionary<string, string> _ErrorMessages = new();
 
-        string IDataErrorInfo.Error
-        {
-            get { return (_ErrorMessages.Count > 0) ? "Has Error" : null; }
-        }
+        string IDataErrorInfo.Error => (_ErrorMessages.Count > 0) ? "Has Error" : "";
 
         string IDataErrorInfo.this[string columnName]
         {
@@ -66,8 +54,6 @@ namespace MPDCtrl.Common
                 _ErrorMessages[propertyName] = "";
         }
 
-
         #endregion
-
     }
 }

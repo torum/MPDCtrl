@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Navigation;
 
 namespace MPDCtrl.Common
 {
@@ -26,7 +27,7 @@ namespace MPDCtrl.Common
             this.CanExecuteFunc = canExecuteFunc;
         }
 
-        public event EventHandler CanExecuteChanged
+        public event EventHandler? CanExecuteChanged
         {
             add
             {
@@ -41,7 +42,7 @@ namespace MPDCtrl.Common
 
         public Predicate<T> CanExecuteFunc { get; private set; }
 
-        public bool CanExecute(object parameter)
+        public bool CanExecute(object? parameter)
         {
             if (parameter != null)
             {
@@ -54,8 +55,12 @@ namespace MPDCtrl.Common
             }
         }
 
-        public void Execute(object parameter)
+        public void Execute(object? parameter)
         {
+            if (parameter == null)
+            {
+                return;
+            }
             this.execute((T)parameter);
         }
     }
@@ -79,13 +84,13 @@ namespace MPDCtrl.Common
         {
         }
 
-        public event EventHandler CanExecuteChanged
+        public event EventHandler? CanExecuteChanged
         {
             add { CommandManager.RequerySuggested += value; }
             remove { CommandManager.RequerySuggested -= value; }
         }
 
-        public bool CanExecute(object parameter)
+        public bool CanExecute(object? parameter)
         {
             if (this.canExecuteEvaluator == null)
             {
@@ -98,7 +103,7 @@ namespace MPDCtrl.Common
             }
         }
 
-        public void Execute(object parameter)
+        public void Execute(object? parameter)
         {
             this.methodToExecute.Invoke();
         }

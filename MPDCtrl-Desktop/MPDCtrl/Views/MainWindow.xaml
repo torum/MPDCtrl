@@ -6,6 +6,7 @@
         xmlns:properties="clr-namespace:MPDCtrl.Properties"
         xmlns:helpers="clr-namespace:MPDCtrl.Helpers"
         xmlns:vms="clr-namespace:MPDCtrl.ViewModels"
+        xmlns:models="clr-namespace:MPDCtrl.Models"
         xmlns:local="clr-namespace:MPDCtrl"
         mc:Ignorable="d"
         WindowStyle="None"
@@ -13,10 +14,11 @@
         Background="Transparent"
         ResizeMode="CanResize"
         StateChanged="Window_StateChanged"
-        DataContext="{StaticResource MainViewModel}"
+        Closing="Window_Closing"
         Title="{Binding AppTitle}"
         Width="780" Height="480"
         MinWidth="768" MinHeight="134">
+    <!-- DataContext="{StaticResource MainViewModel}" -->
     <Window.Style>
         <Style TargetType="Window">
             <Style.Triggers>

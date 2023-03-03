@@ -14,7 +14,7 @@ namespace MPDCtrl.Helpers
 
     public class TreeViewHelper
     {
-        private static Dictionary<DependencyObject, TreeViewSelectedItemBehavior> behaviors = new();
+        private static readonly Dictionary<DependencyObject, TreeViewSelectedItemBehavior> behaviors = new();
 
         public static object GetSelectedItem(DependencyObject obj)
         {
@@ -32,11 +32,11 @@ namespace MPDCtrl.Helpers
 
         private static void SelectedItemChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            if (!(obj is TreeView))
+            if (obj is not TreeView)
                 return;
 
             if (!behaviors.ContainsKey(obj))
-                behaviors.Add(obj, new TreeViewSelectedItemBehavior(obj as TreeView));
+                behaviors.Add(obj, new TreeViewSelectedItemBehavior((TreeView)obj));
 
             TreeViewSelectedItemBehavior view = behaviors[obj];
             view.ChangeSelectedItem(e.NewValue);
@@ -44,7 +44,7 @@ namespace MPDCtrl.Helpers
 
         private class TreeViewSelectedItemBehavior
         {
-            TreeView view;
+            readonly TreeView view;
             public TreeViewSelectedItemBehavior(TreeView view)
             {
                 this.view = view;

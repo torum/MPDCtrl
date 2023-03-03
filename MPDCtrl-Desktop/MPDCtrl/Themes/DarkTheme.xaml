@@ -37,7 +37,7 @@
     <!-- 1c1c1c 191919 121212 or 111111 -->
 
     <Color x:Key="ListviewAlt0Color">#212121</Color>
-    <Color x:Key="ListviewAlt1Color">#282828</Color>
+    <Color x:Key="ListviewAlt1Color">#232323</Color>
 
     <Color x:Key="ListviewItemForegroundColor">#FFCCCCCC</Color>
     <Color x:Key="ListviewItemMouseOverForegroundColor">Gainsboro</Color>
@@ -140,7 +140,7 @@
     <SolidColorBrush x:Key="ItemBackgroundColorBrush" Color="Transparent"/>
     <Color x:Key="ItemAlt0Color">#212121</Color>
     <SolidColorBrush x:Key="ItemBackgroundAlt0ColorBrush" Color="{DynamicResource ItemAlt0Color}"/>
-    <Color x:Key="ItemAlt1Color">#282828</Color>
+    <Color x:Key="ItemAlt1Color">#262626</Color>
     <SolidColorBrush x:Key="ItemBackgroundAlt1ColorBrush" Color="{DynamicResource ItemAlt1Color}"/>
 
     <Color x:Key="ItemSelectedBackgroundColor">DarkGray</Color>

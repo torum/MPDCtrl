@@ -9,15 +9,18 @@
         xmlns:models="clr-namespace:MPDCtrl.Models"
         xmlns:local="clr-namespace:MPDCtrl"
         mc:Ignorable="d"
-        WindowStyle="None"
-        AllowsTransparency="True"
-        Background="Transparent"
+        Background="#C0191919"
         ResizeMode="CanResize"
         StateChanged="Window_StateChanged"
         Closing="Window_Closing"
         Title="{Binding AppTitle}"
+        WindowStyle="None"
         Width="780" Height="480"
-        MinWidth="768" MinHeight="134">
+        MinWidth="768" MinHeight="162">
+    <!--  
+        WindowStyle="None"
+        AllowsTransparency="True"
+    -->
     <!-- DataContext="{StaticResource MainViewModel}" -->
     <Window.Style>
         <Style TargetType="Window">
@@ -32,7 +35,7 @@
         </Style>
     </Window.Style>
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="32" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}" CornerRadius="8"/>
+        <WindowChrome CaptionHeight="32" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"/>
     </WindowChrome.WindowChrome>
     <Window.InputBindings>
         <KeyBinding Command="{Binding PlayCommand}" Key="Play" />
@@ -48,7 +51,8 @@
         <KeyBinding Command="{Binding ShowSettingsCommand}" Modifiers="Ctrl" Key="S"/>
         <KeyBinding Command="{Binding ShowFindCommand}" Modifiers="Ctrl" Key="F"/>
     </Window.InputBindings>
-    <Border Style="{StaticResource WindowMainPanelStyle}" UseLayoutRounding="True" Background="{DynamicResource BoardBackgroundColorBrush}">
+    <!--  Background="#C0333333" -->
+    <Border Style="{StaticResource WindowMainPanelStyle}" Background="{DynamicResource BoardBackgroundColorBrush}" UseLayoutRounding="True">
         <Grid x:Name="LayoutGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="32"/>
@@ -65,124 +69,125 @@
             </Grid.ColumnDefinitions>
 
             <!-- App title bar-->
-            <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="32"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="auto"/>
-                </Grid.ColumnDefinitions>
+            <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}" CornerRadius="8,8,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="32"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
 
-                <!-- App icon -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Button ToolTip="{Binding AppTitleVer}" IsHitTestVisible="True" WindowChrome.IsHitTestVisibleInChrome="True">
-                        <Button.Style>
-                            <Style TargetType="{x:Type Button}">
-                                <Setter Property="OverridesDefaultStyle" Value="true" />
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
-                                <!--
+                    <!-- App icon -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <Button ToolTip="{Binding AppTitleVer}" IsHitTestVisible="True" WindowChrome.IsHitTestVisibleInChrome="True">
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}">
+                                    <Setter Property="OverridesDefaultStyle" Value="true" />
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
+                                    <!--
                                 <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                                 -->
-                                <Setter Property="Focusable" Value="False" />
-                                <Setter Property="BorderThickness" Value="0" />
-                                <Setter Property="Margin" Value="3,0,0,0" />
-                                <Setter Property="Padding" Value="0" />
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border x:Name="Border" CornerRadius="8" BorderThickness="0" Background="{TemplateBinding Background}">
-                                                <Viewbox Width="16" Height="16" Margin="6 0 6 0">
-                                                    <Canvas Width="101.52757" Height="101.52314">
-                                                        <Canvas.RenderTransform>
-                                                            <TranslateTransform X="0" Y="0"/>
-                                                        </Canvas.RenderTransform>
-                                                        <Canvas Name="layer1">
+                                    <Setter Property="Focusable" Value="False" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="Margin" Value="3,0,0,0" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="Border" CornerRadius="8" BorderThickness="0" Background="{TemplateBinding Background}">
+                                                    <Viewbox Width="16" Height="16" Margin="6 0 6 0">
+                                                        <Canvas Width="101.52757" Height="101.52314">
                                                             <Canvas.RenderTransform>
-                                                                <TranslateTransform X="-2.8648005" Y="-194.52514"/>
+                                                                <TranslateTransform X="0" Y="0"/>
                                                             </Canvas.RenderTransform>
-                                                            <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="M 53.823864 196.04415 C 21.886528 194.83142 -3.7832653 229.72314 6.7745021 259.84651 15.060196 290.6957 55.964235 304.96229 81.631867 285.93948 108.66537 268.90685 110.19826 225.61676 84.437146 206.71473 75.820617 199.84108 64.844621 196.0167 53.823864 196.04415 Z m 0 9.84942 c 18.184368 -0.34132 35.234253 13.61727 38.596795 31.47035 3.761965 16.86267 -5.208339 35.37926 -20.678288 43.01021 -15.289342 8.1535 -35.646071 4.41591 -47.068046 -8.60652 -12.118898 -12.84888 -13.65815 -34.02695 -3.509928 -48.48554 7.159606 -10.73064 19.738995 -17.49358 32.659467 -17.3885 z m -9.850044 17.2371 c 0 14.77475 0 29.5495 0 44.32425 9.849834 -7.38748 19.699667 -14.77496 29.549501 -22.16244 -9.849834 -7.38727 -19.699667 -14.77454 -29.549501 -22.16181 z"/>
+                                                            <Canvas Name="layer1">
+                                                                <Canvas.RenderTransform>
+                                                                    <TranslateTransform X="-2.8648005" Y="-194.52514"/>
+                                                                </Canvas.RenderTransform>
+                                                                <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="M 53.823864 196.04415 C 21.886528 194.83142 -3.7832653 229.72314 6.7745021 259.84651 15.060196 290.6957 55.964235 304.96229 81.631867 285.93948 108.66537 268.90685 110.19826 225.61676 84.437146 206.71473 75.820617 199.84108 64.844621 196.0167 53.823864 196.04415 Z m 0 9.84942 c 18.184368 -0.34132 35.234253 13.61727 38.596795 31.47035 3.761965 16.86267 -5.208339 35.37926 -20.678288 43.01021 -15.289342 8.1535 -35.646071 4.41591 -47.068046 -8.60652 -12.118898 -12.84888 -13.65815 -34.02695 -3.509928 -48.48554 7.159606 -10.73064 19.738995 -17.49358 32.659467 -17.3885 z m -9.850044 17.2371 c 0 14.77475 0 29.5495 0 44.32425 9.849834 -7.38748 19.699667 -14.77496 29.549501 -22.16244 -9.849834 -7.38727 -19.699667 -14.77454 -29.549501 -22.16181 z"/>
+                                                            </Canvas>
                                                         </Canvas>
-                                                    </Canvas>
-                                                </Viewbox>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                </StackPanel>
+                                                    </Viewbox>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
 
-                <!-- Now Playing -->
-                <StackPanel Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12 0 0 0" Visibility="{Binding IsConnected, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
-                    <TextBlock Style="{StaticResource DefaultTextBlockStyle}">
-                        <TextBlock.Triggers>
-                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1.0" Duration="0:0:2">
-                                        </DoubleAnimation>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                        </TextBlock.Triggers>
+                    <!-- Now Playing -->
+                    <StackPanel Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12 0 0 0" Visibility="{Binding IsConnected, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                        <TextBlock Style="{StaticResource DefaultTextBlockStyle}">
+                            <TextBlock.Triggers>
+                                <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1.0" Duration="0:0:2">
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </TextBlock.Triggers>
                         <Run x:Name="CurrentSongTitle" Foreground="{DynamicResource ControlLightColorBrush}" FontWeight="DemiBold" Text="{Binding CurrentSongTitle, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}"/>
-                    </TextBlock>
-                    <TextBlock Foreground="{DynamicResource ControlDarkColorBrush}">
-                        <TextBlock.Triggers>
-                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.1" To="1.0" Duration="0:0:2">
-                                        </DoubleAnimation>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                        </TextBlock.Triggers>
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource DefaultTextBlockStyle}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=CurrentSongArtist, Path=Text}" Value="">
-                                        <Setter Property="Control.Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock Foreground="{DynamicResource ControlDarkColorBrush}">
+                            <TextBlock.Triggers>
+                                <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.1" To="1.0" Duration="0:0:2">
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </TextBlock.Triggers>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource DefaultTextBlockStyle}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=CurrentSongArtist, Path=Text}" Value="">
+                                            <Setter Property="Control.Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
                         <Run Text="  by "/>
                         <Run x:Name="CurrentSongArtist" Foreground="{DynamicResource ControlMediumColorBrush}" Text="{Binding CurrentSongArtist, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}" />
-                    </TextBlock>
-                    <TextBlock  Foreground="{DynamicResource ControlDarkColorBrush}">
-                        <TextBlock.Triggers>
-                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.1" To="1.0" Duration="0:0:2">
-                                        </DoubleAnimation>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                        </TextBlock.Triggers>
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource DefaultTextBlockStyle}">
-                                <Style.Triggers>
-                                     <DataTrigger Binding="{Binding ElementName=CurrentSongAlbum, Path=Text}" Value="">
-                                           <Setter Property="Control.Visibility" Value="Collapsed" />
-                                     </DataTrigger>
-                                 </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock  Foreground="{DynamicResource ControlDarkColorBrush}">
+                            <TextBlock.Triggers>
+                                <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.1" To="1.0" Duration="0:0:2">
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </TextBlock.Triggers>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource DefaultTextBlockStyle}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=CurrentSongAlbum, Path=Text}" Value="">
+                                            <Setter Property="Control.Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
                         <Run Text="  from "/>
                         <Run x:Name="CurrentSongAlbum" Foreground="{DynamicResource ControlMediumColorBrush}" Text="{Binding CurrentSongAlbum, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}" />
-                    </TextBlock>
-                </StackPanel>
+                        </TextBlock>
+                    </StackPanel>
 
-                <!-- System icons -->
-                <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right" Margin="0">
+                    <!-- System icons -->
+                    <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right" Margin="0">
 
-                    <Button x:Name="SettingsButton" Style="{DynamicResource PathSysButton}" Command="{Binding ShowSettingsCommand}" ToolTip="{x:Static properties:Resources.Settings_ToolTip}" WindowChrome.IsHitTestVisibleInChrome="True"
+                        <Button x:Name="SettingsButton" Style="{DynamicResource PathSysButton}" Command="{Binding ShowSettingsCommand}" ToolTip="{x:Static properties:Resources.Settings_ToolTip}" WindowChrome.IsHitTestVisibleInChrome="True"
                                 Content="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,
 8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,
 11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,
@@ -193,31 +198,32 @@
 18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,
 21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,
 18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z">
-                    </Button>
+                        </Button>
 
-                    <Button x:Name="MinimizeButton" Style="{StaticResource PathSysButton}" Click="MinimizeButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
-                        M20,14H4V10H20
-                    </Button>
+                        <Button x:Name="MinimizeButton" Style="{StaticResource PathSysButton}" Click="MinimizeButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
+                            M20,14H4V10H20
+                        </Button>
 
-                    <Button x:Name="RestoreButton" Style="{StaticResource PathSysButton}" Click="RestoreButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
-                        M4,8H8V4H20V16H16V20H4V8M16,8V14H18V6H10V8H16M6,12V18H14V12H6Z
-                    </Button>
+                        <Button x:Name="RestoreButton" Style="{StaticResource PathSysButton}" Click="RestoreButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
+                            M4,8H8V4H20V16H16V20H4V8M16,8V14H18V6H10V8H16M6,12V18H14V12H6Z
+                        </Button>
 
-                    <Button x:Name="MaxButton" Style="{StaticResource PathSysButton}" Click="MaxButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
-                        M4,4H20V20H4V4M6,8V18H18V8H6Z
-                    </Button>
+                        <Button x:Name="MaxButton" Style="{StaticResource PathSysButton}" Click="MaxButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
+                            M4,4H20V20H4V4M6,8V18H18V8H6Z
+                        </Button>
 
-                    <Button x:Name="CloseButton" Style="{StaticResource PathSysButtonClose}" Click="CloseButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
-                        M13.46,12L19,17.54V19H17.54L12,13.46L6.46,19H5V17.54L10.54,12L5,6.46V5H6.46L12,10.54L17.54,5H19V6.46L13.46,12Z
-                    </Button>
+                        <Button x:Name="CloseButton" Style="{StaticResource PathSysButtonClose}" Click="CloseButton_Click" WindowChrome.IsHitTestVisibleInChrome="True">
+                            M13.46,12L19,17.54V19H17.54L12,13.46L6.46,19H5V17.54L10.54,12L5,6.46V5H6.46L12,10.54L17.54,5H19V6.46L13.46,12Z
+                        </Button>
 
-                </StackPanel>
+                    </StackPanel>
 
-            </Grid>
+                </Grid>
+            </Border>
 
             <!-- Header -->
-            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0.5">
-                <Grid Background="{DynamicResource BoardBackgroundColorBrush}">
+            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}" Margin="0 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0">
+                <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="4"/>
                         <RowDefinition Height="Auto"/>
@@ -342,10 +348,11 @@
                 </Grid>
 
             </Border>
-            
+
             <!-- Left pane -->
+            <!-- {DynamicResource WindowBackgroundBaseColorBrush} -->
             <Grid Grid.Row="2" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:SizeChange.IsEnabled="True" helpers:SizeChange.ActualWidth="{Binding MainLeftPainActualWidth, Mode=OneWayToSource}">
-                <TreeView Margin="0 0 0 0" Style="{DynamicResource TreeViewMenuStyle}" ItemsSource="{Binding MainMenuItems}"  helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeMenu, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <TreeView Margin="0 0 0 0" Style="{DynamicResource TreeViewMenuStyle}" ItemsSource="{Binding MainMenuItems}" helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeMenu, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <TreeView.Resources>
 
                         <ContextMenu x:Key="TreeviewMenuItemContextMenu">
@@ -731,7 +738,7 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="ListView">
-                                                <Border Name="Border"  Background="{TemplateBinding Background}" BorderBrush="#121212" BorderThickness="0 0 0 0.5">
+                                                <Border Name="Border"  Background="{TemplateBinding Background}" BorderBrush="#121212" BorderThickness="0 0 0 0">
                                                     <ScrollViewer Style="{DynamicResource ListViewScrollViewerStyle}">
                                                         <ItemsPresenter />
                                                     </ScrollViewer>
@@ -745,14 +752,14 @@
                                 <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
                                     <Setter Property="ContextMenu" Value="{StaticResource QueueItemContextMenu}" />
                                     <Setter Property="SnapsToDevicePixels" Value="true" />
-                                    <Setter Property="Margin" Value="0 0 0 0"/>
+                                    <Setter Property="Margin" Value="3 0 3 0"/>
                                     <Setter Property="Padding" Value="0 1 0 1"/>
                                     <Setter Property="HorizontalContentAlignment" Value="Left"/>
                                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                                <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
+                                                <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="4" SnapsToDevicePixels="true">
                                                     <Border.InputBindings>
                                                         <MouseBinding Command="{Binding Path=DataContext.QueueListviewLeftDoubleClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Gesture="LeftDoubleClick" />
                                                     </Border.InputBindings>
@@ -1501,13 +1508,13 @@
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
                                     <Setter Property="ContextMenu" Value="{StaticResource SearchResultListviewItemContextMenu}" />
-                                    <Setter Property="Margin" Value="0 0 0 0"/>
+                                    <Setter Property="Margin" Value="3 0 3 0"/>
                                     <Setter Property="Padding" Value="0 1 0 1"/>
                                     <Setter Property="HorizontalContentAlignment" Value="Left"/>
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                                <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
+                                                <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="4" SnapsToDevicePixels="true">
                                                     <Border.InputBindings>
 
                                                     </Border.InputBindings>
@@ -1884,13 +1891,13 @@
                                 <ListView.ItemContainerStyle>
                                     <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
                                         <Setter Property="ContextMenu" Value="{StaticResource SongFilesListviewItemContextMenu}" />
-                                        <Setter Property="Margin" Value="0 0 0 0"/>
+                                        <Setter Property="Margin" Value="3 0 3 0"/>
                                         <Setter Property="Padding" Value="0 1 0 1"/>
                                         <Setter Property="HorizontalContentAlignment" Value="Left"/>
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                                    <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
+                                                    <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="4" SnapsToDevicePixels="true">
                                                         <Border.InputBindings>
 
                                                         </Border.InputBindings>
@@ -2114,13 +2121,13 @@
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
                                     <Setter Property="ContextMenu" Value="{StaticResource PlaylistsListviewItemContextMenu}" />
-                                    <Setter Property="Margin" Value="0 0 0 0"/>
+                                    <Setter Property="Margin" Value="3 0 3 0"/>
                                     <Setter Property="Padding" Value="0 1 0 1"/>
                                     <Setter Property="HorizontalContentAlignment" Value="Left"/>
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                                <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
+                                                <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="4" SnapsToDevicePixels="true">
                                                     <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                                 </Border>
                                             </ControlTemplate>
@@ -2399,14 +2406,14 @@
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
                                     <Setter Property="ContextMenu" Value="{StaticResource PlaylistSongsListviewItemContextMenu}" />
-                                    <Setter Property="Margin" Value="0 0 0 0"/>
+                                    <Setter Property="Margin" Value="3 0 3 0"/>
                                     <Setter Property="Padding" Value="0 1 0 1"/>
                                     <Setter Property="HorizontalContentAlignment" Value="Left"/>
                                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=OneWay}"/>
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                                <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
+                                                <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="4" SnapsToDevicePixels="true">
                                                     <Border.InputBindings>
 
                                                     </Border.InputBindings>
@@ -2535,7 +2542,7 @@
             </Grid>
 
             <!-- GridSplitter -->
-            <GridSplitter x:Name="DebugWindowGridSplitter" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" ResizeDirection="Rows" Style="{StaticResource GridSplitterStyle}" Visibility="Collapsed"></GridSplitter>
+            <GridSplitter x:Name="DebugWindowGridSplitter" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" ResizeDirection="Rows" Background="{DynamicResource BoardBackgroundColorBrush}" Style="{StaticResource GridSplitterStyle}" Visibility="Collapsed"></GridSplitter>
 
             <!-- Debug Windows -->
             <Grid x:Name="DebugWindow" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Visibility="Collapsed">
@@ -2668,7 +2675,7 @@
             </Grid>
 
             <!-- StatusBar -->
-            <StatusBar Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Background="Transparent" Padding="0 0 0 0" Height="28" Margin="0 0 0 0" BorderBrush="{DynamicResource WindowBackgroundBaseColorBrush}" BorderThickness="0 0.5 0 0">
+            <StatusBar Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Background="Transparent" Padding="0 0 0 0" Height="28" Margin="0 0 0 0" BorderBrush="{DynamicResource WindowBackgroundBaseColorBrush}" BorderThickness="0 0 0 0">
                 <StatusBar.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Grid>
@@ -2747,7 +2754,7 @@
                     </StackPanel>
                 </StatusBarItem>
 
-                <Separator Grid.Column="5" Background="{DynamicResource BorderLightColorBrush}" />
+                <Separator Grid.Column="5" Opacity="0.3" Background="{DynamicResource BorderLightColorBrush}" />
                 
                 <!-- Debug Window Icon  -->
                 <StatusBarItem Grid.Column="6" HorizontalContentAlignment="Right">

@@ -2532,14 +2532,7 @@ namespace MPDCtrl.Services
             {
                 Debug.WriteLine("Exception@ParseStatus:" + ex.Message);
 
-                if (Application.Current != null)
-                {
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        App app = App.Current as App;
-                        app.AppendErrorLog("Exception@MPC@ParseStatus", ex.Message);
-                    });
-                }
+                Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParseStatus", ex.Message); });
 
                 IsBusy?.Invoke(this, false);
                 return Task.FromResult(false);
@@ -2619,14 +2612,10 @@ namespace MPDCtrl.Services
             {
                 Debug.WriteLine("Error@ParseCurrentSong: " + ex.Message);
 
-                if (Application.Current != null)
+                Application.Current?.Dispatcher.Invoke(() =>
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        App app = App.Current as App;
-                        app.AppendErrorLog("Exception@MPC@ParseCurrentSong", ex.Message);
-                    });
-                }
+                    (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParseCurrentSong", ex.Message);
+                });
 
                 return Task.FromResult(false);
             }
@@ -2840,14 +2829,10 @@ namespace MPDCtrl.Services
             {
                 Debug.WriteLine("Exception@ParsePlaylistInfo: " + ex.Message);
 
-                if (Application.Current != null)
+                Application.Current?.Dispatcher.Invoke(() =>
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        App app = App.Current as App;
-                        app.AppendErrorLog("Exception@MPC@ParsePlaylistInfo", ex.Message);
-                    });
-                }
+                    (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParsePlaylistInfo", ex.Message);
+                });
 
                 return Task.FromResult(false);
             }
@@ -2859,7 +2844,7 @@ namespace MPDCtrl.Services
             return Task.FromResult(true);
         }
 
-        private SongInfoEx FillSongInfoEx(Dictionary<string, string> SongValues, int i)
+        private SongInfoEx? FillSongInfoEx(Dictionary<string, string> SongValues, int i)
         {
             try
             {
@@ -2992,14 +2977,10 @@ namespace MPDCtrl.Services
             {
                 Debug.WriteLine("Error@FillSongInfoEx: " + e.ToString());
 
-                if (Application.Current != null)
-                {
-                    Application.Current.Dispatcher.Invoke(() =>
+                Application.Current?.Dispatcher.Invoke(() =>
                     {
-                        App app = App.Current as App;
-                        app.AppendErrorLog("Exception@MPC@FillSongInfoEx", e.Message);
+                        (Application.Current as App)?.AppendErrorLog("Exception@MPC@FillSongInfoEx", e.Message);
                     });
-                }
 
                 return null;
             }
@@ -3105,14 +3086,7 @@ namespace MPDCtrl.Services
             {
                 Debug.WriteLine("Error@ParsePlaylists: " + e.ToString());
 
-                if (Application.Current != null)
-                {
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        App app = App.Current as App;
-                        app.AppendErrorLog("Exception@MPC@ParsePlaylists", e.Message);
-                    });
-                }
+                Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParsePlaylists", e.Message); });
 
                 IsBusy?.Invoke(this, false);
                 return Task.FromResult(false);
@@ -3200,14 +3174,7 @@ namespace MPDCtrl.Services
             {
                 Debug.WriteLine("Error@ParseListAll: " + e.ToString());
 
-                if (Application.Current != null)
-                {
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        App app = App.Current as App;
-                        app.AppendErrorLog("Exception@MPC@ParseListAll", e.Message);
-                    });
-                }
+                Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParseListAll", e.Message); });
 
                 IsBusy?.Invoke(this, false);
                 return Task.FromResult(false); ;
@@ -3347,14 +3314,7 @@ namespace MPDCtrl.Services
             {
                 Debug.WriteLine("Error@ParseSearchResult: " + ex.Message);
 
-                if (Application.Current != null)
-                {
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        App app = App.Current as App;
-                        app.AppendErrorLog("Exception@MPC@ParseSearchResult", ex.Message);
-                    });
-                }
+                Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParseSearchResult", ex.Message); });
 
                 IsBusy?.Invoke(this, false);
                 return Task.FromResult(false);
@@ -3488,14 +3448,7 @@ namespace MPDCtrl.Services
             {
                 Debug.WriteLine("Error@ParsePlaylistSongsResult: " + ex.Message);
 
-                if (Application.Current != null)
-                {
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        App app = App.Current as App;
-                        app.AppendErrorLog("Exception@MPC@ParsePlaylistSongsResult", ex.Message);
-                    });
-                }
+                Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParsePlaylistSongsResult", ex.Message); });
 
                 return songList;
             }
@@ -3610,8 +3563,7 @@ namespace MPDCtrl.Services
 
                 ConnectionState = ConnectionStatus.Disconnecting;
 
-                if (_commandConnection.Client != null)
-                    _commandConnection.Client.Shutdown(SocketShutdown.Both);
+                _commandConnection.Client?.Shutdown(SocketShutdown.Both);
                 _commandConnection.Close();
             }
             catch { }
@@ -3627,8 +3579,7 @@ namespace MPDCtrl.Services
 
                 ConnectionState = ConnectionStatus.Disconnecting;
 
-                if (_idleConnection.Client != null)
-                    _idleConnection.Client.Shutdown(SocketShutdown.Both);
+                _idleConnection.Client?.Shutdown(SocketShutdown.Both);
                 _idleConnection.Close();
             }
             catch { }

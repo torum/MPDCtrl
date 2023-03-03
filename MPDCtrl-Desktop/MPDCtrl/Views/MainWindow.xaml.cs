@@ -1,6 +1,8 @@
-﻿using MPDCtrl.ViewModels;
+﻿using MPDCtrl.Helpers;
+using MPDCtrl.ViewModels;
 using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,6 +15,7 @@ namespace MPDCtrl.Views;
 
 public partial class MainWindow : Window
 {
+
     public MainWindow()
     {
         DataContext = App.GetService<MainViewModel>();
@@ -20,9 +23,7 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         // Set initial visibility for Window's system buttoms.
-
         RestoreButton.Visibility = Visibility.Collapsed;
-
         MaxButton.Visibility = Visibility.Visible;
 
         // Event subscriptions
@@ -30,13 +31,13 @@ public partial class MainWindow : Window
         {
             if (vm != null)
             {
+                vm.OnWindowLoaded(this);
+
                 // Subscribe to Window events.
 
-                Loaded += vm.OnWindowLoaded;
-
-                ContentRendered += vm.OnContentRendered;
-                
+                //Loaded += vm.OnWindowLoaded;
                 //Closing += vm.OnWindowClosing;
+                ContentRendered += vm.OnContentRendered;
 
                 // Subscribe to ViewModel events.
 
@@ -62,6 +63,7 @@ public partial class MainWindow : Window
 
             }
         }
+
     }
 
     public void OnScrollIntoView(int arg)
@@ -70,9 +72,8 @@ public partial class MainWindow : Window
         {
             QueueListview.ScrollIntoView(QueueListview.Items[arg]);
 
-            ListViewItem lvi = QueueListview.ItemContainerGenerator.ContainerFromIndex(arg) as ListViewItem;
-            if (lvi != null)
-                lvi.Focus();
+            ListViewItem? lvi = QueueListview.ItemContainerGenerator.ContainerFromIndex(arg) as ListViewItem;
+            lvi?.Focus();
         }
     }
 
@@ -84,7 +85,7 @@ public partial class MainWindow : Window
 
             QueueListview.ScrollIntoView(QueueListview.Items[arg]);
 
-            ListViewItem lvi = QueueListview.ItemContainerGenerator.ContainerFromIndex(arg) as ListViewItem;
+            ListViewItem? lvi = QueueListview.ItemContainerGenerator.ContainerFromIndex(arg) as ListViewItem;
             if (lvi != null)
             {
                 //QueueListview.ScrollIntoView(lvi);
@@ -203,14 +204,14 @@ public partial class MainWindow : Window
             RestoreButton.Visibility = Visibility.Collapsed;
             MaxButton.Visibility = Visibility.Visible;
 
-            //LayoutGrid.Margin = new Thickness(0);
+            LayoutGrid.Margin = new Thickness(0);
         }
         else if (this.WindowState == WindowState.Maximized)
         {
             RestoreButton.Visibility = Visibility.Visible;
             MaxButton.Visibility = Visibility.Collapsed;
 
-            //LayoutGrid.Margin = new Thickness(8,4,8,8);
+            LayoutGrid.Margin = new Thickness(8,8,8,8);
         }
     }
 
@@ -252,11 +253,11 @@ public partial class MainWindow : Window
     {
         if (sender != null)
         {
-            if (sender is TextBox)
+            if (sender is TextBox tb)
             {
-                if ((sender as TextBox).Visibility == Visibility.Visible)
+                if (tb.Visibility == Visibility.Visible)
                 {
-                    (sender as TextBox).Focus();
+                    tb.Focus();
                     Keyboard.Focus((sender as TextBox));
                 }
             }
@@ -267,9 +268,9 @@ public partial class MainWindow : Window
     {
         if (sender != null)
         {
-            if (sender is PasswordBox)
+            if (sender is PasswordBox pb)
             {
-                var pb = (sender as PasswordBox);
+                //var pb = (sender as PasswordBox);
                 if (pb.Visibility == Visibility.Visible)
                 {
                     if (pb.Focusable)
@@ -298,10 +299,12 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
+
+
     #region == Size fix on window maximize ==
 
     // https://engy.us/blog/2020/01/01/implementing-a-custom-window-title-bar-in-wpf/
-    
+    /*
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
@@ -398,6 +401,7 @@ public partial class MainWindow : Window
         public POINT ptMinTrackSize;
         public POINT ptMaxTrackSize;
     }
+    */
     #endregion
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

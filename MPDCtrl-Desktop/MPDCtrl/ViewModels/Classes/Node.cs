@@ -56,7 +56,7 @@ namespace MPDCtrl.ViewModels.Classes
 
         #region == INotifyPropertyChanged ==
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void NotifyPropertyChanged(string propertyName)
         {
@@ -95,8 +95,8 @@ namespace MPDCtrl.ViewModels.Classes
             }
         }
 
-        private NodeTree _parent;
-        public NodeTree Parent
+        private NodeTree? _parent;
+        public NodeTree? Parent
         {
             get
             {

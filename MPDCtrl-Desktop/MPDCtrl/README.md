@@ -35,7 +35,7 @@ https://github.com/torum/MPDCtrl
 
 
 ## Change log
-* v3.0.21   (2023/2.29) use win32 api to paint background and blur.
+* v3.0.21   (2023/2.29) Use Win32 api to paint background and blur and lots of UI tweaks. Refactoring WIP.
 * v3.0.20.0 (2023/2.29) Implemented dependency injection using Generic host. Nullable enabled. Needs a lot of work. 
 * v3.0.19   (2023/1/11) App Store release. 
 * v3.0.18.1 When maximize, CourneRradius needed to be reset.

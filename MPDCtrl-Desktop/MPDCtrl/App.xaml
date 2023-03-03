@@ -24,11 +24,6 @@
             
             <common:MultipleCommandParameterConverter x:Key="MultipleCommandParameterConverter"/>
 
-
-            <CornerRadius x:Key="CustomCornerRadiusRightTop">0,6,0,0</CornerRadius>
-            
-
-
             <ResourceDictionary.MergedDictionaries>
 
                 <!-- Default theme (for theme switch) -->
@@ -178,7 +173,7 @@
                     <Style x:Key="TreeViewMenuStyle" TargetType="{x:Type TreeView}">
                         <Setter Property="Background" Value="Transparent"/>
                         <Setter Property="BorderBrush" Value="#121212"/>
-                        <Setter Property="BorderThickness" Value="0 0 0 0.5"/>
+                        <Setter Property="BorderThickness" Value="0 0 0 0"/>
                         <Setter Property="Padding" Value="1"/>
                         <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
                         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
@@ -1003,7 +998,7 @@
                                         <RepeatButton Command="{x:Static Slider.IncreaseLarge}" Style="{DynamicResource RepeatButtonTransparent}"/>
                                     </Track.IncreaseRepeatButton>
                                     <Track.Thumb>
-                                        <Thumb x:Name="Thumb" Focusable="False" Height="18" OverridesDefaultStyle="True" Template="{StaticResource SliderThumbHorizontalDefault}" VerticalAlignment="Center" Width="11"/>
+                                        <Thumb x:Name="Thumb" Focusable="False" Height="14" OverridesDefaultStyle="True" Template="{StaticResource SliderThumbHorizontalDefault}" VerticalAlignment="Center" Width="11"/>
                                     </Track.Thumb>
                                 </Track>
                             </Grid>
@@ -1111,7 +1106,7 @@
                                         <RepeatButton Command="{x:Static Slider.IncreaseLarge}" Style="{DynamicResource RepeatButtonTransparent}"/>
                                     </Track.IncreaseRepeatButton>
                                     <Track.Thumb>
-                                        <Thumb x:Name="Thumb" Focusable="False" Height="11" OverridesDefaultStyle="True" Template="{DynamicResource SliderThumbVerticalDefault}" VerticalAlignment="Top" Width="13"/>
+                                        <Thumb x:Name="Thumb" Focusable="False" Height="14" OverridesDefaultStyle="True" Template="{DynamicResource SliderThumbVerticalDefault}" VerticalAlignment="Top" Width="13"/>
                                     </Track.Thumb>
                                 </Track>
                             </Grid>
@@ -1885,7 +1880,7 @@
                                             <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}" />
                                         </Trigger>
                                         <Trigger Property="IsPressed" Value="true">
-                                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource ScrollBarPressedBrush}" />
+                                            <Setter TargetName="Border" Property="Background" Value="Transparent" />
                                             <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource ControlPressedColorBrush}" />
                                         </Trigger>
                                         <Trigger Property="IsEnabled" Value="false">
@@ -1917,7 +1912,7 @@
                                             <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}" />
                                         </Trigger>
                                         <Trigger Property="IsPressed" Value="true">
-                                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource ScrollBarPressedBrush}" />
+                                            <Setter TargetName="Border" Property="Background" Value="Transparent" />
                                             <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource ControlPressedColorBrush}" />
                                         </Trigger>
                                         <Trigger Property="IsEnabled" Value="false">
@@ -1943,50 +1938,50 @@
                     <ControlTemplate x:Key="VerticalScrollBar" TargetType="{x:Type ScrollBar}">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition MaxHeight="18" />
+                                <RowDefinition MaxHeight="14" />
                                 <RowDefinition Height="0.00001*" />
-                                <RowDefinition MaxHeight="18" />
+                                <RowDefinition MaxHeight="14" />
                             </Grid.RowDefinitions>
                             <Border Grid.RowSpan="3" CornerRadius="0" Background="Transparent" />
 
-                            <RepeatButton Grid.Row="0" Height="18" Command="ScrollBar.LineUpCommand" Content="M 0 4 L 8 4 L 4 0 Z" Style="{StaticResource RepeatButtonStyleInc}" IsTabStop="False"/>
+                            <RepeatButton Grid.Row="0" Height="14" Command="ScrollBar.LineUpCommand" Content="M 0 4 L 8 4 L 4 0 Z" Style="{StaticResource RepeatButtonStyleInc}" IsTabStop="False"/>
                             <Track x:Name="PART_Track" Grid.Row="1" IsDirectionReversed="true">
                                 <Track.DecreaseRepeatButton>
                                     <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False"/>
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
-                                    <Thumb Style="{StaticResource ThumbStyle}" Margin="5,0,5,0"></Thumb>
+                                    <Thumb Style="{StaticResource ThumbStyle}" Margin="3,0,3,0"></Thumb>
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
                                     <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False"/>
                                 </Track.IncreaseRepeatButton>
                             </Track>
-                            <RepeatButton Grid.Row="2" Height="18" Command="ScrollBar.LineDownCommand" Content="M 0 0 L 4 4 L 8 0 Z" Style="{StaticResource RepeatButtonStyleDec}" IsTabStop="False"/>
+                            <RepeatButton Grid.Row="2" Height="14" Command="ScrollBar.LineDownCommand" Content="M 0 0 L 4 4 L 8 0 Z" Style="{StaticResource RepeatButtonStyleDec}" IsTabStop="False"/>
                         </Grid>
                     </ControlTemplate>
 
                     <ControlTemplate x:Key="HorizontalScrollBar" TargetType="{x:Type ScrollBar}">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition MaxWidth="18" />
+                                <ColumnDefinition MaxWidth="14" />
                                 <ColumnDefinition Width="0.00001*" />
-                                <ColumnDefinition MaxWidth="18" />
+                                <ColumnDefinition MaxWidth="14" />
                             </Grid.ColumnDefinitions>
                             <Border Grid.ColumnSpan="3" CornerRadius="0" Background="Transparent" />
 
-                            <RepeatButton Grid.Column="0" Style="{StaticResource RepeatButtonStyleInc}" Width="18" Command="ScrollBar.LineLeftCommand" Content="M 4 0 L 4 8 L 0 4 Z" IsTabStop="False" />
+                            <RepeatButton Grid.Column="0" Style="{StaticResource RepeatButtonStyleInc}" Width="14" Command="ScrollBar.LineLeftCommand" Content="M 4 0 L 4 8 L 0 4 Z" IsTabStop="False" />
                             <Track x:Name="PART_Track" Grid.Column="1" IsDirectionReversed="False">
                                 <Track.DecreaseRepeatButton>
                                     <RepeatButton Command="ScrollBar.PageLeftCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False" />
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
-                                    <Thumb Style="{StaticResource ThumbStyle}" Margin="0,5,0,5"></Thumb>
+                                    <Thumb Style="{StaticResource ThumbStyle}" Margin="0,3,0,3"></Thumb>
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
                                     <RepeatButton Command="ScrollBar.PageRightCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False" />
                                 </Track.IncreaseRepeatButton>
                             </Track>
-                            <RepeatButton Grid.Column="2" Style="{StaticResource RepeatButtonStyleDec}" Width="18" Command="ScrollBar.LineRightCommand" Content="M 0 0 L 4 4 L 0 8 Z" IsTabStop="False" />
+                            <RepeatButton Grid.Column="2" Style="{StaticResource RepeatButtonStyleDec}" Width="14" Command="ScrollBar.LineRightCommand" Content="M 0 0 L 4 4 L 0 8 Z" IsTabStop="False" />
                         </Grid>
                     </ControlTemplate>
 

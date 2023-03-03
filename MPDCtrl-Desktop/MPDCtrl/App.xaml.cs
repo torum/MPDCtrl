@@ -112,19 +112,20 @@ public partial class App : Application
     {
         await AppHost!.StartAsync();
 
-        var mainWindow = AppHost.Services.GetRequiredService<MainWindow>();
-
         // For testing.
         //ChangeTheme("LightTheme");
         //ChangeTheme("DarkTheme");
 
         // For testing only. Don't forget to comment this out if you uncomment.
-        //MPDCtrl.Properties.Resources.Culture = CultureInfo.GetCultureInfo("en-US"); //or ja-JP etc
+        //MPDCtrl.Properties.Resources.Culture = System.Globalization.CultureInfo.GetCultureInfo("en-US"); //or ja-JP etc
 
-        // White background flickering issue.
+        var mainWindow = AppHost.Services.GetRequiredService<MainWindow>();
+
+        //  For the white background flickering issue. Paints background black in order to prevent "white flashing" when startup/resizing/maximizing window.
         IntPtr hWnd = new WindowInteropHelper(mainWindow).EnsureHandle();
         UseImmersiveDarkMode(hWnd, true);
 
+        //  For the white background flickering issue, in addition to paint background, blur it.
         WindowBlur.SetIsEnabled(mainWindow, true);
 
         mainWindow.Show();
@@ -222,7 +223,7 @@ public partial class App : Application
 
     public static void ChangeTheme(string themeName)
     {
-        ResourceDictionary? _themeDict = Application.Current.Resources.MergedDictionaries.FirstOrDefault(x => x.Source == new Uri("pack://application:,,,/Themes/DefaultTheme.xaml"));
+        ResourceDictionary? _themeDict = Application.Current.Resources.MergedDictionaries.FirstOrDefault(x => x.Source == new Uri("pack://application:,,,/Themes/DarkTheme.xaml"));
         if (_themeDict != null)
         {
             _themeDict.Clear();
@@ -239,9 +240,7 @@ public partial class App : Application
         _themeDict.Source = new Uri(themeUri);
     }
 
-
-
-
+    // Paints background black in order to prevent "white flashing" when startup/resizing/maximizing window.
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 

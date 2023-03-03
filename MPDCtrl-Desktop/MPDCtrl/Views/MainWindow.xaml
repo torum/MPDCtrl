@@ -412,13 +412,22 @@
                         </ContextMenu>
 
                         <Style TargetType="{x:Type ScrollBar}">
+                            <Setter Property="SnapsToDevicePixels" Value="True" />
+                            <Setter Property="OverridesDefaultStyle" Value="true" />
                             <Setter Property="Margin" Value="0,0,0,0" />
+                            <Setter Property="IsTabStop" Value="False" />
                             <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Background" Value="Transparent" />
                             <Style.Triggers>
                                 <Trigger Property="Orientation" Value="Vertical">
-                                    <Setter Property="Width" Value="18"/>
+                                    <Setter Property="Width" Value="14"/>
                                     <Setter Property="Height" Value="Auto" />
                                     <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
+                                </Trigger>
+                                <Trigger Property="Orientation" Value="Horizontal">
+                                    <Setter Property="Width" Value="Auto"/>
+                                    <Setter Property="Height" Value="14" />
+                                    <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
@@ -668,13 +677,13 @@
                                     <Setter Property="Background" Value="Transparent" />
                                     <Style.Triggers>
                                         <Trigger Property="Orientation" Value="Vertical">
-                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Width" Value="14"/>
                                             <Setter Property="Height" Value="Auto" />
                                             <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
                                         </Trigger>
                                         <Trigger Property="Orientation" Value="Horizontal">
                                             <Setter Property="Width" Value="Auto"/>
-                                            <Setter Property="Height" Value="18" />
+                                            <Setter Property="Height" Value="14" />
                                             <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
                                         </Trigger>
                                     </Style.Triggers>
@@ -1371,13 +1380,22 @@
                                     </MenuItem>
                                 </ContextMenu>
                                 <Style TargetType="{x:Type ScrollBar}">
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="OverridesDefaultStyle" Value="true" />
                                     <Setter Property="Margin" Value="0,0,0,0" />
+                                    <Setter Property="IsTabStop" Value="False" />
                                     <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="Background" Value="Transparent" />
                                     <Style.Triggers>
                                         <Trigger Property="Orientation" Value="Vertical">
-                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Width" Value="14"/>
                                             <Setter Property="Height" Value="Auto" />
                                             <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
+                                        </Trigger>
+                                        <Trigger Property="Orientation" Value="Horizontal">
+                                            <Setter Property="Width" Value="Auto"/>
+                                            <Setter Property="Height" Value="14" />
+                                            <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
@@ -1598,13 +1616,22 @@
                         <TreeView Grid.Row="0" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}" BorderThickness="0 0 0 0" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" ItemsSource="{Binding MusicDirectories}" helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeDirectory, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <TreeView.Resources>
                                 <Style TargetType="{x:Type ScrollBar}">
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="OverridesDefaultStyle" Value="true" />
                                     <Setter Property="Margin" Value="0,0,0,0" />
+                                    <Setter Property="IsTabStop" Value="False" />
                                     <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="Background" Value="Transparent" />
                                     <Style.Triggers>
                                         <Trigger Property="Orientation" Value="Vertical">
-                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Width" Value="14"/>
                                             <Setter Property="Height" Value="Auto" />
                                             <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
+                                        </Trigger>
+                                        <Trigger Property="Orientation" Value="Horizontal">
+                                            <Setter Property="Width" Value="Auto"/>
+                                            <Setter Property="Height" Value="14" />
+                                            <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
@@ -1812,13 +1839,22 @@
                                         </MenuItem>
                                     </ContextMenu>
                                     <Style TargetType="{x:Type ScrollBar}">
+                                        <Setter Property="SnapsToDevicePixels" Value="True" />
+                                        <Setter Property="OverridesDefaultStyle" Value="true" />
                                         <Setter Property="Margin" Value="0,0,0,0" />
+                                        <Setter Property="IsTabStop" Value="False" />
                                         <Setter Property="BorderThickness" Value="0" />
+                                        <Setter Property="Background" Value="Transparent" />
                                         <Style.Triggers>
                                             <Trigger Property="Orientation" Value="Vertical">
-                                                <Setter Property="Width" Value="18"/>
+                                                <Setter Property="Width" Value="14"/>
                                                 <Setter Property="Height" Value="Auto" />
                                                 <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
+                                            </Trigger>
+                                            <Trigger Property="Orientation" Value="Horizontal">
+                                                <Setter Property="Width" Value="Auto"/>
+                                                <Setter Property="Height" Value="14" />
+                                                <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
@@ -2046,13 +2082,22 @@
                                     </MenuItem>
                                 </ContextMenu>
                                 <Style TargetType="{x:Type ScrollBar}">
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="OverridesDefaultStyle" Value="true" />
                                     <Setter Property="Margin" Value="0,0,0,0" />
+                                    <Setter Property="IsTabStop" Value="False" />
                                     <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="Background" Value="Transparent" />
                                     <Style.Triggers>
                                         <Trigger Property="Orientation" Value="Vertical">
-                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Width" Value="14"/>
                                             <Setter Property="Height" Value="Auto" />
                                             <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
+                                        </Trigger>
+                                        <Trigger Property="Orientation" Value="Horizontal">
+                                            <Setter Property="Width" Value="Auto"/>
+                                            <Setter Property="Height" Value="14" />
+                                            <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
@@ -2258,13 +2303,22 @@
                                     </MenuItem>
                                 </ContextMenu>
                                 <Style TargetType="{x:Type ScrollBar}">
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="OverridesDefaultStyle" Value="true" />
                                     <Setter Property="Margin" Value="0,0,0,0" />
+                                    <Setter Property="IsTabStop" Value="False" />
                                     <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="Background" Value="Transparent" />
                                     <Style.Triggers>
                                         <Trigger Property="Orientation" Value="Vertical">
-                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Width" Value="14"/>
                                             <Setter Property="Height" Value="Auto" />
                                             <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
+                                        </Trigger>
+                                        <Trigger Property="Orientation" Value="Horizontal">
+                                            <Setter Property="Width" Value="Auto"/>
+                                            <Setter Property="Height" Value="14" />
+                                            <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
@@ -2571,13 +2625,13 @@
                                     <Setter Property="BorderThickness" Value="0" />
                                     <Style.Triggers>
                                         <Trigger Property="Orientation" Value="Vertical">
-                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Width" Value="14"/>
                                             <Setter Property="Height" Value="Auto" />
                                             <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
                                         </Trigger>
                                         <Trigger Property="Orientation" Value="Horizontal">
                                             <Setter Property="Width" Value="Auto"/>
-                                            <Setter Property="Height" Value="18" />
+                                            <Setter Property="Height" Value="14" />
                                             <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
                                         </Trigger>
                                     </Style.Triggers>
@@ -2627,13 +2681,13 @@
                                     <Setter Property="BorderThickness" Value="0" />
                                     <Style.Triggers>
                                         <Trigger Property="Orientation" Value="Vertical">
-                                            <Setter Property="Width" Value="18"/>
+                                            <Setter Property="Width" Value="14"/>
                                             <Setter Property="Height" Value="Auto" />
                                             <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
                                         </Trigger>
                                         <Trigger Property="Orientation" Value="Horizontal">
                                             <Setter Property="Width" Value="Auto"/>
-                                            <Setter Property="Height" Value="18" />
+                                            <Setter Property="Height" Value="14" />
                                             <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
                                         </Trigger>
                                     </Style.Triggers>
@@ -2675,7 +2729,7 @@
             </Grid>
 
             <!-- StatusBar -->
-            <StatusBar Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Background="Transparent" Padding="0 0 0 0" Height="28" Margin="0 0 0 0" BorderBrush="{DynamicResource WindowBackgroundBaseColorBrush}" BorderThickness="0 0 0 0">
+            <StatusBar Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}" Padding="0 0 0 0" Height="28" Margin="0 0 0 0" BorderBrush="{DynamicResource WindowBackgroundBaseColorBrush}" BorderThickness="0 0 0 0">
                 <StatusBar.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Grid>
@@ -2952,13 +3006,13 @@
                                         <Setter Property="BorderThickness" Value="0" />
                                         <Style.Triggers>
                                             <Trigger Property="Orientation" Value="Vertical">
-                                                <Setter Property="Width" Value="18"/>
+                                                <Setter Property="Width" Value="14"/>
                                                 <Setter Property="Height" Value="Auto" />
                                                 <Setter Property="Template" Value="{StaticResource VerticalScrollBar}" />
                                             </Trigger>
                                             <Trigger Property="Orientation" Value="Horizontal">
                                                 <Setter Property="Width" Value="Auto"/>
-                                                <Setter Property="Height" Value="18" />
+                                                <Setter Property="Height" Value="14" />
                                                 <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}" />
                                             </Trigger>
                                         </Style.Triggers>

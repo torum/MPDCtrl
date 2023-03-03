@@ -34,7 +34,7 @@
     <Color x:Key="NormalTextBoxBackgroundMouseOverColor">#ffffff</Color>
 
     <Color x:Key="BoardBackgroundColor">#191919</Color>
-    <!-- 1c1c1c 191919 121212 or 111111 -->
+    <!-- 191919 1c1c1c 191919 121212 or 111111 -->
 
     <Color x:Key="ListviewAlt0Color">#212121</Color>
     <Color x:Key="ListviewAlt1Color">#232323</Color>

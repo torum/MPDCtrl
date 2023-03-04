@@ -14,7 +14,7 @@ namespace MPDCtrl.Common
         {
             //this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-            if (Application.Current != null)
+            if (Application.Current is not null)
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {

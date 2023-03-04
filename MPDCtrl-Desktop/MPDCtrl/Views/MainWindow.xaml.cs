@@ -29,7 +29,7 @@ public partial class MainWindow : Window
         // Event subscriptions
         if (this.DataContext is MainViewModel vm)
         {
-            if (vm != null)
+            if (vm is not null)
             {
                 vm.OnWindowLoaded(this);
 
@@ -86,7 +86,7 @@ public partial class MainWindow : Window
             QueueListview.ScrollIntoView(QueueListview.Items[arg]);
 
             ListViewItem? lvi = QueueListview.ItemContainerGenerator.ContainerFromIndex(arg) as ListViewItem;
-            if (lvi != null)
+            if (lvi is not null)
             {
                 //QueueListview.ScrollIntoView(lvi);
                 lvi.Focus();
@@ -251,7 +251,7 @@ public partial class MainWindow : Window
 
     private void TextBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        if (sender != null)
+        if (sender is not null)
         {
             if (sender is TextBox tb)
             {
@@ -266,7 +266,7 @@ public partial class MainWindow : Window
 
     private void PasswordBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        if (sender != null)
+        if (sender is not null)
         {
             if (sender is PasswordBox pb)
             {

@@ -44,7 +44,7 @@ namespace MPDCtrl.Common
 
         public bool CanExecute(object? parameter)
         {
-            if (parameter != null)
+            if (parameter is not null)
             {
                 var canExecute = this.CanExecuteFunc((T)parameter);
                 return canExecute;
@@ -57,7 +57,7 @@ namespace MPDCtrl.Common
 
         public void Execute(object? parameter)
         {
-            if (parameter == null)
+            if (parameter is null)
             {
                 return;
             }
@@ -92,7 +92,7 @@ namespace MPDCtrl.Common
 
         public bool CanExecute(object? parameter)
         {
-            if (this.canExecuteEvaluator == null)
+            if (this.canExecuteEvaluator is null)
             {
                 return true;
             }

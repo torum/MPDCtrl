@@ -25,7 +25,7 @@ public class NodeFile : Node
     {
         get
         {
-            if (FileUri != null)
+            if (FileUri is not null)
             {
                 string path = FileUri.LocalPath;
                 string filename = System.IO.Path.GetFileName(path);//System.IO.Path.GetFileName(uri.LocalPath);
@@ -56,19 +56,20 @@ public class DirectoryTreeBuilder : NodeTree
 
     public void Load(List<String> dirs)
     {
-        if (dirs == null)
+        if (dirs is null)
             return;
 
         IsCanceled = false;
 
         Uri uri = new(@"file:///./");
-        NodeDirectory root = new("/", uri);
-        root.Selected = true;
-        root.Expanded = true;
-
-        root.Parent = null;
+        NodeDirectory root = new("/", uri)
+        {
+            Selected = true,
+            Expanded = true,
+            Parent = null
+        };
         //this.Children.Add(root);
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             this.Children.Add(root);
@@ -98,7 +99,7 @@ public class DirectoryTreeBuilder : NodeTree
                         // LINQ may be slower in this case.
                         /*
                         var fuga = parent.Children.FirstOrDefault(i => i.Name == asdf);
-                        if (fuga != null)
+                        if (fuga is not null)
                         {
                             // set parent node
                             parent = fuga as NodeDirectory;
@@ -133,13 +134,14 @@ public class DirectoryTreeBuilder : NodeTree
 
                         if (!found)
                         {
-                            NodeDirectory hoge = new(asdf.Trim(), new Uri(@"file:///" + pathDir.Trim()));
-                            hoge.Selected = false;
-                            hoge.Expanded = true;
-
-                            hoge.Parent = parent;
+                            NodeDirectory hoge = new(asdf.Trim(), new Uri(@"file:///" + pathDir.Trim()))
+                            {
+                                Selected = false,
+                                Expanded = true,
+                                Parent = parent
+                            };
                             //parent.Children.Add(hoge);
-                            if (Application.Current == null) { return; }
+                            if (Application.Current is null) { return; }
                             Application.Current.Dispatcher.Invoke(() =>
                             {
                                 parent.Children.Add(hoge);
@@ -152,13 +154,14 @@ public class DirectoryTreeBuilder : NodeTree
                 }
                 else if (ValuePair.Length == 1)
                 {
-                    NodeDirectory hoge = new(ValuePair[0].Trim(), new Uri(@"file:///" + pathDir.Trim()));
-                    hoge.Selected = false;
-                    hoge.Expanded = true;
-
-                    hoge.Parent = root;
+                    NodeDirectory hoge = new(ValuePair[0].Trim(), new Uri(@"file:///" + pathDir.Trim()))
+                    {
+                        Selected = false,
+                        Expanded = true,
+                        Parent = root
+                    };
                     //root.Children.Add(hoge);
-                    if (Application.Current == null) { return; }
+                    if (Application.Current is null) { return; }
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         root.Children.Add(hoge);

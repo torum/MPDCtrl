@@ -73,7 +73,7 @@ namespace MPDCtrl.Helpers
         {
             _window = window;
             var source = (HwndSource)PresentationSource.FromVisual(window);
-            if (source == null)
+            if (source is null)
             {
                 window.SourceInitialized += OnSourceInitialized;
             }

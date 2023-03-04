@@ -54,7 +54,7 @@ namespace MPDCtrl.Helpers
             internal void ChangeSelectedItem(object p)
             {
                 TreeViewItem item = (TreeViewItem)view.ItemContainerGenerator.ContainerFromItem(p);
-                if (item != null)
+                if (item is not null)
                     item.IsSelected = true;
             }
         }

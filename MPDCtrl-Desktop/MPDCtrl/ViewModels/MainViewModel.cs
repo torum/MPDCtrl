@@ -708,7 +708,7 @@ public class MainViewModel : ViewModelBase
 
             if (_isSettingsShow)
             {
-                if (CurrentProfile == null)
+                if (CurrentProfile is null)
                 {
                     IsConnectionSettingShow = false;
                 }
@@ -719,7 +719,7 @@ public class MainViewModel : ViewModelBase
             }
             else
             {
-                if (CurrentProfile == null)
+                if (CurrentProfile is null)
                 {
                     IsConnectionSettingShow = true;
                 }
@@ -813,7 +813,7 @@ public class MainViewModel : ViewModelBase
 
             NotifyPropertyChanged(nameof(IsProfileSwitchOK));
 
-            if (Application.Current == null) { return; }
+            if (Application.Current is null) { return; }
             Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
         }
     }
@@ -835,7 +835,7 @@ public class MainViewModel : ViewModelBase
 
             NotifyPropertyChanged(nameof(IsProfileSwitchOK));
 
-            if (Application.Current == null) { return; }
+            if (Application.Current is null) { return; }
             Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
         }
     }
@@ -873,7 +873,7 @@ public class MainViewModel : ViewModelBase
 
             if (_isShowDebugWindow)
             {
-                if (Application.Current == null) { return; }
+                if (Application.Current is null) { return; }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     //DebugWindowShowHide?.Invoke
@@ -882,7 +882,7 @@ public class MainViewModel : ViewModelBase
             }
             else
             {
-                if (Application.Current == null) { return; }
+                if (Application.Current is null) { return; }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     //DebugWindowShowHide?.Invoke();
@@ -914,7 +914,7 @@ public class MainViewModel : ViewModelBase
             NotifyPropertyChanged(nameof(CurrentSongArtist));
             NotifyPropertyChanged(nameof(CurrentSongAlbum));
 
-            if (value == null)
+            if (value is null)
                 _elapsedTimer.Stop();
         }
     }
@@ -923,7 +923,7 @@ public class MainViewModel : ViewModelBase
     {
         get
         {
-            if (_currentSong != null)
+            if (_currentSong is not null)
             {
                 return _currentSong.Title;
             }
@@ -938,7 +938,7 @@ public class MainViewModel : ViewModelBase
     {
         get
         {
-            if (_currentSong != null)
+            if (_currentSong is not null)
             {
                 if (!string.IsNullOrEmpty(_currentSong.Artist))
                     return _currentSong.Artist.Trim();
@@ -956,7 +956,7 @@ public class MainViewModel : ViewModelBase
     {
         get
         {
-            if (_currentSong != null)
+            if (_currentSong is not null)
             {
                 if (!string.IsNullOrEmpty(_currentSong.Album))
                     return _currentSong.Album.Trim();
@@ -1006,7 +1006,7 @@ public class MainViewModel : ViewModelBase
                 _volume = value;
                 NotifyPropertyChanged(nameof(Volume));
 
-                if (_mpc != null)
+                if (_mpc is not null)
                 {
                     if (Convert.ToDouble(_mpc.MpdStatus.MpdVolume) != _volume)
                     {
@@ -1037,7 +1037,7 @@ public class MainViewModel : ViewModelBase
     private System.Timers.Timer? _volumeDelayTimer = null;
     private void DoChangeVolume(object? sender, System.Timers.ElapsedEventArgs e)
     {
-        if (_mpc != null)
+        if (_mpc is not null)
         {
             if (Convert.ToDouble(_mpc.MpdStatus.MpdVolume) != _volume)
             {
@@ -1058,7 +1058,7 @@ public class MainViewModel : ViewModelBase
             _repeat = value;
             NotifyPropertyChanged(nameof(Repeat));
 
-            if (_mpc != null)
+            if (_mpc is not null)
             {
                 if (_mpc.MpdStatus.MpdRepeat != value)
                 {
@@ -1080,7 +1080,7 @@ public class MainViewModel : ViewModelBase
             _random = value;
             NotifyPropertyChanged(nameof(Random));
 
-            if (_mpc != null)
+            if (_mpc is not null)
             {
                 if (_mpc.MpdStatus.MpdRandom != value)
                 {
@@ -1102,7 +1102,7 @@ public class MainViewModel : ViewModelBase
             _consume = value;
             NotifyPropertyChanged(nameof(Consume));
 
-            if (_mpc != null)
+            if (_mpc is not null)
             {
                 if (_mpc.MpdStatus.MpdConsume != value)
                 {
@@ -1124,7 +1124,7 @@ public class MainViewModel : ViewModelBase
             _single = value;
             NotifyPropertyChanged(nameof(Single));
 
-            if (_mpc != null)
+            if (_mpc is not null)
             {
                 if (_mpc.MpdStatus.MpdSingle != value)
                 {
@@ -1190,7 +1190,7 @@ public class MainViewModel : ViewModelBase
     private System.Timers.Timer? _elapsedDelayTimer = null;
     private void DoChangeElapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
-        if (_mpc != null)
+        if (_mpc is not null)
         {
             if ((_elapsed < _time))
             {
@@ -1253,7 +1253,7 @@ public class MainViewModel : ViewModelBase
             if (_selectedNodeMenu == value)
                 return;
 
-            if (value == null)
+            if (value is null)
             {
                 //Debug.WriteLine("selectedNodeMenu is null");
                 return;
@@ -1286,7 +1286,7 @@ public class MainViewModel : ViewModelBase
                 IsLibraryVisible = false;
                 IsSearchVisible = false;
 
-                if (Application.Current == null) { return; }
+                if (Application.Current is null) { return; }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     SelectedPlaylistSong = null;
@@ -1417,7 +1417,7 @@ public class MainViewModel : ViewModelBase
     {
         get
         {
-            if (_mpc != null)
+            if (_mpc is not null)
             {
                 return _queue;
                 //return _mpc.CurrentQueue;
@@ -1620,8 +1620,8 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private NodeTree _selectedNodeDirectory = new NodeDirectory(".",new Uri(@"file:///./"));
-    public NodeTree SelectedNodeDirectory
+    private NodeDirectory _selectedNodeDirectory = new(".",new Uri(@"file:///./"));
+    public NodeDirectory SelectedNodeDirectory
     {
         get { return _selectedNodeDirectory; }
         set
@@ -1632,10 +1632,10 @@ public class MainViewModel : ViewModelBase
             _selectedNodeDirectory = value;
             NotifyPropertyChanged(nameof(SelectedNodeDirectory));
 
-            if (_selectedNodeDirectory == null)
+            if (_selectedNodeDirectory is null)
                 return;
 
-            if (MusicEntries == null)
+            if (MusicEntries is null)
                 return;
             if (MusicEntries.Count == 0)
                 return;
@@ -1644,7 +1644,7 @@ public class MainViewModel : ViewModelBase
             bool filteringMode = true;
 
             var collectionView = CollectionViewSource.GetDefaultView(MusicEntries);
-            if (collectionView == null)
+            if (collectionView is null)
                 return;
 
             try
@@ -1653,10 +1653,10 @@ public class MainViewModel : ViewModelBase
                 {
                     var entry = (NodeFile)x;
 
-                    if (entry == null)
+                    if (entry is null)
                         return false;
 
-                    if (entry.FileUri == null)
+                    if (entry.FileUri is null)
                         return false;
 
                     string path = entry.FileUri.LocalPath; //person.FileUri.AbsoluteUri;
@@ -1791,7 +1791,7 @@ public class MainViewModel : ViewModelBase
 
             */
 
-            if (_selectedNodeDirectory == null)
+            if (_selectedNodeDirectory is null)
                 return;
 
             // TODO: 絞り込みモードか、マッチしたフォルダ内だけかの切り替え
@@ -1803,7 +1803,7 @@ public class MainViewModel : ViewModelBase
             {
                 var entry = (NodeFile)x;
 
-                if (entry.FileUri == null)
+                if (entry.FileUri is null)
                     return false;
 
                 string path = entry.FileUri.LocalPath; //person.FileUri.AbsoluteUri;
@@ -1883,7 +1883,7 @@ public class MainViewModel : ViewModelBase
     {
         get
         {
-            if (_mpc != null)
+            if (_mpc is not null)
             {
                 return _mpc.SearchResult;
             }
@@ -2194,7 +2194,7 @@ public class MainViewModel : ViewModelBase
 
             _selectedProfile = value;
 
-            if (_selectedProfile != null)
+            if (_selectedProfile is not null)
             {
                 ClearError(nameof(Host));
                 ClearError(nameof(Port));
@@ -2248,7 +2248,7 @@ public class MainViewModel : ViewModelBase
             {
                 _selectedQuickProfile = value;
 
-                if (_selectedQuickProfile != null)
+                if (_selectedQuickProfile is not null)
                 {
                     SelectedProfile = _selectedQuickProfile;
                     CurrentProfile = _selectedQuickProfile;
@@ -2287,7 +2287,7 @@ public class MainViewModel : ViewModelBase
                 try
                 {
                     ipAddress = IPAddress.Parse(value);
-                    if (ipAddress != null)
+                    if (ipAddress is not null)
                     {
                         _host = value;
                     }
@@ -2441,7 +2441,7 @@ public class MainViewModel : ViewModelBase
     {
         get
         {
-            if (SelectedProfile != null)
+            if (SelectedProfile is not null)
             {
                 if (!string.IsNullOrEmpty(SelectedProfile.Password))
                 {
@@ -3107,7 +3107,7 @@ public class MainViewModel : ViewModelBase
             if (File.Exists(_appConfigFilePath))
             {
                 XDocument xdoc = XDocument.Load(_appConfigFilePath);
-                if (xdoc.Root != null)
+                if (xdoc.Root is not null)
                 {
                     #region == Window setting ==
 
@@ -3115,34 +3115,34 @@ public class MainViewModel : ViewModelBase
                     {
                         // Main Window element
                         var mainWindow = xdoc.Root.Element("MainWindow");
-                        if (mainWindow != null)
+                        if (mainWindow is not null)
                         {
                             var hoge = mainWindow.Attribute("top");
-                            if (hoge != null)
+                            if (hoge is not null)
                             {
                                 w.Top = double.Parse(hoge.Value);
                             }
 
                             hoge = mainWindow.Attribute("left");
-                            if (hoge != null)
+                            if (hoge is not null)
                             {
                                 w.Left = double.Parse(hoge.Value);
                             }
 
                             hoge = mainWindow.Attribute("height");
-                            if (hoge != null)
+                            if (hoge is not null)
                             {
                                 w.Height = double.Parse(hoge.Value);
                             }
 
                             hoge = mainWindow.Attribute("width");
-                            if (hoge != null)
+                            if (hoge is not null)
                             {
                                 w.Width = double.Parse(hoge.Value);
                             }
 
                             hoge = mainWindow.Attribute("state");
-                            if (hoge != null)
+                            if (hoge is not null)
                             {
                                 if (hoge.Value == "Maximized")
                                 {
@@ -3165,15 +3165,15 @@ public class MainViewModel : ViewModelBase
                     #region == Theme ==
 
                     var thm = xdoc.Root.Element("Theme");
-                    if (thm != null)
+                    if (thm is not null)
                     {
                         var hoge = thm.Attribute("ThemeName");
-                        if (hoge != null)
+                        if (hoge is not null)
                         {
                             if ((hoge.Value == "DarkTheme") || hoge.Value == "LightTheme")
                             {
                                 Theme? theme = _themes.FirstOrDefault(x => x.Name == hoge.Value);
-                                if (theme != null)
+                                if (theme is not null)
                                 {
                                     CurrentTheme = theme;
                                 }
@@ -3186,10 +3186,10 @@ public class MainViewModel : ViewModelBase
                     #region == Options ==
 
                     var opts = xdoc.Root.Element("Options");
-                    if (opts != null)
+                    if (opts is not null)
                     {
                         var hoge = opts.Attribute("AutoScrollToNowPlaying");
-                        if (hoge != null)
+                        if (hoge is not null)
                         {
                             if (hoge.Value == "True")
                             {
@@ -3202,7 +3202,7 @@ public class MainViewModel : ViewModelBase
                         }
 
                         hoge = opts.Attribute("UpdateOnStartup");
-                        if (hoge != null)
+                        if (hoge is not null)
                         {
                             if (hoge.Value == "True")
                             {
@@ -3215,7 +3215,7 @@ public class MainViewModel : ViewModelBase
                         }
 
                         hoge = opts.Attribute("ShowDebugWindow");
-                        if (hoge != null)
+                        if (hoge is not null)
                         {
                             if (hoge.Value == "True")
                             {
@@ -3229,7 +3229,7 @@ public class MainViewModel : ViewModelBase
                         }
 
                         hoge = opts.Attribute("SaveLog");
-                        if (hoge != null)
+                        if (hoge is not null)
                         {
                             if (hoge.Value == "True")
                             {
@@ -3243,7 +3243,7 @@ public class MainViewModel : ViewModelBase
                         }
 
                         hoge = opts.Attribute("DownloadAlbumArt");
-                        if (hoge != null)
+                        if (hoge is not null)
                         {
                             if (hoge.Value == "True")
                             {
@@ -3257,7 +3257,7 @@ public class MainViewModel : ViewModelBase
                         }
 
                         hoge = opts.Attribute("DownloadAlbumArtEmbeddedUsingReadPicture");
-                        if (hoge != null)
+                        if (hoge is not null)
                         {
                             if (hoge.Value == "True")
                             {
@@ -3276,7 +3276,7 @@ public class MainViewModel : ViewModelBase
                     #region == Profiles  ==
 
                     var xProfiles = xdoc.Root.Element("Profiles");
-                    if (xProfiles != null)
+                    if (xProfiles is not null)
                     {
                         var profileList = xProfiles.Elements("Profile");
 
@@ -3284,17 +3284,17 @@ public class MainViewModel : ViewModelBase
                         {
                             Profile pro = new();
 
-                            if (p.Attribute("Name") != null)
+                            if (p.Attribute("Name") is not null)
                             {
                                 if (!string.IsNullOrEmpty(p.Attribute("Name").Value))
                                     pro.Name = p.Attribute("Name").Value;
                             }
-                            if (p.Attribute("Host") != null)
+                            if (p.Attribute("Host") is not null)
                             {
                                 if (!string.IsNullOrEmpty(p.Attribute("Host").Value))
                                     pro.Host = p.Attribute("Host").Value;
                             }
-                            if (p.Attribute("Port") != null)
+                            if (p.Attribute("Port") is not null)
                             {
                                 if (!string.IsNullOrEmpty(p.Attribute("Port").Value))
                                 {
@@ -3308,12 +3308,12 @@ public class MainViewModel : ViewModelBase
                                     }
                                 }
                             }
-                            if (p.Attribute("Password") != null)
+                            if (p.Attribute("Password") is not null)
                             {
                                 if (!string.IsNullOrEmpty(p.Attribute("Password").Value))
                                     pro.Password = Decrypt(p.Attribute("Password").Value);
                             }
-                            if (p.Attribute("IsDefault") != null)
+                            if (p.Attribute("IsDefault") is not null)
                             {
                                 if (!string.IsNullOrEmpty(p.Attribute("IsDefault").Value))
                                 {
@@ -3326,7 +3326,7 @@ public class MainViewModel : ViewModelBase
                                     }
                                 }
                             }
-                            if (p.Attribute("Volume") != null)
+                            if (p.Attribute("Volume") is not null)
                             {
                                 if (!string.IsNullOrEmpty(p.Attribute("Volume").Value))
                                 {
@@ -3349,15 +3349,15 @@ public class MainViewModel : ViewModelBase
                     #region == Header columns ==
 
                     var Headers = xdoc.Root.Element("Headers");///Queue/Position
-                    if (Headers != null)
+                    if (Headers is not null)
                     {
                         var Que = Headers.Element("Queue");
-                        if (Que != null)
+                        if (Que is not null)
                         {
                             var column = Que.Element("Position");
-                            if (column != null)
+                            if (column is not null)
                             {
-                                if (column.Attribute("Visible") != null)
+                                if (column.Attribute("Visible") is not null)
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
                                     {
@@ -3371,7 +3371,7 @@ public class MainViewModel : ViewModelBase
                                         }
                                     }
                                 }
-                                if (column.Attribute("Width") != null)
+                                if (column.Attribute("Width") is not null)
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
                                     {
@@ -3389,9 +3389,9 @@ public class MainViewModel : ViewModelBase
                                     QueueColumnHeaderPositionWidthRestore = QueueColumnHeaderPositionWidth;
                             }
                             column = Que.Element("NowPlaying");
-                            if (column != null)
+                            if (column is not null)
                             {
-                                if (column.Attribute("Visible") != null)
+                                if (column.Attribute("Visible") is not null)
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
                                     {
@@ -3401,7 +3401,7 @@ public class MainViewModel : ViewModelBase
                                             QueueColumnHeaderNowPlayingVisibility = false;
                                     }
                                 }
-                                if (column.Attribute("Width") != null)
+                                if (column.Attribute("Width") is not null)
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
                                     {
@@ -3419,9 +3419,9 @@ public class MainViewModel : ViewModelBase
                                     QueueColumnHeaderNowPlayingWidthRestore = QueueColumnHeaderNowPlayingWidth;
                             }
                             column = Que.Element("Title");
-                            if (column != null)
+                            if (column is not null)
                             {
-                                if (column.Attribute("Width") != null)
+                                if (column.Attribute("Width") is not null)
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
                                     {
@@ -3441,9 +3441,9 @@ public class MainViewModel : ViewModelBase
                                     QueueColumnHeaderTitleWidthRestore = QueueColumnHeaderTitleWidth;
                             }
                             column = Que.Element("Time");
-                            if (column != null)
+                            if (column is not null)
                             {
-                                if (column.Attribute("Visible") != null)
+                                if (column.Attribute("Visible") is not null)
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
                                     {
@@ -3453,7 +3453,7 @@ public class MainViewModel : ViewModelBase
                                             QueueColumnHeaderTimeVisibility = false;
                                     }
                                 }
-                                if (column.Attribute("Width") != null)
+                                if (column.Attribute("Width") is not null)
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
                                     {
@@ -3471,9 +3471,9 @@ public class MainViewModel : ViewModelBase
                                     QueueColumnHeaderTimeWidthRestore = QueueColumnHeaderTimeWidth;
                             }
                             column = Que.Element("Artist");
-                            if (column != null)
+                            if (column is not null)
                             {
-                                if (column.Attribute("Visible") != null)
+                                if (column.Attribute("Visible") is not null)
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
                                     {
@@ -3483,7 +3483,7 @@ public class MainViewModel : ViewModelBase
                                             QueueColumnHeaderArtistVisibility = false;
                                     }
                                 }
-                                if (column.Attribute("Width") != null)
+                                if (column.Attribute("Width") is not null)
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
                                     {
@@ -3501,9 +3501,9 @@ public class MainViewModel : ViewModelBase
                                     QueueColumnHeaderArtistWidthRestore = QueueColumnHeaderArtistWidth;
                             }
                             column = Que.Element("Album");
-                            if (column != null)
+                            if (column is not null)
                             {
-                                if (column.Attribute("Visible") != null)
+                                if (column.Attribute("Visible") is not null)
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
                                     {
@@ -3513,7 +3513,7 @@ public class MainViewModel : ViewModelBase
                                             QueueColumnHeaderAlbumVisibility = false;
                                     }
                                 }
-                                if (column.Attribute("Width") != null)
+                                if (column.Attribute("Width") is not null)
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
                                     {
@@ -3531,9 +3531,9 @@ public class MainViewModel : ViewModelBase
                                     QueueColumnHeaderAlbumWidthRestore = QueueColumnHeaderAlbumWidth;
                             }
                             column = Que.Element("Genre");
-                            if (column != null)
+                            if (column is not null)
                             {
-                                if (column.Attribute("Visible") != null)
+                                if (column.Attribute("Visible") is not null)
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
                                     {
@@ -3543,7 +3543,7 @@ public class MainViewModel : ViewModelBase
                                             QueueColumnHeaderGenreVisibility = false;
                                     }
                                 }
-                                if (column.Attribute("Width") != null)
+                                if (column.Attribute("Width") is not null)
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
                                     {
@@ -3561,9 +3561,9 @@ public class MainViewModel : ViewModelBase
                                     QueueColumnHeaderGenreWidthRestore = QueueColumnHeaderGenreWidth;
                             }
                             column = Que.Element("LastModified");
-                            if (column != null)
+                            if (column is not null)
                             {
-                                if (column.Attribute("Visible") != null)
+                                if (column.Attribute("Visible") is not null)
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
                                     {
@@ -3573,7 +3573,7 @@ public class MainViewModel : ViewModelBase
                                             QueueColumnHeaderLastModifiedVisibility = false;
                                     }
                                 }
-                                if (column.Attribute("Width") != null)
+                                if (column.Attribute("Width") is not null)
                                 {
                                     if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
                                     {
@@ -3598,12 +3598,12 @@ public class MainViewModel : ViewModelBase
                     #region == Layout ==
 
                     var lay = xdoc.Root.Element("Layout");
-                    if (lay != null)
+                    if (lay is not null)
                     {
                         var leftpain = lay.Element("LeftPain");
-                        if (leftpain != null)
+                        if (leftpain is not null)
                         {
-                            if (leftpain.Attribute("Width") != null)
+                            if (leftpain.Attribute("Width") is not null)
                             {
                                 if (!string.IsNullOrEmpty(leftpain.Attribute("Width").Value))
                                 {
@@ -3641,7 +3641,7 @@ public class MainViewModel : ViewModelBase
 
         NotifyPropertyChanged(nameof(IsCurrentProfileSet));
 
-        if (CurrentProfile == null)
+        if (CurrentProfile is null)
         {
             ConnectionStatusMessage = MPDCtrl.Properties.Resources.Init_NewConnectionSetting;
             StatusButton = _pathNewConnectionButton;
@@ -3667,7 +3667,7 @@ public class MainViewModel : ViewModelBase
             if (App.Current is not null)
             {
                 App? app = App.Current as App;
-                if (app != null)
+                if (app is not null)
                 {
                     app.IsSaveErrorLog = true;
                     app.LogFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl_errors.txt";
@@ -4183,7 +4183,7 @@ public class MainViewModel : ViewModelBase
 
     private void UpdateButtonStatus()
     {
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             try
@@ -4250,7 +4250,7 @@ public class MainViewModel : ViewModelBase
                     _elapsedTimer.Stop();
                 }
 
-                //if (Application.Current == null) { return; }
+                //if (Application.Current is null) { return; }
                 //Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());
             }
             catch
@@ -4268,13 +4268,13 @@ public class MainViewModel : ViewModelBase
 
         UpdateProgress?.Invoke(this, "[UI] Status updating...");
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             bool isSongChanged = false;
             bool isCurrentSongWasNull = false;
 
-            if (CurrentSong != null)
+            if (CurrentSong is not null)
             {
                 if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
                 {
@@ -4284,7 +4284,7 @@ public class MainViewModel : ViewModelBase
                     CurrentSong.IsPlaying = false;
 
                     //
-                    if (_mpc.MpdCurrentSong != null)
+                    if (_mpc.MpdCurrentSong is not null)
                     {
                         _mpc.MpdCurrentSong.IsPlaying = false;
                     }
@@ -4304,7 +4304,7 @@ public class MainViewModel : ViewModelBase
                 {
                     // Sets Current Song
                     var item = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
-                    if (item != null)
+                    if (item is not null)
                     {
                         CurrentSong = (item as SongInfoEx);
                         CurrentSong.IsPlaying = true;
@@ -4343,7 +4343,7 @@ public class MainViewModel : ViewModelBase
         UpdateProgress?.Invoke(this, "");
 
         if (IsDownloadAlbumArt)
-            if (CurrentSong != null)
+            if (CurrentSong is not null)
                 if (isAlbumArtChanged)
                     await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
     }
@@ -4352,13 +4352,13 @@ public class MainViewModel : ViewModelBase
     {
         bool isAlbumArtChanged = false;
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             bool isSongChanged = false;
             bool isCurrentSongWasNull = false;
 
-            if (CurrentSong != null)
+            if (CurrentSong is not null)
             {
                 if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
                 {
@@ -4376,7 +4376,7 @@ public class MainViewModel : ViewModelBase
                 isCurrentSongWasNull = true;
             }
 
-            if (_mpc.MpdCurrentSong != null)
+            if (_mpc.MpdCurrentSong is not null)
             {
                 if (_mpc.MpdCurrentSong.Id == _mpc.MpdStatus.MpdSongID)
                 {
@@ -4403,7 +4403,7 @@ public class MainViewModel : ViewModelBase
         });
 
         if (IsDownloadAlbumArt)
-            if (CurrentSong != null)
+            if (CurrentSong is not null)
                 if (isAlbumArtChanged)
                     await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
 
@@ -4433,7 +4433,7 @@ public class MainViewModel : ViewModelBase
                 // The simplest way, but all the selections and listview position will be cleared. Kind of annoying when moving items.
                 
                 UpdateProgress?.Invoke(this, "[UI] Loading the queue...");
-                if (Application.Current == null) { return; }
+                if (Application.Current is null) { return; }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     Queue = new ObservableCollection<SongInfoEx>(_mpc.CurrentQueue);
@@ -4442,9 +4442,9 @@ public class MainViewModel : ViewModelBase
 
                     // Set Current and NowPlaying.
                     var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
-                    if (curitem != null)
+                    if (curitem is not null)
                     {
-                        if (CurrentSong != null)
+                        if (CurrentSong is not null)
                         {
                             if (CurrentSong.Id != curitem.Id)
                             {
@@ -4494,7 +4494,7 @@ public class MainViewModel : ViewModelBase
                 UpdateProgress?.Invoke(this, "");
                 
                 /*
-                if (Application.Current == null) { return; }
+                if (Application.Current is null) { return; }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     IsWorking = true;
@@ -4512,7 +4512,7 @@ public class MainViewModel : ViewModelBase
                         IsWorking = true;
 
                         var queitem = _mpc.CurrentQueue.FirstOrDefault(i => i.Id == sng.Id);
-                        if (queitem == null)
+                        if (queitem is null)
                         {
                             // add to tmp deletion list.
                             _tmpQueue.Add(sng);
@@ -4537,7 +4537,7 @@ public class MainViewModel : ViewModelBase
                         IsWorking = true;
 
                         var fuga = Queue.FirstOrDefault(i => i.Id == sng.Id);
-                        if (fuga != null)
+                        if (fuga is not null)
                         {
                             fuga.Pos = sng.Pos;
                             //fuga.Id = sng.Id;
@@ -4584,9 +4584,9 @@ public class MainViewModel : ViewModelBase
 
                     // Set Current and NowPlaying.
                     var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
-                    if (curitem != null)
+                    if (curitem is not null)
                     {
-                        if (CurrentSong != null)
+                        if (CurrentSong is not null)
                         {
                             if (CurrentSong.Id != curitem.Id)
                             {
@@ -4653,7 +4653,7 @@ public class MainViewModel : ViewModelBase
 
             try
             {
-                if (Application.Current == null) { return; }
+                if (Application.Current is null) { return; }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     IsWorking = true;
@@ -4666,7 +4666,7 @@ public class MainViewModel : ViewModelBase
 
                     bool isNeedToFindCurrentSong = false;
 
-                    if (CurrentSong != null)
+                    if (CurrentSong is not null)
                     {
                         if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
                         {
@@ -4674,7 +4674,7 @@ public class MainViewModel : ViewModelBase
                         }
                         else
                         {
-                            if (_mpc.MpdCurrentSong != null)
+                            if (_mpc.MpdCurrentSong is not null)
                             {
                                 // This means CurrentSong is already aquired by "currentsong" command.
                                 if (_mpc.MpdCurrentSong.Id == _mpc.MpdStatus.MpdSongID)
@@ -4705,7 +4705,7 @@ public class MainViewModel : ViewModelBase
                     {
                         // Set Current and NowPlaying.
                         var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
-                        if (curitem != null)
+                        if (curitem is not null)
                         {
                             CurrentSong = curitem;
                             CurrentSong.IsPlaying = true;
@@ -4764,7 +4764,7 @@ public class MainViewModel : ViewModelBase
             IsWorking = false;
         }
 
-        if (CurrentSong != null)
+        if (CurrentSong is not null)
             if (IsDownloadAlbumArt)
                 if (isAlbumArtChanged)
                 {
@@ -4786,7 +4786,7 @@ public class MainViewModel : ViewModelBase
         UpdateProgress?.Invoke(this, "[UI] Playlists loading...");
         await Task.Delay(10);
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
 
@@ -4796,7 +4796,7 @@ public class MainViewModel : ViewModelBase
 
             NodeMenuPlaylists playlistDir = _mainMenuItems.PlaylistsDirectory;
 
-            if (playlistDir != null)
+            if (playlistDir is not null)
             {
                 // Sort playlists.
                 List<string> slTmp = new();
@@ -4810,7 +4810,7 @@ public class MainViewModel : ViewModelBase
                 foreach (var hoge in slTmp)
                 {
                     var fuga = playlistDir.Children.FirstOrDefault(i => i.Name == hoge);
-                    if (fuga == null)
+                    if (fuga is null)
                     {
                         NodeMenuPlaylistItem playlistNode = new(hoge);
                         playlistDir.Children.Add(playlistNode);
@@ -4821,7 +4821,7 @@ public class MainViewModel : ViewModelBase
                 foreach (var hoge in playlistDir.Children)
                 {
                     var fuga = slTmp.FirstOrDefault(i => i == hoge.Name);
-                    if (fuga == null)
+                    if (fuga is null)
                     {
                         tobedeleted.Add(hoge);
                     }
@@ -4877,7 +4877,7 @@ public class MainViewModel : ViewModelBase
         //IsBusy = true;
         IsWorking = true;
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             MusicEntries.Clear();
@@ -4908,7 +4908,7 @@ public class MainViewModel : ViewModelBase
                     string filename = System.IO.Path.GetFileName(songfile.File);//System.IO.Path.GetFileName(uri.LocalPath);
                     NodeFile hoge = new(filename, uri, songfile.File);
                     /*
-                    if (Application.Current == null) { return; }
+                    if (Application.Current is null) { return; }
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         MusicEntries.Add(hoge);
@@ -4939,7 +4939,7 @@ public class MainViewModel : ViewModelBase
         //IsBusy = true;
         IsWorking = true;
         
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
@@ -4963,7 +4963,7 @@ public class MainViewModel : ViewModelBase
         //IsBusy = true;
         IsWorking = true;
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             MusicDirectories.Clear();
@@ -4983,7 +4983,7 @@ public class MainViewModel : ViewModelBase
 
             IsWorking = true;
 
-            if (Application.Current == null) { return; }
+            if (Application.Current is null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
                 UpdateProgress?.Invoke(this, "[UI] Library directories loading...");
@@ -5017,12 +5017,12 @@ public class MainViewModel : ViewModelBase
 
     private async void GetPlaylistSongs(NodeMenuPlaylistItem playlistNode)
     {
-        if (playlistNode == null) 
+        if (playlistNode is null) 
             return;
 
         IsWorking = true;
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             if (playlistNode.PlaylistSongs.Count > 0)
@@ -5034,7 +5034,7 @@ public class MainViewModel : ViewModelBase
         {
             IsWorking = true;
 
-            if (Application.Current == null) { return; }
+            if (Application.Current is null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
                 playlistNode.PlaylistSongs = result.PlaylistSongs;
@@ -5057,13 +5057,13 @@ public class MainViewModel : ViewModelBase
 
     private async void GetLibrary(NodeMenuLibrary librarytNode)
     {
-        if (librarytNode == null)
+        if (librarytNode is null)
             return;
 
         if (librarytNode.IsAcquired)
             return;
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             if (MusicEntries.Count > 0)
@@ -5209,12 +5209,12 @@ public class MainViewModel : ViewModelBase
     private void OnAlbumArtChanged(MpcService sender)
     {
         // AlbumArt
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             if ((!_mpc.AlbumCover.IsDownloading) && _mpc.AlbumCover.IsSuccess)
             {
-                if ((CurrentSong != null) && (_mpc.AlbumCover.AlbumImageSource != null))
+                if ((CurrentSong is not null) && (_mpc.AlbumCover.AlbumImageSource is not null))
                 {
                     if (!String.IsNullOrEmpty(CurrentSong.File))
                     {
@@ -5234,7 +5234,7 @@ public class MainViewModel : ViewModelBase
     {
         if (IsShowDebugWindow)
         {
-            if (Application.Current == null) { return; }
+            if (Application.Current is null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
                 DebugCommandOutput?.Invoke(this, data);
@@ -5246,7 +5246,7 @@ public class MainViewModel : ViewModelBase
     {
         if (IsShowDebugWindow)
         {
-            if (Application.Current == null) { return; }
+            if (Application.Current is null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
                 DebugIdleOutput?.Invoke(this, data);
@@ -5419,7 +5419,7 @@ public class MainViewModel : ViewModelBase
         s = s.Replace("ACK ", string.Empty);
         s = s.Replace("{} ", string.Empty);
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             AckWindowOutput?.Invoke(this, MpdVersion + ": " + MPDCtrl.Properties.Resources.MPD_CommandError + " - " + s + Environment.NewLine);
@@ -5528,7 +5528,7 @@ public class MainViewModel : ViewModelBase
     {
         if (IsBusy) return false;
         if (Queue.Count < 1) { return false; }
-        if (_selectedQueueSong == null) { return false; }
+        if (_selectedQueueSong is null) { return false; }
         return true;
     }
     public async void ChangeSongCommand_ExecuteAsync()
@@ -5712,7 +5712,7 @@ public class MainViewModel : ViewModelBase
         if (IsBusy) return false;
         if (IsWorking) return false;
         if (Queue.Count < 1) { return false; }
-        if (_selectedQueueSong == null) { return false; }
+        if (_selectedQueueSong is null) { return false; }
         return true;
     }
     public async void QueueListviewEnterKeyCommand_ExecuteAsync()
@@ -5726,7 +5726,7 @@ public class MainViewModel : ViewModelBase
         if (IsBusy) return false;
         //if (IsWorking) return false;
         if (Queue.Count < 1) { return false; }
-        if (_selectedQueueSong == null) { return false; }
+        if (_selectedQueueSong is null) { return false; }
         return true;
     }
     public async void QueueListviewLeftDoubleClickCommand_ExecuteAsync(SongInfoEx song)
@@ -5767,16 +5767,16 @@ public class MainViewModel : ViewModelBase
     {
         if (IsBusy) return false;
         if (IsWorking) return false;
-        if (SelectedQueueSong == null) return false;
+        if (SelectedQueueSong is null) return false;
         return true;
     }
     public void QueueListviewDeleteCommand_Execute(object obj)
     {
-        if (obj == null) return;
+        if (obj is null) return;
 
         List<SongInfoEx> selectedList = new();
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             System.Collections.IList items = (System.Collections.IList)obj;
@@ -5806,7 +5806,7 @@ public class MainViewModel : ViewModelBase
     {
         if (IsBusy) return false;
         if (IsWorking) return false;
-        if (SelectedQueueSong == null) return false;
+        if (SelectedQueueSong is null) return false;
         if (Queue.Count == 0) return false;
         return true;
     }
@@ -5831,19 +5831,19 @@ public class MainViewModel : ViewModelBase
         if (IsBusy) return false;
         if (IsWorking) return false;
         if (Queue.Count == 0) return false;
-        if (SelectedQueueSong == null) return false;
+        if (SelectedQueueSong is null) return false;
         return true;
     }
     public async void QueueListviewMoveUpCommand_Execute(object obj)
     {
-        if (obj == null) return;
+        if (obj is null) return;
 
         if (Queue.Count <= 1)
             return;
 
         List<SongInfoEx> selectedList = new();
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             System.Collections.IList items = (System.Collections.IList)obj;
@@ -5886,19 +5886,19 @@ public class MainViewModel : ViewModelBase
         if (IsBusy) return false;
         if (IsWorking) return false;
         if (Queue.Count == 0) return false;
-        if (SelectedQueueSong == null) return false;
+        if (SelectedQueueSong is null) return false;
         return true;
     }
     public async void QueueListviewMoveDownCommand_Execute(object obj)
     {
-        if (obj == null) return;
+        if (obj is null) return;
 
         if (Queue.Count <= 1)
             return;
 
         List<SongInfoEx> selectedList = new();
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             System.Collections.IList items = (System.Collections.IList)obj;
@@ -5941,16 +5941,16 @@ public class MainViewModel : ViewModelBase
         if (IsBusy) return false;
         if (IsWorking) return false;
         if (Queue.Count == 0) return false;
-        if (SelectedQueueSong == null) return false;
+        if (SelectedQueueSong is null) return false;
         return true;
     }
     public void QueueListviewSaveSelectedAsCommand_Execute(object obj)
     {
-        if (obj == null) return;
+        if (obj is null) return;
 
         List<SongInfoEx> selectedList = new();
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             System.Collections.IList items = (System.Collections.IList)obj;
@@ -5986,7 +5986,7 @@ public class MainViewModel : ViewModelBase
         if (IsBusy) return false;
         if (IsWorking) return false;
         if (Queue.Count == 0) return false;
-        if (SelectedQueueSong == null) return false;
+        if (SelectedQueueSong is null) return false;
         return true;
     }
     public async void QueueListviewSaveSelectedAsPopupCommand_Execute(string playlistName)
@@ -6010,12 +6010,12 @@ public class MainViewModel : ViewModelBase
         if (IsBusy) return false;
         if (IsWorking) return false;
         if (Queue.Count == 0) return false;
-        if (SelectedQueueSong == null) return false;
+        if (SelectedQueueSong is null) return false;
         return true;
     }
     public async void QueueListviewSaveSelectedToPopupCommand_Execute(Playlist playlist)
     {
-        if (playlist == null)
+        if (playlist is null)
             return;
 
         if (string.IsNullOrEmpty(playlist.Name))
@@ -6037,16 +6037,16 @@ public class MainViewModel : ViewModelBase
         if (IsBusy) return false;
         if (IsWorking) return false;
         if (Queue.Count == 0) return false;
-        if (SelectedQueueSong == null) return false;
+        if (SelectedQueueSong is null) return false;
         return true;
     }
     public void QueueListviewSaveSelectedToCommand_Execute(object obj)
     {
-        if (obj == null) return;
+        if (obj is null) return;
 
         List<SongInfoEx> selectedList = new();
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             System.Collections.IList items = (System.Collections.IList)obj;
@@ -6082,13 +6082,13 @@ public class MainViewModel : ViewModelBase
         if (IsBusy) return false;
         if (IsWorking) return false;
         if (Queue.Count == 0) { return false; }
-        if (CurrentSong == null) { return false; }
+        if (CurrentSong is null) { return false; }
         return true;
     }
     public void ScrollIntoNowPlayingCommand_Execute()
     {
         if (Queue.Count == 0) return;
-        if (CurrentSong == null) return;
+        if (CurrentSong is null) return;
         if (Queue.Count < CurrentSong.Index + 1) return;
 
         // should I?
@@ -6123,7 +6123,7 @@ public class MainViewModel : ViewModelBase
         else
         {
             QueueForFilter.Clear();
-            if (Queue != null)
+            if (Queue is not null)
             {
                 QueueForFilter = new ObservableCollection<SongInfoEx>(Queue);
 
@@ -6175,11 +6175,11 @@ public class MainViewModel : ViewModelBase
     }
     public void SearchResultListviewSaveSelectedAsCommand_Execute(object obj)
     {
-        if (obj == null) return;
+        if (obj is null) return;
 
         List<SongInfo> selectedList = new();
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             System.Collections.IList items = (System.Collections.IList)obj;
@@ -6239,11 +6239,11 @@ public class MainViewModel : ViewModelBase
     }
     public void SearchResultListviewSaveSelectedToCommand_Execute(object obj)
     {
-        if (obj == null) return;
+        if (obj is null) return;
 
         List<SongInfo> selectedList = new();
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             System.Collections.IList items = (System.Collections.IList)obj;
@@ -6282,7 +6282,7 @@ public class MainViewModel : ViewModelBase
     }
     public async void SearchResultListviewSaveSelectedToPopupCommand_Execute(Playlist playlist)
     {
-        if (playlist == null)
+        if (playlist is null)
             return;
 
         if (string.IsNullOrEmpty(playlist.Name))
@@ -6312,7 +6312,7 @@ public class MainViewModel : ViewModelBase
     }
     public async void SongFilesListviewAddCommand_Execute(object obj)
     {
-        if (obj == null) return;
+        if (obj is null) return;
 
         System.Collections.IList items = (System.Collections.IList)obj;
 
@@ -6345,11 +6345,11 @@ public class MainViewModel : ViewModelBase
     }
     public void SongFilesListviewSaveSelectedAsCommand_Execute(object obj)
     {
-        if (obj == null) return;
+        if (obj is null) return;
 
         List<NodeFile> selectedList = new();
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             System.Collections.IList items = (System.Collections.IList)obj;
@@ -6409,11 +6409,11 @@ public class MainViewModel : ViewModelBase
     }
     public void SongFilesListviewSaveSelectedToCommand_Execute(object obj)
     {
-        if (obj == null) return;
+        if (obj is null) return;
 
         List<NodeFile> selectedList = new();
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             System.Collections.IList items = (System.Collections.IList)obj;
@@ -6452,7 +6452,7 @@ public class MainViewModel : ViewModelBase
     }
     public async void SongFilesListviewSaveSelectedToPopupCommand_Execute(Playlist playlist)
     {
-        if (playlist == null)
+        if (playlist is null)
             return;
 
         if (string.IsNullOrEmpty(playlist.Name))
@@ -6489,7 +6489,7 @@ public class MainViewModel : ViewModelBase
     {
         if (IsBusy) return false;
         if (IsWorking) return false;
-        if (_selectedPlaylist == null)
+        if (_selectedPlaylist is null)
             return false;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return false;
@@ -6497,12 +6497,12 @@ public class MainViewModel : ViewModelBase
     }
     public async void ChangePlaylistCommand_ExecuteAsync()
     {
-        if (_selectedPlaylist == null)
+        if (_selectedPlaylist is null)
             return;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return;
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             Queue.Clear();
@@ -6516,7 +6516,7 @@ public class MainViewModel : ViewModelBase
     {
         if (IsBusy) return false;
         if (IsWorking) return false;
-        if (_selectedPlaylist == null)
+        if (_selectedPlaylist is null)
             return false;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return false;
@@ -6524,7 +6524,7 @@ public class MainViewModel : ViewModelBase
     }
     public async void PlaylistListviewLeftDoubleClickCommand_ExecuteAsync(Playlist playlist)
     {
-        if (_selectedPlaylist == null)
+        if (_selectedPlaylist is null)
             return;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return;
@@ -6540,7 +6540,7 @@ public class MainViewModel : ViewModelBase
     {
         if (IsBusy) return false;
         if (IsWorking) return false;
-        if (_selectedPlaylist == null)
+        if (_selectedPlaylist is null)
             return false;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return false;
@@ -6548,7 +6548,7 @@ public class MainViewModel : ViewModelBase
     }
     public async void PlaylistListviewEnterKeyCommand_ExecuteAsync()
     {
-        if (_selectedPlaylist == null)
+        if (_selectedPlaylist is null)
             return;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return;
@@ -6561,7 +6561,7 @@ public class MainViewModel : ViewModelBase
     {
         if (IsBusy) return false;
         if (IsWorking) return false;
-        if (_selectedPlaylist == null)
+        if (_selectedPlaylist is null)
             return false;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return false;
@@ -6569,7 +6569,7 @@ public class MainViewModel : ViewModelBase
     }
     public async void PlaylistListviewLoadPlaylistCommand_ExecuteAsync()
     {
-        if (_selectedPlaylist == null)
+        if (_selectedPlaylist is null)
             return;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return;
@@ -6582,7 +6582,7 @@ public class MainViewModel : ViewModelBase
     {
         if (IsBusy) return false;
         if (IsWorking) return false;
-        if (_selectedPlaylist == null)
+        if (_selectedPlaylist is null)
             return false;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return false;
@@ -6590,12 +6590,12 @@ public class MainViewModel : ViewModelBase
     }
     public async void PlaylistListviewClearLoadPlaylistCommand_ExecuteAsync()
     {
-        if (_selectedPlaylist == null)
+        if (_selectedPlaylist is null)
             return;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return;
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             Queue.Clear();
@@ -6611,7 +6611,7 @@ public class MainViewModel : ViewModelBase
         if (IsBusy) 
             return false;
         if (IsWorking) return false;
-        if (_selectedPlaylist == null) 
+        if (_selectedPlaylist is null) 
             return false;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return false;
@@ -6620,7 +6620,7 @@ public class MainViewModel : ViewModelBase
     }
     public void PlaylistListviewRenamePlaylistCommand_Execute(Playlist playlist)
     {
-        if (_selectedPlaylist == null) 
+        if (_selectedPlaylist is null) 
             return;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return;
@@ -6660,7 +6660,7 @@ public class MainViewModel : ViewModelBase
     public bool PlaylistListviewRemovePlaylistCommand_CanExecute()
     {
         if (IsBusy) return false;
-        if (_selectedPlaylist == null)
+        if (_selectedPlaylist is null)
             return false;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return false;
@@ -6668,7 +6668,7 @@ public class MainViewModel : ViewModelBase
     }
     public void PlaylistListviewRemovePlaylistCommand_Execute(Playlist playlist)
     {
-        if (_selectedPlaylist == null)
+        if (_selectedPlaylist is null)
             return;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return;
@@ -6683,7 +6683,7 @@ public class MainViewModel : ViewModelBase
     public bool PlaylistListviewConfirmRemovePlaylistPopupCommand_CanExecute()
     {
         if (IsBusy) return false;
-        if (_selectedPlaylist == null)
+        if (_selectedPlaylist is null)
             return false;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return false;
@@ -6691,7 +6691,7 @@ public class MainViewModel : ViewModelBase
     }
     public async void PlaylistListviewConfirmRemovePlaylistPopupCommand_Execute()
     {
-        if (_selectedPlaylist == null)
+        if (_selectedPlaylist is null)
             return;
         if (string.IsNullOrEmpty(_selectedPlaylist.Name))
             return;
@@ -6729,7 +6729,7 @@ public class MainViewModel : ViewModelBase
     public ICommand PlaylistListviewDeletePosCommand { get; set; }
     public bool PlaylistListviewDeletePosCommand_CanExecute()
     {
-        if (SelectedPlaylistSong == null) return false;
+        if (SelectedPlaylistSong is null) return false;
         if (IsBusy) return false;
         return true;
     }
@@ -6747,7 +6747,7 @@ public class MainViewModel : ViewModelBase
             return;
         }
 
-        if (obj == null) return;
+        if (obj is null) return;
 
         System.Collections.IList items = (System.Collections.IList)obj;
 
@@ -6779,7 +6779,7 @@ public class MainViewModel : ViewModelBase
     public ICommand PlaylistListviewDeletePosPopupCommand { get; set; }
     public bool PlaylistListviewDeletePosPopupCommand_CanExecute()
     {
-        if (SelectedPlaylistSong == null) return false;
+        if (SelectedPlaylistSong is null) return false;
         if (IsBusy) return false;
         return true;
     }
@@ -6803,7 +6803,7 @@ public class MainViewModel : ViewModelBase
             return;
         }
 
-        if (SelectedPlaylistSong == null)
+        if (SelectedPlaylistSong is null)
             return;
 
         await _mpc.MpdPlaylistDelete(playlistName, SelectedPlaylistSong.Index);
@@ -6867,7 +6867,7 @@ public class MainViewModel : ViewModelBase
     }
     public async void SongsListviewAddCommand_Execute(object obj)
     {
-        if (obj == null) return;
+        if (obj is null) return;
 
         System.Collections.IList items = (System.Collections.IList)obj;
 
@@ -6928,7 +6928,7 @@ public class MainViewModel : ViewModelBase
     public ICommand NewProfileCommand { get; }
     public bool NewProfileCommand_CanExecute()
     {
-        if (SelectedProfile == null) return false;
+        if (SelectedProfile is null) return false;
         return true;
     }
     public void NewProfileCommand_Execute()
@@ -6940,12 +6940,12 @@ public class MainViewModel : ViewModelBase
     public bool DeleteProfileCommand_CanExecute()
     {
         if (Profiles.Count < 2) return false;
-        if (SelectedProfile == null) return false;
+        if (SelectedProfile is null) return false;
         return true;
     }
     public void DeleteProfileCommand_Execute()
     {
-        if (SelectedProfile == null) return;
+        if (SelectedProfile is null) return;
         if (Profiles.Count < 2) return;
 
         var tmpNama = SelectedProfile.Name;
@@ -6965,15 +6965,15 @@ public class MainViewModel : ViewModelBase
     public ICommand SaveProfileCommand { get; }
     public bool SaveProfileCommand_CanExecute()
     {
-        if (SelectedProfile != null) return false;
+        if (SelectedProfile is not null) return false;
         if (String.IsNullOrEmpty(Host)) return false;
         if (_port == 0) return false;
         return true;
     }
     public void SaveProfileCommand_Execute(object obj)
     {
-        if (obj == null) return;
-        if (SelectedProfile != null) return;
+        if (obj is null) return;
+        if (SelectedProfile is not null) return;
         if (String.IsNullOrEmpty(Host)) return;
         if (_port == 0) return;
 
@@ -7012,7 +7012,7 @@ public class MainViewModel : ViewModelBase
 
         SettingProfileEditMessage = MPDCtrl.Properties.Resources.Settings_ProfileSaved;
 
-        if (CurrentProfile == null)
+        if (CurrentProfile is null)
         {
             SetIsDefault = true;
             pro.IsDefault = true;
@@ -7023,13 +7023,13 @@ public class MainViewModel : ViewModelBase
     public ICommand UpdateProfileCommand { get; }
     public bool UpdateProfileCommand_CanExecute()
     {
-        if (SelectedProfile == null) return false;
+        if (SelectedProfile is null) return false;
         return true;
     }
     public void UpdateProfileCommand_Execute(object obj)
     {
-        if (obj == null) return;
-        if (SelectedProfile == null) return;
+        if (obj is null) return;
+        if (SelectedProfile is null) return;
         if (String.IsNullOrEmpty(Host)) return;
         if (_port == 0) return;
 
@@ -7087,12 +7087,12 @@ public class MainViewModel : ViewModelBase
         if (string.IsNullOrWhiteSpace(Host)) return false;
         if (String.IsNullOrEmpty(Host)) return false;
         if (IsConnecting) return false;
-        if ((SelectedProfile != null) && CurrentProfile == null) return false;
+        if ((SelectedProfile is not null) && CurrentProfile is null) return false;
         return true;
     }
     public async void ChangeConnectionProfileCommand_Execute(object obj)
     {
-        if (obj == null) return;
+        if (obj is null) return;
         if (String.IsNullOrEmpty(Host)) return;
         if (string.IsNullOrWhiteSpace(Host)) return;
         if (_port == 0) return;
@@ -7110,7 +7110,7 @@ public class MainViewModel : ViewModelBase
         }
 
         // Save volume.
-        if (CurrentProfile != null)
+        if (CurrentProfile is not null)
             CurrentProfile.Volume = Convert.ToInt32(Volume);
 
         // Validate Host input.
@@ -7132,7 +7132,7 @@ public class MainViewModel : ViewModelBase
             try
             {
                 ipAddress = IPAddress.Parse(Host);
-                if (ipAddress != null)
+                if (ipAddress is not null)
                 {
                     ClearError(nameof(Host));
                 }
@@ -7193,17 +7193,17 @@ public class MainViewModel : ViewModelBase
         }
 
         // Clear current...
-        if (CurrentSong != null)
+        if (CurrentSong is not null)
         {
             CurrentSong.IsPlaying = false;
             CurrentSong = null;
         }
-        if (CurrentSong != null)
+        if (CurrentSong is not null)
         {
             SelectedQueueSong = null;
         }
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             SelectedNodeMenu = null;
@@ -7221,7 +7221,7 @@ public class MainViewModel : ViewModelBase
 
             SelectedPlaylistSong = null;
 
-            if (_mainMenuItems.LibraryDirectory != null)
+            if (_mainMenuItems.LibraryDirectory is not null)
                 _mainMenuItems.LibraryDirectory.IsAcquired = false;
 
             MusicEntries.Clear();
@@ -7251,7 +7251,7 @@ public class MainViewModel : ViewModelBase
 
         IsConnecting = true;
 
-        if (HostIpAddress == null) return;
+        if (HostIpAddress is null) return;
         //ConnectionResult r = await _mpc.MpdIdleConnect(_host, _port);
         ConnectionResult r = await _mpc.MpdIdleConnect(HostIpAddress.ToString(), _port);
 
@@ -7259,7 +7259,7 @@ public class MainViewModel : ViewModelBase
         {
             IsSettingsShow = false;
 
-            if (CurrentProfile == null)
+            if (CurrentProfile is null)
             {
                 // Create new profile
                 Profile prof = new()
@@ -7326,21 +7326,21 @@ public class MainViewModel : ViewModelBase
         }
 
         // Save volume.
-        if (CurrentProfile != null)
+        if (CurrentProfile is not null)
             CurrentProfile.Volume = Volume;
 
         // Clear current...
-        if (CurrentSong != null)
+        if (CurrentSong is not null)
         {
             CurrentSong.IsPlaying = false;
             CurrentSong = null;
         }
-        if (CurrentSong != null)
+        if (CurrentSong is not null)
         {
             SelectedQueueSong = null;
         }
 
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             SelectedNodeMenu = null;
@@ -7361,7 +7361,7 @@ public class MainViewModel : ViewModelBase
 
             SelectedPlaylistSong = null;
 
-            if (_mainMenuItems.LibraryDirectory != null)
+            if (_mainMenuItems.LibraryDirectory is not null)
                 _mainMenuItems.LibraryDirectory.IsAcquired = false;
 
             MusicEntries.Clear();
@@ -7430,7 +7430,7 @@ public class MainViewModel : ViewModelBase
 
         IsConnecting = true;
 
-        if (HostIpAddress == null) return;
+        if (HostIpAddress is null) return;
         //ConnectionResult r = await _mpc.MpdIdleConnect(_host, _port);
         ConnectionResult r = await _mpc.MpdIdleConnect(HostIpAddress.ToString(), _port);
 
@@ -7452,7 +7452,7 @@ public class MainViewModel : ViewModelBase
     public ICommand ShowChangePasswordDialogCommand { get; }
     public bool ShowChangePasswordDialogCommand_CanExecute()
     {
-        if (SelectedProfile == null) return false;
+        if (SelectedProfile is null) return false;
         if (String.IsNullOrEmpty(Host)) return false;
         if (_port == 0) return false;
         return true;
@@ -7465,7 +7465,7 @@ public class MainViewModel : ViewModelBase
         }
         else
         {
-            if (obj == null) return;
+            if (obj is null) return;
             // for Unbindable PasswordBox.
             var passwordBox = obj as PasswordBox;
             passwordBox.Password = "";
@@ -7477,14 +7477,14 @@ public class MainViewModel : ViewModelBase
     public ICommand ChangePasswordDialogOKCommand { get; }
     public bool ChangePasswordDialogOKCommand_CanExecute()
     {
-        if (SelectedProfile == null) return false;
+        if (SelectedProfile is null) return false;
         if (String.IsNullOrEmpty(Host)) return false;
         if (_port == 0) return false;
         return true;
     }
     public void ChangePasswordDialogOKCommand_Execute(object obj)
     {
-        if (obj == null) return;
+        if (obj is null) return;
 
         // MultipleCommandParameterConverter!
         var values = (object[])obj;
@@ -7680,7 +7680,7 @@ public class MainViewModel : ViewModelBase
     }
     public void ClearDebugCommandTextCommand_Execute()
     {
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             DebugCommandClear?.Invoke();
@@ -7694,7 +7694,7 @@ public class MainViewModel : ViewModelBase
     }
     public void ClearDebugIdleTextCommand_Execute()
     {
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             DebugIdleClear?.Invoke();
@@ -7708,7 +7708,7 @@ public class MainViewModel : ViewModelBase
     }
     public void ShowDebugWindowCommand_Execute()
     {
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             DebugWindowShowHide?.Invoke();
@@ -7722,7 +7722,7 @@ public class MainViewModel : ViewModelBase
     }
     public void ClearAckTextCommand_Execute()
     {
-        if (Application.Current == null) { return; }
+        if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             AckWindowClear?.Invoke();
@@ -7776,7 +7776,7 @@ public class MainViewModel : ViewModelBase
     }
     public void QueueFilterSelectCommand_Execute(object obj)
     {
-        if (obj == null)
+        if (obj is null)
             return;
 
         if (obj != _selectedQueueFilterSong)
@@ -7784,7 +7784,7 @@ public class MainViewModel : ViewModelBase
 
         IsQueueFindVisible = false;
 
-        if (_selectedQueueFilterSong != null)
+        if (_selectedQueueFilterSong is not null)
         {
             ScrollIntoViewAndSelect?.Invoke(this, _selectedQueueFilterSong.Index);
         }
@@ -7797,7 +7797,7 @@ public class MainViewModel : ViewModelBase
     public ICommand TreeviewMenuItemLoadPlaylistCommand { get; }
     public bool TreeviewMenuItemLoadPlaylistCommand_CanExecute()
     {
-        if (SelectedNodeMenu == null)
+        if (SelectedNodeMenu is null)
             return false;
         if (SelectedNodeMenu is not NodeMenuPlaylistItem)
             return false;
@@ -7810,7 +7810,7 @@ public class MainViewModel : ViewModelBase
     {
         if (IsBusy) return;
         if (IsWorking) return;
-        if (SelectedNodeMenu == null)
+        if (SelectedNodeMenu is null)
             return;
         if (SelectedNodeMenu is not NodeMenuPlaylistItem)
             return;
@@ -7821,7 +7821,7 @@ public class MainViewModel : ViewModelBase
     public ICommand TreeviewMenuItemClearLoadPlaylistCommand { get; }
     public bool TreeviewMenuItemClearLoadPlaylistCommand_CanExecute()
     {
-        if (SelectedNodeMenu == null)
+        if (SelectedNodeMenu is null)
             return false;
         if (SelectedNodeMenu is not NodeMenuPlaylistItem)
             return false;
@@ -7835,7 +7835,7 @@ public class MainViewModel : ViewModelBase
         if (IsBusy)
             return;
         if (IsWorking) return;
-        if (SelectedNodeMenu == null)
+        if (SelectedNodeMenu is null)
             return;
         if (SelectedNodeMenu is not NodeMenuPlaylistItem)
             return;

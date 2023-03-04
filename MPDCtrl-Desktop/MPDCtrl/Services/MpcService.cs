@@ -189,11 +189,11 @@ namespace MPDCtrl.Services
                 await _idleConnection.ConnectAsync(MpdHost, MpdPort);
 
                 // TODO:
-                if (_idleConnection.Client == null)
+                if (_idleConnection.Client is null)
                 {
-                    Debug.WriteLine("_idleConnection.Client == null. " + host + " " + port.ToString());
+                    Debug.WriteLine("_idleConnection.Client is null. " + host + " " + port.ToString());
 
-                    result.ErrorMessage = "_idleConnection.Client == null";
+                    result.ErrorMessage = "_idleConnection.Client is null";
 
                     DebugIdleOutput?.Invoke(this, "TCP Idle Connection: Error while connecting. Fail to connect... " + "\n" + "\n");
 
@@ -315,19 +315,19 @@ namespace MPDCtrl.Services
         {
             CommandResult ret = new();
 
-            if (_idleConnection.Client == null)
+            if (_idleConnection.Client is null)
             {
-                Debug.WriteLine("@MpdIdleSendCommand: " + "TcpClient.Client == null");
+                Debug.WriteLine("@MpdIdleSendCommand: " + "TcpClient.Client is null");
 
                 ret.IsSuccess = false;
-                ret.ErrorMessage = "TcpClient.Client == null";
+                ret.ErrorMessage = "TcpClient.Client is null";
 
-                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdleSendCommand", "TcpClient.Client == null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdleSendCommand", "TcpClient.Client is null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
 
                 return ret;
             }
 
-            if ((_idleWriter == null) || (_idleReader == null))
+            if ((_idleWriter is null) || (_idleReader is null))
             {
                 Debug.WriteLine("@MpdIdleSendCommand: " + "_idleWriter or _idleReader is null");
 
@@ -429,7 +429,7 @@ namespace MPDCtrl.Services
                 {
                     string line = await _idleReader.ReadLineAsync();
 
-                    if (line != null)
+                    if (line is not null)
                     {
                         if (line.StartsWith("ACK"))
                         {
@@ -474,7 +474,7 @@ namespace MPDCtrl.Services
                     }
                     else
                     {
-                        Debug.WriteLine("@MpdIdleSendCommand ReadLineAsync line != null");
+                        Debug.WriteLine("@MpdIdleSendCommand ReadLineAsync line is not null");
 
                         DebugIdleOutput?.Invoke(this, string.Format("################ Error @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdleSendCommand", "ReadLineAsync received null data", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
 
@@ -624,16 +624,16 @@ namespace MPDCtrl.Services
             if (MpdStop)
                 return;
 
-            if (_idleConnection.Client == null)
+            if (_idleConnection.Client is null)
             {
-                Debug.WriteLine("@MpdIdle: " + "TcpClient.Client == null");
+                Debug.WriteLine("@MpdIdle: " + "TcpClient.Client is null");
 
-                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdle", "TcpClient.Client == null", "", Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdle", "TcpClient.Client is null", "", Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
 
                 return;
             }
 
-            if ((_commandWriter == null) || (_commandReader == null))
+            if ((_commandWriter is null) || (_commandReader is null))
             {
                 Debug.WriteLine("@MpdIdle: " + "_idleWriter or _idleReader is null");
 
@@ -700,7 +700,7 @@ namespace MPDCtrl.Services
 
                     string line = await _idleReader.ReadLineAsync();
 
-                    if (line != null)
+                    if (line is not null)
                     {
                         if (line.StartsWith("ACK"))
                         {
@@ -974,11 +974,11 @@ namespace MPDCtrl.Services
                 await _commandConnection.ConnectAsync(MpdHost, MpdPort);
 
                 // TODO:
-                if (_commandConnection.Client == null)
+                if (_commandConnection.Client is null)
                 {
-                    Debug.WriteLine("_commandConnection.Client == null. " + host + " " + port.ToString());
+                    Debug.WriteLine("_commandConnection.Client is null. " + host + " " + port.ToString());
 
-                    result.ErrorMessage = "_commandConnection.Client == null";
+                    result.ErrorMessage = "_commandConnection.Client is null";
 
                     DebugCommandOutput?.Invoke(this, "TCP Command Connection: Error while connecting. Fail to connect... " + "\n" + "\n");
 
@@ -1091,19 +1091,19 @@ namespace MPDCtrl.Services
         {
             CommandResult ret = new();
 
-            if (_commandConnection.Client == null)
+            if (_commandConnection.Client is null)
             {
-                Debug.WriteLine("@MpdSendCommand: " + "TcpClient.Client == null");
+                Debug.WriteLine("@MpdSendCommand: " + "TcpClient.Client is null");
 
                 ret.IsSuccess = false;
-                ret.ErrorMessage = "TcpClient.Client == null";
+                ret.ErrorMessage = "TcpClient.Client is null";
 
-                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdSendCommand", "TcpClient.Client == null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdSendCommand", "TcpClient.Client is null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
 
                 return ret;
             }
 
-            if ((_commandWriter == null) || (_commandReader == null))
+            if ((_commandWriter is null) || (_commandReader is null))
             {
                 Debug.WriteLine("@MpdSendCommand: " + "_commandWriter or _commandReader is null");
 
@@ -1274,7 +1274,7 @@ namespace MPDCtrl.Services
                 {
                     string line = await _commandReader.ReadLineAsync();
 
-                    if (line != null)
+                    if (line is not null)
                     {
                         if (line.StartsWith("ACK"))
                         {
@@ -1595,7 +1595,7 @@ namespace MPDCtrl.Services
 
             CommandSearchResult result = new();
 
-            if (Application.Current == null) { return result; }
+            if (Application.Current is null) { return result; }
             Application.Current.Dispatcher.Invoke(() =>
             {
                 SearchResult.Clear();
@@ -1677,7 +1677,7 @@ namespace MPDCtrl.Services
 
                 if (b.IsSuccess)
                 {
-                    if (Application.Current == null) { return f; }
+                    if (Application.Current is null) { return f; }
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         AlbumCover = hoge.AlbumCover;
@@ -2062,7 +2062,7 @@ namespace MPDCtrl.Services
 
         public async Task<CommandResult> MpdMoveId(Dictionary<string, string> IdToNewPosPair)
         {
-            if (IdToNewPosPair == null)
+            if (IdToNewPosPair is null)
             {
                 CommandResult f = new()
                 {
@@ -2185,7 +2185,7 @@ namespace MPDCtrl.Services
                 };
                 return f;
             }
-            if (uris == null)
+            if (uris is null)
             {
                 CommandResult f = new()
                 {
@@ -2247,7 +2247,7 @@ namespace MPDCtrl.Services
                 f.IsSuccess = false;
                 return f;
             }
-            if (posList == null)
+            if (posList is null)
             {
                 CommandResult f = new CommandResult();
                 f.IsSuccess = false;
@@ -2558,7 +2558,7 @@ namespace MPDCtrl.Services
                 isEmptyResult = true;
 
             List<string> resultLines = result.Split('\n').ToList();
-            if (resultLines == null)
+            if (resultLines is null)
                 isEmptyResult = true;
             if (resultLines.Count == 0)
                 isEmptyResult = true;
@@ -2599,7 +2599,7 @@ namespace MPDCtrl.Services
                 {
                     SongInfoEx sng = FillSongInfoEx(SongValues, -1);
 
-                    if (sng != null)
+                    if (sng is not null)
                     {
                         if (MpdCurrentSong?.Id != sng.Id)
                             MpdCurrentSong = sng;
@@ -2640,14 +2640,14 @@ namespace MPDCtrl.Services
                 isEmptyResult = true;
 
             List<string> resultLines = result.Split('\n').ToList();
-            if (resultLines == null)
+            if (resultLines is null)
                 isEmptyResult = true;
             if (resultLines.Count == 0)
                 isEmptyResult = true;
 
             if (isEmptyResult)
             {
-                if (Application.Current == null) { return Task.FromResult(false); }
+                if (Application.Current is null) { return Task.FromResult(false); }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     CurrentQueue.Clear();
@@ -2721,7 +2721,7 @@ namespace MPDCtrl.Services
 
                 ObservableCollection<SongInfoEx> tmpQueue = new();
                 /*
-                if (Application.Current == null) { return Task.FromResult(false); }
+                if (Application.Current is null) { return Task.FromResult(false); }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     CurrentQueue.Clear();
@@ -2744,10 +2744,10 @@ namespace MPDCtrl.Services
                             {
                                 SongInfoEx sng = FillSongInfoEx(SongValues, i);
 
-                                if (sng != null)
+                                if (sng is not null)
                                 {
                                     /*
-                                    if (Application.Current == null) { return Task.FromResult(false); }
+                                    if (Application.Current is null) { return Task.FromResult(false); }
                                     Application.Current.Dispatcher.Invoke(() =>
                                     {
                                         CurrentQueue.Add(sng);
@@ -2796,11 +2796,11 @@ namespace MPDCtrl.Services
                 {
                     SongInfoEx sng = FillSongInfoEx(SongValues, i);
 
-                    if (sng != null)
+                    if (sng is not null)
                     {
                         SongValues.Clear();
                         /*
-                        if (Application.Current == null) { return Task.FromResult(false); }
+                        if (Application.Current is null) { return Task.FromResult(false); }
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             CurrentQueue.Add(sng);
@@ -2815,7 +2815,7 @@ namespace MPDCtrl.Services
 
                 // test
                 MpcProgress?.Invoke(this, "[Background] Updating internal queue list...");
-                if (Application.Current == null) { return Task.FromResult(false); }
+                if (Application.Current is null) { return Task.FromResult(false); }
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
                     //CurrentQueue.Clear();
@@ -3000,7 +3000,7 @@ namespace MPDCtrl.Services
 
             if (isEmptyResult)
             {
-                if (Application.Current == null) { return Task.FromResult(false); }
+                if (Application.Current is null) { return Task.FromResult(false); }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     Playlists.Clear();
@@ -3031,7 +3031,7 @@ namespace MPDCtrl.Services
                     }
                     else if (value.StartsWith("Last-Modified: "))
                     {
-                        if (pl != null)
+                        if (pl is not null)
                             pl.LastModified = value.Replace("Last-Modified: ", "");
                     }
                     else if (value.StartsWith("OK"))
@@ -3040,14 +3040,14 @@ namespace MPDCtrl.Services
                     }
                 }
 
-                if (Application.Current == null) { return Task.FromResult(false); }
+                if (Application.Current is null) { return Task.FromResult(false); }
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
                     this.Playlists = new ObservableCollection<Playlist>(tmpPlaylists);
                 }));
 
                 /*
-                if (Application.Current == null) { return Task.FromResult(false); }
+                if (Application.Current is null) { return Task.FromResult(false); }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     Playlists.Clear();
@@ -3071,7 +3071,7 @@ namespace MPDCtrl.Services
                         }
                         else if (value.StartsWith("Last-Modified: "))
                         {
-                            if (pl != null)
+                            if (pl is not null)
                                 pl.LastModified = value.Replace("Last-Modified: ", "");
                         }
                         else if (value.StartsWith("OK"))
@@ -3113,7 +3113,7 @@ namespace MPDCtrl.Services
             {
                 IsBusy?.Invoke(this, true);
 
-                if (Application.Current == null) { return Task.FromResult(false); }
+                if (Application.Current is null) { return Task.FromResult(false); }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     LocalFiles.Clear();
@@ -3128,7 +3128,7 @@ namespace MPDCtrl.Services
                 {
                     if (value.StartsWith("directory:"))
                     {
-                        if (Application.Current == null) { return Task.FromResult(false); }
+                        if (Application.Current is null) { return Task.FromResult(false); }
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             LocalDirectories.Add(value.Replace("directory: ", ""));
@@ -3145,7 +3145,7 @@ namespace MPDCtrl.Services
                             File = value.Replace("file: ", "")
                         };
 
-                        if (Application.Current == null) { return Task.FromResult(false); }
+                        if (Application.Current is null) { return Task.FromResult(false); }
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             LocalFiles.Add(song);
@@ -3191,7 +3191,7 @@ namespace MPDCtrl.Services
         {
             if (MpdStop) return Task.FromResult(false);
 
-            if (Application.Current == null) { return Task.FromResult(false); }
+            if (Application.Current is null) { return Task.FromResult(false); }
             Application.Current.Dispatcher.Invoke(() =>
             {
                 SearchResult.Clear();
@@ -3202,7 +3202,7 @@ namespace MPDCtrl.Services
             //if (result.Trim() == "OK") return true;
 
             List<string> resultLines = result.Split('\n').ToList();
-            if (resultLines == null) return Task.FromResult(true);
+            if (resultLines is null) return Task.FromResult(true);
             if (resultLines.Count == 0) return Task.FromResult(true);
 
 
@@ -3261,7 +3261,7 @@ namespace MPDCtrl.Services
 
                                 SongValues.Clear();
 
-                                if (Application.Current == null) { return Task.FromResult(false); }
+                                if (Application.Current is null) { return Task.FromResult(false); }
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
                                     SearchResult.Add(sng);
@@ -3300,7 +3300,7 @@ namespace MPDCtrl.Services
 
                     SongValues.Clear();
 
-                    if (Application.Current == null) { return Task.FromResult(false); }
+                    if (Application.Current is null) { return Task.FromResult(false); }
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         SearchResult.Add(sng);
@@ -3340,7 +3340,7 @@ namespace MPDCtrl.Services
             if (result.Trim() == "OK") return songList;
 
             List<string> resultLines = result.Split('\n').ToList();
-            if (resultLines == null) return songList;
+            if (resultLines is null) return songList;
             if (resultLines.Count == 0) return songList;
 
 
@@ -3396,7 +3396,7 @@ namespace MPDCtrl.Services
 
                                 SongValues.Clear();
 
-                                //if (Application.Current == null) { return songList; }
+                                //if (Application.Current is null) { return songList; }
                                 //Application.Current.Dispatcher.Invoke(() =>
                                 //{
                                 songList.Add(sng);
@@ -3435,7 +3435,7 @@ namespace MPDCtrl.Services
 
                     SongValues.Clear();
 
-                    //if (Application.Current == null) { return songList; }
+                    //if (Application.Current is null) { return songList; }
                     //Application.Current.Dispatcher.Invoke(() =>
                     //{
                     songList.Add(sng);

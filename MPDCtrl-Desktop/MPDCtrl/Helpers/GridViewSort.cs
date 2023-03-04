@@ -36,15 +36,15 @@ namespace MPDCtrl.Helpers
                     (o, e) =>
                     {
                         ItemsControl listView = o as ItemsControl;
-                        if (listView != null)
+                        if (listView is not null)
                         {
                             if (!GetAutoSort(listView)) // Don't change click handler if AutoSort enabled
                             {
-                                if (e.OldValue != null && e.NewValue == null)
+                                if (e.OldValue is not null && e.NewValue is null)
                                 {
                                     listView.RemoveHandler(GridViewColumnHeader.ClickEvent, new RoutedEventHandler(ColumnHeader_Click));
                                 }
-                                if (e.OldValue == null && e.NewValue != null)
+                                if (e.OldValue is null && e.NewValue is not null)
                                 {
                                     listView.AddHandler(GridViewColumnHeader.ClickEvent, new RoutedEventHandler(ColumnHeader_Click));
                                 }
@@ -75,9 +75,9 @@ namespace MPDCtrl.Helpers
                     (o, e) =>
                     {
                         ListView listView = o as ListView;
-                        if (listView != null)
+                        if (listView is not null)
                         {
-                            if (GetCommand(listView) == null) // Don't change click handler if a command is set
+                            if (GetCommand(listView) is null) // Don't change click handler if a command is set
                             {
                                 bool oldValue = (bool)e.OldValue;
                                 bool newValue = (bool)e.NewValue;
@@ -181,16 +181,16 @@ namespace MPDCtrl.Helpers
         private static void ColumnHeader_Click(object sender, RoutedEventArgs e)
         {
             GridViewColumnHeader headerClicked = e.OriginalSource as GridViewColumnHeader;
-            if (headerClicked != null && headerClicked.Column != null)
+            if (headerClicked is not null && headerClicked.Column is not null)
             {
                 string propertyName = GetPropertyName(headerClicked.Column);
                 if (!string.IsNullOrEmpty(propertyName))
                 {
                     ListView listView = GetAncestor<ListView>(headerClicked);
-                    if (listView != null)
+                    if (listView is not null)
                     {
                         ICommand command = GetCommand(listView);
-                        if (command != null)
+                        if (command is not null)
                         {
                             if (command.CanExecute(propertyName))
                             {
@@ -217,7 +217,7 @@ namespace MPDCtrl.Helpers
             {
                 parent = VisualTreeHelper.GetParent(parent);
             }
-            if (parent != null)
+            if (parent is not null)
                 return (T)parent;
             else
                 return null;
@@ -239,7 +239,7 @@ namespace MPDCtrl.Helpers
                 view.SortDescriptions.Clear();
 
                 GridViewColumnHeader currentSortedColumnHeader = GetSortedColumnHeader(listView);
-                if (currentSortedColumnHeader != null)
+                if (currentSortedColumnHeader is not null)
                 {
                     RemoveSortGlyph(currentSortedColumnHeader);
                 }
@@ -271,7 +271,7 @@ namespace MPDCtrl.Helpers
         {
             AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer(columnHeader);
             Adorner[] adorners = adornerLayer.GetAdorners(columnHeader);
-            if (adorners != null)
+            if (adorners is not null)
             {
                 foreach (Adorner adorner in adorners)
                 {
@@ -334,7 +334,7 @@ namespace MPDCtrl.Helpers
             {
                 base.OnRender(drawingContext);
 
-                if (_sortGlyph != null)
+                if (_sortGlyph is not null)
                 {
                     double x = _columnHeader.ActualWidth - 13;
                     double y = _columnHeader.ActualHeight / 2 - 5;

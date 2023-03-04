@@ -125,7 +125,7 @@ namespace MPDCtrl.Helpers
             // of it.
             FrameworkElement element = obj as FrameworkElement;
 
-            if (element == null)
+            if (element is null)
             {
                 // The given object is not an instance of FrameworkElement,
                 // meaning SizeChanged event is not available. So, nothing
@@ -134,7 +134,7 @@ namespace MPDCtrl.Helpers
             }
 
             // If IsEnabled=True
-            if (args.NewValue != null && (bool)args.NewValue == true)
+            if (args.NewValue is not null && (bool)args.NewValue == true)
             {
                 // Attach to the element.
                 Attach(element);
@@ -164,7 +164,7 @@ namespace MPDCtrl.Helpers
         {
             FrameworkElement element = sender as FrameworkElement;
 
-            if (element == null)
+            if (element is null)
             {
                 return;
             }

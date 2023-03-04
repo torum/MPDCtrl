@@ -354,7 +354,10 @@
             <Grid Grid.Row="2" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}" helpers:SizeChange.IsEnabled="True" helpers:SizeChange.ActualWidth="{Binding MainLeftPainActualWidth, Mode=OneWayToSource}">
                 <TreeView Margin="0 0 0 0" Style="{DynamicResource TreeViewMenuStyle}" ItemsSource="{Binding MainMenuItems}" helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeMenu, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <TreeView.Resources>
-
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                        </Style>
                         <ContextMenu x:Key="TreeviewMenuItemContextMenu">
 
                             <MenuItem Header="{x:Static properties:Resources.TreeviewMenuItemContextMenu_Load}" Command="{Binding Path=DataContext.TreeviewMenuItemLoadPlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}}" Visibility="{Binding DataContext.IsPlaylistItemVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}}">
@@ -433,7 +436,7 @@
                         </Style>
                     </TreeView.Resources>
                     <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate DataType="local:NodeTree" ItemsSource="{Binding Path=Children}">
+                        <HierarchicalDataTemplate DataType="local:NodeDirectory" ItemsSource="{Binding Path=Children}">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                                 <Viewbox Width="12" Height="12" Margin="0 0 4 2">
                                     <Canvas Width="18" Height="18">
@@ -450,6 +453,8 @@
                             <Setter Property="IsExpanded" Value="{Binding Expanded, Mode=TwoWay}"/>
                             <Setter Property="IsSelected" Value="{Binding Selected, Mode=OneWay}"/>
                             <Setter Property="ContextMenu" Value="{StaticResource TreeviewMenuItemContextMenu}"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
                         </Style>
                     </TreeView.ItemContainerStyle>
                 </TreeView>
@@ -1615,6 +1620,10 @@
 
                         <TreeView Grid.Row="0" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}" BorderThickness="0 0 0 0" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" ItemsSource="{Binding MusicDirectories}" helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeDirectory, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <TreeView.Resources>
+                                <Style TargetType="{x:Type TreeViewItem}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                </Style>
                                 <Style TargetType="{x:Type ScrollBar}">
                                     <Setter Property="SnapsToDevicePixels" Value="True" />
                                     <Setter Property="OverridesDefaultStyle" Value="true" />
@@ -1653,6 +1662,8 @@
                                     <Setter Property="OverridesDefaultStyle" Value="False" />
                                     <Setter Property="IsExpanded" Value="{Binding Expanded, Mode=TwoWay}"/>
                                     <Setter Property="IsSelected" Value="{Binding Selected, Mode=TwoWay}"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
                                 </Style>
                             </TreeView.ItemContainerStyle>
                         </TreeView>

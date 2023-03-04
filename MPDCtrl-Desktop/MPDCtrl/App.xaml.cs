@@ -160,7 +160,7 @@ public partial class App : Application
 
     private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
-        if (e.Exception.InnerException != null)
+        if (e.Exception.InnerException is not null)
         {
             var exception = e.Exception.InnerException as Exception;
 
@@ -224,7 +224,7 @@ public partial class App : Application
     public static void ChangeTheme(string themeName)
     {
         ResourceDictionary? _themeDict = Application.Current.Resources.MergedDictionaries.FirstOrDefault(x => x.Source == new Uri("pack://application:,,,/Themes/DarkTheme.xaml"));
-        if (_themeDict != null)
+        if (_themeDict is not null)
         {
             _themeDict.Clear();
         }

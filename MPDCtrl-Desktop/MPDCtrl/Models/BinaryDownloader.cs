@@ -68,11 +68,11 @@ namespace MPDCtrl.Models
             {
                 await _binaryConnection.ConnectAsync(_host, _port);
 
-                if (_binaryConnection.Client == null)
+                if (_binaryConnection.Client is null)
                 {
-                    Debug.WriteLine("_binaryConnection.Client == null. " + host + " " + port.ToString());
+                    Debug.WriteLine("_binaryConnection.Client is null. " + host + " " + port.ToString());
 
-                    result.ErrorMessage = "_binaryConnection.Client == null";
+                    result.ErrorMessage = "_binaryConnection.Client is null";
 
                     return result;
                 }
@@ -137,12 +137,12 @@ namespace MPDCtrl.Models
         {
             CommandResult ret = new();
 
-            if (_binaryConnection.Client == null)
+            if (_binaryConnection.Client is null)
             {
                 return ret;
             }
 
-            if ((_binaryWriter == null) || (_binaryReader == null))
+            if ((_binaryWriter is null) || (_binaryReader is null))
             {
                 Debug.WriteLine("@MpdBinarySendCommand: " + "_commandWriter or _commandReader is null");
 
@@ -222,7 +222,7 @@ namespace MPDCtrl.Models
                 {
                     string line = await _binaryReader.ReadLineAsync();
 
-                    if (line != null)
+                    if (line is not null)
                     {
                         if (line.StartsWith("ACK"))
                         {
@@ -345,17 +345,17 @@ namespace MPDCtrl.Models
         {
             CommandBinaryResult ret = new();
 
-            if (_binaryConnection.Client == null)
+            if (_binaryConnection.Client is null)
             {
-                Debug.WriteLine("@MpdBinarySendBinaryCommand: " + "TcpClient.Client == null");
+                Debug.WriteLine("@MpdBinarySendBinaryCommand: " + "TcpClient.Client is null");
 
                 ret.IsSuccess = false;
-                ret.ErrorMessage = "TcpClient.Client == null";
+                ret.ErrorMessage = "TcpClient.Client is null";
 
                 return ret;
             }
 
-            if ((_binaryWriter == null) || (_binaryReader == null))
+            if ((_binaryWriter is null) || (_binaryReader is null))
             {
                 Debug.WriteLine("@MpdBinarySendBinaryCommand: " + "_binaryWriter or _binaryReader is null");
 
@@ -473,7 +473,7 @@ namespace MPDCtrl.Models
 
                         foreach (var line in values)
                         {
-                            if (line != null)
+                            if (line is not null)
                             {
                                 if (line.StartsWith("ACK"))
                                 {
@@ -883,11 +883,11 @@ namespace MPDCtrl.Models
                         {
                             result = await MpdReQueryAlbumArt(_albumCover.SongFilePath, _albumCover.BinaryData.Length, isUsingReadpicture);
 
-                            if (result.IsSuccess && (result.BinaryData != null))
+                            if (result.IsSuccess && (result.BinaryData is not null))
                                 _albumCover.BinaryData = CombineByteArray(_albumCover.BinaryData, result.BinaryData);
                         }
 
-                        if (result.IsSuccess && (_albumCover.BinaryData != null))
+                        if (result.IsSuccess && (_albumCover.BinaryData is not null))
                         {
                             Application.Current.Dispatcher.Invoke(() =>
                             {
@@ -979,7 +979,7 @@ namespace MPDCtrl.Models
         {
             try
             {
-                if (_binaryConnection.Client != null)
+                if (_binaryConnection.Client is not null)
                     _binaryConnection.Client.Shutdown(SocketShutdown.Both);
                 _binaryConnection.Close();
             }

@@ -175,6 +175,8 @@
                         <Setter Property="BorderBrush" Value="#121212"/>
                         <Setter Property="BorderThickness" Value="0 0 0 0"/>
                         <Setter Property="Padding" Value="1"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Left" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
                         <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
                         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
                         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
@@ -250,8 +252,9 @@
 
                     <Style x:Key="TreeViewMenuItemStyle" TargetType="{x:Type TreeViewItem}">
                         <Setter Property="Background" Value="{DynamicResource ItemBackgroundColorBrush}"/>
-                        <Setter Property="HorizontalContentAlignment" Value="{Binding Path=HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
-                        <Setter Property="VerticalContentAlignment" Value="{Binding Path=VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+
+                        <Setter Property="HorizontalContentAlignment" Value="Left" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
                         <Setter Property="Padding" Value="1,1,0,1"/>
                         <Setter Property="Foreground" Value="{DynamicResource ItemForegroundColorBrush}"/>
                         <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}"/>

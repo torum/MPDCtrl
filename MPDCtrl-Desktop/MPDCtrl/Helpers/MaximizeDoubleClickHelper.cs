@@ -23,7 +23,7 @@ namespace MPDCtrl.Helpers
             DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
             UIElement uiElement = dependencyObject as UIElement;
-            if (uiElement == null || (dependencyPropertyChangedEventArgs.NewValue is bool) == false)
+            if (uiElement is null || (dependencyPropertyChangedEventArgs.NewValue is bool) == false)
             {
                 return;
             }
@@ -41,12 +41,12 @@ namespace MPDCtrl.Helpers
         private static void UIElementMouseLeftButtonDown(object sender, MouseButtonEventArgs mouseEventArgs)
         {
             UIElement uiElement = sender as UIElement;
-            if (uiElement != null)
+            if (uiElement is not null)
             {
                 if (mouseEventArgs.ClickCount == 2)
                 {
                     var parentWindow = Window.GetWindow(uiElement);
-                    if (parentWindow != null && parentWindow.WindowState == WindowState.Normal)
+                    if (parentWindow is not null && parentWindow.WindowState == WindowState.Normal)
                     {
                         if (parentWindow.ResizeMode != ResizeMode.NoResize)
                         {
@@ -55,7 +55,7 @@ namespace MPDCtrl.Helpers
 
                         
                     }
-                    else if (parentWindow != null && parentWindow.WindowState == WindowState.Maximized)
+                    else if (parentWindow is not null && parentWindow.WindowState == WindowState.Maximized)
                     {
                         parentWindow.WindowState = WindowState.Normal;
                     }

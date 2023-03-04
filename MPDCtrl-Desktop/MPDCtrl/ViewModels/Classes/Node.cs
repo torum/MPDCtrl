@@ -56,7 +56,7 @@ abstract public class Node : INotifyPropertyChanged
 
     protected void NotifyPropertyChanged(string propertyName)
     {
-        if (Application.Current == null) return;
+        if (Application.Current is null) return;
         Application.Current.Dispatcher.Invoke(() =>
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

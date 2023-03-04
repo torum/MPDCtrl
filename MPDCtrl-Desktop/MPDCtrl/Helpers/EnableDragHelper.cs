@@ -24,7 +24,7 @@ namespace MPDCtrl.Helpers
             DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
             UIElement uiElement = dependencyObject as UIElement;
-            if (uiElement == null || (dependencyPropertyChangedEventArgs.NewValue is bool) == false)
+            if (uiElement is null || (dependencyPropertyChangedEventArgs.NewValue is bool) == false)
             {
                 return;
             }
@@ -42,7 +42,7 @@ namespace MPDCtrl.Helpers
         private static void UiElementOnMouseMove(object sender, MouseEventArgs mouseEventArgs)
         {
             UIElement uiElement = sender as UIElement;
-            if (uiElement != null && mouseEventArgs.LeftButton == MouseButtonState.Pressed)
+            if (uiElement is not null && mouseEventArgs.LeftButton == MouseButtonState.Pressed)
             {
                 DependencyObject parent = uiElement;
                 int avoidInfiniteLoop = 0;

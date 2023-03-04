@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Data;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.ComponentModel;
-using System.Globalization;
+using System.Windows.Data;
 using System.Windows.Media;
 
 namespace MPDCtrl.Common
@@ -64,15 +57,15 @@ namespace MPDCtrl.Common
             FalseValue = Visibility.Collapsed;
         }
 
-        public object Convert(object value, Type targetType,
+        public object? Convert(object value, Type targetType,
             object parameter, CultureInfo culture)
         {
-            if (!(value is bool))
+            if (value is not bool)
                 return null;
             return (bool)value ? TrueValue : FalseValue;
         }
 
-        public object ConvertBack(object value, Type targetType,
+        public object? ConvertBack(object value, Type targetType,
             object parameter, CultureInfo culture)
         {
             if (Equals(value, TrueValue))
@@ -89,8 +82,7 @@ namespace MPDCtrl.Common
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var item = value as TreeViewItem;
-            if (item == null)
+            if (value is not TreeViewItem item)
                 return new Thickness(0);
 
             return new Thickness(Length * item.GetDepth(), 0, 0, 0);
@@ -106,15 +98,15 @@ namespace MPDCtrl.Common
     {
         public static int GetDepth(this TreeViewItem item)
         {
-            TreeViewItem parent;
-            while ((parent = GetParent(item)) != null)
+            TreeViewItem? parent;
+            while ((parent = GetParent(item)) is not null)
             {
                 return GetDepth(parent) + 1;
             }
             return 0;
         }
 
-        private static TreeViewItem GetParent(TreeViewItem item)
+        private static TreeViewItem? GetParent(TreeViewItem item)
         {
             var parent = VisualTreeHelper.GetParent(item);
             while (!(parent is TreeViewItem || parent is TreeView))

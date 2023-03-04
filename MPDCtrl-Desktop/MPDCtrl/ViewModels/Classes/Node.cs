@@ -2,140 +2,133 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
-using System;
-using System.Collections.Generic;
 
-namespace MPDCtrl.ViewModels.Classes
+namespace MPDCtrl.ViewModels.Classes;
+
+/// <summary>
+/// Base class for Treeview Node and Listview Item.
+/// </summary>
+abstract public class Node : INotifyPropertyChanged
 {
-    /// <summary>
-    /// Base class for Treeview Node and Listview Item.
-    /// </summary>
-    abstract public class Node : INotifyPropertyChanged
+    private string _name;
+    public string Name
     {
-        private string _name;
-        public string Name
+        get
         {
-            get
-            {
-                return _name;
-            }
-            set
-            {
-                if (_name == value)
-                    return;
-
-                _name = value;
-
-                NotifyPropertyChanged(nameof(Name));
-            }
+            return _name;
         }
-
-        private string _pathData = "M20,18H4V8H20M20,6H12L10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6Z";
-        public string PathIcon
+        set
         {
-            get
-            {
-                return _pathData;
-            }
-            protected set
-            {
-                if (_pathData == value)
-                    return;
-                _pathData = value;
+            if (_name == value)
+                return;
 
-                NotifyPropertyChanged(nameof(PathIcon));
-            }
+            _name = value;
+
+            NotifyPropertyChanged(nameof(Name));
         }
-
-        protected Node(){}
-
-        protected Node(string name)
-        {
-            Name = name;
-        }
-
-        #region == INotifyPropertyChanged ==
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected void NotifyPropertyChanged(string propertyName)
-        {
-            if (Application.Current == null) return;
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            });
-        }
-
-        #endregion
     }
 
-    /// <summary>
-    /// Base class for Treeview Node.
-    /// </summary>
-    public class NodeTree : Node
+    private string _pathData = "M20,18H4V8H20M20,6H12L10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6Z";
+    public string PathIcon
     {
-        public bool Selected { get; set; }
-
-        private bool _expanded;
-        public bool Expanded
+        get
         {
-            get
-            {
-                return _expanded;
-            }
-            set
-            {
-                if (_expanded == value)
-                    return;
-
-                _expanded = value;
-
-                NotifyPropertyChanged(nameof(Expanded));
-            }
+            return _pathData;
         }
-
-        private NodeTree? _parent;
-        public NodeTree? Parent
+        protected set
         {
-            get
-            {
-                return this._parent;
-            }
+            if (_pathData == value)
+                return;
+            _pathData = value;
 
-            set
-            {
-                if (_parent == value)
-                    return;
-
-
-                _parent = value;
-
-                NotifyPropertyChanged(nameof(Parent));
-            }
+            NotifyPropertyChanged(nameof(PathIcon));
         }
-
-        private ObservableCollection<NodeTree> _children = new();
-        public ObservableCollection<NodeTree> Children
-        {
-            get
-            {
-                return _children;
-            }
-            set
-            {
-                _children = value;
-
-                NotifyPropertyChanged(nameof(Children));
-            }
-        }
-
-        protected NodeTree(){}
-
-        protected NodeTree(string name): base(name)
-        {
-            BindingOperations.EnableCollectionSynchronization(_children, new object());
-        }
-
     }
+
+    protected Node(string name)
+    {
+        _name = name;
+    }
+
+    #region == INotifyPropertyChanged ==
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected void NotifyPropertyChanged(string propertyName)
+    {
+        if (Application.Current == null) return;
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        });
+    }
+
+    #endregion
+}
+
+/// <summary>
+/// Base class for Treeview Node.
+/// </summary>
+public class NodeTree : Node
+{
+    public bool Selected { get; set; }
+
+    private bool _expanded;
+    public bool Expanded
+    {
+        get
+        {
+            return _expanded;
+        }
+        set
+        {
+            if (_expanded == value)
+                return;
+
+            _expanded = value;
+
+            NotifyPropertyChanged(nameof(Expanded));
+        }
+    }
+
+    private NodeTree? _parent;
+    public NodeTree? Parent
+    {
+        get
+        {
+            return this._parent;
+        }
+
+        set
+        {
+            if (_parent == value)
+                return;
+
+
+            _parent = value;
+
+            NotifyPropertyChanged(nameof(Parent));
+        }
+    }
+
+    private ObservableCollection<NodeTree> _children = new();
+    public ObservableCollection<NodeTree> Children
+    {
+        get
+        {
+            return _children;
+        }
+        set
+        {
+            _children = value;
+
+            NotifyPropertyChanged(nameof(Children));
+        }
+    }
+
+    protected NodeTree(string name): base(name)
+    {
+        BindingOperations.EnableCollectionSynchronization(_children, new object());
+    }
+
 }

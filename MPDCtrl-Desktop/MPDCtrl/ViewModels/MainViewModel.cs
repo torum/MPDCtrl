@@ -1233,7 +1233,7 @@ public class MainViewModel : ViewModelBase
 
     #region == MenuTree ==
 
-    private readonly MenuTreeBuilder _mainMenuItems = new();
+    private readonly MenuTreeBuilder _mainMenuItems = new("");
     public ObservableCollection<NodeTree> MainMenuItems
     {
         get { return _mainMenuItems.Children; }
@@ -1609,7 +1609,7 @@ public class MainViewModel : ViewModelBase
 
     #region == Library ==
 
-    private readonly DirectoryTreeBuilder _musicDirectories = new();
+    private readonly DirectoryTreeBuilder _musicDirectories = new("");
     public ObservableCollection<NodeTree> MusicDirectories
     {
         get { return _musicDirectories.Children; }
@@ -4971,7 +4971,7 @@ public class MainViewModel : ViewModelBase
 
         try
         {
-            var tmpMusicDirectories = new DirectoryTreeBuilder();
+            var tmpMusicDirectories = new DirectoryTreeBuilder("");
             /*
             await Task.Run(() =>
             {

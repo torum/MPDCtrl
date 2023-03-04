@@ -50,7 +50,7 @@ public class NodeFile : Node
 
 public class DirectoryTreeBuilder : NodeTree
 {
-    public DirectoryTreeBuilder() { }
+    public DirectoryTreeBuilder(string name) : base(name) { }
 
     public bool IsCanceled { get; set; }
 

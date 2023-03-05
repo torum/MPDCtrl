@@ -61,7 +61,7 @@ public class NodeMenuPlaylistItem : NodeMenu
 
 public class MenuTreeBuilder : NodeTree
 {
-    private NodeMenuPlaylists _playlistsDirectory;
+    private readonly NodeMenuPlaylists _playlistsDirectory;
     public NodeMenuPlaylists PlaylistsDirectory
     {
         get
@@ -70,7 +70,7 @@ public class MenuTreeBuilder : NodeTree
         }
     }
 
-    private NodeMenuSearch _searchDirectory;
+    private readonly NodeMenuSearch _searchDirectory;
     public NodeMenuSearch SearchDirectory
     {
         get
@@ -79,7 +79,7 @@ public class MenuTreeBuilder : NodeTree
         }
     }
 
-    private NodeMenuLibrary _libraryDirectory;
+    private readonly NodeMenuLibrary _libraryDirectory;
     public NodeMenuLibrary LibraryDirectory
     {
         get
@@ -90,39 +90,47 @@ public class MenuTreeBuilder : NodeTree
 
     public MenuTreeBuilder(string name) : base(name)
     {
-        NodeMenuQueue queue = new(MPDCtrl.Properties.Resources.MenuTreeItem_Queue); 
-        queue.Selected = true;
-        queue.Expanded = false;
+        NodeMenuQueue queue = new(MPDCtrl.Properties.Resources.MenuTreeItem_Queue)
+        {
+            Selected = true,
+            Expanded = false,
 
-        queue.Parent = this;
+            Parent = this
+        };
         this.Children.Add(queue);
 
 
-        NodeMenuSearch search = new(MPDCtrl.Properties.Resources.MenuTreeItem_Search);
-        search.Selected = false;
-        search.Expanded = false;
+        NodeMenuSearch search = new(MPDCtrl.Properties.Resources.MenuTreeItem_Search)
+        {
+            Selected = false,
+            Expanded = false,
 
-        search.Parent = this;
+            Parent = this
+        };
         this.Children.Add(search);
 
         _searchDirectory = search;
 
 
-        NodeMenuLibrary browse = new(MPDCtrl.Properties.Resources.MenuTreeItem_Browse);
-        browse.Selected = false;
-        browse.Expanded = false;
+        NodeMenuLibrary browse = new(MPDCtrl.Properties.Resources.MenuTreeItem_Browse)
+        {
+            Selected = false,
+            Expanded = false,
 
-        browse.Parent = this;
+            Parent = this
+        };
         this.Children.Add(browse);
 
         _libraryDirectory = browse;
 
 
-        NodeMenuPlaylists playlists = new(MPDCtrl.Properties.Resources.MenuTreeItem_Playlists);
-        playlists.Selected = false;
-        playlists.Expanded = true;
+        NodeMenuPlaylists playlists = new(MPDCtrl.Properties.Resources.MenuTreeItem_Playlists)
+        {
+            Selected = false,
+            Expanded = true,
 
-        playlists.Parent = this;
+            Parent = this
+        };
         this.Children.Add(playlists);
 
         _playlistsDirectory = playlists;

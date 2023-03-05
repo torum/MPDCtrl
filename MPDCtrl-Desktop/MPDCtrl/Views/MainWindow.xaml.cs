@@ -293,8 +293,10 @@ public partial class MainWindow : Window
 
     private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
     {
-        ProcessStartInfo psi = new(e.Uri.AbsoluteUri);
-        psi.UseShellExecute = true;
+        ProcessStartInfo psi = new(e.Uri.AbsoluteUri)
+        {
+            UseShellExecute = true
+        };
         Process.Start(psi);
         e.Handled = true;
     }

@@ -59,7 +59,7 @@ abstract public class Node : INotifyPropertyChanged
         if (Application.Current is null) return;
         Application.Current.Dispatcher.Invoke(() =>
         {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         });
     }
 
@@ -96,7 +96,7 @@ public class NodeTree : Node
     {
         get
         {
-            return this._parent;
+            return _parent;
         }
 
         set
@@ -126,7 +126,7 @@ public class NodeTree : Node
         }
     }
 
-    protected NodeTree(string name): base(name)
+    protected NodeTree(string name) : base(name)
     {
         BindingOperations.EnableCollectionSynchronization(_children, new object());
     }

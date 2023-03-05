@@ -1,6 +1,6 @@
-﻿using System;
+﻿using MPDCtrl.Contracts;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -13,13 +13,13 @@ using System.Windows.Media.Imaging;
 
 namespace MPDCtrl.Models
 {
-    public class BinaryDownloader
+    public class BinaryDownloader : IBinaryDownloader
     {
         private static TcpClient _binaryConnection = new();
         private StreamReader _binaryReader;
         private StreamWriter _binaryWriter;
 
-        private AlbumImage _albumCover = new();
+        private readonly AlbumImage _albumCover = new();
         public AlbumImage AlbumCover { get => _albumCover; }
 
         private string _host;
@@ -84,8 +84,10 @@ namespace MPDCtrl.Models
                     tcpStream.ReadTimeout = 3000;
 
                     _binaryReader = new(tcpStream);
-                    _binaryWriter = new(tcpStream);
-                    _binaryWriter.AutoFlush = true;
+                    _binaryWriter = new(tcpStream)
+                    {
+                        AutoFlush = true
+                    };
 
                     string response = await _binaryReader.ReadLineAsync();
 
@@ -444,7 +446,7 @@ namespace MPDCtrl.Models
 
                     using (MemoryStream ms = new())
                     {
-                        while ((readSize = await _binaryReader.BaseStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                        while ((readSize = await _binaryReader.BaseStream.ReadAsync(buffer)) > 0)
                         {
                             ms.Write(buffer, 0, readSize);
 
@@ -536,7 +538,7 @@ namespace MPDCtrl.Models
                                         }
                                     }
                                 }
-                                else if (line == "OK") 
+                                else if (line == "OK")
                                 {
                                     if (isAutoIdling)
                                     {
@@ -777,7 +779,7 @@ namespace MPDCtrl.Models
                     }
                 }
 
-                gabEnd++; 
+                gabEnd++;
 
                 if (binSize > 1000000)
                 {
@@ -840,9 +842,11 @@ namespace MPDCtrl.Models
         {
             if (string.IsNullOrEmpty(uri))
             {
-                CommandResult f = new();
-                f.ErrorMessage = "IsNullOrEmpty(uri)";
-                f.IsSuccess = false;
+                CommandResult f = new()
+                {
+                    ErrorMessage = "IsNullOrEmpty(uri)",
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -853,7 +857,7 @@ namespace MPDCtrl.Models
 
             string cmd = "albumart \"" + uri + "\" 0" + "\n";
             if (isUsingReadpicture)
-                if (CompareVersionString(MpdVersion,"0.22.0") >= 0)
+                if (CompareVersionString(MpdVersion, "0.22.0") >= 0)
                     cmd = "readpicture \"" + uri + "\" 0" + "\n";
 
             CommandBinaryResult result = await MpdBinarySendBinaryCommand(cmd, false);
@@ -902,8 +906,10 @@ namespace MPDCtrl.Models
                 }
             }
 
-            CommandResult b = new();
-            b.IsSuccess = r;
+            CommandResult b = new()
+            {
+                IsSuccess = r
+            };
             if (!r)
             {
                 b.ErrorMessage = result.ErrorMessage;
@@ -916,16 +922,20 @@ namespace MPDCtrl.Models
         {
             if (string.IsNullOrEmpty(uri))
             {
-                CommandBinaryResult f = new();
-                f.ErrorMessage = "IsNullOrEmpty(uri)";
-                f.IsSuccess = false;
+                CommandBinaryResult f = new()
+                {
+                    ErrorMessage = "IsNullOrEmpty(uri)",
+                    IsSuccess = false
+                };
                 return f;
             }
 
             if (!_albumCover.IsDownloading)
             {
-                CommandBinaryResult f = new();
-                f.IsSuccess = false;
+                CommandBinaryResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -933,8 +943,10 @@ namespace MPDCtrl.Models
             {
                 _albumCover.IsDownloading = false;
 
-                CommandBinaryResult f = new();
-                f.IsSuccess = false;
+                CommandBinaryResult f = new()
+                {
+                    IsSuccess = false
+                };
                 return f;
             }
 
@@ -979,8 +991,7 @@ namespace MPDCtrl.Models
         {
             try
             {
-                if (_binaryConnection.Client is not null)
-                    _binaryConnection.Client.Shutdown(SocketShutdown.Both);
+                _binaryConnection.Client?.Shutdown(SocketShutdown.Both);
                 _binaryConnection.Close();
             }
             catch { }

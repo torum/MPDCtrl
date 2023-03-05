@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using MPDCtrl.Contracts;
 using MPDCtrl.Helpers;
+using MPDCtrl.Models;
 using MPDCtrl.Services;
 using MPDCtrl.ViewModels;
 using MPDCtrl.Views;
@@ -64,6 +65,7 @@ public partial class App : Application
                     services.AddSingleton<MainWindow>();
                     services.AddSingleton<MainViewModel>();
                     services.AddSingleton<IMpcService, MpcService>();
+                    services.AddTransient<IBinaryDownloader, BinaryDownloader>();
                 })
                 .Build();
 
@@ -230,12 +232,10 @@ public partial class App : Application
         }
         else
         {
-            // 新しいリソース・ディクショナリを追加
             _themeDict = new ResourceDictionary();
             Application.Current.Resources.MergedDictionaries.Add(_themeDict);
         }
 
-        // テーマをリソース・ディクショナリのソースに指定
         string themeUri = String.Format("pack://application:,,,/Themes/{0}.xaml", themeName);
         _themeDict.Source = new Uri(themeUri);
     }

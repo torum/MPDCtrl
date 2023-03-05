@@ -7,7 +7,8 @@
         xmlns:helpers="clr-namespace:MPDCtrl.Helpers"
         xmlns:vms="clr-namespace:MPDCtrl.ViewModels"
         xmlns:models="clr-namespace:MPDCtrl.Models"
-        xmlns:local="clr-namespace:MPDCtrl"
+        xmlns:local="clr-namespace:MPDCtrl" 
+        d:DataContext="{d:DesignInstance Type=vms:MainViewModel}"
         mc:Ignorable="d"
         Background="#C0191919"
         ResizeMode="CanResize"
@@ -134,7 +135,7 @@
                                     </BeginStoryboard>
                                 </EventTrigger>
                             </TextBlock.Triggers>
-                        <Run x:Name="CurrentSongTitle" Foreground="{DynamicResource ControlLightColorBrush}" FontWeight="DemiBold" Text="{Binding CurrentSongTitle, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}"/>
+                        <Run x:Name="CurrentSongTitle" Foreground="{DynamicResource ControlForegroundColorBrush}" FontWeight="DemiBold" Text="{Binding CurrentSongTitle, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}"/>
                         </TextBlock>
                         <TextBlock Foreground="{DynamicResource ControlDarkColorBrush}">
                             <TextBlock.Triggers>
@@ -157,7 +158,7 @@
                                 </Style>
                             </TextBlock.Style>
                         <Run Text="  by "/>
-                        <Run x:Name="CurrentSongArtist" Foreground="{DynamicResource ControlMediumColorBrush}" Text="{Binding CurrentSongArtist, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}" />
+                        <Run x:Name="CurrentSongArtist" Foreground="{DynamicResource ControlLightColorBrush}" Text="{Binding CurrentSongArtist, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}" />
                         </TextBlock>
                         <TextBlock  Foreground="{DynamicResource ControlDarkColorBrush}">
                             <TextBlock.Triggers>
@@ -339,7 +340,7 @@
                             </Button>
                         </Grid>
 
-                        <Grid Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0 6 16 6" Width="30">
+                        <Grid Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0 3 16 0" Width="30" Height="Auto">
                             <Slider x:Name="SliderVol" ToolTip="{x:Static properties:Resources.Playback_SliderVolume}" Style="{DynamicResource CustomSliderStyle}" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Stretch" IsMoveToPointEnabled="True" Maximum="100" Value="{Binding Volume}">
                             </Slider>
                         </Grid>
@@ -766,7 +767,7 @@
                                 <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
                                     <Setter Property="ContextMenu" Value="{StaticResource QueueItemContextMenu}" />
                                     <Setter Property="SnapsToDevicePixels" Value="true" />
-                                    <Setter Property="Margin" Value="3 0 3 0"/>
+                                    <Setter Property="Margin" Value="2 0 1 0"/>
                                     <Setter Property="Padding" Value="0 1 0 1"/>
                                     <Setter Property="HorizontalContentAlignment" Value="Left"/>
                                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
@@ -1531,7 +1532,7 @@
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
                                     <Setter Property="ContextMenu" Value="{StaticResource SearchResultListviewItemContextMenu}" />
-                                    <Setter Property="Margin" Value="3 0 3 0"/>
+                                    <Setter Property="Margin" Value="2 0 1 0"/>
                                     <Setter Property="Padding" Value="0 1 0 1"/>
                                     <Setter Property="HorizontalContentAlignment" Value="Left"/>
                                     <Setter Property="Template">
@@ -1938,7 +1939,7 @@
                                 <ListView.ItemContainerStyle>
                                     <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
                                         <Setter Property="ContextMenu" Value="{StaticResource SongFilesListviewItemContextMenu}" />
-                                        <Setter Property="Margin" Value="3 0 3 0"/>
+                                        <Setter Property="Margin" Value="2 0 1 0"/>
                                         <Setter Property="Padding" Value="0 1 0 1"/>
                                         <Setter Property="HorizontalContentAlignment" Value="Left"/>
                                         <Setter Property="Template">
@@ -2177,7 +2178,7 @@
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
                                     <Setter Property="ContextMenu" Value="{StaticResource PlaylistsListviewItemContextMenu}" />
-                                    <Setter Property="Margin" Value="3 0 3 0"/>
+                                    <Setter Property="Margin" Value="2 0 1 0"/>
                                     <Setter Property="Padding" Value="0 1 0 1"/>
                                     <Setter Property="HorizontalContentAlignment" Value="Left"/>
                                     <Setter Property="Template">
@@ -2471,7 +2472,7 @@
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
                                     <Setter Property="ContextMenu" Value="{StaticResource PlaylistSongsListviewItemContextMenu}" />
-                                    <Setter Property="Margin" Value="3 0 3 0"/>
+                                    <Setter Property="Margin" Value="2 0 1 0"/>
                                     <Setter Property="Padding" Value="0 1 0 1"/>
                                     <Setter Property="HorizontalContentAlignment" Value="Left"/>
                                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=OneWay}"/>
@@ -3244,12 +3245,11 @@
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type TabItem}">
 
-                                                <Border Name="HeaderBorder" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" Padding="{TemplateBinding Padding}" HorizontalAlignment="Center" CornerRadius="0">
+                                                <Border Name="HeaderBorder" BorderThickness="0,0,0,2" Background="{TemplateBinding Background}" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" Padding="{TemplateBinding Padding}" HorizontalAlignment="Center" CornerRadius="0">
                                                     <ContentPresenter x:Name="ContentSite" HorizontalAlignment="Center" VerticalAlignment="Center" ContentSource="Header" RecognizesAccessKey="True" />
                                                 </Border>
 
                                                 <ControlTemplate.Triggers>
-
                                                     <Trigger Property="IsSelected" Value="True">
                                                         <Setter Property="Foreground" Value="{DynamicResource TitleTextColorBrush}" />
                                                         <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="{DynamicResource ControlLightColorBrush}" />
@@ -3442,24 +3442,13 @@
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
-
-                                        <!-- MPD Server -->
-                                        <Border Grid.Row="0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
-                                            <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.Settings_Opts_MPDDatabase}" HorizontalAlignment="Left"/>
-                                        </Border>
-
-                                        <Grid Grid.Row="1" HorizontalAlignment="Left" Margin="0 12 0 0">
-                                            <CheckBox Content="{x:Static properties:Resources.Settings_Opts_UpdateDatabaseOnStartup}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsUpdateOnStartup}" Margin="0 12 0 0"></CheckBox>
-                                        </Grid>
-
                                         <!-- Themes -->
 
-                                        <Border Grid.Row="2" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                        <Border Grid.Row="0" Margin="0 0 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
                                             <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.Settings_Opts_Themes}" HorizontalAlignment="Left"/>
                                         </Border>
 
-                                        <Grid Grid.Row="3" HorizontalAlignment="Left" Margin="0 12 0 0">
-                                            
+                                        <Grid Grid.Row="1" HorizontalAlignment="Left" Margin="0 24 0 0">
                                             <StackPanel Orientation="Horizontal">
                                                 <ComboBox x:Name="ThemeComboBox" ItemsSource="{Binding Themes}" SelectedItem="{Binding CurrentTheme}" VerticalAlignment="Center" Margin="0" Padding="4 3 4 3" Background="Transparent">
                                                     <ComboBox.ItemTemplate>
@@ -3474,6 +3463,15 @@
                                                     </ComboBox.ItemTemplate>
                                                 </ComboBox>
                                             </StackPanel>
+                                        </Grid>
+                                        
+                                        <!-- MPD Server -->
+                                        <Border Grid.Row="2" Margin="0 32 0 0" HorizontalAlignment="Stretch" BorderBrush="{DynamicResource ControlLightColorBrush}" BorderThickness="0 0 0 1">
+                                            <Label Style="{DynamicResource SectionTitle}" Content="{x:Static properties:Resources.Settings_Opts_MPDDatabase}" HorizontalAlignment="Left"/>
+                                        </Border>
+
+                                        <Grid Grid.Row="3" HorizontalAlignment="Left" Margin="0 12 0 0">
+                                            <CheckBox Content="{x:Static properties:Resources.Settings_Opts_UpdateDatabaseOnStartup}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsUpdateOnStartup}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
 
                                         <!-- Options -->
@@ -3492,7 +3490,6 @@
                                         <Grid Grid.Row="7" HorizontalAlignment="Left" Margin="24 12 0 0">
                                             <CheckBox Content="{x:Static properties:Resources.Settings_Opts_UseReadPicture}" IsEnabled="{Binding IsDownloadAlbumArt}" Style="{DynamicResource DefaultCheckBoxStyle}" IsChecked="{Binding IsDownloadAlbumArtEmbeddedUsingReadPicture}" Margin="0 12 0 0"></CheckBox>
                                         </Grid>
-
 
 
                                         <!-- Developer Mode -->
@@ -3552,12 +3549,11 @@
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type TabItem}">
 
-                                                <Border Name="HeaderBorder" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" Padding="{TemplateBinding Padding}" HorizontalAlignment="Center" CornerRadius="0">
+                                                <Border Name="HeaderBorder" BorderThickness="0,0,0,2" Background="{TemplateBinding Background}" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" Padding="{TemplateBinding Padding}" HorizontalAlignment="Center" CornerRadius="0">
                                                     <ContentPresenter x:Name="ContentSite" HorizontalAlignment="Center" VerticalAlignment="Center" ContentSource="Header" RecognizesAccessKey="True" />
                                                 </Border>
 
                                                 <ControlTemplate.Triggers>
-
                                                     <Trigger Property="IsSelected" Value="True">
                                                         <Setter Property="Foreground" Value="{DynamicResource TitleTextColorBrush}" />
                                                         <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="{DynamicResource ControlLightColorBrush}" />

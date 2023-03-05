@@ -7,7 +7,7 @@
     <Color x:Key="WindowBackgroundBaseColor">#212121</Color>
     <Color x:Key="WindowBackgroundColor">#212121</Color>
 
-    <Color x:Key="ControlForegroundColor">Gray</Color>
+    <Color x:Key="ControlForegroundColor">Gainsboro</Color>
     <Color x:Key="ControlLightColor">LightGray</Color>
     <Color x:Key="ControlMediumColor">DarkGray</Color>
     <Color x:Key="ControlDarkColor">DimGray</Color>
@@ -22,7 +22,7 @@
     <Color x:Key="DisabledControlDarkColor">Gray</Color>
     <Color x:Key="DisabledForegroundColor">#FF444444</Color>
 
-    <Color x:Key="BorderLightColor">#141414</Color>
+    <Color x:Key="BorderLightColor">#292929</Color>
     <Color x:Key="BorderMediumColor">#131313</Color>
     <Color x:Key="BorderDarkColor">#121212</Color>
 

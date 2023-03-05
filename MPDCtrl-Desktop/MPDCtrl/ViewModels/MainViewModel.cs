@@ -1,7 +1,6 @@
 ﻿using MPDCtrl.Common;
 using MPDCtrl.Contracts;
 using MPDCtrl.Models;
-using MPDCtrl.Models.Classes;
 using MPDCtrl.Services;
 using MPDCtrl.ViewModels.Classes;
 using System;
@@ -5440,7 +5439,8 @@ public class MainViewModel : ViewModelBase
 
     private void OnMpcIsBusy(MpcService sender, bool on)
     {
-        this.IsBusy = on;
+        // No need to do this anymore since we have a idle connection.
+        //this.IsBusy = on;
     }
 
     #endregion

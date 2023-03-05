@@ -1001,7 +1001,7 @@
                                         <RepeatButton Command="{x:Static Slider.IncreaseLarge}" Style="{DynamicResource RepeatButtonTransparent}"/>
                                     </Track.IncreaseRepeatButton>
                                     <Track.Thumb>
-                                        <Thumb x:Name="Thumb" Focusable="False" Height="14" OverridesDefaultStyle="True" Template="{StaticResource SliderThumbHorizontalDefault}" VerticalAlignment="Center" Width="11"/>
+                                        <Thumb x:Name="Thumb" Focusable="False" Width="12" Height="14" OverridesDefaultStyle="True" Template="{StaticResource SliderThumbHorizontalDefault}" VerticalAlignment="Center"/>
                                     </Track.Thumb>
                                 </Track>
                             </Grid>
@@ -1097,7 +1097,7 @@
                                 <TickBar x:Name="TopTick" Grid.Column="0" Fill="{TemplateBinding Foreground}" Margin="0,0,2,0" Placement="Left" Visibility="Collapsed" Width="4"/>
                                 <TickBar x:Name="BottomTick" Grid.Column="2" Fill="{TemplateBinding Foreground}" Margin="2,0,0,0" Placement="Right" Visibility="Collapsed" Width="4"/>
                                 <Border x:Name="TrackBackground" Background="{DynamicResource SliderThumb.Track.Background}" BorderThickness="1" BorderBrush="{DynamicResource SliderThumb.Track.Border}" Grid.Column="1" HorizontalAlignment="center" Margin="0,5" Width="4.0" CornerRadius="1">
-                                    <Canvas Margin="-1,-6">
+                                    <Canvas Margin="-1,-1">
                                         <Rectangle x:Name="PART_SelectionRange" Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Visibility="Hidden" Width="4.0"/>
                                     </Canvas>
                                 </Border>
@@ -1109,7 +1109,7 @@
                                         <RepeatButton Command="{x:Static Slider.IncreaseLarge}" Style="{DynamicResource RepeatButtonTransparent}"/>
                                     </Track.IncreaseRepeatButton>
                                     <Track.Thumb>
-                                        <Thumb x:Name="Thumb" Focusable="False" Height="14" OverridesDefaultStyle="True" Template="{DynamicResource SliderThumbVerticalDefault}" VerticalAlignment="Top" Width="13"/>
+                                        <Thumb x:Name="Thumb" Focusable="False" Width="14" Height="12" OverridesDefaultStyle="True" Template="{DynamicResource SliderThumbVerticalDefault}" VerticalAlignment="Top"/>
                                     </Track.Thumb>
                                 </Track>
                             </Grid>
@@ -1550,7 +1550,7 @@
                         <Setter Property="Padding" Value="0 0 0 1" />
                         <Setter Property="Margin" Value="0"/>
                         <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}" />
+                        <Setter Property="Foreground" Value="{DynamicResource ItemForegroundColorBrush}" />
                         <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}" />
                         <Setter Property="HorizontalContentAlignment" Value="Left" />
                         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -1657,7 +1657,7 @@
                                         
                                         <Trigger Property="IsSelected" Value="True">
                                             <Setter TargetName="PART_Header" Property="TextElement.FontWeight" Value="Bold"/>
-                                            <Setter TargetName="PART_Header" Property="TextElement.Foreground" Value="{DynamicResource ControlLightColorBrush}" />
+                                            <Setter TargetName="PART_Header" Property="TextElement.Foreground" Value="{DynamicResource ItemMouseOverForegroundColorBrush}" />
                                         </Trigger>
                                         
 
@@ -1666,7 +1666,7 @@
                                                 <Condition Property="IsMouseOver" Value="True" />
                                                 <Condition Property="IsSelected" Value="False" />
                                             </MultiTrigger.Conditions>
-                                            <Setter TargetName="PART_Header" Property="TextBlock.Foreground" Value="{DynamicResource ControlLightColorBrush}" />
+                                            <Setter TargetName="PART_Header" Property="TextBlock.Foreground" Value="{DynamicResource ItemMouseOverForegroundColorBrush}" />
                                         </MultiTrigger>
                                         <!--
                                         -->
@@ -1700,8 +1700,8 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type Thumb}">
-                                    <Border Background="{DynamicResource BorderLightColorBrush}" BorderBrush="{DynamicResource BorderMediumColorBrush}" BorderThickness="0.5" Opacity="0.5">
-                                        <Rectangle HorizontalAlignment="Center" Width="0.7" Fill="{TemplateBinding Background}"/>
+                                    <Border Background="{DynamicResource BorderLightColorBrush}" BorderBrush="{DynamicResource BorderMediumColorBrush}" BorderThickness="0.6">
+                                        <Rectangle HorizontalAlignment="Center" SnapsToDevicePixels="true" Width="0.6" Fill="{DynamicResource BorderDarktColorBrush}"/>
                                     </Border>
                                 </ControlTemplate>
                             </Setter.Value>
@@ -2832,7 +2832,7 @@
                                                 <Condition Property="IsSelected" Value="False" />
                                                 <Condition Property="IsMouseOver" Value="True" />
                                             </MultiTrigger.Conditions>
-                                            <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource ControlMediumColorBrush}" />
+                                            <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource ControlDarkColorBrush}" />
                                             <Setter TargetName="HeaderBorder" Property="BorderBrush" Value="DarkGray" />
                                             <Setter TargetName="HeaderBorder" Property="BorderThickness" Value="0 0 0 1" />
 

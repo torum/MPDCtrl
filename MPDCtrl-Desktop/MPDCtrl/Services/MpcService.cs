@@ -137,9 +137,11 @@ namespace MPDCtrl.Services
 
         #endregion
 
-        public MpcService()
-        {
+        private readonly IBinaryDownloader _binaryDownloader;
 
+        public MpcService(IBinaryDownloader binaryDownloader)
+        {
+            _binaryDownloader = binaryDownloader;
         }
 
         #region == Idle Connection ==
@@ -1665,25 +1667,25 @@ namespace MPDCtrl.Services
                 return f;
             }
 
-            BinaryDownloader hoge = new();
-
-            bool asdf = await hoge.MpdBinaryConnectionStart(MpdHost, MpdPort, MpdPassword);
+            //BinaryDownloader hoge = new();
+            
+            bool asdf = await _binaryDownloader.MpdBinaryConnectionStart(MpdHost, MpdPort, MpdPassword);
 
             CommandResult b = new();
 
             if (asdf)
             {
-                b = await hoge.MpdQueryAlbumArt(uri, isUsingReadpicture);
+                b = await _binaryDownloader.MpdQueryAlbumArt(uri, isUsingReadpicture);
 
                 if (b.IsSuccess)
                 {
                     if (Application.Current is null) { return f; }
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        AlbumCover = hoge.AlbumCover;
+                        AlbumCover = _binaryDownloader.AlbumCover;
                     });
 
-                    await Task.Delay(1300);
+                    await Task.Delay(1000);
 
                     //Debug.WriteLine("AlbumArt Donwloaded... ");
 
@@ -1699,7 +1701,7 @@ namespace MPDCtrl.Services
                 Debug.WriteLine("damn... ");
             }
 
-            hoge.MpdBinaryConnectionDisconnect();
+            _binaryDownloader.MpdBinaryConnectionDisconnect();
 
             return b;
         }

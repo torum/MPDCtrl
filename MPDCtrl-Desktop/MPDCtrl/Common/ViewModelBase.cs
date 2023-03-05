@@ -14,13 +14,10 @@ namespace MPDCtrl.Common
         {
             //this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-            if (Application.Current is not null)
-            {
-                Application.Current.Dispatcher.Invoke(() =>
+            Application.Current?.Dispatcher.Invoke(() =>
                 {
                     this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
                 });
-            }
         }
 
         #endregion

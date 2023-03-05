@@ -223,23 +223,35 @@ namespace MPDCtrl.Services
                         AutoFlush = true
                     };
 
-                    string response = await _idleReader.ReadLineAsync();
+                    string? response = await _idleReader.ReadLineAsync();
 
-                    if (response.StartsWith("OK MPD "))
+                    if (response is not null)
                     {
-                        MpdVerText = response.Replace("OK MPD ", string.Empty).Trim();
+                        if (response.StartsWith("OK MPD "))
+                        {
+                            MpdVerText = response.Replace("OK MPD ", string.Empty).Trim();
 
-                        DebugIdleOutput?.Invoke(this, "<<<<" + response.Trim() + "\n" + "\n");
-                        MpcProgress?.Invoke(this, response.Trim());
+                            DebugIdleOutput?.Invoke(this, "<<<<" + response.Trim() + "\n" + "\n");
+                            MpcProgress?.Invoke(this, response.Trim());
 
-                        IsMpdIdleConnected = true;
+                            IsMpdIdleConnected = true;
 
-                        result.IsSuccess = true;
+                            result.IsSuccess = true;
 
-                        MpdIdleConnected?.Invoke(this);
+                            MpdIdleConnected?.Invoke(this);
 
-                        // Done for now.
+                            // Done for now.
+                        }
+                        else
+                        {
+                            DebugIdleOutput?.Invoke(this, "TCP Idle Connection: MPD did not respond with proper respose." + "\n" + "\n");
+
+                            ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                            ConnectionError?.Invoke(this, "TCP connection error: MPD did not respond with proper respose.");
+                        }
                     }
+
                     else
                     {
                         DebugIdleOutput?.Invoke(this, "TCP Idle Connection: MPD did not respond with proper respose." + "\n" + "\n");
@@ -429,7 +441,7 @@ namespace MPDCtrl.Services
 
                 while (true)
                 {
-                    string line = await _idleReader.ReadLineAsync();
+                    string? line = await _idleReader.ReadLineAsync();
 
                     if (line is not null)
                     {
@@ -635,7 +647,7 @@ namespace MPDCtrl.Services
                 return;
             }
 
-            if ((_commandWriter is null) || (_commandReader is null))
+            if ((_idleWriter is null) || (_idleReader is null))
             {
                 Debug.WriteLine("@MpdIdle: " + "_idleWriter or _idleReader is null");
 
@@ -700,7 +712,7 @@ namespace MPDCtrl.Services
                     if (MpdStop)
                         break;
 
-                    string line = await _idleReader.ReadLineAsync();
+                    string? line = await _idleReader.ReadLineAsync();
 
                     if (line is not null)
                     {
@@ -1008,19 +1020,30 @@ namespace MPDCtrl.Services
                         AutoFlush = true
                     };
 
-                    string response = await _commandReader.ReadLineAsync();
+                    string? response = await _commandReader.ReadLineAsync();
 
-                    if (response.StartsWith("OK MPD "))
+                    if (response is not null)
                     {
-                        MpdVerText = response.Replace("OK MPD ", string.Empty).Trim();
+                        if (response.StartsWith("OK MPD "))
+                        {
+                            MpdVerText = response.Replace("OK MPD ", string.Empty).Trim();
 
-                        DebugCommandOutput?.Invoke(this, "<<<<" + response.Trim() + "\n" + "\n");
+                            DebugCommandOutput?.Invoke(this, "<<<<" + response.Trim() + "\n" + "\n");
 
-                        IsMpdCommandConnected = true;
+                            IsMpdCommandConnected = true;
 
-                        result.IsSuccess = true;
+                            result.IsSuccess = true;
 
-                        // Done for now.
+                            // Done for now.
+                        }
+                        else
+                        {
+                            DebugCommandOutput?.Invoke(this, "TCP Command Connection: MPD did not respond with proper respose." + "\n" + "\n");
+
+                            ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+
+                            ConnectionError?.Invoke(this, "TCP connection error: MPD did not respond with proper respose.");
+                        }
                     }
                     else
                     {
@@ -1274,7 +1297,7 @@ namespace MPDCtrl.Services
 
                 while (true)
                 {
-                    string line = await _commandReader.ReadLineAsync();
+                    string? line = await _commandReader.ReadLineAsync();
 
                     if (line is not null)
                     {
@@ -1661,6 +1684,7 @@ namespace MPDCtrl.Services
         public async Task<CommandResult> MpdQueryAlbumArt(string uri, bool isUsingReadpicture)
         {
             CommandResult f = new();
+
             if (string.IsNullOrEmpty(uri))
             {
                 f.IsSuccess = false;
@@ -1668,7 +1692,6 @@ namespace MPDCtrl.Services
             }
 
             //BinaryDownloader hoge = new();
-            
             bool asdf = await _binaryDownloader.MpdBinaryConnectionStart(MpdHost, MpdPort, MpdPassword);
 
             CommandResult b = new();
@@ -1685,15 +1708,20 @@ namespace MPDCtrl.Services
                         AlbumCover = _binaryDownloader.AlbumCover;
                     });
 
-                    await Task.Delay(1000);
-
-                    //Debug.WriteLine("AlbumArt Donwloaded... ");
+                    //await Task.Delay(1000);
+                    await Task.Delay(200);
 
                     MpdAlbumArtChanged?.Invoke(this);
                 }
                 else
                 {
                     //Debug.WriteLine("why... " + b.ErrorMessage);
+
+                    if (Application.Current is null) { return f; }
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        AlbumCover = new();
+                    });
                 }
             }
             else
@@ -2561,9 +2589,9 @@ namespace MPDCtrl.Services
 
             List<string> resultLines = result.Split('\n').ToList();
             if (resultLines is null)
-                isEmptyResult = true;
+                return Task.FromResult(true);
             if (resultLines.Count == 0)
-                isEmptyResult = true;
+                return Task.FromResult(true);
 
             if (isEmptyResult)
             {
@@ -2599,7 +2627,7 @@ namespace MPDCtrl.Services
 
                 if ((SongValues.Count > 0) && SongValues.ContainsKey("Id"))
                 {
-                    SongInfoEx sng = FillSongInfoEx(SongValues, -1);
+                    SongInfoEx? sng = FillSongInfoEx(SongValues, -1);
 
                     if (sng is not null)
                     {
@@ -2644,8 +2672,11 @@ namespace MPDCtrl.Services
             List<string> resultLines = result.Split('\n').ToList();
             if (resultLines is null)
                 isEmptyResult = true;
-            if (resultLines.Count == 0)
-                isEmptyResult = true;
+            if (resultLines is not null)
+            {
+                if (resultLines.Count == 0)
+                    isEmptyResult = true;
+            }
 
             if (isEmptyResult)
             {
@@ -2735,6 +2766,9 @@ namespace MPDCtrl.Services
 
                 int i = 0;
 
+                if (resultLines is null)
+                    return Task.FromResult(true);
+
                 foreach (string value in resultLines)
                 {
                     string[] StatusValuePair = value.Trim().Split(':');
@@ -2744,7 +2778,7 @@ namespace MPDCtrl.Services
                         {
                             if (SongValues.ContainsKey("Id"))
                             {
-                                SongInfoEx sng = FillSongInfoEx(SongValues, i);
+                                SongInfoEx? sng = FillSongInfoEx(SongValues, i);
 
                                 if (sng is not null)
                                 {
@@ -2796,7 +2830,7 @@ namespace MPDCtrl.Services
 
                 if ((SongValues.Count > 0) && SongValues.ContainsKey("Id"))
                 {
-                    SongInfoEx sng = FillSongInfoEx(SongValues, i);
+                    SongInfoEx? sng = FillSongInfoEx(SongValues, i);
 
                     if (sng is not null)
                     {
@@ -3017,7 +3051,7 @@ namespace MPDCtrl.Services
 
                 ObservableCollection<Playlist> tmpPlaylists = new();
 
-                Playlist pl = null;
+                Playlist? pl = null;
 
                 foreach (string value in resultLines)
                 {
@@ -3122,7 +3156,7 @@ namespace MPDCtrl.Services
                     LocalDirectories.Clear();
                 });
 
-                SongFile song = null;
+                SongFile? song = null;
 
                 int i = 0;
 

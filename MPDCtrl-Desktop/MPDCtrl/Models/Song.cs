@@ -94,7 +94,7 @@ public class SongInfo : SongFile
     public string Date { get; set; } = "";
     public string Genre { get; set; } = "";
     
-    private string _lastModified;
+    private string _lastModified = "";
     public string LastModified
     {
         get
@@ -185,9 +185,9 @@ public class SongInfoEx : SongInfo
 {
     // Queue specific
 
-    public string Id { get; set; }
+    public string Id { get; set; } = "";
 
-    private string _pos;
+    private string _pos = "";
     public string Pos
     {
         get

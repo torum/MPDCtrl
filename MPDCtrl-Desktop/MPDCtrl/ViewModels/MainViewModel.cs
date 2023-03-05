@@ -80,8 +80,8 @@ public class MainViewModel : ViewModelBase
     #region == Config file load & save ==  
 
     private static readonly string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-    private static string _appDataFolder;
-    private static string _appConfigFilePath;
+    private static readonly string _appDataFolder = _envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
+    private static readonly string _appConfigFilePath = _appDataFolder + System.IO.Path.DirectorySeparatorChar + _appName + ".config";
 
     private bool _isFullyLoaded;
     public bool IsFullyLoaded
@@ -1207,8 +1207,8 @@ public class MainViewModel : ViewModelBase
     #region == AlbumArt == 
 
     private readonly ImageSource? _albumArtDefault = null;
-    private ImageSource _albumArt;
-    public ImageSource AlbumArt
+    private ImageSource? _albumArt;
+    public ImageSource? AlbumArt
     {
         get
         {
@@ -1411,8 +1411,8 @@ public class MainViewModel : ViewModelBase
 
     #region == Queue ==  
 
-    private ObservableCollection<SongInfoEx>? _queue = new();
-    public ObservableCollection<SongInfoEx>? Queue
+    private ObservableCollection<SongInfoEx> _queue = new();
+    public ObservableCollection<SongInfoEx> Queue
     {
         get
         {
@@ -1423,7 +1423,7 @@ public class MainViewModel : ViewModelBase
             }
             else
             {
-                return null;
+                return _queue;
             }
         }
         set
@@ -1587,8 +1587,8 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private SongInfoEx _selectedQueueFilterSong;
-    public SongInfoEx SelectedQueueFilterSong
+    private SongInfoEx? _selectedQueueFilterSong;
+    public SongInfoEx? SelectedQueueFilterSong
     {
         get
         {
@@ -1888,7 +1888,7 @@ public class MainViewModel : ViewModelBase
             }
             else
             {
-                return null;
+                return  new ObservableCollection<SongInfo>(); 
             }
         }
     }
@@ -1910,7 +1910,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private string _searchQuery;
+    private string _searchQuery = "";
     public string SearchQuery
     {
         get
@@ -2009,7 +2009,7 @@ public class MainViewModel : ViewModelBase
 
     #region == Status Messages == 
 
-    private string _statusBarMessage;
+    private string _statusBarMessage = "";
     public string StatusBarMessage
     {
         get
@@ -2023,7 +2023,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private string _connectionStatusMessage;
+    private string _connectionStatusMessage = "";
     public string ConnectionStatusMessage
     {
         get
@@ -2037,7 +2037,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private string _mpdStatusMessage;
+    private string _mpdStatusMessage = "";
     public string MpdStatusMessage
     {
         get
@@ -2128,7 +2128,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private string _mpdVersion;
+    private string _mpdVersion = "";
     public string MpdVersion
     {
         get
@@ -2159,13 +2159,12 @@ public class MainViewModel : ViewModelBase
         get { return _profiles; }
     }
 
-    private Profile _currentProfile;
-    public Profile CurrentProfile
+    private Profile? _currentProfile;
+    public Profile? CurrentProfile
     {
         get { return _currentProfile; }
         set
         {
-
             if (_currentProfile == value)
                 return;
 
@@ -2174,8 +2173,11 @@ public class MainViewModel : ViewModelBase
 
             SelectedProfile = _currentProfile;
 
-            _volume = _currentProfile.Volume;
-            NotifyPropertyChanged(nameof(Volume));
+            if (_currentProfile is not null)
+            {
+                _volume = _currentProfile.Volume;
+                NotifyPropertyChanged(nameof(Volume));
+            }
         }
     }
 
@@ -2197,10 +2199,10 @@ public class MainViewModel : ViewModelBase
             {
                 ClearError(nameof(Host));
                 ClearError(nameof(Port));
-                Host = SelectedProfile.Host;
-                Port = SelectedProfile.Port.ToString();
-                Password = SelectedProfile.Password;
-                SetIsDefault = SelectedProfile.IsDefault;
+                Host = _selectedProfile.Host;
+                Port = _selectedProfile.Port.ToString();
+                Password = _selectedProfile.Password;
+                SetIsDefault = _selectedProfile.IsDefault;
             }
             else
             {
@@ -2214,9 +2216,11 @@ public class MainViewModel : ViewModelBase
             NotifyPropertyChanged(nameof(SelectedProfile));
 
             // "quietly"
-            _selectedQuickProfile = _selectedProfile;
-            NotifyPropertyChanged(nameof(SelectedQuickProfile));
-
+            if (_selectedProfile is not null)
+            {
+                _selectedQuickProfile = _selectedProfile;
+                NotifyPropertyChanged(nameof(SelectedQuickProfile));
+            }
         }
     }
 
@@ -2231,8 +2235,8 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private Profile _selectedQuickProfile;
-    public Profile SelectedQuickProfile
+    private Profile? _selectedQuickProfile;
+    public Profile? SelectedQuickProfile
     {
         get
         {
@@ -2422,7 +2426,7 @@ public class MainViewModel : ViewModelBase
         return e;
     }
 
-    private string _settingProfileEditMessage;
+    private string _settingProfileEditMessage = "";
     public string SettingProfileEditMessage
     {
         get
@@ -2577,7 +2581,7 @@ public class MainViewModel : ViewModelBase
     }
 
 
-    private string _changePasswordDialogMessage;
+    private string _changePasswordDialogMessage = "";
     public string ChangePasswordDialogMessage
     {
         get { return _changePasswordDialogMessage; }
@@ -2843,31 +2847,31 @@ public class MainViewModel : ViewModelBase
 
     // DebugWindow
     public delegate void DebugWindowShowHideEventHandler();
-    public event DebugWindowShowHideEventHandler DebugWindowShowHide;
+    public event DebugWindowShowHideEventHandler? DebugWindowShowHide;
 
-    public event EventHandler<bool> DebugWindowShowHide2;
+    public event EventHandler<bool>? DebugWindowShowHide2;
 
-    public event EventHandler<string> DebugCommandOutput;
+    public event EventHandler<string>? DebugCommandOutput;
 
-    public event EventHandler<string> DebugIdleOutput;
+    public event EventHandler<string>? DebugIdleOutput;
 
     public delegate void DebugCommandClearEventHandler();
-    public event DebugCommandClearEventHandler DebugCommandClear;
+    public event DebugCommandClearEventHandler? DebugCommandClear;
 
     public delegate void DebugIdleClearEventHandler();
-    public event DebugIdleClearEventHandler DebugIdleClear;
+    public event DebugIdleClearEventHandler? DebugIdleClear;
 
     // AckWindow
-    public event EventHandler<string> AckWindowOutput;
+    public event EventHandler<string>? AckWindowOutput;
 
     public delegate void AckWindowClearEventHandler();
-    public event AckWindowClearEventHandler AckWindowClear;
+    public event AckWindowClearEventHandler? AckWindowClear;
 
     // Queue listview ScrollIntoView
-    public event EventHandler<int> ScrollIntoView;
+    public event EventHandler<int>? ScrollIntoView;
 
     // Queue listview ScrollIntoView and select (for filter and first time loading the queue)
-    public event EventHandler<int> ScrollIntoViewAndSelect;
+    public event EventHandler<int>? ScrollIntoViewAndSelect;
 
     // PlaylistSongsListview ScrollIntoView
     //public event EventHandler<int> ScrollIntoViewPlaylistSongs;
@@ -2875,7 +2879,7 @@ public class MainViewModel : ViewModelBase
     //public delegate void QueueSelectionClearEventHandler();
     //public event QueueSelectionClearEventHandler QueueSelectionClear;
 
-    public event EventHandler<string> UpdateProgress;
+    public event EventHandler<string>? UpdateProgress;
 
     #endregion
 
@@ -2897,8 +2901,8 @@ public class MainViewModel : ViewModelBase
 
         #region == Init config folder and file path ==
 
-        _appDataFolder = _envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
-        _appConfigFilePath = _appDataFolder + System.IO.Path.DirectorySeparatorChar + _appName + ".config";
+        //_appDataFolder = _envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
+        //_appConfigFilePath = _appDataFolder + System.IO.Path.DirectorySeparatorChar + _appName + ".config";
         System.IO.Directory.CreateDirectory(_appDataFolder);
 
         #endregion
@@ -3285,21 +3289,24 @@ public class MainViewModel : ViewModelBase
 
                             if (p.Attribute("Name") is not null)
                             {
-                                if (!string.IsNullOrEmpty(p.Attribute("Name").Value))
-                                    pro.Name = p.Attribute("Name").Value;
+                                var s = p.Attribute("Name")?.Value;
+                                if (!string.IsNullOrEmpty(s))
+                                    pro.Name = s;
                             }
                             if (p.Attribute("Host") is not null)
                             {
-                                if (!string.IsNullOrEmpty(p.Attribute("Host").Value))
-                                    pro.Host = p.Attribute("Host").Value;
+                                var s = p.Attribute("Host")?.Value;
+                                if (!string.IsNullOrEmpty(s))
+                                    pro.Host = s;
                             }
                             if (p.Attribute("Port") is not null)
                             {
-                                if (!string.IsNullOrEmpty(p.Attribute("Port").Value))
+                                var s = p.Attribute("Port")?.Value;
+                                if (!string.IsNullOrEmpty(s))
                                 {
                                     try
                                     {
-                                        pro.Port = Int32.Parse(p.Attribute("Port").Value);
+                                        pro.Port = Int32.Parse(s);
                                     }
                                     catch
                                     {
@@ -3309,14 +3316,16 @@ public class MainViewModel : ViewModelBase
                             }
                             if (p.Attribute("Password") is not null)
                             {
-                                if (!string.IsNullOrEmpty(p.Attribute("Password").Value))
-                                    pro.Password = Decrypt(p.Attribute("Password").Value);
+                                var s = p.Attribute("Password")?.Value;
+                                if (!string.IsNullOrEmpty(s))
+                                    pro.Password = Decrypt(s);
                             }
                             if (p.Attribute("IsDefault") is not null)
                             {
-                                if (!string.IsNullOrEmpty(p.Attribute("IsDefault").Value))
+                                var s = p.Attribute("IsDefault")?.Value;
+                                if (!string.IsNullOrEmpty(s))
                                 {
-                                    if (p.Attribute("IsDefault").Value == "True")
+                                    if (s == "True")
                                     {
                                         pro.IsDefault = true;
 
@@ -3327,11 +3336,12 @@ public class MainViewModel : ViewModelBase
                             }
                             if (p.Attribute("Volume") is not null)
                             {
-                                if (!string.IsNullOrEmpty(p.Attribute("Volume").Value))
+                                var s = p.Attribute("Volume")?.Value;
+                                if (!string.IsNullOrEmpty(s))
                                 {
                                     try
                                     {
-                                        pro.Volume = double.Parse(p.Attribute("Volume").Value);
+                                        pro.Volume = double.Parse(s);
                                     }
                                     catch
                                     {
@@ -3358,9 +3368,10 @@ public class MainViewModel : ViewModelBase
                             {
                                 if (column.Attribute("Visible") is not null)
                                 {
-                                    if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
+                                    var s = column.Attribute("Visible")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
                                     {
-                                        if (column.Attribute("Visible").Value.ToString() == "True")
+                                        if (s == "True")
                                         {
                                             QueueColumnHeaderPositionVisibility = true;
                                         }
@@ -3372,11 +3383,12 @@ public class MainViewModel : ViewModelBase
                                 }
                                 if (column.Attribute("Width") is not null)
                                 {
-                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    var s = column.Attribute("Width")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
                                     {
                                         try
                                         {
-                                            QueueColumnHeaderPositionWidth = Double.Parse(column.Attribute("Width").Value.ToString());
+                                            QueueColumnHeaderPositionWidth = Double.Parse(s);
                                         }
                                         catch
                                         {
@@ -3392,9 +3404,10 @@ public class MainViewModel : ViewModelBase
                             {
                                 if (column.Attribute("Visible") is not null)
                                 {
-                                    if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
+                                    var s = column.Attribute("Visible")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
                                     {
-                                        if (column.Attribute("Visible").Value.ToString() == "True")
+                                        if (s == "True")
                                             QueueColumnHeaderNowPlayingVisibility = true;
                                         else
                                             QueueColumnHeaderNowPlayingVisibility = false;
@@ -3402,11 +3415,12 @@ public class MainViewModel : ViewModelBase
                                 }
                                 if (column.Attribute("Width") is not null)
                                 {
-                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    var s = column.Attribute("Width")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
                                     {
                                         try
                                         {
-                                            QueueColumnHeaderNowPlayingWidth = Double.Parse(column.Attribute("Width").Value.ToString());
+                                            QueueColumnHeaderNowPlayingWidth = Double.Parse(s);
                                         }
                                         catch
                                         {
@@ -3422,11 +3436,12 @@ public class MainViewModel : ViewModelBase
                             {
                                 if (column.Attribute("Width") is not null)
                                 {
-                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    var s = column.Attribute("Width")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
                                     {
                                         try
                                         {
-                                            QueueColumnHeaderTitleWidth = Double.Parse(column.Attribute("Width").Value.ToString());
+                                            QueueColumnHeaderTitleWidth = Double.Parse(s);
                                             if (QueueColumnHeaderTitleWidth < 120)
                                                 QueueColumnHeaderTitleWidth = 160;
                                         }
@@ -3444,9 +3459,10 @@ public class MainViewModel : ViewModelBase
                             {
                                 if (column.Attribute("Visible") is not null)
                                 {
-                                    if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
+                                    var s = column.Attribute("Visible")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
                                     {
-                                        if (column.Attribute("Visible").Value.ToString() == "True")
+                                        if (s == "True")
                                             QueueColumnHeaderTimeVisibility = true;
                                         else
                                             QueueColumnHeaderTimeVisibility = false;
@@ -3454,11 +3470,12 @@ public class MainViewModel : ViewModelBase
                                 }
                                 if (column.Attribute("Width") is not null)
                                 {
-                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    var s = column.Attribute("Width")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
                                     {
                                         try
                                         {
-                                            QueueColumnHeaderTimeWidth = Double.Parse(column.Attribute("Width").Value.ToString());
+                                            QueueColumnHeaderTimeWidth = Double.Parse(s);
                                         }
                                         catch
                                         {
@@ -3474,9 +3491,10 @@ public class MainViewModel : ViewModelBase
                             {
                                 if (column.Attribute("Visible") is not null)
                                 {
-                                    if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
+                                    var s = column.Attribute("Visible")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
                                     {
-                                        if (column.Attribute("Visible").Value.ToString() == "True")
+                                        if (s == "True")
                                             QueueColumnHeaderArtistVisibility = true;
                                         else
                                             QueueColumnHeaderArtistVisibility = false;
@@ -3484,11 +3502,12 @@ public class MainViewModel : ViewModelBase
                                 }
                                 if (column.Attribute("Width") is not null)
                                 {
-                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    var s = column.Attribute("Width")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
                                     {
                                         try
                                         {
-                                            QueueColumnHeaderArtistWidth = Double.Parse(column.Attribute("Width").Value.ToString());
+                                            QueueColumnHeaderArtistWidth = Double.Parse(s);
                                         }
                                         catch
                                         {
@@ -3504,9 +3523,10 @@ public class MainViewModel : ViewModelBase
                             {
                                 if (column.Attribute("Visible") is not null)
                                 {
-                                    if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
+                                    var s = column.Attribute("Visible")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
                                     {
-                                        if (column.Attribute("Visible").Value.ToString() == "True")
+                                        if (s == "True")
                                             QueueColumnHeaderAlbumVisibility = true;
                                         else
                                             QueueColumnHeaderAlbumVisibility = false;
@@ -3514,11 +3534,12 @@ public class MainViewModel : ViewModelBase
                                 }
                                 if (column.Attribute("Width") is not null)
                                 {
-                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    var s = column.Attribute("Width")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
                                     {
                                         try
                                         {
-                                            QueueColumnHeaderAlbumWidth = Double.Parse(column.Attribute("Width").Value.ToString());
+                                            QueueColumnHeaderAlbumWidth = Double.Parse(s);
                                         }
                                         catch
                                         {
@@ -3534,9 +3555,10 @@ public class MainViewModel : ViewModelBase
                             {
                                 if (column.Attribute("Visible") is not null)
                                 {
-                                    if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
+                                    var s = column.Attribute("Visible")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
                                     {
-                                        if (column.Attribute("Visible").Value.ToString() == "True")
+                                        if (s == "True")
                                             QueueColumnHeaderGenreVisibility = true;
                                         else
                                             QueueColumnHeaderGenreVisibility = false;
@@ -3544,11 +3566,12 @@ public class MainViewModel : ViewModelBase
                                 }
                                 if (column.Attribute("Width") is not null)
                                 {
-                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    var s = column.Attribute("Width")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
                                     {
                                         try
                                         {
-                                            QueueColumnHeaderGenreWidth = Double.Parse(column.Attribute("Width").Value.ToString());
+                                            QueueColumnHeaderGenreWidth = Double.Parse(s);
                                         }
                                         catch
                                         {
@@ -3564,9 +3587,10 @@ public class MainViewModel : ViewModelBase
                             {
                                 if (column.Attribute("Visible") is not null)
                                 {
-                                    if (!string.IsNullOrEmpty(column.Attribute("Visible").Value))
+                                    var s = column.Attribute("Visible")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
                                     {
-                                        if (column.Attribute("Visible").Value.ToString() == "True")
+                                        if (s == "True")
                                             QueueColumnHeaderLastModifiedVisibility = true;
                                         else
                                             QueueColumnHeaderLastModifiedVisibility = false;
@@ -3574,11 +3598,12 @@ public class MainViewModel : ViewModelBase
                                 }
                                 if (column.Attribute("Width") is not null)
                                 {
-                                    if (!string.IsNullOrEmpty(column.Attribute("Width").Value))
+                                    var s = column.Attribute("Width")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
                                     {
                                         try
                                         {
-                                            QueueColumnHeaderLastModifiedWidth = Double.Parse(column.Attribute("Width").Value.ToString());
+                                            QueueColumnHeaderLastModifiedWidth = Double.Parse(s);
                                         }
                                         catch
                                         {
@@ -3604,11 +3629,12 @@ public class MainViewModel : ViewModelBase
                         {
                             if (leftpain.Attribute("Width") is not null)
                             {
-                                if (!string.IsNullOrEmpty(leftpain.Attribute("Width").Value))
+                                var s = leftpain.Attribute("Width")?.Value;
+                                if (!string.IsNullOrEmpty(s))
                                 {
                                     try
                                     {
-                                        MainLeftPainWidth = Double.Parse(leftpain.Attribute("Width").Value.ToString());
+                                        MainLeftPainWidth = Double.Parse(s);
                                     }
                                     catch
                                     {
@@ -4826,8 +4852,8 @@ public class MainViewModel : ViewModelBase
                     }
                     else
                     {
-                        if (hoge is NodeMenuPlaylistItem)
-                            (hoge as NodeMenuPlaylistItem).IsUpdateRequied = true;
+                        if (hoge is NodeMenuPlaylistItem nmpi)
+                            nmpi.IsUpdateRequied = true;
                     }
                 }
 
@@ -4837,9 +4863,9 @@ public class MainViewModel : ViewModelBase
                 }
 
                 // 通知する
-                if (SelectedNodeMenu is NodeMenuPlaylistItem)
+                if (SelectedNodeMenu is NodeMenuPlaylistItem nmpli)
                 {
-                    if ((SelectedNodeMenu as NodeMenuPlaylistItem).IsUpdateRequied)
+                    if (nmpli.IsUpdateRequied)
                     {
                         IsConfirmUpdatePlaylistSongsPopupVisible = true;
                     }
@@ -4994,7 +5020,8 @@ public class MainViewModel : ViewModelBase
 
             if (MusicDirectories.Count > 0)
             {
-                SelectedNodeDirectory = MusicDirectories[0] as NodeDirectory;
+                if (MusicDirectories[0] is NodeDirectory nd)
+                    SelectedNodeDirectory = nd;
             }
 
             //IsBusy = false;
@@ -5036,18 +5063,21 @@ public class MainViewModel : ViewModelBase
             if (Application.Current is null) { return; }
             Application.Current.Dispatcher.Invoke(() =>
             {
-                playlistNode.PlaylistSongs = result.PlaylistSongs;
-
-                if (SelectedNodeMenu == playlistNode)
+                if (result.PlaylistSongs is not null)
                 {
-                    UpdateProgress?.Invoke(this, "[UI] Playlist loading...");
-                    //PlaylistSongs = new ObservableCollection<SongInfo>(playlistNode.PlaylistSongs);
-                    PlaylistSongs = playlistNode.PlaylistSongs;
-                    UpdateProgress?.Invoke(this, "");
-                    SelectedPlaylistSong = null;
-                }
+                    playlistNode.PlaylistSongs = result.PlaylistSongs;
 
-                playlistNode.IsUpdateRequied = false;
+                    if (SelectedNodeMenu == playlistNode)
+                    {
+                        UpdateProgress?.Invoke(this, "[UI] Playlist loading...");
+                        //PlaylistSongs = new ObservableCollection<SongInfo>(playlistNode.PlaylistSongs);
+                        PlaylistSongs = playlistNode.PlaylistSongs;
+                        UpdateProgress?.Invoke(this, "");
+                        SelectedPlaylistSong = null;
+                    }
+
+                    playlistNode.IsUpdateRequied = false;
+                }
             });
         }
 
@@ -5439,7 +5469,6 @@ public class MainViewModel : ViewModelBase
 
     private void OnMpcIsBusy(MpcService sender, bool on)
     {
-        // No need to do this anymore since we have a idle connection.
         //this.IsBusy = on;
     }
 
@@ -5533,7 +5562,8 @@ public class MainViewModel : ViewModelBase
     }
     public async void ChangeSongCommand_ExecuteAsync()
     {
-        await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), _selectedQueueSong.Id);
+        if (_selectedQueueSong is not null)
+            await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), _selectedQueueSong.Id);
     }
 
     public ICommand PlayPauseCommand { get; }
@@ -5717,7 +5747,8 @@ public class MainViewModel : ViewModelBase
     }
     public async void QueueListviewEnterKeyCommand_ExecuteAsync()
     {
-        await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), _selectedQueueSong.Id);
+        if (_selectedQueueSong is not null)
+            await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), _selectedQueueSong.Id);
     }
 
     public ICommand QueueListviewLeftDoubleClickCommand { get; set; }
@@ -6170,6 +6201,7 @@ public class MainViewModel : ViewModelBase
     public bool SearchResultListviewSaveSelectedAsCommand_CanExecute()
     {
         if (IsBusy) return false;
+        if (SearchResult is null) return false;
         if (SearchResult.Count == 0) return false;
         return true;
     }
@@ -6212,6 +6244,7 @@ public class MainViewModel : ViewModelBase
     public bool SearchResultListviewSaveSelectedAsPopupCommand_CanExecute()
     {
         if (IsBusy) return false;
+        if (SearchResult is null) return false;
         if (SearchResult.Count == 0) return false;
         return true;
     }
@@ -6234,6 +6267,7 @@ public class MainViewModel : ViewModelBase
     public bool SearchResultListviewSaveSelectedToCommand_CanExecute()
     {
         if (IsBusy) return false;
+        if (SearchResult is null) return false;
         if (SearchResult.Count == 0) return false;
         return true;
     }
@@ -6277,6 +6311,7 @@ public class MainViewModel : ViewModelBase
     public bool SearchResultListviewSaveSelectedToPopupCommand_CanExecute()
     {
         if (IsBusy) return false;
+        if (SearchResult is null) return false;
         if (SearchResult.Count == 0) return false;
         return true;
     }
@@ -6331,8 +6366,8 @@ public class MainViewModel : ViewModelBase
         }
         else
         {
-            if (items.Count == 1)
-                await _mpc.MpdAdd((items[0] as NodeFile).OriginalFileUri);
+            if ((items.Count == 1) && (items[0] is NodeFile nf))
+                await _mpc.MpdAdd(nf.OriginalFileUri);
         }
     }
 
@@ -6886,8 +6921,8 @@ public class MainViewModel : ViewModelBase
         }
         else
         {
-            if (items.Count == 1)
-                await _mpc.MpdAdd((items[0] as SongInfo).File);
+            if ((items.Count == 1) && (items[0] is SongInfo si))
+                await _mpc.MpdAdd(si.File);
         }
     }
 
@@ -6985,9 +7020,12 @@ public class MainViewModel : ViewModelBase
 
         // for Unbindable PasswordBox.
         var passwordBox = obj as PasswordBox;
-        if (!String.IsNullOrEmpty(passwordBox.Password))
+        if (passwordBox is not null)
         {
-            Password = passwordBox.Password;
+            if (!String.IsNullOrEmpty(passwordBox.Password))
+            {
+                Password = passwordBox.Password;
+            }
         }
 
         if (SetIsDefault)
@@ -7038,15 +7076,18 @@ public class MainViewModel : ViewModelBase
 
         // for Unbindable PasswordBox.
         var passwordBox = obj as PasswordBox;
-        if (!String.IsNullOrEmpty(passwordBox.Password))
+        if (passwordBox is not null)
         {
-            SelectedProfile.Password = passwordBox.Password;
-            Password = passwordBox.Password;
-
-            if (SelectedProfile == CurrentProfile)
+            if (!String.IsNullOrEmpty(passwordBox.Password))
             {
-                // No need since _mpc uses password when it connects.
-                //_mpc.MpdPassword = passwordBox.Password;
+                SelectedProfile.Password = passwordBox.Password;
+                Password = passwordBox.Password;
+
+                if (SelectedProfile == CurrentProfile)
+                {
+                    // No need since _mpc uses password when it connects.
+                    //_mpc.MpdPassword = passwordBox.Password;
+                }
             }
         }
 
@@ -7187,9 +7228,12 @@ public class MainViewModel : ViewModelBase
 
         // for Unbindable PasswordBox.
         var passwordBox = obj as PasswordBox;
-        if (!String.IsNullOrEmpty(passwordBox.Password))
+        if (passwordBox is not null)
         {
-            Password = passwordBox.Password;
+            if (!String.IsNullOrEmpty(passwordBox.Password))
+            {
+                Password = passwordBox.Password;
+            }
         }
 
         // Clear current...
@@ -7240,7 +7284,7 @@ public class MainViewModel : ViewModelBase
             SelectedQueueSong = null;
             CurrentSong = null;
 
-            SearchResult.Clear();
+            SearchResult?.Clear();
             SearchQuery = "";
 
             IsAlbumArtVisible = false;
@@ -7281,28 +7325,31 @@ public class MainViewModel : ViewModelBase
             else
             {
                 //SelectedProfile = new Profile();
-                SelectedProfile.Host = _host;
-                //SelectedProfile.HostIpAddress = _hostIpAddress;
-                SelectedProfile.Port = _port;
-                SelectedProfile.Password = _password;
-
-                if (SetIsDefault)
+                if (SelectedProfile is not null)
                 {
-                    foreach (var p in Profiles)
+                    SelectedProfile.Host = _host;
+                    //SelectedProfile.HostIpAddress = _hostIpAddress;
+                    SelectedProfile.Port = _port;
+                    SelectedProfile.Password = _password;
+
+                    if (SetIsDefault)
                     {
-                        p.IsDefault = false;
+                        foreach (var p in Profiles)
+                        {
+                            p.IsDefault = false;
+                        }
+
+                        SelectedProfile.IsDefault = true;
+                    }
+                    else
+                    {
+                        SelectedProfile.IsDefault = false;
                     }
 
-                    SelectedProfile.IsDefault = true;
-                }
-                else
-                {
-                    SelectedProfile.IsDefault = false;
-                }
+                    SelectedProfile.Name = Host + ":" + _port.ToString();
 
-                SelectedProfile.Name = Host + ":" + _port.ToString();
-
-                CurrentProfile = SelectedProfile;
+                    CurrentProfile = SelectedProfile;
+                }
             }
         }
 
@@ -7378,7 +7425,7 @@ public class MainViewModel : ViewModelBase
 
             FilterMusicEntriesQuery = "";
 
-            SearchResult.Clear();
+            SearchResult?.Clear();
             SearchQuery = "";
 
             IsAlbumArtVisible = false;
@@ -7468,7 +7515,8 @@ public class MainViewModel : ViewModelBase
             if (obj is null) return;
             // for Unbindable PasswordBox.
             var passwordBox = obj as PasswordBox;
-            passwordBox.Password = "";
+            if (passwordBox is not null)
+                passwordBox.Password = "";
 
             IsChangePasswordDialogShow = true;
         }
@@ -7491,17 +7539,23 @@ public class MainViewModel : ViewModelBase
 
         if ((values[0] is PasswordBox) && (values[1] is PasswordBox))
         {
-            if ((values[0] as PasswordBox).Password == _password)
+            if ((values[0] as PasswordBox)?.Password == _password)
             {
-                SelectedProfile.Password = (values[1] as PasswordBox).Password; //allow empty string.
+                if (SelectedProfile is not null)
+                {
+                    SelectedProfile.Password = (values[1] as PasswordBox)?.Password ?? ""; //allow empty string.
 
-                Password = SelectedProfile.Password;
-                NotifyPropertyChanged(nameof(IsPasswordSet));
-                NotifyPropertyChanged(nameof(IsNotPasswordSet));
+                    Password = SelectedProfile.Password;
+                    NotifyPropertyChanged(nameof(IsPasswordSet));
+                    NotifyPropertyChanged(nameof(IsNotPasswordSet));
+                }
 
-                (values[0] as PasswordBox).Password = "";
-                (values[1] as PasswordBox).Password = "";
+                if (values[0] is PasswordBox pss1)
+                    pss1.Password = "";
+                if (values[1] is PasswordBox pss2)
+                    pss2.Password = "";
 
+                // TODO:
                 if (SelectedProfile == CurrentProfile)
                 {
                     //_mpc.MpdPassword = SelectedProfile.Password;

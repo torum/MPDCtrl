@@ -1,12 +1,8 @@
 ﻿using MPDCtrl.Helpers.Native;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Interop;
 using System.Windows;
+using System.Windows.Interop;
 
 namespace MPDCtrl.Helpers
 {
@@ -67,7 +63,7 @@ namespace MPDCtrl.Helpers
             }
         }
 
-        private Window _window;
+        private Window? _window;
 
         private void Attach(Window window)
         {
@@ -95,20 +91,25 @@ namespace MPDCtrl.Helpers
             }
         }
 
-        private void OnSourceInitialized(object sender, EventArgs e)
+        private void OnSourceInitialized(object? sender, EventArgs e)
         {
-            ((Window)sender).SourceInitialized -= OnSourceInitialized;
-            AttachCore();
+            if (sender is Window win)
+            {
+                win.SourceInitialized -= OnSourceInitialized;
+                AttachCore();
+            }
         }
 
         private void AttachCore()
         {
-            EnableBlur(_window);
+            if (_window is not null)
+                EnableBlur(_window);
         }
 
         private void DetachCore()
         {
-            _window.SourceInitialized += OnSourceInitialized;
+            if (_window is not null)
+                _window.SourceInitialized += OnSourceInitialized;
         }
 
         private static void EnableBlur(Window window)
@@ -132,7 +133,7 @@ namespace MPDCtrl.Helpers
                 Data = accentPtr
             };
 
-            SetWindowCompositionAttribute(windowHelper.Handle, ref data);
+            _ = SetWindowCompositionAttribute(windowHelper.Handle, ref data);
 
             Marshal.FreeHGlobal(accentPtr);
         }

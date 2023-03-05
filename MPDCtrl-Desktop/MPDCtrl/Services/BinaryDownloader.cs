@@ -16,16 +16,16 @@ namespace MPDCtrl.Models
     public class BinaryDownloader : IBinaryDownloader
     {
         private static TcpClient _binaryConnection = new();
-        private StreamReader _binaryReader;
-        private StreamWriter _binaryWriter;
+        private StreamReader? _binaryReader;
+        private StreamWriter? _binaryWriter;
 
         private readonly AlbumImage _albumCover = new();
         public AlbumImage AlbumCover { get => _albumCover; }
 
-        private string _host;
-        private int _port;
+        private string _host = "";
+        private int _port = 6600;
 
-        private string MpdVersion { get; set; }
+        private string? MpdVersion { get; set; }
 
         public BinaryDownloader()
         {
@@ -89,19 +89,25 @@ namespace MPDCtrl.Models
                         AutoFlush = true
                     };
 
-                    string response = await _binaryReader.ReadLineAsync();
-
-                    if (response.StartsWith("OK MPD "))
+                    string? response = await _binaryReader.ReadLineAsync();
+                    if (response is not null)
                     {
-                        MpdVersion = response.Replace("OK MPD ", string.Empty).Trim();
+                        if (response.StartsWith("OK MPD "))
+                        {
+                            MpdVersion = response.Replace("OK MPD ", string.Empty).Trim();
 
-                        result.IsSuccess = true;
+                            result.IsSuccess = true;
 
-                        // Done for now.
+                            // Done for now.
+                        }
+                        else
+                        {
+                            Debug.WriteLine("**** TCP Binary Connection: MPD did not respond with proper respose.@MpdBinaryConnect");
+                        }
                     }
                     else
                     {
-                        Debug.WriteLine("**** TCP Binary Connection: MPD did not respond with proper respose@MpdBinaryConnect");
+                        Debug.WriteLine("**** TCP Binary Connection: MPD did not respond with proper respose. @MpdBinaryConnect");
                     }
                 }
                 else
@@ -222,7 +228,7 @@ namespace MPDCtrl.Models
 
                 while (true)
                 {
-                    string line = await _binaryReader.ReadLineAsync();
+                    string? line = await _binaryReader.ReadLineAsync();
 
                     if (line is not null)
                     {
@@ -591,7 +597,7 @@ namespace MPDCtrl.Models
                     Debug.WriteLine("@MpdBinarySendBinaryCommand ReadAsync isNullReturn");
 
                     ret.ErrorMessage = "ReadAsync@MpdBinarySendBinaryCommand received null data";
-
+                    ret.IsSuccess = false;
                     return ret;
                 }
                 else
@@ -602,7 +608,7 @@ namespace MPDCtrl.Models
                         //MpdAckError?.Invoke(this, ackText + " (@MCGB)");
 
                         ret.ErrorMessage = ackText + " (@MpdBinarySendBinaryCommand)";
-
+                        ret.IsSuccess = false;
                         return ret;
                     }
                     else if (isBinaryFound)
@@ -612,7 +618,7 @@ namespace MPDCtrl.Models
                     else
                     {
                         ret.ErrorMessage = "No binary data(size) found. Could be a readpicture command? (@MpdBinarySendBinaryCommand)";
-
+                        ret.IsSuccess = false;
                         return ret;
                     }
                 }
@@ -856,7 +862,7 @@ namespace MPDCtrl.Models
             uri = Regex.Escape(uri);
 
             string cmd = "albumart \"" + uri + "\" 0" + "\n";
-            if (isUsingReadpicture)
+            if (isUsingReadpicture && (!string.IsNullOrEmpty(MpdVersion)))
                 if (CompareVersionString(MpdVersion, "0.22.0") >= 0)
                     cmd = "readpicture \"" + uri + "\" 0" + "\n";
 
@@ -872,35 +878,71 @@ namespace MPDCtrl.Models
                 {
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
-                        _albumCover.IsSuccess = true;
+                        if (_albumCover.BinaryData is not null)
+                        {
+                            _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
+                        }
+
+                        if (_albumCover.AlbumImageSource is not null)
+                        {
+                            _albumCover.IsSuccess = true;
+                        }
+                        else
+                        {
+                            _albumCover.IsSuccess = false;
+                        }
                         _albumCover.IsDownloading = false;
                     });
 
-                    r = true;
+                    r = _albumCover.IsSuccess;
                 }
                 else
                 {
                     if ((result.WholeSize != 0) && (result.WholeSize > result.ChunkSize))
                     {
-                        while ((result.WholeSize > _albumCover.BinaryData.Length) && result.IsSuccess)
-                        {
-                            result = await MpdReQueryAlbumArt(_albumCover.SongFilePath, _albumCover.BinaryData.Length, isUsingReadpicture);
-
-                            if (result.IsSuccess && (result.BinaryData is not null))
-                                _albumCover.BinaryData = CombineByteArray(_albumCover.BinaryData, result.BinaryData);
-                        }
-
                         if (result.IsSuccess && (_albumCover.BinaryData is not null))
                         {
-                            Application.Current.Dispatcher.Invoke(() =>
+                            // TODO:
+                            while ((result.WholeSize > _albumCover.BinaryData.Length) && result.IsSuccess)
                             {
-                                _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
-                                _albumCover.IsSuccess = true;
-                                _albumCover.IsDownloading = false;
-                            });
+                                result = await MpdReQueryAlbumArt(_albumCover.SongFilePath, _albumCover.BinaryData.Length, isUsingReadpicture);
 
-                            r = true;
+                                if (result.IsSuccess && (result.BinaryData is not null))
+                                    _albumCover.BinaryData = CombineByteArray(_albumCover.BinaryData, result.BinaryData);
+                                else
+                                    break;
+                            }
+
+                            if (result.IsSuccess)
+                            {
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    if (_albumCover.BinaryData is not null)
+                                    {
+                                        _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
+                                    }
+
+                                    if (_albumCover.AlbumImageSource is not null)
+                                    {
+                                        _albumCover.IsSuccess = true;
+                                    }
+                                    else
+                                    {
+                                        _albumCover.IsSuccess = false;
+                                    }
+                                    _albumCover.IsDownloading = false;
+                                });
+
+                                r = true;
+                            }
+                            else
+                            {
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    _albumCover.IsSuccess = false;
+                                    _albumCover.IsDownloading = false;
+                                });
+                            }
                         }
                     }
                 }
@@ -953,7 +995,7 @@ namespace MPDCtrl.Models
             uri = Regex.Escape(uri);
 
             string cmd = "albumart \"" + uri + "\" " + offset.ToString() + "\n";
-            if (isUsingReadpicture)
+            if (isUsingReadpicture && (!string.IsNullOrEmpty(MpdVersion)))
                 if (CompareVersionString(MpdVersion, "0.22.0") >= 0)
                     cmd = "readpicture \"" + uri + "\" " + offset.ToString() + "\n";
 
@@ -965,7 +1007,7 @@ namespace MPDCtrl.Models
             return (new System.Version(a)).CompareTo(new System.Version(b));
         }
 
-        private static BitmapSource BitmaSourceFromByteArray(byte[] buffer)
+        private static BitmapSource? BitmaSourceFromByteArray(byte[] buffer)
         {
             // Bug in MPD 0.23.5 
             if (buffer?.Length > 0)

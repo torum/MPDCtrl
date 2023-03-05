@@ -6,7 +6,7 @@ public class Playlist
 {
     public string Name { get; set; } = "";
 
-    private string _lastModified;
+    private string _lastModified = "";
     public string LastModified
     {
         get

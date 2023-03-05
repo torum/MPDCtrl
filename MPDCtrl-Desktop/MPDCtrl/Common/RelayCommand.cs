@@ -70,8 +70,8 @@ namespace MPDCtrl.Common
     /// </summary>
     public class RelayCommand : ICommand
     {
-        private Action methodToExecute;
-        private Func<bool> canExecuteEvaluator;
+        private readonly Action methodToExecute;
+        private readonly Func<bool> canExecuteEvaluator;
 
         public RelayCommand(Action methodToExecute, Func<bool> canExecuteEvaluator)
         {
@@ -79,10 +79,12 @@ namespace MPDCtrl.Common
             this.canExecuteEvaluator = canExecuteEvaluator;
         }
 
+        /*
         public RelayCommand(Action methodToExecute)
             : this(methodToExecute, null)
         {
         }
+        */
 
         public event EventHandler? CanExecuteChanged
         {

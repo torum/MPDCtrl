@@ -90,7 +90,7 @@ public class DirectoryTreeBuilder : NodeTree
                 if (ValuePair.Length > 1)
                 {
                     // set parent node
-                    NodeDirectory parent = root;
+                    NodeDirectory? parent = root;
 
                     foreach (var asdf in ValuePair)
                     {
@@ -118,7 +118,10 @@ public class DirectoryTreeBuilder : NodeTree
                             parent = hoge;
                         }
                         */
-                        
+
+                        if (parent is null)
+                            continue;
+
                         // check if already exists.
                         bool found = false;
                         foreach (var child in parent.Children)
@@ -144,7 +147,7 @@ public class DirectoryTreeBuilder : NodeTree
                             if (Application.Current is null) { return; }
                             Application.Current.Dispatcher.Invoke(() =>
                             {
-                                parent.Children.Add(hoge);
+                                parent?.Children.Add(hoge);
                             });
                             // set parent node
                             parent = hoge;

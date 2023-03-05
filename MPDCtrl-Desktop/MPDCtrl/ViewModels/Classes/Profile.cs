@@ -7,7 +7,7 @@ namespace MPDCtrl.ViewModels.Classes;
 /// </summary>
 public class Profile : ViewModelBase
 {
-    private string _host;
+    private string _host = "";
     public string Host
     {
         get { return _host; }
@@ -37,7 +37,7 @@ public class Profile : ViewModelBase
     }
     */
 
-    private int _port;
+    private int _port = 6600;
     public int Port
     {
         get { return _port; }
@@ -51,7 +51,7 @@ public class Profile : ViewModelBase
         }
     }
 
-    private string _password;
+    private string _password = "";
     public string Password
     {
         get { return _password; }
@@ -65,7 +65,7 @@ public class Profile : ViewModelBase
         }
     }
 
-    private string _name;
+    private string _name = "";
     public string Name
     {
         get { return _name; }

@@ -4,8 +4,8 @@ namespace MPDCtrl.Models;
 
 public class Result
 {
-    public bool IsSuccess;
-    public string ErrorMessage;
+    public bool IsSuccess = false;
+    public string ErrorMessage = "";
 }
 
 public class ConnectionResult: Result
@@ -15,25 +15,25 @@ public class ConnectionResult: Result
 
 public class CommandResult : Result
 {
-    public string ResultText;
+    public string ResultText = "";
 }
 
 public class CommandBinaryResult : Result
 {
     public int WholeSize;
     public int ChunkSize;
-    public string Type;
-    public byte[] BinaryData;
+    public string Type = "";
+    public byte[]? BinaryData;
 }
 
 public class CommandPlaylistResult : CommandResult
 {
-    public ObservableCollection<SongInfo> PlaylistSongs;
+    public ObservableCollection<SongInfo>? PlaylistSongs;
 }
 
 public class CommandSearchResult : CommandResult
 {
-    public ObservableCollection<SongInfo> SearchResult;
+    public ObservableCollection<SongInfo>? SearchResult;
 }
 
 // TODO: Not used?

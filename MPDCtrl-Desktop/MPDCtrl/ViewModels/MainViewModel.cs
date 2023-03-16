@@ -624,7 +624,8 @@ public class MainViewModel : ViewModelBase
             _currentTheme = value;
             NotifyPropertyChanged(nameof(CurrentTheme));
 
-            App.ChangeTheme(_currentTheme.Name);
+            if (_currentTheme.Name is not null)
+                App.ChangeTheme(_currentTheme.Name);
         }
     }
 

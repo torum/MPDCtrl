@@ -1,21 +1,16 @@
-﻿using MPDCtrl.Helpers;
-using MPDCtrl.ViewModels;
+﻿using MPDCtrl.ViewModels;
 using System;
 using System.Diagnostics;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Navigation;
 
 namespace MPDCtrl.Views;
 
 public partial class MainWindow : Window
 {
-
     public MainWindow()
     {
         DataContext = App.GetService<MainViewModel>();
@@ -64,6 +59,8 @@ public partial class MainWindow : Window
             }
         }
 
+        // Need this for starting maximized.
+        Window_StateChanged(this, EventArgs.Empty);
     }
 
     public void OnScrollIntoView(int arg)

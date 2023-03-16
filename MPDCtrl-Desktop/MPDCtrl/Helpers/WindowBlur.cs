@@ -140,6 +140,7 @@ namespace MPDCtrl.Helpers
 
         [DllImport("user32.dll")]
         internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
+
     }
 
     namespace Native

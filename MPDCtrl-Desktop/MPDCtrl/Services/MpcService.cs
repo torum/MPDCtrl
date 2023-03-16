@@ -2379,9 +2379,9 @@ namespace MPDCtrl.Services
                     }
 
                     // Play state
-                    if (MpdStatusValues.ContainsKey("state"))
+                    if (MpdStatusValues.TryGetValue("state", out var valueState))
                     {
-                        switch (MpdStatusValues["state"])
+                        switch (valueState)
                         {
                             case "play":
                                 {
@@ -2398,15 +2398,18 @@ namespace MPDCtrl.Services
                                     MpdStatus.MpdState = Status.MpdPlayState.Stop;
                                     break;
                                 }
+                            default:
+                                //throw new ArgumentOutOfRangeException("state");
+                                break;
                         }
                     }
 
                     // Volume
-                    if (MpdStatusValues.ContainsKey("volume"))
+                    if (MpdStatusValues.TryGetValue("volume", out var valueVolume))
                     {
                         try
                         {
-                            MpdStatus.MpdVolume = Int32.Parse(MpdStatusValues["volume"]);
+                            MpdStatus.MpdVolume = Int32.Parse(valueVolume);
 
                             MpdStatus.MpdVolumeIsSet = true;
                         }

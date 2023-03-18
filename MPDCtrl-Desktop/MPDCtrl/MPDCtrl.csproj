@@ -20,6 +20,7 @@
 	  <NeutralLanguage>en-US</NeutralLanguage>
 	  <DefaultLanguage>en-US</DefaultLanguage>
 	  <Title>MPDCtrl</Title>
+	  <IncludeSymbols>False</IncludeSymbols>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">

@@ -151,7 +151,6 @@
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="False">
                                 <Setter Property="BorderBrush" Value="{DynamicResource WindowBorderInactiveBrush}" />
-                                
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>

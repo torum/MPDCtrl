@@ -13,6 +13,8 @@
         Background="#C0191919"
         ResizeMode="CanResize"
         StateChanged="Window_StateChanged"
+        Activated="Window_Activated"
+        Deactivated="Window_Deactivated"
         Closing="Window_Closing"
         Title="{Binding AppTitle}"
         WindowStyle="None"
@@ -70,7 +72,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- App title bar-->
-            <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}" CornerRadius="8,8,0,0">
+            <Border x:Name="AppTitleBar" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}" CornerRadius="8,8,0,0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="32"/>
@@ -223,7 +225,7 @@
             </Border>
 
             <!-- Header -->
-            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}" Margin="0 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0">
+            <Border x:Name="AppHeader" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}" Margin="0 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="4"/>
@@ -2741,7 +2743,7 @@
             </Grid>
 
             <!-- StatusBar -->
-            <StatusBar Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}" Padding="0 0 0 0" Height="28" Margin="0 0 0 0" BorderBrush="{DynamicResource WindowBackgroundBaseColorBrush}" BorderThickness="0 0 0 0">
+            <StatusBar x:Name="StatusBar" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundColorBrush}" Padding="0 0 0 0" Height="28" Margin="0 0 0 0" BorderBrush="{DynamicResource WindowBackgroundBaseColorBrush}" BorderThickness="0 0 0 0">
                 <StatusBar.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Grid>

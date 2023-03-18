@@ -298,8 +298,6 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
-
-
     #region == Size fix on window maximize ==
 
     // https://engy.us/blog/2020/01/01/implementing-a-custom-window-title-bar-in-wpf/
@@ -412,5 +410,19 @@ public partial class MainWindow : Window
         {
             vm.OnWindowClosing(sender);
         }
+    }
+
+    private void Window_Activated(object sender, EventArgs e)
+    {
+        AppTitleBar.Opacity = 1;
+        AppHeader.Opacity = 1;
+        StatusBar.Opacity = 1;
+    }
+
+    private void Window_Deactivated(object sender, EventArgs e)
+    {
+        AppTitleBar.Opacity = 0.7;
+        AppHeader.Opacity = 0.7;
+        StatusBar.Opacity = 0.7;
     }
 }

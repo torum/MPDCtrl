@@ -1201,7 +1201,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- 検索ボックス -->
+                        <!-- Search box -->
                         <Grid Grid.Row="0" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Top">
 
                             <TextBox x:Name="SearchTextBox" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" KeyboardNavigation.TabNavigation="Local" Margin="0.5 0.5 1 0.5" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
@@ -1673,7 +1673,7 @@
 
                         <GridSplitter Grid.Row="0" Grid.Column="1" ResizeDirection="Columns" Style="{StaticResource GridSplitterStyle}"></GridSplitter>
 
-                        <!-- Directoryの曲一覧 -->
+                        <!-- Song list of selected directory -->
                         <Grid Grid.Row="0" Grid.Column="2">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -1683,7 +1683,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <!-- 絞り込みボックス -->
+                            <!-- Filter box -->
                             <Grid Grid.Row="0" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Top">
 
                                 <TextBox x:Name="FilterTextBox" Text="{Binding FilterMusicEntriesQuery, UpdateSourceTrigger=PropertyChanged}" KeyboardNavigation.TabNavigation="Local" Padding="3" Margin="0.5 0.5 1 0.5" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
@@ -2483,7 +2483,7 @@
                                             <ControlTemplate TargetType="{x:Type ListViewItem}">
                                                 <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="4" SnapsToDevicePixels="true">
                                                     <Border.InputBindings>
-
+                                                        <MouseBinding Command="{Binding Path=DataContext.PlaylistSongsListviewLeftDoubleClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Gesture="LeftDoubleClick" />
                                                     </Border.InputBindings>
                                                     <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                                 </Border>

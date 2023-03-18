@@ -2943,6 +2943,8 @@ public class MainViewModel : ViewModelBase
         PlaylistListviewClearCommand = new RelayCommand(PlaylistListviewClearCommand_Execute, PlaylistListviewClearCommand_CanExecute);
         PlaylistListviewClearPopupCommand = new RelayCommand(PlaylistListviewClearPopupCommand_Execute, PlaylistListviewClearPopupCommand_CanExecute);
 
+        //
+        PlaylistSongsListviewLeftDoubleClickCommand = new GenericRelayCommand<SongInfo>(param => PlaylistSongsListviewLeftDoubleClickCommand_ExecuteAsync(param), param => PlaylistSongsListviewLeftDoubleClickCommand_CanExecute());
 
         QueueListviewEnterKeyCommand = new RelayCommand(QueueListviewEnterKeyCommand_ExecuteAsync, QueueListviewEnterKeyCommand_CanExecute);
         QueueListviewLeftDoubleClickCommand = new GenericRelayCommand<SongInfoEx>(param => QueueListviewLeftDoubleClickCommand_ExecuteAsync(param), param => QueueListviewLeftDoubleClickCommand_CanExecute());
@@ -6891,6 +6893,22 @@ public class MainViewModel : ViewModelBase
     }
 
     #endregion
+
+
+    public ICommand PlaylistSongsListviewLeftDoubleClickCommand { get; set; }
+    public bool PlaylistSongsListviewLeftDoubleClickCommand_CanExecute()
+    {
+        //if (IsWorking) return false;
+        if (SelectedPlaylistSong is null) return false;
+        if (IsBusy) return false;
+        return true;
+    }
+    public async void PlaylistSongsListviewLeftDoubleClickCommand_ExecuteAsync(SongInfo song)
+    {
+        Debug.WriteLine("PlaylistSongsListviewLeftDoubleClickCommand_ExecuteAsync: " + song.Title);
+        //await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), song.Id);
+        await _mpc.MpdAdd(song.File);
+    }
 
     #region == Search and PlaylistItems ==
 

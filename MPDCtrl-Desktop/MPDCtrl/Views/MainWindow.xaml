@@ -44,12 +44,18 @@
         <KeyBinding Command="{Binding PlayCommand}" Key="Play" />
         <KeyBinding Command="{Binding PlayCommand}" Modifiers="Ctrl" Key="P"/>
         <KeyBinding Command="{Binding PlayCommand}" Key="MediaPlayPause" />
-        <KeyBinding Command="{Binding PlayNextCommand}" Key="MediaNextTrack" />
-        <KeyBinding Command="{Binding PlayPrevCommand}" Key="MediaPreviousTrack" />
         <KeyBinding Command="{Binding PlayCommand}" Key="MediaStop" />
+        <KeyBinding Command="{Binding PlayNextCommand}" Key="MediaNextTrack" />
+        <KeyBinding Command="{Binding PlayNextCommand}" Modifiers="Ctrl" Key="N" />
+        <KeyBinding Command="{Binding PlayPrevCommand}" Key="MediaPreviousTrack" />
+        <KeyBinding Command="{Binding PlayPrevCommand}" Modifiers="Ctrl" Key="B" />
         <KeyBinding Command="{Binding VolumeMuteCommand}" Key="VolumeMute" />
         <KeyBinding Command="{Binding VolumeDownCommand}" Key="VolumeDown" />
+        <KeyBinding Command="{Binding VolumeDownCommand}" Modifiers="Ctrl" Key="OemMinus" />
+        <KeyBinding Command="{Binding VolumeDownCommand}" Modifiers="Ctrl" Key="Subtract" />
         <KeyBinding Command="{Binding VolumeUpCommand}" Key="VolumeUp" />
+        <KeyBinding Command="{Binding VolumeUpCommand}" Modifiers="Ctrl" Key="OemPlus" />
+        <KeyBinding Command="{Binding VolumeUpCommand}" Modifiers="Ctrl" Key="Add" />
         <KeyBinding Command="{Binding EscapeCommand}" Key="Esc" />
         <KeyBinding Command="{Binding ShowSettingsCommand}" Modifiers="Ctrl" Key="S"/>
         <KeyBinding Command="{Binding ShowFindCommand}" Modifiers="Ctrl" Key="F"/>

@@ -2945,6 +2945,8 @@ public class MainViewModel : ViewModelBase
 
         //
         PlaylistSongsListviewLeftDoubleClickCommand = new GenericRelayCommand<SongInfo>(param => PlaylistSongsListviewLeftDoubleClickCommand_ExecuteAsync(param), param => PlaylistSongsListviewLeftDoubleClickCommand_CanExecute());
+        SongFilesListviewLeftDoubleClickCommand = new GenericRelayCommand<NodeFile>(param => SongFilesListviewLeftDoubleClickCommand_ExecuteAsync(param), param => SongFilesListviewLeftDoubleClickCommand_CanExecute());
+
 
         QueueListviewEnterKeyCommand = new RelayCommand(QueueListviewEnterKeyCommand_ExecuteAsync, QueueListviewEnterKeyCommand_CanExecute);
         QueueListviewLeftDoubleClickCommand = new GenericRelayCommand<SongInfoEx>(param => QueueListviewLeftDoubleClickCommand_ExecuteAsync(param), param => QueueListviewLeftDoubleClickCommand_CanExecute());
@@ -6518,6 +6520,24 @@ public class MainViewModel : ViewModelBase
         FilterMusicEntriesQuery = "";
     }
 
+
+    // double clicked 
+    public ICommand SongFilesListviewLeftDoubleClickCommand { get; set; }
+    public bool SongFilesListviewLeftDoubleClickCommand_CanExecute()
+    {
+        //if (IsWorking) return false;
+        if (IsBusy) return false;
+        if (MusicEntries.Count == 0) return false;
+        return true;
+    }
+    public async void SongFilesListviewLeftDoubleClickCommand_ExecuteAsync(NodeFile song)
+    {
+        if (song is not null)
+        {
+            await _mpc.MpdAdd(song.OriginalFileUri);
+        }
+    }
+
     #endregion
 
     #region == Playlists ==
@@ -6892,9 +6912,7 @@ public class MainViewModel : ViewModelBase
         IsConfirmPlaylistClearPopupVisible = false;
     }
 
-    #endregion
-
-
+    // double clicked in a playlist listview
     public ICommand PlaylistSongsListviewLeftDoubleClickCommand { get; set; }
     public bool PlaylistSongsListviewLeftDoubleClickCommand_CanExecute()
     {
@@ -6905,10 +6923,10 @@ public class MainViewModel : ViewModelBase
     }
     public async void PlaylistSongsListviewLeftDoubleClickCommand_ExecuteAsync(SongInfo song)
     {
-        Debug.WriteLine("PlaylistSongsListviewLeftDoubleClickCommand_ExecuteAsync: " + song.Title);
-        //await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), song.Id);
         await _mpc.MpdAdd(song.File);
     }
+
+    #endregion
 
     #region == Search and PlaylistItems ==
 

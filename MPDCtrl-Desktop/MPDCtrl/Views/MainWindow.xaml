@@ -1955,7 +1955,7 @@
                                                 <ControlTemplate TargetType="{x:Type ListViewItem}">
                                                     <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="4" SnapsToDevicePixels="true">
                                                         <Border.InputBindings>
-
+                                                            <MouseBinding Command="{Binding Path=DataContext.SongFilesListviewLeftDoubleClickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Gesture="LeftDoubleClick" />
                                                         </Border.InputBindings>
                                                         <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                                     </Border>
@@ -2775,20 +2775,11 @@
                                 <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding StatusButton}" />
                             </Canvas>
                         </Viewbox>
-<!--
-                        <Label Content="{Binding CurrentProfile.Name}" Style="{DynamicResource DefaultLabelStyle}" Foreground="{DynamicResource ControlDarkColorBrush}" VerticalAlignment="Center" Margin="0 0 4 0" Padding="0" Opacity="0.7"></Label>
--->
+
                         <ComboBox Style="{StaticResource ComboBoxFlatStyle}" IsEnabled="{Binding IsProfileSwitchOK}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedQuickProfile}" Foreground="{DynamicResource ControlForegroundColorBrush}" HorizontalAlignment="Center" Tag="">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <!--
-                                        <Viewbox Width="10" Height="10" Margin="0 0 6 0">
-                                            <Canvas Width="18" Height="18">
-                                                <Path Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" Fill="DimGray" Visibility="{Binding Path=IsDefault, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}"/>
-                                            </Canvas>
-                                        </Viewbox>
-                                        -->
                                         <TextBlock Text="{Binding Path=Name}"></TextBlock>
                                     </StackPanel>
                                 </DataTemplate>
@@ -2833,79 +2824,6 @@
                 <!-- Debug Window Icon  -->
                 <StatusBarItem Grid.Column="6" HorizontalContentAlignment="Right">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 0 0">
-
-                        <!-- ACK Button to show on/off 
-                        <Button x:Name="InfoButton" Width="16" Height="16" Margin="0 0 16 0" Command="{Binding ShowAckWindowCommand}" VerticalAlignment="Center" ToolTip="" Opacity="0.7">
-                            <Button.Style>
-                                <Style TargetType="{x:Type Button}">
-                                    <Setter Property="OverridesDefaultStyle" Value="true" />
-                                    <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
-                                    <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
-                                    <Setter Property="BorderThickness" Value="0" />
-                                    <Setter Property="Margin" Value="0" />
-                                    <Setter Property="Padding" Value="0" />
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border x:Name="Border" Background="{TemplateBinding Background}" CornerRadius="0" BorderThickness="0">
-                                                    <Viewbox Width="16" Height="16" Margin="0">
-                                                        <Canvas Width="24" Height="24">
-                                                            <Canvas.RenderTransform>
-                                                                <TranslateTransform X="2" Y="2.6"/>
-                                                            </Canvas.RenderTransform>
-                                                            <Path x:Name="PathIcon" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform">
-                                                                <Path.Fill>
-                                                                    <SolidColorBrush x:Name="PathIconColor" Color="{DynamicResource ControlForegroundColor}"/>
-                                                                </Path.Fill>
-                                                                <Path.RenderTransform>
-                                                                    <TransformGroup>
-                                                                        <TransformGroup.Children>
-                                                                            <RotateTransform Angle="0" />
-                                                                            <ScaleTransform ScaleX="1" ScaleY="1" />
-                                                                        </TransformGroup.Children>
-                                                                    </TransformGroup>
-                                                                </Path.RenderTransform>
-                                                            </Path>
-                                                        </Canvas>
-                                                    </Viewbox>
-                                                </Border>
-                                                <ControlTemplate.Triggers>
-
-                                                    <Trigger Property="IsMouseOver" Value="true">
-                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
-                                                    </Trigger>
-
-                                                    <Trigger Property="IsMouseOver" Value="true">
-                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
-                                                    </Trigger>
-
-                                                    <MultiTrigger>
-                                                        <MultiTrigger.Conditions>
-                                                            <Condition Property="IsPressed" Value="False" />
-                                                            <Condition Property="IsMouseOver" Value="True" />
-                                                        </MultiTrigger.Conditions>
-                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
-                                                    </MultiTrigger>
-
-                                                    <MultiTrigger>
-                                                        <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlPressedColorBrush}"/>
-                                                        <MultiTrigger.Conditions>
-                                                            <Condition Property="IsPressed" Value="true" />
-                                                            <Condition Property="IsMouseOver" Value="True" />
-                                                        </MultiTrigger.Conditions>
-                                                    </MultiTrigger>
-
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </Button.Style>
-                            <Button.Content>
-                                M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z
-                            </Button.Content>
-                        </Button>
-                        -->
 
                         <Button Width="16" Height="16" Margin="0 0 0 0" Command="{Binding ShowDebugWindowCommand}" VerticalAlignment="Center" ToolTip="Debug Window" Opacity="0.7" Visibility="{Binding IsShowDebugWindow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                             <Button.Style>

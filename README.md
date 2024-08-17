@@ -3,7 +3,7 @@
 MPDCtrl is a desktop client app for [MPD (Music player daemon)](http://www.musicpd.org/).  
   
 ## Download  
-Download and install via [Microsoft Store](https://apps.microsoft.com/store/detail/mpdctrl/9NV2BBJ82BRX)
+Download and install via [Microsoft Store](https://apps.microsoft.com/store/detail/mpdctrl/9NV2BBJ82BRX) or download executables directly from the [releases page](https://github.com/torum/MPDCtrl/releases).
   
 ## Screenshots
 
@@ -23,7 +23,7 @@ Download and install via [Microsoft Store](https://apps.microsoft.com/store/deta
 Feel free to open issues and send PRs. 
 
 ## Technologies & Frameworks
-* [.NET 6](https://github.com/dotnet/runtime)  
+* [.NET 8](https://github.com/dotnet/runtime)  
 * [WPF (Windows Presentation Foundation)](https://github.com/dotnet/wpf)  
 
 ## Getting Started

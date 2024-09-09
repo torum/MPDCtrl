@@ -1,0 +1,131 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MPDCtrlX.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="MPDCtrlX.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="MPDCtrlX">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+<!--
+    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    -->
+	<Grid RowDefinitions="32,102,*,0,200,28" ColumnDefinitions="250,8,4*" Margin="0">
+		
+		<!-- App title bar-->
+		<!-- Header -->
+		<Border Grid.Row="1" Background="Transparent" BorderThickness="0 0.5 0 0" BorderBrush="#555" VerticalAlignment="Stretch">
+			<Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0.5">
+				<Grid RowDefinitions="4,Auto,Auto,Auto,12" ColumnDefinitions="*,Auto,*">
+
+
+					<!-- Playback Controls -->
+					<Grid Grid.Row="1" Grid.Column="1" RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,*" HorizontalAlignment="Center">
+
+						<!-- Playback Buttons -->
+						<Grid Grid.Row="0" Grid.Column="1" Width="280" RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,*">
+
+							<!-- "Play" should be top so that it gets the first keyboard focus -->
+							<Button x:Name="PlayButton" Content="PlayButton" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="62" Width="62" Background="Transparent" Foreground="White" Command="{Binding PlayCommand}"></Button>
+
+							<Button x:Name="BackButton" Content="BackButton" Grid.Column="0" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Command="{Binding PlayPrevCommand}" ></Button>
+
+							<Button x:Name="NextButton" Content="NextButton" Grid.Column="2" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White"  Command="{Binding PlayNextCommand}" ></Button>
+
+						</Grid>
+
+
+					</Grid>
+
+				</Grid>
+
+			</Border>
+		</Border>
+
+		<!-- Left pane -->
+		<Border Grid.Row="2" Grid.Column="0" MinWidth="250" Width="250" MaxWidth="300" BorderThickness="0 0.5 0 0" BorderBrush="#555" VerticalAlignment="Stretch">
+			<Grid RowDefinitions="*" ColumnDefinitions="Auto,*">
+
+				<!-- 
+				<TreeView Items="{Binding Items}" Width="400" Height="480" HorizontalAlignment="Left">
+					<TreeView.ItemTemplate>
+						<TreeDataTemplate ItemsSource="{Binding Subfolders}">
+							<TextBlock Text="{Binding strNodeText}"/>
+						</TreeDataTemplate>
+					</TreeView.ItemTemplate>
+				</TreeView>
+				-->
+
+			</Grid>
+		</Border>
+
+		<Border Grid.Row="2" Grid.Column="1" MinWidth="8"></Border>
+
+		<!-- Right pane -->
+		<Border Grid.Row="2" Grid.Column="2" BorderThickness="0 0.5 0 0" BorderBrush="#555" VerticalAlignment="Stretch">
+			<Grid RowDefinitions="*" ColumnDefinitions="Auto,*">
+
+				<!-- 
+					<DataGrid Name="MyDataGrid" Items="{Binding People}" >
+					</DataGrid>
+				-->
+
+			</Grid>
+		</Border>
+
+		<!-- Debug Windows -->
+		<Grid x:Name="DebugWindow" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" RowDefinitions="Auto,*" ColumnDefinitions="1*,8,1*" Height="200">
+
+			<Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Width="30" Height="30" Margin="0 0 0 0" HorizontalAlignment="Right" VerticalAlignment="Center" Content="x" Command="{Binding ShowDebugWindowCommand}"></Button>
+
+			<Grid Grid.Row="1" Grid.Column="0">
+
+				<TextBox x:Name="DebugCommandTextBox" Text="{Binding DebugCommandText, Mode=OneWay}" Background="Transparent" BorderThickness="0" AcceptsReturn="True" Padding="6 6 24 6" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24">
+				</TextBox>
+
+				<Button Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 18 0" VerticalAlignment="Top" Content="x" Command="{Binding ClearDebugCommandTextCommand}"></Button>
+
+			</Grid>
+
+			<Grid Grid.Row="1" Grid.Column="2">
+
+				<TextBox x:Name="DebugIdleTextBox" Text="{Binding DebugIdleText, Mode=OneWay}" Background="Transparent" BorderThickness="0" AcceptsReturn="True" Padding="6 6 24 6" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24">
+				</TextBox>
+
+				<Button Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 18 0" VerticalAlignment="Top" Content="x" Command="{Binding ClearDebugIdleTextCommand}"></Button>
+
+			</Grid>
+
+		</Grid>
+
+
+		<!-- StatusBar -->
+		<Border Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Height="28" Margin="0 0 0 0">
+			<StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 2 0">
+
+				<!-- Status Error Message -->
+				<TextBlock Text="{Binding MpdStatusMessage}" Margin="6 0 6 0" TextWrapping="NoWrap"></TextBlock>
+				
+				<!-- Statusbar Message  -->
+				<TextBlock Text="{Binding StatusBarMessage}" Margin="6 0 6 0" TextWrapping="NoWrap"></TextBlock>
+
+				<!-- ConnectionStatusMessage  -->
+				<TextBlock Text="{Binding ConnectionStatusMessage}" Margin="6 0 6 0" TextWrapping="NoWrap"></TextBlock>
+
+				
+			</StackPanel>
+		</Border>
+
+	</Grid>
+
+
+
+</Window>

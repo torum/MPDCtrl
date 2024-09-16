@@ -714,7 +714,7 @@ public partial class MainWindowViewModel : ReactiveObject//ViewModelBase
         }
     }
 
-    private double _volume;
+    private double _volume = 50;
     public double Volume
     {
         get

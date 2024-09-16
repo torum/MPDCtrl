@@ -22,7 +22,6 @@
 		
 		<!-- App title bar-->
 		<!-- Header -->
-		<Border Grid.Row="1" Background="Transparent" BorderThickness="0 0.5 0 0" BorderBrush="#555" VerticalAlignment="Stretch">
 			<Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0.5">
 				<Grid RowDefinitions="4,Auto,Auto,Auto,12" ColumnDefinitions="*,Auto,*">
 
@@ -48,7 +47,6 @@
 				</Grid>
 
 			</Border>
-		</Border>
 
 		<!-- Left pane -->
 		<Border Grid.Row="2" Grid.Column="0" MinWidth="250" Width="250" MaxWidth="300" BorderThickness="0 0.5 0 0" BorderBrush="#555" VerticalAlignment="Stretch">

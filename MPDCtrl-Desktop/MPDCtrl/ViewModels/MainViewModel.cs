@@ -31,7 +31,7 @@ public class MainViewModel : ViewModelBase
     const string _appName = "MPDCtrl";
 
     // Application version
-    const string _appVer = "v3.1.0.0";
+    const string _appVer = "v3.1.0.1";
 
     public static string AppVer
     {
@@ -480,6 +480,120 @@ public class MainViewModel : ViewModelBase
             _queueColumnHeaderAlbumWidthUser = value;
 
             NotifyPropertyChanged(nameof(QueueColumnHeaderAlbumWidthRestore));
+        }
+    }
+
+    private bool _queueColumnHeaderDiscVisibility = true;
+    public bool QueueColumnHeaderDiscVisibility
+    {
+        get
+        {
+            return _queueColumnHeaderDiscVisibility;
+        }
+        set
+        {
+            if (value == _queueColumnHeaderDiscVisibility)
+                return;
+
+            _queueColumnHeaderDiscVisibility = value;
+
+            NotifyPropertyChanged(nameof(QueueColumnHeaderDiscVisibility));
+        }
+    }
+
+    private double _queueColumnHeaderDiscWidth = 62;
+    public double QueueColumnHeaderDiscWidth
+    {
+        get
+        {
+            return _queueColumnHeaderDiscWidth;
+        }
+        set
+        {
+            if (value == _queueColumnHeaderDiscWidth)
+                return;
+
+            _queueColumnHeaderDiscWidth = value;
+
+            if (value > 0)
+                QueueColumnHeaderDiscWidthRestore = value;
+
+            NotifyPropertyChanged(nameof(QueueColumnHeaderDiscWidth));
+        }
+    }
+
+    private double _queueColumnHeaderDiscWidthUser = 62;
+    public double QueueColumnHeaderDiscWidthRestore
+    {
+        get
+        {
+            return _queueColumnHeaderDiscWidthUser;
+        }
+        set
+        {
+            if (value == _queueColumnHeaderDiscWidthUser)
+                return;
+
+            _queueColumnHeaderDiscWidthUser = value;
+
+            NotifyPropertyChanged(nameof(QueueColumnHeaderDiscWidthRestore));
+        }
+    }
+
+    private bool _queueColumnHeaderTrackVisibility = true;
+    public bool QueueColumnHeaderTrackVisibility
+    {
+        get
+        {
+            return _queueColumnHeaderTrackVisibility;
+        }
+        set
+        {
+            if (value == _queueColumnHeaderTrackVisibility)
+                return;
+
+            _queueColumnHeaderTrackVisibility = value;
+
+            NotifyPropertyChanged(nameof(QueueColumnHeaderTrackVisibility));
+        }
+    }
+
+    private double _queueColumnHeaderTrackWidth = 62;
+    public double QueueColumnHeaderTrackWidth
+    {
+        get
+        {
+            return _queueColumnHeaderTrackWidth;
+        }
+        set
+        {
+            if (value == _queueColumnHeaderTrackWidth)
+                return;
+
+            _queueColumnHeaderTrackWidth = value;
+
+            if (value > 0)
+                QueueColumnHeaderTrackWidthRestore = value;
+
+            NotifyPropertyChanged(nameof(QueueColumnHeaderTrackWidth));
+        }
+    }
+
+    private double _queueColumnHeaderTrackWidthUser = 62;
+    public double QueueColumnHeaderTrackWidthRestore
+    {
+        get
+        {
+            return _queueColumnHeaderTrackWidthUser;
+        }
+        set
+        {
+            if (value == _queueColumnHeaderTrackWidthUser)
+                return;
+
+            _queueColumnHeaderTrackWidthUser = value;
+
+            NotifyPropertyChanged(nameof(QueueColumnHeaderTrackWidthRestore));
         }
     }
 
@@ -2986,6 +3100,8 @@ public class MainViewModel : ViewModelBase
         QueueColumnHeaderTimeShowHideCommand = new RelayCommand(QueueColumnHeaderTimeShowHideCommand_Execute, QueueColumnHeaderTimeShowHideCommand_CanExecute);
         QueueColumnHeaderArtistShowHideCommand = new RelayCommand(QueueColumnHeaderArtistShowHideCommand_Execute, QueueColumnHeaderArtistShowHideCommand_CanExecute);
         QueueColumnHeaderAlbumShowHideCommand = new RelayCommand(QueueColumnHeaderAlbumShowHideCommand_Execute, QueueColumnHeaderAlbumShowHideCommand_CanExecute);
+        QueueColumnHeaderDiscShowHideCommand = new RelayCommand(QueueColumnHeaderDiscShowHideCommand_Execute, QueueColumnHeaderDiscShowHideCommand_CanExecute);
+        QueueColumnHeaderTrackShowHideCommand = new RelayCommand(QueueColumnHeaderTrackShowHideCommand_Execute, QueueColumnHeaderTrackShowHideCommand_CanExecute);
         QueueColumnHeaderGenreShowHideCommand = new RelayCommand(QueueColumnHeaderGenreShowHideCommand_Execute, QueueColumnHeaderGenreShowHideCommand_CanExecute);
         QueueColumnHeaderLastModifiedShowHideCommand = new RelayCommand(QueueColumnHeaderLastModifiedShowHideCommand_Execute, QueueColumnHeaderLastModifiedShowHideCommand_CanExecute);
 
@@ -3555,6 +3671,70 @@ public class MainViewModel : ViewModelBase
                                 if (QueueColumnHeaderAlbumWidth > 0)
                                     QueueColumnHeaderAlbumWidthRestore = QueueColumnHeaderAlbumWidth;
                             }
+                            column = Que.Element("Disc");
+                            if (column is not null)
+                            {
+                                if (column.Attribute("Visible") is not null)
+                                {
+                                    var s = column.Attribute("Visible")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
+                                    {
+                                        if (s == "True")
+                                            QueueColumnHeaderDiscVisibility = true;
+                                        else
+                                            QueueColumnHeaderDiscVisibility = false;
+                                    }
+                                }
+                                if (column.Attribute("Width") is not null)
+                                {
+                                    var s = column.Attribute("Width")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
+                                    {
+                                        try
+                                        {
+                                            QueueColumnHeaderDiscWidth = Double.Parse(s);
+                                        }
+                                        catch
+                                        {
+                                            QueueColumnHeaderDiscWidth = 53;
+                                        }
+                                    }
+                                }
+                                if (QueueColumnHeaderDiscWidth > 0)
+                                    QueueColumnHeaderDiscWidthRestore = QueueColumnHeaderDiscWidth;
+                            }
+                            column = Que.Element("Track");
+                            if (column is not null)
+                            {
+                                if (column.Attribute("Visible") is not null)
+                                {
+                                    var s = column.Attribute("Visible")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
+                                    {
+                                        if (s == "True")
+                                            QueueColumnHeaderTrackVisibility = true;
+                                        else
+                                            QueueColumnHeaderTrackVisibility = false;
+                                    }
+                                }
+                                if (column.Attribute("Width") is not null)
+                                {
+                                    var s = column.Attribute("Width")?.Value;
+                                    if (!string.IsNullOrEmpty(s))
+                                    {
+                                        try
+                                        {
+                                            QueueColumnHeaderTrackWidth = Double.Parse(s);
+                                        }
+                                        catch
+                                        {
+                                            QueueColumnHeaderTrackWidth = 53;
+                                        }
+                                    }
+                                }
+                                if (QueueColumnHeaderTrackWidth > 0)
+                                    QueueColumnHeaderTrackWidthRestore = QueueColumnHeaderTrackWidth;
+                            }
                             column = Que.Element("Genre");
                             if (column is not null)
                             {
@@ -4066,6 +4246,38 @@ public class MainViewModel : ViewModelBase
             qAttrs.Value = QueueColumnHeaderAlbumWidth.ToString();
         else
             qAttrs.Value = _queueColumnHeaderAlbumWidthUser.ToString();
+        queueHeaderColumn.SetAttributeNode(qAttrs);
+
+        queueHeader.AppendChild(queueHeaderColumn);
+
+        // Disc
+        queueHeaderColumn = doc.CreateElement(string.Empty, "Disc", string.Empty);
+
+        qAttrs = doc.CreateAttribute("Visible");
+        qAttrs.Value = QueueColumnHeaderDiscVisibility.ToString();
+        queueHeaderColumn.SetAttributeNode(qAttrs);
+
+        qAttrs = doc.CreateAttribute("Width");
+        if (IsFullyRendered)
+            qAttrs.Value = QueueColumnHeaderDiscWidth.ToString();
+        else
+            qAttrs.Value = _queueColumnHeaderDiscWidthUser.ToString();
+        queueHeaderColumn.SetAttributeNode(qAttrs);
+
+        queueHeader.AppendChild(queueHeaderColumn);
+
+        // Track
+        queueHeaderColumn = doc.CreateElement(string.Empty, "Track", string.Empty);
+
+        qAttrs = doc.CreateAttribute("Visible");
+        qAttrs.Value = QueueColumnHeaderTrackVisibility.ToString();
+        queueHeaderColumn.SetAttributeNode(qAttrs);
+
+        qAttrs = doc.CreateAttribute("Width");
+        if (IsFullyRendered)
+            qAttrs.Value = QueueColumnHeaderTrackWidth.ToString();
+        else
+            qAttrs.Value = _queueColumnHeaderTrackWidthUser.ToString();
         queueHeaderColumn.SetAttributeNode(qAttrs);
 
         queueHeader.AppendChild(queueHeaderColumn);
@@ -7718,6 +7930,44 @@ public class MainViewModel : ViewModelBase
         {
             QueueColumnHeaderAlbumVisibility = true;
             QueueColumnHeaderAlbumWidth = QueueColumnHeaderAlbumWidthRestore;
+        }
+    }
+
+    public ICommand QueueColumnHeaderDiscShowHideCommand { get; }
+    public static bool QueueColumnHeaderDiscShowHideCommand_CanExecute()
+    {
+        return true;
+    }
+    public void QueueColumnHeaderDiscShowHideCommand_Execute()
+    {
+        if (QueueColumnHeaderDiscVisibility)
+        {
+            QueueColumnHeaderDiscVisibility = false;
+            QueueColumnHeaderDiscWidth = 0;
+        }
+        else
+        {
+            QueueColumnHeaderDiscVisibility = true;
+            QueueColumnHeaderDiscWidth = QueueColumnHeaderDiscWidthRestore;
+        }
+    }
+
+    public ICommand QueueColumnHeaderTrackShowHideCommand { get; }
+    public static bool QueueColumnHeaderTrackShowHideCommand_CanExecute()
+    {
+        return true;
+    }
+    public void QueueColumnHeaderTrackShowHideCommand_Execute()
+    {
+        if (QueueColumnHeaderTrackVisibility)
+        {
+            QueueColumnHeaderTrackVisibility = false;
+            QueueColumnHeaderTrackWidth = 0;
+        }
+        else
+        {
+            QueueColumnHeaderTrackVisibility = true;
+            QueueColumnHeaderTrackWidth = QueueColumnHeaderTrackWidthRestore;
         }
     }
 

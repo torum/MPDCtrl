@@ -502,9 +502,6 @@ SOFTWARE.</value>
   <data name="Save" xml:space="preserve">
     <value>保存</value>
   </data>
-  <data name="SavedProfiles" xml:space="preserve">
-    <value>保存済みプロファイル</value>
-  </data>
   <data name="Search" xml:space="preserve">
     <value>検索</value>
   </data>
@@ -557,7 +554,7 @@ SOFTWARE.</value>
     <value>起動時にMPDサーバーの楽曲データベースを最新の状態に更新する (更新されるまで、しばらくかかる場合があります)</value>
   </data>
   <data name="Settings_Opts_UseReadPicture" xml:space="preserve">
-    <value>"albumart"の代わりに"readpicture" コマンドを使用する。 (MPD プロトコルのバージョンが0.22.0以上の時のみ)</value>
+    <value>"albumart"の代わりに、"readpicture" コマンドを使用する。 (MPD プロトコルのバージョンが0.22.0以上の時のみ)</value>
   </data>
   <data name="Settings_ProfileDeleted" xml:space="preserve">
     <value>プロファイルが削除されました。</value>
@@ -603,5 +600,14 @@ SOFTWARE.</value>
   </data>
   <data name="Website" xml:space="preserve">
     <value>ウェブサイト</value>
+  </data>
+  <data name="SavedProfiles" xml:space="preserve">
+    <value>保存済みプロファイル</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Disc" xml:space="preserve">
+    <value>ディスク</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Track" xml:space="preserve">
+    <value>トラック</value>
   </data>
 </root>

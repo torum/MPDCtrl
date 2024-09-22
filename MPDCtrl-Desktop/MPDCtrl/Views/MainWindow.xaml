@@ -476,7 +476,7 @@
             <Grid Grid.Row="2" Grid.Column="2">
 
                 <Grid>
-
+                    <!-- Queue -->
                     <Grid Visibility="{Binding IsQueueVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
@@ -528,6 +528,10 @@
                                     <MenuItem Header="{x:Static properties:Resources.QueueListviewColumnHeader_Artist}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderArtistVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderArtistShowHideCommand}">
                                     </MenuItem>
                                     <MenuItem Header="{x:Static properties:Resources.QueueListviewColumnHeader_Album}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderAlbumVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderAlbumShowHideCommand}">
+                                    </MenuItem>
+                                    <MenuItem Header="{x:Static properties:Resources.QueueListviewColumnHeader_Disc}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderDiscVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderDiscShowHideCommand}">
+                                    </MenuItem>
+                                    <MenuItem Header="{x:Static properties:Resources.QueueListviewColumnHeader_Track}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderTrackVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderTrackShowHideCommand}">
                                     </MenuItem>
                                     <MenuItem Header="{x:Static properties:Resources.QueueListviewColumnHeader_Genre}" IsChecked="{Binding Path=DataContext.QueueColumnHeaderGenreVisibility, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Command="{Binding QueueColumnHeaderGenreShowHideCommand}">
                                     </MenuItem>
@@ -917,6 +921,48 @@
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
+                                    <!-- Disc -->
+                                    <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderDiscWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Disc}" MinWidth="42"/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock x:Name="DiscListItemTextBlock" Text="{Binding Path=Disc}" Padding="3" />
+                                                </StackPanel>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                                        <Setter TargetName="DiscListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource TextStrongColorBrush}" />
+                                                        <Setter TargetName="DiscListItemTextBlock" Property="TextBlock.FontWeight" Value="ExtraBold" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="DiscListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <!-- Track -->
+                                    <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderTrackWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Track}" MinWidth="42"/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock x:Name="TrackListItemTextBlock" Text="{Binding Path=Track}" Padding="3" />
+                                                </StackPanel>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                                        <Setter TargetName="TrackListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource TextStrongColorBrush}" />
+                                                        <Setter TargetName="TrackListItemTextBlock" Property="TextBlock.FontWeight" Value="ExtraBold" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="TrackListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderGenreWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Genre}" Tag="{Binding QueueColumnHeaderGenreWidthRestore, Mode=TwoWay}" MinWidth="62"/>
                                         <GridViewColumn.CellTemplate>
@@ -1197,7 +1243,8 @@
                         </Popup>
 
                     </Grid>
-
+                    
+                    <!-- Search -->
                     <Grid Visibility="{Binding IsSearchVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -1620,6 +1667,7 @@
 
                     </Grid>
 
+                    <!-- Library -->
                     <Grid Visibility="{Binding IsLibraryVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*"/>
@@ -2029,6 +2077,7 @@
 
                     </Grid>
 
+                    <!-- Playlists -->
                     <Grid Visibility="{Binding IsPlaylistsVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                         <Grid x:Name="PlaylistsListviewDummy" Grid.Row="1" Visibility="Hidden" Margin="0 0 20 0">
                             <Grid.ColumnDefinitions>
@@ -2230,15 +2279,18 @@
                     
                     </Grid>
                     
+                    <!-- PlaylistItems -->
                     <Grid Visibility="{Binding IsPlaylistItemVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                         <Grid x:Name="PlaylistSongsListviewDummy" Visibility="Hidden" Margin="0 0 20 0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="1*" />
-                                <ColumnDefinition Width="32" />
+                                <ColumnDefinition Width="0" />
                                 <ColumnDefinition Width="5*" />
                                 <ColumnDefinition Width="62" />
                                 <ColumnDefinition Width="2*" />
-                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="1*" />
                                 <ColumnDefinition Width="1*" />
                                 <ColumnDefinition Width="2*" />
                             </Grid.ColumnDefinitions>
@@ -2252,6 +2304,8 @@
                             <Grid x:Name="PlaylistSongsListviewDummy5" Grid.Column="5" />
                             <Grid x:Name="PlaylistSongsListviewDummy6" Grid.Column="6" />
                             <Grid x:Name="PlaylistSongsListviewDummy7" Grid.Column="7" />
+                            <Grid x:Name="PlaylistSongsListviewDummy8" Grid.Column="8" />
+                            <Grid x:Name="PlaylistSongsListviewDummy9" Grid.Column="9" />
                         </Grid>
 
                         <ListView x:Name="PlaylistSongsListview" Grid.Row="1" ItemsSource="{Binding PlaylistSongs, NotifyOnTargetUpdated=True}" TargetUpdated="PlaylistSongsListview_TargetUpdated" SelectedItem="{Binding SelectedPlaylistSong}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0 0 0 0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
@@ -2380,6 +2434,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
+                                    
                                     <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy2, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Title">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Title}"/>
                                         <GridViewColumn.CellTemplate>
@@ -2444,7 +2499,39 @@
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
-                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy6, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Genre">
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy6, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Disc">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Disc}"/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock x:Name="PlaylistSongsListviewDiscListItemTextBlock" Text="{Binding Path=Disc}" Padding="3" />
+                                                </StackPanel>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="PlaylistSongsListviewDiscListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy7, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Track">
+                                        <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Track}"/>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBlock x:Name="PlaylistSongsListviewTrackListItemTextBlock" Text="{Binding Path=Track}" Padding="3" />
+                                                </StackPanel>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
+                                                        <Setter TargetName="PlaylistSongsListviewTrackListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy8, Path=ActualWidth}" helpers:GridViewSort.PropertyName="Genre">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_Genre}"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
@@ -2460,7 +2547,7 @@
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
 
-                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy7, Path=ActualWidth}" helpers:GridViewSort.PropertyName="LastModified">
+                                    <GridViewColumn Width="{Binding ElementName=PlaylistSongsListviewDummy9, Path=ActualWidth}" helpers:GridViewSort.PropertyName="LastModified">
                                         <GridViewColumnHeader Content="{x:Static properties:Resources.QueueListviewColumnHeader_LastModified}"/>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
@@ -2475,6 +2562,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
+                                    
                                 </GridView>
                             </ListView.View>
                             <ListView.ItemContainerStyle>

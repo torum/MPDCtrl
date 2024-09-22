@@ -208,7 +208,7 @@ public partial class MainWindow : Window
             RestoreButton.Visibility = Visibility.Visible;
             MaxButton.Visibility = Visibility.Collapsed;
 
-            LayoutGrid.Margin = new Thickness(8,8,8,8);
+            LayoutGrid.Margin = new Thickness(4,4,4,4);
         }
     }
 

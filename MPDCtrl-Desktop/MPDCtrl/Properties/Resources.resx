@@ -600,4 +600,13 @@ SOFTWARE.</value>
   <data name="Website" xml:space="preserve">
     <value>Website</value>
   </data>
+  <data name="SavedProfiles" xml:space="preserve">
+    <value />
+  </data>
+  <data name="QueueListviewColumnHeader_Disc" xml:space="preserve">
+    <value>Disc</value>
+  </data>
+  <data name="QueueListviewColumnHeader_Track" xml:space="preserve">
+    <value>Track</value>
+  </data>
 </root>

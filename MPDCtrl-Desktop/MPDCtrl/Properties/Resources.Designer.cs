@@ -1114,6 +1114,15 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Disc に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueListviewColumnHeader_Disc {
+            get {
+                return ResourceManager.GetString("QueueListviewColumnHeader_Disc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Genre に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string QueueListviewColumnHeader_Genre {
@@ -1159,11 +1168,29 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
+        ///   Track に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string QueueListviewColumnHeader_Track {
+            get {
+                return ResourceManager.GetString("QueueListviewColumnHeader_Track", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Save に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Save {
             get {
                 return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SavedProfiles {
+            get {
+                return ResourceManager.GetString("SavedProfiles", resourceCulture);
             }
         }
         

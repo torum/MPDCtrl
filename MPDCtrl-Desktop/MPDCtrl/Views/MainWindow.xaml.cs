@@ -425,4 +425,112 @@ public partial class MainWindow : Window
         AppHeader.Opacity = 0.7;
         StatusBar.Opacity = 0.7;
     }
+
+    private void QueueListviewPopupConfirmDeleteSelected_Opened(object sender, EventArgs e)
+    {
+        if (QueueListviewPopupConfirmDeleteSelectedDefaultButton.Focusable)
+        {
+            Keyboard.Focus(QueueListviewPopupConfirmDeleteSelectedDefaultButton);
+            QueueListviewPopupConfirmDeleteSelectedDefaultButton.Focus();
+        }
+    }
+
+    private void QueueListviewPopupSelectedSaveAs_Opened(object sender, EventArgs e)
+    {
+        if (QueueListviewPopupNewPlaylistNameAtSelectedSaveAsTextbox.Focusable)
+        {
+            Keyboard.Focus(QueueListviewPopupNewPlaylistNameAtSelectedSaveAsTextbox);
+            QueueListviewPopupNewPlaylistNameAtSelectedSaveAsTextbox.Focus();
+        }
+    }
+
+    private void QueueListviewPopupPlaylistSelect_Opened(object sender, EventArgs e)
+    {
+        if (QueueListviewPopupPlaylistSelectListview.Focusable)
+        {
+            Keyboard.Focus(QueueListviewPopupPlaylistSelectListview);
+            QueueListviewPopupPlaylistSelectListview.Focus();
+        }
+    }
+
+    private void QueueListviewPopupConfirmClearQueue_Opened(object sender, EventArgs e)
+    {
+        if (QueueListviewPopupConfirmClearQueueDefaultButton.Focusable)
+        {
+            Keyboard.Focus(QueueListviewPopupConfirmClearQueueDefaultButton);
+            QueueListviewPopupConfirmClearQueueDefaultButton.Focus();
+        }
+    }
+
+    private void QueueListviewPopupSaveAs_Opened(object sender, EventArgs e)
+    {
+        if (QueueListviewPopupNewPlaylistNameAtSaveAsTextbox.Focusable)
+        {
+            Keyboard.Focus(QueueListviewPopupNewPlaylistNameAtSaveAsTextbox);
+            QueueListviewPopupNewPlaylistNameAtSaveAsTextbox.Focus();
+        }
+    }
+
+    private void SearchResultListviewPopupPlaylistSelect_Opened(object sender, EventArgs e)
+    {
+        if (PopupPlaylistSelectListviewAtSearchResult.Focusable)
+        {
+            Keyboard.Focus(PopupPlaylistSelectListviewAtSearchResult);
+            PopupPlaylistSelectListviewAtSearchResult.Focus();
+        }
+    }
+
+    private void LibraryListviewPopupPlaylistSelect_Opened(object sender, EventArgs e)
+    {
+        if (PopupPlaylistSelectListviewAtSongFiles.Focusable)
+        {
+            Keyboard.Focus(PopupPlaylistSelectListviewAtSongFiles);
+            PopupPlaylistSelectListviewAtSongFiles.Focus();
+        }
+    }
+
+    private void PlaylistsListviewPopupConfirmDeleteSelected_Opened(object sender, EventArgs e)
+    {
+        if (PlaylistsListviewPopupConfirmDeleteSelectedDefaultButton.Focusable)
+        {
+            Keyboard.Focus(PlaylistsListviewPopupConfirmDeleteSelectedDefaultButton);
+            PlaylistsListviewPopupConfirmDeleteSelectedDefaultButton.Focus();
+        }
+    }
+
+    private void PlaylistItemsListviewPopupConfirmUpdatePlaylistSongs_Opened(object sender, EventArgs e)
+    {
+        if (PlaylistItemsListviewPopupConfirmUpdatePlaylistSongsDefaultButton.Focusable)
+        {
+            Keyboard.Focus(PlaylistItemsListviewPopupConfirmUpdatePlaylistSongsDefaultButton);
+            PlaylistItemsListviewPopupConfirmUpdatePlaylistSongsDefaultButton.Focus();
+        }
+    }
+
+    private void PlaylistItemsListviewPopupConfirmMultipleDeletePlaylistSongsNotSupported_Opened(object sender, EventArgs e)
+    {
+        if (PlaylistItemsListviewPopupConfirmMultipleDeletePlaylistSongsNotSupportedDefaultButton.Focusable)
+        {
+            Keyboard.Focus(PlaylistItemsListviewPopupConfirmMultipleDeletePlaylistSongsNotSupportedDefaultButton);
+            PlaylistItemsListviewPopupConfirmMultipleDeletePlaylistSongsNotSupportedDefaultButton.Focus();
+        }
+    }
+
+    private void PlaylistItemsListviewPopupConfirmDeletePlaylistSong_Opened(object sender, EventArgs e)
+    {
+        if (PlaylistItemsListviewPopupConfirmDeletePlaylistSongDefaultButton.Focusable)
+        {
+            Keyboard.Focus(PlaylistItemsListviewPopupConfirmDeletePlaylistSongDefaultButton);
+            PlaylistItemsListviewPopupConfirmDeletePlaylistSongDefaultButton.Focus();
+        }
+    }
+
+    private void PlaylistItemsListviewPopupConfirmClearPlaylistSong_Opened(object sender, EventArgs e)
+    {
+        if (PlaylistItemsListviewPopupConfirmClearPlaylistSongDefaultButton.Focusable)
+        {
+            Keyboard.Focus(PlaylistItemsListviewPopupConfirmClearPlaylistSongDefaultButton);
+            PlaylistItemsListviewPopupConfirmClearPlaylistSongDefaultButton.Focus();
+        }
+    }
 }

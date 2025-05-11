@@ -5,7 +5,7 @@
     <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MPDCtrl2.ico</ApplicationIcon>
-    <Version>3.1.1.0</Version>
+    <Version>3.1.2.0</Version>
     <Authors>torum</Authors>
     <Company>torum</Company>
     <Copyright></Copyright>
@@ -64,8 +64,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Icons\angle-double-small-left.ico" />
+    <None Remove="Icons\angle-double-small-right.ico" />
+    <None Remove="Icons\play-pause.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Icons\angle-double-small-left.ico" />
+    <Resource Include="Icons\angle-double-small-right.ico" />
+    <Resource Include="Icons\play-pause.ico" />
   </ItemGroup>
 
   <ItemGroup>

@@ -533,4 +533,5 @@ public partial class MainWindow : Window
             PlaylistItemsListviewPopupConfirmClearPlaylistSongDefaultButton.Focus();
         }
     }
+
 }

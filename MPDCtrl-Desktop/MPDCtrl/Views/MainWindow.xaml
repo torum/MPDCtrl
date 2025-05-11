@@ -24,6 +24,7 @@
         WindowStyle="None"
         AllowsTransparency="True"
     -->
+    <!--  Background="#C0333333" -->
     <!-- DataContext="{StaticResource MainViewModel}" -->
     <Window.Style>
         <Style TargetType="Window">
@@ -60,7 +61,16 @@
         <KeyBinding Command="{Binding ShowSettingsCommand}" Modifiers="Ctrl" Key="S"/>
         <KeyBinding Command="{Binding ShowFindCommand}" Modifiers="Ctrl" Key="F"/>
     </Window.InputBindings>
-    <!--  Background="#C0333333" -->
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo>
+            <TaskbarItemInfo.ThumbButtonInfos>
+                <ThumbButtonInfo ImageSource="/Icons/angle-double-small-left.ico" Description="Prev" Command="{Binding PlayPrevCommand}" />
+                <ThumbButtonInfo ImageSource="/Icons/play-pause.ico" Description="Play/Pause" Command="{Binding PlayCommand}" />
+                <ThumbButtonInfo ImageSource="/Icons/angle-double-small-right.ico" Description="Next" Command="{Binding PlayNextCommand}" />
+            </TaskbarItemInfo.ThumbButtonInfos>
+        </TaskbarItemInfo>
+    </Window.TaskbarItemInfo>
+    
     <Border Style="{StaticResource WindowMainPanelStyle}" Background="{DynamicResource BoardBackgroundColorBrush}" UseLayoutRounding="True">
         <Grid x:Name="LayoutGrid">
             <Grid.RowDefinitions>

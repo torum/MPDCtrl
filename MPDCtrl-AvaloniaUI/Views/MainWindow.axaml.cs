@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using MPDCtrlX.ViewModels;
 using System.Text;
 using System.Diagnostics;
+using Avalonia;
 
 namespace MPDCtrlX.Views;
 
@@ -40,6 +41,7 @@ public partial class MainWindow : Window
                 //vm.AckWindowClear += () => OnAckWindowClear();
             }
         }
+
     }
 
     private StringBuilder _sbCommandOutput = new StringBuilder();

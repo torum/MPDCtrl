@@ -20,6 +20,8 @@ using System.Windows.Input;
 using System.Xml;
 using System.Xml.Linq;
 using ReactiveUI;
+using Avalonia.Controls.Models.TreeDataGrid;
+using System.Collections;
 
 
 namespace MPDCtrlX.ViewModels;
@@ -2799,7 +2801,7 @@ public partial class MainWindowViewModel : ReactiveObject//ViewModelBase
 
 
         // test
-        IsShowDebugWindow = true;
+        IsShowDebugWindow = false;
         Start("localhost", 6600);
 
     }

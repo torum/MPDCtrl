@@ -3,81 +3,78 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:MPDCtrlX.ViewModels"
+             xmlns:tn="clr-namespace:MPDCtrlX.ViewModels.Classes"
+			 xmlns:sng="clr-namespace:MPDCtrlX.Models"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MPDCtrlX.Views.MainView"
              x:DataType="vm:MainViewModel">
 
-	<Grid RowDefinitions="32,102,*,0,200,28" ColumnDefinitions="250,8,4*" Margin="0">
+	<Grid RowDefinitions="32,120,*,0,Auto,28" ColumnDefinitions="250,8,4*" Margin="0">
 
 		<!-- App title bar-->
 		<!-- Header -->
-		<Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0.5">
-			<Grid RowDefinitions="4,Auto,Auto,Auto,12" ColumnDefinitions="*,Auto,*">
-
+		<Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0">
+			<Grid RowDefinitions="0,Auto,Auto,Auto,12" ColumnDefinitions="*,Auto,*">
 
 				<!-- Playback Controls -->
-				<Grid Grid.Row="1" Grid.Column="1" RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,*" HorizontalAlignment="Center">
+				<Grid Grid.Row="1" Grid.Column="1" RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,*" HorizontalAlignment="Center" VerticalAlignment="Center">
 
 					<!-- Playback Buttons -->
-					<Grid Grid.Row="0" Grid.Column="1" Width="280" RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,*">
+					<Grid Grid.Row="0" Grid.Column="1" Width="280" RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,*" VerticalAlignment="Center">
 
 						<!-- "Play" should be top so that it gets the first keyboard focus -->
-						<Button x:Name="PlayButton" Content="PlayButton" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="62" Width="62" Background="Transparent" Foreground="White" Command="{Binding PlayCommand}"></Button>
+						<Button x:Name="PlayButton" Content="Play" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="62" Width="62" Background="Transparent" Foreground="White" Command="{Binding PlayCommand}"></Button>
 
-						<Button x:Name="BackButton" Content="BackButton" Grid.Column="0" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Command="{Binding PlayPrevCommand}" ></Button>
+						<Button x:Name="BackButton" Content="Prev" Grid.Column="0" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Command="{Binding PlayPrevCommand}" ></Button>
 
-						<Button x:Name="NextButton" Content="NextButton" Grid.Column="2" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White"  Command="{Binding PlayNextCommand}" ></Button>
+						<Button x:Name="NextButton" Content="Next" Grid.Column="2" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White"  Command="{Binding PlayNextCommand}" ></Button>
 
 					</Grid>
 
-
 				</Grid>
+
+				<Border Grid.Row="1" Grid.Column="2" VerticalAlignment="Center">
+					<Slider Height="100" Margin="10" Value="{Binding Volume,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center"></Slider>
+				</Border>
 
 			</Grid>
 
 		</Border>
 
 		<!-- Left pane -->
-		<Border Grid.Row="2" Grid.Column="0" MinWidth="250" Width="250" MaxWidth="300" BorderThickness="0 0.5 0 0" BorderBrush="#555" VerticalAlignment="Stretch">
-			<Grid RowDefinitions="*" ColumnDefinitions="Auto,*">
-
-				<TreeView ItemsSource="{Binding MainMenuItems}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+		<Border Grid.Row="2" Grid.Column="0" MinWidth="250" Width="250" BorderThickness="0 0 0 0" BorderBrush="#555" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+			<Grid RowDefinitions="*" ColumnDefinitions="*">
+				<TreeView ItemsSource="{Binding MainMenuItems}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderThickness="0">
 					<TreeView.ItemTemplate>
 						<TreeDataTemplate ItemsSource="{Binding Children}">
-							<Border HorizontalAlignment="Left"
-									BorderBrush="Gray" BorderThickness="1"
-									CornerRadius="5" Padding="15 3">
+							<Border HorizontalAlignment="Left" Padding="4">
 								<TextBlock Text="{Binding Name}" />
 							</Border>
 						</TreeDataTemplate>
 					</TreeView.ItemTemplate>
+					<TreeView.Styles>
+						<Style Selector="TreeViewItem" x:DataType="tn:NodeTree">
+							<Setter Property="IsExpanded" Value="{Binding Expanded, Mode=TwoWay}"/>
+							<Setter Property="IsSelected" Value="{Binding Selected, Mode=TwoWay}"/>
+						</Style>
+					</TreeView.Styles>
 				</TreeView>
-				<!-- 
-				<TreeView Items="{Binding Items}" Width="400" Height="480" HorizontalAlignment="Left">
-					<TreeView.ItemTemplate>
-						<TreeDataTemplate ItemsSource="{Binding Subfolders}">
-							<TextBlock Text="{Binding strNodeText}"/>
-						</TreeDataTemplate>
-					</TreeView.ItemTemplate>
-				</TreeView>
-				-->
-
 			</Grid>
 		</Border>
 
 		<Border Grid.Row="2" Grid.Column="1" MinWidth="8"></Border>
 
 		<!-- Right pane -->
-		<Border Grid.Row="2" Grid.Column="2" BorderThickness="0 0.5 0 0" BorderBrush="#555" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+		<Border Grid.Row="2" Grid.Column="2" BorderThickness="0 0 0 0" BorderBrush="#555" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
 			<!-- 			<TreeDataGrid Source="{Binding Source}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
 
 					<DataGrid Name="MyDataGrid" Items="{Binding People}" >
 					</DataGrid>
 				-->
-			<ListBox ItemsSource="{Binding Queue}">
+			<ListBox ItemsSource="{Binding Queue}" BorderThickness="0" Background="Transparent" ScrollViewer.AllowAutoHide="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
 				<ListBox.ItemTemplate>
-					<DataTemplate>
-						<Border>
+					<DataTemplate x:DataType="sng:SongInfoEx">
+						<Border Padding="4,6,4,4">
 							<TextBlock Text="{Binding Title}"/>
 						</Border>
 					</DataTemplate>
@@ -86,7 +83,7 @@
 		</Border>
 
 		<!-- Debug Windows -->
-		<Grid x:Name="DebugWindow" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" RowDefinitions="Auto,*" ColumnDefinitions="1*,8,1*" Height="200" IsVisible="True">
+		<Grid x:Name="DebugWindow" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" RowDefinitions="Auto,*" ColumnDefinitions="1*,8,1*" Height="200" IsVisible="False">
 
 			<Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Width="30" Height="30" Margin="0 0 0 0" HorizontalAlignment="Right" VerticalAlignment="Center" Content="x" Command="{Binding ShowDebugWindowCommand}"></Button>
 

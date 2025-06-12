@@ -34,15 +34,15 @@ public class MpcService : IMpcService
     // You need to either get "status" and "queue" before hand, or "currentsong". 
     public SongInfoEx? MpdCurrentSong { get; private set; }
 
-    public ObservableCollection<SongInfoEx> CurrentQueue { get; private set; } = new();
+    public ObservableCollection<SongInfoEx> CurrentQueue { get; private set; } = [];
 
-    public ObservableCollection<Playlist> Playlists { get; private set; } = new();
+    public ObservableCollection<Playlist> Playlists { get; private set; } = [];
 
-    public ObservableCollection<SongFile> LocalFiles { get; private set; } = new();
+    public ObservableCollection<SongFile> LocalFiles { get; private set; } = [];
 
-    public ObservableCollection<String> LocalDirectories { get; private set; } = new();
+    public ObservableCollection<String> LocalDirectories { get; private set; } = [];
 
-    public ObservableCollection<SongInfo> SearchResult { get; private set; } = new();
+    public ObservableCollection<SongInfo> SearchResult { get; private set; } = [];
 
     public AlbumImage AlbumCover { get; private set; } = new();
 
@@ -1623,7 +1623,7 @@ public class MpcService : IMpcService
 
         //if (Application.Current is null) { return result; }
         //Application.Current.Dispatcher.Invoke(() =>
-        Dispatcher.UIThread.Post(async () =>
+        Dispatcher.UIThread.Post(() =>
         {
             SearchResult.Clear();
         });
@@ -1704,7 +1704,7 @@ public class MpcService : IMpcService
 
             if (b.IsSuccess)
             {
-                Dispatcher.UIThread.Post(async () =>
+                Dispatcher.UIThread.Post(() =>
                 {
                     AlbumCover = _binaryDownloader.AlbumCover;
                 });
@@ -1718,7 +1718,7 @@ public class MpcService : IMpcService
             {
                 //Debug.WriteLine("why... " + b.ErrorMessage);
 
-                Dispatcher.UIThread.Post(async () =>
+                Dispatcher.UIThread.Post(() =>
                 {
                     AlbumCover = new();
                 });
@@ -2357,7 +2357,7 @@ public class MpcService : IMpcService
             IsBusy?.Invoke(this, true);
 
             //Application.Current.Dispatcher.Invoke(() =>
-            Dispatcher.UIThread.Post(async () =>
+            Dispatcher.UIThread.Post(() =>
             {
                 MpdStatus.Reset();
 
@@ -2422,9 +2422,9 @@ public class MpcService : IMpcService
 
                 // songID
                 MpdStatus.MpdSongID = "";
-                if (MpdStatusValues.ContainsKey("songid"))
+                if (MpdStatusValues.TryGetValue("songid", out string? value))
                 {
-                    MpdStatus.MpdSongID = MpdStatusValues["songid"];
+                    MpdStatus.MpdSongID = value;
                 }
 
                 // Repeat opt bool.
@@ -2529,21 +2529,21 @@ public class MpcService : IMpcService
                 }
 
                 // Song time elapsed.
-                if (MpdStatusValues.ContainsKey("elapsed"))
+                if (MpdStatusValues.TryGetValue("elapsed", out string? value1))
                 {
                     try
                     {
-                        MpdStatus.MpdSongElapsed = Double.Parse(MpdStatusValues["elapsed"]);
+                        MpdStatus.MpdSongElapsed = Double.Parse(value1);
                     }
                     catch { }
                 }
 
                 // Song duration.
-                if (MpdStatusValues.ContainsKey("duration"))
+                if (MpdStatusValues.TryGetValue("duration", out string? value2))
                 {
                     try
                     {
-                        MpdStatus.MpdSongTime = Double.Parse(MpdStatusValues["duration"]);
+                        MpdStatus.MpdSongTime = Double.Parse(value2);
                     }
                     catch { }
                 }
@@ -2566,7 +2566,7 @@ public class MpcService : IMpcService
         {
             Debug.WriteLine("Exception@ParseStatus:" + ex.Message);
             //Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParseStatus", ex.Message); });
-            Dispatcher.UIThread.Post(async () =>
+            Dispatcher.UIThread.Post(() =>
             {
                 App.AppendErrorLog("Exception@MPC@ParseStatus", ex.Message);
             });
@@ -2650,7 +2650,7 @@ public class MpcService : IMpcService
             Debug.WriteLine("Error@ParseCurrentSong: " + ex.Message);
 
             //Application.Current?.Dispatcher.Invoke(() =>
-            Dispatcher.UIThread.Post(async () =>
+            Dispatcher.UIThread.Post(() =>
             {
                 App.AppendErrorLog("Exception@MPC@ParseCurrentSong", ex.Message);
             });
@@ -2688,7 +2688,7 @@ public class MpcService : IMpcService
 
         if (isEmptyResult)
         {
-            Dispatcher.UIThread.Post(async () =>
+            Dispatcher.UIThread.Post(() =>
             //Application.Current.Dispatcher.Invoke(() =>
             {
                 CurrentQueue.Clear();
@@ -2760,7 +2760,7 @@ public class MpcService : IMpcService
         {
             IsBusy?.Invoke(this, true);
 
-            ObservableCollection<SongInfoEx> tmpQueue = new();
+            ObservableCollection<SongInfoEx> tmpQueue = [];
             /*
             if (Application.Current is null) { return Task.FromResult(false); }
             Application.Current.Dispatcher.Invoke(() =>
@@ -2861,7 +2861,7 @@ public class MpcService : IMpcService
             MpcProgress?.Invoke(this, "[Background] Updating internal queue list...");
             
             //Application.Current.Dispatcher.Invoke((Action)(() =>
-            Dispatcher.UIThread.Post(async () =>
+            Dispatcher.UIThread.Post(() =>
             {
                 //CurrentQueue.Clear();
                 //_queue = tmpQueue;
@@ -2875,7 +2875,7 @@ public class MpcService : IMpcService
             Debug.WriteLine("Exception@ParsePlaylistInfo: " + ex.Message);
 
             //Application.Current?.Dispatcher.Invoke(() =>
-            Dispatcher.UIThread.Post(async () =>
+            Dispatcher.UIThread.Post(() =>
             {
                 App.AppendErrorLog("Exception@MPC@ParsePlaylistInfo", ex.Message);
             });
@@ -3024,7 +3024,7 @@ public class MpcService : IMpcService
             Debug.WriteLine("Error@FillSongInfoEx: " + e.ToString());
 
             //Application.Current?.Dispatcher.Invoke(() =>
-            Dispatcher.UIThread.Post(async () =>
+            Dispatcher.UIThread.Post(() =>
             {
                 App.AppendErrorLog("Exception@MPC@FillSongInfoEx", e.Message);
                 });
@@ -3048,7 +3048,7 @@ public class MpcService : IMpcService
         if (isEmptyResult)
         {
             //Application.Current.Dispatcher.Invoke(() =>
-            Dispatcher.UIThread.Post(async () =>
+            Dispatcher.UIThread.Post(() =>
             {
                 Playlists.Clear();
             });
@@ -3060,7 +3060,7 @@ public class MpcService : IMpcService
         {
             IsBusy?.Invoke(this, true);
 
-            ObservableCollection<Playlist> tmpPlaylists = new();
+            ObservableCollection<Playlist> tmpPlaylists = [];
 
             Playlist? pl = null;
 
@@ -3088,7 +3088,7 @@ public class MpcService : IMpcService
             }
 
             //Application.Current.Dispatcher.Invoke((Action)(() =>
-            Dispatcher.UIThread.Post(async () =>
+            Dispatcher.UIThread.Post(() =>
             {
                 this.Playlists = new ObservableCollection<Playlist>(tmpPlaylists);
             });
@@ -3134,7 +3134,7 @@ public class MpcService : IMpcService
             Debug.WriteLine("Error@ParsePlaylists: " + e.ToString());
 
             //Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParsePlaylists", e.Message); });
-            Dispatcher.UIThread.Post(async () => { App.AppendErrorLog("Exception@MPC@ParsePlaylists", e.Message); });
+            Dispatcher.UIThread.Post(() => { App.AppendErrorLog("Exception@MPC@ParsePlaylists", e.Message); });
 
             IsBusy?.Invoke(this, false);
             return Task.FromResult(false);
@@ -3162,7 +3162,7 @@ public class MpcService : IMpcService
             IsBusy?.Invoke(this, true);
 
             //Application.Current.Dispatcher.Invoke(() =>
-            Dispatcher.UIThread.Post(async () =>
+            Dispatcher.UIThread.Post(() =>
 
             {
                 LocalFiles.Clear();
@@ -3178,7 +3178,7 @@ public class MpcService : IMpcService
                 if (value.StartsWith("directory:"))
                 {
                     //Application.Current.Dispatcher.Invoke(() =>
-                    Dispatcher.UIThread.Post(async () =>
+                    Dispatcher.UIThread.Post(() =>
 
                     {
                         LocalDirectories.Add(value.Replace("directory: ", ""));
@@ -3196,7 +3196,7 @@ public class MpcService : IMpcService
                     };
 
                     //Application.Current.Dispatcher.Invoke(() =>
-                    Dispatcher.UIThread.Post(async () =>
+                    Dispatcher.UIThread.Post(() =>
 
                     {
                         LocalFiles.Add(song);
@@ -3226,7 +3226,7 @@ public class MpcService : IMpcService
             Debug.WriteLine("Error@ParseListAll: " + e.ToString());
 
             //Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParseListAll", e.Message); });
-            Dispatcher.UIThread.Post(async () =>{ App.AppendErrorLog("Exception@MPC@ParseListAll", e.Message); });
+            Dispatcher.UIThread.Post(() =>{ App.AppendErrorLog("Exception@MPC@ParseListAll", e.Message); });
 
             IsBusy?.Invoke(this, false);
             return Task.FromResult(false); ;
@@ -3244,7 +3244,7 @@ public class MpcService : IMpcService
         if (MpdStop) return Task.FromResult(false);
 
         //Application.Current.Dispatcher.Invoke(() =>
-        Dispatcher.UIThread.Post(async () =>
+        Dispatcher.UIThread.Post(() =>
 
         {
             SearchResult.Clear();
@@ -3315,7 +3315,7 @@ public class MpcService : IMpcService
                             SongValues.Clear();
 
                             //Application.Current.Dispatcher.Invoke(() =>
-                            Dispatcher.UIThread.Post(async () =>
+                            Dispatcher.UIThread.Post(() =>
                             {
                                 SearchResult.Add(sng);
                             });
@@ -3354,7 +3354,7 @@ public class MpcService : IMpcService
                 SongValues.Clear();
 
                 //Application.Current.Dispatcher.Invoke(() =>
-                Dispatcher.UIThread.Post(async () =>
+                Dispatcher.UIThread.Post(() =>
                 {
                     SearchResult.Add(sng);
                 });
@@ -3368,7 +3368,7 @@ public class MpcService : IMpcService
             Debug.WriteLine("Error@ParseSearchResult: " + ex.Message);
 
             //Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParseSearchResult", ex.Message); });
-            Dispatcher.UIThread.Post(async () => { App.AppendErrorLog("Exception@MPC@ParseSearchResult", ex.Message); });
+            Dispatcher.UIThread.Post(() => { App.AppendErrorLog("Exception@MPC@ParseSearchResult", ex.Message); });
 
             IsBusy?.Invoke(this, false);
             return Task.FromResult(false);
@@ -3385,7 +3385,7 @@ public class MpcService : IMpcService
 
     private ObservableCollection<SongInfo> ParsePlaylistSongsResult(string result)
     {
-        ObservableCollection<SongInfo> songList = new();
+        ObservableCollection<SongInfo> songList = [];
 
         if (MpdStop) return songList;
 
@@ -3503,7 +3503,7 @@ public class MpcService : IMpcService
             Debug.WriteLine("Error@ParsePlaylistSongsResult: " + ex.Message);
 
             //Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParsePlaylistSongsResult", ex.Message); });
-            Dispatcher.UIThread.Post(async () => { App.AppendErrorLog("Exception@MPC@ParsePlaylistSongsResult", ex.Message); });
+            Dispatcher.UIThread.Post(() => { App.AppendErrorLog("Exception@MPC@ParsePlaylistSongsResult", ex.Message); });
             return songList;
         }
 

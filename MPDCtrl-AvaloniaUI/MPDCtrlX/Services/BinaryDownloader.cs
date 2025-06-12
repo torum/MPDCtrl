@@ -1,6 +1,7 @@
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using MPDCtrlX.Contracts;
+using MPDCtrlX.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +14,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace MPDCtrlX.Models;
+namespace MPDCtrlX.Services;
 
 public class BinaryDownloader : IBinaryDownloader
 {
@@ -435,7 +436,7 @@ public class BinaryDownloader : IBinaryDownloader
         {
             StringBuilder stringBuilder = new();
 
-            byte[] bin = Array.Empty<byte>();
+            byte[] bin = [];
 
             bool isDoubleOk = false;
             bool isAck = false;
@@ -450,7 +451,7 @@ public class BinaryDownloader : IBinaryDownloader
                 int readSize = 0;
                 int bufferSize = 5000;
                 byte[] buffer = new byte[bufferSize];
-                byte[] bindata = Array.Empty<byte>();
+                byte[] bindata = [];
 
                 using (MemoryStream ms = new())
                 {
@@ -939,7 +940,7 @@ public class BinaryDownloader : IBinaryDownloader
                         }
                         else
                         {
-                            Dispatcher.UIThread.Post(async () =>
+                            Dispatcher.UIThread.Post(() =>
                             {
                                 _albumCover.IsSuccess = false;
                                 _albumCover.IsDownloading = false;
@@ -1009,7 +1010,7 @@ public class BinaryDownloader : IBinaryDownloader
         return (new System.Version(a)).CompareTo(new System.Version(b));
     }
 
-    private async Task<Bitmap> BitmaSourceFromByteArray(byte[] buffer)
+    private static async Task<Bitmap?> BitmaSourceFromByteArray(byte[] buffer)
     {
         // Bug in MPD 0.23.5 
         if (buffer?.Length > 0)

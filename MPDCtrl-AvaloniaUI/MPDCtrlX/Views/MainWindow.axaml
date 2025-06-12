@@ -7,6 +7,9 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="MPDCtrlX.Views.MainWindow"
         Icon="/Assets/MPDCtrlX.ico"
-        Title="MPDCtrlX">
+        Title="MPDCtrlX"
+		TransparencyLevelHint="AcrylicBlur"
+		Background="Transparent"
+		ExtendClientAreaToDecorationsHint="True">
         <views:MainView/>
 </Window>

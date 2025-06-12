@@ -71,7 +71,7 @@ public class DirectoryTreeBuilder : NodeTree
         };
         //this.Children.Add(root);
         //Application.Current.Dispatcher.Invoke(() =>
-        Dispatcher.UIThread.Post(async () =>
+        Dispatcher.UIThread.Post(() =>
         {
             this.Children.Add(root);
         });
@@ -146,7 +146,7 @@ public class DirectoryTreeBuilder : NodeTree
                             };
                             //parent.Children.Add(hoge);
                             //Application.Current.Dispatcher.Invoke(() =>
-                            Dispatcher.UIThread.Post(async () =>
+                            Dispatcher.UIThread.Post(() =>
                             {
                                 parent?.Children.Add(hoge);
                             });
@@ -166,7 +166,7 @@ public class DirectoryTreeBuilder : NodeTree
                     };
                     //root.Children.Add(hoge);
                     //Application.Current.Dispatcher.Invoke(() =>
-                    Dispatcher.UIThread.Post(async () =>
+                    Dispatcher.UIThread.Post(() =>
                     {
                         root.Children.Add(hoge);
                     });

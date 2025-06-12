@@ -57,8 +57,7 @@ abstract public class Node : INotifyPropertyChanged
     protected void NotifyPropertyChanged(string propertyName)
     {
         //Application.Current.Dispatcher.Invoke(() =>
-        Dispatcher.UIThread.Post(async () =>
-
+        Dispatcher.UIThread.Post(() =>
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         });

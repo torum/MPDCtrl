@@ -8,8 +8,7 @@
         x:Class="MPDCtrlX.Views.MainWindow"
         Icon="/Assets/MPDCtrlX.ico"
         Title="MPDCtrlX"
-		TransparencyLevelHint="AcrylicBlur"
-		Background="Transparent"
-		ExtendClientAreaToDecorationsHint="True">
-        <views:MainView/>
+		>
+	<!-- Background="{DynamicResource ThemeBackgroundBrush}" -->
+	<!-- <views:MainView/> -->
 </Window>

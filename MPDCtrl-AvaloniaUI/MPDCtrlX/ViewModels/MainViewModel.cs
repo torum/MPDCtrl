@@ -22,6 +22,16 @@ using System.Xml.Linq;
 
 namespace MPDCtrlX.ViewModels;
 
+public partial class MainDummyViewModel
+{
+   public MainDummyViewModel()
+    {
+        // This is a dummy view model for the MainView.
+        // It is used to avoid a build error in the xaml preview.
+        // It is not used in the application.
+    }
+}
+
 public partial class MainViewModel : ViewModelBase
 {
     #region == Basic ==  
@@ -3230,8 +3240,6 @@ public partial class MainViewModel : ViewModelBase
         _elapsedTimer.Elapsed += new System.Timers.ElapsedEventHandler(ElapsedTimer);
 
         #endregion
-
-
 
         // start the connection
         IsShowDebugWindow = true;

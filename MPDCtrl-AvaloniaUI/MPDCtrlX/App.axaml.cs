@@ -33,14 +33,23 @@ public partial class App : Application
             desktop.MainWindow = new MainWindow
             {
                 //DataContext = new MainViewModel()
+
+                Content = new MainView((App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>())
+                //{
+                //DataContext = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>()//new MainViewModel()
+                //}
             };
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
+            // TODO:
+            /*
             singleViewPlatform.MainView = new MainView
             {
                 //DataContext = new MainViewModel()
             };
+            */
+            singleViewPlatform.MainView = new MainView((App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>());
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -67,6 +76,7 @@ public partial class App : Application
                 .ConfigureServices((context, services) =>
                 {
                     services.AddSingleton<MainWindow>();
+                    services.AddSingleton<MainView>();
                     services.AddSingleton<MainViewModel>();
                     services.AddSingleton<IMpcService, MpcService>();
                     services.AddTransient<IBinaryDownloader, BinaryDownloader>();

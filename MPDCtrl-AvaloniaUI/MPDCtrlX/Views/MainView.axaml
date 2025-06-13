@@ -8,12 +8,19 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MPDCtrlX.Views.MainView"
              x:DataType="vm:MainViewModel">
-
-	<Grid RowDefinitions="32,120,*,0,Auto,28" ColumnDefinitions="250,8,4*" Margin="0">
+	<Design.DataContext>
+		<!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+		<vm:MainDummyViewModel />
+	</Design.DataContext>
+	<Grid x:Name="MainGrid" RowDefinitions="0,120,*,0,Auto,28" ColumnDefinitions="250,8,4*" Margin="0">
+		<!-- {OnPlatform Default='0,120,*,0,Auto,28', Windows='32,120,*,0,Auto,28'} -->
+		<!-- ,x:TypeArguments='RowDefinitions' or ,x:TypeArguments='GridLength'-->
 
 		<!-- App title bar-->
 		<!-- Header -->
 		<Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0">
+			
 			<Grid RowDefinitions="0,Auto,Auto,Auto,12" ColumnDefinitions="*,Auto,*">
 
 				<!-- Playback Controls -->
@@ -33,6 +40,7 @@
 
 				</Grid>
 
+				<!-- Volume slider -->
 				<Border Grid.Row="1" Grid.Column="2" VerticalAlignment="Center">
 					<Slider Height="100" Margin="10" Value="{Binding Volume,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center"></Slider>
 				</Border>
@@ -83,30 +91,29 @@
 		</Border>
 
 		<!-- Debug Windows -->
-		<Grid x:Name="DebugWindow" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" RowDefinitions="Auto,*" ColumnDefinitions="1*,8,1*" Height="200" IsVisible="False">
+		<Grid x:Name="DebugWindow" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" RowDefinitions="Auto,*" ColumnDefinitions="1*,8,1*" Height="200" IsVisible="True">
 
-			<Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Width="30" Height="30" Margin="0 0 0 0" HorizontalAlignment="Right" VerticalAlignment="Center" Content="x" Command="{Binding ShowDebugWindowCommand}"></Button>
+			<Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Width="30" Height="30" Margin="0 0 2 0" HorizontalAlignment="Right" VerticalAlignment="Center" Content="x" Background="Transparent" BorderThickness="0" Command="{Binding ShowDebugWindowCommand}"></Button>
 
 			<Grid Grid.Row="1" Grid.Column="0">
 
-				<TextBox x:Name="DebugCommandTextBox" Text="{Binding DebugCommandText, Mode=OneWay}" Background="Transparent" BorderThickness="0" AcceptsReturn="True" Padding="6 6 24 6" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24">
+				<TextBox x:Name="DebugCommandTextBox" Text="{Binding DebugCommandText, Mode=OneWay}" Background="Transparent" BorderThickness="0" AcceptsReturn="True" Padding="6 0 0 0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="False" IsTabStop="False" Margin="0" MinHeight="24">
 				</TextBox>
 
-				<Button Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 18 0" VerticalAlignment="Top" Content="x" Command="{Binding ClearDebugCommandTextCommand}"></Button>
+				<Button Width="30" Height="30" HorizontalAlignment="Right" Margin="0 6 24 0" VerticalAlignment="Top" Content="x" BorderThickness="0" Background="Transparent" Command="{Binding ClearDebugCommandTextCommand}"></Button>
 
 			</Grid>
 
 			<Grid Grid.Row="1" Grid.Column="2">
 
-				<TextBox x:Name="DebugIdleTextBox" Text="{Binding DebugIdleText, Mode=OneWay}" Background="Transparent" BorderThickness="0" AcceptsReturn="True" Padding="6 6 24 6" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24">
+				<TextBox x:Name="DebugIdleTextBox" Text="{Binding DebugIdleText, Mode=OneWay}" Background="Transparent" BorderThickness="0" AcceptsReturn="True" Padding="6 0 0 0" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="False" IsTabStop="False" Margin="0" MinHeight="24">
 				</TextBox>
 
-				<Button Width="30" Height="30" HorizontalAlignment="Right" Margin="0 0 18 0" VerticalAlignment="Top" Content="x" Command="{Binding ClearDebugIdleTextCommand}"></Button>
+				<Button Width="30" Height="30" HorizontalAlignment="Right" Margin="0 6 24 0" VerticalAlignment="Top" Content="x" BorderThickness="0" Background="Transparent" Command="{Binding ClearDebugIdleTextCommand}"></Button>
 
 			</Grid>
 
 		</Grid>
-
 
 		<!-- StatusBar -->
 		<Border Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Height="28" Margin="0 0 0 0">

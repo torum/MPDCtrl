@@ -1,45 +1,61 @@
 ﻿using Avalonia.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using MPDCtrlX.ViewModels;
+using System;
 using System.Text;
+using System.Diagnostics;
 
 namespace MPDCtrlX.Views;
 
 public partial class MainView : UserControl
 {
-    public MainView()
+    public MainView(MainViewModel? vm)
     {
         InitializeComponent();
 
-        DataContext = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();//new MainViewModel();
+        //DataContext = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();//new MainViewModel();
+        DataContext = vm ?? throw new ArgumentNullException(nameof(vm), "MainViewModel cannot be null.");
 
-        // Event subscriptions
-        if (this.DataContext is MainViewModel vm)
+        if (DataContext is MainViewModel)
         {
-            if (vm is not null)
-            {
-                //vm.OnWindowLoaded(this);
+            // Event subscriptions
+            //vm.OnWindowLoaded(this);
 
-                // Subscribe to Window events.
+            // Subscribe to Window events.
 
-                //Loaded += vm.OnWindowLoaded;
-                //Closing += vm.OnWindowClosing;
-                //ContentRendered += vm.OnContentRendered;
+            //Loaded += vm.OnWindowLoaded;
+            //Closing += vm.OnWindowClosing;
+            //ContentRendered += vm.OnContentRendered;
 
-                // Subscribe to ViewModel events.
+            // Subscribe to ViewModel events.
 
-                //vm.ScrollIntoView += (sender, arg) => { this.OnScrollIntoView(arg); };
-                //vm.ScrollIntoViewAndSelect += (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
-                //vm.DebugWindowShowHide += () => OnDebugWindowShowHide();
-                //vm.DebugWindowShowHide2 += (sender, arg) => OnDebugWindowShowHide2(arg);
-                vm.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
-                vm.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
-                //vm.DebugCommandClear += () => OnDebugCommandClear();
-                //vm.DebugIdleClear += () => OnDebugIdleClear();
-                //vm.AckWindowOutput += (sender, arg) => { this.OnAckWindowOutput(arg); };
-                //vm.AckWindowClear += () => OnAckWindowClear();
-            }
+            //vm.ScrollIntoView += (sender, arg) => { this.OnScrollIntoView(arg); };
+            //vm.ScrollIntoViewAndSelect += (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
+            //vm.DebugWindowShowHide += () => OnDebugWindowShowHide();
+            //vm.DebugWindowShowHide2 += (sender, arg) => OnDebugWindowShowHide2(arg);
+            vm.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
+            vm.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
+            //vm.DebugCommandClear += () => OnDebugCommandClear();
+            //vm.DebugIdleClear += () => OnDebugIdleClear();
+            //vm.AckWindowOutput += (sender, arg) => { this.OnAckWindowOutput(arg); };
+            //vm.AckWindowClear += () => OnAckWindowClear();
         }
+
+        var os = Environment.OSVersion;
+        if (os.Platform.ToString().StartsWith("Win"))
+        {
+            MainGrid.RowDefinitions[0].Height = new GridLength(32, GridUnitType.Pixel);
+        }
+        else
+        {
+            MainGrid.RowDefinitions[0].Height = new GridLength(0, GridUnitType.Pixel);
+
+        }
+    }
+
+    public MainView()
+    {
+        InitializeComponent();
     }
 
     private StringBuilder _sbCommandOutput = new();

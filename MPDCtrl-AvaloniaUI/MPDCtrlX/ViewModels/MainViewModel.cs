@@ -3244,7 +3244,8 @@ public partial class MainViewModel : ViewModelBase
         // start the connection
         IsShowDebugWindow = true;
         Start("localhost", 6600);
-
+        Volume = 20;
+        QueueColumnHeaderTitleWidth = 200;
     }
 
     #region == Startup and Shutdown ==

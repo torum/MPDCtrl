@@ -84,7 +84,7 @@ public partial class App : Application
                 .Build();
     }
 
-    private static StringBuilder Errortxt = new();
+    private static readonly StringBuilder Errortxt = new();
     public static bool IsSaveErrorLog;
     public static string LogFilePath = string.Empty;
     public static void AppendErrorLog(string errorTxt, string kindTxt)

@@ -9,12 +9,16 @@ namespace MPDCtrlX.Views;
 
 public partial class MainView : UserControl
 {
+    private MainViewModel _viewModel;
+
     public MainView(MainViewModel? vm)
     {
+        _viewModel = vm ?? throw new ArgumentNullException(nameof(vm), "MainViewModel cannot be null.");
+
         InitializeComponent();
 
         //DataContext = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();//new MainViewModel();
-        DataContext = vm ?? throw new ArgumentNullException(nameof(vm), "MainViewModel cannot be null.");
+        DataContext = _viewModel;
 
         if (DataContext is MainViewModel)
         {
@@ -56,6 +60,7 @@ public partial class MainView : UserControl
     public MainView()
     {
         InitializeComponent();
+
     }
 
     private StringBuilder _sbCommandOutput = new();
@@ -84,5 +89,20 @@ public partial class MainView : UserControl
         _sbIdleOutput.Append(arg);
         DebugIdleTextBox.Text = _sbIdleOutput.ToString();
         DebugIdleTextBox.CaretIndex = DebugIdleTextBox.Text.Length;
+    }
+
+    private void ListBox_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        test1x.Width = _viewModel.QueueColumnHeaderPositionWidth;
+        test2x.Width = _viewModel.QueueColumnHeaderNowPlayingWidth;
+        test3x.Width = _viewModel.QueueColumnHeaderTitleWidth;
+        test4x.Width = _viewModel.QueueColumnHeaderTimeWidth;
+        test5x.Width = _viewModel.QueueColumnHeaderArtistWidth;
+        test6x.Width = _viewModel.QueueColumnHeaderAlbumWidth;
+        test7x.Width = _viewModel.QueueColumnHeaderDiscWidth;
+        test8x.Width = _viewModel.QueueColumnHeaderTrackWidth;
+        test9x.Width = _viewModel.QueueColumnHeaderGenreWidth;
+        test10x.Width = _viewModel.QueueColumnHeaderLastModifiedWidth;
+
     }
 }

@@ -23,7 +23,6 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.1" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.1" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.1" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 
@@ -32,5 +31,6 @@
     <PackageReference Include="FluentAvaloniaUI" Version="2.3.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
+    <PackageReference Include="Xaml.Behaviors.Avalonia" Version="11.3.0.10" />
   </ItemGroup>
 </Project>

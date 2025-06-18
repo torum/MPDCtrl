@@ -1716,7 +1716,7 @@ public class MpcService : IMpcService
             }
             else
             {
-                //Debug.WriteLine("why... " + b.ErrorMessage);
+                Debug.WriteLine("why... " + b.ErrorMessage);
 
                 Dispatcher.UIThread.Post(() =>
                 {

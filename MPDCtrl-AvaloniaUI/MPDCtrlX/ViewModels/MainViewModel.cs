@@ -4612,10 +4612,10 @@ public partial class MainViewModel : ViewModelBase
             else
             {
                 // TODO:
-                CurrentSong = null;
+                //CurrentSong = null;
 
-                IsAlbumArtVisible = false;
-                AlbumArt = _albumArtDefault;
+                //IsAlbumArtVisible = false;
+                //AlbumArt = _albumArtDefault;
             }
         });
 
@@ -4638,8 +4638,8 @@ public partial class MainViewModel : ViewModelBase
                     // Clear IsPlaying icon
                     CurrentSong.IsPlaying = false;
 
-                    IsAlbumArtVisible = false;
-                    AlbumArt = _albumArtDefault;
+                    //IsAlbumArtVisible = false;
+                    //AlbumArt = _albumArtDefault;
                 }
             }
             else
@@ -4728,8 +4728,8 @@ public partial class MainViewModel : ViewModelBase
                                 // AlbumArt
                                 if (_mpc.AlbumCover.SongFilePath != curitem.File)
                                 {
-                                    IsAlbumArtVisible = false;
-                                    AlbumArt = _albumArtDefault;
+                                    //IsAlbumArtVisible = false;
+                                    //AlbumArt = _albumArtDefault;
 
                                     if (!String.IsNullOrEmpty(CurrentSong.File))
                                     {
@@ -4987,8 +4987,8 @@ public partial class MainViewModel : ViewModelBase
                             // AlbumArt
                             if (_mpc.AlbumCover.SongFilePath != curitem.File)
                             {
-                                IsAlbumArtVisible = false;
-                                AlbumArt = _albumArtDefault;
+                                //IsAlbumArtVisible = false;
+                                //AlbumArt = _albumArtDefault;
 
                                 if (!String.IsNullOrEmpty(CurrentSong.File))
                                 {

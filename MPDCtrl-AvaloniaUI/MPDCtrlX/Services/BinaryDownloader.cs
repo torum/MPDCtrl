@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using MPDCtrlX.Contracts;
@@ -393,8 +394,10 @@ public class BinaryDownloader : IBinaryDownloader
             {
                 await _binaryWriter.WriteAsync(cmd.Trim() + "\n");
 
-                if (!isAutoIdling)
+                if (!isAutoIdling) 
+                { 
                     return ret;
+                }
             }
             else
             {
@@ -610,6 +613,8 @@ public class BinaryDownloader : IBinaryDownloader
                     // Ignore "file not exists" for now.
                     //MpdAckError?.Invoke(this, ackText + " (@MCGB)");
 
+                    Debug.WriteLine("@MpdBinarySendBinaryCommand ReadAsync isAck");
+
                     ret.ErrorMessage = ackText + " (@MpdBinarySendBinaryCommand)";
                     ret.IsSuccess = false;
                     return ret;
@@ -620,6 +625,7 @@ public class BinaryDownloader : IBinaryDownloader
                 }
                 else
                 {
+                    Debug.WriteLine("No binary data(size) found. Could be a readpicture command? (@MpdBinarySendBinaryCommand)");
                     ret.ErrorMessage = "No binary data(size) found. Could be a readpicture command? (@MpdBinarySendBinaryCommand)";
                     ret.IsSuccess = false;
                     return ret;
@@ -668,7 +674,8 @@ public class BinaryDownloader : IBinaryDownloader
         if (data.Length > 1000000) //2000000000
         {
             Debug.WriteLine("**ParseAlbumImageData: binary file size too big: " + data.Length.ToString());
-
+            r.IsSuccess = false;
+            r.ErrorMessage = "ParseAlbumImageData: binary file size too big: \" + data.Length.ToString()";
             _albumCover.IsDownloading = false;
             return r;
         }
@@ -833,7 +840,8 @@ public class BinaryDownloader : IBinaryDownloader
         catch (Exception ex)
         {
             Debug.WriteLine("Error@ParseAlbumImageData (l): " + ex.Message);
-
+            r.IsSuccess = false;
+            r.ErrorMessage = ex.Message;
             _albumCover.IsDownloading = false;
             return r;
         }
@@ -879,25 +887,34 @@ public class BinaryDownloader : IBinaryDownloader
 
             if ((result.WholeSize != 0) && (result.WholeSize == result.ChunkSize))
             {
+                /*
                 Dispatcher.UIThread.Post(async () =>
                 {
-                    if (_albumCover.BinaryData is not null)
-                    {
-                        _albumCover.AlbumImageSource = await BitmaSourceFromByteArray(_albumCover.BinaryData);
-                    }
 
-                    if (_albumCover.AlbumImageSource is not null)
-                    {
-                        _albumCover.IsSuccess = true;
-                    }
-                    else
-                    {
-                        _albumCover.IsSuccess = false;
-                    }
-                    _albumCover.IsDownloading = false;
                 });
+                */
+
+                if (_albumCover.BinaryData is not null)
+                {
+                    _albumCover.AlbumImageSource = await BitmaSourceFromByteArray(_albumCover.BinaryData);
+                }
+
+                if (_albumCover.AlbumImageSource is not null)
+                {
+                    Debug.WriteLine("MpdQueryAlbumArt IsSuccess1");
+                    _albumCover.IsSuccess = true;
+                }
+                else
+                {
+                    Debug.WriteLine("1 _albumCover.IsSuccess = false; @MpdQueryAlbumArt");
+                    _albumCover.IsSuccess = false;
+                }
+
+                _albumCover.IsDownloading = false;
 
                 r = _albumCover.IsSuccess;
+                Debug.WriteLine("MpdQueryAlbumArt IsSuccess1 " + r.ToString());
+
             }
             else
             {
@@ -918,35 +935,53 @@ public class BinaryDownloader : IBinaryDownloader
 
                         if (result.IsSuccess)
                         {
+                            /*
                             Dispatcher.UIThread.Post(async () =>
                             {
-                                if (_albumCover.BinaryData is not null)
-                                {
-                                    _albumCover.AlbumImageSource = await BitmaSourceFromByteArray(_albumCover.BinaryData);
-                                }
 
-                                if (_albumCover.AlbumImageSource is not null)
-                                {
-                                    _albumCover.IsSuccess = true;
-                                }
-                                else
-                                {
-                                    _albumCover.IsSuccess = false;
-                                }
-                                _albumCover.IsDownloading = false;
                             });
+                            */
+                            if (_albumCover.BinaryData is not null)
+                            {
+                                _albumCover.AlbumImageSource = await BitmaSourceFromByteArray(_albumCover.BinaryData);
+                            }
+
+                            if (_albumCover.AlbumImageSource is not null)
+                            {
+                                Debug.WriteLine("_albumCover.IsSuccess = true; @MpdQueryAlbumArt");
+                                _albumCover.IsSuccess = true;
+                            }
+                            else
+                            {
+                                Debug.WriteLine("_albumCover.IsSuccess = false; @MpdQueryAlbumArt");
+                                _albumCover.IsSuccess = false;
+                            }
+                            _albumCover.IsDownloading = false;
 
                             r = true;
                         }
                         else
                         {
+                            Debug.WriteLine("not IsSuccess @MpdQueryAlbumArt");
+                            /*
                             Dispatcher.UIThread.Post(() =>
                             {
-                                _albumCover.IsSuccess = false;
-                                _albumCover.IsDownloading = false;
                             });
+                            */
+                            _albumCover.IsSuccess = false;
+                            _albumCover.IsDownloading = false;
                         }
                     }
+                    else
+                    {
+
+                        Debug.WriteLine("if (result.IsSuccess && (_albumCover.BinaryData is not null)) @MpdQueryAlbumArt");
+                    }
+                }
+                else
+                {
+
+                    Debug.WriteLine("if ((result.WholeSize != 0) && (result.WholeSize > result.ChunkSize)) @MpdQueryAlbumArt");
                 }
             }
         }
@@ -1020,14 +1055,17 @@ public class BinaryDownloader : IBinaryDownloader
             {
                 //return BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
                 return await Task.Run(() => Bitmap.DecodeToWidth(stream, 400));
+                //return Bitmap.DecodeToWidth(stream, 400);
             }
             catch
             {
+                Debug.WriteLine("BitmaSourceFromByteArray exception BitmaSourceFromByteArray Bitmap.DecodeToWidth");
                 return null;
             }
         }
         else
         {
+            Debug.WriteLine("BitmaSourceFromByteArray if (buffer?.Length > 0)");
             return null;
         }
     }

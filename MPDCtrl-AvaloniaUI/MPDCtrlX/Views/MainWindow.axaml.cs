@@ -19,9 +19,6 @@ public partial class MainWindow : AppWindow//Window
 
         InitializeComponent();
 
-        TitleBar.ExtendsContentIntoTitleBar = true;
-        TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
-
         var os = Environment.OSVersion;
         Debug.WriteLine("Current OS Information:");
         Debug.WriteLine("Platform: {0:G}", os.Platform);
@@ -33,21 +30,25 @@ public partial class MainWindow : AppWindow//Window
 
         if (os.Platform.ToString().StartsWith("Win"))
         {
-            TransparencyLevelHint = [WindowTransparencyLevel.AcrylicBlur];
-
-            ExtendClientAreaToDecorationsHint = true;
-
+            TitleBar.ExtendsContentIntoTitleBar = true;
+            TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
+            //TransparencyLevelHint = [WindowTransparencyLevel.AcrylicBlur];
             //Background = Brushes.Transparent;
+
+            // Only on Windows
+            ExtendClientAreaToDecorationsHint = true;
         }
         else
         {
-            TitleBar.ExtendsContentIntoTitleBar = false;
-
-            TransparencyLevelHint = [WindowTransparencyLevel.None];
-
-            ExtendClientAreaToDecorationsHint = false;
-
+            TitleBar.ExtendsContentIntoTitleBar = true;
+            TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
+            //TransparencyLevelHint = [WindowTransparencyLevel.None];
+            //TransparencyLevelHint = [WindowTransparencyLevel.AcrylicBlur];
+            //Background = Brushes.Transparent;
             //Background = this.FindResource("ThemeBackgroundBrush") as IBrush;
+
+            // Not currently supported on Linux due to X11.
+            ExtendClientAreaToDecorationsHint = false;
         }
     }
 }

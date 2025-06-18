@@ -103,8 +103,8 @@
 		<Grid Grid.Row="2" Grid.Column="0">
 
 			<Border Grid.Row="0" Grid.Column="0" MinWidth="250" Width="250" BorderThickness="0 0 0 0" BorderBrush="#555" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-				<Grid RowDefinitions="*" ColumnDefinitions="*" Background="{DynamicResource LayerFillColorDefaultBrush}">
-					<TreeView ItemsSource="{Binding MainMenuItems}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderThickness="0" ScrollViewer.AllowAutoHide="False">
+				<Grid RowDefinitions="*" ColumnDefinitions="*">
+					<TreeView ItemsSource="{Binding MainMenuItems}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0" ScrollViewer.AllowAutoHide="False">
 						<TreeView.ItemTemplate>
 							<TreeDataTemplate ItemsSource="{Binding Children}">
 								<Border HorizontalAlignment="Left" Padding="4">
@@ -127,9 +127,9 @@
 		<!-- Right pane -->
 		<Grid Grid.Row="2" Grid.Column="1">
 			
-			<Grid RowDefinitions="1,Auto,1,*" Margin="8,0,0,0" Background="{DynamicResource LayerFillColorDefaultBrush}" >
+			<Grid RowDefinitions="1,Auto,1,*" Margin="8,0,0,0">
 				<Border Grid.Row="0" BorderThickness="0,0,0,1" Background="{DynamicResource SolidBackgroundFillColorBaseBrush}" Opacity="0.9"></Border>
-				<Grid Grid.Row="1" DockPanel.Dock="Top" Height="30" Margin="1,0,0,0" Background="{DynamicResource SolidBackgroundFillColorBaseBrush}">
+				<Grid Grid.Row="1" DockPanel.Dock="Top" Height="30" Margin="1,0,0,0">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"></ColumnDefinition>
 						<ColumnDefinition Width="4"></ColumnDefinition>
@@ -206,7 +206,7 @@
 					
 				</Grid>
 				<Border Grid.Row="2" BorderThickness="0,0,0,1" Background="{DynamicResource SolidBackgroundFillColorBaseBrush}" Opacity="0.5"></Border>
-				<ListBox Grid.Row="3" ItemsSource="{Binding Queue}" BorderThickness="0" Background="Transparent" ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Auto" Loaded="ListBox_Loaded">
+				<ListBox Grid.Row="3" ItemsSource="{Binding Queue}" SelectedItem="{Binding SelectedQueueSong}" SelectionMode="Single" BorderThickness="0" Background="{DynamicResource LayerFillColorDefaultBrush}" ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Auto" Loaded="ListBox_Loaded">
 					<ListBox.ItemsPanel>
 						<ItemsPanelTemplate>
 							<VirtualizingStackPanel />

@@ -111,7 +111,7 @@ public class NodeTree : Node
         }
     }
 
-    private ObservableCollection<NodeTree> _children = new();
+    private ObservableCollection<NodeTree> _children = [];
     public ObservableCollection<NodeTree> Children
     {
         get

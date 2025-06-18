@@ -1,4 +1,5 @@
 ﻿using MPDCtrl.Contracts;
+using MPDCtrl.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
-namespace MPDCtrl.Models
+namespace MPDCtrl.Services
 {
     public class BinaryDownloader : IBinaryDownloader
     {
@@ -876,23 +877,26 @@ namespace MPDCtrl.Models
 
                 if ((result.WholeSize != 0) && (result.WholeSize == result.ChunkSize))
                 {
+                    /*
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        if (_albumCover.BinaryData is not null)
-                        {
-                            _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
-                        }
 
-                        if (_albumCover.AlbumImageSource is not null)
-                        {
-                            _albumCover.IsSuccess = true;
-                        }
-                        else
-                        {
-                            _albumCover.IsSuccess = false;
-                        }
-                        _albumCover.IsDownloading = false;
                     });
+                    */
+                    if (_albumCover.BinaryData is not null)
+                    {
+                        _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
+                    }
+
+                    if (_albumCover.AlbumImageSource is not null)
+                    {
+                        _albumCover.IsSuccess = true;
+                    }
+                    else
+                    {
+                        _albumCover.IsSuccess = false;
+                    }
+                    _albumCover.IsDownloading = false;
 
                     r = _albumCover.IsSuccess;
                 }
@@ -915,33 +919,38 @@ namespace MPDCtrl.Models
 
                             if (result.IsSuccess)
                             {
+                                /*
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
-                                    if (_albumCover.BinaryData is not null)
-                                    {
-                                        _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
-                                    }
 
-                                    if (_albumCover.AlbumImageSource is not null)
-                                    {
-                                        _albumCover.IsSuccess = true;
-                                    }
-                                    else
-                                    {
-                                        _albumCover.IsSuccess = false;
-                                    }
-                                    _albumCover.IsDownloading = false;
                                 });
+                                */
+                                if (_albumCover.BinaryData is not null)
+                                {
+                                    _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
+                                }
+
+                                if (_albumCover.AlbumImageSource is not null)
+                                {
+                                    _albumCover.IsSuccess = true;
+                                }
+                                else
+                                {
+                                    _albumCover.IsSuccess = false;
+                                }
+                                _albumCover.IsDownloading = false;
 
                                 r = true;
                             }
                             else
                             {
+                                /*
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
-                                    _albumCover.IsSuccess = false;
-                                    _albumCover.IsDownloading = false;
                                 });
+                                */
+                                _albumCover.IsSuccess = false;
+                                _albumCover.IsDownloading = false;
                             }
                         }
                     }

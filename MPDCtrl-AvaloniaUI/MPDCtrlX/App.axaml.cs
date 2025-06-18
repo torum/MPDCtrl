@@ -34,7 +34,9 @@ public partial class App : Application
             {
                 //DataContext = new MainViewModel()
 
-                Content = new MainView((App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>())
+                //Content = new MainView((App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>())
+                Content = new MainView()
+
                 //{
                 //DataContext = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>()//new MainViewModel()
                 //}
@@ -49,7 +51,8 @@ public partial class App : Application
                 //DataContext = new MainViewModel()
             };
             */
-            singleViewPlatform.MainView = new MainView((App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>());
+            //singleViewPlatform.MainView = new MainView((App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>());
+            singleViewPlatform.MainView = new MainView();
         }
 
         base.OnFrameworkInitializationCompleted();

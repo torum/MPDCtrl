@@ -9,18 +9,18 @@ namespace MPDCtrlX.Views;
 
 public partial class MainView : UserControl
 {
-    private MainViewModel _viewModel;
+    private readonly MainViewModel? _viewModel;
 
-    public MainView(MainViewModel? vm)
+    public MainView()//MainViewModel? vm
     {
-        _viewModel = vm ?? throw new ArgumentNullException(nameof(vm), "MainViewModel cannot be null.");
+        _viewModel = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();//new MainViewModel();//vm ?? throw new ArgumentNullException(nameof(vm), "MainViewModel cannot be null.");
 
         InitializeComponent();
 
         //DataContext = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();//new MainViewModel();
         DataContext = _viewModel;
 
-        if (DataContext is MainViewModel)
+        if (_viewModel != null)
         {
             // Event subscriptions
             //vm.OnWindowLoaded(this);
@@ -35,35 +35,38 @@ public partial class MainView : UserControl
 
             //vm.ScrollIntoView += (sender, arg) => { this.OnScrollIntoView(arg); };
             //vm.ScrollIntoViewAndSelect += (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
-            //vm.DebugWindowShowHide += () => OnDebugWindowShowHide();
+            _viewModel.DebugWindowShowHide += () => OnDebugWindowShowHide();
             //vm.DebugWindowShowHide2 += (sender, arg) => OnDebugWindowShowHide2(arg);
-            vm.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
-            vm.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
+            _viewModel.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
+            _viewModel.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
             //vm.DebugCommandClear += () => OnDebugCommandClear();
             //vm.DebugIdleClear += () => OnDebugIdleClear();
-            //vm.AckWindowOutput += (sender, arg) => { this.OnAckWindowOutput(arg); };
-            //vm.AckWindowClear += () => OnAckWindowClear();
+            _viewModel.AckWindowOutput += (sender, arg) => { this.OnAckWindowOutput(arg); };
+            _viewModel.AckWindowClear += () => OnAckWindowClear();
         }
 
         var os = Environment.OSVersion;
         if (os.Platform.ToString().StartsWith("Win"))
         {
-            MainGrid.RowDefinitions[0].Height = new GridLength(32, GridUnitType.Pixel);
+            this.MainGrid.RowDefinitions[0].Height = new GridLength(32, GridUnitType.Pixel);
+            this.ImageLogo.IsVisible = true;
         }
         else
         {
-            MainGrid.RowDefinitions[0].Height = new GridLength(0, GridUnitType.Pixel);
-
+            this.MainGrid.RowDefinitions[0].Height = new GridLength(0, GridUnitType.Pixel);
+            this.ImageLogo.IsVisible = false;
         }
     }
-
+    /*
+#pragma warning disable CS8618
     public MainView()
+#pragma warning restore CS8618
     {
         InitializeComponent();
 
     }
-
-    private StringBuilder _sbCommandOutput = new();
+    */
+    private readonly StringBuilder _sbCommandOutput = new();
     public void OnDebugCommandOutput(string arg)
     {
         // AppendText() is much faster than data binding.
@@ -74,7 +77,7 @@ public partial class MainView : UserControl
         DebugCommandTextBox.CaretIndex = DebugCommandTextBox.Text.Length;
     }
 
-    private StringBuilder _sbIdleOutput = new();
+    private readonly StringBuilder _sbIdleOutput = new();
     public void OnDebugIdleOutput(string arg)
     {
         /*
@@ -90,19 +93,51 @@ public partial class MainView : UserControl
         DebugIdleTextBox.Text = _sbIdleOutput.ToString();
         DebugIdleTextBox.CaretIndex = DebugIdleTextBox.Text.Length;
     }
+    public void OnAckWindowOutput(string arg)
+    {
+        /*
+        // AppendText() is much faster than data binding.
+        AckTextBox.AppendText(arg);
+
+        AckTextBox.CaretIndex = AckTextBox.Text.Length;
+        AckTextBox.ScrollToEnd();
+        */
+    }
+
+    public void OnAckWindowClear()
+    {
+        //AckTextBox.Clear();
+    }
+
+    public void OnDebugWindowShowHide()
+    {
+        if (this.DebugWindow.IsVisible)
+        {
+            this.DebugWindow.IsVisible = false;
+        }
+        else
+        {
+            this.DebugWindow.IsVisible = true;
+        }
+    }
 
     private void ListBox_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        test1x.Width = _viewModel.QueueColumnHeaderPositionWidth;
-        test2x.Width = _viewModel.QueueColumnHeaderNowPlayingWidth;
-        test3x.Width = _viewModel.QueueColumnHeaderTitleWidth;
-        test4x.Width = _viewModel.QueueColumnHeaderTimeWidth;
-        test5x.Width = _viewModel.QueueColumnHeaderArtistWidth;
-        test6x.Width = _viewModel.QueueColumnHeaderAlbumWidth;
-        test7x.Width = _viewModel.QueueColumnHeaderDiscWidth;
-        test8x.Width = _viewModel.QueueColumnHeaderTrackWidth;
-        test9x.Width = _viewModel.QueueColumnHeaderGenreWidth;
-        test10x.Width = _viewModel.QueueColumnHeaderLastModifiedWidth;
+        if (_viewModel == null)
+        {
+            return;
+        }
 
+        this.test1x.Width = _viewModel.QueueColumnHeaderPositionWidth;
+        this.test2x.Width = _viewModel.QueueColumnHeaderNowPlayingWidth;
+        this.test3x.Width = _viewModel.QueueColumnHeaderTitleWidth;
+        this.test4x.Width = _viewModel.QueueColumnHeaderTimeWidth;
+        this.test5x.Width = _viewModel.QueueColumnHeaderArtistWidth;
+        this.test6x.Width = _viewModel.QueueColumnHeaderAlbumWidth;
+        this.test7x.Width = _viewModel.QueueColumnHeaderDiscWidth;
+        this.test8x.Width = _viewModel.QueueColumnHeaderTrackWidth;
+        this.test9x.Width = _viewModel.QueueColumnHeaderGenreWidth;
+        this.test10x.Width = _viewModel.QueueColumnHeaderLastModifiedWidth;
+        
     }
 }

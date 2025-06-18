@@ -18,7 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Assets\MPDCtrlX.ico" />
+    <None Remove="Assets\MPDCtrlX.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\MPDCtrlX.ico" />
   </ItemGroup>
 
   <ItemGroup>

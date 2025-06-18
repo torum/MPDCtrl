@@ -1101,8 +1101,8 @@ public partial class MainViewModel : ViewModelBase
 
     #region == Playback ==  
 
-    private static readonly string _pathPlayButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
-    private static readonly string _pathPauseButton = "M15,16H13V8H15M11,16H9V8H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
+    private static readonly string _pathPlayButton = "M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm8.856-3.845A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189Z";//"M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
+    private static readonly string _pathPauseButton = "M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2Zm-1.5 6.25v7.5a.75.75 0 0 1-1.5 0v-7.5a.75.75 0 0 1 1.5 0Zm4.5 0v7.5a.75.75 0 0 1-1.5 0v-7.5a.75.75 0 0 1 1.5 0Z";
     //private static string _pathStopButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
     private string _playButton = _pathPlayButton;
     public string PlayButton
@@ -2673,7 +2673,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    private bool _isDownloadAlbumArt = false;
+    private bool _isDownloadAlbumArt = true;
     public bool IsDownloadAlbumArt
     {
         get { return _isDownloadAlbumArt; }
@@ -2688,7 +2688,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    private bool _isDownloadAlbumArtEmbeddedUsingReadPicture = false;
+    private bool _isDownloadAlbumArtEmbeddedUsingReadPicture = true;
     public bool IsDownloadAlbumArtEmbeddedUsingReadPicture
     {
         get { return _isDownloadAlbumArtEmbeddedUsingReadPicture; }
@@ -3245,7 +3245,7 @@ public partial class MainViewModel : ViewModelBase
         IsShowDebugWindow = true;
         Start("localhost", 6600);
         Volume = 20;
-        QueueColumnHeaderTitleWidth = 200;
+        //QueueColumnHeaderTitleWidth = 200;
     }
 
     #region == Startup and Shutdown ==
@@ -4539,16 +4539,13 @@ public partial class MainViewModel : ViewModelBase
         });
     }
 
-    private async void UpdateStatus()
+    private void UpdateStatus()
     {
         UpdateButtonStatus();
 
-        bool isAlbumArtChanged = false;
-
         UpdateProgress?.Invoke(this, "[UI] Status updating...");
-
         
-        Dispatcher.UIThread.Post(() =>
+        Dispatcher.UIThread.Post(async () =>
         {
             bool isSongChanged = false;
             bool isCurrentSongWasNull = false;
@@ -4596,7 +4593,10 @@ public partial class MainViewModel : ViewModelBase
                         // AlbumArt
                         if (!String.IsNullOrEmpty(CurrentSong.File))
                         {
-                            isAlbumArtChanged = true;
+                            if (IsDownloadAlbumArt)
+                            {
+                                await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                            }
                         }
                     }
                     else
@@ -4620,25 +4620,16 @@ public partial class MainViewModel : ViewModelBase
         });
 
         UpdateProgress?.Invoke(this, "");
-
-        if (IsDownloadAlbumArt)
-            if (CurrentSong is not null)
-                if (isAlbumArtChanged)
-                    await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
-
     }
 
-    private async void UpdateCurrentSong()
+    private void UpdateCurrentSong()
     {
-        bool isAlbumArtChanged = false;
-
-        
-        Dispatcher.UIThread.Post(() =>
+        Dispatcher.UIThread.Post(async () =>
         {
             bool isSongChanged = false;
             bool isCurrentSongWasNull = false;
 
-            if (CurrentSong is not null)
+            if (CurrentSong != null)
             {
                 if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
                 {
@@ -4656,7 +4647,7 @@ public partial class MainViewModel : ViewModelBase
                 isCurrentSongWasNull = true;
             }
 
-            if (_mpc.MpdCurrentSong is not null)
+            if (_mpc.MpdCurrentSong != null)
             {
                 if (_mpc.MpdCurrentSong.Id == _mpc.MpdStatus.MpdSongID)
                 {
@@ -4674,7 +4665,10 @@ public partial class MainViewModel : ViewModelBase
                         // AlbumArt
                         if (!String.IsNullOrEmpty(CurrentSong.File))
                         {
-                            isAlbumArtChanged = true;
+                            if (IsDownloadAlbumArt)
+                            {
+                                await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                            }
                         }
                     }
                 }
@@ -4682,10 +4676,6 @@ public partial class MainViewModel : ViewModelBase
 
         });
 
-        if (IsDownloadAlbumArt)
-            if (CurrentSong is not null)
-                if (isAlbumArtChanged)
-                    await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
 
     }
 
@@ -4694,7 +4684,7 @@ public partial class MainViewModel : ViewModelBase
         if (IsSwitchingProfile)
             return;
 
-        bool isAlbumArtChanged = false;
+        //bool isAlbumArtChanged = false;
 
         IsQueueFindVisible = false;
 
@@ -4743,8 +4733,7 @@ public partial class MainViewModel : ViewModelBase
 
                                     if (!String.IsNullOrEmpty(CurrentSong.File))
                                     {
-                                        //_mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
-                                        isAlbumArtChanged = true;
+                                        //isAlbumArtChanged = true;
                                     }
                                 }
                             }
@@ -5003,7 +4992,7 @@ public partial class MainViewModel : ViewModelBase
 
                                 if (!String.IsNullOrEmpty(CurrentSong.File))
                                 {
-                                    isAlbumArtChanged = true;
+                                    //isAlbumArtChanged = true;
                                 }
                             }
                         }
@@ -5044,7 +5033,7 @@ public partial class MainViewModel : ViewModelBase
 
             IsWorking = false;
         }
-
+        /*
         if (CurrentSong is not null)
             if (IsDownloadAlbumArt)
                 if (isAlbumArtChanged)
@@ -5053,6 +5042,22 @@ public partial class MainViewModel : ViewModelBase
                     await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
                     //UpdateProgress?.Invoke(this, "");
                 }
+        */
+        /*
+        if (IsDownloadAlbumArt)
+        {
+            //Debug.WriteLine("if (IsDownloadAlbumArt)");
+            if (CurrentSong != null)
+            {
+                //Debug.WriteLine("if (CurrentSong != null)" + " " + CurrentSong.File);
+                if (isAlbumArtChanged)
+                {
+                    //Debug.WriteLine("if (isAlbumArtChanged)");
+                    await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                }
+            }
+        }
+        */
     }
 
     private async void UpdatePlaylists()

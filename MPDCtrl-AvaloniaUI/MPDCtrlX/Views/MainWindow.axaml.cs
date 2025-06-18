@@ -1,10 +1,12 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Media;
+using Avalonia.Platform;
+using FluentAvalonia.UI.Windowing;
+using Microsoft.Extensions.DependencyInjection;
+using MPDCtrlX.ViewModels;
 using System;
 using System.Diagnostics;
 using System.Linq;
-using Avalonia.Platform;
-using Avalonia.Media;
-using FluentAvalonia.UI.Windowing;
 
 namespace MPDCtrlX.Views;
 
@@ -12,13 +14,16 @@ public partial class MainWindow : AppWindow//Window
 {
     public MainWindow()
     {
+        // Just for the <Window.InputBindings>
+        DataContext = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();
+
         InitializeComponent();
 
         TitleBar.ExtendsContentIntoTitleBar = true;
         TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
 
         var os = Environment.OSVersion;
-        Debug.WriteLine("Current OS Information:\n");
+        Debug.WriteLine("Current OS Information:");
         Debug.WriteLine("Platform: {0:G}", os.Platform);
         Debug.WriteLine("Version String: {0}", os.VersionString);
         Debug.WriteLine("Version Information:");
@@ -36,6 +41,8 @@ public partial class MainWindow : AppWindow//Window
         }
         else
         {
+            TitleBar.ExtendsContentIntoTitleBar = false;
+
             TransparencyLevelHint = [WindowTransparencyLevel.None];
 
             ExtendClientAreaToDecorationsHint = false;

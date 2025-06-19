@@ -37,4 +37,43 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
     <PackageReference Include="Xaml.Behaviors.Avalonia" Version="11.3.0.10" />
   </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaXaml Update="Styles\AppWindowStyles.axaml">
+      <CopyToOutputDirectory></CopyToOutputDirectory>
+    </AvaloniaXaml>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Views\ArtistPage.axaml.cs">
+      <DependentUpon>ArtistPage.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AlbumPage.axaml.cs">
+      <DependentUpon>AlbumPage.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\PlaylistItemPage.axaml.cs">
+      <DependentUpon>PlaylistItemPage.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\PlaylistsPage.axaml.cs">
+      <DependentUpon>PlaylistsPage.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\QueuePage.axaml.cs">
+      <DependentUpon>QueuePage.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\LibraryPage.axaml.cs">
+      <DependentUpon>LibraryPage.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>

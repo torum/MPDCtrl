@@ -529,6 +529,24 @@ namespace MPDCtrlX.Properties {
         }
         
         /// <summary>
+        ///   Albums に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuTreeItem_Albums {
+            get {
+                return ResourceManager.GetString("MenuTreeItem_Albums", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Artists に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuTreeItem_Artists {
+            get {
+                return ResourceManager.GetString("MenuTreeItem_Artists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Library に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MenuTreeItem_Browse {
@@ -1164,6 +1182,15 @@ namespace MPDCtrlX.Properties {
         public static string Save {
             get {
                 return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Saved Profiles に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SavedProfiles {
+            get {
+                return ResourceManager.GetString("SavedProfiles", resourceCulture);
             }
         }
         

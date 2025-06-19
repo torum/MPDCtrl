@@ -600,4 +600,13 @@ SOFTWARE.</value>
   <data name="Website" xml:space="preserve">
     <value>Website</value>
   </data>
+  <data name="SavedProfiles" xml:space="preserve">
+    <value>Saved Profiles</value>
+  </data>
+  <data name="MenuTreeItem_Albums" xml:space="preserve">
+    <value>Albums</value>
+  </data>
+  <data name="MenuTreeItem_Artists" xml:space="preserve">
+    <value>Artists</value>
+  </data>
 </root>

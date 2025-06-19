@@ -502,9 +502,6 @@ SOFTWARE.</value>
   <data name="Save" xml:space="preserve">
     <value>保存</value>
   </data>
-  <data name="SavedProfiles" xml:space="preserve">
-    <value>保存済みプロファイル</value>
-  </data>
   <data name="Search" xml:space="preserve">
     <value>検索</value>
   </data>
@@ -603,5 +600,14 @@ SOFTWARE.</value>
   </data>
   <data name="Website" xml:space="preserve">
     <value>ウェブサイト</value>
+  </data>
+  <data name="SavedProfiles" xml:space="preserve">
+    <value>保存済みプロファイル</value>
+  </data>
+  <data name="MenuTreeItem_Albums" xml:space="preserve">
+    <value>アルバム</value>
+  </data>
+  <data name="MenuTreeItem_Artists" xml:space="preserve">
+    <value>アーティスト</value>
   </data>
 </root>

@@ -2,11 +2,13 @@
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using MPDCtrlX.Common;
 using MPDCtrlX.Contracts;
 using MPDCtrlX.Models;
 using MPDCtrlX.Services;
 using MPDCtrlX.ViewModels.Classes;
+using MPDCtrlX.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -34,6 +36,18 @@ public partial class MainDummyViewModel
 
 public partial class MainViewModel : ViewModelBase
 {
+
+    private UserControl? _currentpage;
+    public UserControl? CurrentPage
+    {
+        get { return _currentpage; }
+        set
+        {
+            _currentpage = value;
+            NotifyPropertyChanged(nameof(CurrentPage));
+        }
+    }
+
     #region == Basic ==  
 
     // Application name
@@ -1101,7 +1115,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == Playback ==  
 
-    private static readonly string _pathPlayButton = "M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm8.856-3.845A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189Z";//"M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
+    private static readonly string _pathPlayButton = "M10.856 8.155A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189ZM12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2ZM3.5 12a8.5 8.5 0 1 1 17 0 8.5 8.5 0 0 1-17 0Z";//"M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm8.856-3.845A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189Z";//"M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
     private static readonly string _pathPauseButton = "M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2Zm-1.5 6.25v7.5a.75.75 0 0 1-1.5 0v-7.5a.75.75 0 0 1 1.5 0Zm4.5 0v7.5a.75.75 0 0 1-1.5 0v-7.5a.75.75 0 0 1 1.5 0Z";
     //private static string _pathStopButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
     private string _playButton = _pathPlayButton;
@@ -1398,6 +1412,10 @@ public partial class MainViewModel : ViewModelBase
                 IsPlaylistItemVisible = false;
                 IsLibraryVisible = false;
                 IsSearchVisible = false;
+                IsArtistVisible = false;
+                IsAlbumVisible = false;
+
+                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<QueuePage>();
             }
             else if (value is NodeMenuPlaylists)
             {
@@ -1406,6 +1424,10 @@ public partial class MainViewModel : ViewModelBase
                 IsPlaylistItemVisible = false;
                 IsLibraryVisible = false;
                 IsSearchVisible = false;
+                IsArtistVisible = false;
+                IsAlbumVisible = false;
+
+                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistsPage>();
             }
             else if (value is NodeMenuPlaylistItem nmpli)
             {
@@ -1414,8 +1436,9 @@ public partial class MainViewModel : ViewModelBase
                 IsPlaylistItemVisible = true;
                 IsLibraryVisible = false;
                 IsSearchVisible = false;
+                IsArtistVisible = false;
+                IsAlbumVisible = false;
 
-                
                 //Application.Current.Dispatcher.Invoke(() =>
                 Dispatcher.UIThread.Post(() =>
                 {
@@ -1427,6 +1450,8 @@ public partial class MainViewModel : ViewModelBase
 
                 });
 
+                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistItemPage>();
+
                 if ((nmpli.PlaylistSongs.Count == 0) || nmpli.IsUpdateRequied)
                     GetPlaylistSongs(nmpli);
             }
@@ -1437,6 +1462,10 @@ public partial class MainViewModel : ViewModelBase
                 IsPlaylistItemVisible = false;
                 IsLibraryVisible = true;
                 IsSearchVisible = false;
+                IsArtistVisible = false;
+                IsAlbumVisible = false;
+
+                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<LibraryPage>();
 
                 if (!nml.IsAcquired || (MusicDirectories.Count <= 1) && (MusicEntries.Count == 0))
                     GetLibrary(nml);
@@ -1448,6 +1477,34 @@ public partial class MainViewModel : ViewModelBase
                 IsPlaylistItemVisible = false;
                 IsLibraryVisible = false;
                 IsSearchVisible = true;
+                IsArtistVisible = false;
+                IsAlbumVisible = false;
+
+                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<SearchPage>();
+            }
+            else if (value is NodeMenuAlbum)
+            {
+                IsQueueVisible = false;
+                IsPlaylistsVisible = false;
+                IsPlaylistItemVisible = false;
+                IsLibraryVisible = false;
+                IsSearchVisible = false;
+                IsArtistVisible = false;
+                IsAlbumVisible = true;
+
+                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<AlbumPage>();
+            }
+            else if (value is NodeMenuArtist)
+            {
+                IsQueueVisible = false;
+                IsPlaylistsVisible = false;
+                IsPlaylistItemVisible = false;
+                IsLibraryVisible = false;
+                IsSearchVisible = false;
+                IsArtistVisible = true;
+                IsAlbumVisible = false;
+
+                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<ArtistPage>();
             }
             else if (value is NodeMenu)
             {
@@ -1535,6 +1592,35 @@ public partial class MainViewModel : ViewModelBase
 
             _isSearchVisible = value;
             NotifyPropertyChanged(nameof(IsSearchVisible));
+        }
+    }
+
+    private bool _isAlbumVisible = true;
+    public bool IsAlbumVisible
+    {
+        get { return _isAlbumVisible; }
+        set
+        {
+            if (_isAlbumVisible == value)
+                return;
+
+            _isAlbumVisible = value;
+            NotifyPropertyChanged(nameof(IsAlbumVisible));
+        }
+    }
+
+
+    private bool _isArtistVisible = true;
+    public bool IsArtistVisible
+    {
+        get { return _isArtistVisible; }
+        set
+        {
+            if (_isArtistVisible == value)
+                return;
+
+            _isArtistVisible = value;
+            NotifyPropertyChanged(nameof(IsArtistVisible));
         }
     }
 
@@ -3246,6 +3332,7 @@ public partial class MainViewModel : ViewModelBase
         Start("localhost", 6600);
         Volume = 20;
         //QueueColumnHeaderTitleWidth = 200;
+
     }
 
     #region == Startup and Shutdown ==

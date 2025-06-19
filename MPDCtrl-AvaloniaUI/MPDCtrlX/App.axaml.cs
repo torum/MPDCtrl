@@ -83,6 +83,14 @@ public partial class App : Application
                     services.AddSingleton<MainViewModel>();
                     services.AddSingleton<IMpcService, MpcService>();
                     services.AddTransient<IBinaryDownloader, BinaryDownloader>();
+
+                    services.AddSingleton<QueuePage>(); 
+                    services.AddSingleton<SearchPage>(); 
+                    services.AddSingleton<LibraryPage>(); 
+                    services.AddSingleton<PlaylistsPage>(); 
+                    services.AddSingleton<PlaylistItemPage>(); 
+                    services.AddSingleton<AlbumPage>();
+                    services.AddSingleton<ArtistPage>();
                 })
                 .Build();
     }

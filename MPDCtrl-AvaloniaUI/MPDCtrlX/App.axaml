@@ -6,19 +6,21 @@
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
 	<Application.Styles>
-		<sty:FluentAvaloniaTheme PreferUserAccentColor="True" UseSystemFontOnWindows="True" />
+		<sty:FluentAvaloniaTheme PreferUserAccentColor="True" UseSystemFontOnWindows="False" />
 		<!--
 		<SimpleTheme/>
-		FATitle_SysCaptionForegroundInactive
 		-->
 
+		<StyleInclude Source="avares://MPDCtrlX/Styles/Styles.axaml" />
+		
 	</Application.Styles>
-
+	<!--
 	<Application.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-				<MergeResourceInclude Source="/Styles/AppWindowStyles.axaml" />
+
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Application.Resources>
+	-->
 </Application>

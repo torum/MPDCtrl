@@ -39,6 +39,28 @@ public class NodeMenuLibrary : NodeMenu
     }
 }
 
+public class NodeMenuAlbum : NodeMenu
+{
+    public bool IsAcquired { get; set; }
+
+    public NodeMenuAlbum(string name) : base(name)
+    {
+        //PathIcon = "M4 4C2.89 4 2 4.89 2 6V18A2 2 0 0 0 4 20H20A2 2 0 0 0 22 18V8C22 6.89 21.1 6 20 6H12L10 4H4M4 8H20V18H4V8M12 9V11H15V9H12M16 9V11H19V9H16M12 12V14H15V12H12M16 12V14H19V12H16M12 15V17H15V15H12M16 15V17H19V15H16Z";
+        PathIcon = "M12 13H7V18H12V20H5V10H7V11H12V13M8 4V6H4V4H8M10 2H2V8H10V2M20 11V13H16V11H20M22 9H14V15H22V9M20 18V20H16V18H20M22 16H14V22H22V16Z";
+    }
+}
+
+public class NodeMenuArtist : NodeMenu
+{
+    public bool IsAcquired { get; set; }
+
+    public NodeMenuArtist(string name) : base(name)
+    {
+        //PathIcon = "M4 4C2.89 4 2 4.89 2 6V18A2 2 0 0 0 4 20H20A2 2 0 0 0 22 18V8C22 6.89 21.1 6 20 6H12L10 4H4M4 8H20V18H4V8M12 9V11H15V9H12M16 9V11H19V9H16M12 12V14H15V12H12M16 12V14H19V12H16M12 15V17H15V15H12M16 15V17H19V15H16Z";
+        PathIcon = "M12 13H7V18H12V20H5V10H7V11H12V13M8 4V6H4V4H8M10 2H2V8H10V2M20 11V13H16V11H20M22 9H14V15H22V9M20 18V20H16V18H20M22 16H14V22H22V16Z";
+    }
+}
+
 public class NodeMenuPlaylists : NodeMenu
 {
     public NodeMenuPlaylists(string name) : base(name)
@@ -79,6 +101,24 @@ public class MenuTreeBuilder : NodeTree
         }
     }
 
+    private readonly NodeMenuAlbum _albumsDirectory;
+    public NodeMenuAlbum AlbumsDirectory
+    {
+        get
+        {
+            return _albumsDirectory;
+        }
+    }
+
+    private readonly NodeMenuArtist _artistsDirectory;
+    public NodeMenuArtist ArtistsDirectory
+    {
+        get
+        {
+            return _artistsDirectory;
+        }
+    }
+
     private readonly NodeMenuLibrary _libraryDirectory;
     public NodeMenuLibrary LibraryDirectory
     {
@@ -110,6 +150,31 @@ public class MenuTreeBuilder : NodeTree
         this.Children.Add(search);
 
         _searchDirectory = search;
+
+
+        NodeMenuAlbum albums = new(MPDCtrlX.Properties.Resources.MenuTreeItem_Albums)
+        {
+            Selected = false,
+            Expanded = false,
+
+            Parent = this
+        };
+        this.Children.Add(albums);
+
+        _albumsDirectory = albums;
+
+
+        NodeMenuArtist artists = new(MPDCtrlX.Properties.Resources.MenuTreeItem_Artists)
+        {
+            Selected = false,
+            Expanded = false,
+
+            Parent = this
+        };
+        this.Children.Add(artists);
+
+        _artistsDirectory = artists;
+
 
 
         NodeMenuLibrary browse = new(MPDCtrlX.Properties.Resources.MenuTreeItem_Browse)

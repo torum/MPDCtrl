@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,7 +13,7 @@ namespace MPDCtrlX.Common
     /// <summary>
     /// GenericRelayCommand
     /// </summary>
-    public class GenericRelayCommand<T> : ICommand
+    public class GenericRelayCommand<T> : IRelayCommand
     {
         private readonly Action<T> execute;
 
@@ -26,7 +27,7 @@ namespace MPDCtrlX.Common
             this.CanExecuteFunc = canExecuteFunc;
         }
 
-        public event EventHandler? CanExecuteChanged
+        public event EventHandler? CanExecuteChanged; /* CanExecuteChanged
         {
             add
             {
@@ -39,6 +40,12 @@ namespace MPDCtrlX.Common
                 // TODO:
                 //CommandManager.RequerySuggested -= value;
             }
+        }
+            */
+
+        public void NotifyCanExecuteChanged()
+        {
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public Predicate<T> CanExecuteFunc { get; private set; }

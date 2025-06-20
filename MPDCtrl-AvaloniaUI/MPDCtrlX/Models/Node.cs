@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 
-namespace MPDCtrlX.ViewModels.Classes;
+namespace MPDCtrlX.Models;
 
 /// <summary>
 /// Base class for Treeview Node and Listview Item.
@@ -111,7 +111,7 @@ public class NodeTree : Node
         }
     }
 
-    private ObservableCollection<NodeTree> _children = new();
+    private ObservableCollection<NodeTree> _children = [];
     public ObservableCollection<NodeTree> Children
     {
         get

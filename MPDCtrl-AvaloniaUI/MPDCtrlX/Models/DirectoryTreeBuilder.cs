@@ -1,9 +1,12 @@
 using Avalonia.Threading;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 
-namespace MPDCtrlX.ViewModels.Classes;
+namespace MPDCtrlX.Models;
 
 public class NodeDirectory : NodeTree
 {
@@ -20,7 +23,7 @@ public class NodeFile : Node
 {
     public Uri FileUri { get; set; }
 
-    public String OriginalFileUri { get; set; }
+    public string OriginalFileUri { get; set; }
 
     public string FilePath
     {
@@ -41,7 +44,7 @@ public class NodeFile : Node
         }
     }
 
-    public NodeFile(string name, Uri fileUri, String originalFileUri) : base(name)
+    public NodeFile(string name, Uri fileUri, string originalFileUri) : base(name)
     {
         FileUri = fileUri;
         OriginalFileUri = originalFileUri;
@@ -55,7 +58,7 @@ public class DirectoryTreeBuilder : NodeTree
 
     public bool IsCanceled { get; set; }
 
-    public void Load(List<String> dirs)
+    public void Load(ObservableCollection<string> dirs)
     {
         if (dirs is null)
             return;
@@ -69,17 +72,13 @@ public class DirectoryTreeBuilder : NodeTree
             Expanded = true,
             Parent = null
         };
-        //this.Children.Add(root);
-        //Application.Current.Dispatcher.Invoke(() =>
-        Dispatcher.UIThread.Post(() =>
-        {
-            this.Children.Add(root);
-        });
 
+        Children.Add(root);
+        
         foreach (var pathDir in dirs)
         {
             // for responsivenesss.
-            //await Task.Delay(1);
+            //await Task.Delay(1); <- not good.
 
             // changed profile etc.
             if (IsCanceled)
@@ -95,7 +94,7 @@ public class DirectoryTreeBuilder : NodeTree
 
                     foreach (var asdf in ValuePair)
                     {
-                        if (String.IsNullOrEmpty(asdf)) continue;
+                        if (string.IsNullOrEmpty(asdf)) continue;
 
                         // LINQ may be slower in this case.
                         /*
@@ -146,10 +145,13 @@ public class DirectoryTreeBuilder : NodeTree
                             };
                             //parent.Children.Add(hoge);
                             //Application.Current.Dispatcher.Invoke(() =>
+                            /*
                             Dispatcher.UIThread.Post(() =>
                             {
                                 parent?.Children.Add(hoge);
                             });
+                            */
+                            parent?.Children.Add(hoge);
                             // set parent node
                             parent = hoge;
                         }
@@ -166,15 +168,18 @@ public class DirectoryTreeBuilder : NodeTree
                     };
                     //root.Children.Add(hoge);
                     //Application.Current.Dispatcher.Invoke(() =>
+                    /*
                     Dispatcher.UIThread.Post(() =>
                     {
                         root.Children.Add(hoge);
                     });
+                    */
+                    root.Children.Add(hoge);
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("Error@DirectoryTreeBuilder: " + ex.Message);
+                Debug.WriteLine("Error@DirectoryTreeBuilder: " + ex.Message);
             }
         }
 

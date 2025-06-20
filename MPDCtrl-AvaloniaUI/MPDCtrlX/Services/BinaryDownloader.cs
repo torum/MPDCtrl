@@ -948,7 +948,6 @@ public class BinaryDownloader : IBinaryDownloader
 
                             if (_albumCover.AlbumImageSource is not null)
                             {
-                                Debug.WriteLine("_albumCover.IsSuccess = true; @MpdQueryAlbumArt");
                                 _albumCover.IsSuccess = true;
                             }
                             else

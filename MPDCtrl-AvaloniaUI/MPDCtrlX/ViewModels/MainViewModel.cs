@@ -1,14 +1,15 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using MPDCtrlX.Common;
 using MPDCtrlX.Contracts;
 using MPDCtrlX.Models;
 using MPDCtrlX.Services;
-using MPDCtrlX.ViewModels.Classes;
 using MPDCtrlX.Views;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -34,7 +35,7 @@ public partial class MainDummyViewModel
     }
 }
 
-public partial class MainViewModel : ViewModelBase
+public partial class MainViewModel : ViewModelBase //ObservableObject //
 {
 
     private UserControl? _currentpage;
@@ -43,8 +44,18 @@ public partial class MainViewModel : ViewModelBase
         get { return _currentpage; }
         set
         {
+            /*
+            if (SetProperty(ref _currentpage, value))
+            {
+                //
+            }
+            */
+
+            if (_currentpage == value)
+                return;
+
             _currentpage = value;
-            NotifyPropertyChanged(nameof(CurrentPage));
+            this.NotifyPropertyChanged(nameof(CurrentPage));
         }
     }
 
@@ -736,6 +747,47 @@ public partial class MainViewModel : ViewModelBase
 
     #endregion
 
+    #region == Library header column == 
+
+    private double _libraryColumnHeaderTitleWidth = 260;
+    public double LibraryColumnHeaderTitleWidth
+    {
+        get
+        {
+            return _libraryColumnHeaderTitleWidth;
+        }
+        set
+        {
+            if (value == _libraryColumnHeaderTitleWidth)
+                return;
+
+            if (value > 12)
+                _libraryColumnHeaderTitleWidth = value;
+
+            NotifyPropertyChanged(nameof(LibraryColumnHeaderTitleWidth));
+        }
+    }
+
+    private double _libraryColumnHeaderFilePathWidth = 250;
+    public double LibraryColumnHeaderFilePathWidth
+    {
+        get
+        {
+            return _libraryColumnHeaderFilePathWidth;
+        }
+        set
+        {
+            if (value == _libraryColumnHeaderFilePathWidth)
+                return;
+
+            if (value > 12)
+                _libraryColumnHeaderFilePathWidth = value;
+
+            NotifyPropertyChanged(nameof(LibraryColumnHeaderFilePathWidth));
+        }
+    }
+    #endregion
+
     #endregion
 
     #region == Themes ==
@@ -1402,9 +1454,6 @@ public partial class MainViewModel : ViewModelBase
                 return;
             }
 
-            _selectedNodeMenu = value;
-            NotifyPropertyChanged(nameof(SelectedNodeMenu));
-
             if (value is NodeMenuQueue)
             {
                 IsQueueVisible = true;
@@ -1415,7 +1464,7 @@ public partial class MainViewModel : ViewModelBase
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
 
-                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<QueuePage>();
+                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<QueuePage>();
             }
             else if (value is NodeMenuPlaylists)
             {
@@ -1427,7 +1476,7 @@ public partial class MainViewModel : ViewModelBase
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
 
-                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistsPage>();
+                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistsPage>();
             }
             else if (value is NodeMenuPlaylistItem nmpli)
             {
@@ -1450,7 +1499,7 @@ public partial class MainViewModel : ViewModelBase
 
                 });
 
-                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistItemPage>();
+                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistItemPage>();
 
                 if ((nmpli.PlaylistSongs.Count == 0) || nmpli.IsUpdateRequied)
                     GetPlaylistSongs(nmpli);
@@ -1465,10 +1514,18 @@ public partial class MainViewModel : ViewModelBase
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
 
-                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<LibraryPage>();
+                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<LibraryPage>();
 
                 if (!nml.IsAcquired || (MusicDirectories.Count <= 1) && (MusicEntries.Count == 0))
+                {
+                    /*
+                    Task.Run(() =>
+                    {
+                        
+                    });
+                    */
                     GetLibrary(nml);
+                }
             }
             else if (value is NodeMenuSearch)
             {
@@ -1480,7 +1537,7 @@ public partial class MainViewModel : ViewModelBase
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
 
-                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<SearchPage>();
+                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<SearchPage>();
             }
             else if (value is NodeMenuAlbum)
             {
@@ -1492,7 +1549,7 @@ public partial class MainViewModel : ViewModelBase
                 IsArtistVisible = false;
                 IsAlbumVisible = true;
 
-                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<AlbumPage>();
+                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<AlbumPage>();
             }
             else if (value is NodeMenuArtist)
             {
@@ -1504,7 +1561,7 @@ public partial class MainViewModel : ViewModelBase
                 IsArtistVisible = true;
                 IsAlbumVisible = false;
 
-                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<ArtistPage>();
+                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<ArtistPage>();
             }
             else if (value is NodeMenu)
             {
@@ -1522,6 +1579,8 @@ public partial class MainViewModel : ViewModelBase
                 throw new NotImplementedException();
             }
 
+            _selectedNodeMenu = value;
+            NotifyPropertyChanged(nameof(SelectedNodeMenu));
         }
     }
 
@@ -1857,7 +1916,33 @@ public partial class MainViewModel : ViewModelBase
             if (MusicEntries.Count == 0)
                 return;
 
-            // TODO: Make the selection option > Filtering mode or matching mode.
+            if (_selectedNodeDirectory.DireUri.LocalPath == "/")
+            {
+                _musicEntriesFiltered = new ObservableCollection<NodeFile>(_musicEntries);
+                NotifyPropertyChanged(nameof(MusicEntriesFiltered));
+            }
+            else
+            {
+                _musicEntriesFiltered.Clear();
+
+                foreach (var entry in _musicEntries)
+                {
+                    string path = entry.FileUri.LocalPath; //person.FileUri.AbsoluteUri;
+                    if (string.IsNullOrEmpty(path))
+                        continue;
+                    string filename = System.IO.Path.GetFileName(path);//System.IO.Path.GetFileName(uri.LocalPath);
+                    if (string.IsNullOrEmpty(filename))
+                        continue;
+
+                    path = path.Replace(("/" + filename), "");
+
+                    if (path.StartsWith(_selectedNodeDirectory.DireUri.LocalPath))
+                    {
+                        _musicEntriesFiltered.Add(entry);
+                    }
+                }
+            }
+
             /*
             bool filteringMode = true;
             
@@ -1976,6 +2061,15 @@ public partial class MainViewModel : ViewModelBase
             _musicEntries = value;
             NotifyPropertyChanged(nameof(MusicEntries));
 
+        }
+    }
+
+    private ObservableCollection<NodeFile> _musicEntriesFiltered = [];
+    public ObservableCollection<NodeFile> MusicEntriesFiltered
+    {
+        get
+        {
+            return _musicEntriesFiltered;
         }
     }
 
@@ -2113,20 +2207,36 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    private SearchTags _selectedSearchTags = SearchTags.Title;
-    public SearchTags SelectedSearchTags
+    private readonly ObservableCollection<Models.SearchOption> _searchTaglist = 
+    [
+        new MPDCtrlX.Models.SearchOption(SearchTags.Title, MPDCtrlX.Properties.Resources.QueueListviewColumnHeader_Title),
+        new MPDCtrlX.Models.SearchOption(SearchTags.Artist, MPDCtrlX.Properties.Resources.QueueListviewColumnHeader_Artist),
+        new MPDCtrlX.Models.SearchOption(SearchTags.Album, MPDCtrlX.Properties.Resources.QueueListviewColumnHeader_Album),
+        new MPDCtrlX.Models.SearchOption(SearchTags.Genre, MPDCtrlX.Properties.Resources.QueueListviewColumnHeader_Genre)
+    ];
+
+    public ObservableCollection<Models.SearchOption> SearchTaglist
     {
         get
         {
-            return _selectedSearchTags;
+            return _searchTaglist;
+        }
+    }
+
+    private Models.SearchOption _selectedSearchTag = new(SearchTags.Title, MPDCtrlX.Properties.Resources.QueueListviewColumnHeader_Title);
+    public Models.SearchOption SelectedSearchTag
+    {
+        get
+        {
+            return _selectedSearchTag;
         }
         set
         {
-            if (_selectedSearchTags == value)
+            if (_selectedSearchTag == value)
                 return;
 
-            _selectedSearchTags = value;
-            NotifyPropertyChanged(nameof(SelectedSearchTags));
+            _selectedSearchTag = value;
+            NotifyPropertyChanged(nameof(SelectedSearchTag));
         }
     }
 
@@ -2144,6 +2254,7 @@ public partial class MainViewModel : ViewModelBase
 
             _searchQuery = value;
             NotifyPropertyChanged(nameof(SearchQuery));
+            SearchExecCommand.NotifyCanExecuteChanged();
         }
     }
 
@@ -3332,7 +3443,7 @@ public partial class MainViewModel : ViewModelBase
         Start("localhost", 6600);
         Volume = 20;
         //QueueColumnHeaderTitleWidth = 200;
-
+        IsWorking = false;
     }
 
     #region == Startup and Shutdown ==
@@ -4783,7 +4894,10 @@ public partial class MainViewModel : ViewModelBase
             if (IsSwitchingProfile)
                 return;
 
-            IsWorking = true;
+            Dispatcher.UIThread.Post(() =>
+            {
+                IsWorking = true;
+            });
 
             try
             {
@@ -4988,14 +5102,27 @@ public partial class MainViewModel : ViewModelBase
 
                 UpdateProgress?.Invoke(this, "Exception@UpdateCurrentQueue: " + e.Message);
 
-                IsWorking = false;
+                Dispatcher.UIThread.Post(() =>
+                {
+                    IsWorking = false;
+                });
 
                 //Application.Current?.Dispatcher.Invoke(() => { (App.Current as App)?.AppendErrorLog("Exception@UpdateCurrentQueue", e.Message); });
                 Dispatcher.UIThread.Post(() => { App.AppendErrorLog("Exception@UpdateCurrentQueue", e.Message); });
                 return;
             }
+            finally
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    IsWorking = false;
+                });
+            }
 
-            IsWorking = false;
+            Dispatcher.UIThread.Post(() =>
+            {
+                IsWorking = false;
+            });
         }
         else
         {
@@ -5005,7 +5132,10 @@ public partial class MainViewModel : ViewModelBase
             if (IsSwitchingProfile)
                 return;
 
-            IsWorking = true;
+            Dispatcher.UIThread.Post(() =>
+            {
+                IsWorking = true;
+            });
 
             try
             {
@@ -5110,15 +5240,25 @@ public partial class MainViewModel : ViewModelBase
 
                 StatusBarMessage = "Exception@UpdateCurrentQueue: " + e.Message;
 
-                IsWorking = false;
+                Dispatcher.UIThread.Post(() =>
+                {
+                    IsWorking = false;
+                });
 
                 //Application.Current?.Dispatcher.Invoke(() => { (App.Current as App)?.AppendErrorLog("Exception@UpdateCurrentQueue", e.Message); });
                 Dispatcher.UIThread.Post(() => { App.AppendErrorLog("Exception@UpdateCurrentQueue", e.Message); });
 
                 return;
             }
+            finally 
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    IsWorking = false;
+                });
+            }
 
-            IsWorking = false;
+            
         }
         /*
         if (CurrentSong is not null)
@@ -5145,6 +5285,11 @@ public partial class MainViewModel : ViewModelBase
             }
         }
         */
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            IsWorking = false;
+        });
     }
 
     private async void UpdatePlaylists()
@@ -5223,35 +5368,23 @@ public partial class MainViewModel : ViewModelBase
         IsWorking = false;
     }
 
-    private void UpdateLibrary()
-    {
-        Task.Run(() =>
-        {
-            UpdateLibraryMusic();
-        });
-
-        Task.Run(() =>
-        {
-            UpdateLibraryDirectories();
-        });
-    }
-
-    private void UpdateLibraryMusic()
+    private Task<bool> UpdateLibraryMusicAsync()
     {
         // Music files
 
         if (IsSwitchingProfile)
-            return;
+            return Task.FromResult(false);
 
         UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
 
         //IsBusy = true;
         IsWorking = true;
 
-        
+        /*
         Dispatcher.UIThread.Post(() => {
             MusicEntries.Clear();
         });
+        */
 
         var tmpMusicEntries = new ObservableCollection<NodeFile>();
 
@@ -5299,12 +5432,12 @@ public partial class MainViewModel : ViewModelBase
 
                 //Application.Current?.Dispatcher.Invoke(() => { (App.Current as App)?.AppendErrorLog("Exception@UpdateLibraryMusic", e.Message); });
                 Dispatcher.UIThread.Post(() => { App.AppendErrorLog("Exception@UpdateLibraryMusic", e.Message); });
-                return;
+                return Task.FromResult(false);
             }
         }
 
         if (IsSwitchingProfile)
-            return;
+            return Task.FromResult(false);
 
         //IsBusy = true;
         IsWorking = true;
@@ -5313,58 +5446,57 @@ public partial class MainViewModel : ViewModelBase
         Dispatcher.UIThread.Post(() => {
             UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
             MusicEntries = tmpMusicEntries;
+
+            _musicEntriesFiltered = _musicEntriesFiltered = new ObservableCollection<NodeFile>(tmpMusicEntries);
+            NotifyPropertyChanged(nameof(MusicEntriesFiltered));
+
             UpdateProgress?.Invoke(this, "");
+            //IsBusy = false;
+            IsWorking = false;
         });
 
         //IsBusy = false;
         IsWorking = false;
+        return Task.FromResult(true);
     }
 
-    private void UpdateLibraryDirectories()
+    private Task<bool> UpdateLibraryDirectoriesAsync()
     {
         // Directories
 
         if (IsSwitchingProfile)
-            return;
+            return Task.FromResult(false);
 
         UpdateProgress?.Invoke(this, "[UI] Library directories loading...");
 
         //IsBusy = true;
         IsWorking = true;
-
         
+        /*
         Dispatcher.UIThread.Post(() => {
             MusicDirectories.Clear();
         });
+        */
 
         try
         {
             var tmpMusicDirectories = new DirectoryTreeBuilder("");
-            /*
-            await Task.Run(() =>
-            {
-                //_musicDirectories.Load(_mpc.LocalDirectories.ToList<String>());
-                tmpMusicDirectories.Load(_mpc.LocalDirectories.ToList<String>());
-            });
-            */
-            tmpMusicDirectories.Load([.. _mpc.LocalDirectories]);
+            //tmpMusicDirectories.Load([.. _mpc.LocalDirectories]);
+            //_musicDirectories.Load(_mpc.LocalDirectories.ToList<String>());
+            tmpMusicDirectories.Load(_mpc.LocalDirectories);
 
             IsWorking = true;
 
-            
+            UpdateProgress?.Invoke(this, "[UI] Library directories loading...");
             Dispatcher.UIThread.Post(() => {
-                UpdateProgress?.Invoke(this, "[UI] Library directories loading...");
-                MusicDirectories = tmpMusicDirectories.Children;
-                UpdateProgress?.Invoke(this, "");
+                MusicDirectories = tmpMusicDirectories.Children;// [0].Children;
+                if (MusicDirectories.Count > 0)
+                {
+                    if (MusicDirectories[0] is NodeDirectory nd)
+                        _selectedNodeDirectory = nd;
+                }
             });
-
-            //_musicDirectories.Load(_mpc.LocalDirectories.ToList<String>());
-
-            if (MusicDirectories.Count > 0)
-            {
-                if (MusicDirectories[0] is NodeDirectory nd)
-                    SelectedNodeDirectory = nd;
-            }
+            UpdateProgress?.Invoke(this, "");
 
             //IsBusy = false;
             IsWorking = false;
@@ -5378,10 +5510,18 @@ public partial class MainViewModel : ViewModelBase
 
             //Application.Current?.Dispatcher.Invoke(() => { (App.Current as App)?.AppendErrorLog("Exception@UpdateLibraryDirectories", e.Message); });
             Dispatcher.UIThread.Post(() => { App.AppendErrorLog("Exception@UpdateLibraryDirectories", e.Message); });
+            return Task.FromResult(false);
+        }
+        finally
+        {
+            //IsBusy = false;
+            IsWorking = false;
         }
 
         //IsBusy = false;
         IsWorking = false;
+
+        return Task.FromResult(true);
     }
 
     private async void GetPlaylistSongs(NodeMenuPlaylistItem playlistNode)
@@ -5425,29 +5565,51 @@ public partial class MainViewModel : ViewModelBase
         IsWorking = false;
     }
 
-    private async void GetLibrary(NodeMenuLibrary librarytNode)
+    private void GetLibrary(NodeMenuLibrary librarytNode)
     {
         if (librarytNode is null)
             return;
 
         if (librarytNode.IsAcquired)
-            return;
-
-        
-        Dispatcher.UIThread.Post(() => {
-            if (MusicEntries.Count > 0)
-                MusicEntries.Clear();
-
-            if (MusicDirectories.Count > 0)
-                MusicDirectories.Clear();
-        });
-
-        CommandResult result = await _mpc.MpdQueryListAll();
-        if (result.IsSuccess)
         {
-            librarytNode.IsAcquired = true;
-            UpdateLibrary();
+            return;
         }
+
+        if (MusicEntries.Count > 0)
+            MusicEntries.Clear();
+
+        if (MusicDirectories.Count > 0)
+            MusicDirectories.Clear();
+
+        librarytNode.IsAcquired = true;
+
+        Task.Run(async () =>
+        {
+            await Task.Delay(100);
+
+            CommandResult result = await _mpc.MpdQueryListAll().ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    librarytNode.IsAcquired = true;
+                });
+
+                //await UpdateLibraryMusicAsync().ConfigureAwait(false);
+                //await UpdateLibraryDirectoriesAsync().ConfigureAwait(false);
+                var dirTask = UpdateLibraryDirectoriesAsync();
+                var fileTask = UpdateLibraryMusicAsync();
+                await Task.WhenAll(dirTask, fileTask);
+            }
+            else
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    librarytNode.IsAcquired = false;
+                });
+                Debug.WriteLine("fail to get MpdQueryListAll: " + result.ErrorMessage);
+            }
+        });
     }
 
     private static int CompareVersionString(string a, string b)
@@ -5836,7 +5998,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == Playback play ==
 
-    public ICommand PlayCommand { get; }
+    public IRelayCommand PlayCommand { get; }
     public bool PlayCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -5868,7 +6030,7 @@ public partial class MainViewModel : ViewModelBase
 
     }
 
-    public ICommand PlayNextCommand { get; }
+    public IRelayCommand PlayNextCommand { get; }
     public bool PlayNextCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -5880,7 +6042,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdPlaybackNext(Convert.ToInt32(_volume));
     }
 
-    public ICommand PlayPrevCommand { get; }
+    public IRelayCommand PlayPrevCommand { get; }
     public bool PlayPrevCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -5892,7 +6054,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdPlaybackPrev(Convert.ToInt32(_volume));
     }
 
-    public ICommand ChangeSongCommand { get; set; }
+    public IRelayCommand ChangeSongCommand { get; set; }
     public bool ChangeSongCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -5906,7 +6068,7 @@ public partial class MainViewModel : ViewModelBase
             await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), _selectedQueueSong.Id);
     }
 
-    public ICommand PlayPauseCommand { get; }
+    public IRelayCommand PlayPauseCommand { get; }
     public bool PlayPauseCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -5917,7 +6079,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdPlaybackPause();
     }
 
-    public ICommand PlayStopCommand { get; }
+    public IRelayCommand PlayStopCommand { get; }
     public bool PlayStopCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -5932,7 +6094,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == Playback opts ==
 
-    public ICommand SetRandomCommand { get; }
+    public IRelayCommand SetRandomCommand { get; }
     public bool SetRandomCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -5943,7 +6105,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdSetRandom(_random);
     }
 
-    public ICommand SetRpeatCommand { get; }
+    public IRelayCommand SetRpeatCommand { get; }
     public bool SetRpeatCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -5954,7 +6116,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdSetRepeat(_repeat);
     }
 
-    public ICommand SetConsumeCommand { get; }
+    public IRelayCommand SetConsumeCommand { get; }
     public bool SetConsumeCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -5965,7 +6127,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdSetConsume(_consume);
     }
 
-    public ICommand SetSingleCommand { get; }
+    public IRelayCommand SetSingleCommand { get; }
     public bool SetSingleCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -5980,7 +6142,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == Playback seek and volume ==
 
-    public ICommand SetVolumeCommand { get; }
+    public IRelayCommand SetVolumeCommand { get; }
     public bool SetVolumeCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -5991,7 +6153,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdSetVolume(Convert.ToInt32(_volume));
     }
 
-    public ICommand SetSeekCommand { get; }
+    public IRelayCommand SetSeekCommand { get; }
     public bool SetSeekCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6002,7 +6164,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdPlaybackSeek(_mpc.MpdStatus.MpdSongID, Convert.ToInt32(_elapsed));
     }
 
-    public ICommand VolumeMuteCommand { get; }
+    public IRelayCommand VolumeMuteCommand { get; }
     public bool VolumeMuteCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6013,7 +6175,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdSetVolume(0);
     }
 
-    public ICommand VolumeDownCommand { get; }
+    public IRelayCommand VolumeDownCommand { get; }
     public bool VolumeDownCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6027,7 +6189,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ICommand VolumeUpCommand { get; }
+    public IRelayCommand VolumeUpCommand { get; }
     public bool VolumeUpCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6045,7 +6207,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == Queue ==
 
-    public ICommand QueueListviewSaveAsCommand { get; }
+    public IRelayCommand QueueListviewSaveAsCommand { get; }
     public bool QueueListviewSaveAsCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6058,7 +6220,7 @@ public partial class MainViewModel : ViewModelBase
         IsSaveAsPlaylistPopupVisible = true;
     }
 
-    public ICommand QueueListviewSaveAsPopupCommand { get; }
+    public IRelayCommand QueueListviewSaveAsPopupCommand { get; }
     public bool QueueListviewSaveAsPopupCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6076,7 +6238,7 @@ public partial class MainViewModel : ViewModelBase
         IsSaveAsPlaylistPopupVisible = false;
     }
 
-    public ICommand QueueListviewEnterKeyCommand { get; set; }
+    public IRelayCommand QueueListviewEnterKeyCommand { get; set; }
     public bool QueueListviewEnterKeyCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6091,7 +6253,7 @@ public partial class MainViewModel : ViewModelBase
             await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), _selectedQueueSong.Id);
     }
 
-    public ICommand QueueListviewLeftDoubleClickCommand { get; set; }
+    public IRelayCommand QueueListviewLeftDoubleClickCommand { get; set; }
     public bool QueueListviewLeftDoubleClickCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6105,7 +6267,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), song.Id);
     }
 
-    public ICommand QueueListviewClearCommand { get; }
+    public IRelayCommand QueueListviewClearCommand { get; }
     public bool QueueListviewClearCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6118,7 +6280,7 @@ public partial class MainViewModel : ViewModelBase
         IsConfirmClearQueuePopupVisible = true;
     }
 
-    public ICommand QueueListviewConfirmClearPopupCommand { get; }
+    public IRelayCommand QueueListviewConfirmClearPopupCommand { get; }
     public bool QueueListviewConfirmClearPopupCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6133,7 +6295,7 @@ public partial class MainViewModel : ViewModelBase
         IsConfirmClearQueuePopupVisible = false;
     }
 
-    public ICommand QueueListviewDeleteCommand { get; }
+    public IRelayCommand QueueListviewDeleteCommand { get; }
     public bool QueueListviewDeleteCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6171,7 +6333,7 @@ public partial class MainViewModel : ViewModelBase
         IsConfirmDeleteQueuePopupVisible = true;
     }
 
-    public ICommand QueueListviewConfirmDeletePopupCommand { get; }
+    public IRelayCommand QueueListviewConfirmDeletePopupCommand { get; }
     public bool QueueListviewConfirmDeletePopupCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6195,7 +6357,7 @@ public partial class MainViewModel : ViewModelBase
         IsConfirmDeleteQueuePopupVisible = false;
     }
 
-    public ICommand QueueListviewMoveUpCommand { get; }
+    public IRelayCommand QueueListviewMoveUpCommand { get; }
     public bool QueueListviewMoveUpCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6249,7 +6411,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdMoveId(IdToNewPos);
     }
 
-    public ICommand QueueListviewMoveDownCommand { get; }
+    public IRelayCommand QueueListviewMoveDownCommand { get; }
     public bool QueueListviewMoveDownCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6303,7 +6465,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdMoveId(IdToNewPos);
     }
 
-    public ICommand QueueListviewSaveSelectedAsCommand { get; }
+    public IRelayCommand QueueListviewSaveSelectedAsCommand { get; }
     public bool QueueListviewSaveSelectedAsCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6347,7 +6509,7 @@ public partial class MainViewModel : ViewModelBase
 
     }
 
-    public ICommand QueueListviewSaveSelectedAsPopupCommand { get; }
+    public IRelayCommand QueueListviewSaveSelectedAsPopupCommand { get; }
     public bool QueueListviewSaveSelectedAsPopupCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6371,7 +6533,7 @@ public partial class MainViewModel : ViewModelBase
         IsSelectedSaveAsPopupVisible = false;
     }
 
-    public ICommand QueueListviewSaveSelectedToPopupCommand { get; }
+    public IRelayCommand QueueListviewSaveSelectedToPopupCommand { get; }
     public bool QueueListviewSaveSelectedToPopupCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6398,7 +6560,7 @@ public partial class MainViewModel : ViewModelBase
         IsSelectedSaveToPopupVisible = false;
     }
 
-    public ICommand QueueListviewSaveSelectedToCommand { get; }
+    public IRelayCommand QueueListviewSaveSelectedToCommand { get; }
     public bool QueueListviewSaveSelectedToCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6442,7 +6604,7 @@ public partial class MainViewModel : ViewModelBase
 
     }
 
-    public ICommand ScrollIntoNowPlayingCommand { get; }
+    public IRelayCommand ScrollIntoNowPlayingCommand { get; }
     public bool ScrollIntoNowPlayingCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6463,7 +6625,7 @@ public partial class MainViewModel : ViewModelBase
         ScrollIntoView?.Invoke(this, CurrentSong.Index);
     }
 
-    public ICommand FilterQueueClearCommand { get; }
+    public IRelayCommand FilterQueueClearCommand { get; }
     public bool FilterQueueClearCommand_CanExecute()
     {
         if (string.IsNullOrEmpty(FilterQueueQuery))
@@ -6475,7 +6637,7 @@ public partial class MainViewModel : ViewModelBase
         FilterQueueQuery = "";
     }
 
-    public ICommand QueueFindShowHideCommand { get; }
+    public IRelayCommand QueueFindShowHideCommand { get; }
     public static bool QueueFindShowHideCommand_CanExecute()
     {
         return true;
@@ -6510,7 +6672,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == Search ==
 
-    public ICommand SearchExecCommand { get; }
+    public IRelayCommand SearchExecCommand { get; }
     public bool SearchExecCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6527,12 +6689,12 @@ public partial class MainViewModel : ViewModelBase
 
         string queryShiki = "contains";
 
-        await _mpc.MpdSearch(SelectedSearchTags.ToString(), queryShiki, SearchQuery);
+        await _mpc.MpdSearch(SelectedSearchTag.Key.ToString(), queryShiki, SearchQuery);
 
         UpdateProgress?.Invoke(this, "");
     }
 
-    public ICommand SearchResultListviewSaveSelectedAsCommand { get; }
+    public IRelayCommand SearchResultListviewSaveSelectedAsCommand { get; }
     public bool SearchResultListviewSaveSelectedAsCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6575,7 +6737,7 @@ public partial class MainViewModel : ViewModelBase
         IsSearchResultSelectedSaveAsPopupVisible = true;
     }
 
-    public ICommand SearchResultListviewSaveSelectedAsPopupCommand { get; }
+    public IRelayCommand SearchResultListviewSaveSelectedAsPopupCommand { get; }
     public bool SearchResultListviewSaveSelectedAsPopupCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6598,7 +6760,7 @@ public partial class MainViewModel : ViewModelBase
         IsSearchResultSelectedSaveAsPopupVisible = false;
     }
 
-    public ICommand SearchResultListviewSaveSelectedToCommand { get; }
+    public IRelayCommand SearchResultListviewSaveSelectedToCommand { get; }
     public bool SearchResultListviewSaveSelectedToCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6642,7 +6804,7 @@ public partial class MainViewModel : ViewModelBase
 
     }
 
-    public ICommand SearchResultListviewSaveSelectedToPopupCommand { get; }
+    public IRelayCommand SearchResultListviewSaveSelectedToPopupCommand { get; }
     public bool SearchResultListviewSaveSelectedToPopupCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6672,7 +6834,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == Library ==
 
-    public ICommand SongFilesListviewAddCommand { get; }
+    public IRelayCommand SongFilesListviewAddCommand { get; }
     public bool SongFilesListviewAddCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6706,7 +6868,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ICommand SongFilesListviewSaveSelectedAsCommand { get; }
+    public IRelayCommand SongFilesListviewSaveSelectedAsCommand { get; }
     public bool SongFilesListviewSaveSelectedAsCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6748,7 +6910,7 @@ public partial class MainViewModel : ViewModelBase
         IsSongFilesSelectedSaveAsPopupVisible = true;
     }
 
-    public ICommand SongFilesListviewSaveSelectedAsPopupCommand { get; }
+    public IRelayCommand SongFilesListviewSaveSelectedAsPopupCommand { get; }
     public bool SongFilesListviewSaveSelectedAsPopupCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6770,7 +6932,7 @@ public partial class MainViewModel : ViewModelBase
         IsSongFilesSelectedSaveAsPopupVisible = false;
     }
 
-    public ICommand SongFilesListviewSaveSelectedToCommand { get; }
+    public IRelayCommand SongFilesListviewSaveSelectedToCommand { get; }
     public bool SongFilesListviewSaveSelectedToCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6813,7 +6975,7 @@ public partial class MainViewModel : ViewModelBase
 
     }
 
-    public ICommand SongFilesListviewSaveSelectedToPopupCommand { get; }
+    public IRelayCommand SongFilesListviewSaveSelectedToPopupCommand { get; }
     public bool SongFilesListviewSaveSelectedToPopupCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6838,7 +7000,7 @@ public partial class MainViewModel : ViewModelBase
         IsSongFilesSelectedSaveToPopupVisible = false;
     }
 
-    public ICommand FilterMusicEntriesClearCommand { get; }
+    public IRelayCommand FilterMusicEntriesClearCommand { get; }
     public bool FilterMusicEntriesClearCommand_CanExecute()
     {
         if (string.IsNullOrEmpty(FilterMusicEntriesQuery))
@@ -6852,7 +7014,7 @@ public partial class MainViewModel : ViewModelBase
 
 
     // double clicked 
-    public ICommand SongFilesListviewLeftDoubleClickCommand { get; set; }
+    public IRelayCommand SongFilesListviewLeftDoubleClickCommand { get; set; }
     public bool SongFilesListviewLeftDoubleClickCommand_CanExecute()
     {
         //if (IsWorking) return false;
@@ -6872,7 +7034,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == Playlists ==
 
-    public ICommand ChangePlaylistCommand { get; set; }
+    public IRelayCommand ChangePlaylistCommand { get; set; }
     public bool ChangePlaylistCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6899,7 +7061,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdChangePlaylist(_selectedPlaylist.Name);
     }
 
-    public ICommand PlaylistListviewLeftDoubleClickCommand { get; set; }
+    public IRelayCommand PlaylistListviewLeftDoubleClickCommand { get; set; }
     public bool PlaylistListviewLeftDoubleClickCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6923,7 +7085,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdLoadPlaylist(playlist.Name);
     }
 
-    public ICommand PlaylistListviewEnterKeyCommand { get; set; }
+    public IRelayCommand PlaylistListviewEnterKeyCommand { get; set; }
     public bool PlaylistListviewEnterKeyCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6944,7 +7106,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdLoadPlaylist(_selectedPlaylist.Name);
     }
 
-    public ICommand PlaylistListviewLoadPlaylistCommand { get; set; }
+    public IRelayCommand PlaylistListviewLoadPlaylistCommand { get; set; }
     public bool PlaylistListviewLoadPlaylistCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6965,7 +7127,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdLoadPlaylist(_selectedPlaylist.Name);
     }
 
-    public ICommand PlaylistListviewClearLoadPlaylistCommand { get; set; }
+    public IRelayCommand PlaylistListviewClearLoadPlaylistCommand { get; set; }
     public bool PlaylistListviewClearLoadPlaylistCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -6993,7 +7155,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     // TODO: Rename playlists.
-    public ICommand PlaylistListviewRenamePlaylistCommand { get; set; }
+    public IRelayCommand PlaylistListviewRenamePlaylistCommand { get; set; }
     public bool PlaylistListviewRenamePlaylistCommand_CanExecute()
     {
         if (IsBusy)
@@ -7044,7 +7206,7 @@ public partial class MainViewModel : ViewModelBase
     }
     */
 
-    public ICommand PlaylistListviewRemovePlaylistCommand { get; set; }
+    public IRelayCommand PlaylistListviewRemovePlaylistCommand { get; set; }
     public bool PlaylistListviewRemovePlaylistCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -7067,7 +7229,7 @@ public partial class MainViewModel : ViewModelBase
         IsConfirmDeletePlaylistPopupVisible = true;
     }
 
-    public ICommand PlaylistListviewConfirmRemovePlaylistPopupCommand { get; set; }
+    public IRelayCommand PlaylistListviewConfirmRemovePlaylistPopupCommand { get; set; }
     public bool PlaylistListviewConfirmRemovePlaylistPopupCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -7094,7 +7256,7 @@ public partial class MainViewModel : ViewModelBase
     #region == PlaylistItems ==
 
     // Do reload after confirming to reload playlist.
-    public ICommand PlaylistListviewConfirmUpdatePopupCommand { get; set; }
+    public IRelayCommand PlaylistListviewConfirmUpdatePopupCommand { get; set; }
     public bool PlaylistListviewConfirmUpdatePopupCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -7114,7 +7276,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     // Deletes song in a playlist.
-    public ICommand PlaylistListviewDeletePosCommand { get; set; }
+    public IRelayCommand PlaylistListviewDeletePosCommand { get; set; }
     public bool PlaylistListviewDeletePosCommand_CanExecute()
     {
         if (SelectedPlaylistSong is null) return false;
@@ -7153,7 +7315,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     // 
-    public ICommand PlaylistListviewConfirmDeletePosNotSupportedPopupCommand { get; set; }
+    public IRelayCommand PlaylistListviewConfirmDeletePosNotSupportedPopupCommand { get; set; }
     public static bool PlaylistListviewConfirmDeletePosNotSupportedPopupCommand_CanExecute()
     {
         return true;
@@ -7164,7 +7326,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     // 
-    public ICommand PlaylistListviewDeletePosPopupCommand { get; set; }
+    public IRelayCommand PlaylistListviewDeletePosPopupCommand { get; set; }
     public bool PlaylistListviewDeletePosPopupCommand_CanExecute()
     {
         if (SelectedPlaylistSong is null) return false;
@@ -7200,7 +7362,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     // 
-    public ICommand PlaylistListviewClearCommand { get; set; }
+    public IRelayCommand PlaylistListviewClearCommand { get; set; }
     public bool PlaylistListviewClearCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -7211,7 +7373,7 @@ public partial class MainViewModel : ViewModelBase
         IsConfirmPlaylistClearPopupVisible = true;
     }
 
-    public ICommand PlaylistListviewClearPopupCommand { get; set; }
+    public IRelayCommand PlaylistListviewClearPopupCommand { get; set; }
     public bool PlaylistListviewClearPopupCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -7243,7 +7405,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     // double clicked in a playlist listview
-    public ICommand PlaylistSongsListviewLeftDoubleClickCommand { get; set; }
+    public IRelayCommand PlaylistSongsListviewLeftDoubleClickCommand { get; set; }
     public bool PlaylistSongsListviewLeftDoubleClickCommand_CanExecute()
     {
         //if (IsWorking) return false;
@@ -7260,7 +7422,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == Search and PlaylistItems ==
 
-    public ICommand SongsListviewAddCommand { get; }
+    public IRelayCommand SongsListviewAddCommand { get; }
     public bool SongsListviewAddCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -7297,7 +7459,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == Settings ==
 
-    public ICommand ShowSettingsCommand { get; }
+    public IRelayCommand ShowSettingsCommand { get; }
     public bool ShowSettingsCommand_CanExecute()
     {
         if (IsConnecting) return false;
@@ -7317,7 +7479,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ICommand SettingsOKCommand { get; }
+    public IRelayCommand SettingsOKCommand { get; }
     public static bool SettingsOKCommand_CanExecute()
     {
         return true;
@@ -7327,7 +7489,7 @@ public partial class MainViewModel : ViewModelBase
         IsSettingsShow = false;
     }
 
-    public ICommand NewProfileCommand { get; }
+    public IRelayCommand NewProfileCommand { get; }
     public bool NewProfileCommand_CanExecute()
     {
         if (SelectedProfile is null) return false;
@@ -7338,7 +7500,7 @@ public partial class MainViewModel : ViewModelBase
         SelectedProfile = null;
     }
 
-    public ICommand DeleteProfileCommand { get; }
+    public IRelayCommand DeleteProfileCommand { get; }
     public bool DeleteProfileCommand_CanExecute()
     {
         if (Profiles.Count < 2) return false;
@@ -7364,7 +7526,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ICommand SaveProfileCommand { get; }
+    public IRelayCommand SaveProfileCommand { get; }
     public bool SaveProfileCommand_CanExecute()
     {
         if (SelectedProfile is not null) return false;
@@ -7427,7 +7589,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ICommand UpdateProfileCommand { get; }
+    public IRelayCommand UpdateProfileCommand { get; }
     public bool UpdateProfileCommand_CanExecute()
     {
         if (SelectedProfile is null) return false;
@@ -7490,7 +7652,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == Connection ==
 
-    public ICommand ChangeConnectionProfileCommand { get; }
+    public IRelayCommand ChangeConnectionProfileCommand { get; }
     public bool ChangeConnectionProfileCommand_CanExecute()
     {
         if (IsBusy) return false;
@@ -7865,7 +8027,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == Dialogs ==
 
-    public ICommand ShowChangePasswordDialogCommand { get; }
+    public IRelayCommand ShowChangePasswordDialogCommand { get; }
     public bool ShowChangePasswordDialogCommand_CanExecute()
     {
         if (SelectedProfile is null) return false;
@@ -7892,7 +8054,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ICommand ChangePasswordDialogOKCommand { get; }
+    public IRelayCommand ChangePasswordDialogOKCommand { get; }
     public bool ChangePasswordDialogOKCommand_CanExecute()
     {
         if (SelectedProfile is null) return false;
@@ -7945,7 +8107,7 @@ public partial class MainViewModel : ViewModelBase
         */
     }
 
-    public ICommand ChangePasswordDialogCancelCommand { get; }
+    public IRelayCommand ChangePasswordDialogCancelCommand { get; }
     public static bool ChangePasswordDialogCancelCommand_CanExecute()
     {
         return true;
@@ -7959,7 +8121,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == QueueListview header colums Show/Hide ==
 
-    public ICommand QueueColumnHeaderPositionShowHideCommand { get; }
+    public IRelayCommand QueueColumnHeaderPositionShowHideCommand { get; }
     public static bool QueueColumnHeaderPositionShowHideCommand_CanExecute()
     {
         return true;
@@ -7978,7 +8140,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ICommand QueueColumnHeaderNowPlayingShowHideCommand { get; }
+    public IRelayCommand QueueColumnHeaderNowPlayingShowHideCommand { get; }
     public static bool QueueColumnHeaderNowPlayingShowHideCommand_CanExecute()
     {
         return true;
@@ -7997,7 +8159,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ICommand QueueColumnHeaderTimeShowHideCommand { get; }
+    public IRelayCommand QueueColumnHeaderTimeShowHideCommand { get; }
     public static bool QueueColumnHeaderTimeShowHideCommand_CanExecute()
     {
         return true;
@@ -8017,7 +8179,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ICommand QueueColumnHeaderArtistShowHideCommand { get; }
+    public IRelayCommand QueueColumnHeaderArtistShowHideCommand { get; }
     public static bool QueueColumnHeaderArtistShowHideCommand_CanExecute()
     {
         return true;
@@ -8036,7 +8198,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ICommand QueueColumnHeaderAlbumShowHideCommand { get; }
+    public IRelayCommand QueueColumnHeaderAlbumShowHideCommand { get; }
     public static bool QueueColumnHeaderAlbumShowHideCommand_CanExecute()
     {
         return true;
@@ -8055,7 +8217,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ICommand QueueColumnHeaderDiscShowHideCommand { get; }
+    public IRelayCommand QueueColumnHeaderDiscShowHideCommand { get; }
     public static bool QueueColumnHeaderDiscShowHideCommand_CanExecute()
     {
         return true;
@@ -8074,7 +8236,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ICommand QueueColumnHeaderTrackShowHideCommand { get; }
+    public IRelayCommand QueueColumnHeaderTrackShowHideCommand { get; }
     public static bool QueueColumnHeaderTrackShowHideCommand_CanExecute()
     {
         return true;
@@ -8093,7 +8255,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ICommand QueueColumnHeaderGenreShowHideCommand { get; }
+    public IRelayCommand QueueColumnHeaderGenreShowHideCommand { get; }
     public static bool QueueColumnHeaderGenreShowHideCommand_CanExecute()
     {
         return true;
@@ -8112,7 +8274,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ICommand QueueColumnHeaderLastModifiedShowHideCommand { get; }
+    public IRelayCommand QueueColumnHeaderLastModifiedShowHideCommand { get; }
     public static bool QueueColumnHeaderLastModifiedShowHideCommand_CanExecute()
     {
         return true;
@@ -8136,7 +8298,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == DebugWindow and AckWindow ==
 
-    public ICommand ClearDebugCommandTextCommand { get; }
+    public IRelayCommand ClearDebugCommandTextCommand { get; }
     public static bool ClearDebugCommandTextCommand_CanExecute()
     {
         return true;
@@ -8149,7 +8311,7 @@ public partial class MainViewModel : ViewModelBase
         });
     }
 
-    public ICommand ClearDebugIdleTextCommand { get; }
+    public IRelayCommand ClearDebugIdleTextCommand { get; }
     public static bool ClearDebugIdleTextCommand_CanExecute()
     {
         return true;
@@ -8162,7 +8324,7 @@ public partial class MainViewModel : ViewModelBase
         });
     }
 
-    public ICommand ShowDebugWindowCommand { get; }
+    public IRelayCommand ShowDebugWindowCommand { get; }
     public static bool ShowDebugWindowCommand_CanExecute()
     {
         return true;
@@ -8175,7 +8337,7 @@ public partial class MainViewModel : ViewModelBase
         });
     }
 
-    public ICommand ClearAckTextCommand { get; }
+    public IRelayCommand ClearAckTextCommand { get; }
     public static bool ClearAckTextCommand_CanExecute()
     {
         return true;
@@ -8188,7 +8350,7 @@ public partial class MainViewModel : ViewModelBase
         });
     }
 
-    public ICommand ShowAckWindowCommand { get; }
+    public IRelayCommand ShowAckWindowCommand { get; }
     public static bool ShowAckWindowCommand_CanExecute()
     {
         return true;
@@ -8205,7 +8367,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == Find ==
 
-    public ICommand ShowFindCommand { get; }
+    public IRelayCommand ShowFindCommand { get; }
     public static bool ShowFindCommand_CanExecute()
     {
         return true;
@@ -8228,7 +8390,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public ICommand QueueFilterSelectCommand { get; set; }
+    public IRelayCommand QueueFilterSelectCommand { get; set; }
     public static bool QueueFilterSelectCommand_CanExecute()
     {
         return true;
@@ -8253,7 +8415,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region == TreeViewMenu ContextMenu ==
 
-    public ICommand TreeviewMenuItemLoadPlaylistCommand { get; }
+    public IRelayCommand TreeviewMenuItemLoadPlaylistCommand { get; }
     public bool TreeviewMenuItemLoadPlaylistCommand_CanExecute()
     {
         if (SelectedNodeMenu is null)
@@ -8277,7 +8439,7 @@ public partial class MainViewModel : ViewModelBase
         await _mpc.MpdLoadPlaylist(SelectedNodeMenu.Name);
     }
 
-    public ICommand TreeviewMenuItemClearLoadPlaylistCommand { get; }
+    public IRelayCommand TreeviewMenuItemClearLoadPlaylistCommand { get; }
     public bool TreeviewMenuItemClearLoadPlaylistCommand_CanExecute()
     {
         if (SelectedNodeMenu is null)
@@ -8308,7 +8470,7 @@ public partial class MainViewModel : ViewModelBase
 
     #endregion
 
-    public ICommand EscapeCommand { get; }
+    public IRelayCommand EscapeCommand { get; }
     public static bool EscapeCommand_CanExecute()
     {
         return true;

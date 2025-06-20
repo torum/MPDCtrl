@@ -1,7 +1,6 @@
-using MPDCtrlX.Models;
 using System.Collections.ObjectModel;
 
-namespace MPDCtrlX.ViewModels.Classes;
+namespace MPDCtrlX.Models;
 
 public class NodeMenu : NodeTree
 {
@@ -71,7 +70,7 @@ public class NodeMenuPlaylists : NodeMenu
 
 public class NodeMenuPlaylistItem : NodeMenu
 {
-    public ObservableCollection<SongInfo> PlaylistSongs = new();
+    public ObservableCollection<SongInfo> PlaylistSongs = [];
 
     public bool IsUpdateRequied { get; set; }
 
@@ -130,73 +129,72 @@ public class MenuTreeBuilder : NodeTree
 
     public MenuTreeBuilder(string name) : base(name)
     {
-        NodeMenuQueue queue = new(MPDCtrlX.Properties.Resources.MenuTreeItem_Queue)
+        NodeMenuQueue queue = new(Properties.Resources.MenuTreeItem_Queue)
         {
             Selected = true,
             Expanded = false,
 
             Parent = this
         };
-        this.Children.Add(queue);
+        Children.Add(queue);
 
 
-        NodeMenuSearch search = new(MPDCtrlX.Properties.Resources.MenuTreeItem_Search)
+        NodeMenuSearch search = new(Properties.Resources.MenuTreeItem_Search)
         {
             Selected = false,
             Expanded = false,
 
             Parent = this
         };
-        this.Children.Add(search);
+        Children.Add(search);
 
         _searchDirectory = search;
 
 
-        NodeMenuAlbum albums = new(MPDCtrlX.Properties.Resources.MenuTreeItem_Albums)
+        NodeMenuAlbum albums = new(Properties.Resources.MenuTreeItem_Albums)
         {
             Selected = false,
             Expanded = false,
 
             Parent = this
         };
-        this.Children.Add(albums);
+        //this.Children.Add(albums);
 
         _albumsDirectory = albums;
 
 
-        NodeMenuArtist artists = new(MPDCtrlX.Properties.Resources.MenuTreeItem_Artists)
+        NodeMenuArtist artists = new(Properties.Resources.MenuTreeItem_Artists)
         {
             Selected = false,
             Expanded = false,
 
             Parent = this
         };
-        this.Children.Add(artists);
+        //this.Children.Add(artists);
 
         _artistsDirectory = artists;
 
 
-
-        NodeMenuLibrary browse = new(MPDCtrlX.Properties.Resources.MenuTreeItem_Browse)
+        NodeMenuLibrary browse = new(Properties.Resources.MenuTreeItem_Browse)
         {
             Selected = false,
             Expanded = false,
 
             Parent = this
         };
-        this.Children.Add(browse);
+        Children.Add(browse);
 
         _libraryDirectory = browse;
 
 
-        NodeMenuPlaylists playlists = new(MPDCtrlX.Properties.Resources.MenuTreeItem_Playlists)
+        NodeMenuPlaylists playlists = new(Properties.Resources.MenuTreeItem_Playlists)
         {
             Selected = false,
             Expanded = true,
 
             Parent = this
         };
-        this.Children.Add(playlists);
+        Children.Add(playlists);
 
         _playlistsDirectory = playlists;
     }

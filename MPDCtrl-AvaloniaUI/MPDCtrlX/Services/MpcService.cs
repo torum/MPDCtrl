@@ -3160,14 +3160,16 @@ public class MpcService : IMpcService
         try
         {
             IsBusy?.Invoke(this, true);
-
+            /*
             //Application.Current.Dispatcher.Invoke(() =>
             Dispatcher.UIThread.Post(() =>
-
             {
                 LocalFiles.Clear();
                 LocalDirectories.Clear();
             });
+            */
+            LocalFiles.Clear();
+            LocalDirectories.Clear();
 
             SongFile? song = null;
 
@@ -3175,16 +3177,16 @@ public class MpcService : IMpcService
 
             foreach (string value in resultLines)
             {
+                //Debug.WriteLine("LocalDirectories: " + value);
                 if (value.StartsWith("directory:"))
                 {
-                    //Application.Current.Dispatcher.Invoke(() =>
+                    /*
                     Dispatcher.UIThread.Post(() =>
-
                     {
                         LocalDirectories.Add(value.Replace("directory: ", ""));
                     });
-
-                    //LocalDirectories.Add(value.Replace("directory: ", ""));
+                    */
+                    LocalDirectories.Add(value.Replace("directory: ", ""));
 
                     MpcProgress?.Invoke(this, string.Format("[Background] Parsing files and directories ({0})...", i));
                 }
@@ -3194,15 +3196,13 @@ public class MpcService : IMpcService
                     {
                         File = value.Replace("file: ", "")
                     };
-
-                    //Application.Current.Dispatcher.Invoke(() =>
+                    /*
                     Dispatcher.UIThread.Post(() =>
-
                     {
                         LocalFiles.Add(song);
                     });
-
-                    //LocalFiles.Add(song);
+                    */
+                    LocalFiles.Add(song);
 
                     i++;
 
@@ -3219,7 +3219,6 @@ public class MpcService : IMpcService
             }
 
             MpcProgress?.Invoke(this, "[Background] Parsing files and directories is done.");
-
         }
         catch (Exception e)
         {

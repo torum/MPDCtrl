@@ -9,6 +9,7 @@
 			 xmlns:sng="clr-namespace:MPDCtrlX.Models"
              x:Class="MPDCtrlX.Views.QueuePage"
              x:DataType="vm:MainViewModel"
+			 xmlns:prop="clr-namespace:MPDCtrlX.Properties"
              x:CompileBindings="True">
 	<Design.DataContext>
 		<!-- This only sets the DataContext for the previewer in an IDE,
@@ -55,7 +56,7 @@
 					<Border Grid.Column="3" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" MaxWidth="4"/>
 					<GridSplitter Grid.Column="3" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" ResizeDirection="Columns" MaxWidth="4" IsVisible="False"/>
 					<Grid Grid.Column="4" Name="test3">
-						<Label Name="test3x" Opacity="0.5" HorizontalAlignment="Left" Padding="12,0,6,0" VerticalAlignment="Center">Title</Label>
+						<Label Name="test3x" Opacity="0.5" HorizontalAlignment="Left" Padding="12,0,6,0" VerticalAlignment="Center" Content="{x:Static prop:Resources.QueueListviewColumnHeader_Title}"></Label>
 					</Grid>
 
 					<GridSplitter Grid.Column="5" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" ResizeDirection="Columns" MaxWidth="4"/>
@@ -96,7 +97,7 @@
 					
 				</Grid>
 				<Border Grid.Row="2" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.5"></Border>
-				<ListBox Grid.Row="3" ItemsSource="{Binding Queue}" SelectedItem="{Binding SelectedQueueSong}" SelectionMode="Single" BorderThickness="0" ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Auto" Loaded="ListBox_Loaded">
+				<ListBox Grid.Row="3" ItemsSource="{Binding Queue}" SelectedItem="{Binding SelectedQueueSong}" SelectionMode="Single" BorderThickness="0" ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" Loaded="ListBox_Loaded">
 					<!--  Background="{DynamicResource LayerFillColorDefaultBrush}" -->
 					<ListBox.ItemsPanel>
 						<ItemsPanelTemplate>

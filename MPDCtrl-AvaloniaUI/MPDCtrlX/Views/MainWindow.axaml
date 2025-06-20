@@ -9,10 +9,24 @@
 		x:DataType="vm:MainViewModel"
         Icon="/Assets/MPDCtrlX.ico"
         Title="MPDCtrlX"
-             x:CompileBindings="True">
+             x:CompileBindings="True" Cursor="Arrow">
 	<!-- Background="{DynamicResource ThemeBackgroundBrush}" -->
 	<!-- <views:MainView/> -->
 
+	<Interaction.Behaviors>
+		<DataTriggerBehavior Binding="{Binding IsBusy}" ComparisonCondition="Equal" Value="True">
+			<ChangePropertyAction PropertyName="Cursor" Value="Wait" />
+		</DataTriggerBehavior>
+		<DataTriggerBehavior Binding="{Binding IsBusy}" ComparisonCondition="Equal" Value="False">
+			<ChangePropertyAction PropertyName="Cursor" Value="Arrow" />
+		</DataTriggerBehavior>
+		<DataTriggerBehavior Binding="{Binding IsWorking}" ComparisonCondition="Equal" Value="True">
+			<ChangePropertyAction PropertyName="Cursor" Value="AppStarting" />
+		</DataTriggerBehavior>
+		<DataTriggerBehavior Binding="{Binding IsWorking}" ComparisonCondition="Equal" Value="False">
+			<ChangePropertyAction PropertyName="Cursor" Value="Arrow" />
+		</DataTriggerBehavior>
+	</Interaction.Behaviors>
 	<Window.KeyBindings>
 		<KeyBinding Command="{Binding PlayCommand}" Gesture="Play" />
 		<KeyBinding Command="{Binding PlayCommand}" Gesture="Space" />

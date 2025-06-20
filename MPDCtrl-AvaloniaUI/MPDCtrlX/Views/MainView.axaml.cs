@@ -1,9 +1,11 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
+using MPDCtrlX.Models;
 using MPDCtrlX.ViewModels;
 using System;
-using System.Text;
 using System.Diagnostics;
+using System.Text;
 
 namespace MPDCtrlX.Views;
 
@@ -121,4 +123,41 @@ public partial class MainView : UserControl
         }
     }
 
+    private void TreeView_SelectionChanged(object? sender, Avalonia.Controls.SelectionChangedEventArgs e)
+    {
+        NodeMenu? value = ((sender as TreeView)?.SelectedItem as NodeMenu);
+        if (value == null)
+        {
+            return;
+        }
+
+        if (value is NodeMenuQueue)
+        {
+            this.ContentFrame.Content = (App.Current as App)?.AppHost.Services.GetRequiredService<QueuePage>();
+        }
+        else if (value is NodeMenuPlaylists)
+        {
+            this.ContentFrame.Content = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistsPage>();
+        }
+        else if (value is NodeMenuPlaylistItem)
+        {
+            this.ContentFrame.Content = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistItemPage>();
+        }
+        else if (value is NodeMenuLibrary)
+        {
+            this.ContentFrame.Content = (App.Current as App)?.AppHost.Services.GetRequiredService<LibraryPage>();
+        }
+        else if (value is NodeMenuSearch)
+        {
+            this.ContentFrame.Content = (App.Current as App)?.AppHost.Services.GetRequiredService<SearchPage>();
+        }
+        else if (value is NodeMenuAlbum)
+        {
+            this.ContentFrame.Content = (App.Current as App)?.AppHost.Services.GetRequiredService<AlbumPage>();
+        }
+        else if (value is NodeMenuArtist)
+        {
+            this.ContentFrame.Content = (App.Current as App)?.AppHost.Services.GetRequiredService<ArtistPage>();
+        }
+    }
 }

@@ -5,6 +5,7 @@ using MPDCtrlX.Models;
 using MPDCtrlX.ViewModels;
 using System;
 using System.Diagnostics;
+using System.Reflection.PortableExecutable;
 using System.Text;
 
 namespace MPDCtrlX.Views;
@@ -58,6 +59,7 @@ public partial class MainView : UserControl
             this.MainGrid.RowDefinitions[0].Height = new GridLength(0, GridUnitType.Pixel);
             this.ImageLogo.IsVisible = false;
         }
+
     }
     /*
 #pragma warning disable CS8618
@@ -125,12 +127,13 @@ public partial class MainView : UserControl
 
     private void TreeView_SelectionChanged(object? sender, Avalonia.Controls.SelectionChangedEventArgs e)
     {
+        /*
         NodeMenu? value = ((sender as TreeView)?.SelectedItem as NodeMenu);
         if (value == null)
         {
             return;
         }
-
+        
         if (value is NodeMenuQueue)
         {
             this.ContentFrame.Content = (App.Current as App)?.AppHost.Services.GetRequiredService<QueuePage>();
@@ -159,5 +162,18 @@ public partial class MainView : UserControl
         {
             this.ContentFrame.Content = (App.Current as App)?.AppHost.Services.GetRequiredService<ArtistPage>();
         }
+        */
+    }
+    
+    public void WindowDeactivated()
+    {
+        this.Header.Opacity = 0.3;
+        this.AppTitleBar.Opacity = 0.3;
+        this.AppTitle.Content = "asdf";
+    }
+    public void WindowActivated()
+    {
+        this.Header.Opacity = 1;
+        this.AppTitleBar.Opacity = 1;
     }
 }

@@ -241,7 +241,7 @@
 			<Style Selector="^[IsActive=False]">
 				<Style Selector="^ /template/ Panel#DefaultTitleBar">
 					<Setter Property="Background" Value="{DynamicResource FATitle_TitleBarBackgroundInactive}" />
-					<Setter Property="TextElement.Foreground" Value="{DynamicResource FATitle_TitleBarForegroundInactive}" />
+					<Setter Property="TextElement.Foreground" Value="{DynamicResource FATitle_TitleBarForegroundInactive}"/>
 				</Style>
 			</Style>
 		</Style>

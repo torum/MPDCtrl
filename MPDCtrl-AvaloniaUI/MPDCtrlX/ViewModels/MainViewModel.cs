@@ -1066,23 +1066,25 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
             if (_isShowDebugWindow)
             {
-                
+                /*
                 //Application.Current.Dispatcher.Invoke(() =>
                 Dispatcher.UIThread.Post(() =>
                 {
                     //DebugWindowShowHide?.Invoke
                     DebugWindowShowHide2?.Invoke(this, true);
                 });
+                */
             }
             else
             {
-                
+                /*
                 //Application.Current.Dispatcher.Invoke(() =>
                 Dispatcher.UIThread.Post(() =>
                 {
                     //DebugWindowShowHide?.Invoke();
                     DebugWindowShowHide2?.Invoke(this, false);
                 });
+                */
             }
         }
     }
@@ -1108,6 +1110,8 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             NotifyPropertyChanged(nameof(CurrentSongTitle));
             NotifyPropertyChanged(nameof(CurrentSongArtist));
             NotifyPropertyChanged(nameof(CurrentSongAlbum));
+            NotifyPropertyChanged(nameof(IsCurrentSongArtistNotNull));
+            NotifyPropertyChanged(nameof(IsCurrentSongAlbumNotNull));
 
             if (value is null)
                 _elapsedTimer.Stop();
@@ -1161,6 +1165,42 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             else
             {
                 return String.Empty;
+            }
+        }
+    }
+
+    public bool IsCurrentSongArtistNotNull
+    {
+        get
+        {
+            if (_currentSong is not null)
+            {
+                if (!string.IsNullOrEmpty(_currentSong.Artist))
+                    return true;
+                else
+                    return false;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    public bool IsCurrentSongAlbumNotNull
+    {
+        get
+        {
+            if (_currentSong is not null)
+            {
+                if (!string.IsNullOrEmpty(_currentSong.Album))
+                    return true;
+                else
+                    return false;
+            }
+            else
+            {
+                return false;
             }
         }
     }
@@ -1464,7 +1504,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
 
-                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<QueuePage>();
+                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<QueuePage>();
             }
             else if (value is NodeMenuPlaylists)
             {
@@ -1476,7 +1516,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
 
-                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistsPage>();
+                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistsPage>();
             }
             else if (value is NodeMenuPlaylistItem nmpli)
             {
@@ -1499,7 +1539,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
                 });
 
-                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistItemPage>();
+                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistItemPage>();
 
                 if ((nmpli.PlaylistSongs.Count == 0) || nmpli.IsUpdateRequied)
                     GetPlaylistSongs(nmpli);
@@ -1514,16 +1554,10 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
 
-                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<LibraryPage>();
+                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<LibraryPage>();
 
                 if (!nml.IsAcquired || (MusicDirectories.Count <= 1) && (MusicEntries.Count == 0))
                 {
-                    /*
-                    Task.Run(() =>
-                    {
-                        
-                    });
-                    */
                     GetLibrary(nml);
                 }
             }
@@ -1537,7 +1571,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
 
-                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<SearchPage>();
+                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<SearchPage>();
             }
             else if (value is NodeMenuAlbum)
             {
@@ -1549,7 +1583,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 IsArtistVisible = false;
                 IsAlbumVisible = true;
 
-                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<AlbumPage>();
+                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<AlbumPage>();
             }
             else if (value is NodeMenuArtist)
             {
@@ -1561,7 +1595,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 IsArtistVisible = true;
                 IsAlbumVisible = false;
 
-                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<ArtistPage>();
+                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<ArtistPage>();
             }
             else if (value is NodeMenu)
             {
@@ -1884,6 +1918,22 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
     #endregion
 
     #region == Library ==
+
+    /*
+    private HierarchicalTreeDataGridSource<NodeTree>? _musicDirectoriesSource;
+    public HierarchicalTreeDataGridSource<NodeTree>? MusicDirectoriesSource 
+    {
+        get
+        {
+            return _musicDirectoriesSource;
+        }
+        private set
+        {
+            _musicDirectoriesSource= value;
+            NotifyPropertyChanged(nameof(MusicDirectoriesSource));
+        }
+    }
+    */
 
     private readonly DirectoryTreeBuilder _musicDirectories = new("");
     public ObservableCollection<NodeTree> MusicDirectories
@@ -3186,7 +3236,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
     public delegate void DebugWindowShowHideEventHandler();
     public event DebugWindowShowHideEventHandler? DebugWindowShowHide;
 
-    public event EventHandler<bool>? DebugWindowShowHide2;
+    //public event EventHandler<bool>? DebugWindowShowHide2;
 
     public event EventHandler<string>? DebugCommandOutput;
 
@@ -3229,8 +3279,11 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
     #endregion
 
-    //private readonly MPC _mpc = new();
+    #region ==  Services == 
+
     private readonly IMpcService _mpc;
+
+    #endregion
 
     public MainViewModel(IMpcService mpcService)
     {
@@ -3439,11 +3492,12 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
         #endregion
 
         // start the connection
-        IsShowDebugWindow = true;
+        IsShowDebugWindow = false;
         Start("localhost", 6600);
         Volume = 20;
         //QueueColumnHeaderTitleWidth = 200;
         IsWorking = false;
+
     }
 
     #region == Startup and Shutdown ==
@@ -5495,6 +5549,20 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                     if (MusicDirectories[0] is NodeDirectory nd)
                         _selectedNodeDirectory = nd;
                 }
+
+                /*
+                MusicDirectoriesSource = new HierarchicalTreeDataGridSource<NodeTree>(tmpMusicDirectories.Children)
+                {
+                    Columns =
+                    {
+                        new HierarchicalExpanderColumn<NodeTree>(
+                            new TextColumn<NodeTree, string>("Directory", x => x.Name),
+                            x => x.Children)
+                    },
+                };
+                MusicDirectoriesSource.Expand(0);
+                */
+
             });
             UpdateProgress?.Invoke(this, "");
 
@@ -5585,7 +5653,12 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
         Task.Run(async () =>
         {
-            await Task.Delay(100);
+            await Task.Delay(10);
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                IsWorking = true;
+            });
 
             CommandResult result = await _mpc.MpdQueryListAll().ConfigureAwait(false);
             if (result.IsSuccess)
@@ -5609,6 +5682,11 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 });
                 Debug.WriteLine("fail to get MpdQueryListAll: " + result.ErrorMessage);
             }
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                IsWorking = false;
+            });
         });
     }
 

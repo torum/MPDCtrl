@@ -23,33 +23,21 @@
 		</Grid.ColumnDefinitions>
 		
 		<!-- App title bar-->
-		<Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" RowDefinitions="*" ColumnDefinitions="24,*,24">
+		<Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" RowDefinitions="*" ColumnDefinitions="24,*,24" x:Name="AppTitleBar">
 
 			<!-- Logo -->
 			<Image Grid.Row="0" Grid.Column="0" x:Name="ImageLogo" Width="18" Height="18" Margin="6" Source="avares://MPDCtrlX/Assets/MPDCtrlX.ico" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-			
-			<!-- Now Playing -->
-			<StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" IsVisible="False">
-				<TextBlock>
-					<Run x:Name="CurrentSongTitle" Foreground="{DynamicResource ControlForegroundColorBrush}" FontWeight="DemiBold" Text="{Binding CurrentSongTitle, Mode=OneWay}"/>
-				</TextBlock>
-				<TextBlock>
-					<Run Text="  by "/>
-					<Run x:Name="CurrentSongArtist" Foreground="{DynamicResource ControlLightColorBrush}" Text="{Binding CurrentSongArtist, Mode=OneWay}"/>
-				</TextBlock>
-				<TextBlock>
-					<Run Text="  from "/>
-					<Run x:Name="CurrentSongAlbum" Foreground="{DynamicResource ControlMediumColorBrush}" Text="{Binding CurrentSongAlbum, Mode=OneWay}" />
-				</TextBlock>
-			</StackPanel>
+
+			<Label Grid.Row="0" Grid.Column="1" x:Name="AppTitle" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0" Opacity="0.8">MPDCtrlX</Label>
 
 		</Grid>
 
 		<!-- Left pane -->
 		<Grid Grid.Row="1" Grid.Column="0" MinWidth="260">
 
-			<Border Grid.Row="0" Grid.Column="0" MinWidth="260" BorderThickness="0 0 0 0" BorderBrush="#555" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-				<Grid RowDefinitions="*" ColumnDefinitions="*" Margin="0,0,0,0" HorizontalAlignment="Stretch">
+			<!-- TreeView menu -->
+			<Border Grid.Row="0" Grid.Column="0" MinWidth="260" BorderThickness="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+				<Grid RowDefinitions="*" ColumnDefinitions="*" Margin="00" HorizontalAlignment="Stretch">
 					<TreeView ItemsSource="{Binding MainMenuItems}" SelectionMode="AlwaysSelected" SelectedItem="{Binding SelectedNodeMenu, Mode=TwoWay}" SelectionChanged="TreeView_SelectionChanged" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderThickness="0" ScrollViewer.AllowAutoHide="False">
 						<!--  Background="{DynamicResource LayerFillColorDefaultBrush}" -->
 						<TreeView.ItemTemplate>
@@ -71,13 +59,14 @@
 
 		</Grid>
 
-		<!-- Right pane -->
-		<Grid Grid.Row="1" Grid.Column="1" RowDefinitions="128,*" ColumnDefinitions="*">
+		<!-- Right pane RowDefinitions="128,*" -->
+		<Grid Grid.Row="1" Grid.Column="1" RowDefinitions="178,*" ColumnDefinitions="*">
 
 			<!-- Header -->
-			<Grid Grid.Row="0" Grid.Column="0" RowDefinitions="*" ColumnDefinitions="*,Auto,*">
+			<Grid Grid.Row="0" Grid.Column="0" RowDefinitions="*" ColumnDefinitions="*,Auto,*" x:Name="Header">
 
-				<Border Grid.Row="0" Grid.Column="0" Margin="56,0,48,0" Width="110" Height="110" VerticalAlignment="Top" HorizontalAlignment="Left" BorderThickness="0" ClipToBounds="True" CornerRadius="4">
+				<!-- Album cover -->
+				<Border Grid.Row="0" Grid.Column="0" Margin="56,2,48,0" Width="152" Height="152" VerticalAlignment="Top" HorizontalAlignment="Left" BorderThickness="0" ClipToBounds="True" CornerRadius="4">
 					<TransitioningContentControl Content="{Binding AlbumArt, Mode=OneWay}" >
 						<TransitioningContentControl.ContentTemplate>
 							<DataTemplate DataType="Bitmap">
@@ -88,10 +77,29 @@
 				</Border>
 
 				<!-- Main Playback Controls -->
-				<Grid Grid.Row="0" Grid.Column="1" RowDefinitions="Auto,*" ColumnDefinitions="*,Auto,*" HorizontalAlignment="Center" VerticalAlignment="Center">
+				<Grid Grid.Row="0" Grid.Column="1" RowDefinitions="Auto,Auto,*" ColumnDefinitions="*,Auto,*" HorizontalAlignment="Center" VerticalAlignment="Stretch">
+
+					<!-- Now Playing -->
+					<StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,2,0,0" MaxWidth="400">
+						<TextBlock Opacity="1">
+							<Run x:Name="CurrentSongTitle" Text="{Binding CurrentSongTitle, Mode=OneWay}"/>
+						</TextBlock>
+						<TextBlock Opacity="0.3" IsVisible="{Binding IsCurrentSongArtistNotNull}">
+							<Run Text=" by "/>
+						</TextBlock>
+						<TextBlock Opacity="0.7">
+							<Run x:Name="CurrentSongArtist" Text="{Binding CurrentSongArtist, Mode=OneWay}"/>
+						</TextBlock>
+						<TextBlock Opacity="0.3" IsVisible="{Binding IsCurrentSongAlbumNotNull}">
+							<Run Text=" from "/>
+						</TextBlock>
+						<TextBlock Opacity="0.5">
+							<Run x:Name="CurrentSongAlbum" Text="{Binding CurrentSongAlbum, Mode=OneWay}" />
+						</TextBlock>
+					</StackPanel>
 
 					<!-- Playback Buttons -->
-					<Grid Grid.Row="0" Grid.Column="1" Width="280" RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,*" HorizontalAlignment="Center" VerticalAlignment="Center">
+					<Grid Grid.Row="1" Grid.Column="1" Width="280" RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,*" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,32,0,0">
 
 						<!-- "Play" should be top so that it gets the first keyboard focus -->
 						<Button x:Name="PlayButton" ToolTip.Tip="Play" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="62" Width="62" Background="Transparent" Command="{Binding PlayCommand}" BorderThickness="0">
@@ -120,15 +128,15 @@
 
 					</Grid>
 					
-					<Grid Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Bottom">
-						<Slider Orientation="Horizontal" Maximum="{Binding Mode=TwoWay,Path=Time}" Value="{Binding Mode=TwoWay,Path=Elapsed,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Minimum="0" Width="380" Margin="0" Padding="0"></Slider>
+					<Grid Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,2,0,0">
+						<Slider Orientation="Horizontal" Maximum="{Binding Mode=TwoWay,Path=Time}" Value="{Binding Mode=TwoWay,Path=Elapsed,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Minimum="0" Width="400" Margin="0" Padding="0"></Slider>
 					</Grid>
 
 				</Grid>
 
 				<!-- Volume slider and other options -->
-				<Grid Grid.Row="0" Grid.Column="2" ColumnDefinitions="*,Auto" VerticalAlignment="Center">
-					<StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="36,0,0,14">
+				<Grid Grid.Row="0" Grid.Column="2" ColumnDefinitions="*,Auto" VerticalAlignment="Top" Margin="0,2,0,0" Height="152">
+					<StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="36,0,0,0">
 						<ToggleButton x:Name="RepeatButton" ToolTip.Tip="Repeat All" Width="32" Height="32" Padding="0" Margin="10,0,0,0" IsChecked="{Binding Repeat, Mode=TwoWay}" BorderThickness="0" Background="Transparent">
 							<Viewbox Width="14" Height="14">
 								<PathIcon Background="Transparent" Width="NaN" Height="NaN"
@@ -158,7 +166,7 @@
 							</Viewbox>
 						</ToggleButton>
 					</StackPanel>
-					<Slider Grid.Column="1" Height="100" Margin="24,12,0,8" Value="{Binding Volume,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center"></Slider>
+					<Slider Grid.Column="1" Height="130" Margin="12,12,0,0" Value="{Binding Volume,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Slider>
 				</Grid>
 
 			</Grid>
@@ -169,7 +177,7 @@
 		</Grid>
 
 		<!-- Debug Windows -->
-		<Grid x:Name="DebugWindow" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" RowDefinitions="8,*" ColumnDefinitions="1*,8,1*" Height="200" IsVisible="False">
+		<Grid x:Name="DebugWindow" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" RowDefinitions="8,*" ColumnDefinitions="1*,8,1*" Height="200" IsVisible="{Binding IsShowDebugWindow, Mode=TwoWay}">
 
 			<TextBox x:Name="DebugCommandTextBox" Grid.Row="1" Grid.Column="0" Text="{Binding DebugCommandText, Mode=OneWay}" Background="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0" AcceptsReturn="True" Padding="6 0 0 0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24">
 			</TextBox>

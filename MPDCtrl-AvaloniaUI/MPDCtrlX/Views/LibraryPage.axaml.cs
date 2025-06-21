@@ -29,4 +29,5 @@ public partial class LibraryPage : UserControl
         this.Library2x.Width = _viewModel.LibraryColumnHeaderFilePathWidth;
 
     }
+
 }

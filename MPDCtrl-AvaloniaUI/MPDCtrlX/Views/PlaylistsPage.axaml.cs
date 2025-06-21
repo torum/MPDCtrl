@@ -10,4 +10,8 @@ public partial class PlaylistsPage : UserControl
     {
         InitializeComponent();
     }
+
+    private void ListBox_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+    }
 }

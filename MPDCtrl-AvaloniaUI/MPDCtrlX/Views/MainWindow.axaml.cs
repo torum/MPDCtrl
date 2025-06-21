@@ -7,11 +7,14 @@ using MPDCtrlX.ViewModels;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using MPDCtrlX.Views;
 
 namespace MPDCtrlX.Views;
 
-public partial class MainWindow : AppWindow//Window
+public partial class MainWindow : Window//AppWindow//
 {
+    private readonly MainView? shell = (App.Current as App)?.AppHost.Services.GetRequiredService<MainView>();
+
     public MainWindow()
     {
         // Just for the <Window.InputBindings>
@@ -30,8 +33,10 @@ public partial class MainWindow : AppWindow//Window
 
         if (os.Platform.ToString().StartsWith("Win"))
         {
-            TitleBar.ExtendsContentIntoTitleBar = true;
-            TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
+            //TitleBar.ExtendsContentIntoTitleBar = true;
+            //TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
+            
+            //TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
             //TransparencyLevelHint = [WindowTransparencyLevel.AcrylicBlur];
             //Background = Brushes.Transparent;
 
@@ -40,8 +45,9 @@ public partial class MainWindow : AppWindow//Window
         }
         else
         {
-            TitleBar.ExtendsContentIntoTitleBar = true;
-            TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
+            //TitleBar.ExtendsContentIntoTitleBar = true;
+            //TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
+            
             //TransparencyLevelHint = [WindowTransparencyLevel.None];
             //TransparencyLevelHint = [WindowTransparencyLevel.AcrylicBlur];
             //Background = Brushes.Transparent;
@@ -50,5 +56,10 @@ public partial class MainWindow : AppWindow//Window
             // Not currently supported on Linux due to X11.
             ExtendClientAreaToDecorationsHint = false;
         }
+
+        // TODO: not working for current Avalonia UI.
+        this.Activated += (sender, e) => { shell?.WindowActivated();  };
+        this.Deactivated += (sender, e) => { shell?.WindowDeactivated(); };
     }
+
 }

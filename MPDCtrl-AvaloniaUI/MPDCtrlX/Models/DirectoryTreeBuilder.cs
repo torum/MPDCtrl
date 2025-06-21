@@ -58,7 +58,7 @@ public class DirectoryTreeBuilder : NodeTree
 
     public bool IsCanceled { get; set; }
 
-    public void Load(ObservableCollection<string> dirs)
+    public async void Load(ObservableCollection<string> dirs)
     {
         if (dirs is null)
             return;
@@ -78,7 +78,7 @@ public class DirectoryTreeBuilder : NodeTree
         foreach (var pathDir in dirs)
         {
             // for responsivenesss.
-            //await Task.Delay(1); <- not good.
+            await Task.Delay(1); //<- not good. But Avalonia's TreeView does not support virtualization..
 
             // changed profile etc.
             if (IsCanceled)

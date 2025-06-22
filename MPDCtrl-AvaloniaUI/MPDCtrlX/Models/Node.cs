@@ -71,7 +71,23 @@ abstract public class Node : INotifyPropertyChanged
 /// </summary>
 public class NodeTree : Node
 {
-    public bool Selected { get; set; }
+    private bool _selected;
+    public bool Selected
+    {
+        get
+        {
+            return _selected;
+        }
+        set
+        {
+            if (_selected == value)
+                return;
+
+            _selected = value;
+
+            NotifyPropertyChanged(nameof(Selected));
+        }
+    }
 
     private bool _expanded;
     public bool Expanded

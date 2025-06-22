@@ -70,6 +70,9 @@
     <Compile Update="Views\LibraryPage.axaml.cs">
       <DependentUpon>LibraryPage.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\SettingsPage.axaml.cs">
+      <DependentUpon>SettingsPage.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

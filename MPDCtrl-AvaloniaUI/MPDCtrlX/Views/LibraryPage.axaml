@@ -27,7 +27,7 @@
 		<!--
 		<TreeDataGrid Grid.Row="0" Grid.Column="0" BorderThickness="0 0 0 0" Source="{Binding MusicDirectoriesSource, Mode=TwoWay}" />
 		-->
-		<TreeView Grid.Row="0" Grid.Column="0" BorderThickness="0 0 0 0" ItemsSource="{Binding MusicDirectories, Mode=OneWay}" SelectionMode="AlwaysSelected" SelectedItem="{Binding SelectedNodeDirectory, Mode=TwoWay}" ScrollViewer.AllowAutoHide="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+		<TreeView Grid.Row="0" Grid.Column="0" BorderThickness="0 0 0 0" ItemsSource="{Binding MusicDirectories, Mode=OneWay}" SelectionMode="AlwaysSelected" SelectedItem="{Binding SelectedNodeDirectory, Mode=TwoWay}" ScrollViewer.AllowAutoHide="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
 			<TreeView.ItemTemplate>
 				<TreeDataTemplate ItemsSource="{Binding Path=Children}">
 					<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
@@ -83,7 +83,7 @@
 
 				</Grid>
 				<Border Grid.Row="2" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.5"></Border>
-				<ListBox Grid.Row="3" ItemsSource="{Binding MusicEntriesFiltered}" SelectionMode="Multiple" Loaded="ListBox_Loaded" BorderThickness="0" ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+				<ListBox Grid.Row="3" ItemsSource="{Binding MusicEntriesFiltered}" SelectionMode="Multiple" Loaded="ListBox_Loaded" BorderThickness="0" Margin="0,3,0,0" ScrollViewer.AllowAutoHide="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
 					<!--  Background="{DynamicResource LayerFillColorDefaultBrush}" -->
 					<ListBox.ItemsPanel>
 						<ItemsPanelTemplate>

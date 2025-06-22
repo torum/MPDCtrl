@@ -3,6 +3,9 @@
         xmlns:ui="using:FluentAvalonia.UI.Controls">
     <Styles.Resources>
         <ResourceDictionary>
+
+			<CornerRadius x:Key="NavigationViewContentGridCornerRadius">0,0,0,0</CornerRadius>
+			
             <ResourceDictionary.MergedDictionaries>
 				<MergeResourceInclude Source="avares://MPDCtrlX/Styles/AppWindowStyles.axaml" />
             </ResourceDictionary.MergedDictionaries>

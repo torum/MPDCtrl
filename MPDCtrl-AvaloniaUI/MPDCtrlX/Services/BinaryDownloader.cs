@@ -625,8 +625,8 @@ public class BinaryDownloader : IBinaryDownloader
                 }
                 else
                 {
-                    Debug.WriteLine("No binary data(size) found. Could be a readpicture command? (@MpdBinarySendBinaryCommand)");
-                    ret.ErrorMessage = "No binary data(size) found. Could be a readpicture command? (@MpdBinarySendBinaryCommand)";
+                    //Debug.WriteLine("No binary data found. Could be a readpicture command? (@MpdBinarySendBinaryCommand)");
+                    ret.ErrorMessage = "No binary data found. AlbumArt doesn't exists or ... needs to be a readpicture/albumart command? (@MpdBinarySendBinaryCommand)";
                     ret.IsSuccess = false;
                     return ret;
                 }
@@ -896,7 +896,7 @@ public class BinaryDownloader : IBinaryDownloader
 
                 if (_albumCover.BinaryData is not null)
                 {
-                    _albumCover.AlbumImageSource = await BitmaSourceFromByteArray(_albumCover.BinaryData);
+                    _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
                 }
 
                 if (_albumCover.AlbumImageSource is not null)
@@ -943,7 +943,7 @@ public class BinaryDownloader : IBinaryDownloader
                             */
                             if (_albumCover.BinaryData is not null)
                             {
-                                _albumCover.AlbumImageSource = await BitmaSourceFromByteArray(_albumCover.BinaryData);
+                                _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
                             }
 
                             if (_albumCover.AlbumImageSource is not null)
@@ -1044,7 +1044,7 @@ public class BinaryDownloader : IBinaryDownloader
         return (new System.Version(a)).CompareTo(new System.Version(b));
     }
 
-    private static async Task<Bitmap?> BitmaSourceFromByteArray(byte[] buffer)
+    private static Bitmap? BitmaSourceFromByteArray(byte[] buffer)
     {
         // Bug in MPD 0.23.5 
         if (buffer?.Length > 0)
@@ -1053,8 +1053,8 @@ public class BinaryDownloader : IBinaryDownloader
             try
             {
                 //return BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
-                return await Task.Run(() => Bitmap.DecodeToWidth(stream, 400));
-                //return Bitmap.DecodeToWidth(stream, 400);
+                //return await Task.Run(() => Bitmap.DecodeToWidth(stream, 400));
+                return Bitmap.DecodeToWidth(stream, 400);
             }
             catch
             {

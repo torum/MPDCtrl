@@ -35,7 +35,7 @@
 
 		</Grid>
 		<Border Grid.Row="2" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.5"></Border>
-		<ListBox Grid.Row="3" ItemsSource="{Binding Playlists}" SelectionMode="Single" SelectedItem="{Binding SelectedPlaylist}" Loaded="ListBox_Loaded" BorderThickness="0" ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+		<ListBox Grid.Row="3" ItemsSource="{Binding Playlists}" SelectionMode="Single" SelectedItem="{Binding SelectedPlaylist}" Loaded="ListBox_Loaded" BorderThickness="0" Margin="0,3,0,0" ScrollViewer.AllowAutoHide="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
 			<!--  Background="{DynamicResource LayerFillColorDefaultBrush}" -->
 			<ListBox.ItemsPanel>
 				<ItemsPanelTemplate>

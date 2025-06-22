@@ -35,7 +35,8 @@ public partial class App : Application
                 //DataContext = new MainViewModel()
 
                 //Content = new MainView((App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>())
-                Content = new MainView()
+                
+                //Content = new MainView()
 
                 //{
                 //DataContext = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>()//new MainViewModel()
@@ -91,6 +92,7 @@ public partial class App : Application
                     services.AddSingleton<PlaylistItemPage>(); 
                     services.AddSingleton<AlbumPage>();
                     services.AddSingleton<ArtistPage>();
+                    services.AddSingleton<SettingsPage>();
                 })
                 .Build();
     }

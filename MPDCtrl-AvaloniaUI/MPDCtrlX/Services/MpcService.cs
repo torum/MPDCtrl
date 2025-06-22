@@ -1716,7 +1716,7 @@ public class MpcService : IMpcService
             }
             else
             {
-                Debug.WriteLine("why... " + b.ErrorMessage);
+                Debug.WriteLine("MpdQueryAlbumArt failed. Why... > " + b.ErrorMessage);
 
                 Dispatcher.UIThread.Post(() =>
                 {
@@ -1726,7 +1726,7 @@ public class MpcService : IMpcService
         }
         else
         {
-            Debug.WriteLine("damn... ");
+            Debug.WriteLine("Damn... MpdBinaryConnectionStart@MpdQueryAlbumArt failed.");
         }
 
         _binaryDownloader.MpdBinaryConnectionDisconnect();

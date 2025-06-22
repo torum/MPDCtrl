@@ -131,7 +131,8 @@ public class MenuTreeBuilder : NodeTree
     {
         NodeMenuQueue queue = new(Properties.Resources.MenuTreeItem_Queue)
         {
-            Selected = true,
+            //Selected = true,
+            Selected = false,
             Expanded = false,
 
             Parent = this

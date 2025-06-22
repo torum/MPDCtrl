@@ -1,8 +1,13 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using FluentAvalonia.UI.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using MPDCtrlX.ViewModels;
+using System;
+using System.Collections;
+using System.Diagnostics;
+using System.Linq;
 
 namespace MPDCtrlX.Views;
 
@@ -13,7 +18,14 @@ public partial class QueuePage : UserControl
     public QueuePage()
     {
         _viewModel = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();
+
         DataContext = _viewModel;
+
+        if (_viewModel != null)
+        {
+            _viewModel.ScrollIntoView += (sender, arg) => { this.OnScrollIntoView(arg); };
+            _viewModel.ScrollIntoViewAndSelect += (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
+        }
 
         InitializeComponent();
     }
@@ -36,6 +48,30 @@ public partial class QueuePage : UserControl
         this.test8x.Width = _viewModel.QueueColumnHeaderTrackWidth;
         this.test9x.Width = _viewModel.QueueColumnHeaderGenreWidth;
         this.test10x.Width = _viewModel.QueueColumnHeaderLastModifiedWidth;
+    }
 
+    private void OnScrollIntoView(int ind) 
+    {
+        if (this.QueueListBox is ListBox lb)
+        {
+            //lb.AutoScrollToSelectedItem = true;
+            lb.ScrollIntoView(ind);
+        }
+    }
+    private void OnScrollIntoViewAndSelect(int ind)
+    {
+        if (this.QueueListBox is ListBox lb)
+        {
+            lb.ScrollIntoView(ind);
+
+            var test = _viewModel?.Queue.FirstOrDefault(x => x.IsPlaying == true);
+            if (test != null)
+            {
+                //lb.ScrollIntoView(test.Index);
+                test.IsSelected = true;
+            }
+
+            //lb.AutoScrollToSelectedItem = true;
+        }
     }
 }

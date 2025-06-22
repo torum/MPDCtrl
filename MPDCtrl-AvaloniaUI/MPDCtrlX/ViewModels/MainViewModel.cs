@@ -56,6 +56,12 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
             _currentpage = value;
             this.NotifyPropertyChanged(nameof(CurrentPage));
+
+            if (_currentpage is LibraryPage)
+            {
+
+            }
+
         }
     }
 
@@ -1113,6 +1119,10 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             NotifyPropertyChanged(nameof(IsCurrentSongArtistNotNull));
             NotifyPropertyChanged(nameof(IsCurrentSongAlbumNotNull));
 
+            //NotifyPropertyChanged(nameof(CurrentSongStringForWindowTitle));
+            CurrentSongChanged?.Invoke(this, CurrentSongStringForWindowTitle);
+
+
             if (value is null)
                 _elapsedTimer.Stop();
         }
@@ -1201,6 +1211,46 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             else
             {
                 return false;
+            }
+        }
+    }
+
+    public string CurrentSongStringForWindowTitle
+    {
+        get
+        {
+            if (_currentSong is not null)
+            {
+                string s = string.Empty;
+
+                if (!string.IsNullOrEmpty(_currentSong.Title))
+                {
+                    s = _currentSong.Title.Trim();
+                }
+
+                if (!string.IsNullOrEmpty(_currentSong.Artist))
+                {
+                    if (!string.IsNullOrEmpty(s))
+                    {
+                        s += " by ";
+                    }
+                    s += $"{_currentSong.Artist.Trim()}"; 
+                }
+
+                if (!string.IsNullOrEmpty(_currentSong.Album))
+                {
+                    if (!string.IsNullOrEmpty(s))
+                    {
+                        s += " from ";
+                    }
+                    s += $"{_currentSong.Album.Trim()}";
+                }
+
+                return s;
+            }
+            else
+            {
+                return string.Empty;
             }
         }
     }
@@ -3268,6 +3318,8 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
     public event EventHandler<string>? UpdateProgress;
 
+    public event EventHandler<string>? CurrentSongChanged;
+
     #endregion
 
     #region == Lock objects ==
@@ -3481,6 +3533,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
         this.UpdateProgress += (sender, arg) => { this.OnUpdateProgress(arg); };
 
+
         #endregion
 
         #region == Init Song's time elapsed timer. ==  
@@ -3493,9 +3546,9 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
         // start the connection
         IsShowDebugWindow = false;
+        IsAutoScrollToNowPlaying = true;
         Start("localhost", 6600);
         Volume = 20;
-        //QueueColumnHeaderTitleWidth = 200;
         IsWorking = false;
 
     }
@@ -4840,7 +4893,9 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                         //CurrentSong.IsSelected = true;
 
                         if (IsAutoScrollToNowPlaying)
-                            ScrollIntoViewAndSelect?.Invoke(this, CurrentSong.Index);
+                        {
+                            ScrollIntoView?.Invoke(this, CurrentSong.Index);
+                        }
 
                         // AlbumArt
                         if (!String.IsNullOrEmpty(CurrentSong.File))
@@ -4908,11 +4963,6 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
                     if (isSongChanged || isCurrentSongWasNull)
                     {
-                        /*
-                        if (Queue.Count > 0)
-                            if (IsAutoScrollToNowPlaying)
-                                ScrollIntoView?.Invoke(this, CurrentSong.Index);
-                        */
 
                         // AlbumArt
                         if (!String.IsNullOrEmpty(CurrentSong.File))
@@ -4923,6 +4973,9 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                             }
                         }
                     }
+
+                    if (IsAutoScrollToNowPlaying)
+                        ScrollIntoView?.Invoke(this, CurrentSong.Index);
                 }
             }
 

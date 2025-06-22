@@ -132,7 +132,7 @@
 
 			</Grid>
 			<Border Grid.Row="2" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.5"></Border>
-			<ListBox Grid.Row="3" ItemsSource="{Binding SearchResult}" SelectionMode="Multiple" BorderThickness="0" ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" Loaded="ListBox_Loaded">
+			<ListBox Grid.Row="3" ItemsSource="{Binding SearchResult}" SelectionMode="Multiple" BorderThickness="0" Margin="0,3,0,0" ScrollViewer.AllowAutoHide="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" Loaded="ListBox_Loaded">
 				<!--  Background="{DynamicResource LayerFillColorDefaultBrush}" -->
 				<ListBox.ItemsPanel>
 					<ItemsPanelTemplate>

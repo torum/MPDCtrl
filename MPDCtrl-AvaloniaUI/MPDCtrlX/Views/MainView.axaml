@@ -2,8 +2,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 
              xmlns:vm="clr-namespace:MPDCtrlX.ViewModels"
 			 xmlns:mod="clr-namespace:MPDCtrlX.Models"
+			 xmlns:ui="using:FluentAvalonia.UI.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MPDCtrlX.Views.MainView"
              x:DataType="vm:MainViewModel"
@@ -14,16 +16,16 @@
 		<vm:MainDummyViewModel />
 	</Design.DataContext>
 
-	<Grid x:Name="MainGrid" RowDefinitions="0,*,Auto,29">
+	<Grid x:Name="MainGrid" RowDefinitions="0,*" Background="{DynamicResource NavigationViewDefaultPaneBackground}">
 		<!-- {OnPlatform Default='0,120,*,0,Auto,28', Windows='32,120,*,0,Auto,28'} -->
 		<!-- ,x:TypeArguments='RowDefinitions' or ,x:TypeArguments='GridLength'-->
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="1*" MinWidth="260" />
-			<ColumnDefinition Width="5*" />
+			<ColumnDefinition Width="Auto"/>
+			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
 		
 		<!-- App title bar-->
-		<Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" RowDefinitions="*" ColumnDefinitions="24,*,24" x:Name="AppTitleBar">
+		<Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" RowDefinitions="*" ColumnDefinitions="24,*,24" x:Name="AppTitleBar" IsVisible="False">
 
 			<!-- Logo -->
 			<Image Grid.Row="0" Grid.Column="0" x:Name="ImageLogo" Width="18" Height="18" Margin="6" Source="avares://MPDCtrlX/Assets/MPDCtrlX.ico" VerticalAlignment="Center" HorizontalAlignment="Left"/>
@@ -33,10 +35,10 @@
 		</Grid>
 
 		<!-- Left pane -->
-		<Grid Grid.Row="1" Grid.Column="0" MinWidth="260">
+		<Grid Grid.Row="1" Grid.Column="0">
 
 			<!-- TreeView menu -->
-			<Border Grid.Row="0" Grid.Column="0" MinWidth="260" BorderThickness="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+			<Border Grid.Row="0" Grid.Column="0" MinWidth="260" BorderThickness="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsVisible="False">
 				<Grid RowDefinitions="*" ColumnDefinitions="*" Margin="00" HorizontalAlignment="Stretch">
 					<TreeView ItemsSource="{Binding MainMenuItems}" SelectionMode="AlwaysSelected" SelectedItem="{Binding SelectedNodeMenu, Mode=TwoWay}" SelectionChanged="TreeView_SelectionChanged" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderThickness="0" ScrollViewer.AllowAutoHide="False">
 						<!--  Background="{DynamicResource LayerFillColorDefaultBrush}" -->
@@ -57,16 +59,17 @@
 				</Grid>
 			</Border>
 
+
 		</Grid>
 
 		<!-- Right pane RowDefinitions="128,*" -->
-		<Grid Grid.Row="1" Grid.Column="1" RowDefinitions="178,*" ColumnDefinitions="*">
+		<Grid Grid.Row="1" Grid.Column="1" RowDefinitions="178,*" ColumnDefinitions="*" IsVisible="True">
 
 			<!-- Header -->
 			<Grid Grid.Row="0" Grid.Column="0" RowDefinitions="*" ColumnDefinitions="*,Auto,*" x:Name="Header">
 
 				<!-- Album cover -->
-				<Border Grid.Row="0" Grid.Column="0" Margin="56,2,48,0" Width="152" Height="152" VerticalAlignment="Top" HorizontalAlignment="Left" BorderThickness="0" ClipToBounds="True" CornerRadius="4">
+				<Border Grid.Row="0" Grid.Column="0" Margin="56,16,48,0" Width="130" Height="130" VerticalAlignment="Top" HorizontalAlignment="Left" BorderThickness="0" ClipToBounds="True" CornerRadius="4">
 					<TransitioningContentControl Content="{Binding AlbumArt, Mode=OneWay}" >
 						<TransitioningContentControl.ContentTemplate>
 							<DataTemplate DataType="Bitmap">
@@ -77,10 +80,10 @@
 				</Border>
 
 				<!-- Main Playback Controls -->
-				<Grid Grid.Row="0" Grid.Column="1" RowDefinitions="Auto,Auto,*" ColumnDefinitions="*,Auto,*" HorizontalAlignment="Center" VerticalAlignment="Stretch">
+				<Grid Grid.Row="0" Grid.Column="1" RowDefinitions="Auto,Auto,*" ColumnDefinitions="*,Auto,*" HorizontalAlignment="Center" VerticalAlignment="Top">
 
 					<!-- Now Playing -->
-					<StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,2,0,0" MaxWidth="400">
+					<StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,2,0,0" MaxWidth="400" IsVisible="False">
 						<TextBlock Opacity="1">
 							<Run x:Name="CurrentSongTitle" Text="{Binding CurrentSongTitle, Mode=OneWay}"/>
 						</TextBlock>
@@ -99,7 +102,7 @@
 					</StackPanel>
 
 					<!-- Playback Buttons -->
-					<Grid Grid.Row="1" Grid.Column="1" Width="280" RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,*" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,32,0,0">
+					<Grid Grid.Row="1" Grid.Column="1" Width="280" RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,*" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,46,0,0">
 
 						<!-- "Play" should be top so that it gets the first keyboard focus -->
 						<Button x:Name="PlayButton" ToolTip.Tip="Play" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="62" Width="62" Background="Transparent" Command="{Binding PlayCommand}" BorderThickness="0">
@@ -135,7 +138,7 @@
 				</Grid>
 
 				<!-- Volume slider and other options -->
-				<Grid Grid.Row="0" Grid.Column="2" ColumnDefinitions="*,Auto" VerticalAlignment="Top" Margin="0,2,0,0" Height="152">
+				<Grid Grid.Row="0" Grid.Column="2" ColumnDefinitions="*,Auto" VerticalAlignment="Top" Margin="0,0,0,0" Height="148">
 					<StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="36,0,0,0">
 						<ToggleButton x:Name="RepeatButton" ToolTip.Tip="Repeat All" Width="32" Height="32" Padding="0" Margin="10,0,0,0" IsChecked="{Binding Repeat, Mode=TwoWay}" BorderThickness="0" Background="Transparent">
 							<Viewbox Width="14" Height="14">
@@ -166,7 +169,7 @@
 							</Viewbox>
 						</ToggleButton>
 					</StackPanel>
-					<Slider Grid.Column="1" Height="130" Margin="12,12,0,0" Value="{Binding Volume,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Slider>
+					<Slider Grid.Column="1" Height="130" Margin="12,0,0,0" Value="{Binding Volume,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Slider>
 				</Grid>
 
 			</Grid>
@@ -176,111 +179,6 @@
 
 		</Grid>
 
-		<!-- Debug Windows -->
-		<Grid x:Name="DebugWindow" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" RowDefinitions="8,*" ColumnDefinitions="1*,8,1*" Height="200" IsVisible="{Binding IsShowDebugWindow, Mode=TwoWay}">
-
-			<TextBox x:Name="DebugCommandTextBox" Grid.Row="1" Grid.Column="0" Text="{Binding DebugCommandText, Mode=OneWay}" Background="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0" AcceptsReturn="True" Padding="6 0 0 0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24">
-			</TextBox>
-
-			<TextBox x:Name="DebugIdleTextBox" Grid.Row="1" Grid.Column="2" Text="{Binding DebugIdleText, Mode=OneWay}" Background="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0" AcceptsReturn="True" Padding="6 0 0 0" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24">
-			</TextBox>
-
-		</Grid>
-
-		<!-- StatusBar -->
-		<Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="29" Margin="0 0 0 0" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6">
-
-			<Grid>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="Auto" />
-					<ColumnDefinition Width="Auto" />
-					<ColumnDefinition Width="Auto" />
-					<ColumnDefinition Width="Auto" />
-					<ColumnDefinition Width="*" />
-					<ColumnDefinition Width="Auto" />
-					<ColumnDefinition Width="Auto" />
-				</Grid.ColumnDefinitions>
-				
-				<StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 0 0">
-					
-					<Button Width="18" Height="18" Margin="6,0,6,0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Padding="3" Command="{Binding ShowSettingsCommand}">
-						<Viewbox Width="16" Height="16">
-							<PathIcon Background="Transparent" Width="NaN" Height="NaN"
-								Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z">
-							</PathIcon>
-						</Viewbox>
-					</Button>
-					<!-- ConnectionStatusMessage  -->
-					<TextBlock Text="{Binding ConnectionStatusMessage}" Margin="6 0 6 0" TextWrapping="NoWrap" IsVisible="False"></TextBlock>
-					
-					<!--
-					<Viewbox Width="16" Height="16" Margin="2 0 4 0" Opacity="0.7">
-						<Canvas Width="24" Height="24">
-							<Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding StatusButton}" />
-						</Canvas>
-					</Viewbox>
-
-					<ComboBox Style="{StaticResource ComboBoxFlatStyle}" IsEnabled="{Binding IsProfileSwitchOK}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedQuickProfile}" Foreground="{DynamicResource ControlForegroundColorBrush}" HorizontalAlignment="Center" Tag="">
-						<ComboBox.ItemTemplate>
-							<DataTemplate>
-								<StackPanel Orientation="Horizontal">
-									<TextBlock Text="{Binding Path=Name}"></TextBlock>
-								</StackPanel>
-							</DataTemplate>
-						</ComboBox.ItemTemplate>
-					</ComboBox>
-				-->
-				</StackPanel>
-
-				<Border Grid.Column="1" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" MaxWidth="4"/>
-
-				<StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 2 0">
-
-					<!-- Status Error Icon -->
-					<!--
-					<Viewbox Width="16" Height="16" Margin="0 0 4 0" Opacity="0.7">
-						<Canvas Width="24" Height="24">
-							<Path Fill="{DynamicResource ControlDarkColorBrush}" Data="{Binding MpdStatusButton}" />
-						</Canvas>
-					</Viewbox>
-					-->
-					<!-- Status Error Message -->
-					<TextBlock Text="{Binding MpdStatusMessage}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
-
-				</StackPanel>
-
-				<Border Grid.Column="3" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" MaxWidth="4"/>
-
-				<StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="6 0 6 2">
-
-					<TextBlock Text="{Binding StatusBarMessage}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
-
-				</StackPanel>
-				
-				<Border Grid.Column="5" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" MaxWidth="4"/>
-
-				<StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0 0 0 0">
-
-					<Button Width="18" Height="18" Margin="6,0,6,0" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Padding="3" Command="{Binding ShowDebugWindowCommand}">
-						<Viewbox Width="16" Height="16">
-							<PathIcon Background="Transparent" Width="NaN" Height="NaN"
-								Data="">
-								<Interaction.Behaviors>
-									<DataTriggerBehavior Binding="{Binding IsVisible, ElementName=DebugWindow}" ComparisonCondition="Equal" Value="True">
-										<ChangePropertyAction PropertyName="Data" Value="M18,7H15.19C14.74,6.2 14.12,5.5 13.37,5L15,3.41L13.59,2L11.42,4.17C10.96,4.06 10.5,4 10,4C9.5,4 9.05,4.06 8.59,4.17L6.41,2L5,3.41L6.62,5C5.87,5.5 5.26,6.21 4.81,7H2V9H4.09C4.03,9.33 4,9.66 4,10V11H2V13H4V14C4,14.34 4.03,14.67 4.09,15H2V17H4.81C6.26,19.5 9.28,20.61 12,19.65C12,19.43 12,19.22 12,19C12,16.46 13.61,14.2 16,13.35V13H18V11H16V10C16,9.66 15.97,9.33 15.91,9H18V7M12,15H8V13H12V15M12,11H8V9H12V11M17.75,22.16L15,19.16L16.16,18L17.75,19.59L21.34,16L22.5,17.41L17.75,22.16Z" />
-									</DataTriggerBehavior>
-									<DataTriggerBehavior Binding="{Binding IsVisible, ElementName=DebugWindow}" ComparisonCondition="Equal" Value="False">
-										<ChangePropertyAction PropertyName="Data" Value="M20,8H17.19C16.74,7.2 16.12,6.5 15.37,6L17,4.41L15.59,3L13.42,5.17C12.96,5.06 12.5,5 12,5C11.5,5 11.05,5.06 10.59,5.17L8.41,3L7,4.41L8.62,6C7.87,6.5 7.26,7.21 6.81,8H4V10H6.09C6.03,10.33 6,10.66 6,11V12H4V14H6V15C6,15.34 6.03,15.67 6.09,16H4V18H6.81C8.47,20.87 12.14,21.84 15,20.18C15.91,19.66 16.67,18.9 17.19,18H20V16H17.91C17.97,15.67 18,15.34 18,15V14H20V12H18V11C18,10.66 17.97,10.33 17.91,10H20V8M16,15A4,4 0 0,1 12,19A4,4 0 0,1 8,15V11A4,4 0 0,1 12,7A4,4 0 0,1 16,11V15M14,10V12H10V10H14M10,14H14V16H10V14Z" />
-									</DataTriggerBehavior>
-								</Interaction.Behaviors>
-							</PathIcon>
-						</Viewbox>
-					</Button>
-
-				</StackPanel>
-				
-			</Grid>
-		</Border>
 
 	</Grid>
 </UserControl>

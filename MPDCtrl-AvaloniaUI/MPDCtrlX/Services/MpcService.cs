@@ -1467,7 +1467,7 @@ public class MpcService : IMpcService
         catch (System.IO.IOException e)
         {
             // IOException : Unable to write data to the transport connection: 確立された接続がホスト コンピューターのソウトウェアによって中止されました。
-            Debug.WriteLine("IOException@MpdSendCommand: " + cmd.Trim() + " ReadLineAsync ---- " + e.Message);
+            Debug.WriteLine("IOException@ReadLineAsync@MpdSendCommand: " + Environment.NewLine + cmd.Trim() + Environment.NewLine + e.Message);
 
             ret.IsSuccess = false;
             ret.ErrorMessage = e.Message;
@@ -1479,13 +1479,14 @@ public class MpcService : IMpcService
             }
             else
             {
-                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}Reason: {1}Data: {2}{3}Exception: {4} {5}", "ReadLineAsync@MpdSendCommand"+ Environment.NewLine, "IOException"+ Environment.NewLine, cmd.Trim()+ Environment.NewLine, Environment.NewLine, e.Message, Environment.NewLine));
 
                 // タイムアウトしていたらここで「も」エラーになる模様。
 
                 IsMpdCommandConnected = false;
 
-                DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
+                DebugCommandOutput?.Invoke(this, string.Format("Connection Timeout. Reconnecting... " + Environment.NewLine + Environment.NewLine));
+                Debug.WriteLine( string.Format("Connection Timeout. Reconnecting... " + Environment.NewLine));
 
                 try
                 {
@@ -2565,7 +2566,7 @@ public class MpcService : IMpcService
         catch (Exception ex)
         {
             Debug.WriteLine("Exception@ParseStatus:" + ex.Message);
-            //Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParseStatus", ex.Message); });
+
             Dispatcher.UIThread.Post(() =>
             {
                 App.AppendErrorLog("Exception@MPC@ParseStatus", ex.Message);
@@ -2649,7 +2650,6 @@ public class MpcService : IMpcService
         {
             Debug.WriteLine("Error@ParseCurrentSong: " + ex.Message);
 
-            //Application.Current?.Dispatcher.Invoke(() =>
             Dispatcher.UIThread.Post(() =>
             {
                 App.AppendErrorLog("Exception@MPC@ParseCurrentSong", ex.Message);

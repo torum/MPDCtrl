@@ -1,8 +1,11 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Media.Imaging;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FluentAvalonia.Styling;
 using Microsoft.Extensions.DependencyInjection;
 using MPDCtrlX.Common;
 using MPDCtrlX.Contracts;
@@ -37,34 +40,6 @@ public partial class MainDummyViewModel
 
 public partial class MainViewModel : ViewModelBase //ObservableObject //
 {
-
-    private UserControl? _currentpage;
-    public UserControl? CurrentPage
-    {
-        get { return _currentpage; }
-        set
-        {
-            /*
-            if (SetProperty(ref _currentpage, value))
-            {
-                //
-            }
-            */
-
-            if (_currentpage == value)
-                return;
-
-            _currentpage = value;
-            this.NotifyPropertyChanged(nameof(CurrentPage));
-
-            if (_currentpage is LibraryPage)
-            {
-
-            }
-
-        }
-    }
-
     #region == Basic ==  
 
     // Application name
@@ -117,11 +92,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
     #endregion
 
-    #region == Config file load & save ==  
-
-    private static readonly string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-    private static readonly string _appDataFolder = _envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
-    private static readonly string _appConfigFilePath = _appDataFolder + System.IO.Path.DirectorySeparatorChar + _appName + ".config";
+    #region == Layout ==
 
     private bool _isFullyLoaded;
     public bool IsFullyLoaded
@@ -157,10 +128,6 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
         }
     }
 
-    #endregion
-
-    #region == Layout related ==
-
     // TODO: no longer used...
     private double _mainLeftPainActualWidth = 241;
     public double MainLeftPainActualWidth
@@ -194,6 +161,20 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             _mainLeftPainWidth = value;
 
             NotifyPropertyChanged(nameof(MainLeftPainWidth));
+        }
+    }
+
+    private bool _isNavigationViewMenuOpen = true;
+    public bool IsNavigationViewMenuOpen
+    {
+        get { return _isNavigationViewMenuOpen; }
+        set
+        {
+            if (_isNavigationViewMenuOpen == value)
+                return;
+
+            _isNavigationViewMenuOpen = value;
+            NotifyPropertyChanged(nameof(IsNavigationViewMenuOpen));
         }
     }
 
@@ -1514,7 +1495,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
     #endregion
 
-    #region == TreeView Menu (Queue, Library, Search, Playlists, Playlist) ==
+    #region == NavigationView/TreeView Menu (Queue, Library, Search, Playlists, Playlist) ==
 
     #region == MenuTree ==
 
@@ -1546,6 +1527,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
             if (value is NodeMenuQueue)
             {
+                /*
                 IsQueueVisible = true;
                 IsPlaylistsVisible = false;
                 IsPlaylistItemVisible = false;
@@ -1553,11 +1535,12 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 IsSearchVisible = false;
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
-
+                */
                 CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<QueuePage>();
             }
             else if (value is NodeMenuPlaylists)
             {
+                /*
                 IsQueueVisible = false;
                 IsPlaylistsVisible = true;
                 IsPlaylistItemVisible = false;
@@ -1565,11 +1548,12 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 IsSearchVisible = false;
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
-
+                */
                 CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistsPage>();
             }
             else if (value is NodeMenuPlaylistItem nmpli)
             {
+                /*
                 IsQueueVisible = false;
                 IsPlaylistsVisible = false;
                 IsPlaylistItemVisible = true;
@@ -1577,7 +1561,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 IsSearchVisible = false;
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
-
+                */
                 //Application.Current.Dispatcher.Invoke(() =>
                 Dispatcher.UIThread.Post(() =>
                 {
@@ -1596,6 +1580,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             }
             else if (value is NodeMenuLibrary nml)
             {
+                /*
                 IsQueueVisible = false;
                 IsPlaylistsVisible = false;
                 IsPlaylistItemVisible = false;
@@ -1603,7 +1588,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 IsSearchVisible = false;
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
-
+                */
                 CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<LibraryPage>();
 
                 if (!nml.IsAcquired || (MusicDirectories.Count <= 1) && (MusicEntries.Count == 0))
@@ -1613,6 +1598,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             }
             else if (value is NodeMenuSearch)
             {
+                /*
                 IsQueueVisible = false;
                 IsPlaylistsVisible = false;
                 IsPlaylistItemVisible = false;
@@ -1620,11 +1606,12 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 IsSearchVisible = true;
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
-
+                */
                 CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<SearchPage>();
             }
             else if (value is NodeMenuAlbum)
             {
+                /*
                 IsQueueVisible = false;
                 IsPlaylistsVisible = false;
                 IsPlaylistItemVisible = false;
@@ -1632,11 +1619,12 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 IsSearchVisible = false;
                 IsArtistVisible = false;
                 IsAlbumVisible = true;
-
+                */
                 CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<AlbumPage>();
             }
             else if (value is NodeMenuArtist)
             {
+                /*
                 IsQueueVisible = false;
                 IsPlaylistsVisible = false;
                 IsPlaylistItemVisible = false;
@@ -1644,7 +1632,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 IsSearchVisible = false;
                 IsArtistVisible = true;
                 IsAlbumVisible = false;
-
+                */
                 CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<ArtistPage>();
             }
             else if (value is NodeMenu)
@@ -1654,7 +1642,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 if (value.Name != "root")
                     throw new NotImplementedException();
 
-                IsQueueVisible = true;
+                //IsQueueVisible = true;
             }
             else
             {
@@ -1668,6 +1656,34 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
         }
     }
 
+    private UserControl? _currentpage;
+    public UserControl? CurrentPage
+    {
+        get { return _currentpage; }
+        set
+        {
+            /*
+            if (SetProperty(ref _currentpage, value))
+            {
+                //
+            }
+            */
+
+            if (_currentpage == value)
+                return;
+
+            _currentpage = value;
+            this.NotifyPropertyChanged(nameof(CurrentPage));
+
+            if (_currentpage is LibraryPage)
+            {
+
+            }
+
+        }
+    }
+
+    /*
     private bool _isQueueVisible = true;
     public bool IsQueueVisible
     {
@@ -1766,6 +1782,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             NotifyPropertyChanged(nameof(IsArtistVisible));
         }
     }
+    */
 
     #endregion
 
@@ -2438,151 +2455,125 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
     #endregion
 
-    #region == Status Messages == 
+    #region == Debug ==
 
-    private string _statusBarMessage = "";
-    public string StatusBarMessage
+    private string _debugCommandText = string.Empty;
+    public string DebugCommandText
     {
         get
         {
-            return _statusBarMessage;
+            return _debugCommandText;
         }
         set
         {
-            _statusBarMessage = value;
-            NotifyPropertyChanged(nameof(StatusBarMessage));
-        }
-    }
-
-    private string _connectionStatusMessage = "";
-    public string ConnectionStatusMessage
-    {
-        get
-        {
-            return _connectionStatusMessage;
-        }
-        set
-        {
-            _connectionStatusMessage = value;
-            NotifyPropertyChanged(nameof(ConnectionStatusMessage));
-        }
-    }
-
-    private string _mpdStatusMessage = "";
-    public string MpdStatusMessage
-    {
-        get
-        {
-            return _mpdStatusMessage;
-        }
-        set
-        {
-            _mpdStatusMessage = value;
-            NotifyPropertyChanged(nameof(MpdStatusMessage));
-
-            if (_mpdStatusMessage != "")
-                _isMpdStatusMessageContainsText = true;
-            else
-                _isMpdStatusMessageContainsText = false;
-            NotifyPropertyChanged(nameof(IsMpdStatusMessageContainsText));
-        }
-    }
-
-    private bool _isMpdStatusMessageContainsText;
-    public bool IsMpdStatusMessageContainsText
-    {
-        get
-        {
-            return _isMpdStatusMessageContainsText;
-        }
-    }
-
-    private static readonly string _pathDefaultNoneButton = "";
-    private static readonly string _pathDisconnectedButton = "M4,1C2.89,1 2,1.89 2,3V7C2,8.11 2.89,9 4,9H1V11H13V9H10C11.11,9 12,8.11 12,7V3C12,1.89 11.11,1 10,1H4M4,3H10V7H4V3M14,13C12.89,13 12,13.89 12,15V19C12,20.11 12.89,21 14,21H11V23H23V21H20C21.11,21 22,20.11 22,19V15C22,13.89 21.11,13 20,13H14M3.88,13.46L2.46,14.88L4.59,17L2.46,19.12L3.88,20.54L6,18.41L8.12,20.54L9.54,19.12L7.41,17L9.54,14.88L8.12,13.46L6,15.59L3.88,13.46M14,15H20V19H14V15Z";
-
-    private static readonly string _pathConnectingButton = "M11 14H9C9 9.03 13.03 5 18 5V7C14.13 7 11 10.13 11 14M18 11V9C15.24 9 13 11.24 13 14H15C15 12.34 16.34 11 18 11M7 4C7 2.89 6.11 2 5 2S3 2.89 3 4 3.89 6 5 6 7 5.11 7 4M11.45 4.5H9.45C9.21 5.92 8 7 6.5 7H3.5C2.67 7 2 7.67 2 8.5V11H8V8.74C9.86 8.15 11.25 6.5 11.45 4.5M19 17C20.11 17 21 16.11 21 15S20.11 13 19 13 17 13.89 17 15 17.89 17 19 17M20.5 18H17.5C16 18 14.79 16.92 14.55 15.5H12.55C12.75 17.5 14.14 19.15 16 19.74V22H22V19.5C22 18.67 21.33 18 20.5 18Z";
-    private static readonly string _pathConnectedButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
-    //private static string _pathConnectedButton = "";
-    //private static string _pathDisconnectedButton = "";
-    private static readonly string _pathNewConnectionButton = "M20,4C21.11,4 22,4.89 22,6V18C22,19.11 21.11,20 20,20H4C2.89,20 2,19.11 2,18V6C2,4.89 2.89,4 4,4H20M8.5,15V9H7.25V12.5L4.75,9H3.5V15H4.75V11.5L7.3,15H8.5M13.5,10.26V9H9.5V15H13.5V13.75H11V12.64H13.5V11.38H11V10.26H13.5M20.5,14V9H19.25V13.5H18.13V10H16.88V13.5H15.75V9H14.5V14A1,1 0 0,0 15.5,15H19.5A1,1 0 0,0 20.5,14Z";
-    private static readonly string _pathErrorInfoButton = "M23,12L20.56,14.78L20.9,18.46L17.29,19.28L15.4,22.46L12,21L8.6,22.47L6.71,19.29L3.1,18.47L3.44,14.78L1,12L3.44,9.21L3.1,5.53L6.71,4.72L8.6,1.54L12,3L15.4,1.54L17.29,4.72L20.9,5.54L20.56,9.22L23,12M20.33,12L18.5,9.89L18.74,7.1L16,6.5L14.58,4.07L12,5.18L9.42,4.07L8,6.5L5.26,7.09L5.5,9.88L3.67,12L5.5,14.1L5.26,16.9L8,17.5L9.42,19.93L12,18.81L14.58,19.92L16,17.5L18.74,16.89L18.5,14.1L20.33,12M11,15H13V17H11V15M11,7H13V13H11V7";
-
-    private string _statusButton = _pathDefaultNoneButton;
-    public string StatusButton
-    {
-        get
-        {
-            return _statusButton;
-        }
-        set
-        {
-            if (_statusButton == value)
+            if (_debugCommandText == value)
                 return;
 
-            _statusButton = value;
-            NotifyPropertyChanged(nameof(StatusButton));
+            _debugCommandText = value;
+            NotifyPropertyChanged(nameof(DebugCommandText));
         }
     }
 
-    private static readonly string _pathMpdOkButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
 
-    private static readonly string _pathMpdAckErrorButton = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z";
-
-    private string _mpdStatusButton = _pathMpdOkButton;
-    public string MpdStatusButton
+    private string _debugIdleText = string.Empty;
+    public string DebugIdleText
     {
         get
         {
-            return _mpdStatusButton;
+            return _debugIdleText;
         }
         set
         {
-            if (_mpdStatusButton == value)
+            if (_debugIdleText == value)
                 return;
 
-            _mpdStatusButton = value;
-            NotifyPropertyChanged(nameof(MpdStatusButton));
-        }
-    }
-
-    private bool _isUpdatingMpdDb;
-    public bool IsUpdatingMpdDb
-    {
-        get
-        {
-            return _isUpdatingMpdDb;
-        }
-        set
-        {
-            _isUpdatingMpdDb = value;
-            NotifyPropertyChanged(nameof(IsUpdatingMpdDb));
-        }
-    }
-
-    private string _mpdVersion = "";
-    public string MpdVersion
-    {
-        get
-        {
-            if (_mpdVersion != "")
-                return "MPD protocol v" + _mpdVersion;
-            else
-                return _mpdVersion;
-
-        }
-        set
-        {
-            if (value == _mpdVersion)
-                return;
-
-            _mpdVersion = value;
-            NotifyPropertyChanged(nameof(MpdVersion));
+            _debugIdleText = value;
+            NotifyPropertyChanged(nameof(DebugIdleText));
         }
     }
 
     #endregion
 
-    #region == Profile and Settings ==
+    #region == Options ==
+
+    private bool _isUpdateOnStartup = true;
+    public bool IsUpdateOnStartup
+    {
+        get { return _isUpdateOnStartup; }
+        set
+        {
+            if (_isUpdateOnStartup == value)
+                return;
+
+            _isUpdateOnStartup = value;
+
+            NotifyPropertyChanged(nameof(IsUpdateOnStartup));
+        }
+    }
+
+    private bool _isAutoScrollToNowPlaying = false;
+    public bool IsAutoScrollToNowPlaying
+    {
+        get { return _isAutoScrollToNowPlaying; }
+        set
+        {
+            if (_isAutoScrollToNowPlaying == value)
+                return;
+
+            _isAutoScrollToNowPlaying = value;
+
+            NotifyPropertyChanged(nameof(IsAutoScrollToNowPlaying));
+        }
+    }
+
+    private bool _isSaveLog;
+    public bool IsSaveLog
+    {
+        get { return _isSaveLog; }
+        set
+        {
+            if (_isSaveLog == value)
+                return;
+
+            _isSaveLog = value;
+
+            NotifyPropertyChanged(nameof(IsSaveLog));
+        }
+    }
+
+    private bool _isDownloadAlbumArt = true;
+    public bool IsDownloadAlbumArt
+    {
+        get { return _isDownloadAlbumArt; }
+        set
+        {
+            if (_isDownloadAlbumArt == value)
+                return;
+
+            _isDownloadAlbumArt = value;
+
+            NotifyPropertyChanged(nameof(IsDownloadAlbumArt));
+        }
+    }
+
+    private bool _isDownloadAlbumArtEmbeddedUsingReadPicture = true;
+    public bool IsDownloadAlbumArtEmbeddedUsingReadPicture
+    {
+        get { return _isDownloadAlbumArtEmbeddedUsingReadPicture; }
+        set
+        {
+            if (_isDownloadAlbumArtEmbeddedUsingReadPicture == value)
+                return;
+
+            _isDownloadAlbumArtEmbeddedUsingReadPicture = value;
+
+            NotifyPropertyChanged(nameof(IsDownloadAlbumArtEmbeddedUsingReadPicture));
+        }
+    }
+
+    #endregion
+
+    #region == Profile settings ==
 
     private readonly ObservableCollection<Profile> _profiles = [];
     public ObservableCollection<Profile> Profiles
@@ -2925,81 +2916,6 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
         }
     }
 
-    private bool _isUpdateOnStartup = true;
-    public bool IsUpdateOnStartup
-    {
-        get { return _isUpdateOnStartup; }
-        set
-        {
-            if (_isUpdateOnStartup == value)
-                return;
-
-            _isUpdateOnStartup = value;
-
-            NotifyPropertyChanged(nameof(IsUpdateOnStartup));
-        }
-    }
-
-    private bool _isAutoScrollToNowPlaying = false;
-    public bool IsAutoScrollToNowPlaying
-    {
-        get { return _isAutoScrollToNowPlaying; }
-        set
-        {
-            if (_isAutoScrollToNowPlaying == value)
-                return;
-
-            _isAutoScrollToNowPlaying = value;
-
-            NotifyPropertyChanged(nameof(IsAutoScrollToNowPlaying));
-        }
-    }
-
-    private bool _isSaveLog;
-    public bool IsSaveLog
-    {
-        get { return _isSaveLog; }
-        set
-        {
-            if (_isSaveLog == value)
-                return;
-
-            _isSaveLog = value;
-
-            NotifyPropertyChanged(nameof(IsSaveLog));
-        }
-    }
-
-    private bool _isDownloadAlbumArt = true;
-    public bool IsDownloadAlbumArt
-    {
-        get { return _isDownloadAlbumArt; }
-        set
-        {
-            if (_isDownloadAlbumArt == value)
-                return;
-
-            _isDownloadAlbumArt = value;
-
-            NotifyPropertyChanged(nameof(IsDownloadAlbumArt));
-        }
-    }
-
-    private bool _isDownloadAlbumArtEmbeddedUsingReadPicture = true;
-    public bool IsDownloadAlbumArtEmbeddedUsingReadPicture
-    {
-        get { return _isDownloadAlbumArtEmbeddedUsingReadPicture; }
-        set
-        {
-            if (_isDownloadAlbumArtEmbeddedUsingReadPicture == value)
-                return;
-
-            _isDownloadAlbumArtEmbeddedUsingReadPicture = value;
-
-            NotifyPropertyChanged(nameof(IsDownloadAlbumArtEmbeddedUsingReadPicture));
-        }
-    }
-
     private bool _isSwitchingProfile;
     public bool IsSwitchingProfile
     {
@@ -3017,7 +2933,6 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
         }
     }
 
-
     private string _changePasswordDialogMessage = "";
     public string ChangePasswordDialogMessage
     {
@@ -3029,6 +2944,150 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
             _changePasswordDialogMessage = value;
             NotifyPropertyChanged(nameof(ChangePasswordDialogMessage));
+        }
+    }
+
+    #endregion
+
+    #region == Status Messages == 
+
+    private string _statusBarMessage = "";
+    public string StatusBarMessage
+    {
+        get
+        {
+            return _statusBarMessage;
+        }
+        set
+        {
+            _statusBarMessage = value;
+            NotifyPropertyChanged(nameof(StatusBarMessage));
+        }
+    }
+
+    private string _connectionStatusMessage = "";
+    public string ConnectionStatusMessage
+    {
+        get
+        {
+            return _connectionStatusMessage;
+        }
+        set
+        {
+            _connectionStatusMessage = value;
+            NotifyPropertyChanged(nameof(ConnectionStatusMessage));
+        }
+    }
+
+    private string _mpdStatusMessage = "";
+    public string MpdStatusMessage
+    {
+        get
+        {
+            return _mpdStatusMessage;
+        }
+        set
+        {
+            _mpdStatusMessage = value;
+            NotifyPropertyChanged(nameof(MpdStatusMessage));
+
+            if (_mpdStatusMessage != "")
+                _isMpdStatusMessageContainsText = true;
+            else
+                _isMpdStatusMessageContainsText = false;
+            NotifyPropertyChanged(nameof(IsMpdStatusMessageContainsText));
+        }
+    }
+
+    private bool _isMpdStatusMessageContainsText;
+    public bool IsMpdStatusMessageContainsText
+    {
+        get
+        {
+            return _isMpdStatusMessageContainsText;
+        }
+    }
+
+    private static readonly string _pathDefaultNoneButton = "";
+    private static readonly string _pathDisconnectedButton = "M4,1C2.89,1 2,1.89 2,3V7C2,8.11 2.89,9 4,9H1V11H13V9H10C11.11,9 12,8.11 12,7V3C12,1.89 11.11,1 10,1H4M4,3H10V7H4V3M14,13C12.89,13 12,13.89 12,15V19C12,20.11 12.89,21 14,21H11V23H23V21H20C21.11,21 22,20.11 22,19V15C22,13.89 21.11,13 20,13H14M3.88,13.46L2.46,14.88L4.59,17L2.46,19.12L3.88,20.54L6,18.41L8.12,20.54L9.54,19.12L7.41,17L9.54,14.88L8.12,13.46L6,15.59L3.88,13.46M14,15H20V19H14V15Z";
+
+    private static readonly string _pathConnectingButton = "M11 14H9C9 9.03 13.03 5 18 5V7C14.13 7 11 10.13 11 14M18 11V9C15.24 9 13 11.24 13 14H15C15 12.34 16.34 11 18 11M7 4C7 2.89 6.11 2 5 2S3 2.89 3 4 3.89 6 5 6 7 5.11 7 4M11.45 4.5H9.45C9.21 5.92 8 7 6.5 7H3.5C2.67 7 2 7.67 2 8.5V11H8V8.74C9.86 8.15 11.25 6.5 11.45 4.5M19 17C20.11 17 21 16.11 21 15S20.11 13 19 13 17 13.89 17 15 17.89 17 19 17M20.5 18H17.5C16 18 14.79 16.92 14.55 15.5H12.55C12.75 17.5 14.14 19.15 16 19.74V22H22V19.5C22 18.67 21.33 18 20.5 18Z";
+    private static readonly string _pathConnectedButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
+    //private static string _pathConnectedButton = "";
+    //private static string _pathDisconnectedButton = "";
+    private static readonly string _pathNewConnectionButton = "M20,4C21.11,4 22,4.89 22,6V18C22,19.11 21.11,20 20,20H4C2.89,20 2,19.11 2,18V6C2,4.89 2.89,4 4,4H20M8.5,15V9H7.25V12.5L4.75,9H3.5V15H4.75V11.5L7.3,15H8.5M13.5,10.26V9H9.5V15H13.5V13.75H11V12.64H13.5V11.38H11V10.26H13.5M20.5,14V9H19.25V13.5H18.13V10H16.88V13.5H15.75V9H14.5V14A1,1 0 0,0 15.5,15H19.5A1,1 0 0,0 20.5,14Z";
+    private static readonly string _pathErrorInfoButton = "M23,12L20.56,14.78L20.9,18.46L17.29,19.28L15.4,22.46L12,21L8.6,22.47L6.71,19.29L3.1,18.47L3.44,14.78L1,12L3.44,9.21L3.1,5.53L6.71,4.72L8.6,1.54L12,3L15.4,1.54L17.29,4.72L20.9,5.54L20.56,9.22L23,12M20.33,12L18.5,9.89L18.74,7.1L16,6.5L14.58,4.07L12,5.18L9.42,4.07L8,6.5L5.26,7.09L5.5,9.88L3.67,12L5.5,14.1L5.26,16.9L8,17.5L9.42,19.93L12,18.81L14.58,19.92L16,17.5L18.74,16.89L18.5,14.1L20.33,12M11,15H13V17H11V15M11,7H13V13H11V7";
+
+    private string _statusButton = _pathDefaultNoneButton;
+    public string StatusButton
+    {
+        get
+        {
+            return _statusButton;
+        }
+        set
+        {
+            if (_statusButton == value)
+                return;
+
+            _statusButton = value;
+            NotifyPropertyChanged(nameof(StatusButton));
+        }
+    }
+
+    private static readonly string _pathMpdOkButton = "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z";
+
+    private static readonly string _pathMpdAckErrorButton = "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z";
+
+    private string _mpdStatusButton = _pathMpdOkButton;
+    public string MpdStatusButton
+    {
+        get
+        {
+            return _mpdStatusButton;
+        }
+        set
+        {
+            if (_mpdStatusButton == value)
+                return;
+
+            _mpdStatusButton = value;
+            NotifyPropertyChanged(nameof(MpdStatusButton));
+        }
+    }
+
+    private bool _isUpdatingMpdDb;
+    public bool IsUpdatingMpdDb
+    {
+        get
+        {
+            return _isUpdatingMpdDb;
+        }
+        set
+        {
+            _isUpdatingMpdDb = value;
+            NotifyPropertyChanged(nameof(IsUpdatingMpdDb));
+        }
+    }
+
+    private string _mpdVersion = "";
+    public string MpdVersion
+    {
+        get
+        {
+            if (_mpdVersion != "")
+                return "MPD protocol v" + _mpdVersion;
+            else
+                return _mpdVersion;
+
+        }
+        set
+        {
+            if (value == _mpdVersion)
+                return;
+
+            _mpdVersion = value;
+            NotifyPropertyChanged(nameof(MpdVersion));
         }
     }
 
@@ -3331,7 +3390,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
     #endregion
 
-    #region ==  Services == 
+    #region == Services == 
 
     private readonly IMpcService _mpc;
 
@@ -3345,7 +3404,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
         //_appDataFolder = _envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
         //_appConfigFilePath = _appDataFolder + System.IO.Path.DirectorySeparatorChar + _appName + ".config";
-        System.IO.Directory.CreateDirectory(_appDataFolder);
+        System.IO.Directory.CreateDirectory(App.AppDataFolder);
 
         #endregion
 
@@ -3550,43 +3609,61 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
         Start("localhost", 6600);
         Volume = 20;
         IsWorking = false;
+        IsSaveLog = true;
 
+        FluentAvaloniaTheme? _faTheme = ((Application.Current as App)!.Styles[0] as FluentAvaloniaTheme);
+        _faTheme!.PreferSystemTheme = true;
+        _faTheme.CustomAccentColor = Avalonia.Media.Color.FromRgb(28, 96, 168);
+        //(Application.Current as App)!.RequestedThemeVariant = ThemeVariant.Light;
     }
 
     #region == Startup and Shutdown ==
 
     // Startup
-    public void OnWindowLoaded(object sender)
+    public void OnWindowLoaded(object? sender, EventArgs e)
     {
         #region == Load app setting  ==
 
         try
         {
             // Load config file.
-            if (File.Exists(_appConfigFilePath))
+            if (File.Exists(App.AppConfigFilePath))
             {
-                XDocument xdoc = XDocument.Load(_appConfigFilePath);
+                XDocument xdoc = XDocument.Load(App.AppConfigFilePath);
                 if (xdoc.Root is not null)
                 {
                     #region == Window setting ==
-                    /*
+                    
                     if (sender is Window w)
                     {
                         // Main Window element
                         var mainWindow = xdoc.Root.Element("MainWindow");
                         if (mainWindow is not null)
                         {
+                            int wY = 24;
+                            int wX = 24;
+
                             var hoge = mainWindow.Attribute("top");
                             if (hoge is not null)
                             {
-                                w.Top = double.Parse(hoge.Value);
+                                //w.Top = double.Parse(hoge.Value);
+                                //wY = int.Parse(hoge.Value);
+                                if (Int32.TryParse(hoge.Value, out wY))
+                                {
+                                }
                             }
 
                             hoge = mainWindow.Attribute("left");
                             if (hoge is not null)
                             {
-                                w.Left = double.Parse(hoge.Value);
+                                //w.Left = double.Parse(hoge.Value);
+                                //wX = int.Parse(hoge.Value);
+                                if (Int32.TryParse(hoge.Value, out wX))
+                                {
+                                }
                             }
+
+                            w.Position = new PixelPoint(wX, wY);
 
                             hoge = mainWindow.Attribute("height");
                             if (hoge is not null)
@@ -3606,6 +3683,8 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                                 if (hoge.Value == "Maximized")
                                 {
                                     w.WindowState = WindowState.Maximized;
+                                    // Since there is no restorebounds in AvaloniaUI.
+                                    //w.WindowState = WindowState.Normal;
                                 }
                                 else if (hoge.Value == "Normal")
                                 {
@@ -3618,7 +3697,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                             }
                         }
                     }
-                    */
+                    
                     #endregion
 
                     #region == Theme ==
@@ -3811,334 +3890,6 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                     }
                     #endregion
 
-                    #region == Header columns ==
-
-                    var Headers = xdoc.Root.Element("Headers");///Queue/Position
-                    if (Headers is not null)
-                    {
-                        var Que = Headers.Element("Queue");
-                        if (Que is not null)
-                        {
-                            var column = Que.Element("Position");
-                            if (column is not null)
-                            {
-                                if (column.Attribute("Visible") is not null)
-                                {
-                                    var s = column.Attribute("Visible")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        if (s == "True")
-                                        {
-                                            QueueColumnHeaderPositionVisibility = true;
-                                        }
-                                        else
-                                        {
-                                            QueueColumnHeaderPositionVisibility = false;
-                                        }
-                                    }
-                                }
-                                if (column.Attribute("Width") is not null)
-                                {
-                                    var s = column.Attribute("Width")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        try
-                                        {
-                                            QueueColumnHeaderPositionWidth = Double.Parse(s);
-                                        }
-                                        catch
-                                        {
-                                            QueueColumnHeaderPositionWidth = 53;
-                                        }
-                                    }
-                                }
-                                if (QueueColumnHeaderPositionWidth > 0)
-                                    QueueColumnHeaderPositionWidthRestore = QueueColumnHeaderPositionWidth;
-                            }
-                            column = Que.Element("NowPlaying");
-                            if (column is not null)
-                            {
-                                if (column.Attribute("Visible") is not null)
-                                {
-                                    var s = column.Attribute("Visible")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        if (s == "True")
-                                            QueueColumnHeaderNowPlayingVisibility = true;
-                                        else
-                                            QueueColumnHeaderNowPlayingVisibility = false;
-                                    }
-                                }
-                                if (column.Attribute("Width") is not null)
-                                {
-                                    var s = column.Attribute("Width")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        try
-                                        {
-                                            QueueColumnHeaderNowPlayingWidth = Double.Parse(s);
-                                        }
-                                        catch
-                                        {
-                                            QueueColumnHeaderNowPlayingWidth = 53;
-                                        }
-                                    }
-                                }
-                                if (QueueColumnHeaderNowPlayingWidth > 0)
-                                    QueueColumnHeaderNowPlayingWidthRestore = QueueColumnHeaderNowPlayingWidth;
-                            }
-                            column = Que.Element("Title");
-                            if (column is not null)
-                            {
-                                if (column.Attribute("Width") is not null)
-                                {
-                                    var s = column.Attribute("Width")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        try
-                                        {
-                                            QueueColumnHeaderTitleWidth = Double.Parse(s);
-                                            if (QueueColumnHeaderTitleWidth < 120)
-                                                QueueColumnHeaderTitleWidth = 160;
-                                        }
-                                        catch
-                                        {
-                                            QueueColumnHeaderTitleWidth = 160;
-                                        }
-                                    }
-                                }
-                                if (QueueColumnHeaderTitleWidth > 0)
-                                    QueueColumnHeaderTitleWidthRestore = QueueColumnHeaderTitleWidth;
-                            }
-                            column = Que.Element("Time");
-                            if (column is not null)
-                            {
-                                if (column.Attribute("Visible") is not null)
-                                {
-                                    var s = column.Attribute("Visible")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        if (s == "True")
-                                            QueueColumnHeaderTimeVisibility = true;
-                                        else
-                                            QueueColumnHeaderTimeVisibility = false;
-                                    }
-                                }
-                                if (column.Attribute("Width") is not null)
-                                {
-                                    var s = column.Attribute("Width")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        try
-                                        {
-                                            QueueColumnHeaderTimeWidth = Double.Parse(s);
-                                        }
-                                        catch
-                                        {
-                                            QueueColumnHeaderTimeWidth = 53;
-                                        }
-                                    }
-                                }
-                                if (QueueColumnHeaderTimeWidth > 0)
-                                    QueueColumnHeaderTimeWidthRestore = QueueColumnHeaderTimeWidth;
-                            }
-                            column = Que.Element("Artist");
-                            if (column is not null)
-                            {
-                                if (column.Attribute("Visible") is not null)
-                                {
-                                    var s = column.Attribute("Visible")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        if (s == "True")
-                                            QueueColumnHeaderArtistVisibility = true;
-                                        else
-                                            QueueColumnHeaderArtistVisibility = false;
-                                    }
-                                }
-                                if (column.Attribute("Width") is not null)
-                                {
-                                    var s = column.Attribute("Width")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        try
-                                        {
-                                            QueueColumnHeaderArtistWidth = Double.Parse(s);
-                                        }
-                                        catch
-                                        {
-                                            QueueColumnHeaderArtistWidth = 53;
-                                        }
-                                    }
-                                }
-                                if (QueueColumnHeaderArtistWidth > 0)
-                                    QueueColumnHeaderArtistWidthRestore = QueueColumnHeaderArtistWidth;
-                            }
-                            column = Que.Element("Album");
-                            if (column is not null)
-                            {
-                                if (column.Attribute("Visible") is not null)
-                                {
-                                    var s = column.Attribute("Visible")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        if (s == "True")
-                                            QueueColumnHeaderAlbumVisibility = true;
-                                        else
-                                            QueueColumnHeaderAlbumVisibility = false;
-                                    }
-                                }
-                                if (column.Attribute("Width") is not null)
-                                {
-                                    var s = column.Attribute("Width")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        try
-                                        {
-                                            QueueColumnHeaderAlbumWidth = Double.Parse(s);
-                                        }
-                                        catch
-                                        {
-                                            QueueColumnHeaderAlbumWidth = 53;
-                                        }
-                                    }
-                                }
-                                if (QueueColumnHeaderAlbumWidth > 0)
-                                    QueueColumnHeaderAlbumWidthRestore = QueueColumnHeaderAlbumWidth;
-                            }
-                            column = Que.Element("Disc");
-                            if (column is not null)
-                            {
-                                if (column.Attribute("Visible") is not null)
-                                {
-                                    var s = column.Attribute("Visible")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        if (s == "True")
-                                            QueueColumnHeaderDiscVisibility = true;
-                                        else
-                                            QueueColumnHeaderDiscVisibility = false;
-                                    }
-                                }
-                                if (column.Attribute("Width") is not null)
-                                {
-                                    var s = column.Attribute("Width")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        try
-                                        {
-                                            QueueColumnHeaderDiscWidth = Double.Parse(s);
-                                        }
-                                        catch
-                                        {
-                                            QueueColumnHeaderDiscWidth = 53;
-                                        }
-                                    }
-                                }
-                                if (QueueColumnHeaderDiscWidth > 0)
-                                    QueueColumnHeaderDiscWidthRestore = QueueColumnHeaderDiscWidth;
-                            }
-                            column = Que.Element("Track");
-                            if (column is not null)
-                            {
-                                if (column.Attribute("Visible") is not null)
-                                {
-                                    var s = column.Attribute("Visible")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        if (s == "True")
-                                            QueueColumnHeaderTrackVisibility = true;
-                                        else
-                                            QueueColumnHeaderTrackVisibility = false;
-                                    }
-                                }
-                                if (column.Attribute("Width") is not null)
-                                {
-                                    var s = column.Attribute("Width")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        try
-                                        {
-                                            QueueColumnHeaderTrackWidth = Double.Parse(s);
-                                        }
-                                        catch
-                                        {
-                                            QueueColumnHeaderTrackWidth = 53;
-                                        }
-                                    }
-                                }
-                                if (QueueColumnHeaderTrackWidth > 0)
-                                    QueueColumnHeaderTrackWidthRestore = QueueColumnHeaderTrackWidth;
-                            }
-                            column = Que.Element("Genre");
-                            if (column is not null)
-                            {
-                                if (column.Attribute("Visible") is not null)
-                                {
-                                    var s = column.Attribute("Visible")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        if (s == "True")
-                                            QueueColumnHeaderGenreVisibility = true;
-                                        else
-                                            QueueColumnHeaderGenreVisibility = false;
-                                    }
-                                }
-                                if (column.Attribute("Width") is not null)
-                                {
-                                    var s = column.Attribute("Width")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        try
-                                        {
-                                            QueueColumnHeaderGenreWidth = Double.Parse(s);
-                                        }
-                                        catch
-                                        {
-                                            QueueColumnHeaderGenreWidth = 53;
-                                        }
-                                    }
-                                }
-                                if (QueueColumnHeaderGenreWidth > 0)
-                                    QueueColumnHeaderGenreWidthRestore = QueueColumnHeaderGenreWidth;
-                            }
-                            column = Que.Element("LastModified");
-                            if (column is not null)
-                            {
-                                if (column.Attribute("Visible") is not null)
-                                {
-                                    var s = column.Attribute("Visible")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        if (s == "True")
-                                            QueueColumnHeaderLastModifiedVisibility = true;
-                                        else
-                                            QueueColumnHeaderLastModifiedVisibility = false;
-                                    }
-                                }
-                                if (column.Attribute("Width") is not null)
-                                {
-                                    var s = column.Attribute("Width")?.Value;
-                                    if (!string.IsNullOrEmpty(s))
-                                    {
-                                        try
-                                        {
-                                            QueueColumnHeaderLastModifiedWidth = Double.Parse(s);
-                                        }
-                                        catch
-                                        {
-                                            QueueColumnHeaderLastModifiedWidth = 53;
-                                        }
-                                    }
-                                }
-                                if (QueueColumnHeaderLastModifiedWidth > 0)
-                                    QueueColumnHeaderLastModifiedWidthRestore = QueueColumnHeaderLastModifiedWidth;
-                            }
-                        }
-                    }
-
-                    #endregion
-
                     #region == Layout ==
 
                     var lay = xdoc.Root.Element("Layout");
@@ -4162,26 +3913,378 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                                     }
                                 }
                             }
+
+                            var hoge = leftpain.Attribute("NavigationViewMenuOpen");
+                            if (hoge is not null)
+                            {
+                                // Call 
+                                // "NotifyPropertyChanged(nameof(IsNavigationViewMenuOpen));"
+                                // AFTER NavigationMenuItems is added.
+                                if (hoge.Value == "True")
+                                {
+                                    // Don't apply change here.
+                                    _isNavigationViewMenuOpen = true;
+
+                                }
+                                else
+                                {
+                                    // Don't apply change here.
+                                    _isNavigationViewMenuOpen = false;
+                                }
+                            }
                         }
+
+
+
+                        #region == Header columns ==
+
+                        var Headers = lay.Element("Headers");///Queue/Position
+                        if (Headers is not null)
+                        {
+                            var Que = Headers.Element("Queue");
+                            if (Que is not null)
+                            {
+                                var column = Que.Element("Position");
+                                if (column is not null)
+                                {
+                                    if (column.Attribute("Visible") is not null)
+                                    {
+                                        var s = column.Attribute("Visible")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            if (s == "True")
+                                            {
+                                                QueueColumnHeaderPositionVisibility = true;
+                                            }
+                                            else
+                                            {
+                                                QueueColumnHeaderPositionVisibility = false;
+                                            }
+                                        }
+                                    }
+                                    if (column.Attribute("Width") is not null)
+                                    {
+                                        var s = column.Attribute("Width")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            try
+                                            {
+                                                QueueColumnHeaderPositionWidth = Double.Parse(s);
+                                            }
+                                            catch
+                                            {
+                                                QueueColumnHeaderPositionWidth = 53;
+                                            }
+                                        }
+                                    }
+                                    if (QueueColumnHeaderPositionWidth > 0)
+                                        QueueColumnHeaderPositionWidthRestore = QueueColumnHeaderPositionWidth;
+                                }
+                                column = Que.Element("NowPlaying");
+                                if (column is not null)
+                                {
+                                    if (column.Attribute("Visible") is not null)
+                                    {
+                                        var s = column.Attribute("Visible")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            if (s == "True")
+                                                QueueColumnHeaderNowPlayingVisibility = true;
+                                            else
+                                                QueueColumnHeaderNowPlayingVisibility = false;
+                                        }
+                                    }
+                                    if (column.Attribute("Width") is not null)
+                                    {
+                                        var s = column.Attribute("Width")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            try
+                                            {
+                                                QueueColumnHeaderNowPlayingWidth = Double.Parse(s);
+                                            }
+                                            catch
+                                            {
+                                                QueueColumnHeaderNowPlayingWidth = 53;
+                                            }
+                                        }
+                                    }
+                                    if (QueueColumnHeaderNowPlayingWidth > 0)
+                                        QueueColumnHeaderNowPlayingWidthRestore = QueueColumnHeaderNowPlayingWidth;
+                                }
+                                column = Que.Element("Title");
+                                if (column is not null)
+                                {
+                                    if (column.Attribute("Width") is not null)
+                                    {
+                                        var s = column.Attribute("Width")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            try
+                                            {
+                                                QueueColumnHeaderTitleWidth = Double.Parse(s);
+                                                if (QueueColumnHeaderTitleWidth < 120)
+                                                    QueueColumnHeaderTitleWidth = 160;
+                                            }
+                                            catch
+                                            {
+                                                QueueColumnHeaderTitleWidth = 160;
+                                            }
+                                        }
+                                    }
+                                    if (QueueColumnHeaderTitleWidth > 0)
+                                        QueueColumnHeaderTitleWidthRestore = QueueColumnHeaderTitleWidth;
+                                }
+                                column = Que.Element("Time");
+                                if (column is not null)
+                                {
+                                    if (column.Attribute("Visible") is not null)
+                                    {
+                                        var s = column.Attribute("Visible")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            if (s == "True")
+                                                QueueColumnHeaderTimeVisibility = true;
+                                            else
+                                                QueueColumnHeaderTimeVisibility = false;
+                                        }
+                                    }
+                                    if (column.Attribute("Width") is not null)
+                                    {
+                                        var s = column.Attribute("Width")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            try
+                                            {
+                                                QueueColumnHeaderTimeWidth = Double.Parse(s);
+                                            }
+                                            catch
+                                            {
+                                                QueueColumnHeaderTimeWidth = 53;
+                                            }
+                                        }
+                                    }
+                                    if (QueueColumnHeaderTimeWidth > 0)
+                                        QueueColumnHeaderTimeWidthRestore = QueueColumnHeaderTimeWidth;
+                                }
+                                column = Que.Element("Artist");
+                                if (column is not null)
+                                {
+                                    if (column.Attribute("Visible") is not null)
+                                    {
+                                        var s = column.Attribute("Visible")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            if (s == "True")
+                                                QueueColumnHeaderArtistVisibility = true;
+                                            else
+                                                QueueColumnHeaderArtistVisibility = false;
+                                        }
+                                    }
+                                    if (column.Attribute("Width") is not null)
+                                    {
+                                        var s = column.Attribute("Width")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            try
+                                            {
+                                                QueueColumnHeaderArtistWidth = Double.Parse(s);
+                                            }
+                                            catch
+                                            {
+                                                QueueColumnHeaderArtistWidth = 53;
+                                            }
+                                        }
+                                    }
+                                    if (QueueColumnHeaderArtistWidth > 0)
+                                        QueueColumnHeaderArtistWidthRestore = QueueColumnHeaderArtistWidth;
+                                }
+                                column = Que.Element("Album");
+                                if (column is not null)
+                                {
+                                    if (column.Attribute("Visible") is not null)
+                                    {
+                                        var s = column.Attribute("Visible")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            if (s == "True")
+                                                QueueColumnHeaderAlbumVisibility = true;
+                                            else
+                                                QueueColumnHeaderAlbumVisibility = false;
+                                        }
+                                    }
+                                    if (column.Attribute("Width") is not null)
+                                    {
+                                        var s = column.Attribute("Width")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            try
+                                            {
+                                                QueueColumnHeaderAlbumWidth = Double.Parse(s);
+                                            }
+                                            catch
+                                            {
+                                                QueueColumnHeaderAlbumWidth = 53;
+                                            }
+                                        }
+                                    }
+                                    if (QueueColumnHeaderAlbumWidth > 0)
+                                        QueueColumnHeaderAlbumWidthRestore = QueueColumnHeaderAlbumWidth;
+                                }
+                                column = Que.Element("Disc");
+                                if (column is not null)
+                                {
+                                    if (column.Attribute("Visible") is not null)
+                                    {
+                                        var s = column.Attribute("Visible")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            if (s == "True")
+                                                QueueColumnHeaderDiscVisibility = true;
+                                            else
+                                                QueueColumnHeaderDiscVisibility = false;
+                                        }
+                                    }
+                                    if (column.Attribute("Width") is not null)
+                                    {
+                                        var s = column.Attribute("Width")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            try
+                                            {
+                                                QueueColumnHeaderDiscWidth = Double.Parse(s);
+                                            }
+                                            catch
+                                            {
+                                                QueueColumnHeaderDiscWidth = 53;
+                                            }
+                                        }
+                                    }
+                                    if (QueueColumnHeaderDiscWidth > 0)
+                                        QueueColumnHeaderDiscWidthRestore = QueueColumnHeaderDiscWidth;
+                                }
+                                column = Que.Element("Track");
+                                if (column is not null)
+                                {
+                                    if (column.Attribute("Visible") is not null)
+                                    {
+                                        var s = column.Attribute("Visible")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            if (s == "True")
+                                                QueueColumnHeaderTrackVisibility = true;
+                                            else
+                                                QueueColumnHeaderTrackVisibility = false;
+                                        }
+                                    }
+                                    if (column.Attribute("Width") is not null)
+                                    {
+                                        var s = column.Attribute("Width")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            try
+                                            {
+                                                QueueColumnHeaderTrackWidth = Double.Parse(s);
+                                            }
+                                            catch
+                                            {
+                                                QueueColumnHeaderTrackWidth = 53;
+                                            }
+                                        }
+                                    }
+                                    if (QueueColumnHeaderTrackWidth > 0)
+                                        QueueColumnHeaderTrackWidthRestore = QueueColumnHeaderTrackWidth;
+                                }
+                                column = Que.Element("Genre");
+                                if (column is not null)
+                                {
+                                    if (column.Attribute("Visible") is not null)
+                                    {
+                                        var s = column.Attribute("Visible")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            if (s == "True")
+                                                QueueColumnHeaderGenreVisibility = true;
+                                            else
+                                                QueueColumnHeaderGenreVisibility = false;
+                                        }
+                                    }
+                                    if (column.Attribute("Width") is not null)
+                                    {
+                                        var s = column.Attribute("Width")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            try
+                                            {
+                                                QueueColumnHeaderGenreWidth = Double.Parse(s);
+                                            }
+                                            catch
+                                            {
+                                                QueueColumnHeaderGenreWidth = 53;
+                                            }
+                                        }
+                                    }
+                                    if (QueueColumnHeaderGenreWidth > 0)
+                                        QueueColumnHeaderGenreWidthRestore = QueueColumnHeaderGenreWidth;
+                                }
+                                column = Que.Element("LastModified");
+                                if (column is not null)
+                                {
+                                    if (column.Attribute("Visible") is not null)
+                                    {
+                                        var s = column.Attribute("Visible")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            if (s == "True")
+                                                QueueColumnHeaderLastModifiedVisibility = true;
+                                            else
+                                                QueueColumnHeaderLastModifiedVisibility = false;
+                                        }
+                                    }
+                                    if (column.Attribute("Width") is not null)
+                                    {
+                                        var s = column.Attribute("Width")?.Value;
+                                        if (!string.IsNullOrEmpty(s))
+                                        {
+                                            try
+                                            {
+                                                QueueColumnHeaderLastModifiedWidth = Double.Parse(s);
+                                            }
+                                            catch
+                                            {
+                                                QueueColumnHeaderLastModifiedWidth = 53;
+                                            }
+                                        }
+                                    }
+                                    if (QueueColumnHeaderLastModifiedWidth > 0)
+                                        QueueColumnHeaderLastModifiedWidthRestore = QueueColumnHeaderLastModifiedWidth;
+                                }
+                            }
+                        }
+
+                        #endregion
+
                     }
 
                     #endregion
                 }
-
-
             }
 
             IsFullyLoaded = true;
         }
         catch (System.IO.FileNotFoundException ex)
         {
-            //Application.Current?.Dispatcher.Invoke(() => { (App.Current as App)?.AppendErrorLog("System.IO.FileNotFoundException@OnWindowLoaded", ex.Message); });
-            Dispatcher.UIThread.Post(() => { App.AppendErrorLog("System.IO.FileNotFoundException@OnWindowLoaded", ex.Message); });
+            if (IsSaveLog)
+            {
+                Dispatcher.UIThread.Post(() => { App.AppendErrorLog("System.IO.FileNotFoundException@OnWindowLoaded", ex.Message); });
+            }
         }
         catch (Exception ex)
         {
-            //Application.Current?.Dispatcher.Invoke(() => { (App.Current as App)?.AppendErrorLog("Exception@OnWindowLoaded", ex.Message); });
-            Dispatcher.UIThread.Post(() => { App.AppendErrorLog("Exception@OnWindowLoaded", ex.Message); });
+            if (IsSaveLog)
+            {
+                Dispatcher.UIThread.Post(() => { App.AppendErrorLog("Exception@OnWindowLoaded", ex.Message); });
+            }
         }
 
         #endregion
@@ -4207,31 +4310,16 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             // start the connection
             Start(CurrentProfile.Host, CurrentProfile.Port);
         }
-        /*
-        // error log
-        if (IsSaveLog)
-        {
-            if (App.Current is not null)
-            {
-                App? app = App.Current as App;
-                if (app is not null)
-                {
-                    app.IsSaveErrorLog = true;
-                    app.LogFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl_errors.txt";
-                }
-            }
-        }
-        */
     }
 
-    // On window's content rendered
+    // On window's content rendered <<< TODO: Not called in AvaloniaUI
     public void OnContentRendered(object? sender, EventArgs e)
     {
         IsFullyRendered = true;
     }
 
     // Closing
-    public void OnWindowClosing(object sender)//, CancelEventArgs e
+    public void OnWindowClosing(object? sender, CancelEventArgs e)
     {
         // Make sure Window and settings have been fully loaded and not overriding with empty data.
         if (!IsFullyLoaded)
@@ -4239,7 +4327,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
         double windowWidth = 780;
 
-        #region == App Setting ==
+        #region == Save App Setting ==
 
         // Config xml file
         XmlDocument doc = new();
@@ -4254,12 +4342,11 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
         attrs.Value = _appVer;
         root.SetAttributeNode(attrs);
 
-        #region == Window settings ==
-
         // MainWindow
         if (sender is Window w)
         {
-            /*
+            #region == Window settings ==
+
             // Main Window element
             XmlElement mainWindow = doc.CreateElement(string.Empty, "MainWindow", string.Empty);
 
@@ -4268,7 +4355,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             attrs = doc.CreateAttribute("height");
             if (w.WindowState == WindowState.Maximized)
             {
-                attrs.Value = w.RestoreBounds.Height.ToString();
+                //attrs.Value = w.RestoreBounds.Height.ToString();
             }
             else
             {
@@ -4279,8 +4366,8 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             attrs = doc.CreateAttribute("width");
             if (w.WindowState == WindowState.Maximized)
             {
-                attrs.Value = w.RestoreBounds.Width.ToString();
-                windowWidth = w.RestoreBounds.Width;
+                //attrs.Value = w.RestoreBounds.Width.ToString();
+                //windowWidth = w.RestoreBounds.Width;
             }
             else
             {
@@ -4293,22 +4380,24 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             attrs = doc.CreateAttribute("top");
             if (w.WindowState == WindowState.Maximized)
             {
-                attrs.Value = w.RestoreBounds.Top.ToString();
+                //attrs.Value = w.RestoreBounds.Top.ToString();
             }
             else
             {
-                attrs.Value = w.Top.ToString();
+                //attrs.Value = w.Top.ToString();
+                attrs.Value = w.Position.Y.ToString();
             }
             mainWindow.SetAttributeNode(attrs);
 
             attrs = doc.CreateAttribute("left");
             if (w.WindowState == WindowState.Maximized)
             {
-                attrs.Value = w.RestoreBounds.Left.ToString();
+                //attrs.Value = w.RestoreBounds.Left.ToString();
             }
             else
             {
-                attrs.Value = w.Left.ToString();
+                //attrs.Value = w.Left.ToString();
+                attrs.Value = w.Position.X.ToString();
             }
             mainWindow.SetAttributeNode(attrs);
 
@@ -4331,159 +4420,50 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             // set MainWindow element to root.
             root.AppendChild(mainWindow);
 
-        }
-        */
-            #endregion
 
-            #region == Theme ==
-
-            XmlElement thm = doc.CreateElement(string.Empty, "Theme", string.Empty);
-
-            attrs = doc.CreateAttribute("ThemeName");
-            attrs.Value = _currentTheme.Name;
-            thm.SetAttributeNode(attrs);
-
-            /// 
-            root.AppendChild(thm);
 
             #endregion
 
-            #region == Options ==
+            #region == Layout ==
 
-            XmlElement opts = doc.CreateElement(string.Empty, "Options", string.Empty);
+            XmlElement lay = doc.CreateElement(string.Empty, "Layout", string.Empty);
 
-            //
-            attrs = doc.CreateAttribute("AutoScrollToNowPlaying");
-            if (IsAutoScrollToNowPlaying)
+            XmlElement leftpain;
+            XmlAttribute lAttrs;
+
+            // LeftPain
+            leftpain = doc.CreateElement(string.Empty, "LeftPain", string.Empty);
+            lAttrs = doc.CreateAttribute("Width");
+            if (IsFullyRendered) // << Not called in AvaloniaUI
             {
-                attrs.Value = "True";
-            }
-            else
-            {
-                attrs.Value = "False";
-            }
-            opts.SetAttributeNode(attrs);
-
-            // 
-            attrs = doc.CreateAttribute("UpdateOnStartup");
-            if (IsUpdateOnStartup)
-            {
-                attrs.Value = "True";
-            }
-            else
-            {
-                attrs.Value = "False";
-            }
-            opts.SetAttributeNode(attrs);
-
-            //
-            attrs = doc.CreateAttribute("ShowDebugWindow");
-            if (IsShowDebugWindow)
-            {
-                attrs.Value = "True";
-            }
-            else
-            {
-                attrs.Value = "False";
-            }
-            opts.SetAttributeNode(attrs);
-
-            //
-            attrs = doc.CreateAttribute("SaveLog");
-            if (IsSaveLog)
-            {
-                attrs.Value = "True";
-            }
-            else
-            {
-                attrs.Value = "False";
-            }
-            opts.SetAttributeNode(attrs);
-
-            //
-            attrs = doc.CreateAttribute("DownloadAlbumArt");
-            if (IsDownloadAlbumArt)
-            {
-                attrs.Value = "True";
-            }
-            else
-            {
-                attrs.Value = "False";
-            }
-            opts.SetAttributeNode(attrs);
-
-            //
-            attrs = doc.CreateAttribute("DownloadAlbumArtEmbeddedUsingReadPicture");
-            if (IsDownloadAlbumArtEmbeddedUsingReadPicture)
-            {
-                attrs.Value = "True";
-            }
-            else
-            {
-                attrs.Value = "False";
-            }
-            opts.SetAttributeNode(attrs);
-
-            /// 
-            root.AppendChild(opts);
-
-            #endregion
-
-            #region == Profiles  ==
-
-            XmlElement xProfiles = doc.CreateElement(string.Empty, "Profiles", string.Empty);
-
-            XmlElement xProfile;
-            XmlAttribute xAttrs;
-
-            if (Profiles.Count == 1)
-                Profiles[0].IsDefault = true;
-
-            foreach (var p in Profiles)
-            {
-                xProfile = doc.CreateElement(string.Empty, "Profile", string.Empty);
-
-                xAttrs = doc.CreateAttribute("Name");
-                xAttrs.Value = p.Name;
-                xProfile.SetAttributeNode(xAttrs);
-
-                xAttrs = doc.CreateAttribute("Host");
-                xAttrs.Value = p.Host;
-                xProfile.SetAttributeNode(xAttrs);
-
-                xAttrs = doc.CreateAttribute("Port");
-                xAttrs.Value = p.Port.ToString();
-                xProfile.SetAttributeNode(xAttrs);
-
-                xAttrs = doc.CreateAttribute("Password");
-                xAttrs.Value = Encrypt(p.Password);
-                xProfile.SetAttributeNode(xAttrs);
-
-                if (p.IsDefault)
+                if (windowWidth > (MainLeftPainActualWidth - 24))
                 {
-                    xAttrs = doc.CreateAttribute("IsDefault");
-                    xAttrs.Value = "True";
-                    xProfile.SetAttributeNode(xAttrs);
-                }
-
-                xAttrs = doc.CreateAttribute("Volume");
-                if (p == CurrentProfile)
-                {
-                    xAttrs.Value = _volume.ToString();
+                    lAttrs.Value = MainLeftPainActualWidth.ToString();
                 }
                 else
                 {
-                    xAttrs.Value = p.Volume.ToString();
+                    lAttrs.Value = "241";
                 }
-                xProfile.SetAttributeNode(xAttrs);
-
-
-                xProfiles.AppendChild(xProfile);
             }
+            else
+            {
+                lAttrs.Value = MainLeftPainWidth.ToString();
+            }
+            leftpain.SetAttributeNode(lAttrs);
 
-            root.AppendChild(xProfiles);
+            lAttrs = doc.CreateAttribute("NavigationViewMenuOpen");
+            if (_isNavigationViewMenuOpen)
+            {
+                lAttrs.Value = "True";
+            }
+            else
+            {
+                lAttrs.Value = "False";
+            }
+            leftpain.SetAttributeNode(lAttrs);
 
-            #endregion
+            //
+            lay.AppendChild(leftpain);
 
             #region == Header columns ==
 
@@ -4656,79 +4636,209 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             //
             headers.AppendChild(queueHeader);
             ////
-            root.AppendChild(headers);
+            lay.AppendChild(headers);
 
             #endregion
 
-            #region == Layout - not using right now ==
-
-            XmlElement lay = doc.CreateElement(string.Empty, "Layout", string.Empty);
-
-            XmlElement leftpain;
-            XmlAttribute lAttrs;
-
-            // LeftPain
-            leftpain = doc.CreateElement(string.Empty, "LeftPain", string.Empty);
-            lAttrs = doc.CreateAttribute("Width");
-            if (IsFullyRendered)
-            {
-                if (windowWidth > (MainLeftPainActualWidth - 24))
-                {
-                    lAttrs.Value = MainLeftPainActualWidth.ToString();
-                }
-                else
-                {
-                    lAttrs.Value = "241";
-                }
-            }
-            else
-            {
-                lAttrs.Value = MainLeftPainWidth.ToString();
-            }
-            leftpain.SetAttributeNode(lAttrs);
-
-            //
-            lay.AppendChild(leftpain);
             ////
             root.AppendChild(lay);
 
             #endregion
+        }
 
-            try
+        #region == Options ==
+
+        XmlElement opts = doc.CreateElement(string.Empty, "Options", string.Empty);
+
+        //
+        attrs = doc.CreateAttribute("AutoScrollToNowPlaying");
+        if (IsAutoScrollToNowPlaying)
+        {
+            attrs.Value = "True";
+        }
+        else
+        {
+            attrs.Value = "False";
+        }
+        opts.SetAttributeNode(attrs);
+
+        // 
+        attrs = doc.CreateAttribute("UpdateOnStartup");
+        if (IsUpdateOnStartup)
+        {
+            attrs.Value = "True";
+        }
+        else
+        {
+            attrs.Value = "False";
+        }
+        opts.SetAttributeNode(attrs);
+
+        //
+        attrs = doc.CreateAttribute("ShowDebugWindow");
+        if (IsShowDebugWindow)
+        {
+            attrs.Value = "True";
+        }
+        else
+        {
+            attrs.Value = "False";
+        }
+        opts.SetAttributeNode(attrs);
+
+        //
+        attrs = doc.CreateAttribute("SaveLog");
+        if (IsSaveLog)
+        {
+            attrs.Value = "True";
+        }
+        else
+        {
+            attrs.Value = "False";
+        }
+        opts.SetAttributeNode(attrs);
+
+        //
+        attrs = doc.CreateAttribute("DownloadAlbumArt");
+        if (IsDownloadAlbumArt)
+        {
+            attrs.Value = "True";
+        }
+        else
+        {
+            attrs.Value = "False";
+        }
+        opts.SetAttributeNode(attrs);
+
+        //
+        attrs = doc.CreateAttribute("DownloadAlbumArtEmbeddedUsingReadPicture");
+        if (IsDownloadAlbumArtEmbeddedUsingReadPicture)
+        {
+            attrs.Value = "True";
+        }
+        else
+        {
+            attrs.Value = "False";
+        }
+        opts.SetAttributeNode(attrs);
+
+        /// 
+        root.AppendChild(opts);
+
+        #endregion
+
+        #region == Profiles  ==
+
+        XmlElement xProfiles = doc.CreateElement(string.Empty, "Profiles", string.Empty);
+
+        XmlElement xProfile;
+        XmlAttribute xAttrs;
+
+        if (Profiles.Count == 1)
+            Profiles[0].IsDefault = true;
+
+        foreach (var p in Profiles)
+        {
+            xProfile = doc.CreateElement(string.Empty, "Profile", string.Empty);
+
+            xAttrs = doc.CreateAttribute("Name");
+            xAttrs.Value = p.Name;
+            xProfile.SetAttributeNode(xAttrs);
+
+            xAttrs = doc.CreateAttribute("Host");
+            xAttrs.Value = p.Host;
+            xProfile.SetAttributeNode(xAttrs);
+
+            xAttrs = doc.CreateAttribute("Port");
+            xAttrs.Value = p.Port.ToString();
+            xProfile.SetAttributeNode(xAttrs);
+
+            xAttrs = doc.CreateAttribute("Password");
+            xAttrs.Value = Encrypt(p.Password);
+            xProfile.SetAttributeNode(xAttrs);
+
+            if (p.IsDefault)
             {
-                doc.Save(_appConfigFilePath);
+                xAttrs = doc.CreateAttribute("IsDefault");
+                xAttrs.Value = "True";
+                xProfile.SetAttributeNode(xAttrs);
             }
-            //catch (System.IO.FileNotFoundException) { }
-            catch (Exception ex)
+
+            xAttrs = doc.CreateAttribute("Volume");
+            if (p == CurrentProfile)
+            {
+                xAttrs.Value = _volume.ToString();
+            }
+            else
+            {
+                xAttrs.Value = p.Volume.ToString();
+            }
+            xProfile.SetAttributeNode(xAttrs);
+
+
+            xProfiles.AppendChild(xProfile);
+        }
+
+        root.AppendChild(xProfiles);
+
+        #endregion
+
+        #region == Theme ==
+
+        XmlElement thm = doc.CreateElement(string.Empty, "Theme", string.Empty);
+
+        attrs = doc.CreateAttribute("ThemeName");
+        attrs.Value = _currentTheme.Name;
+        thm.SetAttributeNode(attrs);
+
+        /// 
+        root.AppendChild(thm);
+
+        #endregion
+
+        try
+        {
+            if (!Directory.Exists(App.AppDataFolder))
+            {
+                Directory.CreateDirectory(App.AppDataFolder);
+            }
+
+            doc.Save(App.AppConfigFilePath);
+        }
+        //catch (System.IO.FileNotFoundException) { }
+        catch (Exception ex)
+        {
+            if (IsSaveLog)
             {
                 Dispatcher.UIThread.Post(() =>
                 {
                     App.AppendErrorLog("Exception@OnWindowClosing", ex.Message);
                 });
             }
-
-            #endregion
-
-            try
-            {
-                if (IsConnected)
-                {
-                    _mpc.MpdStop = true;
-
-                    // TODO: Although it's a good thing to close...this causes anoying exception in the debug output. 
-                    _mpc.MpdDisconnect();
-                }
-            }
-            catch { }
-
-            /*
-            // Save error logs.
-            Dispatcher.UIThread.Post(async () =>
-            {
-                    (App.Current as App)?.SaveErrorLog();
-                });
-            */
         }
+
+        try
+        {
+            if (IsConnected)
+            {
+                _mpc.MpdStop = true;
+
+                // TODO: Although it's a good thing to close...this causes anoying exception in the debug output. 
+                _mpc.MpdDisconnect();
+            }
+        }
+        catch { }
+
+        if (IsSaveLog)
+        {
+            // Save error logs.
+            Dispatcher.UIThread.Post(() =>
+            {
+                App.SaveErrorLog();
+            });
+        }
+
+        #endregion
     }
 
     #endregion
@@ -5212,10 +5322,9 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 Dispatcher.UIThread.Post(() =>
                 {
                     IsWorking = false;
+                    App.AppendErrorLog("Exception@UpdateCurrentQueue", e.Message);
                 });
 
-                //Application.Current?.Dispatcher.Invoke(() => { (App.Current as App)?.AppendErrorLog("Exception@UpdateCurrentQueue", e.Message); });
-                Dispatcher.UIThread.Post(() => { App.AppendErrorLog("Exception@UpdateCurrentQueue", e.Message); });
                 return;
             }
             finally
@@ -5246,7 +5355,6 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
             try
             {
-                
                 Dispatcher.UIThread.Post(() =>
                 {
                     IsWorking = true;
@@ -5350,10 +5458,9 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 Dispatcher.UIThread.Post(() =>
                 {
                     IsWorking = false;
-                });
 
-                //Application.Current?.Dispatcher.Invoke(() => { (App.Current as App)?.AppendErrorLog("Exception@UpdateCurrentQueue", e.Message); });
-                Dispatcher.UIThread.Post(() => { App.AppendErrorLog("Exception@UpdateCurrentQueue", e.Message); });
+                    App.AppendErrorLog("Exception@UpdateCurrentQueue", e.Message);
+                });
 
                 return;
             }
@@ -5404,14 +5511,14 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
         if (IsSwitchingProfile)
             return;
 
-        //IsBusy = true;
-        IsWorking = true;
-
         UpdateProgress?.Invoke(this, "[UI] Playlists loading...");
         await Task.Delay(10);
 
         
         Dispatcher.UIThread.Post(() => {
+
+            //IsBusy = true;
+            IsWorking = true;
 
             UpdateProgress?.Invoke(this, "[UI] Playlists loading...");
             Playlists = new ObservableCollection<Playlist>(_mpc.Playlists);
@@ -5469,10 +5576,14 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                     }
                 }
             }
+
+            //IsBusy = false;
+            IsWorking = false;
+
+            // apply open/close after this menu is loaded.
+            NotifyPropertyChanged(nameof(IsNavigationViewMenuOpen));
         });
 
-        //IsBusy = false;
-        IsWorking = false;
     }
 
     private Task<bool> UpdateLibraryMusicAsync()
@@ -5534,11 +5645,13 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             {
                 Debug.WriteLine(songfile + e.Message);
 
-                //IsBusy = false;
-                IsWorking = false;
-
                 //Application.Current?.Dispatcher.Invoke(() => { (App.Current as App)?.AppendErrorLog("Exception@UpdateLibraryMusic", e.Message); });
-                Dispatcher.UIThread.Post(() => { App.AppendErrorLog("Exception@UpdateLibraryMusic", e.Message); });
+                Dispatcher.UIThread.Post(() => 
+                {
+                    //IsBusy = false;
+                    IsWorking = false;
+                    App.AppendErrorLog("Exception@UpdateLibraryMusic", e.Message);
+                });
                 return Task.FromResult(false);
             }
         }
@@ -5626,11 +5739,13 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
         {
             Debug.WriteLine("_musicDirectories.Load: " + e.Message);
 
-            //IsBusy = false;
-            IsWorking = false;
 
-            //Application.Current?.Dispatcher.Invoke(() => { (App.Current as App)?.AppendErrorLog("Exception@UpdateLibraryDirectories", e.Message); });
-            Dispatcher.UIThread.Post(() => { App.AppendErrorLog("Exception@UpdateLibraryDirectories", e.Message); });
+            Dispatcher.UIThread.Post(() => 
+            {
+                //IsBusy = false;
+                IsWorking = false; 
+                App.AppendErrorLog("Exception@UpdateLibraryDirectories", e.Message); 
+            });
             return Task.FromResult(false);
         }
         finally
@@ -8632,41 +8747,4 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
     }
 
     #endregion
-
-
-    private string _debugCommandText = string.Empty;
-    public string DebugCommandText
-    {
-        get
-        {
-            return _debugCommandText;
-        }
-        set
-        {
-            if (_debugCommandText == value)
-                return;
-
-            _debugCommandText = value;
-            NotifyPropertyChanged(nameof(DebugCommandText));
-        }
-    }
-
-
-    private string _debugIdleText = string.Empty;
-    public string DebugIdleText
-    {
-        get
-        {
-            return _debugIdleText;
-        }
-        set
-        {
-            if (_debugIdleText == value)
-                return;
-
-            _debugIdleText = value;
-            NotifyPropertyChanged(nameof(DebugIdleText));
-        }
-    }
-
 }

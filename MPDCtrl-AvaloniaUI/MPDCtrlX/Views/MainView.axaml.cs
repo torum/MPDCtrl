@@ -16,9 +16,9 @@ public partial class MainView : UserControl
 
     public MainView()//MainViewModel? vm
     {
-        _viewModel = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();//new MainViewModel();//vm ?? throw new ArgumentNullException(nameof(vm), "MainViewModel cannot be null.");
-
         InitializeComponent();
+
+        _viewModel = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();//new MainViewModel();//vm ?? throw new ArgumentNullException(nameof(vm), "MainViewModel cannot be null.");
 
         //DataContext = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();//new MainViewModel();
         DataContext = _viewModel;

@@ -10,6 +10,7 @@ using MPDCtrlX.Services;
 using MPDCtrlX.ViewModels;
 using MPDCtrlX.Views;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -17,60 +18,20 @@ namespace MPDCtrlX;
 
 public partial class App : Application
 {
-    public override void Initialize()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
+    private static readonly string _appName = "MPDCtrlX";
+    private static readonly string _appDeveloper = "torum";
 
-    public override void OnFrameworkInitializationCompleted()
-    {
-        // Line below is needed to remove Avalonia data validation.
-        // Without this line you will get duplicate validations from both Avalonia and CT
-        BindingPlugins.DataValidators.RemoveAt(0);
+    // Data folder and Config file path.
+    private static readonly string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+    public static string AppDataFolder { get; } = System.IO.Path.Combine((System.IO.Path.Combine(_envDataFolder, _appDeveloper)),_appName);
+    public static string AppConfigFilePath { get; } = System.IO.Path.Combine(AppDataFolder, _appName + ".config");
 
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            desktop.MainWindow = new MainWindow
-            {
-                //DataContext = new MainViewModel()
-
-                //Content = new MainView((App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>())
-                
-                //Content = new MainView()
-
-                //{
-                //DataContext = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>()//new MainViewModel()
-                //}
-            };
-        }
-        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
-        {
-            // TODO:
-            /*
-            singleViewPlatform.MainView = new MainView
-            {
-                //DataContext = new MainViewModel()
-            };
-            */
-            //singleViewPlatform.MainView = new MainView((App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>());
-            singleViewPlatform.MainView = new MainView();
-        }
-
-        base.OnFrameworkInitializationCompleted();
-    }
+    // Log file.
+    private static readonly StringBuilder _errortxt = new();
+    private static readonly string _logFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + _appName + "_errors.txt";
+    
 
     public IHost AppHost { get; private set; }
-
-    public static T GetService<T>()
-    where T : class
-    {
-        if ((App.Current as App)!.AppHost!.Services.GetService(typeof(T)) is not T service)
-        {
-            throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
-        }
-
-        return service;
-    }
 
     public App()
     {
@@ -88,7 +49,7 @@ public partial class App : Application
                     services.AddSingleton<QueuePage>(); 
                     services.AddSingleton<SearchPage>(); 
                     services.AddSingleton<LibraryPage>(); 
-                    services.AddSingleton<PlaylistsPage>(); 
+                    //services.AddSingleton<PlaylistsPage>(); 
                     services.AddSingleton<PlaylistItemPage>(); 
                     services.AddSingleton<AlbumPage>();
                     services.AddSingleton<ArtistPage>();
@@ -97,27 +58,54 @@ public partial class App : Application
                 .Build();
     }
 
-    private static readonly StringBuilder Errortxt = new();
-    public static bool IsSaveErrorLog;
-    public static string LogFilePath = string.Empty;
+    public static T GetService<T>()
+    where T : class
+    {
+        if ((App.Current as App)!.AppHost!.Services.GetService(typeof(T)) is not T service)
+        {
+            throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
+        }
+
+        return service;
+    }
+
+    public override void Initialize()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
+
+    public override void OnFrameworkInitializationCompleted()
+    {
+        // Line below is needed to remove Avalonia data validation.
+        // Without this line you will get duplicate validations from both Avalonia and CT
+        BindingPlugins.DataValidators.RemoveAt(0);
+
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.MainWindow = new MainWindow
+            {
+
+            };
+        }
+
+        base.OnFrameworkInitializationCompleted();
+    }
+
     public static void AppendErrorLog(string errorTxt, string kindTxt)
     {
         DateTime dt = DateTime.Now;
         string nowString = dt.ToString("yyyy/MM/dd HH:mm:ss");
 
-        Errortxt.AppendLine(nowString + " - " + kindTxt + " - " + errorTxt);
+        _errortxt.AppendLine(nowString + " - " + kindTxt + " - " + errorTxt);
     }
 
     public static void SaveErrorLog()
     {
-        if (!IsSaveErrorLog)
+        if (string.IsNullOrEmpty(_logFilePath))
             return;
 
-        if (string.IsNullOrEmpty(LogFilePath))
-            return;
-
-        string s = Errortxt.ToString();
+        string s = _errortxt.ToString();
         if (!string.IsNullOrEmpty(s))
-            File.WriteAllText(LogFilePath, s);
+            File.WriteAllText(_logFilePath, s);
     }
 }

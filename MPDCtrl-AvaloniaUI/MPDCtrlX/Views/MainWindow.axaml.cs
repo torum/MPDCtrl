@@ -23,7 +23,6 @@ public partial class MainWindow : Window//AppWindow//
 
     public MainWindow()
     {
-        // Just for the <Window.InputBindings>
         this.DataContext = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();
 
         InitializeComponent();
@@ -32,8 +31,11 @@ public partial class MainWindow : Window//AppWindow//
 
         if (this.DataContext is MainViewModel vm)
         {
-            vm.CurrentSongChanged += (sender, arg) => OnCurrentSongChanged(arg);
+            this.Loaded += vm.OnWindowLoaded;
+            this.Closing += vm.OnWindowClosing;
+            //this.ContentRendered += vm.OnContentRendered;
 
+            //vm.CurrentSongChanged += (sender, arg) => OnCurrentSongChanged(arg);
             vm.DebugWindowShowHide += () => OnDebugWindowShowHide();
             //vm.DebugWindowShowHide2 += (sender, arg) => OnDebugWindowShowHide2(arg);
             vm.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
@@ -42,7 +44,6 @@ public partial class MainWindow : Window//AppWindow//
             //vm.DebugIdleClear += () => OnDebugIdleClear();
             vm.AckWindowOutput += (sender, arg) => { this.OnAckWindowOutput(arg); };
             vm.AckWindowClear += () => OnAckWindowClear();
-
         }
 
         var os = Environment.OSVersion;
@@ -82,15 +83,16 @@ public partial class MainWindow : Window//AppWindow//
             //ExtendClientAreaToDecorationsHint = false;
         }
 
-        // TODO: not working for current Avalonia UI.
         this.Activated += (sender, e) => { shell?.WindowActivated();  };
         this.Deactivated += (sender, e) => { shell?.WindowDeactivated(); };
     }
 
+    /*
     private void OnCurrentSongChanged(string msg)
     {
-        this.Title = msg;
+        //this.Title = msg;
     }
+    */
 
     private readonly StringBuilder _sbCommandOutput = new();
     public void OnDebugCommandOutput(string arg)

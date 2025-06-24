@@ -16,7 +16,7 @@
 
 		<StackPanel Spacing="20">
 			<StackPanel Spacing="10">
-				<TextBlock Text="Theme Settings Page"
+				<TextBlock Text="MPDCtrlX"
 						   FontWeight="Bold"
 						   FontSize="24"/>
 				<Separator/>
@@ -33,7 +33,7 @@
 -->
 
 					<StackPanel Spacing="0" Margin="15 0">
-						<TextBlock Text="Avalonia Guide Application Theme"
+						<TextBlock Text="Application Settings"
                                    Theme="{StaticResource TitleTextBlockStyle}" />
 
 						<TextBlock Text=""

@@ -625,8 +625,7 @@ public class BinaryDownloader : IBinaryDownloader
                 }
                 else
                 {
-                    //Debug.WriteLine("No binary data found. Could be a readpicture command? (@MpdBinarySendBinaryCommand)");
-                    ret.ErrorMessage = "No binary data found. AlbumArt doesn't exists or ... needs to be a readpicture/albumart command? (@MpdBinarySendBinaryCommand)";
+                    ret.ErrorMessage = "No binary data found. AlbumArt doesn't exists or ... needs to be a albumart command instead of readpicture? (@MpdBinarySendBinaryCommand)";
                     ret.IsSuccess = false;
                     return ret;
                 }
@@ -901,20 +900,17 @@ public class BinaryDownloader : IBinaryDownloader
 
                 if (_albumCover.AlbumImageSource is not null)
                 {
-                    Debug.WriteLine("MpdQueryAlbumArt IsSuccess1");
                     _albumCover.IsSuccess = true;
                 }
                 else
                 {
-                    Debug.WriteLine("1 _albumCover.IsSuccess = false; @MpdQueryAlbumArt");
+                    Debug.WriteLine("_albumCover.IsSuccess == false; BitmaSourceFromByteArray@MpdQueryAlbumArt");
                     _albumCover.IsSuccess = false;
                 }
 
                 _albumCover.IsDownloading = false;
 
                 r = _albumCover.IsSuccess;
-                Debug.WriteLine("MpdQueryAlbumArt IsSuccess1 " + r.ToString());
-
             }
             else
             {

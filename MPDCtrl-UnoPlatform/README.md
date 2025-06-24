@@ -1,5 +1,0 @@
-# MPDCtrl
-
-Testing Uno Platform. 
-  
-

@@ -547,11 +547,20 @@ namespace MPDCtrlX.Properties {
         }
         
         /// <summary>
+        ///   Files に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuTreeItem_Files {
+            get {
+                return ResourceManager.GetString("MenuTreeItem_Files", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Library に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string MenuTreeItem_Browse {
+        public static string MenuTreeItem_Library {
             get {
-                return ResourceManager.GetString("MenuTreeItem_Browse", resourceCulture);
+                return ResourceManager.GetString("MenuTreeItem_Library", resourceCulture);
             }
         }
         

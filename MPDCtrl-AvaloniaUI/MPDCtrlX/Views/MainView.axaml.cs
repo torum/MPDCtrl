@@ -39,6 +39,16 @@ public partial class MainView : UserControl
             //vm.ScrollIntoView += (sender, arg) => { this.OnScrollIntoView(arg); };
             //vm.ScrollIntoViewAndSelect += (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
 
+
+            _viewModel.DebugWindowShowHide += () => OnDebugWindowShowHide();
+            //vm.DebugWindowShowHide2 += (sender, arg) => OnDebugWindowShowHide2(arg);
+            _viewModel.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
+            _viewModel.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
+            //vm.DebugCommandClear += () => OnDebugCommandClear();
+            //vm.DebugIdleClear += () => OnDebugIdleClear();
+            _viewModel.AckWindowOutput += (sender, arg) => { this.OnAckWindowOutput(arg); };
+            _viewModel.AckWindowClear += () => OnAckWindowClear();
+
         }
 
         /*
@@ -64,6 +74,61 @@ public partial class MainView : UserControl
 
     }
     */
+
+    private readonly StringBuilder _sbCommandOutput = new();
+    public void OnDebugCommandOutput(string arg)
+    {
+        // AppendText() is much faster than data binding.
+        //DebugCommandTextBox.AppendText(arg);
+
+        _sbCommandOutput.Append(arg);
+        DebugCommandTextBox.Text = _sbCommandOutput.ToString();
+        DebugCommandTextBox.CaretIndex = DebugCommandTextBox.Text.Length;
+    }
+
+    private readonly StringBuilder _sbIdleOutput = new();
+    public void OnDebugIdleOutput(string arg)
+    {
+        /*
+        // AppendText() is much faster than data binding.
+        DebugIdleTextBox.AppendText(arg);
+
+        DebugIdleTextBox.CaretIndex = DebugIdleTextBox.Text.Length;
+        DebugIdleTextBox.ScrollToEnd();
+        */
+
+        //_sbIdleOutput.Append(DebugIdleTextBox.Text);
+        _sbIdleOutput.Append(arg);
+        DebugIdleTextBox.Text = _sbIdleOutput.ToString();
+        DebugIdleTextBox.CaretIndex = DebugIdleTextBox.Text.Length;
+    }
+    public void OnAckWindowOutput(string arg)
+    {
+        /*
+        // AppendText() is much faster than data binding.
+        AckTextBox.AppendText(arg);
+
+        AckTextBox.CaretIndex = AckTextBox.Text.Length;
+        AckTextBox.ScrollToEnd();
+        */
+    }
+
+    public void OnAckWindowClear()
+    {
+        //AckTextBox.Clear();
+    }
+
+    public void OnDebugWindowShowHide()
+    {
+        if (this.DebugWindow.IsVisible)
+        {
+            this.DebugWindow.IsVisible = false;
+        }
+        else
+        {
+            this.DebugWindow.IsVisible = true;
+        }
+    }
 
 
     private void TreeView_SelectionChanged(object? sender, Avalonia.Controls.SelectionChangedEventArgs e)
@@ -109,11 +174,11 @@ public partial class MainView : UserControl
     public void WindowDeactivated()
     {
         //this.Header.Opacity = 0.3;
-        this.AppTitleBar.Opacity = 0.3;
+        //this.AppTitleBar.Opacity = 0.3;
     }
     public void WindowActivated()
     {
         //this.Header.Opacity = 1;
-        this.AppTitleBar.Opacity = 1;
+        //this.AppTitleBar.Opacity = 1;
     }
 }

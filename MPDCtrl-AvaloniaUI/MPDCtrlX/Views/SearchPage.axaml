@@ -17,9 +17,26 @@
 		<vm:MainDummyViewModel />
 	</Design.DataContext>
 
-	<Grid RowDefinitions="Auto,*">
+	<Grid RowDefinitions="Auto,Auto,*" Margin="8,0,0,0">
 
-		<Grid Grid.Row="0" RowDefinitions="*" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,12,0,12">
+		<Border Grid.Row="0" BorderBrush="{DynamicResource CardStrokeBorderBrush}" BorderThickness="0,0,0,0">
+			<StackPanel Spacing="24" Margin="7 12 0 0" Orientation="Horizontal" HorizontalAlignment="Left">
+				<TextBlock Text="Search" Theme="{StaticResource TitleTextBlockStyle}" VerticalAlignment="Bottom" Margin="3,0,0,0"/>
+
+				<!-- <TextBlock Theme="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Bottom">
+					<Run Text="Search Key"/><Run Text="{Binding SelectedSearchTag.Label,Mode=OneWay}"/><Run Text=": "/><Run Text="{Binding SearchQuery, Mode=OneWay}"/></TextBlock> -->
+
+				<TextBlock Theme="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Bottom" Padding="0,0,0,4">
+					<Run Text="Search Result"/>
+					<Run Text=": "/>
+					<Run Text="{Binding SearchResult.Count ,Mode=OneWay}"/>
+				</TextBlock>
+
+				
+			</StackPanel>
+		</Border>
+
+		<Grid Grid.Row="1" RowDefinitions="*" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,12,0,12">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="0"></ColumnDefinition>
 				<ColumnDefinition Width="*"></ColumnDefinition>
@@ -27,9 +44,9 @@
 				<ColumnDefinition Width="Auto"></ColumnDefinition>
 			</Grid.ColumnDefinitions>
 			
-			<TextBox Grid.Column="1" MinWidth="100" Text="{Binding SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="48,0,0,0"></TextBox>
+			<TextBox Grid.Column="1" MinWidth="100" Text="{Binding SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="9,0,0,0"></TextBox>
 
-			<ComboBox Grid.Column="2" SelectedIndex="0" MinWidth="120" Margin="12,0,0,0" ItemsSource="{Binding SearchTaglist,Mode=OneWay}" SelectedItem="{Binding SelectedSearchTag,Mode=TwoWay}">
+			<ComboBox Grid.Column="2" SelectedIndex="0" MinWidth="160" Margin="12,0,0,0" ItemsSource="{Binding SearchTaglist,Mode=OneWay}" SelectedItem="{Binding SelectedSearchTag,Mode=TwoWay}">
 				<ComboBox.ItemTemplate>
 					<DataTemplate>
 						<TextBlock Text="{Binding Label}" />
@@ -50,14 +67,14 @@
 		</Grid>
 
 		<!-- Search ListBox -->
-		<Grid Grid.Row="1" RowDefinitions="1,Auto,1,*" Margin="8,0,0,0">
+		<Grid Grid.Row="2" RowDefinitions="1,Auto,1,*" Margin="0,0,0,0">
 			<Border Grid.Row="0" BorderThickness="1,0,0,0" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6"></Border>
 			<Grid Grid.Row="1" DockPanel.Dock="Top" Height="30" Margin="1,0,0,0">
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="Auto"></ColumnDefinition>
-					<ColumnDefinition Width="4"></ColumnDefinition>
-					<ColumnDefinition Width="28"></ColumnDefinition>
-					<ColumnDefinition Width="4"></ColumnDefinition>
+					<ColumnDefinition Width="0"></ColumnDefinition>
+					<ColumnDefinition Width="0"></ColumnDefinition>
+					<ColumnDefinition Width="0"></ColumnDefinition>
+					<ColumnDefinition Width="0"></ColumnDefinition>
 					<ColumnDefinition Width="Auto"></ColumnDefinition>
 					<ColumnDefinition Width="4"></ColumnDefinition>
 					<ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -143,10 +160,10 @@
 					<DataTemplate x:DataType="sng:SongInfo">
 						<Grid>
 							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="Auto"></ColumnDefinition>
-								<ColumnDefinition Width="4"></ColumnDefinition>
-								<ColumnDefinition Width="28"></ColumnDefinition>
-								<ColumnDefinition Width="4"></ColumnDefinition>
+								<ColumnDefinition Width="0"></ColumnDefinition>
+								<ColumnDefinition Width="0"></ColumnDefinition>
+								<ColumnDefinition Width="0"></ColumnDefinition>
+								<ColumnDefinition Width="0"></ColumnDefinition>
 								<ColumnDefinition Width="Auto"></ColumnDefinition>
 								<ColumnDefinition Width="4"></ColumnDefinition>
 								<ColumnDefinition Width="Auto"></ColumnDefinition>

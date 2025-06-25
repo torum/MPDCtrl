@@ -30,6 +30,23 @@ public partial class QueuePage : UserControl
         InitializeComponent();
     }
 
+    public void UpdateHeaderWidth()
+    {
+        if (_viewModel != null)
+        {
+            // This is a dirty work around for AvaloniaUI.
+            _viewModel.QueueColumnHeaderPositionWidth = this.test1x.Width;
+            _viewModel.QueueColumnHeaderNowPlayingWidth = this.test2x.Width;
+            _viewModel.QueueColumnHeaderTitleWidth = this.test3x.Width;
+            _viewModel.QueueColumnHeaderTimeWidth = this.test4x.Width;
+            _viewModel.QueueColumnHeaderArtistWidth = this.test5x.Width;
+            _viewModel.QueueColumnHeaderAlbumWidth = this.test6x.Width;
+            _viewModel.QueueColumnHeaderDiscWidth = this.test7x.Width;
+            _viewModel.QueueColumnHeaderTrackWidth = this.test8x.Width;
+            _viewModel.QueueColumnHeaderGenreWidth = this.test9x.Width;
+            _viewModel.QueueColumnHeaderLastModifiedWidth = this.test10x.Width;
+        }
+    }
 
     private void ListBox_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
@@ -38,6 +55,7 @@ public partial class QueuePage : UserControl
             return;
         }
 
+        // This is a dirty work around for AvaloniaUI.
         this.test1x.Width = _viewModel.QueueColumnHeaderPositionWidth;
         this.test2x.Width = _viewModel.QueueColumnHeaderNowPlayingWidth;
         this.test3x.Width = _viewModel.QueueColumnHeaderTitleWidth;

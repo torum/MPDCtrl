@@ -18,19 +18,6 @@ namespace MPDCtrlX;
 
 public partial class App : Application
 {
-    private static readonly string _appName = "MPDCtrlX";
-    private static readonly string _appDeveloper = "torum";
-
-    // Data folder and Config file path.
-    private static readonly string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-    public static string AppDataFolder { get; } = System.IO.Path.Combine((System.IO.Path.Combine(_envDataFolder, _appDeveloper)),_appName);
-    public static string AppConfigFilePath { get; } = System.IO.Path.Combine(AppDataFolder, _appName + ".config");
-
-    // Log file.
-    private static readonly StringBuilder _errortxt = new();
-    private static readonly string _logFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + _appName + "_errors.txt";
-    
-
     public IHost AppHost { get; private set; }
 
     public App()
@@ -84,12 +71,17 @@ public partial class App : Application
         {
             desktop.MainWindow = new MainWindow
             {
-
+                
             };
         }
 
         base.OnFrameworkInitializationCompleted();
     }
+
+    // Log file.
+    private static readonly string _appName = "MPDCtrlX";
+    private static readonly StringBuilder _errortxt = new();
+    private static readonly string _logFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + _appName + "_errors.txt";
 
     public static void AppendErrorLog(string errorTxt, string kindTxt)
     {

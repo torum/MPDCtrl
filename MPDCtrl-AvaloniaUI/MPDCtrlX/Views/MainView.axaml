@@ -2,7 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			 
              xmlns:vm="clr-namespace:MPDCtrlX.ViewModels"
 			 xmlns:mod="clr-namespace:MPDCtrlX.Models"
 			 xmlns:ui="using:FluentAvalonia.UI.Controls"
@@ -16,23 +15,281 @@
 		<vm:MainDummyViewModel />
 	</Design.DataContext>
 
-	<Grid x:Name="MainGrid" RowDefinitions="Auto,*" Background="{DynamicResource NavigationViewDefaultPaneBackground}">
+	<Grid RowDefinitions="170,*,Auto,32" ColumnDefinitions="*" Background="{DynamicResource NavigationViewDefaultPaneBackground}">
 		<!-- {OnPlatform Default='0,120,*,0,Auto,28', Windows='32,120,*,0,Auto,28'} -->
 		<!-- ,x:TypeArguments='RowDefinitions' or ,x:TypeArguments='GridLength'-->
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="Auto"/>
-			<ColumnDefinition Width="*" />
-		</Grid.ColumnDefinitions>
-		
-		<!-- App title bar-->
+
+		<!-- HeaderOverlay -->
+		<Grid Grid.Row="0" Grid.Column="0" RowDefinitions="*" x:Name="HeaderOverlay">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="170" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="24" />
+			</Grid.ColumnDefinitions>
+			<StackPanel Grid.Column="1" Grid.ColumnSpan="1" Name="stpnOverlay" Background="Transparent" Margin="0,16,0,0" HorizontalAlignment="Stretch">
+				<TextBlock x:Name="CurrentSongTitle" Text="{Binding CurrentSongTitle, Mode=OneWay}" Opacity="1" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxWidth="{Binding Bounds.Size.Width, ElementName=stpnOverlay}"/>
+				<WrapPanel>
+					<TextBlock Opacity="0.3" IsVisible="{Binding IsCurrentSongArtistNotNull}">
+						<Run Text="by "/>
+					</TextBlock>
+					<TextBlock Opacity="0.7" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxWidth="{Binding Bounds.Size.Width, ElementName=stpnOverlay}">
+						<Run x:Name="CurrentSongArtist" Text="{Binding CurrentSongArtist, Mode=OneWay}"/>
+					</TextBlock>
+					<TextBlock Opacity="0.3" IsVisible="{Binding IsCurrentSongAlbumNotNull}">
+						<Run Text=" from "/>
+					</TextBlock>
+					<TextBlock Opacity="0.5" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxWidth="{Binding Bounds.Size.Width, ElementName=stpnOverlay}">
+						<Run x:Name="CurrentSongAlbum" Text="{Binding CurrentSongAlbum, Mode=OneWay}" />
+					</TextBlock>
+				</WrapPanel>
+			</StackPanel>
+		</Grid>
+
+		<!-- Header -->
+		<Grid Grid.Row="0" Grid.Column="0" RowDefinitions="*" x:Name="Header">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" MinWidth="170" />
+				<ColumnDefinition Width="380" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+
+			<!-- Album cover -->
+			<Border Grid.Row="0" Grid.Column="0" Margin="16,16,16,0" Width="138" Height="138" VerticalAlignment="Top" HorizontalAlignment="Left" BorderThickness="0" ClipToBounds="True" CornerRadius="4">
+				<TransitioningContentControl Content="{Binding AlbumArt, Mode=OneWay}" >
+					<TransitioningContentControl.ContentTemplate>
+						<DataTemplate DataType="Bitmap">
+							<Image Margin="0" Source="{Binding}" Stretch="UniformToFill" VerticalAlignment="Center"/>
+						</DataTemplate>
+					</TransitioningContentControl.ContentTemplate>
+				</TransitioningContentControl>
+			</Border>
+
+			<!-- Main Playback Controls -->
+			<Grid Grid.Row="0" Grid.Column="1" RowDefinitions="*,Auto,Auto" ColumnDefinitions="*,Auto,*" HorizontalAlignment="Center" VerticalAlignment="Stretch">
+
+				<!-- Now Playing -->
+				<!--
+					<StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,2,0,0" MaxWidth="400" IsVisible="False">
+						<TextBlock Opacity="1">
+							<Run x:Name="CurrentSongTitle" Text="{Binding CurrentSongTitle, Mode=OneWay}"/>
+						</TextBlock>
+						<TextBlock Opacity="0.3" IsVisible="{Binding IsCurrentSongArtistNotNull}">
+							<Run Text=" by "/>
+						</TextBlock>
+						<TextBlock Opacity="0.7">
+							<Run x:Name="CurrentSongArtist" Text="{Binding CurrentSongArtist, Mode=OneWay}"/>
+						</TextBlock>
+						<TextBlock Opacity="0.3" IsVisible="{Binding IsCurrentSongAlbumNotNull}">
+							<Run Text=" from "/>
+						</TextBlock>
+						<TextBlock Opacity="0.5">
+							<Run x:Name="CurrentSongAlbum" Text="{Binding CurrentSongAlbum, Mode=OneWay}" />
+						</TextBlock>
+					</StackPanel>-->
+
+				<!-- Playback Buttons -->
+				<Grid Grid.Row="1" Grid.Column="1" Width="280" RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,*" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,0">
+
+					<!-- "Play" should be top so that it gets the first keyboard focus -->
+					<Button x:Name="PlayButton" ToolTip.Tip="Play" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="62" Width="62" Background="Transparent" Command="{Binding PlayCommand}" BorderThickness="0">
+						<Viewbox Width="46" Height="46">
+							<PathIcon Background="Transparent" Width="NaN" Height="NaN"
+								Data="{Binding PlayButton, Mode=OneWay}">
+							</PathIcon>
+						</Viewbox>
+					</Button>
+
+					<Button x:Name="BackButton" ToolTip.Tip="Prev" Grid.Column="0" HorizontalAlignment="Center" Height="36" Width="48" Background="Transparent" Command="{Binding PlayPrevCommand}" BorderThickness="0">
+						<Viewbox Width="24" Height="24">
+							<PathIcon Background="Transparent" Width="NaN" Height="NaN"
+								Data="M3 20.25a.75.75 0 0 0 1.5 0V3.75a.75.75 0 1 0-1.5 0v16.5ZM18.23 20.475c1.158.83 2.77.002 2.77-1.422V4.83c0-1.384-1.53-2.22-2.695-1.473l-10.47 6.716a1.75 1.75 0 0 0-.074 2.895l10.47 7.507Zm1.27-1.422a.25.25 0 0 1-.396.203l-10.47-7.507a.25.25 0 0 1 .011-.413l10.47-6.717a.25.25 0 0 1 .385.21v14.224Z">
+							</PathIcon>
+						</Viewbox>
+					</Button>
+
+					<Button x:Name="NextButton" ToolTip.Tip="Next" Grid.Column="2" HorizontalAlignment="Center" Height="36" Width="48" Background="Transparent" Command="{Binding PlayNextCommand}" BorderThickness="0">
+						<Viewbox Width="24" Height="24">
+							<PathIcon Background="Transparent" Width="NaN" Height="NaN"
+								Data="M21 3.75a.75.75 0 0 0-1.5 0v16.5a.75.75 0 0 0 1.5 0V3.75ZM5.77 3.525C4.612 2.695 3 3.523 3 4.947V19.17c0 1.384 1.53 2.22 2.695 1.473l10.47-6.716a1.75 1.75 0 0 0 .074-2.895L5.77 3.525ZM4.5 4.947a.25.25 0 0 1 .396-.203l10.47 7.507a.25.25 0 0 1-.011.413l-10.47 6.717a.25.25 0 0 1-.385-.21V4.946Z">
+							</PathIcon>
+						</Viewbox>
+					</Button>
+
+				</Grid>
+
+				<!-- Seek -->
+				<Grid Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,0">
+					<Slider Orientation="Horizontal" Maximum="{Binding Mode=TwoWay,Path=Time}" Value="{Binding Mode=TwoWay,Path=Elapsed,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Minimum="0" Width="380" Margin="0" Padding="0"></Slider>
+				</Grid>
+
+			</Grid>
+
+			<!-- Volume and other options -->
+			<Grid Grid.Row="0" Grid.Column="2" ColumnDefinitions="*,Auto" VerticalAlignment="Top" Margin="0,16,0,16" Height="138" MinWidth="50">
+				<WrapPanel Name="stpnlOptions" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="12,0,0,0">
+					<ToggleButton x:Name="RepeatButton" ToolTip.Tip="Repeat" Width="32" Height="32" Padding="0" Margin="10,0,0,0" IsChecked="{Binding Repeat, Mode=TwoWay}" BorderThickness="0" Background="Transparent">
+						<Viewbox Width="14" Height="14">
+							<PathIcon Background="Transparent" Width="NaN" Height="NaN"
+								Data="m14.61 2.47-.077-.067a.748.748 0 0 0-.983.067l-.068.078a.755.755 0 0 0 .068.987l1.971 1.977H8.5l-.233.004C4.785 5.639 2 8.51 2 12.036c0 1.69.64 3.23 1.692 4.39l.072.069a.751.751 0 0 0 1.08-1.033l-.2-.231A5.009 5.009 0 0 1 3.5 12.035c0-2.771 2.239-5.018 5-5.018h6.881l-1.832 1.84-.067.078a.755.755 0 0 0 .068.987.748.748 0 0 0 1.06 0l3.182-3.193.067-.078a.755.755 0 0 0-.067-.987L14.61 2.47Zm5.62 5.101a.751.751 0 0 0-1.05 1.066 5.01 5.01 0 0 1 1.32 3.398c0 2.772-2.239 5.019-5 5.019H8.558l1.905-1.911.074-.086a.755.755 0 0 0-.007-.902l-.067-.077-.084-.073a.748.748 0 0 0-.9.006l-.076.067-3.182 3.194-.073.085a.755.755 0 0 0 .006.902l.067.077 3.182 3.194.084.072c.293.22.71.195.976-.073a.755.755 0 0 0 .068-.987l-.068-.077-1.899-1.906H15.5l.233-.004C19.215 18.432 22 15.56 22 12.035a6.513 6.513 0 0 0-1.697-4.395l-.073-.069Z">
+							</PathIcon>
+						</Viewbox>
+					</ToggleButton>
+					<ToggleButton x:Name="SingleButton" ToolTip.Tip="Single" Width="32" Height="32" Padding="0" Margin="10,0,0,0" IsChecked="{Binding Single, Mode=TwoWay}" BorderThickness="0" Background="Transparent">
+						<Viewbox Width="14" Height="14">
+							<!-- 								Data="M14.6102 2.47047L14.5334 2.4031C14.2394 2.17855 13.818 2.20101 13.5495 2.47047L13.4824 2.54755C13.2587 2.84259 13.281 3.26552 13.5495 3.53498L15.521 5.5118H8.5L8.26687 5.51592C4.785 5.63911 2 8.51085 2 12.0354C2 13.7259 2.6407 15.2663 3.6917 16.4252L3.76407 16.4947C3.89496 16.6065 4.06463 16.674 4.25 16.674C4.66421 16.674 5 16.337 5 15.9213C5 15.7481 4.9417 15.5885 4.84373 15.4613L4.64439 15.2306C3.92953 14.3627 3.5 13.2494 3.5 12.0354C3.5 9.26396 5.73858 7.01725 8.5 7.01725H15.381L13.5495 8.85754L13.4824 8.93463C13.2587 9.22967 13.281 9.6526 13.5495 9.92206C13.8424 10.216 14.3173 10.216 14.6102 9.92206L17.7922 6.72852L17.8593 6.65144C18.083 6.3564 18.0606 5.93347 17.7922 5.66401L14.6102 2.47047ZM20.23 7.57108C20.0999 7.46224 19.9326 7.39677 19.75 7.39677C19.3358 7.39677 19 7.73378 19 8.14949C19 8.33618 19.0677 8.507 19.1791 8.63722C19.9345 9.46055 20.419 10.5381 20.4907 11.7274C21.0285 12.0066 21.5224 12.3587 21.9592 12.7707C21.9861 12.5294 22 12.284 22 12.0354C22 10.342 21.3571 8.79923 20.3029 7.63965L20.23 7.57108ZM8.558 17.0536H11.0151C11.0051 17.2011 11 17.3499 11 17.5C11 17.8606 11.0294 18.2144 11.0858 18.559H8.564L10.4634 20.465L10.5305 20.5421C10.7542 20.8371 10.7319 21.2601 10.4634 21.5295C10.1971 21.7968 9.78044 21.8211 9.48683 21.6024L9.40271 21.5295L6.22073 18.336L6.15361 18.2589C5.95224 17.9934 5.95023 17.6242 6.14756 17.3566L6.22073 17.2715L9.40271 14.0779L9.47951 14.0106C9.74409 13.8085 10.1119 13.8065 10.3785 14.0045L10.4634 14.0779L10.5305 14.155C10.7319 14.4206 10.7339 14.7897 10.5365 15.0573L10.4634 15.1425L8.558 17.0536ZM23 17.5C23 20.5376 20.5376 23 17.5 23C14.4624 23 12 20.5376 12 17.5C12 14.4624 14.4624 12 17.5 12C20.5376 12 23 14.4624 23 17.5ZM18.1149 14.0134C17.8892 13.9601 17.6565 14.069 17.5528 14.2764C17.4958 14.3904 17.2759 14.7286 16.9399 15.1041C16.6058 15.4775 16.1965 15.8427 15.7764 16.0528C15.5294 16.1763 15.4293 16.4766 15.5528 16.7236C15.6763 16.9706 15.9766 17.0707 16.2236 16.9472C16.7128 16.7026 17.1504 16.3312 17.5 15.9699V20.5C17.5 20.7761 17.7239 21 18 21C18.2761 21 18.5 20.7761 18.5 20.5V14.5C18.5 14.2681 18.3406 14.0667 18.1149 14.0134Z">
+ -->
+							<PathIcon Background="Transparent" Width="NaN" Height="NaN"
+								Data="M19,19H5V5H19M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M12,17H14V7H10V9H12">
+							</PathIcon>
+						</Viewbox>
+					</ToggleButton>
+					<ToggleButton x:Name="RandomButton" ToolTip.Tip="Shuffle" Width="32" Height="32" Padding="0" Margin="10,0,0,0" IsChecked="{Binding Random, Mode=TwoWay}" BorderThickness="0" Background="Transparent">
+						<Viewbox Width="14" Height="14">
+							<PathIcon Background="Transparent" Width="NaN" Height="NaN"
+								Data="M19.2803 4.71967C18.9874 4.42678 18.5126 4.42678 18.2197 4.71967C17.9268 5.01256 17.9268 5.48744 18.2197 5.78033L19.4393 6.99999H19.25C15.332 6.99999 12.8269 9.30232 10.5579 11.3877L10.4925 11.4477C8.15388 13.5968 6.04432 15.5 2.75 15.5C2.33579 15.5 2 15.8358 2 16.25C2 16.6642 2.33579 17 2.75 17C6.66803 17 9.1731 14.6977 11.4421 12.6123L11.4421 12.6123L11.5075 12.5522C13.8461 10.4032 15.9557 8.49999 19.25 8.49999H19.4393L18.2197 9.71966C17.9268 10.0126 17.9268 10.4874 18.2197 10.7803C18.5126 11.0732 18.9874 11.0732 19.2803 10.7803L21.7803 8.28032C21.921 8.13967 22 7.9489 22 7.74999C22 7.55108 21.921 7.36031 21.7803 7.21966L19.2803 4.71967ZM2.75 6.99983C5.99799 6.99983 8.27497 8.58203 10.2514 10.3112C10.1492 10.4048 10.0482 10.4978 9.94821 10.5897L9.81591 10.7113C9.58463 10.9239 9.35843 11.1309 9.13588 11.3316C7.28326 9.73131 5.39993 8.49983 2.75 8.49983C2.33579 8.49983 2 8.16405 2 7.74983C2 7.33562 2.33579 6.99983 2.75 6.99983ZM19.25 16.9998C16.0021 16.9998 13.7251 15.4177 11.7487 13.6885C11.8507 13.5951 11.9515 13.5023 12.0513 13.4105L12.0518 13.4101L12.1841 13.2885C12.4154 13.0759 12.6416 12.8688 12.8642 12.6681C14.7168 14.2684 16.6001 15.4998 19.25 15.4998H19.4393L18.2197 14.2802C17.9268 13.9873 17.9268 13.5124 18.2197 13.2195C18.5126 12.9266 18.9874 12.9266 19.2803 13.2195L21.7803 15.7195C21.921 15.8602 22 16.0509 22 16.2498C22 16.4487 21.921 16.6395 21.7803 16.7802L19.2803 19.2802C18.9874 19.5731 18.5126 19.5731 18.2197 19.2802C17.9268 18.9873 17.9268 18.5124 18.2197 18.2195L19.4393 16.9998H19.25Z">
+							</PathIcon>
+						</Viewbox>
+					</ToggleButton>
+					<ToggleButton x:Name="ConsumeButton" ToolTip.Tip="Consume" Width="32" Height="32" Padding="0" Margin="10,0,0,0" IsChecked="{Binding Consume, Mode=TwoWay}" BorderThickness="0" Background="Transparent">
+						<Viewbox Width="14" Height="14">
+							<PathIcon Background="Transparent" Width="NaN" Height="NaN"
+								Data="M3 5.5C3.55228 5.5 4 5.05228 4 4.5C4 3.94772 3.55228 3.5 3 3.5C2.44772 3.5 2 3.94772 2 4.5C2 5.05228 2.44772 5.5 3 5.5ZM6 4.5C6 4.22386 6.22386 4 6.5 4H17.5C17.7761 4 18 4.22386 18 4.5C18 4.77614 17.7761 5 17.5 5H6.5C6.22386 5 6 4.77614 6 4.5ZM6 9.5C6 9.22386 6.22386 9 6.5 9H17.5C17.7761 9 18 9.22386 18 9.5C18 9.77614 17.7761 10 17.5 10H6.5C6.22386 10 6 9.77614 6 9.5ZM10.0224 15C10.0534 14.6566 10.1159 14.3223 10.207 14H6.5C6.22386 14 6 14.2239 6 14.5C6 14.7761 6.22386 15 6.5 15H10.0224ZM4 14.5C4 15.0523 3.55228 15.5 3 15.5C2.44772 15.5 2 15.0523 2 14.5C2 13.9477 2.44772 13.5 3 13.5C3.55228 13.5 4 13.9477 4 14.5ZM3 10.5C3.55228 10.5 4 10.0523 4 9.5C4 8.94772 3.55228 8.5 3 8.5C2.44772 8.5 2 8.94772 2 9.5C2 10.0523 2.44772 10.5 3 10.5ZM20 15.5C20 17.9853 17.9853 20 15.5 20C13.0147 20 11 17.9853 11 15.5C11 13.0147 13.0147 11 15.5 11C17.9853 11 20 13.0147 20 15.5ZM16.2071 15.5L17.3536 14.3536C17.5488 14.1583 17.5488 13.8417 17.3536 13.6464C17.1583 13.4512 16.8417 13.4512 16.6464 13.6464L15.5 14.7929L14.3536 13.6464C14.1583 13.4512 13.8417 13.4512 13.6464 13.6464C13.4512 13.8417 13.4512 14.1583 13.6464 14.3536L14.7929 15.5L13.6464 16.6464C13.4512 16.8417 13.4512 17.1583 13.6464 17.3536C13.8417 17.5488 14.1583 17.5488 14.3536 17.3536L15.5 16.2071L16.6464 17.3536C16.8417 17.5488 17.1583 17.5488 17.3536 17.3536C17.5488 17.1583 17.5488 16.8417 17.3536 16.6464L16.2071 15.5Z">
+							</PathIcon>
+						</Viewbox>
+					</ToggleButton>
+				</WrapPanel>
+				<Slider Grid.Column="1" Height="138" Margin="12,0,0,0" Value="{Binding Volume,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Slider>
+			</Grid>
+
+		</Grid>
+
+		<!-- Pages -->
+		<Grid Grid.Row="1" Grid.Column="1" RowDefinitions="*" ColumnDefinitions="*">
+
+			<TransitioningContentControl x:Name="ContentFrame" Grid.Row="1" Grid.Column="0" Content="{Binding CurrentPage}"/>
+
+		</Grid>
+
+		<!-- Debug Windows -->
+		<Grid x:Name="DebugWindow" Grid.Row="2" Grid.Column="0" RowDefinitions="8,*" ColumnDefinitions="1*,8,1*" Height="200" IsVisible="{Binding IsShowDebugWindow, Mode=TwoWay}">
+
+			<TextBox x:Name="DebugCommandTextBox" Grid.Row="1" Grid.Column="0" Text="{Binding DebugCommandText, Mode=OneWay}" Background="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0" AcceptsReturn="True" Padding="6 0 0 0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24">
+			</TextBox>
+
+			<TextBox x:Name="DebugIdleTextBox" Grid.Row="1" Grid.Column="2" Text="{Binding DebugIdleText, Mode=OneWay}" Background="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0" AcceptsReturn="True" Padding="6 0 0 0" VerticalAlignment="Stretch" TextWrapping="NoWrap" IsReadOnly="True" IsTabStop="False" Margin="0" MinHeight="24">
+			</TextBox>
+
+		</Grid>
+
+		<!-- StatusBar -->
+		<Border Grid.Row="3" Grid.Column="0" Height="32" Margin="0 0 0 0" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource CardStrokeBorderBrush}" Opacity="0.6">
+
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+
+				<StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 0 0">
+
+					<Button Width="18" Height="18" Margin="6,0,6,0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Padding="3" Command="{Binding ShowSettingsCommand}">
+						<Viewbox Width="16" Height="16">
+							<PathIcon Background="Transparent" Width="NaN" Height="NaN"
+								Data="">
+							</PathIcon>
+						</Viewbox>
+					</Button>
+					<!-- ConnectionStatusMessage  -->
+					<TextBlock Text="{Binding ConnectionStatusMessage}" Margin="6 0 6 0" TextWrapping="NoWrap" IsVisible="False"></TextBlock>
+
+					<!--
+					<Viewbox Width="16" Height="16" Margin="2 0 4 0" Opacity="0.7">
+						<Canvas Width="24" Height="24">
+							<Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding StatusButton}" />
+						</Canvas>
+					</Viewbox>
+
+					<ComboBox Style="{StaticResource ComboBoxFlatStyle}" IsEnabled="{Binding IsProfileSwitchOK}" ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedQuickProfile}" Foreground="{DynamicResource ControlForegroundColorBrush}" HorizontalAlignment="Center" Tag="">
+						<ComboBox.ItemTemplate>
+							<DataTemplate>
+								<StackPanel Orientation="Horizontal">
+									<TextBlock Text="{Binding Path=Name}"></TextBlock>
+								</StackPanel>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
+				-->
+				</StackPanel>
+
+				<Border Grid.Column="1" Background="Transparent" BorderBrush="{DynamicResource CardStrokeBorderBrush}" BorderThickness="0,0,1,0" Opacity="0.5" MaxWidth="4"/>
+
+				<StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0 0 2 0">
+
+					<!-- Status Error Icon -->
+					<!--
+					<Viewbox Width="16" Height="16" Margin="0 0 4 0" Opacity="0.7">
+						<Canvas Width="24" Height="24">
+							<Path Fill="{DynamicResource ControlDarkColorBrush}" Data="{Binding MpdStatusButton}" />
+						</Canvas>
+					</Viewbox>
+					-->
+					<!-- Status Error Message -->
+					<TextBlock Text="{Binding MpdStatusMessage}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
+
+				</StackPanel>
+
+				<Border Grid.Column="3" Background="Transparent" BorderBrush="{DynamicResource CardStrokeBorderBrush}" BorderThickness="0,0,1,0" Opacity="0.5" MaxWidth="4"/>
+
+				<StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="6 0 6 2">
+
+					<TextBlock Text="{Binding StatusBarMessage}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="6 0 6 0" Padding="0" TextWrapping="NoWrap"></TextBlock>
+
+				</StackPanel>
+
+				<Border Grid.Column="5" Background="Transparent" BorderBrush="{DynamicResource CardStrokeBorderBrush}" BorderThickness="0,0,1,0" Opacity="0.5" MaxWidth="4"/>
+
+				<StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0 0 0 0">
+
+					<Button Width="18" Height="18" Margin="6,0,6,0" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Padding="3" Command="{Binding ShowDebugWindowCommand}">
+						<Viewbox Width="16" Height="16">
+							<PathIcon Background="Transparent" Width="NaN" Height="NaN"
+								Data="">
+								<Interaction.Behaviors>
+									<DataTriggerBehavior Binding="{Binding IsVisible, ElementName=DebugWindow}" ComparisonCondition="Equal" Value="True">
+										<ChangePropertyAction PropertyName="Data" Value="M18,7H15.19C14.74,6.2 14.12,5.5 13.37,5L15,3.41L13.59,2L11.42,4.17C10.96,4.06 10.5,4 10,4C9.5,4 9.05,4.06 8.59,4.17L6.41,2L5,3.41L6.62,5C5.87,5.5 5.26,6.21 4.81,7H2V9H4.09C4.03,9.33 4,9.66 4,10V11H2V13H4V14C4,14.34 4.03,14.67 4.09,15H2V17H4.81C6.26,19.5 9.28,20.61 12,19.65C12,19.43 12,19.22 12,19C12,16.46 13.61,14.2 16,13.35V13H18V11H16V10C16,9.66 15.97,9.33 15.91,9H18V7M12,15H8V13H12V15M12,11H8V9H12V11M17.75,22.16L15,19.16L16.16,18L17.75,19.59L21.34,16L22.5,17.41L17.75,22.16Z" />
+									</DataTriggerBehavior>
+									<DataTriggerBehavior Binding="{Binding IsVisible, ElementName=DebugWindow}" ComparisonCondition="Equal" Value="False">
+										<ChangePropertyAction PropertyName="Data" Value="M20,8H17.19C16.74,7.2 16.12,6.5 15.37,6L17,4.41L15.59,3L13.42,5.17C12.96,5.06 12.5,5 12,5C11.5,5 11.05,5.06 10.59,5.17L8.41,3L7,4.41L8.62,6C7.87,6.5 7.26,7.21 6.81,8H4V10H6.09C6.03,10.33 6,10.66 6,11V12H4V14H6V15C6,15.34 6.03,15.67 6.09,16H4V18H6.81C8.47,20.87 12.14,21.84 15,20.18C15.91,19.66 16.67,18.9 17.19,18H20V16H17.91C17.97,15.67 18,15.34 18,15V14H20V12H18V11C18,10.66 17.97,10.33 17.91,10H20V8M16,15A4,4 0 0,1 12,19A4,4 0 0,1 8,15V11A4,4 0 0,1 12,7A4,4 0 0,1 16,11V15M14,10V12H10V10H14M10,14H14V16H10V14Z" />
+									</DataTriggerBehavior>
+								</Interaction.Behaviors>
+							</PathIcon>
+						</Viewbox>
+					</Button>
+
+				</StackPanel>
+
+			</Grid>
+		</Border>
+
+
+	</Grid>
+
+	<!-- App title bar
 		<Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" RowDefinitions="*" ColumnDefinitions="24,*,24" x:Name="AppTitleBar">
 
-			<!-- Logo -->
 			<Image Grid.Row="0" Grid.Column="0" x:Name="ImageLogo" Width="18" Height="18" Margin="6" Source="avares://MPDCtrlX/Assets/MPDCtrlX.ico" VerticalAlignment="Center" HorizontalAlignment="Left" IsVisible="False"/>
 
 			<Label Grid.Row="0" Grid.Column="1" x:Name="AppTitle" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0" Opacity="0.8" IsVisible="False">MPDCtrlX</Label>
 
-			<!-- Now Playing -->
+		</Grid>
+		-->
+
+	<!-- Now Playing 
 			<StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,2,0,0">
 				<TextBlock Opacity="1">
 					<Run x:Name="CurrentSongTitle" Text="{Binding CurrentSongTitle, Mode=OneWay}"/>
@@ -50,14 +307,10 @@
 					<Run x:Name="CurrentSongAlbum" Text="{Binding CurrentSongAlbum, Mode=OneWay}" />
 				</TextBlock>
 			</StackPanel>
+			-->
 
-		</Grid>
-
-		<!-- Left pane -->
-		<Grid Grid.Row="1" Grid.Column="0">
-
-			<!-- TreeView menu -->
-			<!--						
+	<!-- TreeView menu -->
+	<!--						
 			<Border Grid.Row="0" Grid.Column="0" MinWidth="260" BorderThickness="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsVisible="False">
 				<Grid RowDefinitions="*" ColumnDefinitions="*" Margin="00" HorizontalAlignment="Stretch">
 					<TreeView ItemsSource="{Binding MainMenuItems}" Background="{DynamicResource LayerFillColorDefaultBrush}" SelectionMode="AlwaysSelected" SelectedItem="{Binding SelectedNodeMenu, Mode=TwoWay}" SelectionChanged="TreeView_SelectionChanged" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderThickness="0" ScrollViewer.AllowAutoHide="False">
@@ -79,127 +332,6 @@
 				</Grid>
 			</Border>
 			-->
-
-		</Grid>
-
-		<!-- Right pane RowDefinitions="128,*" -->
-		<Grid Grid.Row="1" Grid.Column="1" RowDefinitions="178,*" ColumnDefinitions="*" IsVisible="True">
-
-			<!-- Header -->
-			<Grid Grid.Row="0" Grid.Column="0" RowDefinitions="*" ColumnDefinitions="*,Auto,*" x:Name="Header">
-
-				<!-- Album cover -->
-				<Border Grid.Row="0" Grid.Column="0" Margin="54,6,48,0" Width="130" Height="130" VerticalAlignment="Top" HorizontalAlignment="Left" BorderThickness="0" ClipToBounds="True" CornerRadius="4">
-					<TransitioningContentControl Content="{Binding AlbumArt, Mode=OneWay}" >
-						<TransitioningContentControl.ContentTemplate>
-							<DataTemplate DataType="Bitmap">
-								<Image Margin="0" Source="{Binding}"/>
-							</DataTemplate>
-						</TransitioningContentControl.ContentTemplate>
-					</TransitioningContentControl>
-				</Border>
-
-				<!-- Main Playback Controls -->
-				<Grid Grid.Row="0" Grid.Column="1" RowDefinitions="Auto,Auto,*" ColumnDefinitions="*,Auto,*" HorizontalAlignment="Center" VerticalAlignment="Top">
-
-					<!-- Now Playing -->
-					<!--
-					<StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,2,0,0" MaxWidth="400" IsVisible="False">
-						<TextBlock Opacity="1">
-							<Run x:Name="CurrentSongTitle" Text="{Binding CurrentSongTitle, Mode=OneWay}"/>
-						</TextBlock>
-						<TextBlock Opacity="0.3" IsVisible="{Binding IsCurrentSongArtistNotNull}">
-							<Run Text=" by "/>
-						</TextBlock>
-						<TextBlock Opacity="0.7">
-							<Run x:Name="CurrentSongArtist" Text="{Binding CurrentSongArtist, Mode=OneWay}"/>
-						</TextBlock>
-						<TextBlock Opacity="0.3" IsVisible="{Binding IsCurrentSongAlbumNotNull}">
-							<Run Text=" from "/>
-						</TextBlock>
-						<TextBlock Opacity="0.5">
-							<Run x:Name="CurrentSongAlbum" Text="{Binding CurrentSongAlbum, Mode=OneWay}" />
-						</TextBlock>
-					</StackPanel>-->
-
-					<!-- Playback Buttons -->
-					<Grid Grid.Row="1" Grid.Column="1" Width="280" RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,*" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,36,0,0">
-
-						<!-- "Play" should be top so that it gets the first keyboard focus -->
-						<Button x:Name="PlayButton" ToolTip.Tip="Play" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="62" Width="62" Background="Transparent" Command="{Binding PlayCommand}" BorderThickness="0">
-							<Viewbox Width="46" Height="46">
-								<PathIcon Background="Transparent" Width="NaN" Height="NaN"
-									Data="{Binding PlayButton, Mode=OneWay}">
-								</PathIcon>
-							</Viewbox>
-						</Button>
-
-						<Button x:Name="BackButton" ToolTip.Tip="Prev" Grid.Column="0" HorizontalAlignment="Center" Height="36" Width="48" Background="Transparent" Command="{Binding PlayPrevCommand}" BorderThickness="0">
-							<Viewbox Width="24" Height="24">
-								<PathIcon Background="Transparent" Width="NaN" Height="NaN"
-									Data="M3 20.25a.75.75 0 0 0 1.5 0V3.75a.75.75 0 1 0-1.5 0v16.5ZM18.23 20.475c1.158.83 2.77.002 2.77-1.422V4.83c0-1.384-1.53-2.22-2.695-1.473l-10.47 6.716a1.75 1.75 0 0 0-.074 2.895l10.47 7.507Zm1.27-1.422a.25.25 0 0 1-.396.203l-10.47-7.507a.25.25 0 0 1 .011-.413l10.47-6.717a.25.25 0 0 1 .385.21v14.224Z">
-								</PathIcon>
-							</Viewbox>
-						</Button>
-
-						<Button x:Name="NextButton" ToolTip.Tip="Next" Grid.Column="2" HorizontalAlignment="Center" Height="36" Width="48" Background="Transparent" Command="{Binding PlayNextCommand}" BorderThickness="0">
-							<Viewbox Width="24" Height="24">
-								<PathIcon Background="Transparent" Width="NaN" Height="NaN"
-									Data="M21 3.75a.75.75 0 0 0-1.5 0v16.5a.75.75 0 0 0 1.5 0V3.75ZM5.77 3.525C4.612 2.695 3 3.523 3 4.947V19.17c0 1.384 1.53 2.22 2.695 1.473l10.47-6.716a1.75 1.75 0 0 0 .074-2.895L5.77 3.525ZM4.5 4.947a.25.25 0 0 1 .396-.203l10.47 7.507a.25.25 0 0 1-.011.413l-10.47 6.717a.25.25 0 0 1-.385-.21V4.946Z">
-								</PathIcon>
-							</Viewbox>
-						</Button>
-
-					</Grid>
-					
-					<Grid Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,2,0,0">
-						<Slider Orientation="Horizontal" Maximum="{Binding Mode=TwoWay,Path=Time}" Value="{Binding Mode=TwoWay,Path=Elapsed,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Minimum="0" Width="400" Margin="0" Padding="0"></Slider>
-					</Grid>
-
-				</Grid>
-
-				<!-- Volume slider and other options -->
-				<Grid Grid.Row="0" Grid.Column="2" ColumnDefinitions="*,Auto" VerticalAlignment="Top" Margin="0,0,0,0" Height="136">
-					<StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="36,0,0,0">
-						<ToggleButton x:Name="RepeatButton" ToolTip.Tip="Repeat All" Width="32" Height="32" Padding="0" Margin="10,0,0,0" IsChecked="{Binding Repeat, Mode=TwoWay}" BorderThickness="0" Background="Transparent">
-							<Viewbox Width="14" Height="14">
-								<PathIcon Background="Transparent" Width="NaN" Height="NaN"
-									Data="m14.61 2.47-.077-.067a.748.748 0 0 0-.983.067l-.068.078a.755.755 0 0 0 .068.987l1.971 1.977H8.5l-.233.004C4.785 5.639 2 8.51 2 12.036c0 1.69.64 3.23 1.692 4.39l.072.069a.751.751 0 0 0 1.08-1.033l-.2-.231A5.009 5.009 0 0 1 3.5 12.035c0-2.771 2.239-5.018 5-5.018h6.881l-1.832 1.84-.067.078a.755.755 0 0 0 .068.987.748.748 0 0 0 1.06 0l3.182-3.193.067-.078a.755.755 0 0 0-.067-.987L14.61 2.47Zm5.62 5.101a.751.751 0 0 0-1.05 1.066 5.01 5.01 0 0 1 1.32 3.398c0 2.772-2.239 5.019-5 5.019H8.558l1.905-1.911.074-.086a.755.755 0 0 0-.007-.902l-.067-.077-.084-.073a.748.748 0 0 0-.9.006l-.076.067-3.182 3.194-.073.085a.755.755 0 0 0 .006.902l.067.077 3.182 3.194.084.072c.293.22.71.195.976-.073a.755.755 0 0 0 .068-.987l-.068-.077-1.899-1.906H15.5l.233-.004C19.215 18.432 22 15.56 22 12.035a6.513 6.513 0 0 0-1.697-4.395l-.073-.069Z">
-								</PathIcon>
-							</Viewbox>
-						</ToggleButton>
-						<ToggleButton x:Name="SingleButton" ToolTip.Tip="Repeat Single" Width="32" Height="32" Padding="0" Margin="10,0,0,0" IsChecked="{Binding Single, Mode=TwoWay}" BorderThickness="0" Background="Transparent">
-							<Viewbox Width="14" Height="14">
-								<PathIcon Background="Transparent" Width="NaN" Height="NaN"
-									Data="M14.6102 2.47047L14.5334 2.4031C14.2394 2.17855 13.818 2.20101 13.5495 2.47047L13.4824 2.54755C13.2587 2.84259 13.281 3.26552 13.5495 3.53498L15.521 5.5118H8.5L8.26687 5.51592C4.785 5.63911 2 8.51085 2 12.0354C2 13.7259 2.6407 15.2663 3.6917 16.4252L3.76407 16.4947C3.89496 16.6065 4.06463 16.674 4.25 16.674C4.66421 16.674 5 16.337 5 15.9213C5 15.7481 4.9417 15.5885 4.84373 15.4613L4.64439 15.2306C3.92953 14.3627 3.5 13.2494 3.5 12.0354C3.5 9.26396 5.73858 7.01725 8.5 7.01725H15.381L13.5495 8.85754L13.4824 8.93463C13.2587 9.22967 13.281 9.6526 13.5495 9.92206C13.8424 10.216 14.3173 10.216 14.6102 9.92206L17.7922 6.72852L17.8593 6.65144C18.083 6.3564 18.0606 5.93347 17.7922 5.66401L14.6102 2.47047ZM20.23 7.57108C20.0999 7.46224 19.9326 7.39677 19.75 7.39677C19.3358 7.39677 19 7.73378 19 8.14949C19 8.33618 19.0677 8.507 19.1791 8.63722C19.9345 9.46055 20.419 10.5381 20.4907 11.7274C21.0285 12.0066 21.5224 12.3587 21.9592 12.7707C21.9861 12.5294 22 12.284 22 12.0354C22 10.342 21.3571 8.79923 20.3029 7.63965L20.23 7.57108ZM8.558 17.0536H11.0151C11.0051 17.2011 11 17.3499 11 17.5C11 17.8606 11.0294 18.2144 11.0858 18.559H8.564L10.4634 20.465L10.5305 20.5421C10.7542 20.8371 10.7319 21.2601 10.4634 21.5295C10.1971 21.7968 9.78044 21.8211 9.48683 21.6024L9.40271 21.5295L6.22073 18.336L6.15361 18.2589C5.95224 17.9934 5.95023 17.6242 6.14756 17.3566L6.22073 17.2715L9.40271 14.0779L9.47951 14.0106C9.74409 13.8085 10.1119 13.8065 10.3785 14.0045L10.4634 14.0779L10.5305 14.155C10.7319 14.4206 10.7339 14.7897 10.5365 15.0573L10.4634 15.1425L8.558 17.0536ZM23 17.5C23 20.5376 20.5376 23 17.5 23C14.4624 23 12 20.5376 12 17.5C12 14.4624 14.4624 12 17.5 12C20.5376 12 23 14.4624 23 17.5ZM18.1149 14.0134C17.8892 13.9601 17.6565 14.069 17.5528 14.2764C17.4958 14.3904 17.2759 14.7286 16.9399 15.1041C16.6058 15.4775 16.1965 15.8427 15.7764 16.0528C15.5294 16.1763 15.4293 16.4766 15.5528 16.7236C15.6763 16.9706 15.9766 17.0707 16.2236 16.9472C16.7128 16.7026 17.1504 16.3312 17.5 15.9699V20.5C17.5 20.7761 17.7239 21 18 21C18.2761 21 18.5 20.7761 18.5 20.5V14.5C18.5 14.2681 18.3406 14.0667 18.1149 14.0134Z">
-								</PathIcon>
-							</Viewbox>
-						</ToggleButton>
-						<ToggleButton x:Name="RandomButton" ToolTip.Tip="Shuffle" Width="32" Height="32" Padding="0" Margin="10,0,0,0" IsChecked="{Binding Random, Mode=TwoWay}" BorderThickness="0" Background="Transparent">
-							<Viewbox Width="14" Height="14">
-								<PathIcon Background="Transparent" Width="NaN" Height="NaN"
-									Data="M19.2803 4.71967C18.9874 4.42678 18.5126 4.42678 18.2197 4.71967C17.9268 5.01256 17.9268 5.48744 18.2197 5.78033L19.4393 6.99999H19.25C15.332 6.99999 12.8269 9.30232 10.5579 11.3877L10.4925 11.4477C8.15388 13.5968 6.04432 15.5 2.75 15.5C2.33579 15.5 2 15.8358 2 16.25C2 16.6642 2.33579 17 2.75 17C6.66803 17 9.1731 14.6977 11.4421 12.6123L11.4421 12.6123L11.5075 12.5522C13.8461 10.4032 15.9557 8.49999 19.25 8.49999H19.4393L18.2197 9.71966C17.9268 10.0126 17.9268 10.4874 18.2197 10.7803C18.5126 11.0732 18.9874 11.0732 19.2803 10.7803L21.7803 8.28032C21.921 8.13967 22 7.9489 22 7.74999C22 7.55108 21.921 7.36031 21.7803 7.21966L19.2803 4.71967ZM2.75 6.99983C5.99799 6.99983 8.27497 8.58203 10.2514 10.3112C10.1492 10.4048 10.0482 10.4978 9.94821 10.5897L9.81591 10.7113C9.58463 10.9239 9.35843 11.1309 9.13588 11.3316C7.28326 9.73131 5.39993 8.49983 2.75 8.49983C2.33579 8.49983 2 8.16405 2 7.74983C2 7.33562 2.33579 6.99983 2.75 6.99983ZM19.25 16.9998C16.0021 16.9998 13.7251 15.4177 11.7487 13.6885C11.8507 13.5951 11.9515 13.5023 12.0513 13.4105L12.0518 13.4101L12.1841 13.2885C12.4154 13.0759 12.6416 12.8688 12.8642 12.6681C14.7168 14.2684 16.6001 15.4998 19.25 15.4998H19.4393L18.2197 14.2802C17.9268 13.9873 17.9268 13.5124 18.2197 13.2195C18.5126 12.9266 18.9874 12.9266 19.2803 13.2195L21.7803 15.7195C21.921 15.8602 22 16.0509 22 16.2498C22 16.4487 21.921 16.6395 21.7803 16.7802L19.2803 19.2802C18.9874 19.5731 18.5126 19.5731 18.2197 19.2802C17.9268 18.9873 17.9268 18.5124 18.2197 18.2195L19.4393 16.9998H19.25Z">
-								</PathIcon>
-							</Viewbox>
-						</ToggleButton>
-						<ToggleButton x:Name="ConsumeButton" ToolTip.Tip="Consume" Width="32" Height="32" Padding="0" Margin="10,0,0,0" IsChecked="{Binding Consume, Mode=TwoWay}" BorderThickness="0" Background="Transparent">
-							<Viewbox Width="14" Height="14">
-								<PathIcon Background="Transparent" Width="NaN" Height="NaN"
-									Data="M3 5.5C3.55228 5.5 4 5.05228 4 4.5C4 3.94772 3.55228 3.5 3 3.5C2.44772 3.5 2 3.94772 2 4.5C2 5.05228 2.44772 5.5 3 5.5ZM6 4.5C6 4.22386 6.22386 4 6.5 4H17.5C17.7761 4 18 4.22386 18 4.5C18 4.77614 17.7761 5 17.5 5H6.5C6.22386 5 6 4.77614 6 4.5ZM6 9.5C6 9.22386 6.22386 9 6.5 9H17.5C17.7761 9 18 9.22386 18 9.5C18 9.77614 17.7761 10 17.5 10H6.5C6.22386 10 6 9.77614 6 9.5ZM10.0224 15C10.0534 14.6566 10.1159 14.3223 10.207 14H6.5C6.22386 14 6 14.2239 6 14.5C6 14.7761 6.22386 15 6.5 15H10.0224ZM4 14.5C4 15.0523 3.55228 15.5 3 15.5C2.44772 15.5 2 15.0523 2 14.5C2 13.9477 2.44772 13.5 3 13.5C3.55228 13.5 4 13.9477 4 14.5ZM3 10.5C3.55228 10.5 4 10.0523 4 9.5C4 8.94772 3.55228 8.5 3 8.5C2.44772 8.5 2 8.94772 2 9.5C2 10.0523 2.44772 10.5 3 10.5ZM20 15.5C20 17.9853 17.9853 20 15.5 20C13.0147 20 11 17.9853 11 15.5C11 13.0147 13.0147 11 15.5 11C17.9853 11 20 13.0147 20 15.5ZM16.2071 15.5L17.3536 14.3536C17.5488 14.1583 17.5488 13.8417 17.3536 13.6464C17.1583 13.4512 16.8417 13.4512 16.6464 13.6464L15.5 14.7929L14.3536 13.6464C14.1583 13.4512 13.8417 13.4512 13.6464 13.6464C13.4512 13.8417 13.4512 14.1583 13.6464 14.3536L14.7929 15.5L13.6464 16.6464C13.4512 16.8417 13.4512 17.1583 13.6464 17.3536C13.8417 17.5488 14.1583 17.5488 14.3536 17.3536L15.5 16.2071L16.6464 17.3536C16.8417 17.5488 17.1583 17.5488 17.3536 17.3536C17.5488 17.1583 17.5488 16.8417 17.3536 16.6464L16.2071 15.5Z">
-								</PathIcon>
-							</Viewbox>
-						</ToggleButton>
-					</StackPanel>
-					<Slider Grid.Column="1" Height="126" Margin="12,0,0,0" Value="{Binding Volume,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Slider>
-				</Grid>
-
-			</Grid>
-
-			<!-- Pages -->
-			<TransitioningContentControl x:Name="ContentFrame" Grid.Row="1" Grid.Column="0" Content="{Binding CurrentPage}"/>
-
-		</Grid>
-
-
-	</Grid>
+	
+	
 </UserControl>

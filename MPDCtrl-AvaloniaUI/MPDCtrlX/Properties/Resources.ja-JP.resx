@@ -288,8 +288,8 @@ SOFTWARE.</value>
   <data name="LocalfileListviewTabitemHeader_LocalFiles" xml:space="preserve">
     <value>ファイル (_F)</value>
   </data>
-  <data name="MenuTreeItem_Browse" xml:space="preserve">
-    <value>ライブラリ</value>
+  <data name="MenuTreeItem_Files" xml:space="preserve">
+    <value>ファイル</value>
   </data>
   <data name="MenuTreeItem_Playlists" xml:space="preserve">
     <value>プレイリスト</value>
@@ -609,5 +609,8 @@ SOFTWARE.</value>
   </data>
   <data name="MenuTreeItem_Artists" xml:space="preserve">
     <value>アーティスト</value>
+  </data>
+  <data name="MenuTreeItem_Library" xml:space="preserve">
+    <value>ライブラリ</value>
   </data>
 </root>

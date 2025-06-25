@@ -23,9 +23,9 @@ public partial class MainWindow : Window//AppWindow//
 
     public MainWindow()
     {
-        this.DataContext = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();
-
         InitializeComponent();
+
+        this.DataContext = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();
 
         this.navigateView.Content = shell;
 
@@ -36,14 +36,6 @@ public partial class MainWindow : Window//AppWindow//
             //this.ContentRendered += vm.OnContentRendered;
 
             //vm.CurrentSongChanged += (sender, arg) => OnCurrentSongChanged(arg);
-            vm.DebugWindowShowHide += () => OnDebugWindowShowHide();
-            //vm.DebugWindowShowHide2 += (sender, arg) => OnDebugWindowShowHide2(arg);
-            vm.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
-            vm.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
-            //vm.DebugCommandClear += () => OnDebugCommandClear();
-            //vm.DebugIdleClear += () => OnDebugIdleClear();
-            vm.AckWindowOutput += (sender, arg) => { this.OnAckWindowOutput(arg); };
-            vm.AckWindowClear += () => OnAckWindowClear();
         }
 
         var os = Environment.OSVersion;
@@ -94,61 +86,6 @@ public partial class MainWindow : Window//AppWindow//
     }
     */
 
-    private readonly StringBuilder _sbCommandOutput = new();
-    public void OnDebugCommandOutput(string arg)
-    {
-        // AppendText() is much faster than data binding.
-        //DebugCommandTextBox.AppendText(arg);
-
-        _sbCommandOutput.Append(arg);
-        DebugCommandTextBox.Text = _sbCommandOutput.ToString();
-        DebugCommandTextBox.CaretIndex = DebugCommandTextBox.Text.Length;
-    }
-
-    private readonly StringBuilder _sbIdleOutput = new();
-    public void OnDebugIdleOutput(string arg)
-    {
-        /*
-        // AppendText() is much faster than data binding.
-        DebugIdleTextBox.AppendText(arg);
-
-        DebugIdleTextBox.CaretIndex = DebugIdleTextBox.Text.Length;
-        DebugIdleTextBox.ScrollToEnd();
-        */
-
-        //_sbIdleOutput.Append(DebugIdleTextBox.Text);
-        _sbIdleOutput.Append(arg);
-        DebugIdleTextBox.Text = _sbIdleOutput.ToString();
-        DebugIdleTextBox.CaretIndex = DebugIdleTextBox.Text.Length;
-    }
-    public void OnAckWindowOutput(string arg)
-    {
-        /*
-        // AppendText() is much faster than data binding.
-        AckTextBox.AppendText(arg);
-
-        AckTextBox.CaretIndex = AckTextBox.Text.Length;
-        AckTextBox.ScrollToEnd();
-        */
-    }
-
-    public void OnAckWindowClear()
-    {
-        //AckTextBox.Clear();
-    }
-
-    public void OnDebugWindowShowHide()
-    {
-        if (this.DebugWindow.IsVisible)
-        {
-            this.DebugWindow.IsVisible = false;
-        }
-        else
-        {
-            this.DebugWindow.IsVisible = true;
-        }
-    }
-
     private void NavigationView_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (sender is not NavigationView)
@@ -185,6 +122,15 @@ public partial class MainWindow : Window//AppWindow//
             {
                 // don't change page here.
                 pl.Selected = false;
+                if (vm.SelectedNodeMenu != null)
+                {
+                    vm.SelectedNodeMenu.Selected = true;
+                }
+            }
+            else if (e.SelectedItem is NodeMenuLibrary lb)
+            {
+                // don't change page here.
+                lb.Selected = false;
                 if (vm.SelectedNodeMenu != null)
                 {
                     vm.SelectedNodeMenu.Selected = true;

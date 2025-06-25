@@ -288,8 +288,8 @@ SOFTWARE.</value>
   <data name="LocalfileListviewTabitemHeader_LocalFiles" xml:space="preserve">
     <value>_Files</value>
   </data>
-  <data name="MenuTreeItem_Browse" xml:space="preserve">
-    <value>Library</value>
+  <data name="MenuTreeItem_Files" xml:space="preserve">
+    <value>Files</value>
   </data>
   <data name="MenuTreeItem_Playlists" xml:space="preserve">
     <value>Playlists</value>
@@ -608,5 +608,8 @@ SOFTWARE.</value>
   </data>
   <data name="MenuTreeItem_Artists" xml:space="preserve">
     <value>Artists</value>
+  </data>
+  <data name="MenuTreeItem_Library" xml:space="preserve">
+    <value>Library</value>
   </data>
 </root>

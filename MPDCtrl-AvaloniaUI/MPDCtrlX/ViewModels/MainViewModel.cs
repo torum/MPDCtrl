@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using Avalonia.Threading;
@@ -7,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentAvalonia.Styling;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting.Internal;
 using MPDCtrlX.Common;
 using MPDCtrlX.Contracts;
 using MPDCtrlX.Models;
@@ -21,6 +23,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Xml;
@@ -38,15 +41,20 @@ public partial class MainDummyViewModel
     }
 }
 
-public partial class MainViewModel : ViewModelBase //ObservableObject //
+public partial class MainViewModel : ViewModelBase //ObservableObject
 {
     #region == Basic ==  
 
-    // Application name
-    const string _appName = "MPDCtrlX";
+    private static readonly string _appName = "MPDCtrlX";
+    private static readonly string _appDeveloper = "torum";
+    private const string _appVer = "v3.1.2.0";
+
+    // Data folder and Config file path.
+    private static readonly string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+    public static string AppDataFolder { get; } = System.IO.Path.Combine((System.IO.Path.Combine(_envDataFolder, _appDeveloper)), _appName);
+    public static string AppConfigFilePath { get; } = System.IO.Path.Combine(AppDataFolder, _appName + ".config");
 
     // Application version
-    const string _appVer = "v3.1.2.0";
 
     public static string AppVer
     {
@@ -73,9 +81,6 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             return _appName + " " + _appVer;
         }
     }
-
-    // For the application config file folder
-    const string _appDeveloper = "torum";
 
     // TODO: no longer used.
     public static bool DeveloperMode
@@ -1522,6 +1527,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             if (value is null)
             {
                 //Debug.WriteLine("selectedNodeMenu is null");
+                SelectedPlaylistName = string.Empty;
                 return;
             }
 
@@ -1549,7 +1555,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
                 */
-                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistsPage>();
+                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistsPage>();
             }
             else if (value is NodeMenuPlaylistItem nmpli)
             {
@@ -1572,13 +1578,27 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                     //PlaylistSongs = new ObservableCollection<SongInfo>((value as NodeMenuPlaylistItem).PlaylistSongs); 
 
                 });
-
+                SelectedPlaylistName = nmpli.Name;
                 CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistItemPage>();
 
                 if ((nmpli.PlaylistSongs.Count == 0) || nmpli.IsUpdateRequied)
                     GetPlaylistSongs(nmpli);
             }
-            else if (value is NodeMenuLibrary nml)
+            else if (value is NodeMenuLibrary)
+            {
+                /*
+                IsQueueVisible = false;
+                IsPlaylistsVisible = false;
+                IsPlaylistItemVisible = false;
+                IsLibraryVisible = true;
+                IsSearchVisible = false;
+                IsArtistVisible = false;
+                IsAlbumVisible = false;
+                */
+                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<LibraryPage>();
+
+            }
+            else if (value is NodeMenuFiles nml)
             {
                 /*
                 IsQueueVisible = false;
@@ -1680,6 +1700,23 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
             }
 
+        }
+    }
+
+    private string _selectedPlaylistName = "";
+    public string SelectedPlaylistName
+    {
+        get
+        {
+            return _selectedPlaylistName;
+        }
+        set
+        {
+            if (_selectedPlaylistName == value)
+                return;
+
+            _selectedPlaylistName = value;
+            NotifyPropertyChanged(nameof(SelectedPlaylistName));
         }
     }
 
@@ -3402,9 +3439,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
         #region == Init config folder and file path ==
 
-        //_appDataFolder = _envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
-        //_appConfigFilePath = _appDataFolder + System.IO.Path.DirectorySeparatorChar + _appName + ".config";
-        System.IO.Directory.CreateDirectory(App.AppDataFolder);
+        System.IO.Directory.CreateDirectory(AppDataFolder);
 
         #endregion
 
@@ -3536,22 +3571,6 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
         #endregion
 
-        #region == Locks == 
-
-        //TODO; not used
-        /*
-        BindingOperations.EnableCollectionSynchronization(Queue, lockQueueObject);
-        BindingOperations.EnableCollectionSynchronization(_mpc.CurrentQueue, lockCurrentQueueObject);
-        
-        BindingOperations.EnableCollectionSynchronization(MusicDirectories, new object());
-        BindingOperations.EnableCollectionSynchronization(MusicEntries, new object());
-        BindingOperations.EnableCollectionSynchronization(SearchResult, new object());
-        BindingOperations.EnableCollectionSynchronization(Playlists, new object());
-        BindingOperations.EnableCollectionSynchronization(PlaylistSongs, new object());
-        BindingOperations.EnableCollectionSynchronization(Profiles, new object());
-        */
-        #endregion
-
         #region == Themes ==
 
         // 
@@ -3588,10 +3607,9 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
         //_mpc.MpcInfo += new MpcService.MpcInfoEvent(OnMpcInfoEvent);
 
-        _mpc.MpcProgress += new MpcService.MpcProgressEvent(OnMpcProgress);
-
+        // [Background][UI] etc
+        //_mpc.MpcProgress += new MpcService.MpcProgressEvent(OnMpcProgress);
         this.UpdateProgress += (sender, arg) => { this.OnUpdateProgress(arg); };
-
 
         #endregion
 
@@ -3627,13 +3645,13 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
         try
         {
             // Load config file.
-            if (File.Exists(App.AppConfigFilePath))
+            if (File.Exists(AppConfigFilePath))
             {
-                XDocument xdoc = XDocument.Load(App.AppConfigFilePath);
+                XDocument xdoc = XDocument.Load(AppConfigFilePath);
                 if (xdoc.Root is not null)
                 {
                     #region == Window setting ==
-                    
+
                     if (sender is Window w)
                     {
                         // Main Window element
@@ -3697,7 +3715,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                             }
                         }
                     }
-                    
+
                     #endregion
 
                     #region == Theme ==
@@ -3933,8 +3951,6 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
                                 }
                             }
                         }
-
-
 
                         #region == Header columns ==
 
@@ -4271,6 +4287,9 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             }
 
             IsFullyLoaded = true;
+
+            // TODO: Since AvaloniaUI does not call OnContentRendered....
+            IsFullyRendered = true;
         }
         catch (System.IO.FileNotFoundException ex)
         {
@@ -4310,6 +4329,13 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
             // start the connection
             Start(CurrentProfile.Host, CurrentProfile.Port);
         }
+
+
+        if (sender is Window win)
+        {
+            //win.Show();
+            //win.IsVisible = true;
+        }
     }
 
     // On window's content rendered <<< TODO: Not called in AvaloniaUI
@@ -4324,6 +4350,13 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
         // Make sure Window and settings have been fully loaded and not overriding with empty data.
         if (!IsFullyLoaded)
             return;
+
+        // TODO: Since AvaloniaUI does not call OnContentRendered....
+        IsFullyRendered = true;
+
+        // This is a dirty work around for AvaloniaUI.
+        QueuePage? qp = (App.Current as App)?.AppHost.Services.GetRequiredService<QueuePage>();
+        qp?.UpdateHeaderWidth();
 
         double windowWidth = 780;
 
@@ -4798,12 +4831,12 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
         try
         {
-            if (!Directory.Exists(App.AppDataFolder))
+            if (!Directory.Exists(AppDataFolder))
             {
-                Directory.CreateDirectory(App.AppDataFolder);
+                Directory.CreateDirectory(AppDataFolder);
             }
 
-            doc.Save(App.AppConfigFilePath);
+            doc.Save(AppConfigFilePath);
         }
         //catch (System.IO.FileNotFoundException) { }
         catch (Exception ex)
@@ -5801,7 +5834,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
         IsWorking = false;
     }
 
-    private void GetLibrary(NodeMenuLibrary librarytNode)
+    private void GetLibrary(NodeMenuFiles librarytNode)
     {
         if (librarytNode is null)
             return;
@@ -8042,8 +8075,8 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
             SelectedPlaylistSong = null;
 
-            if (_mainMenuItems.LibraryDirectory is not null)
-                _mainMenuItems.LibraryDirectory.IsAcquired = false;
+            if (_mainMenuItems.FilesDirectory is not null)
+                _mainMenuItems.FilesDirectory.IsAcquired = false;
 
             MusicEntries.Clear();
 
@@ -8185,8 +8218,8 @@ public partial class MainViewModel : ViewModelBase //ObservableObject //
 
             SelectedPlaylistSong = null;
 
-            if (_mainMenuItems.LibraryDirectory is not null)
-                _mainMenuItems.LibraryDirectory.IsAcquired = false;
+            if (_mainMenuItems.FilesDirectory is not null)
+                _mainMenuItems.FilesDirectory.IsAcquired = false;
 
             MusicEntries.Clear();
 

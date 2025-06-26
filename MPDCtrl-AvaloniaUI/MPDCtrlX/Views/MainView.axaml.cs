@@ -12,18 +12,16 @@ namespace MPDCtrlX.Views;
 
 public partial class MainView : UserControl
 {
-    private readonly MainViewModel? _viewModel;
+    //private readonly MainViewModel? _viewModel;
+    public MainView() { }
 
-    public MainView()//MainViewModel? vm
+    public MainView(MainViewModel? vm)
     {
         InitializeComponent();
 
-        _viewModel = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();//new MainViewModel();//vm ?? throw new ArgumentNullException(nameof(vm), "MainViewModel cannot be null.");
+        DataContext = vm;//App.GetService<MainViewModel>();//new MainViewModel();
 
-        //DataContext = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();//new MainViewModel();
-        DataContext = _viewModel;
-
-        if (_viewModel != null)
+        if (vm is not null)
         {
             // Event subscriptions
             //vm.OnWindowLoaded(this);
@@ -40,14 +38,14 @@ public partial class MainView : UserControl
             //vm.ScrollIntoViewAndSelect += (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
 
 
-            _viewModel.DebugWindowShowHide += () => OnDebugWindowShowHide();
+            vm.DebugWindowShowHide += () => OnDebugWindowShowHide();
             //vm.DebugWindowShowHide2 += (sender, arg) => OnDebugWindowShowHide2(arg);
-            _viewModel.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
-            _viewModel.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
+            vm.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
+            vm.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
             //vm.DebugCommandClear += () => OnDebugCommandClear();
             //vm.DebugIdleClear += () => OnDebugIdleClear();
-            _viewModel.AckWindowOutput += (sender, arg) => { this.OnAckWindowOutput(arg); };
-            _viewModel.AckWindowClear += () => OnAckWindowClear();
+            vm.AckWindowOutput += (sender, arg) => { this.OnAckWindowOutput(arg); };
+            vm.AckWindowClear += () => OnAckWindowClear();
 
         }
 

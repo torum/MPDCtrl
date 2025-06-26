@@ -2,9 +2,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using MPDCtrlX.Models;
-using MPDCtrlX.Services;
 
-namespace MPDCtrlX.Contracts;
+namespace MPDCtrlX.Services;
 
 public interface IMpcService
 {
@@ -15,6 +14,7 @@ public interface IMpcService
     bool IsMpdIdleConnected { get; set; }
     ObservableCollection<string> LocalDirectories { get; }
     ObservableCollection<SongFile> LocalFiles { get; }
+    ObservableCollection<AlbumArtist> AlbumArtists { get; }
     SongInfoEx? MpdCurrentSong { get; }
     string MpdHost { get; }
     string MpdPassword { get; }
@@ -73,6 +73,7 @@ public interface IMpcService
     Task<CommandResult> MpdQueryCurrentQueue(bool autoIdling = true);
     Task<CommandResult> MpdQueryCurrentSong(bool autoIdling = true);
     Task<CommandResult> MpdQueryListAll(bool autoIdling = true);
+    Task<CommandResult> MpdQueryListArtists(bool autoIdling = true);
     Task<CommandResult> MpdQueryPlaylists(bool autoIdling = true);
     Task<CommandPlaylistResult> MpdQueryPlaylistSongs(string playlistName, bool autoIdling = true);
     Task<CommandResult> MpdQueryStatus(bool autoIdling = true);

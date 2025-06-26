@@ -66,8 +66,8 @@
     <Compile Update="Views\QueuePage.axaml.cs">
       <DependentUpon>QueuePage.axaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\LibraryPage.axaml.cs">
-      <DependentUpon>LibraryPage.axaml</DependentUpon>
+    <Compile Update="Views\FilesPage.axaml.cs">
+      <DependentUpon>FilesPage.axaml</DependentUpon>
     </Compile>
     <Compile Update="Views\SettingsPage.axaml.cs">
       <DependentUpon>SettingsPage.axaml</DependentUpon>

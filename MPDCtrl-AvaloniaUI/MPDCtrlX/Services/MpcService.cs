@@ -1,5 +1,4 @@
 using Avalonia.Threading;
-using MPDCtrlX.Contracts;
 using MPDCtrlX.Models;
 using System;
 using System.Collections.Generic;
@@ -41,6 +40,10 @@ public class MpcService : IMpcService
     public ObservableCollection<SongFile> LocalFiles { get; private set; } = [];
 
     public ObservableCollection<String> LocalDirectories { get; private set; } = [];
+
+    public ObservableCollection<AlbumArtist> AlbumArtists { get; private set; } = [];
+
+    //public ObservableCollection<Album> Albums { get; private set; } = [];
 
     public ObservableCollection<SongInfo> SearchResult { get; private set; } = [];
 
@@ -1611,6 +1614,21 @@ public class MpcService : IMpcService
             MpcProgress?.Invoke(this, "[Background] Parsing files and directories...");
             result.IsSuccess = await ParseListAll(result.ResultText);
             MpcProgress?.Invoke(this, "[Background] Files and directories updated.");
+        }
+
+        return result;
+    }
+    
+    public async Task<CommandResult> MpdQueryListArtists(bool autoIdling = true)
+    {
+        MpcProgress?.Invoke(this, "[Background] Querying artists...");
+
+        CommandResult result = await MpdCommandSendCommand("list album group albumartist", autoIdling);
+        if (result.IsSuccess)
+        {
+            MpcProgress?.Invoke(this, "[Background] Parsing artists...");
+            result.IsSuccess = await ParseListAlbumGroupAlbumArtist(result.ResultText);
+            MpcProgress?.Invoke(this, "[Background] Artists updated.");
         }
 
         return result;
@@ -3235,7 +3253,81 @@ public class MpcService : IMpcService
             IsBusy?.Invoke(this, false);
         }
 
-        return Task.FromResult(true); ;
+        return Task.FromResult(true);
+    }
+
+    private Task<bool> ParseListAlbumGroupAlbumArtist(string result)
+    {
+        if (MpdStop) return Task.FromResult(false);
+
+        if (string.IsNullOrEmpty(result)) return Task.FromResult(false);
+
+        List<string> resultLines = result.Split('\n').ToList();
+
+        if (resultLines.Count == 0) return Task.FromResult(false);
+
+        try
+        {
+            IsBusy?.Invoke(this, true);
+
+            AlbumArtists.Clear();
+            //Albums.Clear();
+
+            int i = 0;
+
+            foreach (string value in resultLines)
+            {
+                AlbumArtist? arts = null;
+                //Debug.WriteLine("LocalDirectories: " + value);
+                if (value.StartsWith("AlbumArtist:"))
+                {
+                    arts = new AlbumArtist();
+                    arts.Name = value.Replace("AlbumArtist: ", "");
+                    AlbumArtists.Add(arts);
+
+                    MpcProgress?.Invoke(this, string.Format("[Background] Parsing AlbumArtists ({0})...", i));
+                }
+                else if (value.StartsWith("Album:"))
+                {
+                    var alb = new Album
+                    {
+                        Name = value.Replace("Album: ", "")
+                    };
+
+                    arts?.Albums.Add(alb);
+
+                    i++;
+
+                    MpcProgress?.Invoke(this, string.Format("[Background] Parsing albumartists and albums ({0})...", i));
+                }
+                else if ((value.StartsWith("OK")))
+                {
+                    // Ignoring.
+                }
+                else
+                {
+                    //Debug.WriteLine(value);
+                }
+            }
+
+            MpcProgress?.Invoke(this, "[Background] Parsing albumartists and albums is done.");
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine("Error@ParseListAlbumGroupAlbumArtist: " + e.ToString());
+
+            //Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParseListAlbumGroupAlbumArtist", e.Message); });
+            Dispatcher.UIThread.Post(() =>{ App.AppendErrorLog("Exception@MPC@ParseListAlbumGroupAlbumArtist", e.Message); });
+
+            IsBusy?.Invoke(this, false);
+            return Task.FromResult(false); ;
+        }
+        finally
+        {
+            IsBusy?.Invoke(this, false);
+        }
+
+        return Task.FromResult(true);
     }
 
     private Task<bool> ParseSearchResult(string result)

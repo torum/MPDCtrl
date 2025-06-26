@@ -12,7 +12,7 @@
 		x:DataType="vm:MainViewModel"
         Icon="/Assets/MPDCtrlX.ico"
         Title="MPDCtrlX"
-             x:CompileBindings="True" Cursor="Arrow" WindowStartupLocation="CenterScreen">
+             x:CompileBindings="True" Cursor="Arrow" WindowStartupLocation="Manual">
 	<!-- Background="{DynamicResource ThemeBackgroundBrush}" -->
 	<!-- <views:MainView/> -->
 	<Window.Resources>

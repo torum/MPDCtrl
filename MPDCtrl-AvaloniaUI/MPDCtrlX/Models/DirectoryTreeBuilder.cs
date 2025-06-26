@@ -78,7 +78,9 @@ public class DirectoryTreeBuilder : NodeTree
         foreach (var pathDir in dirs)
         {
             // for responsivenesss.
-            await Task.Delay(1); //<- not good. But Avalonia's TreeView does not support virtualization..
+            await Task.Delay(1); //<- not good practice, but Avalonia's TreeView does not support virtualization..
+
+            //await Task.Yield();
 
             // changed profile etc.
             if (IsCanceled)

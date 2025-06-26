@@ -12,8 +12,12 @@
              x:CompileBindings="True">
 	<Grid RowDefinitions="Auto,*" Margin="8,0,0,0">
 
-		<Border Grid.Row="0" Grid.Column="0" BorderBrush="{DynamicResource CardStrokeBorderBrush}" BorderThickness="0,0,0,0">
-			<StackPanel Spacing="24" Margin="7 12 0 12" Orientation="Horizontal" HorizontalAlignment="Left">
+		<Grid Grid.Row="0" Grid.Column="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"></ColumnDefinition>
+				<ColumnDefinition Width="Auto"></ColumnDefinition>
+			</Grid.ColumnDefinitions>
+			<StackPanel Grid.Column="0" Spacing="24" Margin="7 12 24 12" Orientation="Horizontal" HorizontalAlignment="Left">
 				<TextBlock Text="Playlist" Theme="{StaticResource TitleTextBlockStyle}" VerticalAlignment="Bottom" Margin="3,0,0,0"/>
 
 				<!-- <TextBlock Theme="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Bottom">
@@ -22,14 +26,17 @@
 				<TextBlock Theme="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Bottom" Padding="0,0,0,4">
 					<Run Text="{Binding SelectedPlaylistName, Mode=OneWay}"/>
 				</TextBlock>
-				<TextBlock Theme="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Bottom" Padding="0,0,0,4">
+				<Button Content="Play"></Button>
+
+			</StackPanel>
+			<StackPanel Grid.Column="1" Spacing="24" Margin="7 12 24 12" Orientation="Horizontal" HorizontalAlignment="Right">
+				<TextBlock Theme="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Bottom" Padding="0,0,0,4" Opacity="0.7">
 					<Run Text="Files"/>
 					<Run Text=": "/>
 					<Run Text="{Binding PlaylistSongs.Count, Mode=OneWay}"/>
 				</TextBlock>
-
 			</StackPanel>
-		</Border>
+		</Grid>
 
 		<!-- PlaylistItem ListBox -->
 		<Grid Grid.Row="1" RowDefinitions="1,Auto,1,*" Margin="0,0,0,0">

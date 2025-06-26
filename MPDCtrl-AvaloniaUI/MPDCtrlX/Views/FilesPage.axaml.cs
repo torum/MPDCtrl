@@ -6,11 +6,11 @@ using MPDCtrlX.ViewModels;
 
 namespace MPDCtrlX.Views;
 
-public partial class LibraryPage : UserControl
+public partial class FilesPage : UserControl
 {
     private readonly MainViewModel? _viewModel;
 
-    public LibraryPage()
+    public FilesPage()
     {
         _viewModel = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();
         DataContext = _viewModel;

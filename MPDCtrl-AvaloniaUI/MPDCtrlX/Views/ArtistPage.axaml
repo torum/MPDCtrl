@@ -6,11 +6,154 @@
 			 d:DesignWidth="800" d:DesignHeight="450"
 			 xmlns:vm="clr-namespace:MPDCtrlX.ViewModels"
              xmlns:tn="clr-namespace:MPDCtrlX.ViewModels.Classes"
-			 xmlns:sng="clr-namespace:MPDCtrlX.Models"
+			 xmlns:mod="clr-namespace:MPDCtrlX.Models"
              x:Class="MPDCtrlX.Views.ArtistPage"
 			 x:DataType="vm:MainViewModel"
              x:CompileBindings="True">
 
+	<Design.DataContext>
+		<!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+		<vm:MainDummyViewModel />
+	</Design.DataContext>
 
-	Artist Page!
+	<!-- Artists -->
+	<Grid Margin="8,0,0,0">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"></RowDefinition>
+			<RowDefinition Height="*"></RowDefinition>
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="1*" MinWidth="230"/>
+			<ColumnDefinition Width="8"/>
+			<ColumnDefinition Width="3*"/>
+		</Grid.ColumnDefinitions>
+
+		<Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="{DynamicResource CardStrokeBorderBrush}" BorderThickness="0,0,0,0">
+			<StackPanel Spacing="24" Margin="7 12 0 12" Orientation="Horizontal" HorizontalAlignment="Left">
+				<TextBlock Text="Artists" Theme="{StaticResource TitleTextBlockStyle}" VerticalAlignment="Bottom" Margin="3,0,0,0"/>
+
+				<!-- <TextBlock Theme="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Bottom">
+					<Run Text="Search Key"/><Run Text="{Binding SelectedSearchTag.Label,Mode=OneWay}"/><Run Text=": "/><Run Text="{Binding SearchQuery, Mode=OneWay}"/></TextBlock> -->
+				<!--
+				<TextBlock Theme="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Bottom" Padding="0,0,0,4">
+					<Run Text="Total Files"/>
+					<Run Text=": "/>
+					<Run Text="{Binding MusicEntries.Count, Mode=OneWay}"/>
+				</TextBlock>
+                -->
+			</StackPanel>
+		</Border>
+
+        <Grid Grid.Row="1" Grid.Column="0" RowDefinitions="1,*">
+			<Border Grid.Row="0" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.5"></Border>
+			<ListBox Grid.Row="1" MinWidth="230" ItemsSource="{Binding AlbumArtists}" SelectionMode="Single" Loaded="ListBox_Loaded" BorderThickness="0" Margin="0,3,0,0" ScrollViewer.AllowAutoHide="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+				<!--  Background="{DynamicResource LayerFillColorDefaultBrush}" -->
+				<ListBox.ItemsPanel>
+					<ItemsPanelTemplate>
+						<VirtualizingStackPanel />
+					</ItemsPanelTemplate>
+				</ListBox.ItemsPanel>
+				<ListBox.ItemTemplate>
+					<DataTemplate x:DataType="mod:AlbumArtist">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="48"></ColumnDefinition>
+								<ColumnDefinition MinWidth="138"></ColumnDefinition>
+							</Grid.ColumnDefinitions>
+							<Canvas Background="Transparent" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center">
+								<Ellipse Fill="Gray" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+							</Canvas>
+							<Border Name="bdrArtistName" Grid.Row="0" Grid.Column="1">
+								<TextBlock Text="{Binding Name}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxWidth="{Binding Bounds.Size.Width, ElementName=bdrArtistName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="0,0,0,0" Opacity="0.9">
+								</TextBlock>
+							</Border>
+						</Grid>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+				<ListBox.Styles>
+					<Style Selector="ListBoxItem">
+						<Setter Property="Height" Value="48"/>
+						<Setter Property="MinHeight" Value="48"/>
+						<Setter Property="Padding" Value="0,0,6,0" />
+					</Style>
+				</ListBox.Styles>
+
+			</ListBox>
+        </Grid>
+
+		<!-- Song list of selected artists -->
+		<Grid Grid.Row="1" Grid.Column="2">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="*"/>
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+
+			<Grid Grid.Row="1" Grid.Column="0" RowDefinitions="1,Auto,1,*" Margin="8,0,0,0">
+				<Border Grid.Row="0" BorderThickness="1,0,0,0" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6"></Border>
+				<Grid Grid.Row="1" DockPanel.Dock="Top" Height="30" Margin="1,0,0,0">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"></ColumnDefinition>
+						<ColumnDefinition Width="4"></ColumnDefinition>
+						<ColumnDefinition Width="Auto"></ColumnDefinition>
+						<ColumnDefinition Width="4"></ColumnDefinition>
+						<ColumnDefinition Width="*"></ColumnDefinition>
+					</Grid.ColumnDefinitions>
+
+					<Grid Grid.Column="0" Name="Artist1">
+						<Label Name="Artist1x" Opacity="0.5" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center">File Name</Label>
+					</Grid>
+
+					<GridSplitter Grid.Column="1" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" ResizeDirection="Columns" MaxWidth="4"/>
+					<Grid Grid.Column="2" Name="Artist2">
+						<Label Name="Artist2x" Opacity="0.5" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center">File Path</Label>
+					</Grid>
+
+					<GridSplitter Grid.Column="3" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" ResizeDirection="Columns"/>
+
+				</Grid>
+				<Border Grid.Row="2" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.5"></Border>
+				<ListBox Grid.Row="3" SelectionMode="Multiple" Loaded="ListBox_Loaded" BorderThickness="0" Margin="0,3,0,0" ScrollViewer.AllowAutoHide="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+					<!--  Background="{DynamicResource LayerFillColorDefaultBrush}" -->
+					<ListBox.ItemsPanel>
+						<ItemsPanelTemplate>
+							<VirtualizingStackPanel />
+						</ItemsPanelTemplate>
+					</ListBox.ItemsPanel>
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="Auto"></ColumnDefinition>
+									<ColumnDefinition Width="4"></ColumnDefinition>
+									<ColumnDefinition Width="Auto"></ColumnDefinition>
+									<ColumnDefinition Width="4"></ColumnDefinition>
+									<ColumnDefinition Width="*"></ColumnDefinition>
+									<!-- Width="{Binding Width, ElementName=test3}" MinWidth="{Binding MinWidth, ElementName=test3}" MaxWidth="{Binding MaxWidth, ElementName=test3}" -->
+								</Grid.ColumnDefinitions>
+								<TextBlock Grid.Column="0" Width="{Binding Bounds.Size.Width, ElementName=Artist1}" Text="" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+								</TextBlock>
+								<TextBlock Grid.Column="2" Width="{Binding Bounds.Size.Width, ElementName=Artist2}" Text="" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+								</TextBlock>
+							</Grid>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+					<ListBox.Styles>
+						<Style Selector="ListBoxItem">
+							<Setter Property="Height" Value="36"/>
+							<Setter Property="MinHeight" Value="32"/>
+							<Setter Property="Padding" Value="0,0,6,0" />
+						</Style>
+					</ListBox.Styles>
+
+				</ListBox>
+			</Grid>
+
+
+		</Grid>
+
+	</Grid>
 </UserControl>

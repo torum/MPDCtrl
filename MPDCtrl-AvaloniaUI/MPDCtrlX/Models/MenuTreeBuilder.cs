@@ -224,7 +224,7 @@ public class MenuTreeBuilder : NodeTree
         NodeMenuPlaylists playlists = new(Properties.Resources.MenuTreeItem_Playlists)
         {
             Selected = false,
-            Expanded = true,
+            Expanded = false,
 
             Parent = this
         };

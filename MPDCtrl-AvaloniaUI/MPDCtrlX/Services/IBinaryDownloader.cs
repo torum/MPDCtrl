@@ -1,7 +1,7 @@
 using MPDCtrlX.Models;
 using System.Threading.Tasks;
 
-namespace MPDCtrlX.Contracts;
+namespace MPDCtrlX.Services;
 
 public interface IBinaryDownloader
 {

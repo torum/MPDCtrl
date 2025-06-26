@@ -2,9 +2,9 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using FluentAvalonia.UI.Windowing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MPDCtrlX.Contracts;
 using MPDCtrlX.Models;
 using MPDCtrlX.Services;
 using MPDCtrlX.ViewModels;
@@ -18,6 +18,9 @@ namespace MPDCtrlX;
 
 public partial class App : Application
 {
+
+    public static readonly string AppName = "MPDCtrlX";
+
     public IHost AppHost { get; private set; }
 
     public App()
@@ -35,7 +38,7 @@ public partial class App : Application
 
                     services.AddSingleton<QueuePage>(); 
                     services.AddSingleton<SearchPage>(); 
-                    services.AddSingleton<LibraryPage>(); 
+                    services.AddSingleton<FilesPage>(); 
                     //services.AddSingleton<PlaylistsPage>(); 
                     services.AddSingleton<PlaylistItemPage>(); 
                     services.AddSingleton<AlbumPage>();
@@ -69,19 +72,23 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
+            /*
+            desktop.MainWindow = new MainWindow()
             {
                 
             };
+            */
+
+            desktop.MainWindow = App.GetService<MainWindow>();
+            desktop.MainWindow.Show();
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
     // Log file.
-    private static readonly string _appName = "MPDCtrlX";
     private static readonly StringBuilder _errortxt = new();
-    private static readonly string _logFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + _appName + "_errors.txt";
+    private static readonly string _logFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + AppName + "_errors.txt";
 
     public static void AppendErrorLog(string errorTxt, string kindTxt)
     {

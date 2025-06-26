@@ -7,7 +7,7 @@
 			 xmlns:vm="clr-namespace:MPDCtrlX.ViewModels"
 			 xmlns:mod="clr-namespace:MPDCtrlX.Models"
 			 xmlns:prop="clr-namespace:MPDCtrlX.Properties"
-             x:Class="MPDCtrlX.Views.LibraryPage"
+             x:Class="MPDCtrlX.Views.FilesPage"
 			 x:DataType="vm:MainViewModel"
              x:CompileBindings="True">
 	
@@ -17,7 +17,7 @@
 		<vm:MainDummyViewModel />
 	</Design.DataContext>
 
-	<!-- Library -->
+	<!-- Directories and files -->
 	<Grid Margin="8,0,0,0">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"></RowDefinition>
@@ -29,9 +29,12 @@
 			<ColumnDefinition Width="3*"/>
 		</Grid.ColumnDefinitions>
 
-
-		<Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="{DynamicResource CardStrokeBorderBrush}" BorderThickness="0,0,0,0">
-			<StackPanel Spacing="24" Margin="7 12 0 12" Orientation="Horizontal" HorizontalAlignment="Left">
+		<Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"></ColumnDefinition>
+				<ColumnDefinition Width="Auto"></ColumnDefinition>
+			</Grid.ColumnDefinitions>
+			<StackPanel Grid.Column="0" Spacing="24" Margin="7 12 24 12" Orientation="Horizontal" HorizontalAlignment="Left">
 				<TextBlock Text="Files" Theme="{StaticResource TitleTextBlockStyle}" VerticalAlignment="Bottom" Margin="3,0,0,0"/>
 
 				<!-- <TextBlock Theme="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Bottom">
@@ -43,11 +46,7 @@
 					<Run Text="{Binding MusicDirectoriesCount, Mode=OneWay}"/>
 				</TextBlock>
 				-->
-				<TextBlock Theme="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Bottom" Padding="0,0,0,4">
-					<Run Text="Total Files"/>
-					<Run Text=": "/>
-					<Run Text="{Binding MusicEntries.Count, Mode=OneWay}"/>
-				</TextBlock>
+
 				<!--
 				<TextBlock Theme="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Bottom" Padding="0,0,0,4">
 					<Run Text="Files"/>
@@ -56,7 +55,14 @@
 				</TextBlock>
 				-->
 			</StackPanel>
-		</Border>
+			<StackPanel Grid.Column="1" Spacing="24" Margin="7 12 24 12" Orientation="Horizontal" HorizontalAlignment="Right">
+				<TextBlock Theme="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Bottom" Padding="0,0,0,4">
+					<Run Text="Total Files"/>
+					<Run Text=": "/>
+					<Run Text="{Binding MusicEntries.Count, Mode=OneWay}"/>
+				</TextBlock>
+			</StackPanel>
+		</Grid>
 
 		<!--
 		<TreeDataGrid Grid.Row="0" Grid.Column="0" BorderThickness="0 0 0 0" Source="{Binding MusicDirectoriesSource, Mode=TwoWay}" />

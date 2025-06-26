@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Styling;
@@ -12,31 +13,52 @@ using MPDCtrlX.Views;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime;
 using System.Text;
+
 
 namespace MPDCtrlX.Views;
 
 public partial class MainWindow : Window//AppWindow//
 {
-    private readonly MainView? shell = (App.Current as App)?.AppHost.Services.GetRequiredService<MainView>();
-    private readonly SettingsPage? settings = (App.Current as App)?.AppHost.Services.GetRequiredService<SettingsPage>();
+    private readonly MainView? _shellPage;// = (App.Current as App)?.AppHost.Services.GetRequiredService<MainView>();
+    private readonly SettingsPage? _settingsPage;// = (App.Current as App)?.AppHost.Services.GetRequiredService<SettingsPage>();
+    public MainWindow() { }
 
-    public MainWindow()
+    public MainWindow(MainView shellPage, MainViewModel vm, SettingsPage settingsPage)
     {
+        _shellPage = shellPage;
+        _settingsPage = settingsPage;
+
+        this.DataContext = vm;
+        
+        #region == This must be before InitializeComponent() ==
+
+        if ((vm.WindowLeft > 0) && (vm.WindowTop > 0)) 
+        {
+            this.Position = new PixelPoint(vm.WindowLeft, vm.WindowTop);
+        }
+
+        if (vm.WindowHeight > 200)
+        {
+            this.Height = vm.WindowHeight;
+        }
+
+        if (vm.WindowWidth > 200)
+        {
+            this.Width = vm.WindowWidth;
+        }
+
+        #endregion
+
         InitializeComponent();
 
-        this.DataContext = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();
+        this.navigateView.Content = shellPage;
 
-        this.navigateView.Content = shell;
-
-        if (this.DataContext is MainViewModel vm)
-        {
-            this.Loaded += vm.OnWindowLoaded;
-            this.Closing += vm.OnWindowClosing;
-            //this.ContentRendered += vm.OnContentRendered;
-
-            //vm.CurrentSongChanged += (sender, arg) => OnCurrentSongChanged(arg);
-        }
+        this.Loaded += vm.OnWindowLoaded;
+        this.Closing += vm.OnWindowClosing;
+        //this.ContentRendered += vm.OnContentRendered;
+        //vm.CurrentSongChanged += (sender, arg) => OnCurrentSongChanged(arg);
 
         var os = Environment.OSVersion;
         /*
@@ -75,8 +97,8 @@ public partial class MainWindow : Window//AppWindow//
             //ExtendClientAreaToDecorationsHint = false;
         }
 
-        this.Activated += (sender, e) => { shell?.WindowActivated();  };
-        this.Deactivated += (sender, e) => { shell?.WindowDeactivated(); };
+        this.Activated += (sender, e) => { shellPage?.WindowActivated();  };
+        this.Deactivated += (sender, e) => { shellPage?.WindowDeactivated(); };
     }
 
     /*
@@ -149,13 +171,13 @@ public partial class MainWindow : Window//AppWindow//
         {
             if (e.IsSettingsInvoked == true)
             {
-                nv.Content = settings;
+                nv.Content = _settingsPage;
                 return;
             }
 
-            if (nv.Content != shell)
+            if (nv.Content != _shellPage)
             {
-                nv.Content = shell;
+                nv.Content = _shellPage;
             }
         }
     }

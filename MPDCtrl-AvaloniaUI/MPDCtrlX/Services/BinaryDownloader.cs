@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
-using MPDCtrlX.Contracts;
 using MPDCtrlX.Models;
 using System;
 using System.Collections.Generic;

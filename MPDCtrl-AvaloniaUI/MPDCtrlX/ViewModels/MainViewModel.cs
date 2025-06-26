@@ -10,7 +10,6 @@ using FluentAvalonia.Styling;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting.Internal;
 using MPDCtrlX.Common;
-using MPDCtrlX.Contracts;
 using MPDCtrlX.Models;
 using MPDCtrlX.Services;
 using MPDCtrlX.Views;
@@ -24,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Xml;
@@ -45,7 +45,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 {
     #region == Basic ==  
 
-    private static readonly string _appName = "MPDCtrlX";
+    private static readonly string _appName = App.AppName;
     private static readonly string _appDeveloper = "torum";
     private const string _appVer = "v3.1.2.0";
 
@@ -98,6 +98,12 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
     #endregion
 
     #region == Layout ==
+
+    public int WindowTop = 0;
+    public int WindowLeft = 0;
+    public double WindowHeight = 0;
+    public double WindowWidth = 0;
+    public WindowState WindowState = WindowState.Normal;
 
     private bool _isFullyLoaded;
     public bool IsFullyLoaded
@@ -180,6 +186,20 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
             _isNavigationViewMenuOpen = value;
             NotifyPropertyChanged(nameof(IsNavigationViewMenuOpen));
+            //
+
+            foreach (var hoge in MainMenuItems)
+            {
+                if (hoge is NodeMenuLibrary lib)
+                {
+                    lib.Expanded = _isNavigationViewMenuOpen;
+                }
+                else if (hoge is NodeMenuPlaylists plt)
+                {
+                    plt.Expanded = _isNavigationViewMenuOpen;
+                }
+            }
+
         }
     }
 
@@ -1500,7 +1520,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
     #endregion
 
-    #region == NavigationView/TreeView Menu (Queue, Library, Search, Playlists, Playlist) ==
+    #region == NavigationView/TreeView Menu (Queue, Files, Search, Playlists, Playlist) ==
 
     #region == MenuTree ==
 
@@ -1609,11 +1629,11 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
                 */
-                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<LibraryPage>();
+                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<FilesPage>();
 
                 if (!nml.IsAcquired || (MusicDirectories.Count <= 1) && (MusicEntries.Count == 0))
                 {
-                    GetLibrary(nml);
+                    GetFiles(nml);
                 }
             }
             else if (value is NodeMenuSearch)
@@ -1642,7 +1662,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 */
                 CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<AlbumPage>();
             }
-            else if (value is NodeMenuArtist)
+            else if (value is NodeMenuArtist nma)
             {
                 /*
                 IsQueueVisible = false;
@@ -1654,6 +1674,11 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 IsAlbumVisible = false;
                 */
                 CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<ArtistPage>();
+
+                if (!nma.IsAcquired || (AlbumArtists.Count < 1))
+                {
+                    GetAlbumArtists(nma);
+                }
             }
             else if (value is NodeMenu)
             {
@@ -1694,12 +1719,6 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
             _currentpage = value;
             this.NotifyPropertyChanged(nameof(CurrentPage));
-
-            if (_currentpage is LibraryPage)
-            {
-
-            }
-
         }
     }
 
@@ -2021,7 +2040,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
     #endregion
 
-    #region == Library ==
+    #region == Files ==
 
     /*
     private HierarchicalTreeDataGridSource<NodeTree>? _musicDirectoriesSource;
@@ -2339,6 +2358,24 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
             collectionView.Refresh();
             */
+        }
+    }
+
+    #endregion
+
+    #region == Artists ==
+
+    private ObservableCollection<AlbumArtist> _albumArtists = [];
+    public ObservableCollection<AlbumArtist> AlbumArtists
+    {
+        get { return _albumArtists; }
+        set
+        {
+            if (_albumArtists == value)
+                return;
+
+            _albumArtists = value;
+            NotifyPropertyChanged(nameof(AlbumArtists));
         }
     }
 
@@ -3437,12 +3474,6 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
     {
         _mpc = mpcService;
 
-        #region == Init config folder and file path ==
-
-        System.IO.Directory.CreateDirectory(AppDataFolder);
-
-        #endregion
-
         #region == Init commands ==
 
         PlayCommand = new RelayCommand(PlayCommand_ExecuteAsync, PlayCommand_CanExecute);
@@ -3569,6 +3600,8 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         TreeviewMenuItemLoadPlaylistCommand = new RelayCommand(TreeviewMenuItemLoadPlaylistCommand_Execute, TreeviewMenuItemLoadPlaylistCommand_CanExecute);
         TreeviewMenuItemClearLoadPlaylistCommand = new RelayCommand(TreeviewMenuItemClearLoadPlaylistCommand_Execute, TreeviewMenuItemClearLoadPlaylistCommand_CanExecute);
 
+        GetArtistsCommand = new RelayCommand(GetArtistsCommand_ExecuteAsync, GetArtistsCommand_CanExecute);
+
         #endregion
 
         #region == Themes ==
@@ -3621,11 +3654,22 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
         #endregion
 
+
+
+        #region == Load settings ==
+
+        System.IO.Directory.CreateDirectory(AppDataFolder);
+
+        LoadSettings();
+
+        #endregion
+
+
         // start the connection
         IsShowDebugWindow = false;
         IsAutoScrollToNowPlaying = true;
         Start("localhost", 6600);
-        Volume = 20;
+        //Volume = 20;
         IsWorking = false;
         IsSaveLog = true;
 
@@ -3633,12 +3677,14 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         _faTheme!.PreferSystemTheme = true;
         _faTheme.CustomAccentColor = Avalonia.Media.Color.FromRgb(28, 96, 168);
         //(Application.Current as App)!.RequestedThemeVariant = ThemeVariant.Light;
+
+
+
     }
 
     #region == Startup and Shutdown ==
 
-    // Startup
-    public void OnWindowLoaded(object? sender, EventArgs e)
+    public void LoadSettings()
     {
         #region == Load app setting  ==
 
@@ -3652,66 +3698,69 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 {
                     #region == Window setting ==
 
-                    if (sender is Window w)
+                    // Main Window element
+                    var mainWindow = xdoc.Root.Element("MainWindow");
+                    if (mainWindow is not null)
                     {
-                        // Main Window element
-                        var mainWindow = xdoc.Root.Element("MainWindow");
-                        if (mainWindow is not null)
+                        int wY = 24;
+                        int wX = 24;
+
+                        var hoge = mainWindow.Attribute("top");
+                        if (hoge is not null)
                         {
-                            int wY = 24;
-                            int wX = 24;
-
-                            var hoge = mainWindow.Attribute("top");
-                            if (hoge is not null)
+                            //w.Top = double.Parse(hoge.Value);
+                            //wY = int.Parse(hoge.Value);
+                            if (Int32.TryParse(hoge.Value, out wY))
                             {
-                                //w.Top = double.Parse(hoge.Value);
-                                //wY = int.Parse(hoge.Value);
-                                if (Int32.TryParse(hoge.Value, out wY))
-                                {
-                                }
+                                WindowTop = wY;
                             }
+                        }
 
-                            hoge = mainWindow.Attribute("left");
-                            if (hoge is not null)
+                        hoge = mainWindow.Attribute("left");
+                        if (hoge is not null)
+                        {
+                            //w.Left = double.Parse(hoge.Value);
+                            //wX = int.Parse(hoge.Value);
+                            if (Int32.TryParse(hoge.Value, out wX))
                             {
-                                //w.Left = double.Parse(hoge.Value);
-                                //wX = int.Parse(hoge.Value);
-                                if (Int32.TryParse(hoge.Value, out wX))
-                                {
-                                }
+                                WindowLeft = wX;
                             }
+                        }
 
-                            w.Position = new PixelPoint(wX, wY);
+                        //w.Position = new PixelPoint(wX, wY);
 
-                            hoge = mainWindow.Attribute("height");
-                            if (hoge is not null)
+                        hoge = mainWindow.Attribute("height");
+                        if (hoge is not null)
+                        {
+                            //w.Height = double.Parse(hoge.Value);
+                            WindowHeight = double.Parse(hoge.Value);
+                        }
+
+                        hoge = mainWindow.Attribute("width");
+                        if (hoge is not null)
+                        {
+                            //w.Width = double.Parse(hoge.Value);
+                            WindowWidth = double.Parse(hoge.Value);
+                        }
+
+                        hoge = mainWindow.Attribute("state");
+                        if (hoge is not null)
+                        {
+                            if (hoge.Value == "Maximized")
                             {
-                                w.Height = double.Parse(hoge.Value);
+                                //w.WindowState = WindowState.Maximized;
+                                // Since there is no restorebounds in AvaloniaUI.
+                                WindowState = WindowState.Normal;
                             }
-
-                            hoge = mainWindow.Attribute("width");
-                            if (hoge is not null)
+                            else if (hoge.Value == "Normal")
                             {
-                                w.Width = double.Parse(hoge.Value);
+                                //w.WindowState = WindowState.Normal;
+                                WindowState = WindowState.Normal;
                             }
-
-                            hoge = mainWindow.Attribute("state");
-                            if (hoge is not null)
+                            else if (hoge.Value == "Minimized")
                             {
-                                if (hoge.Value == "Maximized")
-                                {
-                                    w.WindowState = WindowState.Maximized;
-                                    // Since there is no restorebounds in AvaloniaUI.
-                                    //w.WindowState = WindowState.Normal;
-                                }
-                                else if (hoge.Value == "Normal")
-                                {
-                                    w.WindowState = WindowState.Normal;
-                                }
-                                else if (hoge.Value == "Minimized")
-                                {
-                                    w.WindowState = WindowState.Normal;
-                                }
+                                //w.WindowState = WindowState.Normal;
+                                WindowState = WindowState.Normal;
                             }
                         }
                     }
@@ -4308,6 +4357,12 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
         #endregion
 
+    }
+
+    // Startup
+    public void OnWindowLoaded(object? sender, EventArgs e)
+    {
+
         NotifyPropertyChanged(nameof(IsCurrentProfileSet));
 
         if (CurrentProfile is null)
@@ -4334,7 +4389,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         if (sender is Window win)
         {
             //win.Show();
-            //win.IsVisible = true;
+            win.IsVisible = true;
         }
     }
 
@@ -5608,6 +5663,11 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                         IsConfirmUpdatePlaylistSongsPopupVisible = true;
                     }
                 }
+
+                if (_isNavigationViewMenuOpen)
+                {
+                    playlistDir.Expanded = true;
+                }
             }
 
             //IsBusy = false;
@@ -5615,6 +5675,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
             // apply open/close after this menu is loaded.
             NotifyPropertyChanged(nameof(IsNavigationViewMenuOpen));
+
         });
 
     }
@@ -5724,12 +5785,6 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
         //IsBusy = true;
         IsWorking = true;
-        
-        /*
-        Dispatcher.UIThread.Post(() => {
-            MusicDirectories.Clear();
-        });
-        */
 
         try
         {
@@ -5834,12 +5889,12 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         IsWorking = false;
     }
 
-    private void GetLibrary(NodeMenuFiles librarytNode)
+    private void GetFiles(NodeMenuFiles filestNode)
     {
-        if (librarytNode is null)
+        if (filestNode is null)
             return;
 
-        if (librarytNode.IsAcquired)
+        if (filestNode.IsAcquired)
         {
             return;
         }
@@ -5850,11 +5905,12 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         if (MusicDirectories.Count > 0)
             MusicDirectories.Clear();
 
-        librarytNode.IsAcquired = true;
+        filestNode.IsAcquired = true;
 
         Task.Run(async () =>
         {
             await Task.Delay(10);
+            //await Task.Yield();
 
             Dispatcher.UIThread.Post(() =>
             {
@@ -5866,7 +5922,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
             {
                 Dispatcher.UIThread.Post(() =>
                 {
-                    librarytNode.IsAcquired = true;
+                    filestNode.IsAcquired = true;
                 });
 
                 //await UpdateLibraryMusicAsync().ConfigureAwait(false);
@@ -5879,7 +5935,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
             {
                 Dispatcher.UIThread.Post(() =>
                 {
-                    librarytNode.IsAcquired = false;
+                    filestNode.IsAcquired = false;
                 });
                 Debug.WriteLine("fail to get MpdQueryListAll: " + result.ErrorMessage);
             }
@@ -5889,6 +5945,61 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 IsWorking = false;
             });
         });
+    }
+
+    private void GetAlbumArtists(NodeMenuArtist artistNode)
+    {
+        //AlbumArtists
+        if (artistNode is null)
+            return;
+
+        if (artistNode.IsAcquired)
+        {
+            return;
+        }
+
+        if (AlbumArtists.Count > 0)
+            AlbumArtists.Clear();
+
+        artistNode.IsAcquired = true;
+
+        Task.Run(async () =>
+        {
+            await Task.Delay(10);
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                IsWorking = true;
+            });
+
+            CommandResult result = await _mpc.MpdQueryListArtists().ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    artistNode.IsAcquired = true;
+
+                    // test COPY.
+                    AlbumArtists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists);
+                });
+            }
+            else
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    artistNode.IsAcquired = false;
+                });
+                Debug.WriteLine("fail to get MpdQueryListArtists: " + result.ErrorMessage);
+            }
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                IsWorking = false;
+            });
+        });
+
+
+
     }
 
     private static int CompareVersionString(string a, string b)
@@ -7111,7 +7222,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
     #endregion
 
-    #region == Library ==
+    #region == Files ==
 
     public IRelayCommand SongFilesListviewAddCommand { get; }
     public bool SongFilesListviewAddCommand_CanExecute()
@@ -7306,6 +7417,28 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         if (song is not null)
         {
             await _mpc.MpdAdd(song.OriginalFileUri);
+        }
+    }
+
+    #endregion
+
+    #region == AlbumArtists ==
+
+    public IRelayCommand GetArtistsCommand { get; }
+    public bool GetArtistsCommand_CanExecute()
+    {
+        if (IsBusy) return false;
+        if (IsWorking) return false;
+        return true;
+    }
+    public async void GetArtistsCommand_ExecuteAsync()
+    {
+        var r = await _mpc.MpdQueryListArtists();
+        if (r.IsSuccess)
+        {
+            Debug.WriteLine("--------");
+            Debug.WriteLine(r.ResultText);
+            Debug.WriteLine("--------");
         }
     }
 
@@ -8749,6 +8882,8 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
     #endregion
 
+    #region == Other commands == 
+
     public IRelayCommand EscapeCommand { get; }
     public static bool EscapeCommand_CanExecute()
     {
@@ -8778,6 +8913,8 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         if (IsSongFilesSelectedSaveAsPopupVisible) { IsSongFilesSelectedSaveAsPopupVisible = false; }
         if (IsSongFilesSelectedSaveToPopupVisible) { IsSongFilesSelectedSaveToPopupVisible = false; }
     }
+
+    #endregion
 
     #endregion
 }

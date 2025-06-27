@@ -10,7 +10,8 @@
              x:Class="MPDCtrlX.Views.PlaylistItemPage"
 			 x:DataType="vm:MainViewModel"
              x:CompileBindings="True">
-	<Grid RowDefinitions="Auto,*" Margin="8,0,0,0">
+	
+	<Grid RowDefinitions="Auto,*" Margin="16,12,0,0">
 
 		<Grid Grid.Row="0" Grid.Column="0">
 			<Grid.ColumnDefinitions>
@@ -40,7 +41,7 @@
 
 		<!-- PlaylistItem ListBox -->
 		<Grid Grid.Row="1" RowDefinitions="1,Auto,1,*" Margin="0,0,0,0">
-			<Border Grid.Row="0" BorderThickness="1,0,0,0" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6"></Border>
+			<Border Grid.Row="0" BorderThickness="1,1,0,0" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6"></Border>
 			<Grid Grid.Row="1" DockPanel.Dock="Top" Height="30" Margin="1,0,0,0">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="0"></ColumnDefinition>

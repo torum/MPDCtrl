@@ -176,7 +176,7 @@ public class MenuTreeBuilder : NodeTree
         NodeMenuLibrary browse = new(Properties.Resources.MenuTreeItem_Library)
         {
             Selected = false,
-            Expanded = true,
+            Expanded = false,
 
             Parent = this
         };

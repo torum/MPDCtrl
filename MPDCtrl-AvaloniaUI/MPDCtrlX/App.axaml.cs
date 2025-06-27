@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MPDCtrlX.Models;
 using MPDCtrlX.Services;
+using MPDCtrlX.Services.Contracts;
 using MPDCtrlX.ViewModels;
 using MPDCtrlX.Views;
 using System;

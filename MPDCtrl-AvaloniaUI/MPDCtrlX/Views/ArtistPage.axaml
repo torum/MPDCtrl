@@ -18,7 +18,7 @@
 	</Design.DataContext>
 
 	<!-- Artists -->
-	<Grid Margin="8,0,0,0">
+	<Grid Margin="16,12,0,0">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"></RowDefinition>
 			<RowDefinition Height="*"></RowDefinition>
@@ -46,7 +46,7 @@
 		</Border>
 
         <Grid Grid.Row="1" Grid.Column="0" RowDefinitions="1,*">
-			<Border Grid.Row="0" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.5"></Border>
+			<Border Grid.Row="0" BorderThickness="0,1,0,1" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.5"></Border>
 			<ListBox Grid.Row="1" MinWidth="230" ItemsSource="{Binding AlbumArtists}" SelectionMode="Single" Loaded="ListBox_Loaded" BorderThickness="0" Margin="0,3,0,0" ScrollViewer.AllowAutoHide="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
 				<!--  Background="{DynamicResource LayerFillColorDefaultBrush}" -->
 				<ListBox.ItemsPanel>
@@ -93,7 +93,7 @@
 			</Grid.ColumnDefinitions>
 
 			<Grid Grid.Row="1" Grid.Column="0" RowDefinitions="1,Auto,1,*" Margin="8,0,0,0">
-				<Border Grid.Row="0" BorderThickness="1,0,0,0" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6"></Border>
+				<Border Grid.Row="0" BorderThickness="1,0,0,1" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6"></Border>
 				<Grid Grid.Row="1" DockPanel.Dock="Top" Height="30" Margin="1,0,0,0">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -115,7 +115,7 @@
 					<GridSplitter Grid.Column="3" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" ResizeDirection="Columns"/>
 
 				</Grid>
-				<Border Grid.Row="2" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.5"></Border>
+				<Border Grid.Row="2" BorderThickness="0,1,0,1" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.5"></Border>
 				<ListBox Grid.Row="3" SelectionMode="Multiple" Loaded="ListBox_Loaded" BorderThickness="0" Margin="0,3,0,0" ScrollViewer.AllowAutoHide="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
 					<!--  Background="{DynamicResource LayerFillColorDefaultBrush}" -->
 					<ListBox.ItemsPanel>

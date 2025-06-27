@@ -1,5 +1,6 @@
 using Avalonia.Threading;
 using MPDCtrlX.Models;
+using MPDCtrlX.Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

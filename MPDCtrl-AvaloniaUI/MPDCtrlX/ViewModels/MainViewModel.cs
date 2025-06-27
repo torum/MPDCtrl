@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting.Internal;
 using MPDCtrlX.Common;
 using MPDCtrlX.Models;
 using MPDCtrlX.Services;
+using MPDCtrlX.Services.Contracts;
 using MPDCtrlX.Views;
 using SkiaSharp;
 using System;
@@ -3669,7 +3670,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         IsShowDebugWindow = false;
         IsAutoScrollToNowPlaying = true;
         Start("localhost", 6600);
-        //Volume = 20;
+        Volume = 20; // needs this until implement profiles.
         IsWorking = false;
         IsSaveLog = true;
 
@@ -5468,19 +5469,48 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                                 // This means CurrentSong is already aquired by "currentsong" command.
                                 if (_mpc.MpdCurrentSong.Id == _mpc.MpdStatus.MpdSongID)
                                 {
+                                    // Set Current(again) and NowPlaying.
+
+                                    // the reason not to use CurrentSong is that it points different instance (set by "currentsong" command and currentqueue). 
+                                    var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
+                                    if (curitem is not null)
+                                    {
+                                        CurrentSong = curitem;
+                                        CurrentSong.IsPlaying = true;
+                                        CurrentSong.IsSelected = true;
+
+                                        if (IsAutoScrollToNowPlaying)
+                                            // use ScrollIntoViewAndSelect instead of ScrollIntoView
+                                            ScrollIntoViewAndSelect?.Invoke(this, CurrentSong.Index);
+
+                                        // AlbumArt
+                                        if (_mpc.AlbumCover.SongFilePath != curitem.File)
+                                        {
+                                            //IsAlbumArtVisible = false;
+                                            //AlbumArt = _albumArtDefault;
+
+                                            if (!String.IsNullOrEmpty(CurrentSong.File))
+                                            {
+                                                //isAlbumArtChanged = true;
+                                            }
+                                        }
+                                    }
+                                    /*
                                     // the reason not to use CurrentSong is that it points different instance (set by "currentsong" command and currentqueue). 
                                     _mpc.MpdCurrentSong.IsPlaying = true;
+                                    
+                                    // just in case. < no. don't override.
+                                    //CurrentSong.IsPlaying = true;
 
-                                    // just in case.
-                                    CurrentSong.IsPlaying = true;
                                     // currentsong command does not return pos, so it's needed to be set.
                                     CurrentSong.Index = _mpc.MpdCurrentSong.Index;
 
-                                    CurrentSong.IsSelected = true;
+                                    _mpc.MpdCurrentSong.IsSelected = true;
 
                                     if (IsAutoScrollToNowPlaying)
                                         // use ScrollIntoViewAndSelect instead of ScrollIntoView
                                         ScrollIntoViewAndSelect?.Invoke(this, CurrentSong.Index);
+                                    */
                                 }
                             }
                         }

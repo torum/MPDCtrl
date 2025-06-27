@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using MPDCtrlX.Models;
 
-namespace MPDCtrlX.Services;
+namespace MPDCtrlX.Services.Contracts;
 
 public interface IMpcService
 {

@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using MPDCtrlX.Models;
+using MPDCtrlX.Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -1047,8 +1048,7 @@ public class BinaryDownloader : IBinaryDownloader
             using var stream = new MemoryStream(buffer);
             try
             {
-                //return BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
-                //return await Task.Run(() => Bitmap.DecodeToWidth(stream, 400));
+                // Bug in Avalonia UI Skia dll.
                 return Bitmap.DecodeToWidth(stream, 400);
             }
             catch

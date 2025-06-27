@@ -38,20 +38,22 @@ public partial class MainWindow : Window//AppWindow//
         {
             this.Position = new PixelPoint(vm.WindowLeft, vm.WindowTop);
         }
-
-        if (vm.WindowHeight > 200)
+        // MinWidth="740" MinHeight="180"
+        if (vm.WindowHeight >= 180)
         {
             this.Height = vm.WindowHeight;
         }
+        else { this.Height = 180; }
 
-        if (vm.WindowWidth > 200)
+        if (vm.WindowWidth >= 740)
         {
             this.Width = vm.WindowWidth;
         }
+        else { this.Width = 740; }
 
-        #endregion
+            #endregion
 
-        InitializeComponent();
+            InitializeComponent();
 
         this.navigateView.Content = shellPage;
 
@@ -128,6 +130,22 @@ public partial class MainWindow : Window//AppWindow//
             {
                 vm.SelectedNodeMenu.Selected = true;
             }
+
+            if (vm.IsNavigationViewMenuOpen)
+            {
+                foreach (var fuga in vm.MainMenuItems)
+                {
+                    if (fuga is NodeMenuLibrary lib)
+                    {
+                        lib.Expanded = true;
+                    }
+                    else if (fuga is NodeMenuPlaylists plt)
+                    {
+                        plt.Expanded = true;
+                    }
+                }
+            }
+
         }
     }
 

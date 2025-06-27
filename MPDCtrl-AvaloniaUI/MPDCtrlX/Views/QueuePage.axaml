@@ -18,13 +18,13 @@
 	</Design.DataContext>
 
 	<!-- Queue ListBox -->
-	<Grid RowDefinitions="1,Auto,1,*" Margin="8,0,0,0">
-		<Border Grid.Row="0" BorderThickness="1,0,0,0" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6"></Border>
+	<Grid RowDefinitions="1,Auto,1,*" Margin="16,24,0,0">
+		<Border Grid.Row="0" BorderThickness="1,1,0,0" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6"></Border>
 		<Grid Grid.Row="1" DockPanel.Dock="Top" Height="30" Margin="1,0,0,0">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto"></ColumnDefinition>
 				<ColumnDefinition Width="4"></ColumnDefinition>
-				<ColumnDefinition Width="28"></ColumnDefinition>
+				<ColumnDefinition Width="18"></ColumnDefinition>
 				<ColumnDefinition Width="4"></ColumnDefinition>
 				<ColumnDefinition Width="Auto"></ColumnDefinition>
 				<ColumnDefinition Width="4"></ColumnDefinition>
@@ -52,48 +52,48 @@
 
 			<GridSplitter Grid.Column="1" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" ResizeDirection="Columns" IsVisible="False"/>
 			<Grid Grid.Column="2" Name="test2">
-				<Label Name="test2x" Opacity="1" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test2}"></Label>
+				<Label Name="test2x" Opacity="0.7" HorizontalAlignment="Left" Padding="0,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test2}"></Label>
 			</Grid>
 
 			<Border Grid.Column="3" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" MaxWidth="4"/>
 			<GridSplitter Grid.Column="3" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" ResizeDirection="Columns" MaxWidth="4" IsVisible="False"/>
 			<Grid Grid.Column="4" Name="test3">
-				<Label Name="test3x" Opacity="0.5" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Content="{x:Static prop:Resources.QueueListviewColumnHeader_Title}" Width="{Binding Bounds.Size.Width, ElementName=test3}"></Label>
+				<Label Name="test3x" Opacity="0.7" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Content="{x:Static prop:Resources.QueueListviewColumnHeader_Title}" Width="{Binding Bounds.Size.Width, ElementName=test3}"></Label>
 			</Grid>
 
 			<GridSplitter Grid.Column="5" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" ResizeDirection="Columns" MaxWidth="4"/>
 			<Grid Grid.Column="6" Name="test4">
-				<Label Name="test4x" Opacity="0.5" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test4}">Time</Label>
+				<Label Name="test4x" Opacity="0.7" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test4}">Time</Label>
 			</Grid>
 
 			<GridSplitter Grid.Column="7" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" ResizeDirection="Columns"/>
 			<Grid Grid.Column="8" Name="test5">
-				<Label Name="test5x" Opacity="0.5" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test5}">Artist</Label>
+				<Label Name="test5x" Opacity="0.7" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test5}">Artist</Label>
 			</Grid>
 
 			<GridSplitter Grid.Column="9" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" ResizeDirection="Columns"/>
 			<Grid Grid.Column="10" Name="test6">
-				<Label Name="test6x" Opacity="0.5" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test6}">Album</Label>
+				<Label Name="test6x" Opacity="0.7" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test6}">Album</Label>
 			</Grid>
 
 			<GridSplitter Grid.Column="11" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" ResizeDirection="Columns"/>
 			<Grid Grid.Column="12" Name="test7">
-				<Label Name="test7x" Opacity="0.5" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test7}">Disc</Label>
+				<Label Name="test7x" Opacity="0.7" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test7}">Disc</Label>
 			</Grid>
 
 			<GridSplitter Grid.Column="13" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" ResizeDirection="Columns"/>
 			<Grid Grid.Column="14" Name="test8">
-				<Label Name="test8x" Opacity="0.5" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test8}">Track</Label>
+				<Label Name="test8x" Opacity="0.7" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test8}">Track</Label>
 			</Grid>
 
 			<GridSplitter Grid.Column="15" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" ResizeDirection="Columns"/>
 			<Grid Grid.Column="16" Name="test9">
-				<Label Name="test9x" Opacity="0.5" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test9}">Genre</Label>
+				<Label Name="test9x" Opacity="0.7" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test9}">Genre</Label>
 			</Grid>
 
 			<GridSplitter Grid.Column="17" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" ResizeDirection="Columns"/>
 			<Grid Grid.Column="18" Name="test10">
-				<Label Name="test10x" Opacity="0.5" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test10}">LastModified</Label>
+				<Label Name="test10x" Opacity="0.7" HorizontalAlignment="Left" Padding="12,0,0,0" VerticalAlignment="Center" Width="{Binding Bounds.Size.Width, ElementName=test10}">LastModified</Label>
 			</Grid>
 
 			<GridSplitter Grid.Column="19" Background="Transparent" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" BorderThickness="0,0,1,0" Opacity="0.5" ResizeDirection="Columns"/>
@@ -113,7 +113,7 @@
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto"></ColumnDefinition>
 							<ColumnDefinition Width="4"></ColumnDefinition>
-							<ColumnDefinition Width="28"></ColumnDefinition>
+							<ColumnDefinition Width="18"></ColumnDefinition>
 							<ColumnDefinition Width="4"></ColumnDefinition>
 							<ColumnDefinition Width="Auto"></ColumnDefinition>
 							<ColumnDefinition Width="4"></ColumnDefinition>
@@ -135,7 +135,7 @@
 							<ColumnDefinition Width="*"></ColumnDefinition>
 							<!-- Width="{Binding Width, ElementName=test3}" MinWidth="{Binding MinWidth, ElementName=test3}" MaxWidth="{Binding MaxWidth, ElementName=test3}" -->
 						</Grid.ColumnDefinitions>
-						<TextBlock Grid.Column="0" Width="{Binding Bounds.Size.Width, ElementName=test1}" Text="{Binding IndexPlusOne}" HorizontalAlignment="Left" Margin="0" Padding="12,0,0,0" Opacity="0.9" IsVisible="False"></TextBlock>
+						<TextBlock Grid.Column="0" Width="{Binding Bounds.Size.Width, ElementName=test1}" Text="{Binding IndexPlusOne}" HorizontalAlignment="Left" Margin="0" Padding="0,0,0,0" Opacity="0.9" IsVisible="False"></TextBlock>
 						<Viewbox Grid.Column="2" Width="14" Height="14" Margin="0" HorizontalAlignment="Right" VerticalAlignment="Center">
 							<PathIcon Data="M296.494737,3608.57322 L292.500752,3606.14219 C291.83208,3605.73542 291,3606.25002 291,3607.06891 L291,3611.93095 C291,3612.7509 291.83208,3613.26444 292.500752,3612.85767 L296.494737,3610.42771 C297.168421,3610.01774 297.168421,3608.98319 296.494737,3608.57322" Width="NaN" Height="NaN" Foreground="{DynamicResource AccentFillColorDefaultBrush}" Margin="0" Padding="0">
 								<Interaction.Behaviors>

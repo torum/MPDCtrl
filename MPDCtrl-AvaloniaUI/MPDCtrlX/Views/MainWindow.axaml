@@ -12,7 +12,7 @@
 		x:DataType="vm:MainViewModel"
         Icon="/Assets/MPDCtrlX.ico"
         Title="MPDCtrlX"
-             x:CompileBindings="True" Cursor="Arrow" WindowStartupLocation="Manual">
+             x:CompileBindings="True" Cursor="Arrow" WindowStartupLocation="Manual" MinWidth="740" MinHeight="180">
 	<!-- Background="{DynamicResource ThemeBackgroundBrush}" -->
 	<!-- <views:MainView/> -->
 	<Window.Resources>
@@ -67,7 +67,7 @@
 		
 		<!-- Navigation menu -->
 		<Border Grid.Row="0" BorderBrush="{DynamicResource CardStrokeBorderBrush}" BorderThickness="0,1,0,0">
-			<ui:NavigationView Name="navigateView" MenuItemsSource="{Binding MainMenuItems, Mode=OneWay}" MenuItemTemplate="{StaticResource NavigationViewMenuItem}" SelectionFollowsFocus="False" ItemInvoked="NavigationView_ItemInvoked" SelectionChanged="NavigationView_SelectionChanged" Loaded="NavigationView_Loaded" IsPaneToggleButtonVisible="True" IsSettingsVisible="True" PaneDisplayMode="Left" OpenPaneLength="260" IsPaneOpen="{Binding IsNavigationViewMenuOpen, Mode=TwoWay}" Margin="0" ScrollViewer.AllowAutoHide="True" CompactModeThresholdWidth="1000" ExpandedModeThresholdWidth="1023" ScrollViewer.VerticalScrollBarVisibility="Visible">
+			<ui:NavigationView Name="navigateView" MenuItemsSource="{Binding MainMenuItems, Mode=OneWay}" MenuItemTemplate="{StaticResource NavigationViewMenuItem}" SelectionFollowsFocus="False" ItemInvoked="NavigationView_ItemInvoked" SelectionChanged="NavigationView_SelectionChanged" Loaded="NavigationView_Loaded" IsPaneToggleButtonVisible="True" IsSettingsVisible="True" PaneDisplayMode="Auto" OpenPaneLength="260" IsPaneOpen="{Binding IsNavigationViewMenuOpen, Mode=TwoWay}" Margin="0" ScrollViewer.AllowAutoHide="True" CompactModeThresholdWidth="740" ExpandedModeThresholdWidth="1000" ScrollViewer.VerticalScrollBarVisibility="Visible">
 				
 				<ui:NavigationView.Resources>
 					<DataTemplate x:Key="NavigationViewMenuItem" x:DataType="mod:NodeMenu">

@@ -18,7 +18,7 @@
 	</Design.DataContext>
 
 	<!-- Directories and files -->
-	<Grid Margin="8,0,0,0">
+	<Grid Margin="16,12,0,0">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"></RowDefinition>
 			<RowDefinition Height="*"></RowDefinition>
@@ -100,7 +100,7 @@
 
 
 			<Grid Grid.Row="1" Grid.Column="0" RowDefinitions="1,Auto,1,*" Margin="8,0,0,0">
-				<Border Grid.Row="0" BorderThickness="1,0,0,0" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6"></Border>
+				<Border Grid.Row="0" BorderThickness="1,1,0,0" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6"></Border>
 				<Grid Grid.Row="1" DockPanel.Dock="Top" Height="30" Margin="1,0,0,0">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"></ColumnDefinition>

@@ -44,7 +44,7 @@ public class MpcService : IMpcService
 
     public ObservableCollection<AlbumArtist> AlbumArtists { get; private set; } = [];
 
-    //public ObservableCollection<Album> Albums { get; private set; } = [];
+    public ObservableCollection<AlbumEx> Albums { get; private set; } = [];
 
     public ObservableCollection<SongInfo> SearchResult { get; private set; } = [];
 
@@ -1620,7 +1620,7 @@ public class MpcService : IMpcService
         return result;
     }
     
-    public async Task<CommandResult> MpdQueryListArtists(bool autoIdling = true)
+    public async Task<CommandResult> MpdQueryListAlbumArtists(bool autoIdling = true)
     {
         MpcProgress?.Invoke(this, "[Background] Querying artists...");
 
@@ -1667,6 +1667,8 @@ public class MpcService : IMpcService
                 result.IsSuccess = true;
 
                 result.SearchResult = this.SearchResult;
+
+                result.ResultText = cm.ResultText;
 
                 MpcProgress?.Invoke(this, "[Background] Search result updated.");
             }
@@ -3272,19 +3274,29 @@ public class MpcService : IMpcService
             IsBusy?.Invoke(this, true);
 
             AlbumArtists.Clear();
-            //Albums.Clear();
+            Albums.Clear();
 
             int i = 0;
 
+            AlbumArtist? arts = null;
             foreach (string value in resultLines)
             {
-                AlbumArtist? arts = null;
                 //Debug.WriteLine("LocalDirectories: " + value);
                 if (value.StartsWith("AlbumArtist:"))
                 {
+                    if (arts is not null)
+                    {
+                        AlbumArtists.Add(arts);
+                    }
+
                     arts = new AlbumArtist();
                     arts.Name = value.Replace("AlbumArtist: ", "");
-                    AlbumArtists.Add(arts);
+                    //AlbumArtists.Add(arts);
+
+                    if (string.IsNullOrEmpty(arts.Name.Trim()))
+                    {
+                        arts.Name = "";
+                    }
 
                     MpcProgress?.Invoke(this, string.Format("[Background] Parsing AlbumArtists ({0})...", i));
                 }
@@ -3295,7 +3307,21 @@ public class MpcService : IMpcService
                         Name = value.Replace("Album: ", "")
                     };
 
+                    if (string.IsNullOrEmpty(alb.Name.Trim()))
+                    {
+                        alb.Name = "";
+                    }
+
                     arts?.Albums.Add(alb);
+
+                    // Create Albums at the same time.
+                    var albx = new AlbumEx
+                    {
+                        Name = alb.Name,
+                        AlbumArtist = arts?.Name ?? ""
+                    };
+                    Albums.Add(albx);
+                    //
 
                     i++;
 

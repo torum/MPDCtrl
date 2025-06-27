@@ -34,26 +34,28 @@
 	</Interaction.Behaviors>
 	<Window.KeyBindings>
 		<KeyBinding Command="{Binding PlayCommand}" Gesture="Play" />
-		<KeyBinding Command="{Binding PlayCommand}" Gesture="Space" />
+		<KeyBinding Command="{Binding PlayCommand}" Gesture="Ctrl+Space" />
+		<!-- 
+		<KeyBinding Command="{Binding PlayCommand}" Gesture="Space" /> -->
 		<KeyBinding Command="{Binding PlayCommand}" Gesture="Ctrl+P"/>
 		<KeyBinding Command="{Binding PlayCommand}" Gesture="MediaPlayPause" />
-		<!--
-		<KeyBinding Command="{Binding PlayCommand}" Key="MediaStop" />
-		<KeyBinding Command="{Binding PlayNextCommand}" Key="MediaNextTrack" />
-		<KeyBinding Command="{Binding PlayNextCommand}" Modifiers="Ctrl" Key="N" />
-		<KeyBinding Command="{Binding PlayPrevCommand}" Key="MediaPreviousTrack" />
-		<KeyBinding Command="{Binding PlayPrevCommand}" Modifiers="Ctrl" Key="B" />
-		<KeyBinding Command="{Binding VolumeMuteCommand}" Key="VolumeMute" />
-		<KeyBinding Command="{Binding VolumeDownCommand}" Key="VolumeDown" />
-		<KeyBinding Command="{Binding VolumeDownCommand}" Modifiers="Ctrl" Key="OemMinus" />
-		<KeyBinding Command="{Binding VolumeDownCommand}" Modifiers="Ctrl" Key="Subtract" />
-		<KeyBinding Command="{Binding VolumeUpCommand}" Key="VolumeUp" />
-		<KeyBinding Command="{Binding VolumeUpCommand}" Modifiers="Ctrl" Key="OemPlus" />
-		<KeyBinding Command="{Binding VolumeUpCommand}" Modifiers="Ctrl" Key="Add" />
-		<KeyBinding Command="{Binding EscapeCommand}" Key="Esc" />
-		<KeyBinding Command="{Binding ShowSettingsCommand}" Modifiers="Ctrl" Key="S"/>
-		<KeyBinding Command="{Binding ShowFindCommand}" Modifiers="Ctrl" Key="F"/>
-		-->
+		<KeyBinding Command="{Binding PlayCommand}" Gesture="MediaStop" />
+		<KeyBinding Command="{Binding PlayNextCommand}" Gesture="MediaNextTrack" />
+		<KeyBinding Command="{Binding PlayNextCommand}" Gesture="Ctrl+N" />
+		<KeyBinding Command="{Binding PlayNextCommand}" Gesture="Ctrl+Right" />
+		<KeyBinding Command="{Binding PlayPrevCommand}" Gesture="MediaPreviousTrack" />
+		<KeyBinding Command="{Binding PlayPrevCommand}" Gesture="Ctrl+B" />
+		<KeyBinding Command="{Binding PlayPrevCommand}" Gesture="Ctrl+Left" />
+		<KeyBinding Command="{Binding VolumeMuteCommand}" Gesture="VolumeMute" />
+		<KeyBinding Command="{Binding VolumeDownCommand}" Gesture="VolumeDown" />
+		<KeyBinding Command="{Binding VolumeDownCommand}" Gesture="Ctrl+OemMinus" />
+		<KeyBinding Command="{Binding VolumeDownCommand}" Gesture="Ctrl+Subtract" />
+		<KeyBinding Command="{Binding VolumeUpCommand}" Gesture="VolumeUp" />
+		<KeyBinding Command="{Binding VolumeUpCommand}" Gesture="Ctrl+OemPlus" />
+		<KeyBinding Command="{Binding VolumeUpCommand}" Gesture="Ctrl+Add" />
+		<KeyBinding Command="{Binding EscapeCommand}" Gesture="Escape" />
+		<KeyBinding Command="{Binding ShowSettingsCommand}" Gesture="Ctrl+S"/>
+		<KeyBinding Command="{Binding ShowFindCommand}" Gesture="Ctrl+F"/>
 		<!--
 		<KeyBinding Gesture="Alt+D" Command="{Binding DevCenterViewActivation}">
 			<KeyBinding.CommandParameter>

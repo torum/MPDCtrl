@@ -15,6 +15,7 @@ public interface IMpcService
     ObservableCollection<string> LocalDirectories { get; }
     ObservableCollection<SongFile> LocalFiles { get; }
     ObservableCollection<AlbumArtist> AlbumArtists { get; }
+    ObservableCollection<AlbumEx> Albums { get; }
     SongInfoEx? MpdCurrentSong { get; }
     string MpdHost { get; }
     string MpdPassword { get; }
@@ -73,7 +74,7 @@ public interface IMpcService
     Task<CommandResult> MpdQueryCurrentQueue(bool autoIdling = true);
     Task<CommandResult> MpdQueryCurrentSong(bool autoIdling = true);
     Task<CommandResult> MpdQueryListAll(bool autoIdling = true);
-    Task<CommandResult> MpdQueryListArtists(bool autoIdling = true);
+    Task<CommandResult> MpdQueryListAlbumArtists(bool autoIdling = true);
     Task<CommandResult> MpdQueryPlaylists(bool autoIdling = true);
     Task<CommandPlaylistResult> MpdQueryPlaylistSongs(string playlistName, bool autoIdling = true);
     Task<CommandResult> MpdQueryStatus(bool autoIdling = true);

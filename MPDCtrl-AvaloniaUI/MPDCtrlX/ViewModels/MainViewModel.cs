@@ -25,6 +25,8 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.Marshalling;
+using System.Runtime.Intrinsics.X86;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Xml;
@@ -1650,7 +1652,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 */
                 CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<SearchPage>();
             }
-            else if (value is NodeMenuAlbum)
+            else if (value is NodeMenuAlbum nmb)
             {
                 /*
                 IsQueueVisible = false;
@@ -1662,6 +1664,11 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 IsAlbumVisible = true;
                 */
                 CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<AlbumPage>();
+
+                if (!nmb.IsAcquired && (Albums.Count < 1))
+                {
+                    GetAlbums(nmb);
+                }
             }
             else if (value is NodeMenuArtist nma)
             {
@@ -1676,7 +1683,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 */
                 CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<ArtistPage>();
 
-                if (!nma.IsAcquired || (AlbumArtists.Count < 1))
+                if (!nma.IsAcquired && (AlbumArtists.Count < 1))
                 {
                     GetAlbumArtists(nma);
                 }
@@ -2377,6 +2384,60 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
             _albumArtists = value;
             NotifyPropertyChanged(nameof(AlbumArtists));
+        }
+    }
+
+    private AlbumArtist? _selectedAlbumArtist;
+    public AlbumArtist? SelectedAlbumArtist
+    {
+        get { return _selectedAlbumArtist; }
+        set
+        {
+            if (_selectedAlbumArtist != value)
+            {
+                _selectedAlbumArtist = value;
+
+                NotifyPropertyChanged(nameof(SelectedAlbumArtist));
+
+                SelectedArtistAlbums = _selectedAlbumArtist?.Albums;
+               
+                GetAlbumArtistSongs(_selectedAlbumArtist);
+            }
+        }
+    }
+
+    private ObservableCollection<Album>? _selectedArtistAlbums = [];
+    public ObservableCollection<Album>? SelectedArtistAlbums
+    {
+        get 
+        {
+            return _selectedArtistAlbums;
+        }
+        set
+        {
+            if (_selectedArtistAlbums == value)
+                return;
+
+            _selectedArtistAlbums = value;
+            NotifyPropertyChanged(nameof(SelectedArtistAlbums));
+        }
+    }
+
+    #endregion
+
+    #region == Albums ==
+
+    private ObservableCollection<AlbumEx> _albums = [];
+    public ObservableCollection<AlbumEx> Albums
+    {
+        get { return _albums; }
+        set
+        {
+            if (_albums == value)
+                return;
+
+            _albums = value;
+            NotifyPropertyChanged(nameof(Albums));
         }
     }
 
@@ -3601,7 +3662,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         TreeviewMenuItemLoadPlaylistCommand = new RelayCommand(TreeviewMenuItemLoadPlaylistCommand_Execute, TreeviewMenuItemLoadPlaylistCommand_CanExecute);
         TreeviewMenuItemClearLoadPlaylistCommand = new RelayCommand(TreeviewMenuItemClearLoadPlaylistCommand_Execute, TreeviewMenuItemClearLoadPlaylistCommand_CanExecute);
 
-        GetArtistsCommand = new RelayCommand(GetArtistsCommand_ExecuteAsync, GetArtistsCommand_CanExecute);
+        //GetArtistsCommand = new RelayCommand(GetArtistsCommand_ExecuteAsync, GetArtistsCommand_CanExecute);
 
         #endregion
 
@@ -3688,7 +3749,6 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
     public void LoadSettings()
     {
         #region == Load app setting  ==
-
         try
         {
             // Load config file.
@@ -3727,21 +3787,26 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                                 WindowLeft = wX;
                             }
                         }
-
                         //w.Position = new PixelPoint(wX, wY);
 
                         hoge = mainWindow.Attribute("height");
                         if (hoge is not null)
                         {
-                            //w.Height = double.Parse(hoge.Value);
-                            WindowHeight = double.Parse(hoge.Value);
+                            if (!string.IsNullOrEmpty(hoge.Value))
+                            {
+                                //w.Height = double.Parse(hoge.Value);
+                                WindowHeight = double.Parse(hoge.Value);
+                            }
                         }
 
                         hoge = mainWindow.Attribute("width");
                         if (hoge is not null)
                         {
-                            //w.Width = double.Parse(hoge.Value);
-                            WindowWidth = double.Parse(hoge.Value);
+                            if (!string.IsNullOrEmpty(hoge.Value))
+                            {
+                                //w.Width = double.Parse(hoge.Value);
+                                WindowWidth = double.Parse(hoge.Value);
+                            }
                         }
 
                         hoge = mainWindow.Attribute("state");
@@ -4333,6 +4398,13 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                     }
 
                     #endregion
+
+
+                    NotifyPropertyChanged(nameof(IsCurrentProfileSet));
+                }
+                else
+                {
+                    Debug.WriteLine("Oops. xdoc.Root is null.");
                 }
             }
 
@@ -4343,28 +4415,28 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         }
         catch (System.IO.FileNotFoundException ex)
         {
+            Debug.WriteLine("Oops. @Load(AppConfigFilePath)");
             if (IsSaveLog)
             {
-                Dispatcher.UIThread.Post(() => { App.AppendErrorLog("System.IO.FileNotFoundException@OnWindowLoaded", ex.Message); });
+                Dispatcher.UIThread.Post(() => { App.AppendErrorLog("System.IO.FileNotFoundExceptionLoad(AppConfigFilePath)", ex.Message); });
             }
         }
         catch (Exception ex)
         {
+            Debug.WriteLine("Oops. @Load(AppConfigFilePath)");
             if (IsSaveLog)
             {
-                Dispatcher.UIThread.Post(() => { App.AppendErrorLog("Exception@OnWindowLoaded", ex.Message); });
+                Dispatcher.UIThread.Post(() => { App.AppendErrorLog("ExceptionLoad(AppConfigFilePath)", ex.Message); });
             }
         }
 
         #endregion
-
     }
 
     // Startup
     public void OnWindowLoaded(object? sender, EventArgs e)
     {
 
-        NotifyPropertyChanged(nameof(IsCurrentProfileSet));
 
         if (CurrentProfile is null)
         {
@@ -5789,7 +5861,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         
         Dispatcher.UIThread.Post(() => {
             UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
-            MusicEntries = tmpMusicEntries;
+            MusicEntries = new ObservableCollection<NodeFile>(tmpMusicEntries);// COPY
 
             _musicEntriesFiltered = _musicEntriesFiltered = new ObservableCollection<NodeFile>(tmpMusicEntries);
             NotifyPropertyChanged(nameof(MusicEntriesFiltered));
@@ -5827,7 +5899,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
             UpdateProgress?.Invoke(this, "[UI] Library directories loading...");
             Dispatcher.UIThread.Post(() => {
-                MusicDirectories = tmpMusicDirectories.Children;// [0].Children;
+                MusicDirectories = new ObservableCollection<NodeTree>(tmpMusicDirectories.Children);// COPY
                 if (MusicDirectories.Count > 0)
                 {
                     if (MusicDirectories[0] is NodeDirectory nd)
@@ -5979,7 +6051,6 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
     private void GetAlbumArtists(NodeMenuArtist artistNode)
     {
-        //AlbumArtists
         if (artistNode is null)
             return;
 
@@ -5989,7 +6060,19 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         }
 
         if (AlbumArtists.Count > 0)
-            AlbumArtists.Clear();
+        {
+            //AlbumArtists.Clear();
+            return;
+        }
+
+        if (_mpc.AlbumArtists.Count > 0)
+        {
+            // COPY.
+            AlbumArtists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists);
+            NotifyPropertyChanged(nameof(AlbumArtists));
+            artistNode.IsAcquired = true;
+            return;
+        }
 
         artistNode.IsAcquired = true;
 
@@ -6002,15 +6085,17 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 IsWorking = true;
             });
 
-            CommandResult result = await _mpc.MpdQueryListArtists().ConfigureAwait(false);
+            CommandResult result = await _mpc.MpdQueryListAlbumArtists().ConfigureAwait(false);
             if (result.IsSuccess)
             {
                 Dispatcher.UIThread.Post(() =>
                 {
                     artistNode.IsAcquired = true;
 
-                    // test COPY.
+                    // COPY.
                     AlbumArtists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists);
+
+                    NotifyPropertyChanged(nameof(AlbumArtists));
                 });
             }
             else
@@ -6019,7 +6104,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 {
                     artistNode.IsAcquired = false;
                 });
-                Debug.WriteLine("fail to get MpdQueryListArtists: " + result.ErrorMessage);
+                Debug.WriteLine("fail to get MpdQueryListAlbumArtists: " + result.ErrorMessage);
             }
 
             Dispatcher.UIThread.Post(() =>
@@ -6027,9 +6112,159 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 IsWorking = false;
             });
         });
+    }
+
+    private void GetAlbums(NodeMenuAlbum albumNode)
+    {
+        if (albumNode is null)
+            return;
+
+        if (albumNode.IsAcquired)
+        {
+            return;
+        }
+
+        if (Albums.Count > 0)
+        {
+            //Albums.Clear();
+            return;
+        }
+
+        if (_mpc.Albums.Count > 0)
+        {
+            Albums = new ObservableCollection<AlbumEx>(_mpc.Albums);
+            NotifyPropertyChanged(nameof(Albums));
+            albumNode.IsAcquired = true;
+            return;
+        }
+
+        albumNode.IsAcquired = true;
+
+        Task.Run(async () =>
+        {
+            await Task.Delay(10);
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                IsWorking = true;
+            });
+
+            CommandResult result = await _mpc.MpdQueryListAlbumArtists().ConfigureAwait(false);
+            if (result.IsSuccess)
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    albumNode.IsAcquired = true;
+
+                    // COPY.
+                    Albums = new ObservableCollection<AlbumEx>(_mpc.Albums);
+                    NotifyPropertyChanged(nameof(Albums));
+                });
+            }
+            else
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    albumNode.IsAcquired = false;
+                });
+                Debug.WriteLine("fail to get MpdQueryListAlbumArtists: " + result.ErrorMessage);
+            }
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                IsWorking = false;
+            });
+        });
+    }
+
+    private void GetAlbumArtistSongs(AlbumArtist? artist)
+    {
+        if (artist is null)
+        {
+            Debug.WriteLine("GetAlbumArtistSongs: artist is null, returning.");
+            return;
+        }
+
+        //var res = Task.Run(async () => { await SearchArtistSongs(artist);});
+        Task.Run(async () =>
+        {
+            if (artist is null)
+            {
+                Debug.WriteLine("GetAlbumArtistSongs: artist is null, returning.");
+                return;
+            }
+            var r = await SearchArtistSongs(artist.Name).ConfigureAwait(ConfigureAwaitOptions.None);
+
+            if (!r)
+            {
+                Debug.WriteLine("GetAlbumArtistSongs: SearchArtistSongs returned false, returning.");
+                return;
+            }
+            if (artist is null)
+            {
+                Debug.WriteLine("GetAlbumArtistSongs: SelectedAlbumArtist is null, returning.");
+                return;
+            }
 
 
+            Dispatcher.UIThread.Post(() =>
+            {
+                foreach (var slbm in artist.Albums)
+                {
+                    if (artist is null)
+                    {
+                        Debug.WriteLine("Artist is null, cannot add song to album.");
+                        break;
+                    }
 
+                    if (SelectedAlbumArtist != artist)
+                    {
+                        Debug.WriteLine("GetAlbumArtistSongs: SelectedAlbumArtist is not the same as artist, returning.");
+                        break;
+                        //return;
+                    }
+
+                    if (slbm.IsSongsAcquired)
+                    {
+                        continue;
+                    }
+
+                    foreach (var song in _mpc.SearchResult)
+                    {
+                        if (song.Album.Trim() == slbm.Name.Trim())
+                        {
+                            slbm.Songs.Add(song);
+                        }
+                    }
+
+                    slbm.IsSongsAcquired = true;
+                }
+            });
+
+        });
+    }
+
+    private async Task<bool> SearchArtistSongs(string name)
+    {
+        if (name is null)
+        {
+            return false;
+        }
+
+        string queryShiki = "==";
+        var res = await _mpc.MpdSearch("AlbumArtist", queryShiki, name.Trim());
+
+        if (res.IsSuccess)
+        {
+            //Debug.WriteLine(res.ResultText);
+            return true;
+        }
+        else
+        {
+            Debug.WriteLine("SearchArtistSongs failed: " + res.ErrorMessage);
+        }
+
+            return false;
     }
 
     private static int CompareVersionString(string a, string b)
@@ -7454,23 +7689,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
     #region == AlbumArtists ==
 
-    public IRelayCommand GetArtistsCommand { get; }
-    public bool GetArtistsCommand_CanExecute()
-    {
-        if (IsBusy) return false;
-        if (IsWorking) return false;
-        return true;
-    }
-    public async void GetArtistsCommand_ExecuteAsync()
-    {
-        var r = await _mpc.MpdQueryListArtists();
-        if (r.IsSuccess)
-        {
-            Debug.WriteLine("--------");
-            Debug.WriteLine(r.ResultText);
-            Debug.WriteLine("--------");
-        }
-    }
+
 
     #endregion
 

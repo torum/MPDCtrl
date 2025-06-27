@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Styling;
@@ -38,22 +39,22 @@ public partial class MainWindow : Window//AppWindow//
         {
             this.Position = new PixelPoint(vm.WindowLeft, vm.WindowTop);
         }
-        // MinWidth="740" MinHeight="180"
+        
         if (vm.WindowHeight >= 180)
         {
             this.Height = vm.WindowHeight;
         }
-        else { this.Height = 180; }
+        //else { this.Height = 180; }
 
         if (vm.WindowWidth >= 740)
         {
             this.Width = vm.WindowWidth;
         }
-        else { this.Width = 740; }
+        //else { this.Width = 740; }
 
-            #endregion
+        #endregion
 
-            InitializeComponent();
+        InitializeComponent();
 
         this.navigateView.Content = shellPage;
 
@@ -101,6 +102,8 @@ public partial class MainWindow : Window//AppWindow//
 
         this.Activated += (sender, e) => { shellPage?.WindowActivated();  };
         this.Deactivated += (sender, e) => { shellPage?.WindowDeactivated(); };
+
+
     }
 
     /*

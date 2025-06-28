@@ -12,7 +12,7 @@ public partial class FilesPage : UserControl
 
     public FilesPage()
     {
-        _viewModel = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();
+        _viewModel = App.GetService<MainViewModel>();
         DataContext = _viewModel;
 
         InitializeComponent();

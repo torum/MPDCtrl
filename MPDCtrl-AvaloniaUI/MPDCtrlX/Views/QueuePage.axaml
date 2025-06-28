@@ -18,9 +18,9 @@
 	</Design.DataContext>
 
 	<!-- Queue ListBox -->
-	<Grid RowDefinitions="1,Auto,1,*" Margin="16,24,0,0">
-		<Border Grid.Row="0" BorderThickness="1,1,0,0" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6"></Border>
-		<Grid Grid.Row="1" DockPanel.Dock="Top" Height="30" Margin="1,0,0,0">
+	<Grid RowDefinitions="1,Auto,1,*" Margin="16,4,0,0">
+		<Border Grid.Row="0" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6"></Border>
+		<Grid Grid.Row="1" DockPanel.Dock="Top" Height="34" Margin="1,0,0,0">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto"></ColumnDefinition>
 				<ColumnDefinition Width="4"></ColumnDefinition>
@@ -148,7 +148,7 @@
 								</Interaction.Behaviors>
 							</PathIcon>
 						</Viewbox>
-						<TextBlock Grid.Column="4" Width="{Binding Bounds.Size.Width, ElementName=test3}" Text="{Binding Title}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+						<TextBlock Grid.Column="4" Width="{Binding Bounds.Size.Width, ElementName=test3}" Text="{Binding Title}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 							<Interaction.Behaviors>
 								<DataTriggerBehavior Binding="{Binding IsPlaying}" ComparisonCondition="Equal" Value="True">
 									<ChangePropertyAction PropertyName="FontWeight" Value="SemiBold" />
@@ -158,7 +158,7 @@
 								</DataTriggerBehavior>
 							</Interaction.Behaviors>
 						</TextBlock>
-						<TextBlock Grid.Column="6" Width="{Binding Bounds.Size.Width, ElementName=test4}" Text="{Binding TimeFormated}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+						<TextBlock Grid.Column="6" Width="{Binding Bounds.Size.Width, ElementName=test4}" Text="{Binding TimeFormated}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 							<Interaction.Behaviors>
 								<DataTriggerBehavior Binding="{Binding IsPlaying}" ComparisonCondition="Equal" Value="True">
 									<ChangePropertyAction PropertyName="FontWeight" Value="SemiBold" />
@@ -168,7 +168,7 @@
 								</DataTriggerBehavior>
 							</Interaction.Behaviors>
 						</TextBlock>
-						<TextBlock Grid.Column="8" Width="{Binding Bounds.Size.Width, ElementName=test5}" Text="{Binding Artist}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+						<TextBlock Grid.Column="8" Width="{Binding Bounds.Size.Width, ElementName=test5}" Text="{Binding Artist}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 							<Interaction.Behaviors>
 								<DataTriggerBehavior Binding="{Binding IsPlaying}" ComparisonCondition="Equal" Value="True">
 									<ChangePropertyAction PropertyName="FontWeight" Value="SemiBold" />
@@ -178,7 +178,7 @@
 								</DataTriggerBehavior>
 							</Interaction.Behaviors>
 						</TextBlock>
-						<TextBlock Grid.Column="10" Width="{Binding Bounds.Size.Width, ElementName=test6}" Text="{Binding Album}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+						<TextBlock Grid.Column="10" Width="{Binding Bounds.Size.Width, ElementName=test6}" Text="{Binding Album}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 							<Interaction.Behaviors>
 								<DataTriggerBehavior Binding="{Binding IsPlaying}" ComparisonCondition="Equal" Value="True">
 									<ChangePropertyAction PropertyName="FontWeight" Value="SemiBold" />
@@ -188,7 +188,7 @@
 								</DataTriggerBehavior>
 							</Interaction.Behaviors>
 						</TextBlock>
-						<TextBlock Grid.Column="12" Width="{Binding Bounds.Size.Width, ElementName=test7}" Text="{Binding Disc}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+						<TextBlock Grid.Column="12" Width="{Binding Bounds.Size.Width, ElementName=test7}" Text="{Binding Disc}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 							<Interaction.Behaviors>
 								<DataTriggerBehavior Binding="{Binding IsPlaying}" ComparisonCondition="Equal" Value="True">
 									<ChangePropertyAction PropertyName="FontWeight" Value="SemiBold" />
@@ -198,7 +198,7 @@
 								</DataTriggerBehavior>
 							</Interaction.Behaviors>
 						</TextBlock>
-						<TextBlock Grid.Column="14" Width="{Binding Bounds.Size.Width, ElementName=test8}" Text="{Binding Track}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+						<TextBlock Grid.Column="14" Width="{Binding Bounds.Size.Width, ElementName=test8}" Text="{Binding Track}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 							<Interaction.Behaviors>
 								<DataTriggerBehavior Binding="{Binding IsPlaying}" ComparisonCondition="Equal" Value="True">
 									<ChangePropertyAction PropertyName="FontWeight" Value="SemiBold" />
@@ -208,7 +208,7 @@
 								</DataTriggerBehavior>
 							</Interaction.Behaviors>
 						</TextBlock>
-						<TextBlock Grid.Column="16" Width="{Binding Bounds.Size.Width, ElementName=test9}" Text="{Binding Genre}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+						<TextBlock Grid.Column="16" Width="{Binding Bounds.Size.Width, ElementName=test9}" Text="{Binding Genre}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 							<Interaction.Behaviors>
 								<DataTriggerBehavior Binding="{Binding IsPlaying}" ComparisonCondition="Equal" Value="True">
 									<ChangePropertyAction PropertyName="FontWeight" Value="SemiBold" />
@@ -218,7 +218,7 @@
 								</DataTriggerBehavior>
 							</Interaction.Behaviors>
 						</TextBlock>
-						<TextBlock Grid.Column="18" Width="{Binding Bounds.Size.Width, ElementName=test10}" Text="{Binding LastModifiedFormated}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+						<TextBlock Grid.Column="18" Width="{Binding Bounds.Size.Width, ElementName=test10}" Text="{Binding LastModifiedFormated}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 							<Interaction.Behaviors>
 								<DataTriggerBehavior Binding="{Binding IsPlaying}" ComparisonCondition="Equal" Value="True">
 									<ChangePropertyAction PropertyName="FontWeight" Value="SemiBold" />

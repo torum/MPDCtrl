@@ -12,7 +12,7 @@ public partial class ArtistPage : UserControl
 
     public ArtistPage()
     {
-        _viewModel = (App.Current as App)?.AppHost.Services.GetRequiredService<MainViewModel>();
+        _viewModel = App.GetService<MainViewModel>();
         DataContext = _viewModel;
 
         InitializeComponent();

@@ -1565,7 +1565,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
                 */
-                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<QueuePage>();
+                CurrentPage = App.GetService<QueuePage>();
             }
             else if (value is NodeMenuPlaylists)
             {
@@ -1578,7 +1578,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
                 */
-                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistsPage>();
+                //CurrentPage = App.GetService<PlaylistsPage>();
             }
             else if (value is NodeMenuPlaylistItem nmpli)
             {
@@ -1602,7 +1602,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
                 });
                 SelectedPlaylistName = nmpli.Name;
-                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<PlaylistItemPage>();
+                CurrentPage = App.GetService<PlaylistItemPage>();
 
                 if ((nmpli.PlaylistSongs.Count == 0) || nmpli.IsUpdateRequied)
                     GetPlaylistSongs(nmpli);
@@ -1618,7 +1618,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
                 */
-                //CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<LibraryPage>();
+                //CurrentPage = App.GetService<LibraryPage>();
 
             }
             else if (value is NodeMenuFiles nml)
@@ -1632,7 +1632,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
                 */
-                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<FilesPage>();
+                CurrentPage = App.GetService<FilesPage>();
 
                 if (!nml.IsAcquired || (MusicDirectories.Count <= 1) && (MusicEntries.Count == 0))
                 {
@@ -1650,7 +1650,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 IsArtistVisible = false;
                 IsAlbumVisible = false;
                 */
-                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<SearchPage>();
+                CurrentPage = App.GetService<SearchPage>();
             }
             else if (value is NodeMenuAlbum nmb)
             {
@@ -1663,7 +1663,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 IsArtistVisible = false;
                 IsAlbumVisible = true;
                 */
-                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<AlbumPage>();
+                CurrentPage = App.GetService<AlbumPage>();
 
                 if (!nmb.IsAcquired && (Albums.Count < 1))
                 {
@@ -1681,7 +1681,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 IsArtistVisible = true;
                 IsAlbumVisible = false;
                 */
-                CurrentPage = (App.Current as App)?.AppHost.Services.GetRequiredService<ArtistPage>();
+                CurrentPage = App.GetService<ArtistPage>();
 
                 if (!nma.IsAcquired && (AlbumArtists.Count < 1))
                 {
@@ -2438,6 +2438,57 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
             _albums = value;
             NotifyPropertyChanged(nameof(Albums));
+        }
+    }
+
+    private bool _isAlbumContentPanelVisible = false;
+    public bool IsAlbumContentPanelVisible
+    {
+        get { return _isAlbumContentPanelVisible; }
+        set
+        {
+            if (_isAlbumContentPanelVisible == value)
+                return;
+
+            _isAlbumContentPanelVisible = value;
+            NotifyPropertyChanged(nameof(IsAlbumContentPanelVisible));
+        }
+    }
+
+    private AlbumEx? _invokedAlbum = new();
+    public AlbumEx? InvokedAlbum
+    {
+        get { return _invokedAlbum; }
+        set
+        {
+            if (_invokedAlbum == value)
+                return;
+
+            _invokedAlbum = value;
+            NotifyPropertyChanged(nameof(InvokedAlbum));
+            NotifyPropertyChanged(nameof(InvokedAlbumSongs));
+        }
+    }
+
+    private ObservableCollection<SongInfo> _invokedAlbumSongs = [];
+    public ObservableCollection<SongInfo> InvokedAlbumSongs
+    {
+        get 
+        {
+            if (_invokedAlbum is not null)
+            {
+                return _invokedAlbum.Songs;
+            }
+
+            return _invokedAlbumSongs; 
+        }
+        set
+        {
+            if (_invokedAlbumSongs == value)
+                return;
+
+            _invokedAlbumSongs = value;
+            NotifyPropertyChanged(nameof(InvokedAlbumSongs));
         }
     }
 
@@ -3663,6 +3714,8 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         TreeviewMenuItemClearLoadPlaylistCommand = new RelayCommand(TreeviewMenuItemClearLoadPlaylistCommand_Execute, TreeviewMenuItemClearLoadPlaylistCommand_CanExecute);
 
         //GetArtistsCommand = new RelayCommand(GetArtistsCommand_ExecuteAsync, GetArtistsCommand_CanExecute);
+        AlbumsItemInvokedCommand = new GenericRelayCommand<object>(param => AlbumsItemInvokedCommand_Execute(param), param => AlbumsItemInvokedCommand_CanExecute());
+        AlbumsCloseAlbumContentPanelCommand = new RelayCommand(AlbumsCloseAlbumContentPanelCommand_Execute, AlbumsCloseAlbumContentPanelCommand_CanExecute);
 
         #endregion
 
@@ -4483,7 +4536,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         IsFullyRendered = true;
 
         // This is a dirty work around for AvaloniaUI.
-        QueuePage? qp = (App.Current as App)?.AppHost.Services.GetRequiredService<QueuePage>();
+        QueuePage? qp = App.GetService<QueuePage>();
         qp?.UpdateHeaderWidth();
 
         double windowWidth = 780;
@@ -6252,11 +6305,10 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         }
 
         string queryShiki = "==";
-        var res = await _mpc.MpdSearch("AlbumArtist", queryShiki, name.Trim());
+        var res = await _mpc.MpdSearch("AlbumArtist", queryShiki, name); // No name.Trim() because of "=="
 
         if (res.IsSuccess)
         {
-            //Debug.WriteLine(res.ResultText);
             return true;
         }
         else
@@ -6264,7 +6316,29 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
             Debug.WriteLine("SearchArtistSongs failed: " + res.ErrorMessage);
         }
 
+        return false;
+    }
+
+    private async Task<bool> SearchAlbumSongs(string name)
+    {
+        if (name is null)
+        {
             return false;
+        }
+
+        string queryShiki = "==";
+        var res = await _mpc.MpdSearch("Album", queryShiki, name); // No name.Trim() because of "=="
+
+        if (res.IsSuccess)
+        {
+            return true;
+        }
+        else
+        {
+            Debug.WriteLine("SearchAlbumSongs failed: " + res.ErrorMessage);
+        }
+
+        return false;
     }
 
     private static int CompareVersionString(string a, string b)
@@ -9164,6 +9238,109 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
     }
 
     #endregion
+
+
+    public IRelayCommand AlbumsItemInvokedCommand { get; set; }
+    public static bool AlbumsItemInvokedCommand_CanExecute()
+    {
+        return true;
+    }
+    public void AlbumsItemInvokedCommand_Execute(object obj)
+    {
+        if (obj is null)
+        {
+            return;
+        }
+
+        if (obj is not AlbumEx)
+        {
+            return;
+        }
+
+        var album = obj as AlbumEx;
+        if (album is null)
+        {
+            return;
+        }
+
+        if (!album.IsSongsAcquired)
+        {
+            album.IsSongsAcquired = true;
+
+            Task.Run(async () =>
+            {
+                if (!string.IsNullOrEmpty(album.AlbumArtist.Trim()))
+                {
+                    var r = await SearchArtistSongs(album.AlbumArtist).ConfigureAwait(ConfigureAwaitOptions.None);// no trim() here.
+
+                    if (!r)
+                    {
+                        Debug.WriteLine("GetAlbumArtistSongs: SearchArtistSongs returned false, returning.");
+                        return;
+                    }
+
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        foreach (var song in _mpc.SearchResult)
+                        {
+                            if (song.Album.Trim() == album.Name.Trim())
+                            {
+                                album.Songs.Add(song);
+                            }
+                        }
+                        album.IsSongsAcquired = true;
+                    });
+                }
+                else
+                {
+                    Debug.WriteLine($"GetAlbumArtistSongs: No album artist, trying to search by album name. ({album.Name})");
+
+                    if (!string.IsNullOrEmpty(album.Name.Trim()))
+                    {
+                        var r = await SearchAlbumSongs(album.Name); // no trim() here.
+                        if (!r)
+                        {
+                            Debug.WriteLine("GetAlbumArtistSongs: SearchArtistSongs returned false, returning.");
+                            return;
+                        }
+
+                        Dispatcher.UIThread.Post(() =>
+                        {
+                            foreach (var song in _mpc.SearchResult)
+                            {
+                                /*
+                                if (song.Album.Trim() == album.Name.Trim())
+                                {
+                                    album.Songs.Add(song);
+                                }
+                                */
+                                album.Songs.Add(song);
+                            }
+                            album.IsSongsAcquired = true;
+                        });
+
+                    }
+                    else
+                    {
+                        // TODO: no artist name, no album name.
+                    }
+                }
+            });
+        }
+
+        InvokedAlbum = album;
+        IsAlbumContentPanelVisible = true;
+    }
+    //
+    public IRelayCommand AlbumsCloseAlbumContentPanelCommand { get; set; }
+    public static bool AlbumsCloseAlbumContentPanelCommand_CanExecute()
+    {
+        return true;
+    }
+    public void AlbumsCloseAlbumContentPanelCommand_Execute()
+    {
+        IsAlbumContentPanelVisible = false;
+    }
 
     #endregion
 }

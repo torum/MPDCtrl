@@ -28,4 +28,5 @@ public partial class AlbumPage : UserControl
         //this.Artist2x.Width = _viewModel.LibraryColumnHeaderFilePathWidth;
 
     }
+
 }

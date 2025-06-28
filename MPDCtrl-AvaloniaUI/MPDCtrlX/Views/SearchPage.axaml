@@ -17,19 +17,19 @@
 		<vm:MainDummyViewModel />
 	</Design.DataContext>
 
-	<Grid RowDefinitions="Auto,Auto,*" Margin="16,12,0,0">
+	<Grid RowDefinitions="Auto,Auto,*" Margin="16,0,0,0">
 		
 		<Grid Grid.Row="0">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*"></ColumnDefinition>
 				<ColumnDefinition Width="Auto"></ColumnDefinition>
 			</Grid.ColumnDefinitions>
-			<StackPanel Spacing="24" Margin="7 12 24 0" Orientation="Horizontal" HorizontalAlignment="Left">
+			<StackPanel Spacing="24" Margin="32 6 24 0" Orientation="Horizontal" HorizontalAlignment="Left">
 				<TextBlock Text="Search" Theme="{StaticResource TitleTextBlockStyle}" VerticalAlignment="Bottom" Margin="3,0,0,0"/>
 				<!-- <TextBlock Theme="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Bottom">
 					<Run Text="Search Key"/><Run Text="{Binding SelectedSearchTag.Label,Mode=OneWay}"/><Run Text=": "/><Run Text="{Binding SearchQuery, Mode=OneWay}"/></TextBlock> -->
 			</StackPanel>
-			<StackPanel Grid.Column="1" Spacing="24" Margin="7 12 24 0" Orientation="Horizontal" HorizontalAlignment="Right">
+			<StackPanel Grid.Column="1" Spacing="24" Margin="7 0 24 0" Orientation="Horizontal" HorizontalAlignment="Right">
 				<TextBlock Theme="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Bottom" Padding="0,0,0,4">
 					<Run Text="Search Result"/>
 					<Run Text=": "/>
@@ -69,9 +69,9 @@
 		</Grid>
 
 		<!-- Search ListBox -->
-		<Grid Grid.Row="2" RowDefinitions="1,Auto,1,*" Margin="0,0,0,0">
-			<Border Grid.Row="0" BorderThickness="1,0,0,0" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6"></Border>
-			<Grid Grid.Row="1" DockPanel.Dock="Top" Height="30" Margin="1,0,0,0">
+		<Grid Grid.Row="2" RowDefinitions="1,Auto,1,*" Margin="8,12,0,0">
+			<Border Grid.Row="0" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6"></Border>
+			<Grid Grid.Row="1" DockPanel.Dock="Top" Height="34" Margin="1,0,0,0">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="0"></ColumnDefinition>
 					<ColumnDefinition Width="0"></ColumnDefinition>
@@ -190,28 +190,28 @@
 							<Viewbox Grid.Column="2" Width="14" Height="14" Margin="0" HorizontalAlignment="Right" VerticalAlignment="Center">
 
 							</Viewbox>
-							<TextBlock Grid.Column="4" Width="{Binding Bounds.Size.Width, ElementName=test3}" Text="{Binding Title}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+							<TextBlock Grid.Column="4" Width="{Binding Bounds.Size.Width, ElementName=test3}" Text="{Binding Title}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 
 							</TextBlock>
-							<TextBlock Grid.Column="6" Width="{Binding Bounds.Size.Width, ElementName=test4}" Text="{Binding TimeFormated}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+							<TextBlock Grid.Column="6" Width="{Binding Bounds.Size.Width, ElementName=test4}" Text="{Binding TimeFormated}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 
 							</TextBlock>
-							<TextBlock Grid.Column="8" Width="{Binding Bounds.Size.Width, ElementName=test5}" Text="{Binding Artist}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+							<TextBlock Grid.Column="8" Width="{Binding Bounds.Size.Width, ElementName=test5}" Text="{Binding Artist}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 
 							</TextBlock>
-							<TextBlock Grid.Column="10" Width="{Binding Bounds.Size.Width, ElementName=test6}" Text="{Binding Album}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+							<TextBlock Grid.Column="10" Width="{Binding Bounds.Size.Width, ElementName=test6}" Text="{Binding Album}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 
 							</TextBlock>
-							<TextBlock Grid.Column="12" Width="{Binding Bounds.Size.Width, ElementName=test7}" Text="{Binding Disc}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+							<TextBlock Grid.Column="12" Width="{Binding Bounds.Size.Width, ElementName=test7}" Text="{Binding Disc}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 
 							</TextBlock>
-							<TextBlock Grid.Column="14" Width="{Binding Bounds.Size.Width, ElementName=test8}" Text="{Binding Track}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+							<TextBlock Grid.Column="14" Width="{Binding Bounds.Size.Width, ElementName=test8}" Text="{Binding Track}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 
 							</TextBlock>
-							<TextBlock Grid.Column="16" Width="{Binding Bounds.Size.Width, ElementName=test9}" Text="{Binding Genre}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+							<TextBlock Grid.Column="16" Width="{Binding Bounds.Size.Width, ElementName=test9}" Text="{Binding Genre}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 
 							</TextBlock>
-							<TextBlock Grid.Column="18" Width="{Binding Bounds.Size.Width, ElementName=test10}" Text="{Binding LastModifiedFormated}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+							<TextBlock Grid.Column="18" Width="{Binding Bounds.Size.Width, ElementName=test10}" Text="{Binding LastModifiedFormated}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 
 							</TextBlock>
 

@@ -18,7 +18,7 @@
 	</Design.DataContext>
 
 	<!-- Artists -->
-	<Grid Margin="16,12,0,0">
+	<Grid Margin="16,0,0,0">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"></RowDefinition>
 			<RowDefinition Height="*"></RowDefinition>
@@ -30,7 +30,7 @@
 		</Grid.ColumnDefinitions>
 
 		<Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="{DynamicResource CardStrokeBorderBrush}" BorderThickness="0,0,0,0">
-			<StackPanel Spacing="24" Margin="7 12 0 12" Orientation="Horizontal" HorizontalAlignment="Left">
+			<StackPanel Spacing="24" Margin="32 6 24 0" Orientation="Horizontal" HorizontalAlignment="Left">
 				<TextBlock Text="Artists" Theme="{StaticResource TitleTextBlockStyle}" VerticalAlignment="Bottom" Margin="3,0,0,0"/>
 
 				<!-- <TextBlock Theme="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Bottom">
@@ -45,7 +45,7 @@
 			</StackPanel>
 		</Border>
 
-        <Grid Grid.Row="1" Grid.Column="0" RowDefinitions="1,*">
+        <Grid Grid.Row="1" Grid.Column="0" RowDefinitions="1,*" Margin="8,12,0,0">
 			<Border Grid.Row="0" BorderThickness="0,1,0,1" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.5"></Border>
 			<ListBox Grid.Row="1" MinWidth="230" ItemsSource="{Binding AlbumArtists}" SelectedItem="{Binding SelectedAlbumArtist,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" SelectionMode="Single" Loaded="ListBox_Loaded" BorderThickness="0" Margin="0,3,0,0" ScrollViewer.AllowAutoHide="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
 				<!--  Background="{DynamicResource LayerFillColorDefaultBrush}" -->
@@ -83,7 +83,7 @@
         </Grid>
 
 		<!-- Song list of selected artists -->
-		<Grid Grid.Row="1" Grid.Column="2">
+		<Grid Grid.Row="1" Grid.Column="2" Margin="8,12,0,0">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="Auto"/>
 				<RowDefinition Height="*"/>
@@ -106,10 +106,10 @@
 					-->
 					<ItemsControl.ItemTemplate>
 						<DataTemplate x:DataType="mod:Album">
-							<Grid>
+							<Grid Margin="0,0,0,24">
 								<Grid.ColumnDefinitions>
 									<ColumnDefinition Width="Auto"></ColumnDefinition>
-									<ColumnDefinition Width="Auto"></ColumnDefinition>
+									<ColumnDefinition Width="*"></ColumnDefinition>
 								</Grid.ColumnDefinitions>
 
 								<Border Grid.Row="0" Grid.Column="0" Margin="16,16,16,0" Width="134" Height="134" HorizontalAlignment="Left" VerticalAlignment="Top">
@@ -120,11 +120,17 @@
 								<Grid Grid.Row="0" Grid.Column="1" >
 									<Grid.RowDefinitions>
 										<RowDefinition Height="Auto"></RowDefinition>
-										<RowDefinition Height="Auto"></RowDefinition>
+										<RowDefinition Height="*"></RowDefinition>
 									</Grid.RowDefinitions>
 
 									<StackPanel Margin="16,16,16,16">
-										<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Name}" Theme="{StaticResource BodyTextBlockStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="4" Opacity="0.9"></TextBlock>
+										<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Name}" Theme="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="4" Opacity="0.9">
+											<Interaction.Behaviors>
+												<DataTriggerBehavior Binding="{Binding Name}" ComparisonCondition="Equal" Value="">
+													<ChangePropertyAction PropertyName="Text" Value="Unknown Album" />
+												</DataTriggerBehavior>
+											</Interaction.Behaviors>
+										</TextBlock>
 									</StackPanel>
 
 									<Border Grid.Row="1" Grid.Column="1">
@@ -133,7 +139,7 @@
 										<!--<TransitioningContentControl x:Name="ContentAlbumSongs" Content="ArtistAlbumSongs"/>-->
 										<!--  Content="{Binding CurrentAlbumSongs}" -->
 										<!-- " SelectedItem="{Binding SelectedSong}" -->
-										<ListBox ItemsSource="{Binding Songs}" SelectionMode="Single" BorderThickness="0" Margin="0,3,0,0">
+										<ListBox ItemsSource="{Binding Songs}" SelectionMode="Single" BorderThickness="0" Margin="24,3,0,0">
 											<!--<ListBox.ItemsPanel>
 												<ItemsPanelTemplate>
 													<VirtualizingStackPanel />
@@ -141,13 +147,14 @@
 											</ListBox.ItemsPanel>-->
 											<ListBox.ItemTemplate>
 												<DataTemplate x:DataType="mod:SongInfo">
-													<TextBlock Text="{Binding Title}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"  HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="0,0,0,0" Opacity="0.9"></TextBlock>
+													<TextBlock Text="{Binding Title}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="4" Opacity="0.9"></TextBlock>
 												</DataTemplate>
 											</ListBox.ItemTemplate>
 											<ListBox.Styles>
 												<Style Selector="ListBoxItem">
+													<Setter Property="Height" Value="32"/>
 													<Setter Property="MinHeight" Value="32"/>
-													<Setter Property="Padding" Value="0,0,6,0" />
+													<Setter Property="Padding" Value="12,0,6,0" />
 												</Style>
 											</ListBox.Styles>
 										</ListBox>

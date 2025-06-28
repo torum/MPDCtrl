@@ -40,13 +40,13 @@ public partial class MainWindow : Window//AppWindow//
             this.Position = new PixelPoint(vm.WindowLeft, vm.WindowTop);
         }
         
-        if (vm.WindowHeight >= 180)
+        if (vm.WindowHeight >= 120)
         {
             this.Height = vm.WindowHeight;
         }
         //else { this.Height = 180; }
 
-        if (vm.WindowWidth >= 740)
+        if (vm.WindowWidth >= 480)
         {
             this.Width = vm.WindowWidth;
         }

@@ -18,7 +18,7 @@
 	</Design.DataContext>
 
 	<!-- Directories and files -->
-	<Grid Margin="16,12,0,0">
+	<Grid Margin="16,0,0,0">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"></RowDefinition>
 			<RowDefinition Height="*"></RowDefinition>
@@ -34,7 +34,7 @@
 				<ColumnDefinition Width="*"></ColumnDefinition>
 				<ColumnDefinition Width="Auto"></ColumnDefinition>
 			</Grid.ColumnDefinitions>
-			<StackPanel Grid.Column="0" Spacing="24" Margin="7 12 24 12" Orientation="Horizontal" HorizontalAlignment="Left">
+			<StackPanel Grid.Column="0" Spacing="24" Margin="32 6 24 0" Orientation="Horizontal" HorizontalAlignment="Left">
 				<TextBlock Text="Files" Theme="{StaticResource TitleTextBlockStyle}" VerticalAlignment="Bottom" Margin="3,0,0,0"/>
 
 				<!-- <TextBlock Theme="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Bottom">
@@ -55,8 +55,8 @@
 				</TextBlock>
 				-->
 			</StackPanel>
-			<StackPanel Grid.Column="1" Spacing="24" Margin="7 12 24 12" Orientation="Horizontal" HorizontalAlignment="Right">
-				<TextBlock Theme="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Bottom" Padding="0,0,0,4">
+			<StackPanel Grid.Column="1" Spacing="24" Margin="32 6 24 0" Orientation="Horizontal" HorizontalAlignment="Right">
+				<TextBlock Theme="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Bottom" Padding="0,0,0,4" Opacity="0.7">
 					<Run Text="Total Files"/>
 					<Run Text=": "/>
 					<Run Text="{Binding MusicEntries.Count, Mode=OneWay}"/>
@@ -67,7 +67,7 @@
 		<!--
 		<TreeDataGrid Grid.Row="0" Grid.Column="0" BorderThickness="0 0 0 0" Source="{Binding MusicDirectoriesSource, Mode=TwoWay}" />
 		-->
-		<TreeView Grid.Row="1" Grid.Column="0" BorderThickness="0 0 0 0" ItemsSource="{Binding MusicDirectories, Mode=OneWay}" SelectionMode="AlwaysSelected" SelectedItem="{Binding SelectedNodeDirectory, Mode=TwoWay}" ScrollViewer.AllowAutoHide="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+		<TreeView Grid.Row="1" Grid.Column="0" BorderThickness="8 12 0 0" ItemsSource="{Binding MusicDirectories, Mode=OneWay}" SelectionMode="AlwaysSelected" SelectedItem="{Binding SelectedNodeDirectory, Mode=TwoWay}" ScrollViewer.AllowAutoHide="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
 			<TreeView.ItemTemplate>
 				<TreeDataTemplate ItemsSource="{Binding Path=Children}">
 					<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
@@ -89,7 +89,7 @@
 		</TreeView>
 
 		<!-- Song list of selected directory -->
-		<Grid Grid.Row="1" Grid.Column="2">
+		<Grid Grid.Row="1" Grid.Column="2" Margin="8,12,0,0">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="Auto"/>
 				<RowDefinition Height="*"/>
@@ -101,7 +101,7 @@
 
 			<Grid Grid.Row="1" Grid.Column="0" RowDefinitions="1,Auto,1,*" Margin="8,0,0,0">
 				<Border Grid.Row="0" BorderThickness="1,1,0,0" BorderBrush="{DynamicResource LayerFillColorDefaultBrush}" Opacity="0.6"></Border>
-				<Grid Grid.Row="1" DockPanel.Dock="Top" Height="30" Margin="1,0,0,0">
+				<Grid Grid.Row="1" DockPanel.Dock="Top" Height="34" Margin="1,0,0,0">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"></ColumnDefinition>
 						<ColumnDefinition Width="4"></ColumnDefinition>
@@ -141,9 +141,9 @@
 									<ColumnDefinition Width="*"></ColumnDefinition>
 									<!-- Width="{Binding Width, ElementName=test3}" MinWidth="{Binding MinWidth, ElementName=test3}" MaxWidth="{Binding MaxWidth, ElementName=test3}" -->
 								</Grid.ColumnDefinitions>
-								<TextBlock Grid.Column="0" Width="{Binding Bounds.Size.Width, ElementName=Library1}" Text="{Binding Name}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+								<TextBlock Grid.Column="0" Width="{Binding Bounds.Size.Width, ElementName=Library1}" Text="{Binding Name}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 								</TextBlock>
-								<TextBlock Grid.Column="2" Width="{Binding Bounds.Size.Width, ElementName=Library2}" Text="{Binding FilePath}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
+								<TextBlock Grid.Column="2" Width="{Binding Bounds.Size.Width, ElementName=Library2}" Text="{Binding FilePath}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
 								</TextBlock>
 							</Grid>
 						</DataTemplate>

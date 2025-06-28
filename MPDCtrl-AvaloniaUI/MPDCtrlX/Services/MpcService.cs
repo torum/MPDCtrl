@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Threading;
 using MPDCtrlX.Models;
 using MPDCtrlX.Services.Contracts;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -1174,6 +1176,7 @@ public class MpcService : IMpcService
                     ret.IsSuccess = true;
 
                     IsBusy?.Invoke(this, false);
+                    ;
                     return ret;
                 }
             }
@@ -1232,7 +1235,7 @@ public class MpcService : IMpcService
 
                 if (newCon.IsSuccess)
                 {
-                    CommandResult d = await MpdCommandSendPassword(MpdPassword);
+                    CommandResult d = await MpdCommandSendCommand(MpdPassword);
 
                     if (d.IsSuccess)
                     {
@@ -1257,6 +1260,7 @@ public class MpcService : IMpcService
             }
 
             IsBusy?.Invoke(this, false);
+
             return ret;
         }
         catch (Exception e)
@@ -1280,11 +1284,13 @@ public class MpcService : IMpcService
             }
 
             IsBusy?.Invoke(this, false);
+
             return ret;
         }
 
         if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
         {
+
             return ret;
         }
 
@@ -1386,6 +1392,7 @@ public class MpcService : IMpcService
                 if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
                 {
                     IsBusy?.Invoke(this, false);
+
                     return ret;
                 }
 
@@ -1429,6 +1436,7 @@ public class MpcService : IMpcService
                 }
 
                 IsBusy?.Invoke(this, false);
+
                 return ret;
             }
             else
@@ -1442,6 +1450,7 @@ public class MpcService : IMpcService
                 ret.ResultText = stringBuilder.ToString();
 
                 IsBusy?.Invoke(this, false);
+
                 return ret;
             }
 
@@ -1466,6 +1475,7 @@ public class MpcService : IMpcService
             ret.ErrorMessage = e.Message;
 
             IsBusy?.Invoke(this, false);
+
             return ret;
         }
         catch (System.IO.IOException e)
@@ -1483,14 +1493,14 @@ public class MpcService : IMpcService
             }
             else
             {
-                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}Reason: {1}Data: {2}{3}Exception: {4} {5}", "ReadLineAsync@MpdSendCommand"+ Environment.NewLine, "IOException"+ Environment.NewLine, cmd.Trim()+ Environment.NewLine, Environment.NewLine, e.Message, Environment.NewLine));
+                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}Reason: {1}Data: {2}{3}Exception: {4} {5}", "ReadLineAsync@MpdSendCommand" + Environment.NewLine, "IOException" + Environment.NewLine, cmd.Trim() + Environment.NewLine, Environment.NewLine, e.Message, Environment.NewLine));
 
                 // タイムアウトしていたらここで「も」エラーになる模様。
 
                 IsMpdCommandConnected = false;
 
                 DebugCommandOutput?.Invoke(this, string.Format("Connection Timeout. Reconnecting... " + Environment.NewLine + Environment.NewLine));
-                Debug.WriteLine( string.Format("Connection Timeout. Reconnecting... " + Environment.NewLine));
+                Debug.WriteLine(string.Format("Connection Timeout. Reconnecting... " + Environment.NewLine));
 
                 try
                 {
@@ -1530,6 +1540,7 @@ public class MpcService : IMpcService
             }
 
             IsBusy?.Invoke(this, false);
+
             return ret;
         }
         catch (Exception e)
@@ -1542,6 +1553,7 @@ public class MpcService : IMpcService
             DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
 
             IsBusy?.Invoke(this, false);
+
             return ret;
         }
 
@@ -1654,7 +1666,14 @@ public class MpcService : IMpcService
             return result;
         }
 
-        var expression = queryTag + " " + queryShiki + " \'" + Regex.Escape(queryValue) + "\'";
+        //var expression = queryTag + " " + queryShiki + " \'" + Regex.Escape(queryValue) + "\'";
+
+        //var test = @"foo'bar""";
+        var escapeValue = Regex.Replace(queryValue, @"[\\]+", @"\");
+        escapeValue = Regex.Replace(escapeValue, @"[\']+", @"\\'");
+        escapeValue = Regex.Replace(escapeValue, @"[""]+", @"\\\""");
+
+        var expression = queryTag + " " + queryShiki + " \\\"" + escapeValue + "\\\"";
 
         string cmd = "search \"(" + expression + ")\"\n";
 
@@ -1668,7 +1687,7 @@ public class MpcService : IMpcService
 
                 result.SearchResult = this.SearchResult;
 
-                result.ResultText = cm.ResultText;
+                //result.ResultText = cm.ResultText;
 
                 MpcProgress?.Invoke(this, "[Background] Search result updated.");
             }
@@ -3286,7 +3305,10 @@ public class MpcService : IMpcService
                 {
                     if (arts is not null)
                     {
-                        AlbumArtists.Add(arts);
+                        if (!string.IsNullOrEmpty(arts.Name))
+                        {
+                            AlbumArtists.Add(arts);
+                        }
                     }
 
                     arts = new AlbumArtist();
@@ -3315,12 +3337,15 @@ public class MpcService : IMpcService
                     arts?.Albums.Add(alb);
 
                     // Create Albums at the same time.
-                    var albx = new AlbumEx
+                    if ((!string.IsNullOrEmpty(alb.Name.Trim())) || (!string.IsNullOrEmpty(arts?.Name.Trim())))
                     {
-                        Name = alb.Name,
-                        AlbumArtist = arts?.Name ?? ""
-                    };
-                    Albums.Add(albx);
+                        var albx = new AlbumEx
+                        {
+                            Name = alb.Name,
+                            AlbumArtist = arts?.Name ?? ""
+                        };
+                        Albums.Add(albx);
+                    }
                     //
 
                     i++;

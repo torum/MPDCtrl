@@ -70,6 +70,8 @@ class Program
             }
         }
 
+        SaveErrorLog();
+
         // TODO: Exit?
         //Environment.Exit(1);
     }

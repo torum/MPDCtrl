@@ -1501,21 +1501,37 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
     #region == AlbumArt == 
 
-    private readonly Bitmap? _albumArtDefault = null;
-    private Bitmap? _albumArt;
-    public Bitmap? AlbumArt
+    private AlbumImage? _albumCover;
+    public AlbumImage? AlbumCover
     {
         get
         {
-            return _albumArt;
+            return _albumCover;
         }
         set
         {
-            if (_albumArt == value)
+            if (_albumCover == value)
+                return;
+            _albumCover = value;
+            NotifyPropertyChanged(nameof(AlbumCover));
+        }
+    }
+
+    private readonly Bitmap? _albumArtBitmapSourceDefault = null;
+    private Bitmap? _albumArtBitmapSource;
+    public Bitmap? AlbumArtBitmapSource
+    {
+        get
+        {
+            return _albumArtBitmapSource;
+        }
+        set
+        {
+            if (_albumArtBitmapSource == value)
                 return;
 
-            _albumArt = value;
-            NotifyPropertyChanged(nameof(AlbumArt));
+            _albumArtBitmapSource = value;
+            NotifyPropertyChanged(nameof(AlbumArtBitmapSource));
         }
     }
 
@@ -1683,9 +1699,9 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                 */
                 CurrentPage = App.GetService<ArtistPage>();
 
-                if (!nma.IsAcquired && (AlbumArtists.Count < 1))
+                if (!nma.IsAcquired && (Artists.Count < 1))
                 {
-                    GetAlbumArtists(nma);
+                    GetArtists(nma);
                 }
             }
             else if (value is NodeMenu)
@@ -2373,17 +2389,17 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
     #region == Artists ==
 
-    private ObservableCollection<AlbumArtist> _albumArtists = [];
-    public ObservableCollection<AlbumArtist> AlbumArtists
+    private ObservableCollection<AlbumArtist> _artists = [];
+    public ObservableCollection<AlbumArtist> Artists
     {
-        get { return _albumArtists; }
+        get { return _artists; }
         set
         {
-            if (_albumArtists == value)
+            if (_artists == value)
                 return;
 
-            _albumArtists = value;
-            NotifyPropertyChanged(nameof(AlbumArtists));
+            _artists = value;
+            NotifyPropertyChanged(nameof(Artists));
         }
     }
 
@@ -2401,7 +2417,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
                 SelectedArtistAlbums = _selectedAlbumArtist?.Albums;
                
-                GetAlbumArtistSongs(_selectedAlbumArtist);
+                GetArtistSongs(_selectedAlbumArtist);
             }
         }
     }
@@ -2438,6 +2454,12 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
             _albums = value;
             NotifyPropertyChanged(nameof(Albums));
+
+            // Get album pictures.
+            if (_albums.Count > 0)
+            {
+                //GetAlbumPictures(_albums);
+            }
         }
     }
 
@@ -2496,18 +2518,20 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
     #region == Search ==
 
+    private ObservableCollection<SongInfo>? _searchResult = [];
     public ObservableCollection<SongInfo>? SearchResult
     {
         get
         {
-            if (_mpc is not null)
-            {
-                return _mpc.SearchResult;
-            }
-            else
-            {
-                return [];
-            }
+            return _searchResult;
+        }
+        set
+        {
+            if (_searchResult == value)
+                return;
+
+            _searchResult = value;
+            NotifyPropertyChanged(nameof(SearchResult));
         }
     }
 
@@ -5194,8 +5218,9 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                         _mpc.MpdCurrentSong.IsPlaying = false;
                     }
 
+                    AlbumCover = null;
                     IsAlbumArtVisible = false;
-                    AlbumArt = _albumArtDefault;
+                    AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
                 }
             }
             else
@@ -5221,12 +5246,25 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                             ScrollIntoView?.Invoke(this, CurrentSong.Index);
                         }
 
+                        IsAlbumArtVisible = false;
+                        AlbumCover = null;
+                        AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
+
                         // AlbumArt
                         if (!String.IsNullOrEmpty(CurrentSong.File))
                         {
                             if (IsDownloadAlbumArt)
                             {
-                                await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                                var res = await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+
+                                if (res.AlbumCover?.SongFilePath == CurrentSong.File)
+                                {
+                                    if ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading))
+                                    {
+                                        AlbumCover = res.AlbumCover;
+                                        //AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
+                                    }
+                                }
                             }
                         }
                     }
@@ -5234,9 +5272,9 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                     {
                         // TODO:
                         CurrentSong = null;
-
+                        AlbumCover = null;
                         IsAlbumArtVisible = false;
-                        AlbumArt = _albumArtDefault;
+                        AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
                     }
                 }
             }
@@ -5244,9 +5282,9 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
             {
                 // TODO:
                 //CurrentSong = null;
-
-                //IsAlbumArtVisible = false;
-                //AlbumArt = _albumArtDefault;
+                AlbumCover = null;
+                IsAlbumArtVisible = false;
+                AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
             }
         });
 
@@ -5293,7 +5331,24 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                         {
                             if (IsDownloadAlbumArt)
                             {
-                                await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                                //await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                                var res = await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+
+                                Dispatcher.UIThread.Post(() =>
+                                {
+                                    if (res.AlbumCover?.SongFilePath == CurrentSong.File)
+                                    {
+                                        AlbumArtBitmapSource = res.AlbumCover?.AlbumImageSource;
+                                        AlbumCover = res.AlbumCover;
+                                    }
+                                    else
+                                    {
+                                        AlbumCover = null;
+                                        IsAlbumArtVisible = false;
+                                        AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
+                                    }
+                                });
+
                             }
                         }
                     }
@@ -5358,6 +5413,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                                     ScrollIntoView?.Invoke(this, CurrentSong.Index);
 
                                 // AlbumArt
+                                /*
                                 if (_mpc.AlbumCover.SongFilePath != curitem.File)
                                 {
                                     //IsAlbumArtVisible = false;
@@ -5368,6 +5424,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                                         //isAlbumArtChanged = true;
                                     }
                                 }
+                                */
                             }
                             else
                             {
@@ -5385,7 +5442,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                         CurrentSong = null;
 
                         IsAlbumArtVisible = false;
-                        AlbumArt = _albumArtDefault;
+                        AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
                     }
 
                     UpdateProgress?.Invoke(this, "");
@@ -5609,6 +5666,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                                             ScrollIntoViewAndSelect?.Invoke(this, CurrentSong.Index);
 
                                         // AlbumArt
+                                        /*
                                         if (_mpc.AlbumCover.SongFilePath != curitem.File)
                                         {
                                             //IsAlbumArtVisible = false;
@@ -5619,6 +5677,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                                                 //isAlbumArtChanged = true;
                                             }
                                         }
+                                        */
                                     }
                                     /*
                                     // the reason not to use CurrentSong is that it points different instance (set by "currentsong" command and currentqueue). 
@@ -5660,6 +5719,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                                 ScrollIntoViewAndSelect?.Invoke(this, CurrentSong.Index);
 
                             // AlbumArt
+                            /*
                             if (_mpc.AlbumCover.SongFilePath != curitem.File)
                             {
                                 //IsAlbumArtVisible = false;
@@ -5670,6 +5730,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                                     //isAlbumArtChanged = true;
                                 }
                             }
+                            */
                         }
                         else
                         {
@@ -5677,7 +5738,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                             CurrentSong = null;
 
                             IsAlbumArtVisible = false;
-                            AlbumArt = _albumArtDefault;
+                            AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
                         }
                     }
 
@@ -6102,32 +6163,33 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         });
     }
 
-    private void GetAlbumArtists(NodeMenuArtist artistNode)
+    private void GetArtists(NodeMenuArtist artistNode)
     {
         if (artistNode is null)
             return;
 
         if (artistNode.IsAcquired)
         {
+            Debug.WriteLine("GetArtists: artistNode.IsAcquired is true, returning.");
             return;
         }
 
-        if (AlbumArtists.Count > 0)
+        if (Artists.Count > 0)
         {
-            //AlbumArtists.Clear();
+            Debug.WriteLine("GetArtists: AlbumArtists.Count > 0, returning.");
             return;
         }
 
         if (_mpc.AlbumArtists.Count > 0)
         {
-            // COPY.
-            AlbumArtists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists);
-            NotifyPropertyChanged(nameof(AlbumArtists));
+            Debug.WriteLine("GetArtists: _mpc.AlbumArtists.Count > 0, populating Artists and returning.");
+            Artists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists);// COPY.
+            NotifyPropertyChanged(nameof(Artists));
             artistNode.IsAcquired = true;
             return;
         }
 
-        artistNode.IsAcquired = true;
+        //artistNode.IsAcquired = true;
 
         Task.Run(async () =>
         {
@@ -6146,9 +6208,9 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                     artistNode.IsAcquired = true;
 
                     // COPY.
-                    AlbumArtists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists);
+                    Artists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists);
 
-                    NotifyPropertyChanged(nameof(AlbumArtists));
+                    NotifyPropertyChanged(nameof(Artists));
                 });
             }
             else
@@ -6167,6 +6229,103 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         });
     }
 
+    private void GetArtistSongs(AlbumArtist? artist)
+    {
+        if (artist is null)
+        {
+            Debug.WriteLine("GetArtistSongs: artist is null, returning.");
+            return;
+        }
+
+        //var res = Task.Run(async () => { await SearchArtistSongs(artist);});
+        Task.Run(async () =>
+        {
+            if (artist is null)
+            {
+                Debug.WriteLine("GetArtistSongs: artist is null, returning.");
+                return;
+            }
+            var r = await SearchArtistSongs(artist.Name).ConfigureAwait(ConfigureAwaitOptions.None);
+
+            if (!r.IsSuccess)
+            {
+                Debug.WriteLine("GetArtistSongs: SearchArtistSongs returned false, returning.");
+                return;
+            }
+            if (artist is null)
+            {
+                Debug.WriteLine("GetArtistSongs: SelectedAlbumArtist is null, returning.");
+                return;
+            }
+
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (r.SearchResult is null)
+                {
+                    Debug.WriteLine("GetArtistSongs: SearchResult is null, returning.");
+                    return;
+                }
+
+                foreach (var slbm in artist.Albums)
+                {
+                    if (artist is null)
+                    {
+                        Debug.WriteLine("Artist is null, cannot add song to album.");
+                        break;
+                    }
+
+                    if (SelectedAlbumArtist != artist)
+                    {
+                        Debug.WriteLine("GetArtistSongs: SelectedAlbumArtist is not the same as artist, returning.");
+                        break;
+                        //return;
+                    }
+
+                    if (slbm.IsSongsAcquired)
+                    {
+                        Debug.WriteLine("GetArtistSongs: Album's song is already acquired, skipping.");
+                        continue;
+                    }
+
+                    foreach (var song in r.SearchResult)
+                    {
+                        if (song.Album.Trim() == slbm.Name.Trim())
+                        {
+                            slbm.Songs.Add(song);
+                        }
+                    }
+
+                    slbm.IsSongsAcquired = true;
+                }
+            });
+
+        });
+    }
+
+    private async Task<CommandSearchResult> SearchArtistSongs(string name)
+    {
+        if (name is null)
+        {
+            CommandSearchResult result = new()
+            {
+                IsSuccess = false,
+                ErrorMessage = "SearchArtistSongs: name is null"
+            };
+            return result;
+        }
+
+        string queryShiki = "==";
+        var res = await _mpc.MpdSearch("AlbumArtist", queryShiki, name); // No name.Trim() because of "=="
+
+        if (!res.IsSuccess)
+        {
+            Debug.WriteLine("SearchArtistSongs failed: " + res.ErrorMessage);
+        }
+
+        return res;
+    }
+
     private void GetAlbums(NodeMenuAlbum albumNode)
     {
         if (albumNode is null)
@@ -6179,19 +6338,20 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
         if (Albums.Count > 0)
         {
-            //Albums.Clear();
+            Debug.WriteLine("GetAlbums: Albums.Count > 0, returning.");
             return;
         }
 
         if (_mpc.Albums.Count > 0)
         {
-            Albums = new ObservableCollection<AlbumEx>(_mpc.Albums);
+            Debug.WriteLine("GetAlbums: _mpc.Albums.Count > 0, populating Albums and returning.");
+            Albums = new ObservableCollection<AlbumEx>(_mpc.Albums); // COPY.
             NotifyPropertyChanged(nameof(Albums));
             albumNode.IsAcquired = true;
             return;
         }
 
-        albumNode.IsAcquired = true;
+        //albumNode.IsAcquired = true;
 
         Task.Run(async () =>
         {
@@ -6230,115 +6390,117 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
         });
     }
 
-    private void GetAlbumArtistSongs(AlbumArtist? artist)
-    {
-        if (artist is null)
-        {
-            Debug.WriteLine("GetAlbumArtistSongs: artist is null, returning.");
-            return;
-        }
-
-        //var res = Task.Run(async () => { await SearchArtistSongs(artist);});
-        Task.Run(async () =>
-        {
-            if (artist is null)
-            {
-                Debug.WriteLine("GetAlbumArtistSongs: artist is null, returning.");
-                return;
-            }
-            var r = await SearchArtistSongs(artist.Name).ConfigureAwait(ConfigureAwaitOptions.None);
-
-            if (!r)
-            {
-                Debug.WriteLine("GetAlbumArtistSongs: SearchArtistSongs returned false, returning.");
-                return;
-            }
-            if (artist is null)
-            {
-                Debug.WriteLine("GetAlbumArtistSongs: SelectedAlbumArtist is null, returning.");
-                return;
-            }
-
-
-            Dispatcher.UIThread.Post(() =>
-            {
-                foreach (var slbm in artist.Albums)
-                {
-                    if (artist is null)
-                    {
-                        Debug.WriteLine("Artist is null, cannot add song to album.");
-                        break;
-                    }
-
-                    if (SelectedAlbumArtist != artist)
-                    {
-                        Debug.WriteLine("GetAlbumArtistSongs: SelectedAlbumArtist is not the same as artist, returning.");
-                        break;
-                        //return;
-                    }
-
-                    if (slbm.IsSongsAcquired)
-                    {
-                        continue;
-                    }
-
-                    foreach (var song in _mpc.SearchResult)
-                    {
-                        if (song.Album.Trim() == slbm.Name.Trim())
-                        {
-                            slbm.Songs.Add(song);
-                        }
-                    }
-
-                    slbm.IsSongsAcquired = true;
-                }
-            });
-
-        });
-    }
-
-    private async Task<bool> SearchArtistSongs(string name)
+    private async Task<CommandSearchResult> SearchAlbumSongs(string name)
     {
         if (name is null)
         {
-            return false;
-        }
-
-        string queryShiki = "==";
-        var res = await _mpc.MpdSearch("AlbumArtist", queryShiki, name); // No name.Trim() because of "=="
-
-        if (res.IsSuccess)
-        {
-            return true;
-        }
-        else
-        {
-            Debug.WriteLine("SearchArtistSongs failed: " + res.ErrorMessage);
-        }
-
-        return false;
-    }
-
-    private async Task<bool> SearchAlbumSongs(string name)
-    {
-        if (name is null)
-        {
-            return false;
+            CommandSearchResult result = new()
+            {
+                IsSuccess = false,
+                ErrorMessage = "SearchAlbumSongs: name is null"
+            };
+            return result;
         }
 
         string queryShiki = "==";
         var res = await _mpc.MpdSearch("Album", queryShiki, name); // No name.Trim() because of "=="
 
-        if (res.IsSuccess)
-        {
-            return true;
-        }
-        else
+        if (!res.IsSuccess)
         {
             Debug.WriteLine("SearchAlbumSongs failed: " + res.ErrorMessage);
         }
 
-        return false;
+        return res;
+    }
+
+    private async void GetAlbumPictures(ObservableCollection<AlbumEx> albums)
+    {
+        if (albums.Count < 1)
+        {
+            Debug.WriteLine("GetAlbumPictures: Albums.Count < 1, returning.");
+            return;
+        }
+        /*
+        Task.Run(async () =>
+        {
+        });
+        */
+
+        foreach (var album in albums)
+        {
+            if (album is null)
+            {
+                Debug.WriteLine("GetAlbumPictures: album is null, skipping.");
+                continue;
+            }
+            if (album.IsImageAcquired)
+            {
+                Debug.WriteLine("GetAlbumPictures: album.IsImageAcquired is true, skipping.");
+                continue;
+            }
+            if (string.IsNullOrEmpty(album.Name.Trim()))
+            {
+                //Debug.WriteLine($"GetAlbumPictures: album.Name is null or empty, skipping. {album.AlbumArtist}");
+                continue;
+            }
+            else
+            {
+                //Debug.WriteLine($"GetAlbumPictures: Processing album ({album.Name})");
+            }
+
+            var ret = await SearchAlbumSongs(album.Name);
+            if (!ret.IsSuccess)
+            {
+                Debug.WriteLine("GetAlbumPictures: SearchAlbumSongs failed: " + ret.ErrorMessage);
+                continue;
+            }
+
+            if (ret.SearchResult is not null)
+            {
+                var sresult = new ObservableCollection<SongInfo>(ret.SearchResult);
+                if (sresult.Count < 1)
+                {
+                    //Debug.WriteLine("GetAlbumPictures: ret.SearchResult.Count < 1, skipping.");
+                    continue;
+                }
+                foreach (var albumsong in sresult)
+                {
+                    if (albumsong is null)
+                    {
+                        continue;
+                    }
+
+                    //Debug.WriteLine($"GetAlbumPictures: Processing song {albumsong.File} from album {album.Name}");
+                    var r = await _mpc.MpdQueryAlbumArtForAlbumView(albumsong.File, true);
+                    if (r.IsSuccess)
+                    {
+                        if (r.AlbumCover is not null)
+                        {
+                            if (r.AlbumCover.IsSuccess)
+                            {
+                                //Dispatcher.UIThread.Post(() =>
+                                //{
+                                album.AlbumImage = r.AlbumCover.AlbumImageSource;
+                                album.IsImageAcquired = true;
+                                //});
+
+                                //Debug.WriteLine($"GetAlbumPictures: Successfully retrieved album art for {album.Name}");
+                                break; // Break after first successful album art retrieval.
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Debug.WriteLine("GetAlbumPictures: ret.SearchResult is null, skipping.");
+            }
+
+
+            // Get Album Picture.
+            //_mpc.MpdQueryAlbumArt(, true);
+        }
+
     }
 
     private static int CompareVersionString(string a, string b)
@@ -6468,26 +6630,54 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
     private void OnAlbumArtChanged(MpcService sender)
     {
-        // AlbumArt
-        
         Dispatcher.UIThread.Post(() =>
         {
-            if ((!_mpc.AlbumCover.IsDownloading) && _mpc.AlbumCover.IsSuccess)
+            /*
+            if (AlbumCover is null)
             {
-                if ((CurrentSong is not null) && (_mpc.AlbumCover.AlbumImageSource is not null))
-                {
-                    if (!String.IsNullOrEmpty(CurrentSong.File))
-                    {
-                        if (CurrentSong.File == _mpc.AlbumCover.SongFilePath)
-                        {
-                            //AlbumArt = null;
-                            AlbumArt = _mpc.AlbumCover.AlbumImageSource;
-                            IsAlbumArtVisible = true;
-                        }
-                    }
-                }
+                IsAlbumArtVisible = false;
+                AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
+                return;
+            }
+
+            if ((AlbumCover.IsDownloading) || (!AlbumCover.IsSuccess))
+            {
+                AlbumCover = null;
+                IsAlbumArtVisible = false;
+                AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
+                return;
+            }
+
+            if ((CurrentSong is null) || (AlbumCover.AlbumImageSource is null))
+            {
+                AlbumCover = null;
+                IsAlbumArtVisible = false;
+                AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
+                return;
+            }
+
+            if (String.IsNullOrEmpty(CurrentSong?.File))
+            {
+                AlbumCover = null;
+                IsAlbumArtVisible = false;
+                AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
+                return;
+            }
+            */
+
+            if (CurrentSong?.File == AlbumCover?.SongFilePath)
+            {
+                AlbumArtBitmapSource = AlbumCover?.AlbumImageSource;
+                IsAlbumArtVisible = true;
+            }
+            else
+            {
+                AlbumCover = null;
+                IsAlbumArtVisible = false;
+                AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
             }
         });
+
     }
 
     private void OnDebugCommandOutput(MpcService sender, string data)
@@ -7411,6 +7601,8 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
     }
     public async void SearchExecCommand_Execute()
     {
+        Debug.WriteLine("SearchExecCommand_Execute: " + SearchQuery);
+
         if (string.IsNullOrEmpty(SearchQuery)) return;
 
         // TODO: Make "==" an option in search.
@@ -7418,7 +7610,27 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
         string queryShiki = "contains";
 
-        await _mpc.MpdSearch(SelectedSearchTag.Key.ToString(), queryShiki, SearchQuery);
+        var res = await _mpc.MpdSearch(SelectedSearchTag.Key.ToString(), queryShiki, SearchQuery);
+        if (res.IsSuccess)
+        {
+            if (res.SearchResult is not null)
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+
+                    this.SearchResult = new ObservableCollection<SongInfo>(res.SearchResult); // COPY ON PURPOSE
+                });
+            }
+            else
+            {
+                Debug.WriteLine("Search result is null.");
+            }
+        }
+        else
+        {
+            Debug.WriteLine("Search failed: " + res.ErrorMessage);
+            this.SearchResult?.Clear();
+        }
 
         UpdateProgress?.Invoke(this, "");
     }
@@ -8554,7 +8766,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
             SearchQuery = "";
 
             IsAlbumArtVisible = false;
-            AlbumArt = _albumArtDefault;
+            AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
 
             // TODO: more
         });
@@ -8695,7 +8907,7 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
             SearchQuery = "";
 
             IsAlbumArtVisible = false;
-            AlbumArt = _albumArtDefault;
+            AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
 
             HostIpAddress = null;
 
@@ -9249,39 +9461,50 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
     {
         if (obj is null)
         {
+            Debug.WriteLine("AlbumsItemInvokedCommand: obj is null, returning.");
             return;
         }
 
         if (obj is not AlbumEx)
         {
+            Debug.WriteLine("AlbumsItemInvokedCommand: obj is not AlbumEx, returning.");
             return;
         }
 
-        var album = obj as AlbumEx;
-        if (album is null)
+        if (obj is not AlbumEx album)
         {
+            Debug.WriteLine("AlbumsItemInvokedCommand: album is null, returning.");
             return;
         }
+
+        //Debug.WriteLine("AlbumsItemInvokedCommand: Invoked with Album name: " + album.Name);
 
         if (!album.IsSongsAcquired)
         {
-            album.IsSongsAcquired = true;
+            //album.IsSongsAcquired = true;
 
             Task.Run(async () =>
             {
                 if (!string.IsNullOrEmpty(album.AlbumArtist.Trim()))
                 {
-                    var r = await SearchArtistSongs(album.AlbumArtist).ConfigureAwait(ConfigureAwaitOptions.None);// no trim() here.
+                    Debug.WriteLine($"AlbumsItemInvokedCommand: Album artist is not empty, searching by album artist. ({album.AlbumArtist})");
+                    var r = await SearchArtistSongs(album.AlbumArtist);//.ConfigureAwait(ConfigureAwaitOptions.None);// no trim() here.
 
-                    if (!r)
+                    if (!r.IsSuccess)
                     {
-                        Debug.WriteLine("GetAlbumArtistSongs: SearchArtistSongs returned false, returning.");
+                        Debug.WriteLine("AlbumsItemInvokedCommand: SearchArtistSongs returned false, returning.");
                         return;
                     }
 
                     Dispatcher.UIThread.Post(() =>
                     {
-                        foreach (var song in _mpc.SearchResult)
+                        if (r.SearchResult is null)
+                        {
+                            Debug.WriteLine("AlbumsItemInvokedCommand: SearchResult is null, returning.");
+                            return;
+                        }
+
+                        foreach (var song in r.SearchResult)
                         {
                             if (song.Album.Trim() == album.Name.Trim())
                             {
@@ -9289,16 +9512,19 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                             }
                         }
                         album.IsSongsAcquired = true;
+
+                        InvokedAlbum = album;
+                        IsAlbumContentPanelVisible = true;
                     });
                 }
                 else
                 {
-                    Debug.WriteLine($"GetAlbumArtistSongs: No album artist, trying to search by album name. ({album.Name})");
+                    //Debug.WriteLine($"AlbumsItemInvokedCommand: No album artist, trying to search by album name. ({album.Name})");
 
                     if (!string.IsNullOrEmpty(album.Name.Trim()))
                     {
                         var r = await SearchAlbumSongs(album.Name); // no trim() here.
-                        if (!r)
+                        if (!r.IsSuccess)
                         {
                             Debug.WriteLine("GetAlbumArtistSongs: SearchArtistSongs returned false, returning.");
                             return;
@@ -9306,7 +9532,13 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
 
                         Dispatcher.UIThread.Post(() =>
                         {
-                            foreach (var song in _mpc.SearchResult)
+                            if (r.SearchResult is null)
+                            {
+                                Debug.WriteLine("GetAlbumArtistSongs: SearchResult is null, returning.");
+                                return;
+                            }
+
+                            foreach (var song in r.SearchResult)
                             {
                                 /*
                                 if (song.Album.Trim() == album.Name.Trim())
@@ -9317,21 +9549,29 @@ public partial class MainViewModel : ViewModelBase //ObservableObject
                                 album.Songs.Add(song);
                             }
                             album.IsSongsAcquired = true;
+
+                            InvokedAlbum = album;
+                            IsAlbumContentPanelVisible = true;
                         });
 
                     }
                     else
                     {
-                        // TODO: no artist name, no album name.
+                        Debug.WriteLine("AlbumsItemInvokedCommand: No album name, no artist name.");
+                        // This should not happen.
                     }
                 }
             });
         }
+        else
+        {
+            InvokedAlbum = album;
+            IsAlbumContentPanelVisible = true;
+        }
 
-        InvokedAlbum = album;
-        IsAlbumContentPanelVisible = true;
+        UpdateProgress?.Invoke(this, "");
     }
-    //
+
     public IRelayCommand AlbumsCloseAlbumContentPanelCommand { get; set; }
     public static bool AlbumsCloseAlbumContentPanelCommand_CanExecute()
     {

@@ -17,7 +17,12 @@ using System.Windows;
 
 namespace MPDCtrlX.Services;
 
-public class MpcService : IMpcService
+#pragma warning disable IDE0079 //
+#pragma warning disable CA1854
+#pragma warning disable IDE0305
+#pragma warning disable CA1862
+#pragma warning restore IDE0079 //
+public partial class MpcService : IMpcService
 {
     #region == Consts, Properties, etc == 
 
@@ -48,9 +53,9 @@ public class MpcService : IMpcService
 
     public ObservableCollection<AlbumEx> Albums { get; private set; } = [];
 
-    public ObservableCollection<SongInfo> SearchResult { get; private set; } = [];
+    private ObservableCollection<SongInfo> SearchResult { get; set; } = [];
 
-    public AlbumImage AlbumCover { get; private set; } = new();
+    private AlbumImage AlbumCover { get; set; } = new();
 
     #endregion
 
@@ -146,7 +151,11 @@ public class MpcService : IMpcService
 
     private readonly IBinaryDownloader _binaryDownloader;
 
+#pragma warning disable IDE0079 
+#pragma warning disable IDE0290
     public MpcService(IBinaryDownloader binaryDownloader)
+#pragma warning restore IDE0290
+#pragma warning restore IDE0079
     {
         _binaryDownloader = binaryDownloader;
     }
@@ -962,6 +971,9 @@ public class MpcService : IMpcService
 
             if (d.IsSuccess)
             {
+                // BinaryConnection start.
+                await _binaryDownloader.MpdBinaryConnectionStart(MpdHost, MpdPort, MpdPassword);
+
                 // ここでIdleにして、以降はnoidle + cmd + idleの組み合わせでやる。
                 // ただし、実際にはidleのあとReadしていないからタイムアウトで切断されてしまう模様。
 
@@ -1212,7 +1224,9 @@ public class MpcService : IMpcService
             // Could be application shutdopwn.
             if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
             {
+                IsBusy?.Invoke(this, false);
 
+                return ret;
             }
             else
             {
@@ -1272,7 +1286,9 @@ public class MpcService : IMpcService
 
             if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
             {
+                IsBusy?.Invoke(this, false);
 
+                return ret;
             }
             else
             {
@@ -1290,7 +1306,7 @@ public class MpcService : IMpcService
 
         if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
         {
-
+            IsBusy?.Invoke(this, false);
             return ret;
         }
 
@@ -1388,7 +1404,7 @@ public class MpcService : IMpcService
                 ret.ErrorMessage = "ReadLineAsync@MpdSendCommand received null data";
 
                 // タイムアウトしていたらここで「も」エラーになる模様。
-
+                /*
                 if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
                 {
                     IsBusy?.Invoke(this, false);
@@ -1398,7 +1414,7 @@ public class MpcService : IMpcService
 
                 IsMpdCommandConnected = false;
 
-                DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
+                DebugCommandOutput?.Invoke(this, string.Format("Connection Timeout. Reconnecting... " + Environment.NewLine + Environment.NewLine));
 
                 try
                 {
@@ -1420,6 +1436,7 @@ public class MpcService : IMpcService
                         if (d.IsSuccess)
                         {
                             DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. @isNullReturn" + Environment.NewLine + Environment.NewLine));
+                            Debug.WriteLine(string.Format("Reconnecting Success. " + Environment.NewLine));
 
                             ret = await MpdCommandSendCommand(cmd, isAutoIdling);
                         }
@@ -1434,7 +1451,7 @@ public class MpcService : IMpcService
 
                     ConnectionError?.Invoke(this, "The connection (command) has been terminated (null return).");
                 }
-
+                */
                 IsBusy?.Invoke(this, false);
 
                 return ret;
@@ -1489,7 +1506,9 @@ public class MpcService : IMpcService
             // Could be application shutdopwn.
             if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
             {
+                IsBusy?.Invoke(this, false);
 
+                return ret;
             }
             else
             {
@@ -1522,6 +1541,7 @@ public class MpcService : IMpcService
                         if (d.IsSuccess)
                         {
                             DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. @IOExceptionOfReadLineAsync" + Environment.NewLine + Environment.NewLine));
+                            Debug.WriteLine(string.Format("Reconnecting Success. " + Environment.NewLine));
 
                             ret = await MpdCommandSendCommand(cmd, isAutoIdling);
                         }
@@ -1675,6 +1695,8 @@ public class MpcService : IMpcService
 
         var expression = queryTag + " " + queryShiki + " \\\"" + escapeValue + "\\\"";
 
+        //Debug.WriteLine("MpdSearch expression: " + expression);
+
         string cmd = "search \"(" + expression + ")\"\n";
 
         CommandResult cm = await MpdCommandSendCommand(cmd, autoIdling);
@@ -1724,45 +1746,81 @@ public class MpcService : IMpcService
         return result;
     }
 
-    public async Task<CommandResult> MpdQueryAlbumArt(string uri, bool isUsingReadpicture)
+    public async Task<CommandImageResult> MpdQueryAlbumArt(string uri, bool isUsingReadpicture)
     {
-        CommandResult f = new();
+        CommandImageResult res = new();
 
         if (string.IsNullOrEmpty(uri))
         {
-            f.IsSuccess = false;
-            return f;
+            res.IsSuccess = false;
+            return res;
         }
 
-        //BinaryDownloader hoge = new();
-        bool asdf = await _binaryDownloader.MpdBinaryConnectionStart(MpdHost, MpdPort, MpdPassword);
+        //bool asdf = await _binaryDownloader.MpdBinaryConnectionStart(MpdHost, MpdPort, MpdPassword);
+        bool asdf = true;
 
-        CommandResult b = new();
 
         if (asdf)
         {
-            b = await _binaryDownloader.MpdQueryAlbumArt(uri, isUsingReadpicture);
+            res = await _binaryDownloader.MpdQueryAlbumArt(uri, isUsingReadpicture);
 
-            if (b.IsSuccess)
+            if (res.IsSuccess)
             {
+                /*
                 Dispatcher.UIThread.Post(() =>
                 {
                     AlbumCover = _binaryDownloader.AlbumCover;
                 });
+                */
+
+                //res.IsSuccess = true;
+                //res.AlbumCover = _binaryDownloader.AlbumCover;
 
                 //await Task.Delay(1000);
                 await Task.Delay(200);
-
                 MpdAlbumArtChanged?.Invoke(this);
             }
             else
             {
-                Debug.WriteLine("MpdQueryAlbumArt failed. Why... > " + b.ErrorMessage);
+                //Debug.WriteLine("MpdQueryAlbumArt failed. Why... > " + res.ErrorMessage);
 
+                // need this to clear image.
+                await Task.Delay(200);
+                MpdAlbumArtChanged?.Invoke(this);
+
+                if (res.IsTimeOut)
+                {
+                    if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
+                    {
+
+                        Debug.WriteLine("MpdQueryAlbumArt@Timeout. Disconnecting...");
+                        IsBusy?.Invoke(this, false);
+
+                        return res;
+                    }
+                    else
+                    {
+                        DebugCommandOutput?.Invoke(this, "MpdQueryAlbumArt@Timeout. Reconnecting...");
+                        // re-connect
+                        var b = await _binaryDownloader.MpdBinaryConnectionStart(MpdHost, MpdPort, MpdPassword);
+                        if (b)
+                        {
+                            Debug.WriteLine("MpdQueryAlbumArt@Timeout. Reconnecting success.");
+                            // retry for the timeout.
+                            return await MpdQueryAlbumArt(uri, isUsingReadpicture);
+                        }
+                        else
+                        {
+                            Debug.WriteLine("MpdQueryAlbumArt@Timeout. Reconnecting failed.");
+                        }
+                    }
+                }
+                /*
                 Dispatcher.UIThread.Post(() =>
                 {
                     AlbumCover = new();
                 });
+                */
             }
         }
         else
@@ -1770,10 +1828,88 @@ public class MpcService : IMpcService
             Debug.WriteLine("Damn... MpdBinaryConnectionStart@MpdQueryAlbumArt failed.");
         }
 
-        _binaryDownloader.MpdBinaryConnectionDisconnect();
+        //_binaryDownloader.MpdBinaryConnectionDisconnect();
 
-        return b;
+        return res;
     }
+
+    public async Task<CommandImageResult> MpdQueryAlbumArtForAlbumView(string uri, bool isUsingReadpicture)
+    {
+        CommandImageResult res = new();
+
+        if (string.IsNullOrEmpty(uri))
+        {
+            res.IsSuccess = false;
+            return res;
+        }
+
+        //bool asdf = await _binaryDownloader.MpdBinaryConnectionStart(MpdHost, MpdPort, MpdPassword);
+        bool asdf = true;
+
+
+        if (asdf)
+        {
+            res = await _binaryDownloader.MpdQueryAlbumArt(uri, isUsingReadpicture);
+
+            if (res.IsSuccess)
+            {
+
+                //await Task.Delay(200);
+                //MpdAlbumArtChanged?.Invoke(this);
+            }
+            else
+            {
+                //Debug.WriteLine("MpdQueryAlbumArt failed. Why... > " + res.ErrorMessage);
+
+                // need this to clear image.
+                //await Task.Delay(200);
+                //MpdAlbumArtChanged?.Invoke(this);
+
+                if (res.IsTimeOut)
+                {
+                    if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
+                    {
+
+                        Debug.WriteLine("MpdQueryAlbumArt@Timeout. Disconnecting...");
+                        IsBusy?.Invoke(this, false);
+
+                        return res;
+                    }
+                    else
+                    {
+                        DebugCommandOutput?.Invoke(this, "MpdQueryAlbumArt@Timeout. Reconnecting...");
+                        // re-connect
+                        var b = await _binaryDownloader.MpdBinaryConnectionStart(MpdHost, MpdPort, MpdPassword);
+                        if (b)
+                        {
+                            Debug.WriteLine("MpdQueryAlbumArt@Timeout. Reconnecting success.");
+                            // retry for the timeout.
+                            return await MpdQueryAlbumArtForAlbumView(uri, isUsingReadpicture);
+                        }
+                        else
+                        {
+                            Debug.WriteLine("MpdQueryAlbumArt@Timeout. Reconnecting failed.");
+                        }
+                    }
+                }
+                /*
+                Dispatcher.UIThread.Post(() =>
+                {
+                    AlbumCover = new();
+                });
+                */
+            }
+        }
+        else
+        {
+            Debug.WriteLine("Damn... MpdBinaryConnectionStart@MpdQueryAlbumArt failed.");
+        }
+
+        //_binaryDownloader.MpdBinaryConnectionDisconnect();
+
+        return res;
+    }
+
 
     #endregion
 
@@ -2599,6 +2735,7 @@ public class MpcService : IMpcService
                     MpdStatus.MpdError = "";
                 }
 
+
                 // TODO: more?
             });
 
@@ -2636,6 +2773,7 @@ public class MpcService : IMpcService
             isEmptyResult = true;
 
         List<string> resultLines = result.Split('\n').ToList();
+
         if (resultLines is null)
             return Task.FromResult(true);
         if (resultLines.Count == 0)
@@ -2718,6 +2856,7 @@ public class MpcService : IMpcService
             isEmptyResult = true;
 
         List<string> resultLines = result.Split('\n').ToList();
+
         if (resultLines is null)
             isEmptyResult = true;
         if (resultLines is not null)
@@ -3311,14 +3450,11 @@ public class MpcService : IMpcService
                         }
                     }
 
-                    arts = new AlbumArtist();
-                    arts.Name = value.Replace("AlbumArtist: ", "");
-                    //AlbumArtists.Add(arts);
-
-                    if (string.IsNullOrEmpty(arts.Name.Trim()))
+                    arts = new AlbumArtist
                     {
-                        arts.Name = "";
-                    }
+                        Name = value.Replace("AlbumArtist: ", "")
+                    };
+                    //AlbumArtists.Add(arts);
 
                     MpcProgress?.Invoke(this, string.Format("[Background] Parsing AlbumArtists ({0})...", i));
                 }
@@ -3328,11 +3464,6 @@ public class MpcService : IMpcService
                     {
                         Name = value.Replace("Album: ", "")
                     };
-
-                    if (string.IsNullOrEmpty(alb.Name.Trim()))
-                    {
-                        alb.Name = "";
-                    }
 
                     arts?.Albums.Add(alb);
 
@@ -3388,7 +3519,6 @@ public class MpcService : IMpcService
 
         //Application.Current.Dispatcher.Invoke(() =>
         Dispatcher.UIThread.Post(() =>
-
         {
             SearchResult.Clear();
         });
@@ -3398,6 +3528,7 @@ public class MpcService : IMpcService
         //if (result.Trim() == "OK") return true;
 
         List<string> resultLines = result.Split('\n').ToList();
+
         if (resultLines is null) return Task.FromResult(true);
         if (resultLines.Count == 0) return Task.FromResult(true);
 
@@ -3497,10 +3628,10 @@ public class MpcService : IMpcService
                 SongValues.Clear();
 
                 //Application.Current.Dispatcher.Invoke(() =>
-                Dispatcher.UIThread.Post(() =>
-                {
+                //Dispatcher.UIThread.Post(() =>
+                //{
                     SearchResult.Add(sng);
-                });
+                //});
 
                 MpcProgress?.Invoke(this, string.Format("[Background] Parsing search result item... ({0})", i + 1));
             }
@@ -3537,6 +3668,7 @@ public class MpcService : IMpcService
         if (result.Trim() == "OK") return songList;
 
         List<string> resultLines = result.Split('\n').ToList();
+
         if (resultLines is null) return songList;
         if (resultLines.Count == 0) return songList;
 
@@ -3786,6 +3918,16 @@ public class MpcService : IMpcService
             ConnectionState = ConnectionStatus.DisconnectedByUser;
         }
 
+        try
+        {
+            _binaryDownloader.MpdBinaryConnectionDisconnect();
+        }
+        catch { }
+        finally
+        {
+            IsBusy?.Invoke(this, false);
+            ConnectionState = ConnectionStatus.DisconnectedByUser;
+        }
     }
 
 }

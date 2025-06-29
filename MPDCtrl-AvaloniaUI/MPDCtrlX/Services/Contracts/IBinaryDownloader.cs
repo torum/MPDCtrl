@@ -9,5 +9,5 @@ public interface IBinaryDownloader
 
     void MpdBinaryConnectionDisconnect();
     Task<bool> MpdBinaryConnectionStart(string host, int port, string password);
-    Task<CommandResult> MpdQueryAlbumArt(string uri, bool isUsingReadpicture);
+    Task<CommandImageResult> MpdQueryAlbumArt(string uri, bool isUsingReadpicture);
 }

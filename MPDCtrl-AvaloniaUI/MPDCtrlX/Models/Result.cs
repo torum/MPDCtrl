@@ -1,3 +1,4 @@
+using Avalonia.Media.Imaging;
 using System.Collections.ObjectModel;
 
 namespace MPDCtrlX.Models;
@@ -20,10 +21,17 @@ public class CommandResult : Result
 
 public class CommandBinaryResult : Result
 {
+    public bool IsTimeOut = false;
     public int WholeSize;
     public int ChunkSize;
     public string Type = "";
     public byte[]? BinaryData;
+}
+
+public class  CommandImageResult : Result
+{
+    public bool IsTimeOut = false;
+    public AlbumImage AlbumCover = new();
 }
 
 public class CommandPlaylistResult : CommandResult

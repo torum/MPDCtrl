@@ -7,7 +7,7 @@ namespace MPDCtrlX.Services.Contracts;
 
 public interface IMpcService
 {
-    AlbumImage AlbumCover { get; }
+    //AlbumImage AlbumCover { get; }
     MpcService.ConnectionStatus ConnectionState { get; }
     ObservableCollection<SongInfoEx> CurrentQueue { get; }
     bool IsMpdCommandConnected { get; set; }
@@ -24,7 +24,7 @@ public interface IMpcService
     bool MpdStop { get; set; }
     string MpdVerText { get; set; }
     ObservableCollection<Playlist> Playlists { get; }
-    ObservableCollection<SongInfo> SearchResult { get; }
+    //ObservableCollection<SongInfo> SearchResult { get; }
 
     event MpcService.ConnectionErrorEvent ConnectionError;
     event MpcService.ConnectionStatusChangedEvent ConnectionStatusChanged;
@@ -70,7 +70,8 @@ public interface IMpcService
     Task<CommandResult> MpdPlaylistAdd(string playlistName, List<string> uris);
     Task<CommandResult> MpdPlaylistClear(string playlistName);
     Task<CommandResult> MpdPlaylistDelete(string playlistName, int pos);
-    Task<CommandResult> MpdQueryAlbumArt(string uri, bool isUsingReadpicture);
+    Task<CommandImageResult> MpdQueryAlbumArt(string uri, bool isUsingReadpicture);
+    Task<CommandImageResult> MpdQueryAlbumArtForAlbumView(string uri, bool isUsingReadpicture);
     Task<CommandResult> MpdQueryCurrentQueue(bool autoIdling = true);
     Task<CommandResult> MpdQueryCurrentSong(bool autoIdling = true);
     Task<CommandResult> MpdQueryListAll(bool autoIdling = true);

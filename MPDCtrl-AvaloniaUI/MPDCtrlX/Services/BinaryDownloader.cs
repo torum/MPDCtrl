@@ -5,6 +5,7 @@ using MPDCtrlX.Models;
 using MPDCtrlX.Services.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -14,6 +15,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using static MPDCtrlX.Services.MpcService;
 
 namespace MPDCtrlX.Services;
 
@@ -23,7 +25,7 @@ public class BinaryDownloader : IBinaryDownloader
     private StreamReader? _binaryReader;
     private StreamWriter? _binaryWriter;
 
-    private readonly AlbumImage _albumCover = new();
+    private AlbumImage _albumCover = new();
     public AlbumImage AlbumCover { get => _albumCover; }
 
     private string _host = "";
@@ -379,10 +381,10 @@ public class BinaryDownloader : IBinaryDownloader
 
         if (!_binaryConnection.Client.Connected)
         {
-            Debug.WriteLine("@MpdBinarySendBinaryCommand: " + "NOT IsMpdCommandConnected");
+            Debug.WriteLine("@MpdBinarySendBinaryCommand: " + "NOT IsMpdBinaryCommandConnected");
 
             ret.IsSuccess = false;
-            ret.ErrorMessage = "NOT IsMpdCommandConnected";
+            ret.ErrorMessage = "NOT IsMpdBinaryCommandConnected";
 
             return ret;
         }
@@ -416,13 +418,16 @@ public class BinaryDownloader : IBinaryDownloader
         catch (System.IO.IOException e)
         {
             // IOException : Unable to write data to the transport connection
-
+            
             Debug.WriteLine("Exception@MpdBinarySendBinaryCommand: " + cmd.Trim() + " WriteAsync " + e.Message);
+
+            ret.IsTimeOut = true; // re-try.
 
             ret.IsSuccess = false;
             ret.ErrorMessage = e.Message;
 
             return ret;
+            
         }
         catch (Exception e)
         {
@@ -483,7 +488,9 @@ public class BinaryDownloader : IBinaryDownloader
 
                     string res = Encoding.Default.GetString(bindata, 0, bindata.Length);
 
+#pragma warning disable IDE0305 
                     List<string> values = res.Split("\n").ToList();
+#pragma warning restore IDE0305 
 
                     foreach (var line in values)
                     {
@@ -511,8 +518,9 @@ public class BinaryDownloader : IBinaryDownloader
                             {
                                 if (!string.IsNullOrEmpty(line))
                                     stringBuilder.Append(line + "\n");
-
+#pragma warning disable IDE0305
                                 List<string> s = line.Split(':').ToList();
+#pragma warning restore IDE0305
                                 if (s.Count > 1)
                                 {
                                     if (Int32.TryParse(s[1], out int i))
@@ -525,8 +533,9 @@ public class BinaryDownloader : IBinaryDownloader
                             {
                                 if (!string.IsNullOrEmpty(line))
                                     stringBuilder.Append(line + "\n");
-
+#pragma warning disable IDE0305
                                 List<string> s = line.Split(':').ToList();
+#pragma warning restore IDE0305
                                 if (s.Count > 1)
                                 {
                                     ret.Type = s[1].Trim();
@@ -540,8 +549,9 @@ public class BinaryDownloader : IBinaryDownloader
                                     stringBuilder.Append(line + "\n");
 
                                 stringBuilder.Append("{binary data}" + "\n");
-
+#pragma warning disable IDE0305
                                 List<string> s = line.Split(':').ToList();
+#pragma warning restore IDE0305
                                 if (s.Count > 1)
                                 {
                                     if (Int32.TryParse(s[1], out int i))
@@ -648,6 +658,8 @@ public class BinaryDownloader : IBinaryDownloader
 
             Debug.WriteLine("IOException@MpdBinarySendBinaryCommand: " + cmd.Trim() + " ReadAsync ---- " + e.Message);
 
+            ret.IsTimeOut = true; // re-try.
+
             ret.IsSuccess = false;
             ret.ErrorMessage = e.Message;
 
@@ -705,7 +717,9 @@ public class BinaryDownloader : IBinaryDownloader
             int binSize = 0;
             int binResSize = 0;
 
+#pragma warning disable IDE0305
             List<string> values = res.Split('\n').ToList();
+#pragma warning restore IDE0305
 
             bool found = false;
             foreach (var val in values)
@@ -715,8 +729,9 @@ public class BinaryDownloader : IBinaryDownloader
                     found = true;
 
                     gabStart = gabStart + val.Length + 1;
-
+#pragma warning disable IDE0305
                     List<string> s = val.Split(':').ToList();
+#pragma warning restore IDE0305
                     if (s.Count > 1)
                     {
                         if (Int32.TryParse(s[1], out int i))
@@ -730,8 +745,9 @@ public class BinaryDownloader : IBinaryDownloader
                 else if (val.StartsWith("type: "))
                 {
                     gabStart = gabStart + val.Length + 1;
-
+#pragma warning disable IDE0305
                     List<string> s = val.Split(':').ToList();
+#pragma warning restore IDE0305
                     if (s.Count > 1)
                     {
                         r.Type = s[1];
@@ -741,8 +757,9 @@ public class BinaryDownloader : IBinaryDownloader
                 else if (val.StartsWith("binary: "))
                 {
                     gabStart = gabStart + val.Length + 1;
-
+#pragma warning disable IDE0305
                     List<string> s = val.Split(':').ToList();
+#pragma warning restore IDE0305
                     if (s.Count > 1)
                     {
                         if (Int32.TryParse(s[1], out int i))
@@ -854,11 +871,11 @@ public class BinaryDownloader : IBinaryDownloader
         return ret;
     }
 
-    public async Task<CommandResult> MpdQueryAlbumArt(string uri, bool isUsingReadpicture)
+    public async Task<CommandImageResult> MpdQueryAlbumArt(string uri, bool isUsingReadpicture)
     {
         if (string.IsNullOrEmpty(uri))
         {
-            CommandResult f = new()
+            CommandImageResult f = new()
             {
                 ErrorMessage = "IsNullOrEmpty(uri)",
                 IsSuccess = false
@@ -866,6 +883,16 @@ public class BinaryDownloader : IBinaryDownloader
             return f;
         }
 
+        if (_albumCover.IsDownloading)
+        {
+            CommandImageResult f = new()
+            {
+                ErrorMessage = "_albumCover.IsDownloading",
+                IsSuccess = false
+            };
+            return f;
+        }
+  
         _albumCover.SongFilePath = uri;
         _albumCover.IsDownloading = true;
 
@@ -878,6 +905,7 @@ public class BinaryDownloader : IBinaryDownloader
 
         CommandBinaryResult result = await MpdBinarySendBinaryCommand(cmd, false);
 
+        CommandImageResult b = new();
         bool r = false;
 
         if (result.IsSuccess)
@@ -895,10 +923,12 @@ public class BinaryDownloader : IBinaryDownloader
 
                 if (_albumCover.BinaryData is not null)
                 {
-                    _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
+                    //_albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
+                    b.AlbumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
                 }
 
-                if (_albumCover.AlbumImageSource is not null)
+                //if (_albumCover.AlbumImageSource is not null)
+                if (b.AlbumCover.AlbumImageSource is not null)
                 {
                     _albumCover.IsSuccess = true;
                 }
@@ -939,10 +969,12 @@ public class BinaryDownloader : IBinaryDownloader
                             */
                             if (_albumCover.BinaryData is not null)
                             {
-                                _albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
+                                //_albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
+                                b.AlbumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
                             }
 
-                            if (_albumCover.AlbumImageSource is not null)
+                            //if (_albumCover.AlbumImageSource is not null)
+                            if (b.AlbumCover.AlbumImageSource is not null)
                             {
                                 _albumCover.IsSuccess = true;
                             }
@@ -980,15 +1012,24 @@ public class BinaryDownloader : IBinaryDownloader
                 }
             }
         }
-
-        CommandResult b = new()
+        else
         {
-            IsSuccess = r
-        };
+            b.IsTimeOut = result.IsTimeOut;
+        }
+
+        b.IsSuccess = r;
         if (!r)
         {
             b.ErrorMessage = result.ErrorMessage;
         }
+        b.AlbumCover.SongFilePath = _albumCover.SongFilePath;
+        b.AlbumCover.IsDownloading = false;
+        b.AlbumCover.IsSuccess = r;
+        //b.ErrorMessage = result.ErrorMessage;
+
+        //_albumCover.AlbumImageSource = null; // Clear the image source to free memory.
+        //_albumCover.IsDownloading = false;
+        _albumCover = new AlbumImage(); // Reset the album cover for next use.
 
         return b;
     }

@@ -34,9 +34,10 @@
 	</Interaction.Behaviors>
 	<Window.KeyBindings>
 		<KeyBinding Command="{Binding PlayCommand}" Gesture="Play" />
-		<KeyBinding Command="{Binding PlayCommand}" Gesture="Ctrl+Space" />
 		<!-- 
-		<KeyBinding Command="{Binding PlayCommand}" Gesture="Space" /> -->
+		<KeyBinding Command="{Binding PlayCommand}" Gesture="Ctrl+Space" />
+		 -->
+		<KeyBinding Command="{Binding PlayCommand}" Gesture="Space" />
 		<KeyBinding Command="{Binding PlayCommand}" Gesture="Ctrl+P"/>
 		<KeyBinding Command="{Binding PlayCommand}" Gesture="MediaPlayPause" />
 		<KeyBinding Command="{Binding PlayCommand}" Gesture="MediaStop" />
@@ -230,7 +231,7 @@
 				
 				<ui:NavigationView.Resources>
 					<DataTemplate x:Key="NavigationViewMenuItem" x:DataType="mod:NodeMenu">
-						<ui:NavigationViewItem MenuItemsSource="{Binding Children}" IsExpanded="{Binding Expanded,Mode=TwoWay}" IsSelected="{Binding Selected, Mode=TwoWay}">
+						<ui:NavigationViewItem MenuItemsSource="{Binding Children, Mode=OneWay}" IsExpanded="{Binding Expanded, Mode=TwoWay}" IsSelected="{Binding Selected, Mode=TwoWay}">
 
 							<ui:NavigationViewItem.Content>
 								<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="-1,0,0,0">

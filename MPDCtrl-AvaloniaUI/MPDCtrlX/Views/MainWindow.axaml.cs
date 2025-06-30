@@ -24,6 +24,9 @@ public partial class MainWindow : Window//AppWindow//
 {
     private readonly MainView? _shellPage;// = (App.Current as App)?.AppHost.Services.GetRequiredService<MainView>();
     private readonly SettingsPage? _settingsPage;// = (App.Current as App)?.AppHost.Services.GetRequiredService<SettingsPage>();
+
+    private NavigationViewItem? _navigationViewSelectedItem;
+
     public MainWindow() { }
 
     public MainWindow(MainView shellPage, MainViewModel vm, SettingsPage settingsPage)
@@ -126,6 +129,9 @@ public partial class MainWindow : Window//AppWindow//
             if (hoge != null)
             {
                 hoge.IsSelected = true;
+
+                //
+                _navigationViewSelectedItem = hoge;
             }
 
             vm.SelectedNodeMenu = vm.MainMenuItems.FirstOrDefault();
@@ -158,30 +164,39 @@ public partial class MainWindow : Window//AppWindow//
         {
             return;
         }
+        /*
 
+        */
         if (this.DataContext is MainViewModel vm)
         {
             if (e.SelectedItem is NodeMenuPlaylists pl)
             {
                 // don't change page here.
-                pl.Selected = false;
+                //pl.Selected = false;
                 if (vm.SelectedNodeMenu != null)
                 {
-                    vm.SelectedNodeMenu.Selected = true;
+                    //vm.SelectedNodeMenu.Selected = true;
                 }
             }
             else if (e.SelectedItem is NodeMenuLibrary lb)
             {
                 // don't change page here.
-                lb.Selected = false;
+                //lb.Selected = false;
                 if (vm.SelectedNodeMenu != null)
                 {
-                    vm.SelectedNodeMenu.Selected = true;
+                    //vm.SelectedNodeMenu.Selected = true;
                 }
             }
             else
             {
-                vm.SelectedNodeMenu = e.SelectedItem as NodeTree;
+                if (e.SelectedItem is not null)
+                {
+                    vm.SelectedNodeMenu = e.SelectedItem as NodeTree;
+                }
+                else
+                {
+                    vm.SelectedNodeMenu = null; 
+                }
             }
         }
     }
@@ -200,6 +215,22 @@ public partial class MainWindow : Window//AppWindow//
             {
                 nv.Content = _shellPage;
             }
+
+
+            if (nv.SelectedItem is NodeMenuPlaylists pl)
+            {
+                // don't change page here.
+                //nv.SelectedItem = _navigationViewSelectedItem;
+                return;
+            }
+            else if (nv.SelectedItem is NodeMenuLibrary lb)
+            {
+                // don't change page here.
+                //nv.SelectedItem = _navigationViewSelectedItem;
+                return;
+            }
+
+            _navigationViewSelectedItem = nv.SelectedItem as NavigationViewItem;
         }
     }
 }

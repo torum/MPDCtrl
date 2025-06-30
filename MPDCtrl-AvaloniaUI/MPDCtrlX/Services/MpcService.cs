@@ -53,9 +53,9 @@ public partial class MpcService : IMpcService
 
     public ObservableCollection<AlbumEx> Albums { get; private set; } = [];
 
-    private ObservableCollection<SongInfo> SearchResult { get; set; } = [];
+    //private ObservableCollection<SongInfo> SearchResult { get; set; } = [];
 
-    private AlbumImage AlbumCover { get; set; } = new();
+    //private AlbumImage AlbumCover { get; set; } = new();
 
     #endregion
 
@@ -106,6 +106,8 @@ public partial class MpcService : IMpcService
     // TODO: Not really used...
     public bool IsMpdCommandConnected { get; set; }
     public bool IsMpdIdleConnected { get; set; }
+
+    //private bool IsMpdCommandInIdle = false;
 
     #endregion
 
@@ -977,7 +979,8 @@ public partial class MpcService : IMpcService
                 // ここでIdleにして、以降はnoidle + cmd + idleの組み合わせでやる。
                 // ただし、実際にはidleのあとReadしていないからタイムアウトで切断されてしまう模様。
 
-                d = await MpdSendIdle();
+                // TEST:
+                //d = await MpdSendIdle();
 
                 return d.IsSuccess;
             }
@@ -1131,8 +1134,11 @@ public partial class MpcService : IMpcService
 
     }
 
-    private async Task<CommandResult> MpdCommandSendCommand(string cmd, bool isAutoIdling = false)
+    private async Task<CommandResult> MpdCommandSendCommand(string cmd, bool isAutoIdling = false, int reTryCount = 0)
     {
+        // TEST: 
+        isAutoIdling = false;
+
         CommandResult ret = new();
 
         if (_commandConnection.Client is null)
@@ -1171,11 +1177,23 @@ public partial class MpcService : IMpcService
             return ret;
         }
 
+        if (reTryCount > 5)
+        {
+            Debug.WriteLine("@MpdSendCommand: " + "retryCount > 5, returning.");
+
+            ret.IsSuccess = false;
+            ret.ErrorMessage = "RetryCount > 5, returning.";
+
+            DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdSendCommand", "RetryCount > 5", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+
+            return ret;
+        }
+
         // WriteAsync
         try
         {
             IsBusy?.Invoke(this, true);
-
+            /*
             if (cmd.Trim().StartsWith("idle"))
             {
                 //DebugCommandOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
@@ -1213,6 +1231,42 @@ public partial class MpcService : IMpcService
                 else
                     await _commandWriter.WriteAsync(cmd.Trim() + "\n");
             }
+            */
+
+
+            // TEST:
+            /*
+            if (IsMpdCommandInIdle)
+            {
+                if ((!cmd.StartsWith("password")) && (!cmd.StartsWith("idle")) && (!cmd.StartsWith("noidle")))
+                {
+                    Debug.WriteLine("MpdSendCommand: IsMpdCommandInIdle is true, cmd: " + cmd.Trim());
+                    var n = await MpdCommandSendCommand("noidle");
+                    if (n.IsSuccess)
+                    {
+                        IsMpdCommandInIdle = false;
+                        return ret = await MpdCommandSendCommand(cmd);
+                    }
+                    else
+                    {
+                        Debug.WriteLine("MpdSendCommand: IsMpdCommandInIdle is true, but noidle failed: " + n.ErrorMessage);
+                    }
+                    return n;
+                }
+            }
+            else
+            {
+
+            }
+            */
+
+            string cmdDummy = cmd;
+            if (cmd.StartsWith("password "))
+                cmdDummy = "password ****";
+            Task nowait = Task.Run(() => DebugCommandOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n"));
+
+            cmdDummy = cmdDummy.Trim().Replace("\n", "\n" + ">>>>");
+            await _commandWriter.WriteAsync(cmd.Trim() + "\n");
         }
         catch (System.IO.IOException e)
         {
@@ -1224,9 +1278,9 @@ public partial class MpcService : IMpcService
             // Could be application shutdopwn.
             if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
             {
-                IsBusy?.Invoke(this, false);
+                //IsBusy?.Invoke(this, false);
 
-                return ret;
+                //return ret;
             }
             else
             {
@@ -1241,7 +1295,7 @@ public partial class MpcService : IMpcService
                 try
                 {
                     //_commandConnection.Client.Shutdown(SocketShutdown.Both);
-                    _commandConnection.Close();
+                    //_commandConnection.Close();
                 }
                 catch { }
 
@@ -1249,18 +1303,18 @@ public partial class MpcService : IMpcService
 
                 if (newCon.IsSuccess)
                 {
-                    CommandResult d = await MpdCommandSendCommand(MpdPassword);
+                    CommandResult d = await MpdCommandSendPassword(MpdPassword);
 
                     if (d.IsSuccess)
                     {
-                        d = await MpdCommandSendCommand("idle player");
-
-                        if (d.IsSuccess)
-                        {
+                        // TEST:
+                        //d = await MpdCommandSendCommand("idle player", isAutoIdling, reTryCount++);
+                        //if (d.IsSuccess)
+                        //{
                             DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. @IOExceptionOfWriteAsync" + Environment.NewLine + Environment.NewLine));
 
-                            ret = await MpdCommandSendCommand(cmd, isAutoIdling);
-                        }
+                            ret = await MpdCommandSendCommand(cmd, isAutoIdling, reTryCount++);
+                        //}
                     }
                 }
                 else
@@ -1398,13 +1452,14 @@ public partial class MpcService : IMpcService
             {
                 Debug.WriteLine("@MpdSendCommand ReadLineAsync isNullReturn");
 
+
                 DebugCommandOutput?.Invoke(this, string.Format("################ Error @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "ReadLineAsync received null data", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
 
                 ret.ResultText = stringBuilder.ToString();
                 ret.ErrorMessage = "ReadLineAsync@MpdSendCommand received null data";
 
                 // タイムアウトしていたらここで「も」エラーになる模様。
-                /*
+                
                 if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
                 {
                     IsBusy?.Invoke(this, false);
@@ -1414,12 +1469,12 @@ public partial class MpcService : IMpcService
 
                 IsMpdCommandConnected = false;
 
-                DebugCommandOutput?.Invoke(this, string.Format("Connection Timeout. Reconnecting... " + Environment.NewLine + Environment.NewLine));
+                DebugCommandOutput?.Invoke(this, string.Format("Connection Timeout(NullReturn). Reconnecting... " + Environment.NewLine + Environment.NewLine));
 
                 try
                 {
                     //_commandConnection.Client.Shutdown(SocketShutdown.Both);
-                    _commandConnection.Close();
+                    //_commandConnection.Close();
                 }
                 catch { }
 
@@ -1431,15 +1486,15 @@ public partial class MpcService : IMpcService
 
                     if (d.IsSuccess)
                     {
-                        d = await MpdCommandSendCommand("idle player");
-
-                        if (d.IsSuccess)
-                        {
+                        // TEST:
+                        //d = await MpdCommandSendCommand("idle player", isAutoIdling, reTryCount);
+                        //if (d.IsSuccess)
+                        //{
                             DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. @isNullReturn" + Environment.NewLine + Environment.NewLine));
-                            Debug.WriteLine(string.Format("Reconnecting Success. " + Environment.NewLine));
+                            Debug.WriteLine(string.Format("Reconnecting Success. @isNullReturn, RetryCount="+ reTryCount.ToString() + Environment.NewLine));
 
-                            ret = await MpdCommandSendCommand(cmd, isAutoIdling);
-                        }
+                            ret = await MpdCommandSendCommand(cmd, isAutoIdling, reTryCount++);
+                        //}
                     }
                 }
                 else
@@ -1451,10 +1506,11 @@ public partial class MpcService : IMpcService
 
                     ConnectionError?.Invoke(this, "The connection (command) has been terminated (null return).");
                 }
-                */
+                
                 IsBusy?.Invoke(this, false);
 
                 return ret;
+
             }
             else
             {
@@ -1467,6 +1523,22 @@ public partial class MpcService : IMpcService
                 ret.ResultText = stringBuilder.ToString();
 
                 IsBusy?.Invoke(this, false);
+
+                // TEST: 
+                /*
+                if (!IsMpdCommandInIdle)
+                {
+                    if ((!cmd.StartsWith("password")) && (!cmd.StartsWith("idle")) && (!cmd.StartsWith("noidle")))
+                    {
+                        Debug.WriteLine("MpdSendCommand: " + "IsMpdCommandInIdle is false, sending idle command...");
+                        var y = await MpdCommandSendCommand("idle");
+                        if (y.IsSuccess)
+                        {
+                            IsMpdCommandInIdle = true;
+                        }
+                    }
+                }
+                */
 
                 return ret;
             }
@@ -1524,7 +1596,7 @@ public partial class MpcService : IMpcService
                 try
                 {
                     //_commandConnection.Client.Shutdown(SocketShutdown.Both);
-                    _commandConnection.Close();
+                    //_commandConnection.Close();
                 }
                 catch { }
 
@@ -1536,15 +1608,15 @@ public partial class MpcService : IMpcService
 
                     if (d.IsSuccess)
                     {
-                        d = await MpdCommandSendCommand("idle player");
-
-                        if (d.IsSuccess)
-                        {
+                        // TEST:
+                        //d = await MpdCommandSendCommand("idle player", isAutoIdling, reTryCount);
+                        //if (d.IsSuccess)
+                        //{
                             DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. @IOExceptionOfReadLineAsync" + Environment.NewLine + Environment.NewLine));
                             Debug.WriteLine(string.Format("Reconnecting Success. " + Environment.NewLine));
 
-                            ret = await MpdCommandSendCommand(cmd, isAutoIdling);
-                        }
+                            ret = await MpdCommandSendCommand(cmd, isAutoIdling, reTryCount++);
+                        //}
                     }
                 }
                 else
@@ -1673,12 +1745,12 @@ public partial class MpcService : IMpcService
 
         CommandSearchResult result = new();
 
-        //if (Application.Current is null) { return result; }
-        //Application.Current.Dispatcher.Invoke(() =>
+        /*
         Dispatcher.UIThread.Post(() =>
         {
             SearchResult.Clear();
         });
+        */
 
         if (string.IsNullOrEmpty(queryTag) || string.IsNullOrEmpty(queryValue) || string.IsNullOrEmpty(queryShiki))
         {
@@ -1688,21 +1760,24 @@ public partial class MpcService : IMpcService
 
         //var expression = queryTag + " " + queryShiki + " \'" + Regex.Escape(queryValue) + "\'";
 
-        //var test = @"foo'bar""";
-        var escapeValue = Regex.Replace(queryValue, @"[\\]+", @"\");
+        //queryValue = @"foo'bar""";
+        var escapeValue = queryValue;
+        escapeValue = Regex.Replace(escapeValue, @"[\\]+", @"\");
         escapeValue = Regex.Replace(escapeValue, @"[\']+", @"\\'");
         escapeValue = Regex.Replace(escapeValue, @"[""]+", @"\\\""");
 
         var expression = queryTag + " " + queryShiki + " \\\"" + escapeValue + "\\\"";
-
-        //Debug.WriteLine("MpdSearch expression: " + expression);
+        //var expression = queryTag + " " + queryShiki + " \'" + Regex.Escape(queryValue) + "\'";
 
         string cmd = "search \"(" + expression + ")\"\n";
+
+        //Debug.WriteLine("MpdSearch cmd: " + cmd);
 
         CommandResult cm = await MpdCommandSendCommand(cmd, autoIdling);
         if (cm.IsSuccess)
         {
             MpcProgress?.Invoke(this, "[Background] Parsing search result...");
+            /*
             if (await ParseSearchResult(cm.ResultText))
             {
                 result.IsSuccess = true;
@@ -1713,6 +1788,10 @@ public partial class MpcService : IMpcService
 
                 MpcProgress?.Invoke(this, "[Background] Search result updated.");
             }
+            */
+            MpcProgress?.Invoke(this, "[Background] Search completed.");
+            result.IsSuccess = true;
+            result.SearchResult = await ParseSearchResult(cm.ResultText);
         }
 
         return result;
@@ -1883,12 +1962,14 @@ public partial class MpcService : IMpcService
                         if (b)
                         {
                             Debug.WriteLine("MpdQueryAlbumArt@Timeout. Reconnecting success.");
+                            DebugCommandOutput?.Invoke(this, "MpdQueryAlbumArt@Timeout. Reconnecting success.");
                             // retry for the timeout.
                             return await MpdQueryAlbumArtForAlbumView(uri, isUsingReadpicture);
                         }
                         else
                         {
                             Debug.WriteLine("MpdQueryAlbumArt@Timeout. Reconnecting failed.");
+                            DebugCommandOutput?.Invoke(this, "MpdQueryAlbumArt@Timeout. Reconnecting failed.");
                         }
                     }
                 }
@@ -1910,14 +1991,13 @@ public partial class MpcService : IMpcService
         return res;
     }
 
-
     #endregion
 
     #region == Command Connection's MPD Commands with boolean result ==
 
     public async Task<CommandResult> MpdSendUpdate()
     {
-        CommandResult result = await MpdCommandSendCommand("update", true);
+        CommandResult result = await MpdCommandSendCommand("update", false);// TEST: no autoIdling
 
         return result;
     }
@@ -3460,21 +3540,17 @@ public partial class MpcService : IMpcService
                 }
                 else if (value.StartsWith("Album:"))
                 {
-                    var alb = new Album
+                    var albx = new AlbumEx
                     {
-                        Name = value.Replace("Album: ", "")
+                        Name = value.Replace("Album: ", ""),
+                        AlbumArtist = arts?.Name ?? ""
                     };
 
-                    arts?.Albums.Add(alb);
+                    arts?.Albums.Add(albx);
 
                     // Create Albums at the same time.
-                    if ((!string.IsNullOrEmpty(alb.Name.Trim())) || (!string.IsNullOrEmpty(arts?.Name.Trim())))
+                    if ((!string.IsNullOrEmpty(albx.Name.Trim())))// (!string.IsNullOrEmpty(arts?.Name.Trim()))
                     {
-                        var albx = new AlbumEx
-                        {
-                            Name = alb.Name,
-                            AlbumArtist = arts?.Name ?? ""
-                        };
                         Albums.Add(albx);
                     }
                     //
@@ -3513,24 +3589,25 @@ public partial class MpcService : IMpcService
         return Task.FromResult(true);
     }
 
-    private Task<bool> ParseSearchResult(string result)
+    private Task<ObservableCollection<SongInfo>> ParseSearchResult(string result)
     {
-        if (MpdStop) return Task.FromResult(false);
+        var res = new ObservableCollection<SongInfo>();
 
-        //Application.Current.Dispatcher.Invoke(() =>
-        Dispatcher.UIThread.Post(() =>
-        {
-            SearchResult.Clear();
-        });
+        if (MpdStop) return Task.FromResult(res);
 
-        if (string.IsNullOrEmpty(result)) return Task.FromResult(false);
+        //Dispatcher.UIThread.Post(() =>
+        //{
+        //    SearchResult.Clear();
+        //});
+
+        if (string.IsNullOrEmpty(result)) return Task.FromResult(res);
 
         //if (result.Trim() == "OK") return true;
 
         List<string> resultLines = result.Split('\n').ToList();
 
-        if (resultLines is null) return Task.FromResult(true);
-        if (resultLines.Count == 0) return Task.FromResult(true);
+        if (resultLines is null) return Task.FromResult(res);
+        if (resultLines.Count == 0) return Task.FromResult(res);
 
 
 
@@ -3588,11 +3665,11 @@ public partial class MpcService : IMpcService
 
                             SongValues.Clear();
 
-                            //Application.Current.Dispatcher.Invoke(() =>
-                            Dispatcher.UIThread.Post(() =>
-                            {
-                                SearchResult.Add(sng);
-                            });
+                            //Dispatcher.UIThread.Post(() =>
+                            //{
+                            //    SearchResult.Add(sng);
+                            res.Add(sng);
+                            //});
 
                             MpcProgress?.Invoke(this, string.Format("[Background] Parsing search result item... ({0})", i));
                         }
@@ -3630,7 +3707,7 @@ public partial class MpcService : IMpcService
                 //Application.Current.Dispatcher.Invoke(() =>
                 //Dispatcher.UIThread.Post(() =>
                 //{
-                    SearchResult.Add(sng);
+                    res.Add(sng);
                 //});
 
                 MpcProgress?.Invoke(this, string.Format("[Background] Parsing search result item... ({0})", i + 1));
@@ -3645,7 +3722,7 @@ public partial class MpcService : IMpcService
             Dispatcher.UIThread.Post(() => { App.AppendErrorLog("Exception@MPC@ParseSearchResult", ex.Message); });
 
             IsBusy?.Invoke(this, false);
-            return Task.FromResult(false);
+            return Task.FromResult(res);
         }
         finally
         {
@@ -3654,7 +3731,7 @@ public partial class MpcService : IMpcService
             MpcProgress?.Invoke(this, "[Background] Search result loaded.");
         }
 
-        return Task.FromResult(true);
+        return Task.FromResult(res);
     }
 
     private ObservableCollection<SongInfo> ParsePlaylistSongsResult(string result)

@@ -38,7 +38,7 @@ Feel free to open issues and send PRs.
 
 ## MPDCtrlX for cross-platoform
 
-MPDCtrlX is a cross-platform desktop GUI client app based on Avalonia UI, a port of WPF-based [MPDCtrl](https://github.com/torum/MPDCtrl).  
+[MPDCtrlX](https://github.com/torum/MPDCtrlX) is a cross-platform desktop GUI client app based on [Avalonia UI](https://avaloniaui.net/), a port of WPF-based [MPDCtrl](https://github.com/torum/MPDCtrl).  
 
 Currently under developement.
 

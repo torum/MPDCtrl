@@ -42,14 +42,19 @@
         <WindowChrome CaptionHeight="32" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"/>
     </WindowChrome.WindowChrome>
     <Window.InputBindings>
+        <!-- Not good for listview's key bind to select row.
+        <KeyBinding Command="{Binding PlayCommand}" Modifiers="Ctrl" Key="Space" /> -->
         <KeyBinding Command="{Binding PlayCommand}" Key="Play" />
+        <KeyBinding Command="{Binding PlayCommand}" Key="Space" />
         <KeyBinding Command="{Binding PlayCommand}" Modifiers="Ctrl" Key="P"/>
         <KeyBinding Command="{Binding PlayCommand}" Key="MediaPlayPause" />
         <KeyBinding Command="{Binding PlayCommand}" Key="MediaStop" />
         <KeyBinding Command="{Binding PlayNextCommand}" Key="MediaNextTrack" />
         <KeyBinding Command="{Binding PlayNextCommand}" Modifiers="Ctrl" Key="N" />
+        <KeyBinding Command="{Binding PlayNextCommand}" Modifiers="Ctrl" Key="Right" />
         <KeyBinding Command="{Binding PlayPrevCommand}" Key="MediaPreviousTrack" />
         <KeyBinding Command="{Binding PlayPrevCommand}" Modifiers="Ctrl" Key="B" />
+        <KeyBinding Command="{Binding PlayPrevCommand}" Modifiers="Ctrl" Key="Left" />
         <KeyBinding Command="{Binding VolumeMuteCommand}" Key="VolumeMute" />
         <KeyBinding Command="{Binding VolumeDownCommand}" Key="VolumeDown" />
         <KeyBinding Command="{Binding VolumeDownCommand}" Modifiers="Ctrl" Key="OemMinus" />
@@ -307,11 +312,11 @@
                             </Grid.ColumnDefinitions>
 
                             <!-- "Play" should be top so that it gets the first keyboard focus -->
-                            <Button x:Name="PlayButton" ToolTip="{x:Static properties:Resources.Playback_PlayPauseButton}" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="62" Width="62" Background="Transparent" Foreground="White" Style="{StaticResource PathButton}" Command="{Binding PlayCommand}" Content="{Binding PlayButton}"></Button>
+                            <Button x:Name="PlayButton" ToolTip="{x:Static properties:Resources.Playback_PlayPauseButton}" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Height="62" Width="62" Background="Transparent" Foreground="White" Style="{StaticResource PathButton}" Command="{Binding PlayCommand}" Content="{Binding PlayButton}" Focusable="False"></Button>
 
-                            <Button x:Name="BackButton" ToolTip="{x:Static properties:Resources.Playback_BackButton}" Grid.Column="0" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8H10V16H8M16,8V16L11,12" Style="{StaticResource PathButton}" Command="{Binding PlayPrevCommand}" ></Button>
+                            <Button x:Name="BackButton" ToolTip="{x:Static properties:Resources.Playback_BackButton}" Grid.Column="0" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8H10V16H8M16,8V16L11,12" Style="{StaticResource PathButton}" Command="{Binding PlayPrevCommand}" Focusable="False"></Button>
 
-                            <Button x:Name="NextButton" ToolTip="{x:Static properties:Resources.Playback_NextButton}" Grid.Column="2" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8L13,12L8,16M14,8H16V16H14" Style="{StaticResource PathButton}" Command="{Binding PlayNextCommand}" ></Button>
+                            <Button x:Name="NextButton" ToolTip="{x:Static properties:Resources.Playback_NextButton}" Grid.Column="2" HorizontalAlignment="Center" Height="42" Width="42" Background="Transparent" Foreground="White" Content="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,8L13,12L8,16M14,8H16V16H14" Style="{StaticResource PathButton}" Command="{Binding PlayNextCommand}" Focusable="False"></Button>
 
                         </Grid>
 
@@ -494,7 +499,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <ListView x:Name="QueueListview" Grid.Row="1" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedQueueSong, Mode=TwoWay}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" VirtualizingPanel.VirtualizationMode="Standard" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" SelectionChanged="QueueListview_SelectionChanged">
+                    <ListView x:Name="QueueListview" Grid.Row="0" ItemsSource="{Binding Queue}" SelectionMode="Extended" SelectedItem="{Binding Path=SelectedQueueSong, Mode=TwoWay}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" IsSynchronizedWithCurrentItem="True" VirtualizingPanel.VirtualizationMode="Standard" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" SelectionChanged="QueueListview_SelectionChanged">
                         <ListView.InputBindings>
                             <KeyBinding Key="Return" Command="{Binding Path=DataContext.QueueListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                             <KeyBinding Gesture="Ctrl+U" Command="{Binding Path=DataContext.QueueListviewMoveUpCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
@@ -2317,7 +2322,7 @@
                         <Grid x:Name="PlaylistSongsListviewDummy9" Grid.Column="9" />
                     </Grid>
 
-                    <ListView x:Name="PlaylistSongsListview" Grid.Row="1" ItemsSource="{Binding PlaylistSongs, NotifyOnTargetUpdated=True}" TargetUpdated="PlaylistSongsListview_TargetUpdated" SelectedItem="{Binding SelectedPlaylistSong}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0 0 0 0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
+                    <ListView x:Name="PlaylistSongsListview" Grid.Row="0" ItemsSource="{Binding PlaylistSongs, NotifyOnTargetUpdated=True}" TargetUpdated="PlaylistSongsListview_TargetUpdated" SelectedItem="{Binding SelectedPlaylistSong}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0 0 0 0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
                         <ListView.Resources>
                             <ContextMenu x:Key="PlaylistSongsListviewItemContextMenu">
                                 <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_SelectedItems}">

@@ -958,7 +958,8 @@ namespace MPDCtrl.Services
                     // ここでIdleにして、以降はnoidle + cmd + idleの組み合わせでやる。
                     // ただし、実際にはidleのあとReadしていないからタイムアウトで切断されてしまう模様。
 
-                    d = await MpdSendIdle();
+                    // TMP:
+                    //d = await MpdSendIdle();
 
                     return d.IsSuccess;
                 }
@@ -1114,6 +1115,9 @@ namespace MPDCtrl.Services
 
         private async Task<CommandResult> MpdCommandSendCommand(string cmd, bool isAutoIdling = false)
         {
+            // TMP:
+            isAutoIdling = false;
+
             CommandResult ret = new();
 
             if (_commandConnection.Client is null)
@@ -1218,7 +1222,7 @@ namespace MPDCtrl.Services
 
                     try
                     {
-                        //_commandConnection.Client.Shutdown(SocketShutdown.Both);
+                        _commandConnection.Client.Shutdown(SocketShutdown.Both);
                         _commandConnection.Close();
                     }
                     catch { }
@@ -1231,14 +1235,14 @@ namespace MPDCtrl.Services
 
                         if (d.IsSuccess)
                         {
-                            d = await MpdCommandSendCommand("idle player");
-
-                            if (d.IsSuccess)
-                            {
+                            // TMP:
+                            //d = await MpdCommandSendCommand("idle player");
+                            //if (d.IsSuccess)
+                            //{
                                 DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. @IOExceptionOfWriteAsync" + Environment.NewLine + Environment.NewLine));
 
                                 ret = await MpdCommandSendCommand(cmd, isAutoIdling);
-                            }
+                            //}
                         }
                     }
                     else
@@ -1377,7 +1381,7 @@ namespace MPDCtrl.Services
                     ret.ErrorMessage = "ReadLineAsync@MpdSendCommand received null data";
 
                     // タイムアウトしていたらここで「も」エラーになる模様。
-
+                    
                     if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
                     {
                         IsBusy?.Invoke(this, false);
@@ -1390,7 +1394,7 @@ namespace MPDCtrl.Services
 
                     try
                     {
-                        //_commandConnection.Client.Shutdown(SocketShutdown.Both);
+                        _commandConnection.Client.Shutdown(SocketShutdown.Both);
                         _commandConnection.Close();
                     }
                     catch { }
@@ -1403,14 +1407,14 @@ namespace MPDCtrl.Services
 
                         if (d.IsSuccess)
                         {
-                            d = await MpdCommandSendCommand("idle player");
-
-                            if (d.IsSuccess)
-                            {
+                            // TMP:
+                            //d = await MpdCommandSendCommand("idle player");
+                            //if (d.IsSuccess)
+                            //{
                                 DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. @isNullReturn" + Environment.NewLine + Environment.NewLine));
 
                                 ret = await MpdCommandSendCommand(cmd, isAutoIdling);
-                            }
+                            //}
                         }
                     }
                     else
@@ -1422,7 +1426,7 @@ namespace MPDCtrl.Services
 
                         ConnectionError?.Invoke(this, "The connection (command) has been terminated (null return).");
                     }
-
+                    
                     IsBusy?.Invoke(this, false);
                     return ret;
                 }
@@ -1488,7 +1492,7 @@ namespace MPDCtrl.Services
 
                     try
                     {
-                        //_commandConnection.Client.Shutdown(SocketShutdown.Both);
+                        _commandConnection.Client.Shutdown(SocketShutdown.Both);
                         _commandConnection.Close();
                     }
                     catch { }
@@ -1501,14 +1505,14 @@ namespace MPDCtrl.Services
 
                         if (d.IsSuccess)
                         {
-                            d = await MpdCommandSendCommand("idle player");
-
-                            if (d.IsSuccess)
-                            {
+                            // TMP:
+                            //d = await MpdCommandSendCommand("idle player");
+                            //if (d.IsSuccess)
+                            //{
                                 DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. @IOExceptionOfReadLineAsync" + Environment.NewLine + Environment.NewLine));
 
                                 ret = await MpdCommandSendCommand(cmd, isAutoIdling);
-                            }
+                            //}
                         }
                     }
                     else
@@ -1632,7 +1636,11 @@ namespace MPDCtrl.Services
                 return result;
             }
 
-            var expression = queryTag + " " + queryShiki + " \'" + Regex.Escape(queryValue) + "\'";
+            //var expression = queryTag + " " + queryShiki + " \'" + Regex.Escape(queryValue) + "\'";
+            var escapeValue = Regex.Replace(queryValue, @"[\\]+", @"\");
+            escapeValue = Regex.Replace(escapeValue, @"[\']+", @"\\'");
+            escapeValue = Regex.Replace(escapeValue, @"[""]+", @"\\\""");
+            var expression = queryTag + " " + queryShiki + " \\\"" + escapeValue + "\\\"";
 
             string cmd = "search \"(" + expression + ")\"\n";
 

@@ -331,13 +331,13 @@ SOFTWARE.</value>
     <value>Single</value>
   </data>
   <data name="Playback_BackButton" xml:space="preserve">
-    <value>Back</value>
+    <value>Back (Ctrl+B/Ctrl+Left/MediaKey)</value>
   </data>
   <data name="Playback_NextButton" xml:space="preserve">
-    <value>Next</value>
+    <value>Next (Ctrl+N/Ctrl+Right/MediaKey)</value>
   </data>
   <data name="Playback_PlayPauseButton" xml:space="preserve">
-    <value>Play/Pause</value>
+    <value>Play/Pause (Space/Ctrl+P/MediaKeys)</value>
   </data>
   <data name="Playback_SliderSeek" xml:space="preserve">
     <value>Seek</value>

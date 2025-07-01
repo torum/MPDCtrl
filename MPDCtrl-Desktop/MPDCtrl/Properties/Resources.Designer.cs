@@ -619,7 +619,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Back に類似しているローカライズされた文字列を検索します。
+        ///   Back (Ctrl+B/Ctrl+Left/MediaKey) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Playback_BackButton {
             get {
@@ -628,7 +628,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Next に類似しているローカライズされた文字列を検索します。
+        ///   Next (Ctrl+N/Ctrl+Right/MediaKey) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Playback_NextButton {
             get {
@@ -637,7 +637,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Play/Pause に類似しているローカライズされた文字列を検索します。
+        ///   Play/Pause (Space/Ctrl+P/MediaKeys) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Playback_PlayPauseButton {
             get {

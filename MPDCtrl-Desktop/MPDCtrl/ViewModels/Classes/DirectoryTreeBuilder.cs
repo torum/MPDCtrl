@@ -68,12 +68,14 @@ public class DirectoryTreeBuilder : NodeTree
             Expanded = true,
             Parent = null
         };
-        //this.Children.Add(root);
+        /*
         if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             this.Children.Add(root);
         });
+        */
+        this.Children.Add(root);
 
         foreach (var pathDir in dirs)
         {
@@ -143,12 +145,14 @@ public class DirectoryTreeBuilder : NodeTree
                                 Expanded = true,
                                 Parent = parent
                             };
-                            //parent.Children.Add(hoge);
+                            /*
                             if (Application.Current is null) { return; }
                             Application.Current.Dispatcher.Invoke(() =>
                             {
                                 parent?.Children.Add(hoge);
                             });
+                            */
+                            parent?.Children.Add(hoge);
                             // set parent node
                             parent = hoge;
                         }
@@ -163,12 +167,14 @@ public class DirectoryTreeBuilder : NodeTree
                         Expanded = true,
                         Parent = root
                     };
-                    //root.Children.Add(hoge);
+                    /*
                     if (Application.Current is null) { return; }
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         root.Children.Add(hoge);
                     });
+                    */
+                    root.Children.Add(hoge);
                 }
             }
             catch (Exception ex)

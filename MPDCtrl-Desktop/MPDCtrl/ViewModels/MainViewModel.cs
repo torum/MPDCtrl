@@ -18,6 +18,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -971,7 +972,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private bool _isShowDebugWindow;
+    private bool _isShowDebugWindow = false;
     public bool IsShowDebugWindow
 
     {
@@ -3893,7 +3894,7 @@ public class MainViewModel : ViewModelBase
     }
 
     // Closing
-    public void OnWindowClosing(object sender)//, CancelEventArgs e
+    public void OnWindowClosing(object? sender)//, CancelEventArgs e
     {
         // Make sure Window and settings have been fully loaded and not overriding with empty data.
         if (!IsFullyLoaded)
@@ -4927,6 +4928,7 @@ public class MainViewModel : ViewModelBase
                                 // This means CurrentSong is already aquired by "currentsong" command.
                                 if (_mpc.MpdCurrentSong.Id == _mpc.MpdStatus.MpdSongID)
                                 {
+                                    /*
                                     // the reason not to use CurrentSong is that it points different instance (set by "currentsong" command and currentqueue). 
                                     _mpc.MpdCurrentSong.IsPlaying = true;
 
@@ -4940,6 +4942,31 @@ public class MainViewModel : ViewModelBase
                                     if (IsAutoScrollToNowPlaying)
                                         // use ScrollIntoViewAndSelect instead of ScrollIntoView
                                         ScrollIntoViewAndSelect?.Invoke(this, CurrentSong.Index);
+                                    */
+
+                                    var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
+                                    if (curitem is not null)
+                                    {
+                                        CurrentSong = curitem;
+                                        CurrentSong.IsPlaying = true;
+                                        CurrentSong.IsSelected = true;
+
+                                        if (IsAutoScrollToNowPlaying)
+                                            // use ScrollIntoViewAndSelect instead of ScrollIntoView
+                                            ScrollIntoViewAndSelect?.Invoke(this, CurrentSong.Index);
+
+                                        // AlbumArt
+                                        if (_mpc.AlbumCover.SongFilePath != curitem.File)
+                                        {
+                                            IsAlbumArtVisible = false;
+                                            AlbumArt = _albumArtDefault;
+
+                                            if (!String.IsNullOrEmpty(CurrentSong.File))
+                                            {
+                                                //isAlbumArtChanged = true;
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -5100,32 +5127,19 @@ public class MainViewModel : ViewModelBase
         IsWorking = false;
     }
 
-    private void UpdateLibrary()
-    {
-        Task.Run(() =>
-        {
-            UpdateLibraryMusic();
-        });
-
-        Task.Run(() =>
-        {
-            UpdateLibraryDirectories();
-        });
-    }
-
-    private void UpdateLibraryMusic()
+    private Task UpdateLibraryMusicAsync()
     {
         // Music files
 
         if (IsSwitchingProfile)
-            return;
+            return Task.CompletedTask;
 
         UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
 
         //IsBusy = true;
         IsWorking = true;
 
-        if (Application.Current is null) { return; }
+        if (Application.Current is null) { return Task.CompletedTask; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             MusicEntries.Clear();
@@ -5177,17 +5191,17 @@ public class MainViewModel : ViewModelBase
 
                 Application.Current?.Dispatcher.Invoke(() => { (App.Current as App)?.AppendErrorLog("Exception@UpdateLibraryMusic", e.Message); });
 
-                return;
+                return Task.CompletedTask;
             }
         }
 
         if (IsSwitchingProfile)
-            return;
+            return Task.CompletedTask;
 
         //IsBusy = true;
         IsWorking = true;
         
-        if (Application.Current is null) { return; }
+        if (Application.Current is null) { return Task.CompletedTask; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
@@ -5197,21 +5211,23 @@ public class MainViewModel : ViewModelBase
         
         //IsBusy = false;
         IsWorking = false;
+
+        return Task.CompletedTask;
     }
 
-    private void UpdateLibraryDirectories()
+    private Task UpdateLibraryDirectoriesAsync()
     {
         // Directories
 
         if (IsSwitchingProfile)
-            return;
+            return Task.CompletedTask;
 
         UpdateProgress?.Invoke(this, "[UI] Library directories loading...");
 
         //IsBusy = true;
         IsWorking = true;
 
-        if (Application.Current is null) { return; }
+        if (Application.Current is null) { return Task.CompletedTask; }
         Application.Current.Dispatcher.Invoke(() =>
         {
             MusicDirectories.Clear();
@@ -5231,7 +5247,7 @@ public class MainViewModel : ViewModelBase
 
             IsWorking = true;
 
-            if (Application.Current is null) { return; }
+            if (Application.Current is null) { return Task.CompletedTask; }
             Application.Current.Dispatcher.Invoke(() =>
             {
                 UpdateProgress?.Invoke(this, "[UI] Library directories loading...");
@@ -5262,6 +5278,7 @@ public class MainViewModel : ViewModelBase
 
         //IsBusy = false;
         IsWorking = false;
+        return Task.CompletedTask;
     }
 
     private async void GetPlaylistSongs(NodeMenuPlaylistItem playlistNode)
@@ -5314,23 +5331,72 @@ public class MainViewModel : ViewModelBase
 
         if (librarytNode.IsAcquired)
             return;
-
+        /*
         if (Application.Current is null) { return; }
         Application.Current.Dispatcher.Invoke(() =>
         {
-            if (MusicEntries.Count > 0)
+
+        });
+        */
+        if (MusicEntries.Count > 0)
             MusicEntries.Clear();
 
-            if (MusicDirectories.Count > 0)
-                MusicDirectories.Clear();
-        });
+        if (MusicDirectories.Count > 0)
+            MusicDirectories.Clear();
 
+        /*
         CommandResult result = await _mpc.MpdQueryListAll();
         if (result.IsSuccess)
         {
             librarytNode.IsAcquired = true;
             UpdateLibrary();
         }
+        */
+
+        librarytNode.IsAcquired = true;
+
+        //IsBusy = true;
+        IsWorking = true;
+
+        // WPF does not cause trouble with this.
+        /*
+        Task.Run(async () =>
+        {
+
+        });
+        */
+
+        CommandResult result = await _mpc.MpdQueryListAll().ConfigureAwait(false);
+        if (result.IsSuccess)
+        {
+            if (Application.Current is null) { return; }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                librarytNode.IsAcquired = true;
+            });
+
+            //await UpdateLibraryMusicAsync().ConfigureAwait(false);
+            //await UpdateLibraryDirectoriesAsync().ConfigureAwait(false);
+            var dirTask = UpdateLibraryDirectoriesAsync();
+            var fileTask = UpdateLibraryMusicAsync();
+            await Task.WhenAll(dirTask, fileTask);
+        }
+        else
+        {
+            if (Application.Current is null) { return; }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                librarytNode.IsAcquired = false;
+            });
+            Debug.WriteLine("fail to get MpdQueryListAll: " + result.ErrorMessage);
+        }
+
+        if (Application.Current is null) { return; }
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            //IsBusy = false;
+            IsWorking = false;
+        });
     }
 
     private static int CompareVersionString(string a, string b)
@@ -5719,7 +5785,7 @@ public class MainViewModel : ViewModelBase
 
     #region == Playback play ==
 
-    public ICommand PlayCommand { get; }
+    public RelayCommand PlayCommand { get; }
     public bool PlayCommand_CanExecute()
     {
         if (IsBusy) return false;

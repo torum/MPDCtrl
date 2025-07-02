@@ -36,10 +36,14 @@ Feel free to open issues and send PRs.
 2. Clone this repository
 3. Open solution in Visual Studio and run
 
-## MPDCtrl for mobile
-sometime in the near future... (hopefully).  
+## MPDCtrlX for cross-platoform
 
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/mobile/iOS-v0.0.0.1-screnshot.png?raw=true) 
+[MPDCtrlX](https://github.com/torum/MPDCtrlX) is a cross-platform desktop GUI client app based on [Avalonia UI](https://avaloniaui.net/), a port of WPF-based [MPDCtrl](https://github.com/torum/MPDCtrl).  
+
+Currently under developement.
+
+![Screenshot](https://github.com/torum/MPDCtrlX/blob/main/Docs/Images/MPDCtrlX-Screenshot-1.png?raw=true) 
+
 
 
 

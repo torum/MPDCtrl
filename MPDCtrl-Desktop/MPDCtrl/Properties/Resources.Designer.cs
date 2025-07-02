@@ -655,7 +655,7 @@ namespace MPDCtrl.Properties {
         }
         
         /// <summary>
-        ///   Volume に類似しているローカライズされた文字列を検索します。
+        ///   Volume (Ctrl+Plus/Minus/MediaKey) に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Playback_SliderVolume {
             get {

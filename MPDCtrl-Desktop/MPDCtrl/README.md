@@ -5,19 +5,23 @@ MPDCtrl is a Windows client app for [MPD (Music player daemon)](http://www.music
 ## Repo
 https://github.com/torum/MPDCtrl
 
+
 ## Download App
 
  [Download from Microsoft Store](https://www.microsoft.com/store/apps/9NCC3NTG9DP3)
  
+## Cross-platform
+
+ [Avalonia UI version is here (Under development)](https://github.com/torum/MPDCtrlX)
+
 
 ## TODO
 
 ### Things that currentry working on
 
-- Refactoring and modernizing. (DI and Nullable, etc)
+- Better keyboard bindings.
 
 ### Planning
-*  Better keyboard bindings.
 *  Add "Play Next" menu item in playlists and search result.　
 *  Add "update" and "rescan" button in Setting's page.
 *  Add inline renaming in the TreeView popup menu. (and right click select)
@@ -35,6 +39,7 @@ https://github.com/torum/MPDCtrl
 
 
 ## Change log
+* v3.0.24   (2023/10/1) MS Store release.
 * v3.0.21   (2023/2.29) Use Win32 api to paint background and blur and lots of UI tweaks. Refactoring WIP.
 * v3.0.20.0 (2023/2.29) Implemented dependency injection using Generic host. Nullable enabled. Needs a lot of work. 
 * v3.0.19   (2023/1/11) App Store release. 

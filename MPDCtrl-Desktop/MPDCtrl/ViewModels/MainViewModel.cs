@@ -32,7 +32,7 @@ public class MainViewModel : ViewModelBase
     const string _appName = "MPDCtrl";
 
     // Application version
-    const string _appVer = "v3.1.2.0";
+    const string _appVer = "v3.1.3.0";
 
     public static string AppVer
     {
@@ -4555,7 +4555,10 @@ public class MainViewModel : ViewModelBase
                         //CurrentSong.IsSelected = true;
 
                         if (IsAutoScrollToNowPlaying)
-                            ScrollIntoViewAndSelect?.Invoke(this, CurrentSong.Index);
+                        {
+                            //ScrollIntoViewAndSelect?.Invoke(this, CurrentSong.Index);
+                            ScrollIntoView?.Invoke(this, CurrentSong.Index);
+                        }
 
                         // AlbumArt
                         if (!String.IsNullOrEmpty(CurrentSong.File))
@@ -4952,8 +4955,11 @@ public class MainViewModel : ViewModelBase
                                         CurrentSong.IsSelected = true;
 
                                         if (IsAutoScrollToNowPlaying)
-                                            // use ScrollIntoViewAndSelect instead of ScrollIntoView
-                                            ScrollIntoViewAndSelect?.Invoke(this, CurrentSong.Index);
+                                        {
+                                            // use ScrollIntoViewAndSelect instead of ScrollIntoView <- Why?
+                                            //ScrollIntoViewAndSelect?.Invoke(this, CurrentSong.Index);
+                                            ScrollIntoView?.Invoke(this, CurrentSong.Index);
+                                        }
 
                                         // AlbumArt
                                         if (_mpc.AlbumCover.SongFilePath != curitem.File)
@@ -4987,8 +4993,11 @@ public class MainViewModel : ViewModelBase
                             CurrentSong.IsSelected = true;
 
                             if (IsAutoScrollToNowPlaying)
-                                // use ScrollIntoViewAndSelect instead of ScrollIntoView
-                                ScrollIntoViewAndSelect?.Invoke(this, CurrentSong.Index);
+                            {
+                                // use ScrollIntoViewAndSelect instead of ScrollIntoView <- why?
+                                //ScrollIntoViewAndSelect?.Invoke(this, CurrentSong.Index);
+                                ScrollIntoView?.Invoke(this, CurrentSong.Index);
+                            }
 
                             // AlbumArt
                             if (_mpc.AlbumCover.SongFilePath != curitem.File)

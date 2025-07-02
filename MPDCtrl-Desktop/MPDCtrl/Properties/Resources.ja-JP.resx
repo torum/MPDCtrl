@@ -343,7 +343,7 @@ SOFTWARE.</value>
     <value>シーク</value>
   </data>
   <data name="Playback_SliderVolume" xml:space="preserve">
-    <value>ボリューム</value>
+    <value>ボリューム (Ctrl+Plus/Minus/MediaKey)</value>
   </data>
   <data name="PlaylistItemContextMenu_ClearAndLoad" xml:space="preserve">
     <value>キューをクリアして追加する</value>

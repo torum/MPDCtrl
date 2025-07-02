@@ -343,7 +343,7 @@ SOFTWARE.</value>
     <value>Seek</value>
   </data>
   <data name="Playback_SliderVolume" xml:space="preserve">
-    <value>Volume</value>
+    <value>Volume (Ctrl+Plus/Minus/MediaKey)</value>
   </data>
   <data name="PlaylistItemContextMenu_ClearAndLoad" xml:space="preserve">
     <value>Clear Queue and Load</value>

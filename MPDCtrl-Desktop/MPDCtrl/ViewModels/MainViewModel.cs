@@ -32,7 +32,7 @@ public class MainViewModel : ViewModelBase
     const string _appName = "MPDCtrl";
 
     // Application version
-    const string _appVer = "v3.1.3.0";
+    const string _appVer = "v3.1.4.0";
 
     public static string AppVer
     {
@@ -4684,7 +4684,8 @@ public class MainViewModel : ViewModelBase
             try
             {
                 // The simplest way, but all the selections and listview position will be cleared. Kind of annoying when moving items.
-                
+                #region == simple ==
+                /*
                 UpdateProgress?.Invoke(this, "[UI] Loading the queue...");
                 if (Application.Current is null) { return; }
                 Application.Current.Dispatcher.Invoke(() =>
@@ -4744,8 +4745,11 @@ public class MainViewModel : ViewModelBase
                     IsWorking = false;
                 });
                 UpdateProgress?.Invoke(this, "");
-                
-                /*
+                */
+                #endregion
+
+                #region == better ==
+
                 if (Application.Current is null) { return; }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -4790,7 +4794,11 @@ public class MainViewModel : ViewModelBase
 
                         var fuga = Queue.FirstOrDefault(i => i.Id == sng.Id);
                         if (fuga is not null)
-                        {
+                        {                            // this cuase strange selection problem.
+                            //sng.IsSelected = fuga.IsSelected;
+                            fuga.IsSelected = false; // so clear it for now.
+                            fuga.IsPlaying = false;
+
                             fuga.Pos = sng.Pos;
                             //fuga.Id = sng.Id;
                             fuga.LastModified = sng.LastModified;
@@ -4849,18 +4857,7 @@ public class MainViewModel : ViewModelBase
                                     // ScrollIntoView while don't change the selection 
                                     ScrollIntoView?.Invoke(this, CurrentSong.Index);
 
-                                // AlbumArt
-                                if (_mpc.AlbumCover.SongFilePath != curitem.File)
-                                {
-                                    IsAlbumArtVisible = false;
-                                    AlbumArt = _albumArtDefault;
 
-                                    if (!String.IsNullOrEmpty(CurrentSong.File))
-                                    {
-                                        //_mpc.MpdQueryAlbumArt(CurrentSong.file, CurrentSong.Id);
-                                        isAlbumArtChanged = true;
-                                    }
-                                }
                             }
                         }
                     }
@@ -4876,7 +4873,8 @@ public class MainViewModel : ViewModelBase
 
                     IsWorking = false;
                 });
-                */
+ 
+                #endregion
             }
             catch (Exception e)
             {
@@ -5977,11 +5975,12 @@ public class MainViewModel : ViewModelBase
         if (IsBusy) return false;
         return true;
     }
-    public async void VolumeDownCommand_Execute()
+    public void VolumeDownCommand_Execute()
     {
         if (_volume >= 10)
         {
-            await _mpc.MpdSetVolume(Convert.ToInt32(_volume - 10));
+            Volume -= 10;
+            //await _mpc.MpdSetVolume(Convert.ToInt32(_volume - 10));
         }
     }
 
@@ -5991,11 +5990,12 @@ public class MainViewModel : ViewModelBase
         if (IsBusy) return false;
         return true;
     }
-    public async void VolumeUpCommand_Execute()
+    public void VolumeUpCommand_Execute()
     {
         if (_volume <= 90)
         {
-            await _mpc.MpdSetVolume(Convert.ToInt32(_volume + 10));
+            Volume += 10;
+            //await _mpc.MpdSetVolume(Convert.ToInt32(_volume + 10));
         }
     }
 

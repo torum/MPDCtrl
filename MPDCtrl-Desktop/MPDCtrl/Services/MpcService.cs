@@ -2417,9 +2417,12 @@ namespace MPDCtrl.Services
                     {
                         try
                         {
-                            MpdStatus.MpdVolume = Int32.Parse(valueVolume);
+                            if (string.IsNullOrEmpty(valueVolume))
+                            {
+                                MpdStatus.MpdVolume = Int32.Parse(valueVolume);
 
-                            MpdStatus.MpdVolumeIsSet = true;
+                                MpdStatus.MpdVolumeIsSet = true;
+                            }
                         }
                         catch (FormatException e)
                         {

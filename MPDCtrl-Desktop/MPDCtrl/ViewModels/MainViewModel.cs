@@ -6423,7 +6423,7 @@ public class MainViewModel : ViewModelBase
         // should I?
         //SelectedQueueSong = CurrentSong;
 
-        ScrollIntoView?.Invoke(this, CurrentSong.Index);
+        ScrollIntoViewAndSelect?.Invoke(this, CurrentSong.Index);
     }
 
     public ICommand FilterQueueClearCommand { get; }

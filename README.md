@@ -42,7 +42,7 @@ Feel free to open issues and send PRs.
 
 Currently under developement.
 
-![Screenshot](https://github.com/torum/MPDCtrlX/blob/main/Docs/Images/MPDCtrlX-Screenshot-1.png?raw=true) 
+<img width="800" alt="MPDCtrlX based on Avalonia UI, a port of WPF-based Windows client MPDCtrl" src="https://github.com/torum/MPDCtrlX/blob/main/Docs/Images/MPDCtrlX.png?raw=true">
 
 
 

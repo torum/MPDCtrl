@@ -631,7 +631,7 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="Button">
-                                    <Border x:Name="Border" TextBlock.Foreground="{DynamicResource ControlForegroundColorBrush}" Background="{TemplateBinding Background}" BorderThickness="0">
+                                    <Border x:Name="Border" TextBlock.Foreground="{DynamicResource ControlForegroundColorBrush}" Background="{TemplateBinding Background}" BorderThickness="0" CornerRadius="0,8,0,0">
                                         <Border.BorderBrush>
                                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                                                 <LinearGradientBrush.GradientStops>
@@ -1656,7 +1656,7 @@
                                         
                                         <Trigger Property="IsSelected" Value="True">
                                             <Setter TargetName="PART_Header" Property="TextElement.FontWeight" Value="Bold"/>
-                                            <Setter TargetName="PART_Header" Property="TextElement.Foreground" Value="{DynamicResource ItemMouseOverForegroundColorBrush}" />
+                                            <Setter TargetName="PART_Header" Property="TextElement.Foreground" Value="{DynamicResource ItemForegroundColorBrush}" />
                                         </Trigger>
                                         
 
@@ -1712,7 +1712,7 @@
                         <Setter Property="Height" Value="27" />
                         <Setter Property="Margin" Value="-1 0 0 0" />
                         <Setter Property="Padding" Value="0 0 0 0" />
-                        <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
+                        <Setter Property="Background" Value="Transparent" />
                         <Setter Property="TextElement.FontWeight" Value="Normal" />
                         <Setter Property="TextElement.Foreground" Value="{DynamicResource NormalTextColorBrush}" />
                         <Setter Property="HorizontalContentAlignment" Value="Left"/>
@@ -2003,15 +2003,15 @@
                         <Setter Property="FocusVisualStyle" Value="{StaticResource ListviewFocusVisual}"/>
                         <Setter Property="Background" Value="{DynamicResource ItemBackgroundColorBrush}"/>
                         
+                        <Setter Property="Foreground" Value="{DynamicResource ItemForegroundColorBrush}"/>
                         <!--
                         <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"/>
                         -->
-                        <Setter Property="Foreground" Value="{DynamicResource ItemForegroundColorBrush}"/>
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                    <Border Name="Border" Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
-                                        <GridViewRowPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                    <Border Name="Border" Margin="{TemplateBinding Margin}" TextBlock.Foreground="{TemplateBinding Foreground}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="{TemplateBinding ClipToBounds}" CornerRadius="0" SnapsToDevicePixels="true">
+                                        <GridViewRowPresenter x:Name="PART_Head" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                     </Border>
                                 </ControlTemplate>
                             </Setter.Value>
@@ -2029,8 +2029,8 @@
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter Property="Background" Value="{DynamicResource ItemSelectedBackgroundColorBrush}" />
                                 <Setter Property="Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
-                                <Setter Property="TextElement.FontWeight" Value="Bold"/> 
-                            </Trigger> 
+                                <Setter Property="TextElement.FontWeight" Value="Bold"/>
+                            </Trigger>
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
                                     <Condition Property="IsSelected" Value="True" />

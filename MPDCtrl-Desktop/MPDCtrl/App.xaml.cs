@@ -124,11 +124,11 @@ public partial class App : Application
         var mainWindow = AppHost.Services.GetRequiredService<MainWindow>();
 
         //  For the white background flickering issue. Paints background black in order to prevent "white flashing" when startup/resizing/maximizing window.
-        IntPtr hWnd = new WindowInteropHelper(mainWindow).EnsureHandle();
-        UseImmersiveDarkMode(hWnd, true);
+        //IntPtr hWnd = new WindowInteropHelper(mainWindow).EnsureHandle();
+        //UseImmersiveDarkMode(hWnd, true);
 
         //  For the white background flickering issue, in addition to paint background, blur it.
-        WindowBlur.SetIsEnabled(mainWindow, true);
+        //WindowBlur.SetIsEnabled(mainWindow.LayoutGrid, true);
 
         mainWindow.Show();
         mainWindow.Activate();

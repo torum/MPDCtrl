@@ -1,10 +1,12 @@
 ﻿using MPDCtrl.ViewModels;
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Navigation;
 
 namespace MPDCtrl.Views;
@@ -202,13 +204,19 @@ public partial class MainWindow : Window
             MaxButton.Visibility = Visibility.Visible;
 
             LayoutGrid.Margin = new Thickness(0);
+            WindowChromeBorder.Margin = new Thickness(18);
+            WindowBackgroundBorder.Margin = new Thickness(18);
+            //WindowBackgroundGrid.Margin = new Thickness(18);
         }
         else if (this.WindowState == WindowState.Maximized)
         {
             RestoreButton.Visibility = Visibility.Visible;
             MaxButton.Visibility = Visibility.Collapsed;
 
-            LayoutGrid.Margin = new Thickness(4,4,4,4);
+            LayoutGrid.Margin = new Thickness(0,18,0,4);
+            WindowChromeBorder.Margin = new Thickness(0,4,0,0);
+            WindowBackgroundBorder.Margin = new Thickness(0);
+            
         }
     }
 
@@ -301,7 +309,7 @@ public partial class MainWindow : Window
     #region == Size fix on window maximize ==
 
     // https://engy.us/blog/2020/01/01/implementing-a-custom-window-title-bar-in-wpf/
-    /*
+
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
@@ -327,9 +335,9 @@ public partial class MainWindow : Window
                 RECT rcWorkArea = monitorInfo.rcWork;
                 RECT rcMonitorArea = monitorInfo.rcMonitor;
                 mmi.ptMaxPosition.X = Math.Abs(rcWorkArea.Left - rcMonitorArea.Left);
-                mmi.ptMaxPosition.Y = Math.Abs(rcWorkArea.Top - rcMonitorArea.Top) - 4; // -4を付加した。てっぺんをクリックしても反応がなかったから。
+                mmi.ptMaxPosition.Y = Math.Abs(rcWorkArea.Top - rcMonitorArea.Top) - 32; // -4を付加した。てっぺんをクリックしても反応がなかったから。
                 mmi.ptMaxSize.X = Math.Abs(rcWorkArea.Right - rcWorkArea.Left);
-                mmi.ptMaxSize.Y = Math.Abs(rcWorkArea.Bottom - rcWorkArea.Top) + 4; // 付加した分の補正。
+                mmi.ptMaxSize.Y = Math.Abs(rcWorkArea.Bottom - rcWorkArea.Top) + 38; // +4 付加した分の補正。
             }
 
             Marshal.StructureToPtr(mmi, lParam, true);
@@ -398,7 +406,7 @@ public partial class MainWindow : Window
         public POINT ptMinTrackSize;
         public POINT ptMaxTrackSize;
     }
-    */
+
     #endregion
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

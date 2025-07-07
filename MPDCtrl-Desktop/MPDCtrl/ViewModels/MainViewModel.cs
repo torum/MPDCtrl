@@ -3927,27 +3927,36 @@ public class MainViewModel : ViewModelBase
 
             //Window w = (sender as Window);
             // Main Window attributes
+            double fa = 0;
             attrs = doc.CreateAttribute("height");
             if (w.WindowState == WindowState.Maximized)
             {
-                attrs.Value = w.RestoreBounds.Height.ToString();
+                var tmp = w.RestoreBounds.Height;
+                tmp = tmp - fa;
+                attrs.Value = tmp.ToString();
             }
             else
             {
-                attrs.Value = w.Height.ToString();
+                var tmp = w.Height;
+                tmp = tmp - fa;
+                attrs.Value = tmp.ToString();
             }
             mainWindow.SetAttributeNode(attrs);
 
             attrs = doc.CreateAttribute("width");
             if (w.WindowState == WindowState.Maximized)
             {
-                attrs.Value = w.RestoreBounds.Width.ToString();
-                windowWidth = w.RestoreBounds.Width;
+                var tmp = w.RestoreBounds.Width;
+                tmp = tmp - fa;
+                attrs.Value = tmp.ToString();
+                windowWidth = tmp;
             }
             else
             {
-                attrs.Value = w.Width.ToString();
-                windowWidth = w.Width;
+                var tmp = w.Width;
+                tmp = tmp - fa;
+                attrs.Value = tmp.ToString();
+                windowWidth = tmp;
 
             }
             mainWindow.SetAttributeNode(attrs);

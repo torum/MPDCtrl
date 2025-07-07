@@ -4,8 +4,17 @@
 
     <Color x:Key="WindowTintColor">#282828</Color>
     <Color x:Key="WindowFallbackColor">#212121</Color>
+    <Color x:Key="WindowBackgroundBaseColor">#C0191919</Color>
+    <Color x:Key="WindowBackgroundColor">Transparent</Color>
+        <!--  #C0191919
+    <Color x:Key="WindowBackgroundBaseColor">#C0333333</Color>
     <Color x:Key="WindowBackgroundBaseColor">#212121</Color>
-    <Color x:Key="WindowBackgroundColor">#212121</Color>
+    <Color x:Key="WindowBackgroundColor">#212121</Color> -->
+    
+    <Color x:Key="BoardBackgroundColor">#C0333333</Color>
+    <!-- 
+    <Color x:Key="BoardBackgroundColor">#191919</Color> -->
+    <!-- 191919 1c1c1c 191919 121212 or 111111 -->
 
     <Color x:Key="ControlForegroundColor">Gainsboro</Color>
     <Color x:Key="ControlLightColor">LightGray</Color>
@@ -33,13 +42,15 @@
     <Color x:Key="NormalTextBoxBackgroundFocusedColor">Gainsboro</Color>
     <Color x:Key="NormalTextBoxBackgroundMouseOverColor">#ffffff</Color>
 
-    <Color x:Key="BoardBackgroundColor">#191919</Color>
-    <!-- 191919 1c1c1c 191919 121212 or 111111 -->
 
+
+    <!-- not used
     <Color x:Key="ListviewAlt0Color">#212121</Color>
     <Color x:Key="ListviewAlt1Color">#232323</Color>
+    -->
 
-    <Color x:Key="ListviewItemForegroundColor">#FFCCCCCC</Color>
+    <Color x:Key="ListviewItemForegroundColor">White</Color>
+    <!-- #FFCCCCCC -->
     <Color x:Key="ListviewItemMouseOverForegroundColor">Gainsboro</Color>
     <Color x:Key="ListviewItemSelectedForegroundColor">White</Color>
 
@@ -123,10 +134,10 @@
 
     <SolidColorBrush x:Key="AccentWarmDarkColorBrush" Color="{DynamicResource AccentWarmDarkColor}"/>
     <SolidColorBrush x:Key="AccentWarmLightColorBrush" Color="{DynamicResource AccentWarmLightColor}"/>
-
+<!--
     <SolidColorBrush x:Key="ListviewAlt0ColorBrush" Color="{DynamicResource ListviewAlt0Color}"/>
     <SolidColorBrush x:Key="ListviewAlt1ColorBrush" Color="{DynamicResource ListviewAlt1Color}"/>
-
+-->
     <SolidColorBrush x:Key="ChartVolumeColorBrush" Color="{DynamicResource ChartVolumeColor}" Opacity="0.1"/>
 
     <SolidColorBrush x:Key="RadioButtonCheckedBackgroundColorBrush" Color="{DynamicResource RadioButtonCheckedBackgroundColor}"/>
@@ -138,26 +149,39 @@
 
     <!-- new none white theme aware -->
     <SolidColorBrush x:Key="ItemBackgroundColorBrush" Color="Transparent"/>
+    <!--  
     <Color x:Key="ItemAlt0Color">#212121</Color>
-    <SolidColorBrush x:Key="ItemBackgroundAlt0ColorBrush" Color="{DynamicResource ItemAlt0Color}"/>
     <Color x:Key="ItemAlt1Color">#262626</Color>
+    -->
+    <Color x:Key="ItemAlt0Color">Transparent</Color>
+    <Color x:Key="ItemAlt1Color">Transparent</Color>
+    <SolidColorBrush x:Key="ItemBackgroundAlt0ColorBrush" Color="{DynamicResource ItemAlt0Color}"/>
     <SolidColorBrush x:Key="ItemBackgroundAlt1ColorBrush" Color="{DynamicResource ItemAlt1Color}"/>
 
-    <Color x:Key="ItemSelectedBackgroundColor">DarkGray</Color>
+    <Color x:Key="ItemSelectedBackgroundColor">#A0333333</Color>
+    <!-- 
+    <Color x:Key="ItemSelectedBackgroundColor">DarkGray</Color> -->
     <SolidColorBrush x:Key="ItemSelectedBackgroundColorBrush" Color="{DynamicResource ItemSelectedBackgroundColor}"/>
 
-    <Color x:Key="ItemSelectedNoneFocusedBackgroundColor">Gray</Color>
+    <Color x:Key="ItemSelectedNoneFocusedBackgroundColor">#D0333333</Color>
+    <!-- 
+    <Color x:Key="ItemSelectedNoneFocusedBackgroundColor">Gray</Color> -->
     <SolidColorBrush x:Key="ItemSelectedNoneFocusedBackgroundColorBrush" Color="{DynamicResource ItemSelectedNoneFocusedBackgroundColor}"/>
     <SolidColorBrush x:Key="ItemSelectedInactiveBackgroundColorBrush" Color="{DynamicResource ItemSelectedNoneFocusedBackgroundColor}"/>
 
 
-    <Color x:Key="ItemForegroundColor">#FFCCCCCC</Color>
+    <Color x:Key="ItemForegroundColor">#CCC</Color>
+    <!-- #FFCCCCCC -->
     <SolidColorBrush x:Key="ItemForegroundColorBrush" Color="{DynamicResource ItemForegroundColor}"/>
 
-    <Color x:Key="ItemSelectedForegroundColor">#191919</Color>
+    <Color x:Key="ItemSelectedForegroundColor">#FFDDCCCC</Color>
+    <!-- 
+    <Color x:Key="ItemSelectedForegroundColor">#191919</Color> -->
     <SolidColorBrush x:Key="ItemSelectedForegroundColorBrush" Color="{DynamicResource ItemSelectedForegroundColor}"/>
 
-    <Color x:Key="ItemSelectedInactiveForegroundColor">#191919</Color>
+    <Color x:Key="ItemSelectedInactiveForegroundColor">#FFEECCCC</Color>
+    <!-- 
+    <Color x:Key="ItemSelectedInactiveForegroundColor">#191919</Color> -->
     <SolidColorBrush x:Key="ItemSelectedInactiveForegroundColorBrush" Color="{DynamicResource ItemSelectedInactiveForegroundColor}"/>
 
 

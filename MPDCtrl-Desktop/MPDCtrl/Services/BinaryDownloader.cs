@@ -665,7 +665,7 @@ namespace MPDCtrl.Services
 
             //if (MpdStop) return r;
 
-            if (data.Length > 1000000) //2000000000
+            if (data.Length > 2000000) //2000000000
             {
                 Debug.WriteLine("**ParseAlbumImageData: binary file size too big: " + data.Length.ToString());
 
@@ -790,7 +790,7 @@ namespace MPDCtrl.Services
 
                 gabEnd++;
 
-                if (binSize > 1000000)
+                if (binSize > 2000000)
                 {
                     Debug.WriteLine("binary file too big: " + binSize.ToString());
 
@@ -1018,7 +1018,7 @@ namespace MPDCtrl.Services
             return (new System.Version(a)).CompareTo(new System.Version(b));
         }
 
-        private static BitmapSource? BitmaSourceFromByteArray(byte[] buffer)
+        private static BitmapFrame? BitmaSourceFromByteArray(byte[] buffer)
         {
             // Bug in MPD 0.23.5 
             if (buffer?.Length > 0)

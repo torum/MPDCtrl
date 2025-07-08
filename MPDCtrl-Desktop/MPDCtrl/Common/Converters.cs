@@ -76,6 +76,42 @@ namespace MPDCtrl.Common
         }
     }
 
+
+    /// <summary>
+    /// BooleanToVisibilityConverterの、 hidden 版
+    /// </summary>
+    [ValueConversion(typeof(bool), typeof(Visibility))]
+    public class BooleanToVisibilityHiddenConverter : IValueConverter
+    {
+        public Visibility TrueValue { get; set; }
+        public Visibility FalseValue { get; set; }
+
+        public BooleanToVisibilityHiddenConverter()
+        {
+            // set defaults
+            TrueValue = Visibility.Visible;
+            FalseValue = Visibility.Hidden;
+        }
+
+        public object? Convert(object value, Type targetType,
+            object parameter, CultureInfo culture)
+        {
+            if (value is not bool)
+                return null;
+            return (bool)value ? TrueValue : FalseValue;
+        }
+
+        public object? ConvertBack(object value, Type targetType,
+            object parameter, CultureInfo culture)
+        {
+            if (Equals(value, TrueValue))
+                return true;
+            if (Equals(value, FalseValue))
+                return false;
+            return null;
+        }
+    }
+
     public class LeftMarginMultiplierConverter : IValueConverter
     {
         public double Length { get; set; }

@@ -128,7 +128,7 @@ public partial class App : Application
         //UseImmersiveDarkMode(hWnd, true);
 
         //  For the white background flickering issue, in addition to paint background, blur it.
-        //WindowBlur.SetIsEnabled(mainWindow.LayoutGrid, true);
+        //WindowBlur.SetIsEnabled(mainWindow.WindowChromeBorder, true);
 
         mainWindow.Show();
         mainWindow.Activate();

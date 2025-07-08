@@ -46,7 +46,7 @@
                     <Setter Property="WindowChrome.CaptionHeight" Value="32" />
                     <Setter Property="WindowChrome.ResizeBorderThickness" Value="0" />
                 </DataTrigger>
-                <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Value="Normal">
+                <DataTrigger Binding="{Binding WindowState}" Value="Normal">
                     <Setter Property="WindowChrome.CaptionHeight" Value="50" />
                     <Setter Property="WindowChrome.ResizeBorderThickness" Value="36" />
                 </DataTrigger>
@@ -54,10 +54,10 @@
             </Style.Triggers>
         </Style>
     </Window.Style>
-    <!-- 
+    <!-- don't when set above.
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="32" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}" GlassFrameThickness="-1" CornerRadius="8" />
-    </WindowChrome.WindowChrome>  -->
+        <WindowChrome CaptionHeight="32" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}" GlassFrameThickness="0" CornerRadius="8" />
+    </WindowChrome.WindowChrome> -->
     <Window.InputBindings>
         <!-- Not good for listview's key bind to select row.
         <KeyBinding Command="{Binding PlayCommand}" Modifiers="Ctrl" Key="Space" /> -->
@@ -94,16 +94,16 @@
     </Window.TaskbarItemInfo>
     <!--  Background="{DynamicResource BoardBackgroundColorBrush}" -->
     <Grid>
-        <Border x:Name="WindowBackgroundBorder" Style="{StaticResource WindowMainPanelStyle}" Background="{DynamicResource BoardBackgroundColorBrush}" CornerRadius="8" Opacity="1">
+        <Border x:Name="WindowChromeBorder" Style="{StaticResource WindowMainPanelStyle}" Background="{DynamicResource WindowBackgroundBaseColorBrush}" CornerRadius="8" Opacity="1">
             <Border.Effect>
-                <DropShadowEffect BlurRadius="18" ShadowDepth="2" Opacity="0.7" Direction="-75" />
+                <DropShadowEffect BlurRadius="18" ShadowDepth="2" Opacity="0.8" Direction="270" />
             </Border.Effect>
         </Border>
-        <Border x:Name="WindowChromeBorder" UseLayoutRounding="True" Style="{StaticResource WindowMainPanelStyle}" CornerRadius="8" Background="{DynamicResource WindowBackgroundBaseColorBrush}">
+        <Border x:Name="WindowBackgroundBorder" UseLayoutRounding="True" Style="{StaticResource WindowMainPanelStyle}" Background="{DynamicResource WindowBackgroundColorBrush}" CornerRadius="8">
             <Grid x:Name="LayoutGrid">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="32"/>
-                    <RowDefinition Height="102"/>
+                    <RowDefinition Height="132"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="0"/>
                     <RowDefinition Height="0"/>
@@ -116,7 +116,7 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- App title bar  Background="{DynamicResource BoardBackgroundColorBrush}" -->
-                <Border x:Name="AppTitleBar" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" CornerRadius="8,8,0,0">
+                <Border x:Name="AppTitleBar" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" CornerRadius="8">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="32"/>
@@ -128,7 +128,7 @@
                         </Grid.ColumnDefinitions>
 
                         <!-- App icon -->
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Visibility="Collapsed">
                             <Button ToolTip="{Binding AppTitleVer}" IsHitTestVisible="True" WindowChrome.IsHitTestVisibleInChrome="True">
                                 <Button.Style>
                                     <Style TargetType="{x:Type Button}">
@@ -169,8 +169,8 @@
                         </StackPanel>
 
                         <!-- Now Playing -->
-                        <StackPanel Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12 0 0 0" Visibility="{Binding IsConnected, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
-                            <TextBlock Style="{StaticResource DefaultTextBlockStyle}">
+                        <WrapPanel Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="150,0,150,0"  Visibility="{Binding IsConnected, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                            <TextBlock Style="{StaticResource DefaultTextBlockStyle}" TextTrimming="CharacterEllipsis">
                                 <TextBlock.Triggers>
                                     <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                         <BeginStoryboard>
@@ -183,7 +183,7 @@
                                 </TextBlock.Triggers>
                         <Run x:Name="CurrentSongTitle" Foreground="{DynamicResource ControlForegroundColorBrush}" FontWeight="DemiBold" Text="{Binding CurrentSongTitle, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}"/>
                             </TextBlock>
-                            <TextBlock Foreground="{DynamicResource ControlDarkColorBrush}">
+                            <TextBlock Foreground="{DynamicResource ControlDarkColorBrush}" TextTrimming="CharacterEllipsis">
                                 <TextBlock.Triggers>
                                     <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                         <BeginStoryboard>
@@ -206,7 +206,7 @@
                         <Run Text="  by "/>
                         <Run x:Name="CurrentSongArtist" Foreground="{DynamicResource ControlLightColorBrush}" Text="{Binding CurrentSongArtist, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}" />
                             </TextBlock>
-                            <TextBlock  Foreground="{DynamicResource ControlDarkColorBrush}">
+                            <TextBlock  Foreground="{DynamicResource ControlDarkColorBrush}" TextTrimming="CharacterEllipsis">
                                 <TextBlock.Triggers>
                                     <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                         <BeginStoryboard>
@@ -229,7 +229,7 @@
                         <Run Text="  from "/>
                         <Run x:Name="CurrentSongAlbum" Foreground="{DynamicResource ControlMediumColorBrush}" Text="{Binding CurrentSongAlbum, NotifyOnTargetUpdated=True, Mode=OneWay}" Style="{DynamicResource DefaultRunStyle}" />
                             </TextBlock>
-                        </StackPanel>
+                        </WrapPanel>
 
                         <!-- System icons -->
                         <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right" Margin="0">
@@ -269,14 +269,14 @@
                 </Border>
 
                 <!-- Header  Background="{DynamicResource BoardBackgroundColorBrush}" -->
-                <Border x:Name="AppHeader" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0">
+                <Border x:Name="AppHeader" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 0 0 0">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="4"/>
+                            <RowDefinition Height="0"/>
+                            <RowDefinition Height="132"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="12"/>
+                            <RowDefinition Height="0"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -284,34 +284,8 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Album cover -->
-                        <Grid Grid.Row="1" Grid.Column="0">
-                            <Grid Width="86" Height="86" Margin="36 0 6 0" HorizontalAlignment="Left" VerticalAlignment="Top">
-                                <!--  Add rounded corners here   {DynamicResource BoardBackgroundColorBrush} -->
-                                <Border Name="PicPrevMask" Margin="0" Background="#A0333333" CornerRadius="4" BorderThickness="0" />
-                                <Grid>
-                                    <Grid.OpacityMask>
-                                        <VisualBrush Visual="{Binding ElementName=PicPrevMask}" />
-                                    </Grid.OpacityMask>
-                                    <Image Source="{Binding AlbumArt, NotifyOnTargetUpdated=True}" Stretch="UniformToFill" VerticalAlignment="Top" HorizontalAlignment="Left" Width="86" Height="86" Visibility="{Binding IsAlbumArtVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
-                                        <Image.Triggers>
-                                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1.0" Duration="0:0:1">
-                                                        </DoubleAnimation>
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </EventTrigger>
-                                        </Image.Triggers>
-                                    </Image>
-                                </Grid>
-
-                            </Grid>
-                        </Grid>
-
                         <!-- Playback Controls -->
-                        <Grid Grid.Row="1" Grid.Column="1">
+                        <Grid Grid.Row="1" Grid.Column="1" Margin="0,0,0,24" VerticalAlignment="Bottom">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
@@ -344,11 +318,11 @@
                             </Grid>
 
                             <!-- Slider Seek -->
-                            <Grid Grid.Row="1" Grid.ColumnSpan="3" Width="450">
+                            <Grid Grid.Row="1" Grid.ColumnSpan="3" Width="400">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="24"/>
+                                    <ColumnDefinition Width="0"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="24"/>
+                                    <ColumnDefinition Width="0"/>
                                 </Grid.ColumnDefinitions>
 
                                 <Slider x:Name="SliderSeek" ToolTip="{x:Static properties:Resources.Playback_SliderSeek}" Style="{DynamicResource SliderHorizontalStyle}" Grid.Column="1" VerticalAlignment="Center" Margin="6 6 6 0" IsMoveToPointEnabled="True" Minimum="0" Maximum="{Binding Mode=TwoWay,Path=Time}" Value="{Binding Mode=TwoWay,Path=Elapsed}" WindowChrome.IsHitTestVisibleInChrome="True"></Slider>
@@ -358,14 +332,14 @@
                         </Grid>
 
                         <!-- Playback Options and Volume -->
-                        <Grid Grid.Row="1" Grid.Column="2">
+                        <Grid Grid.Row="1" Grid.Column="2" Margin="0,0,0,24" VerticalAlignment="Bottom">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0 0 0 0">
+                            <WrapPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0 0 0 0">
                                 <ToggleButton x:Name="RepeatButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Repeat}" IsChecked="{Binding Mode=TwoWay,Path=Repeat}" Style="{DynamicResource PathToggleButton}"  Width="18" Height="18" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
                                   Content="M17,17H7V14L3,18L7,22V19H19V13H17M7,7H17V10L21,6L17,2V5H5V11H7V7Z">
                                 </ToggleButton>
@@ -380,7 +354,7 @@
                                 <ToggleButton x:Name="ConsumeButton" ToolTip="{x:Static properties:Resources.PlaybackOptions_Consume}" IsChecked="{Binding Mode=TwoWay,Path=Consume}" Style="{DynamicResource PathToggleButton}" Width="18" Height="18" Padding="0" Margin="4" VerticalAlignment="Center" HorizontalAlignment="Center"
                                   Content="M2,16H10V14H2M12,14V16H22V14M14,6H2V8H14M14,10H2V12H14V10Z">
                                 </ToggleButton>
-                            </StackPanel>
+                            </WrapPanel>
 
                             <Grid Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0 0 7 0" Visibility="{Binding IsQueueVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                                 <Button Style="{DynamicResource PathButton}" Width="30" Height="30" Margin="0" Command="{Binding ShowFindCommand}" ToolTip="{x:Static properties:Resources.Search_ToolTip}"
@@ -388,12 +362,38 @@
                                 </Button>
                             </Grid>
 
-                            <Grid Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0 3 16 0" Width="30" Height="Auto">
+                            <Grid Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0 3 16 0" Width="30" Height="100">
                                 <Slider x:Name="SliderVol" ToolTip="{x:Static properties:Resources.Playback_SliderVolume}" Style="{DynamicResource CustomSliderStyle}" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Stretch" IsMoveToPointEnabled="True" Maximum="100" Value="{Binding Volume}" WindowChrome.IsHitTestVisibleInChrome="True">
                                 </Slider>
                             </Grid>
                         </Grid>
+                        
+                        <!-- Album cover -->
+                        <Grid Grid.Row="1" Visibility="{Binding IsAlbumCoverVisibleWhenSettingIsOpen, Converter={StaticResource BooleanToVisibilityHiddenConverter}}">
+                            <!--  Width="86" Height="86" Margin="36 0 6 0"  -->
+                            <Grid Width="126" Height="126" Margin="20 -14 0 0" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="{Binding IsAlbumArtVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                                <!--  Add rounded corners here   {DynamicResource BoardBackgroundColorBrush} -->
+                                <Border Name="PicPrevMask" Margin="0" Background="#C0212121" CornerRadius="4" BorderThickness="0" Visibility="{Binding IsAlbumArtVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" />
+                                <Grid>
+                                    <Grid.OpacityMask>
+                                        <VisualBrush Visual="{Binding ElementName=PicPrevMask}" />
+                                    </Grid.OpacityMask>
+                                    <Image Source="{Binding AlbumArt, NotifyOnTargetUpdated=True}" Stretch="Uniform"  VerticalAlignment="Top" HorizontalAlignment="Left" Width="126" Height="126" Visibility="{Binding IsAlbumArtVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                                        <Image.Triggers>
+                                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1.0" Duration="0:0:2">
+                                                        </DoubleAnimation>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </Image.Triggers>
+                                    </Image>
+                                </Grid>
 
+                            </Grid>
+                        </Grid>
                     </Grid>
 
                 </Border>
@@ -407,7 +407,7 @@
                                 <Setter Property="HorizontalContentAlignment" Value="Left" />
                                 <Setter Property="VerticalContentAlignment" Value="Center" />
                             </Style>
-                            <ContextMenu x:Key="TreeviewMenuItemContextMenu">
+                            <ContextMenu x:Key="TreeviewMenuItemContextMenu" IsTabStop="False">
 
                                 <MenuItem Header="{x:Static properties:Resources.TreeviewMenuItemContextMenu_Load}" Command="{Binding Path=DataContext.TreeviewMenuItemLoadPlaylistCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}}" Visibility="{Binding DataContext.IsPlaylistItemVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}}">
                                     <MenuItem.Resources>
@@ -492,7 +492,7 @@
                                             <Path Data="{Binding PathIcon}" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" />
                                         </Canvas>
                                     </Viewbox>
-                                    <TextBlock Text="{Binding Path=Name}" Padding="4"/>
+                                    <TextBlock Text="{Binding Path=Name}" TextTrimming="CharacterEllipsis" Padding="4"/>
                                 </StackPanel>
                             </HierarchicalDataTemplate>
                         </TreeView.ItemTemplate>
@@ -851,7 +851,7 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock Text="{Binding Path=IndexPlusOne}" Padding="3" />
+                                                    <TextBlock Text="{Binding Path=IndexPlusOne}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
@@ -859,7 +859,7 @@
 
                                     <GridViewColumn Width="{Binding Path=DataContext.QueueColumnHeaderNowPlayingWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Mode=TwoWay}">
                                         <GridViewColumnHeader Tag="{Binding QueueColumnHeaderNowPlayingWidthRestore, Mode=TwoWay}" MinWidth="32">
-                                            <Viewbox Width="16" Height="16" Margin="-2 0 0 -2">
+                                            <Viewbox Width="16" Height="16" Margin="0 0 0 -2">
                                                 <Canvas Width="24" Height="24">
                                                     <Path Fill="{DynamicResource ControlForegroundColorBrush}" Data="M8.5,8.64L13.77,12L8.5,15.36V8.64M6.5,5V19L17.5,12"/>
                                                 </Canvas>
@@ -874,7 +874,7 @@
                                                 </Viewbox>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="IsPlayingIcon" Property="Fill" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
+                                                        <Setter TargetName="IsPlayingIcon" Property="Fill" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -886,7 +886,7 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="SongTitleListItemTextBlock" Text="{Binding Path=Title}" Padding="3" />
+                                                    <TextBlock x:Name="SongTitleListItemTextBlock" Text="{Binding Path=Title}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
@@ -906,7 +906,7 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="TimeListItemTextBlock" Text="{Binding Path=TimeFormated}" Padding="3" />
+                                                    <TextBlock x:Name="TimeListItemTextBlock" Text="{Binding Path=TimeFormated}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
@@ -926,7 +926,7 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="ArtistListItemTextBlock" Text="{Binding Path=Artist}" Padding="3" />
+                                                    <TextBlock x:Name="ArtistListItemTextBlock" Text="{Binding Path=Artist}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
@@ -946,7 +946,7 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="AlbumListItemTextBlock" Text="{Binding Path=Album}" Padding="3" />
+                                                    <TextBlock x:Name="AlbumListItemTextBlock" Text="{Binding Path=Album}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
@@ -967,7 +967,7 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="DiscListItemTextBlock" Text="{Binding Path=Disc}" Padding="3" />
+                                                    <TextBlock x:Name="DiscListItemTextBlock" Text="{Binding Path=Disc}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
@@ -988,7 +988,7 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="TrackListItemTextBlock" Text="{Binding Path=Track}" Padding="3" />
+                                                    <TextBlock x:Name="TrackListItemTextBlock" Text="{Binding Path=Track}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
@@ -1008,7 +1008,7 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="GenreListItemTextBlock" Text="{Binding Path=Genre}" Padding="3" />
+                                                    <TextBlock x:Name="GenreListItemTextBlock" Text="{Binding Path=Genre}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
@@ -1028,7 +1028,7 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="LastModifiedListItemTextBlock" Text="{Binding Path=LastModifiedFormated}" Padding="3" />
+                                                    <TextBlock x:Name="LastModifiedListItemTextBlock" Text="{Binding Path=LastModifiedFormated}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding IsPlaying}" Value="True">
@@ -1436,7 +1436,7 @@
                             <Grid x:Name="SearchResultListviewDummy7" Grid.Column="6" />
                         </Grid>
 
-                        <ListView x:Name="SearchResultListview" Grid.Row="1" ItemsSource="{Binding SearchResult}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" BorderThickness="0 0 0 0" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" Padding="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListView x:Name="SearchResultListview" Grid.Row="1" ItemsSource="{Binding SearchResult}" SelectionMode="Extended" AlternationCount="2" Background="Transparent" BorderThickness="0 0 0 0" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" Padding="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListView.Resources>
                                 <ContextMenu x:Key="SearchResultListviewItemContextMenu">
                                     <MenuItem Header="{x:Static properties:Resources.SongsItemContextMenu_Add}" Command="{Binding Path=DataContext.SongsListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
@@ -1521,7 +1521,7 @@
                                                 </Viewbox>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="MusicFileIcon" Property="Fill" Value="#111111" />
+                                                        <Setter TargetName="MusicFileIcon" Property="Fill" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -1532,11 +1532,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="SearchResultListviewSongTitleListItemTextBlock" Text="{Binding Path=Title}" Padding="3" />
+                                                    <TextBlock x:Name="SearchResultListviewSongTitleListItemTextBlock" Text="{Binding Path=Title}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="SearchResultListviewSongTitleListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="SearchResultListviewSongTitleListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -1548,11 +1548,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="SearchResultListviewTimeListItemTextBlock" Text="{Binding Path=TimeFormated}" Padding="3" />
+                                                    <TextBlock x:Name="SearchResultListviewTimeListItemTextBlock" Text="{Binding Path=TimeFormated}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="SearchResultListviewTimeListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="SearchResultListviewTimeListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -1564,11 +1564,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="SearchResultListviewArtistListItemTextBlock" Text="{Binding Path=Artist}" Padding="3" />
+                                                    <TextBlock x:Name="SearchResultListviewArtistListItemTextBlock" Text="{Binding Path=Artist}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="SearchResultListviewArtistListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="SearchResultListviewArtistListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -1580,11 +1580,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="SearchResultListviewAlbumListItemTextBlock" Text="{Binding Path=Album}" Padding="3" />
+                                                    <TextBlock x:Name="SearchResultListviewAlbumListItemTextBlock" Text="{Binding Path=Album}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="SearchResultListviewAlbumListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="SearchResultListviewAlbumListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -1596,11 +1596,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="SearchResultListviewGenreListItemTextBlock" Text="{Binding Path=Genre}" Padding="3" />
+                                                    <TextBlock x:Name="SearchResultListviewGenreListItemTextBlock" Text="{Binding Path=Genre}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="SearchResultListviewGenreListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="SearchResultListviewGenreListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -1612,11 +1612,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="SearchResultListviewLastModifiedListItemTextBlock" Text="{Binding Path=LastModifiedFormated}" Padding="3" />
+                                                    <TextBlock x:Name="SearchResultListviewLastModifiedListItemTextBlock" Text="{Binding Path=LastModifiedFormated}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="SearchResultListviewLastModifiedListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="SearchResultListviewLastModifiedListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -1715,7 +1715,7 @@
                             <ColumnDefinition Width="3*"/>
                         </Grid.ColumnDefinitions>
 
-                        <TreeView Grid.Row="0" Grid.Column="0" Background="{DynamicResource WindowBackgroundBaseColorBrush}" BorderThickness="0 0 0 0" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" ItemsSource="{Binding MusicDirectories}" helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeDirectory, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <TreeView Grid.Row="0" Grid.Column="0" Background="Transparent" BorderThickness="0 0 0 0" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" ItemsSource="{Binding MusicDirectories}" helpers:TreeViewHelper.SelectedItem="{Binding SelectedNodeDirectory, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <TreeView.Resources>
                                 <Style TargetType="{x:Type TreeViewItem}">
                                     <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -1902,7 +1902,7 @@
                                 <Grid x:Name="SongFilesListviewDummy3" Grid.Column="2" />
                             </Grid>
 
-                            <ListView x:Name="SongFilesListview" Grid.Row="1" ItemsSource="{Binding MusicEntries}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderBrush="#121212" BorderThickness="0 0 0 0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
+                            <ListView x:Name="SongFilesListview" Grid.Row="1" ItemsSource="{Binding MusicEntries}" SelectionMode="Extended" AlternationCount="2" Background="Transparent" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderBrush="#121212" BorderThickness="0 0 0 0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
                                 <ListView.Resources>
                                     <ContextMenu x:Key="SongFilesListviewItemContextMenu">
                                         <MenuItem Header="{x:Static properties:Resources.SongsItemContextMenu_Add}" Command="{Binding Path=DataContext.SongFilesListviewAddCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
@@ -1986,7 +1986,7 @@
                                                     </Viewbox>
                                                     <DataTemplate.Triggers>
                                                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                            <Setter TargetName="MusicFileIcon" Property="Fill" Value="#111111" />
+                                                            <Setter TargetName="MusicFileIcon" Property="Fill" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                         </DataTrigger>
                                                     </DataTemplate.Triggers>
                                                 </DataTemplate>
@@ -1998,11 +1998,11 @@
                                             <GridViewColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <StackPanel>
-                                                        <TextBlock x:Name="SongsListviewSongTitleListItemTextBlock" Text="{Binding Path=Name}" Padding="3" />
+                                                        <TextBlock x:Name="SongsListviewSongTitleListItemTextBlock" Text="{Binding Path=Name}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                     </StackPanel>
                                                     <DataTemplate.Triggers>
                                                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                            <Setter TargetName="SongsListviewSongTitleListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                            <Setter TargetName="SongsListviewSongTitleListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                         </DataTrigger>
                                                     </DataTemplate.Triggers>
                                                 </DataTemplate>
@@ -2014,11 +2014,11 @@
                                             <GridViewColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <StackPanel>
-                                                        <TextBlock x:Name="SongsListviewSongPathListItemTextBlock" Text="{Binding Path=FilePath}" Padding="3" />
+                                                        <TextBlock x:Name="SongsListviewSongPathListItemTextBlock" Text="{Binding Path=FilePath}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                     </StackPanel>
                                                     <DataTemplate.Triggers>
                                                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                            <Setter TargetName="SongsListviewSongPathListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                            <Setter TargetName="SongsListviewSongPathListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                         </DataTrigger>
                                                     </DataTemplate.Triggers>
                                                 </DataTemplate>
@@ -2132,7 +2132,7 @@
                             <Grid x:Name="PlaylistsListviewDummy3" Grid.Column="2" />
                         </Grid>
 
-                        <ListView x:Name="PlaylistsListview" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}" SelectionMode="Single" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True"  IsSynchronizedWithCurrentItem="True" BorderThickness="0 0 0 0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListView x:Name="PlaylistsListview" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist}" SelectionMode="Single" AlternationCount="2" Background="Transparent" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True"  IsSynchronizedWithCurrentItem="True" BorderThickness="0 0 0 0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListView.InputBindings>
                                 <KeyBinding Key="Return" Command="{Binding Path=DataContext.PlaylistListviewEnterKeyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" />
                             </ListView.InputBindings>
@@ -2231,7 +2231,7 @@
                                                 </Viewbox>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="PlaylistIcon" Property="Fill" Value="#111111" />
+                                                        <Setter TargetName="PlaylistIcon" Property="Fill" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -2243,11 +2243,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="PlaylistsListviewSongTitleListItemTextBlock" Text="{Binding Path=Name}" Padding="3" />
+                                                    <TextBlock x:Name="PlaylistsListviewSongTitleListItemTextBlock" Text="{Binding Path=Name}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="PlaylistsListviewSongTitleListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="PlaylistsListviewSongTitleListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -2259,11 +2259,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="PlaylistsListviewLastModifiedListItemTextBlock" Text="{Binding Path=LastModifiedFormated}" Padding="3" />
+                                                    <TextBlock x:Name="PlaylistsListviewLastModifiedListItemTextBlock" Text="{Binding Path=LastModifiedFormated}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="PlaylistsListviewLastModifiedListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="PlaylistsListviewLastModifiedListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -2348,7 +2348,7 @@
                             <Grid x:Name="PlaylistSongsListviewDummy9" Grid.Column="9" />
                         </Grid>
 
-                        <ListView x:Name="PlaylistSongsListview" Grid.Row="0" ItemsSource="{Binding PlaylistSongs, NotifyOnTargetUpdated=True}" TargetUpdated="PlaylistSongsListview_TargetUpdated" SelectedItem="{Binding SelectedPlaylistSong}" SelectionMode="Extended" AlternationCount="2" Background="{DynamicResource WindowBackgroundBaseColorBrush}" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0 0 0 0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
+                        <ListView x:Name="PlaylistSongsListview" Grid.Row="0" ItemsSource="{Binding PlaylistSongs, NotifyOnTargetUpdated=True}" TargetUpdated="PlaylistSongsListview_TargetUpdated" SelectedItem="{Binding SelectedPlaylistSong}" SelectionMode="Extended" AlternationCount="2" Background="Transparent" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingStackPanel.ScrollUnit="Pixel" helpers:GridViewSort.AutoSort="True" helpers:GridViewSort.ShowSortGlyph="True" IsSynchronizedWithCurrentItem="True" BorderThickness="0 0 0 0" Padding="0" Margin="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
                             <ListView.Resources>
                                 <ContextMenu x:Key="PlaylistSongsListviewItemContextMenu">
                                     <MenuItem Header="{x:Static properties:Resources.QueueItemContextMenu_SelectedItems}">
@@ -2450,7 +2450,7 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock Text="{Binding Path=IndexPlusOne}" Padding="3" />
+                                                    <TextBlock Text="{Binding Path=IndexPlusOne}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
@@ -2468,7 +2468,7 @@
                                                 </Viewbox>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="MusicFileIcon" Property="Fill" Value="#111111" />
+                                                        <Setter TargetName="MusicFileIcon" Property="Fill" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -2480,11 +2480,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="PlaylistSongsListviewSongTitleListItemTextBlock" Text="{Binding Path=Title}" Padding="3" />
+                                                    <TextBlock x:Name="PlaylistSongsListviewSongTitleListItemTextBlock" Text="{Binding Path=Title}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="PlaylistSongsListviewSongTitleListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="PlaylistSongsListviewSongTitleListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -2496,11 +2496,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="PlaylistSongsListviewTimeListItemTextBlock" Text="{Binding Path=TimeFormated}" Padding="3" />
+                                                    <TextBlock x:Name="PlaylistSongsListviewTimeListItemTextBlock" Text="{Binding Path=TimeFormated}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="PlaylistSongsListviewTimeListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="PlaylistSongsListviewTimeListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -2512,11 +2512,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="PlaylistSongsListviewArtistListItemTextBlock" Text="{Binding Path=Artist}" Padding="3" />
+                                                    <TextBlock x:Name="PlaylistSongsListviewArtistListItemTextBlock" Text="{Binding Path=Artist}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="PlaylistSongsListviewArtistListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="PlaylistSongsListviewArtistListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -2528,11 +2528,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="PlaylistSongsListviewAlbumListItemTextBlock" Text="{Binding Path=Album}" Padding="3" />
+                                                    <TextBlock x:Name="PlaylistSongsListviewAlbumListItemTextBlock" Text="{Binding Path=Album}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="PlaylistSongsListviewAlbumListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="PlaylistSongsListviewAlbumListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -2544,11 +2544,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="PlaylistSongsListviewDiscListItemTextBlock" Text="{Binding Path=Disc}" Padding="3" />
+                                                    <TextBlock x:Name="PlaylistSongsListviewDiscListItemTextBlock" Text="{Binding Path=Disc}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="PlaylistSongsListviewDiscListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="PlaylistSongsListviewDiscListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -2560,11 +2560,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="PlaylistSongsListviewTrackListItemTextBlock" Text="{Binding Path=Track}" Padding="3" />
+                                                    <TextBlock x:Name="PlaylistSongsListviewTrackListItemTextBlock" Text="{Binding Path=Track}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="PlaylistSongsListviewTrackListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="PlaylistSongsListviewTrackListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -2576,11 +2576,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="PlaylistSongsListviewGenreListItemTextBlock" Text="{Binding Path=Genre}" Padding="3" />
+                                                    <TextBlock x:Name="PlaylistSongsListviewGenreListItemTextBlock" Text="{Binding Path=Genre}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="PlaylistSongsListviewGenreListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="PlaylistSongsListviewGenreListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -2592,11 +2592,11 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel>
-                                                    <TextBlock x:Name="PlaylistSongsListviewLastModifiedListItemTextBlock" Text="{Binding Path=LastModifiedFormated}" Padding="3" />
+                                                    <TextBlock x:Name="PlaylistSongsListviewLastModifiedListItemTextBlock" Text="{Binding Path=LastModifiedFormated}" TextTrimming="CharacterEllipsis" Padding="3" />
                                                 </StackPanel>
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Path=IsSelected}" Value="True">
-                                                        <Setter TargetName="PlaylistSongsListviewLastModifiedListItemTextBlock" Property="TextBlock.Foreground" Value="#111111" />
+                                                        <Setter TargetName="PlaylistSongsListviewLastModifiedListItemTextBlock" Property="TextBlock.Foreground" Value="{DynamicResource ItemSelectedForegroundColorBrush}" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -2876,7 +2876,7 @@
                 </Grid>
 
                 <!-- StatusBar  Background="{DynamicResource BoardBackgroundColorBrush}" -->
-                <StatusBar x:Name="StatusBar" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Padding="0 0 0 0" Background="Transparent" Height="28" Margin="0 0 0 0" BorderBrush="{DynamicResource WindowBackgroundBaseColorBrush}" BorderThickness="0 0 0 0">
+                <StatusBar x:Name="StatusBar" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Padding="0 0 0 0" Background="Transparent" Height="28" Margin="0 0 0 0" BorderBrush="{DynamicResource DefaultBorderColorBrush}" BorderThickness="0 1 0 0">
                     <StatusBar.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Grid>
@@ -2907,7 +2907,7 @@
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding Path=Name}"></TextBlock>
+                                            <TextBlock Text="{Binding Path=Name}" Opacity="0.7"></TextBlock>
                                         </StackPanel>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
@@ -2956,7 +2956,7 @@
                                 <Button.Style>
                                     <Style TargetType="{x:Type Button}">
                                         <Setter Property="OverridesDefaultStyle" Value="true" />
-                                        <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
+                                        <Setter Property="Background" Value="Transparent" />
                                         <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
                                         <Setter Property="BorderThickness" Value="0" />
                                         <Setter Property="Margin" Value="0 0 0 0" />
@@ -3252,7 +3252,7 @@
                 </Grid>
 
                 <!-- Setting screen -->
-                <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="3" Visibility="{Binding IsSettingsShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
+                <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="3" Background="{DynamicResource BoardBackgroundAltColorBrush}" Visibility="{Binding IsSettingsShow, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}" KeyboardNavigation.TabNavigation="Cycle">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="0"/>
                         <RowDefinition Height="*"/>

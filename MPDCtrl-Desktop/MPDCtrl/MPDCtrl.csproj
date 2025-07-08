@@ -25,42 +25,50 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <DebugType>embedded</DebugType>
+    <DebugType>portable</DebugType>
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <DebugType>embedded</DebugType>
+    <DebugType>portable</DebugType>
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <DebugType>embedded</DebugType>
+    <DebugType>portable</DebugType>
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <DebugType>embedded</DebugType>
+    <DebugType>portable</DebugType>
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <DebugType>embedded</DebugType>
+    <DebugType>portable</DebugType>
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <DebugType>embedded</DebugType>
+    <DebugType>portable</DebugType>
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <DebugType>embedded</DebugType>
+    <DebugType>portable</DebugType>
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <DebugType>embedded</DebugType>
+    <DebugType>portable</DebugType>
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
   <ItemGroup>

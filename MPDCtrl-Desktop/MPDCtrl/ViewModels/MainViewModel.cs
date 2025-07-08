@@ -823,6 +823,7 @@ public class MainViewModel : ViewModelBase
 
             if (_isSettingsShow)
             {
+                // TODO: what a heck is going on here...?
                 if (CurrentProfile is null)
                 {
                     IsConnectionSettingShow = false;
@@ -831,6 +832,8 @@ public class MainViewModel : ViewModelBase
                 {
                     IsConnectionSettingShow = false;
                 }
+
+                IsAlbumCoverVisibleWhenSettingIsOpen = false;
             }
             else
             {
@@ -845,10 +848,26 @@ public class MainViewModel : ViewModelBase
                         IsConnectionSettingShow = true;
                     }
                 }
+
+                IsAlbumCoverVisibleWhenSettingIsOpen = true;
             }
 
             NotifyPropertyChanged(nameof(IsSettingsShow));
 
+        }
+    }
+
+    private bool _isAlbumCoverVisibleWhenSettingIsOpen = true;
+    public bool IsAlbumCoverVisibleWhenSettingIsOpen
+    {
+        get { return _isAlbumCoverVisibleWhenSettingIsOpen; }
+        set
+        {
+            if (_isAlbumCoverVisibleWhenSettingIsOpen == value)
+                return;
+
+            _isAlbumCoverVisibleWhenSettingIsOpen = value;
+            NotifyPropertyChanged(nameof(IsAlbumCoverVisibleWhenSettingIsOpen));
         }
     }
 

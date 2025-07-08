@@ -17,6 +17,7 @@
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 
             <common:BooleanToVisibilityCollapsedConverter x:Key="BooleanToVisibilityCollapsedConverter" TrueValue="Visible" FalseValue="Collapsed" />
+            <common:BooleanToVisibilityCollapsedConverter x:Key="BooleanToVisibilityHiddenConverter" TrueValue="Visible" FalseValue="Hidden" />
             
             <common:EnumToBoolConverter x:Key="EnumBooleanConverter"/>
             
@@ -532,7 +533,7 @@
                         <Setter Property="Height" Value="32" />
                         <Setter Property="Focusable" Value="False" />
                         <Setter Property="FocusVisualStyle" Value="{DynamicResource ButtonFocusVisual}" />
-                        <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
+                        <Setter Property="Background" Value="Transparent" />
                         <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
                         <Setter Property="Template">
                             <Setter.Value>
@@ -567,8 +568,8 @@
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="true">
-                                            
-                                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource ControlMouseOverBackgroundColorBrush}"></Setter>
+
+                                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource SysButtonMouseOverBackgroundColorBrush}"></Setter>
                                             
                                             <Setter TargetName="PathIcon" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}"/>
                                         </Trigger>
@@ -626,7 +627,7 @@
                         <Setter Property="Height" Value="32" />
                         <Setter Property="Focusable" Value="False" />
                         <Setter Property="FocusVisualStyle" Value="{DynamicResource ButtonFocusVisual}" />
-                        <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
+                        <Setter Property="Background" Value="Transparent" />
                         <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
                         <Setter Property="Template">
                             <Setter.Value>
@@ -696,7 +697,14 @@
                                             </MultiTrigger.Conditions>
 
                                         </MultiTrigger>
-
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=WindowState}" Value="Maximized">
+                                            <Setter Property="BorderThickness" Value="0" />
+                                            <Setter TargetName="Border" Property="CornerRadius" Value="0" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="False">
+                                            <Setter Property="BorderBrush" Value="{DynamicResource WindowBorderInactiveBrush}" />
+                                            <Setter TargetName="Border" Property="CornerRadius" Value="0,8,0,0" />
+                                        </DataTrigger>
                                     </ControlTemplate.Triggers>
 
                                 </ControlTemplate>
@@ -723,7 +731,7 @@
                     </Style>
                     
                     <Style x:Key="PathToggleButton" TargetType="{x:Type ToggleButton}">
-                        <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}"/>
+                        <Setter Property="Background" Value="Transparent"/>
                         <Setter Property="Foreground" Value="{DynamicResource ControlForegroundColorBrush}"/>
                         <Setter Property="FocusVisualStyle" Value="{DynamicResource ToggleButtonFocusVisual}" />
                         <Setter Property="Template">
@@ -1684,23 +1692,12 @@
 
                     <Style x:Key="GridViewColumnHeaderGripperStyle" TargetType="Thumb">
                         <Setter Property="OverridesDefaultStyle" Value="False"/>
-                        <Setter Property="Background">
-                            <Setter.Value>
-                                <LinearGradientBrush StartPoint="1,0" EndPoint="0,1" Opacity="0.5">
-                                    <LinearGradientBrush.GradientStops>
-                                        <GradientStopCollection>
-                                            <GradientStop Offset="0.0" Color="{DynamicResource BorderDarkColor}" />
-                                            <GradientStop Offset="1.0" Color="{DynamicResource BorderDarkColor}" />
-                                        </GradientStopCollection>
-                                    </LinearGradientBrush.GradientStops>
-                                </LinearGradientBrush>
-                            </Setter.Value>
-                        </Setter>
+
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type Thumb}">
-                                    <Border Background="{DynamicResource BorderLightColorBrush}" BorderBrush="{DynamicResource BorderMediumColorBrush}" BorderThickness="0.6">
-                                        <Rectangle HorizontalAlignment="Center" SnapsToDevicePixels="true" Width="0.6" Fill="{DynamicResource BorderDarktColorBrush}"/>
+                                    <Border Background="{DynamicResource WindowBackgroundColorBrush}" BorderBrush="{DynamicResource WindowBackgroundColorBrush}" BorderThickness="0.6">
+                                        <Rectangle HorizontalAlignment="Center" SnapsToDevicePixels="true" Width="1.4" Fill="{DynamicResource DefaultBorderColorBrush}"/>
                                     </Border>
                                 </ControlTemplate>
                             </Setter.Value>
@@ -1721,7 +1718,7 @@
                             <Setter.Value>
                                 <ControlTemplate TargetType="GridViewColumnHeader">
                                     <Grid>
-                                        <Border Name="HeaderBorder" Padding="12 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0" Background="{TemplateBinding Background}">
+                                        <Border Name="HeaderBorder" Padding="12 0 0 0" BorderBrush="{DynamicResource DefaultBorderColorBrush}" BorderThickness="0,0,0,1" Background="{TemplateBinding Background}">
                                             <ContentPresenter Name="HeaderContent" Margin="0,0,0,1" RecognizesAccessKey="True" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                         </Border>
                                         <!-- disable colum header resize by removing this. -->
@@ -1775,7 +1772,7 @@
                         <Setter Property="Height" Value="27" />
                         <Setter Property="Margin" Value="-1 0 0 0" />
                         <Setter Property="Padding" Value="0 0 0 0" />
-                        <Setter Property="Background" Value="{DynamicResource BoardBackgroundColorBrush}" />
+                        <Setter Property="Background" Value="Transparent" />
                         <Setter Property="TextElement.FontWeight" Value="Normal" />
                         <Setter Property="TextElement.Foreground" Value="{DynamicResource ControlForegroundColorBrush}" />
                         <Setter Property="HorizontalContentAlignment" Value="Left"/>
@@ -1784,7 +1781,7 @@
                             <Setter.Value>
                                 <ControlTemplate TargetType="GridViewColumnHeader">
                                     <Grid>
-                                        <Border Name="HeaderBorder" Padding="12 0 0 0" BorderBrush="#121212" BorderThickness="0,0,0,0" Background="{TemplateBinding Background}">
+                                        <Border Name="HeaderBorder" Padding="12 0 0 0" BorderBrush="{DynamicResource DefaultBorderColorBrush}" BorderThickness="0,0,0,1" Background="{TemplateBinding Background}">
                                             <ContentPresenter Name="HeaderContent" Margin="0,0,0,1" RecognizesAccessKey="True" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                         </Border>
                                         <!-- disable colum header resize by removing this. -->
@@ -1874,12 +1871,12 @@
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type RepeatButton}">
                                     <Border x:Name="Border" Margin="0" CornerRadius="0" BorderThickness="0">
-                                        <Path x:Name="Arrow" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" >
+                                        <Path x:Name="Arrow" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ScrollBarColorBrush}" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" >
                                         </Path>
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="true">
-                                            <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}" />
+                                            <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource ScrollBarMouseOverColorBrush}" />
                                         </Trigger>
                                         <Trigger Property="IsPressed" Value="true">
                                             <Setter TargetName="Border" Property="Background" Value="Transparent" />
@@ -1905,13 +1902,13 @@
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type RepeatButton}">
                                     <Border x:Name="Border" Margin="0" CornerRadius="0" BorderThickness="0">
-                                        <Path x:Name="Arrow" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ControlForegroundColorBrush}" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" >
+                                        <Path x:Name="Arrow" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource ScrollBarColorBrush}" Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" >
                                         </Path>
                                     </Border>
 
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="true">
-                                            <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource ControlMouseOverColorBrush}" />
+                                            <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource ScrollBarMouseOverColorBrush}" />
                                         </Trigger>
                                         <Trigger Property="IsPressed" Value="true">
                                             <Setter TargetName="Border" Property="Background" Value="Transparent" />
@@ -1926,12 +1923,22 @@
                         </Setter>
                     </Style>
 
-                    <Style x:Key="ScrollBarTrackStyle" TargetType="{x:Type RepeatButton}">
+                    <Style x:Key="ScrollBarTrackVerticalStyle" TargetType="{x:Type RepeatButton}">
                         <Setter Property="Focusable" Value="False"/>
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type RepeatButton}">
-                                    <Border Background="Transparent"/>
+                                    <Border Background="#3333" Width="3"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <Style x:Key="ScrollBarTrackHorizontalStyle" TargetType="{x:Type RepeatButton}">
+                        <Setter Property="Focusable" Value="False"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                    <Border Background="#3333" Height="3"/>
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
@@ -1949,13 +1956,13 @@
                             <RepeatButton Grid.Row="0" Height="14" Command="ScrollBar.LineUpCommand" Content="M 0 4 L 8 4 L 4 0 Z" Style="{StaticResource RepeatButtonStyleInc}" IsTabStop="False"/>
                             <Track x:Name="PART_Track" Grid.Row="1" IsDirectionReversed="true">
                                 <Track.DecreaseRepeatButton>
-                                    <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False"/>
+                                    <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource ScrollBarTrackVerticalStyle}" Focusable="False" Background="Transparent" IsTabStop="False"/>
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
                                     <Thumb Style="{StaticResource ThumbStyle}" Margin="3,0,3,0"></Thumb>
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
-                                    <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False"/>
+                                    <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource ScrollBarTrackVerticalStyle}" Focusable="False" Background="Transparent" IsTabStop="False"/>
                                 </Track.IncreaseRepeatButton>
                             </Track>
                             <RepeatButton Grid.Row="2" Height="14" Command="ScrollBar.LineDownCommand" Content="M 0 0 L 4 4 L 8 0 Z" Style="{StaticResource RepeatButtonStyleDec}" IsTabStop="False"/>
@@ -1974,13 +1981,13 @@
                             <RepeatButton Grid.Column="0" Style="{StaticResource RepeatButtonStyleInc}" Width="14" Command="ScrollBar.LineLeftCommand" Content="M 4 0 L 4 8 L 0 4 Z" IsTabStop="False" />
                             <Track x:Name="PART_Track" Grid.Column="1" IsDirectionReversed="False">
                                 <Track.DecreaseRepeatButton>
-                                    <RepeatButton Command="ScrollBar.PageLeftCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False" />
+                                    <RepeatButton Command="ScrollBar.PageLeftCommand" Style="{StaticResource ScrollBarTrackHorizontalStyle}" Focusable="False" Background="Transparent" IsTabStop="False" />
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
                                     <Thumb Style="{StaticResource ThumbStyle}" Margin="0,3,0,3"></Thumb>
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
-                                    <RepeatButton Command="ScrollBar.PageRightCommand" Style="{StaticResource ScrollBarTrackStyle}" Focusable="False" Background="Transparent" IsTabStop="False" />
+                                    <RepeatButton Command="ScrollBar.PageRightCommand" Style="{StaticResource ScrollBarTrackHorizontalStyle}" Focusable="False" Background="Transparent" IsTabStop="False" />
                                 </Track.IncreaseRepeatButton>
                             </Track>
                             <RepeatButton Grid.Column="2" Style="{StaticResource RepeatButtonStyleDec}" Width="14" Command="ScrollBar.LineRightCommand" Content="M 0 0 L 4 4 L 0 8 Z" IsTabStop="False" />
@@ -2655,7 +2662,7 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type RepeatButton}">
-                                    <Border Background="Transparent"/>
+                                    <Border Background="#3333"/>
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
@@ -2706,7 +2713,7 @@
                                                 </Grid.RowDefinitions>
                                                 <Border Grid.RowSpan="3" CornerRadius="0" Background="{DynamicResource ScrollBarTrackBrush}" />
                                                 <RepeatButton Grid.Row="0" Style="{StaticResource ScrollBarRepeatButtonStyle}" Height="{StaticResource ScrollBarRepeatButtonSize}" Command="ScrollBar.LineUpCommand" Content="M 0 4 L 8 4 L 4 0 Z" />
-                                                <Track x:Name="PART_Track" Grid.Row="1" IsDirectionReversed="true">
+                                                <Track x:Name="PART_Track" Grid.Row="1" IsDirectionReversed="true" Margin="0,0,1,0">
                                                     <Track.DecreaseRepeatButton>
                                                         <RepeatButton Style="{StaticResource ScrollBarTrackStyle}" Command="ScrollBar.PageUpCommand" />
                                                     </Track.DecreaseRepeatButton>

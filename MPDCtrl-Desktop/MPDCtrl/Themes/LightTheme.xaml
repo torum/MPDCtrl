@@ -2,10 +2,20 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
 
-    <Color x:Key="WindowTintColor">#CCCCCC</Color>
-    <Color x:Key="WindowFallbackColor">#dddddd</Color>
-    <Color x:Key="WindowBackgroundBaseColor">#fdfdfd</Color>
-    <Color x:Key="WindowBackgroundColor">#FBF9F7</Color>
+
+    <Color x:Key="SysButtonMouseOverBackgroundColor">#ddd</Color>
+    <SolidColorBrush x:Key="SysButtonMouseOverBackgroundColorBrush" Color="{DynamicResource SysButtonMouseOverBackgroundColor}" />
+    <Color x:Key="DefaultBorderColor">#3333</Color>
+    <SolidColorBrush x:Key="DefaultBorderColorBrush" Color="{DynamicResource DefaultBorderColor}" />
+    
+    <Color x:Key="BoardBackgroundAltColor">#333</Color>
+    <SolidColorBrush x:Key="BoardBackgroundAltColorBrush" Color="{DynamicResource BoardBackgroundAltColor}"/>
+
+    <Color x:Key="WindowBackgroundBaseColor">#C0DDDDDD</Color>
+    <SolidColorBrush x:Key="WindowBackgroundBaseColorBrush" Color="{DynamicResource WindowBackgroundBaseColor}"/>
+    <Color x:Key="WindowBackgroundColor">#C0f1f1f1</Color>
+    <SolidColorBrush x:Key="WindowBackgroundColorBrush" Color="{DynamicResource WindowBackgroundColor}"/>
+    
     <!-- eee f3f3f3-->
 
     <Color x:Key="ControlForegroundColor">#444</Color>
@@ -92,13 +102,14 @@
     <!-- 使用不可の色 -->
     <SolidColorBrush x:Key="ScrollBarDisabledBrush" Color="Gray" />
 
+    <!-- 
+    
+    <Color x:Key="WindowTintColor">#CCCCCC</Color>
+    <Color x:Key="WindowFallbackColor">#dddddd</Color>
+  -->
 
-
-    <SolidColorBrush x:Key="WindowBorderBrush" Color="#333333" />
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="LightGray" />
     <SolidColorBrush x:Key="WindowBorderInactiveBrush" Color="Gray" />
-
-    <SolidColorBrush x:Key="WindowBackgroundBaseColorBrush" Color="{DynamicResource WindowBackgroundBaseColor}"/>
-    <SolidColorBrush x:Key="WindowBackgroundColorBrush" Color="{DynamicResource WindowBackgroundColor}"/>
 
     <SolidColorBrush x:Key="ControlForegroundColorBrush" Color="{DynamicResource ControlForegroundColor}"/>
     <SolidColorBrush x:Key="ControlLightColorBrush" Color="{DynamicResource ControlLightColor}"/>
@@ -143,9 +154,9 @@
 
     <!-- new none white theme aware -->
     <SolidColorBrush x:Key="ItemBackgroundColorBrush" Color="Transparent"/>
-    <Color x:Key="ItemAlt0Color">#eeeeee</Color>
+    <Color x:Key="ItemAlt0Color">Transparent</Color>
     <SolidColorBrush x:Key="ItemBackgroundAlt0ColorBrush" Color="{DynamicResource ItemAlt0Color}"/>
-    <Color x:Key="ItemAlt1Color">#fdfdfd</Color>
+    <Color x:Key="ItemAlt1Color">Transparent</Color>
     <SolidColorBrush x:Key="ItemBackgroundAlt1ColorBrush" Color="{DynamicResource ItemAlt1Color}"/>
 
     <Color x:Key="ItemSelectedBackgroundColor">#bbb</Color>

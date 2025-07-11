@@ -31,7 +31,7 @@ public class MainViewModel : ViewModelBase
     const string _appName = "MPDCtrl";
 
     // Application version
-    const string _appVer = "v3.2.0.0";
+    const string _appVer = "v3.2.1.0";
 
     public static string AppVer
     {

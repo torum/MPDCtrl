@@ -2634,7 +2634,7 @@ namespace MPDCtrl.Services
                         }
                         else
                         {
-                            SongValues.Add(StatusValuePair[0].Trim(), value.Replace(StatusValuePair[0].Trim() + ": ", ""));
+                            SongValues.TryAdd(StatusValuePair[0].Trim(), value.Replace(StatusValuePair[0].Trim() + ": ", ""));
                         }
                     }
                 }
@@ -2788,7 +2788,8 @@ namespace MPDCtrl.Services
                     string[] StatusValuePair = value.Trim().Split(':');
                     if (StatusValuePair.Length > 1)
                     {
-                        if (SongValues.ContainsKey(StatusValuePair[0].Trim()))
+                        //if (SongValues.ContainsKey(StatusValuePair[0].Trim()))
+                        if (StatusValuePair[0].Trim().Equals("file"))
                         {
                             if (SongValues.ContainsKey("Id"))
                             {
@@ -2813,31 +2814,13 @@ namespace MPDCtrl.Services
                                     SongValues.Clear();
                                 }
                             }
-                            /*
-                            if (!SongValues.ContainsKey(StatusValuePair[0].Trim()))
-                            {
-                                SongValues.Add(StatusValuePair[0].Trim(), value.Replace(StatusValuePair[0].Trim() + ": ", ""));
-                            }
-                            else
-                            {
-                                if (StatusValuePair[0].Trim() == "Genre")
-                                {
-                                    SongValues["Genre"] = SongValues["Genre"] + "/" + value.Replace(StatusValuePair[0].Trim() + ": ", "");
-                                } 
-                            }
-                            */
-                        }
 
-                        if (!SongValues.ContainsKey(StatusValuePair[0].Trim()))
-                        {
+                            SongValues.Clear();
                             SongValues.Add(StatusValuePair[0].Trim(), value.Replace(StatusValuePair[0].Trim() + ": ", ""));
                         }
                         else
                         {
-                            if (StatusValuePair[0].Trim() == "Genre")
-                            {
-                                SongValues["Genre"] = SongValues["Genre"] + "/" + value.Replace(StatusValuePair[0].Trim() + ": ", "");
-                            }
+                            SongValues.TryAdd(StatusValuePair[0].Trim(), value.Replace(StatusValuePair[0].Trim() + ": ", ""));
                         }
                     }
                 }
@@ -3298,7 +3281,8 @@ namespace MPDCtrl.Services
                     string[] ValuePair = line.Split(':');
                     if (ValuePair.Length > 1)
                     {
-                        if (SongValues.ContainsKey(ValuePair[0].Trim()))
+                        //if (SongValues.ContainsKey(ValuePair[0].Trim()))
+                        if (ValuePair[0].Trim().Equals("file"))
                         {
                             // Contains means new one.
 
@@ -3321,24 +3305,12 @@ namespace MPDCtrl.Services
                             }
 
                             // start over
-                            //SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
-                        }
-                        /*
-                        else
-                        {
-                            SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
-                        }
-                        */
-                        if (!SongValues.ContainsKey(ValuePair[0].Trim()))
-                        {
+                            SongValues.Clear();
                             SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
                         }
                         else
                         {
-                            if (ValuePair[0].Trim() == "Genre")
-                            {
-                                SongValues["Genre"] = SongValues["Genre"] + "/" + line.Replace(ValuePair[0].Trim() + ": ", "");
-                            }
+                            SongValues.TryAdd(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
                         }
                     }
                 }
@@ -3433,7 +3405,8 @@ namespace MPDCtrl.Services
                     string[] ValuePair = line.Split(':');
                     if (ValuePair.Length > 1)
                     {
-                        if (SongValues.ContainsKey(ValuePair[0].Trim()))
+                        //if (SongValues.ContainsKey(ValuePair[0].Trim()))
+                        if (ValuePair[0].Trim().Equals("file"))
                         {
                             // Contains means new one.
 
@@ -3456,14 +3429,14 @@ namespace MPDCtrl.Services
                             }
 
                             // start over
-                            //SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
-                        }
-                        /*
-                        else
-                        {
+                            SongValues.Clear();
                             SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
                         }
-                        */
+                        else
+                        {
+                            SongValues.TryAdd(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
+                        }
+                        /*
                         if (!SongValues.ContainsKey(ValuePair[0].Trim()))
                         {
                             SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
@@ -3475,6 +3448,7 @@ namespace MPDCtrl.Services
                                 SongValues["Genre"] = SongValues["Genre"] + "/" + line.Replace(ValuePair[0].Trim() + ": ", "");
                             }
                         }
+                        */
                     }
                 }
 

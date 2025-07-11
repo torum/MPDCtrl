@@ -127,6 +127,10 @@ public class SongInfo : SongFile
                     System.Diagnostics.Debug.WriteLine("Wrong LastModified timestamp format. " + _lastModified);
                 }
             }
+            else
+            {
+                return String.Empty;
+            }
 
             var culture = System.Globalization.CultureInfo.CurrentCulture;
             return _lastModifiedDateTime.ToString(culture);

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 
-namespace MPDCtrl.ViewModels.Classes;
+namespace MPDCtrl.Models;
 
 public class NodeDirectory : NodeTree
 {
@@ -19,7 +19,7 @@ public class NodeFile : Node
 {
     public Uri FileUri { get; set; }
 
-    public String OriginalFileUri { get; set; }
+    public string OriginalFileUri { get; set; }
 
     public string FilePath
     {
@@ -40,7 +40,7 @@ public class NodeFile : Node
         }
     }
 
-    public NodeFile(string name, Uri fileUri, String originalFileUri) : base(name)
+    public NodeFile(string name, Uri fileUri, string originalFileUri) : base(name)
     {
         FileUri = fileUri;
         OriginalFileUri = originalFileUri;
@@ -54,7 +54,7 @@ public class DirectoryTreeBuilder : NodeTree
 
     public bool IsCanceled { get; set; }
 
-    public void Load(List<String> dirs)
+    public void Load(List<string> dirs)
     {
         if (dirs is null)
             return;
@@ -75,7 +75,7 @@ public class DirectoryTreeBuilder : NodeTree
             this.Children.Add(root);
         });
         */
-        this.Children.Add(root);
+        Children.Add(root);
 
         foreach (var pathDir in dirs)
         {
@@ -96,7 +96,7 @@ public class DirectoryTreeBuilder : NodeTree
 
                     foreach (var asdf in ValuePair)
                     {
-                        if (String.IsNullOrEmpty(asdf)) continue;
+                        if (string.IsNullOrEmpty(asdf)) continue;
 
                         // LINQ may be slower in this case.
                         /*

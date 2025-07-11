@@ -2,7 +2,6 @@
 using MPDCtrl.Contracts;
 using MPDCtrl.Models;
 using MPDCtrl.Services;
-using MPDCtrl.ViewModels.Classes;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -32,7 +31,7 @@ public class MainViewModel : ViewModelBase
     const string _appName = "MPDCtrl";
 
     // Application version
-    const string _appVer = "v3.1.4.0";
+    const string _appVer = "v3.2.0.0";
 
     public static string AppVer
     {
@@ -2638,7 +2637,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private bool _isAutoScrollToNowPlaying = false;
+    private bool _isAutoScrollToNowPlaying = true;
     public bool IsAutoScrollToNowPlaying
     {
         get { return _isAutoScrollToNowPlaying; }
@@ -2668,7 +2667,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private bool _isDownloadAlbumArt = false;
+    private bool _isDownloadAlbumArt = true;
     public bool IsDownloadAlbumArt
     {
         get { return _isDownloadAlbumArt; }
@@ -2683,7 +2682,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private bool _isDownloadAlbumArtEmbeddedUsingReadPicture = false;
+    private bool _isDownloadAlbumArtEmbeddedUsingReadPicture = true;
     public bool IsDownloadAlbumArtEmbeddedUsingReadPicture
     {
         get { return _isDownloadAlbumArtEmbeddedUsingReadPicture; }
@@ -3946,36 +3945,27 @@ public class MainViewModel : ViewModelBase
 
             //Window w = (sender as Window);
             // Main Window attributes
-            double fa = 0;
             attrs = doc.CreateAttribute("height");
             if (w.WindowState == WindowState.Maximized)
             {
-                var tmp = w.RestoreBounds.Height;
-                tmp = tmp - fa;
-                attrs.Value = tmp.ToString();
+                attrs.Value = w.RestoreBounds.Height.ToString();
             }
             else
             {
-                var tmp = w.Height;
-                tmp = tmp - fa;
-                attrs.Value = tmp.ToString();
+                attrs.Value = w.Height.ToString();
             }
             mainWindow.SetAttributeNode(attrs);
 
             attrs = doc.CreateAttribute("width");
             if (w.WindowState == WindowState.Maximized)
             {
-                var tmp = w.RestoreBounds.Width;
-                tmp = tmp - fa;
-                attrs.Value = tmp.ToString();
-                windowWidth = tmp;
+                attrs.Value = w.RestoreBounds.Width.ToString();
+                windowWidth = w.RestoreBounds.Width;
             }
             else
             {
-                var tmp = w.Width;
-                tmp = tmp - fa;
-                attrs.Value = tmp.ToString();
-                windowWidth = tmp;
+                attrs.Value = w.Width.ToString();
+                windowWidth = w.Width;
 
             }
             mainWindow.SetAttributeNode(attrs);
@@ -4786,7 +4776,7 @@ public class MainViewModel : ViewModelBase
                     UpdateProgress?.Invoke(this, "[UI] Updating the queue...");
 
                     // tmp list of deletion
-                    List<SongInfoEx> _tmpQueue = new();
+                    List<SongInfoEx> _tmpQueue = [];
 
                     // deletes items that does not exists in the new queue. 
                     foreach (var sng in Queue)

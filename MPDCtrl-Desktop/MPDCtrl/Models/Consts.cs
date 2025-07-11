@@ -1,4 +1,4 @@
-﻿namespace MPDCtrl.ViewModels
+﻿namespace MPDCtrl.Models
 {
     public enum SearchTags
     {

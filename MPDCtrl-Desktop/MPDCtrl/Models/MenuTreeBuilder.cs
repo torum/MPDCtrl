@@ -1,7 +1,6 @@
-﻿using MPDCtrl.Models;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
-namespace MPDCtrl.ViewModels.Classes;
+namespace MPDCtrl.Models;
 
 public class NodeMenu : NodeTree
 {
@@ -90,48 +89,48 @@ public class MenuTreeBuilder : NodeTree
 
     public MenuTreeBuilder(string name) : base(name)
     {
-        NodeMenuQueue queue = new(MPDCtrl.Properties.Resources.MenuTreeItem_Queue)
+        NodeMenuQueue queue = new(Properties.Resources.MenuTreeItem_Queue)
         {
             Selected = true,
             Expanded = false,
 
             Parent = this
         };
-        this.Children.Add(queue);
+        Children.Add(queue);
 
 
-        NodeMenuSearch search = new(MPDCtrl.Properties.Resources.MenuTreeItem_Search)
+        NodeMenuSearch search = new(Properties.Resources.MenuTreeItem_Search)
         {
             Selected = false,
             Expanded = false,
 
             Parent = this
         };
-        this.Children.Add(search);
+        Children.Add(search);
 
         _searchDirectory = search;
 
 
-        NodeMenuLibrary browse = new(MPDCtrl.Properties.Resources.MenuTreeItem_Browse)
+        NodeMenuLibrary browse = new(Properties.Resources.MenuTreeItem_Browse)
         {
             Selected = false,
             Expanded = false,
 
             Parent = this
         };
-        this.Children.Add(browse);
+        Children.Add(browse);
 
         _libraryDirectory = browse;
 
 
-        NodeMenuPlaylists playlists = new(MPDCtrl.Properties.Resources.MenuTreeItem_Playlists)
+        NodeMenuPlaylists playlists = new(Properties.Resources.MenuTreeItem_Playlists)
         {
             Selected = false,
             Expanded = true,
 
             Parent = this
         };
-        this.Children.Add(playlists);
+        Children.Add(playlists);
 
         _playlistsDirectory = playlists;
     }

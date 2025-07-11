@@ -240,6 +240,7 @@ public partial class App : Application
         _themeDict.Source = new Uri(themeUri);
     }
 
+    /*
     // Paints background black in order to prevent "white flashing" when startup/resizing/maximizing window.
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
@@ -268,4 +269,5 @@ public partial class App : Application
     {
         return Environment.OSVersion.Version.Major >= 10 && Environment.OSVersion.Version.Build >= build;
     }
+    */
 }

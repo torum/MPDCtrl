@@ -1,6 +1,6 @@
 ﻿using MPDCtrl.Common;
 
-namespace MPDCtrl.ViewModels.Classes;
+namespace MPDCtrl.Models;
 
 /// <summary>
 /// Profile class for connection setting.

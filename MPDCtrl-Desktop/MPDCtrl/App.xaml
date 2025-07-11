@@ -238,12 +238,13 @@
                             </Setter.Value>
                         </Setter>
                     </Style>
+                    
                     <Style x:Key="TreeViewItemFocusVisual">
                         <Setter Property="Control.Template">
                             <Setter.Value>
                                 <ControlTemplate>
                                     <Border>
-                                        <Rectangle Margin="0,0,0,0" StrokeThickness="5" Stroke="Black" StrokeDashArray="1 2" Opacity="0"/>
+                                        <Rectangle Margin="2" StrokeThickness="1" Stroke="#CCCCCC" StrokeDashArray="1 2" />
                                     </Border>
                                 </ControlTemplate>
                             </Setter.Value>

@@ -31,7 +31,7 @@ public class MainViewModel : ViewModelBase
     const string _appName = "MPDCtrl";
 
     // Application version
-    const string _appVer = "v3.2.1.0";
+    const string _appVer = "v3.2.2.0";
 
     public static string AppVer
     {
@@ -4561,7 +4561,7 @@ public class MainViewModel : ViewModelBase
         UpdateProgress?.Invoke(this, "[UI] Status updating...");
 
         if (Application.Current is null) { return; }
-        Application.Current.Dispatcher.Invoke(async () =>
+        Application.Current.Dispatcher.Invoke(() =>
         {
             bool isSongChanged = false;
             bool isCurrentSongWasNull = false;
@@ -4695,7 +4695,7 @@ public class MainViewModel : ViewModelBase
     private void UpdateCurrentSong()
     {
         if (Application.Current is null) { return; }
-        Application.Current.Dispatcher.Invoke(async () =>
+        Application.Current.Dispatcher.Invoke(() =>
         {
             bool isSongChanged = false;
             bool isCurrentSongWasNull = false;

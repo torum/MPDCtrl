@@ -5,7 +5,7 @@
     <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MPDCtrl2.ico</ApplicationIcon>
-    <Version>3.2.1.0</Version>
+    <Version>3.2.2.0</Version>
     <Authors>torum</Authors>
     <Company>torum</Company>
     <Copyright></Copyright>

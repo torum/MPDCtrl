@@ -1340,21 +1340,52 @@ public class MainViewModel : ViewModelBase
 
     #region == AlbumArt == 
 
-    private readonly ImageSource? _albumArtDefault = null;
-    private ImageSource? _albumArt;
-    public ImageSource? AlbumArt
+    private AlbumCoverObject? _albumCoverObj;
+    public AlbumCoverObject? AlbumCoverObj
     {
         get
         {
-            return _albumArt;
+            return _albumCoverObj;
         }
         set
         {
-            if (_albumArt == value)
+            if (_albumCoverObj == value)
+                return;
+            _albumCoverObj = value;
+
+            /*
+            if (_albumCover is null)
+            {
+                //IsAlbumArtVisible = false; 
+            }
+            else
+            {
+                if (!IsAlbumArtPanelIsOpen)
+                {
+                    //IsAlbumArtVisible = true;
+                }
+            }
+            */
+
+            NotifyPropertyChanged(nameof(AlbumCoverObj));
+        }
+    }
+
+    private readonly ImageSource? _albumArtDefault = null;
+    private ImageSource? _albumArtImage;
+    public ImageSource? AlbumArtImage
+    {
+        get
+        {
+            return _albumArtImage;
+        }
+        set
+        {
+            if (_albumArtImage == value)
                 return;
 
-            _albumArt = value;
-            NotifyPropertyChanged(nameof(AlbumArt));
+            _albumArtImage = value;
+            NotifyPropertyChanged(nameof(AlbumArtImage));
         }
     }
 
@@ -4551,7 +4582,7 @@ public class MainViewModel : ViewModelBase
                     }
 
                     IsAlbumArtVisible = false;
-                    AlbumArt = _albumArtDefault;
+                    AlbumArtImage = _albumArtDefault;
                 }
             }
             else
@@ -4584,27 +4615,71 @@ public class MainViewModel : ViewModelBase
                             //isAlbumArtChanged = true;
                             if (IsDownloadAlbumArt)
                             {
-                                await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                                //Debug.WriteLine("getting album cover. @UpdateStatus()");
+                                //await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                                GetAlbumPicture(CurrentSong.File);
+                                /*
+                                var res = await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                                if (res.IsSuccess)
+                                {
+                                    if (res.AlbumCover?.SongFilePath == CurrentSong.File)
+                                    {
+                                        if ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading))
+                                        {
+                                            if (Application.Current is null) { return; }
+                                            Application.Current.Dispatcher.Invoke(() =>
+                                            {
+                                                //AlbumCoverObj = res.AlbumCover;
+                                                AlbumArtImage = res.AlbumCover.AlbumImageSource;
+                                                //AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
+                                                IsAlbumArtVisible = true;
+                                            });
+                                        }
+                                        else
+                                        {
+                                            Debug.WriteLine("if ! ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading))");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Debug.WriteLine("if ! (res.AlbumCover?.SongFilePath == CurrentSong.File)");
+                                    }
+                                }
+                                else
+                                {
+                                    Debug.WriteLine($"MpdQueryAlbumArt not success. err:{res.ErrorMessage} @UpdateStatus()");
+                                }
+                                */
                             }
+                        }
+                        else
+                        {
+                            Debug.WriteLine("CurrentSong.File is null. @UpdateStatus()");
                         }
                     }
                     else
                     {
+                        Debug.WriteLine("item is null or empty. @UpdateStatus()");
                         // TODO:
                         CurrentSong = null;
 
                         IsAlbumArtVisible = false;
-                        AlbumArt = _albumArtDefault;
+                        AlbumArtImage = _albumArtDefault;
                     }
+                }
+                else
+                {
+                    Debug.WriteLine("! (isSongChanged || isCurrentSongWasNull). @UpdateStatus()");
                 }
             }
             else
             {
+                Debug.WriteLine("(Queue.Count == 0). @UpdateStatus()");
                 // TODO:
                 CurrentSong = null;
 
                 IsAlbumArtVisible = false;
-                AlbumArt = _albumArtDefault;
+                AlbumArtImage = _albumArtDefault;
             }
         });
 
@@ -4635,7 +4710,7 @@ public class MainViewModel : ViewModelBase
                     CurrentSong.IsPlaying = false;
 
                     IsAlbumArtVisible = false;
-                    AlbumArt = _albumArtDefault;
+                    AlbumArtImage = _albumArtDefault;
                 }
             }
             else
@@ -4664,7 +4739,53 @@ public class MainViewModel : ViewModelBase
                             //isAlbumArtChanged = true;
                             if (IsDownloadAlbumArt)
                             {
-                                await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                                //Debug.WriteLine("getting album cover. @UpdateCurrentSong()");
+                                GetAlbumPicture(CurrentSong.File);
+                                /*
+                                var res = await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                                if (res.IsSuccess)
+                                {
+                                    if (res.AlbumCover?.SongFilePath == CurrentSong.File)
+                                    {
+                                        if ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading))
+                                        {
+                                            if (Application.Current is null) { return; }
+                                            Application.Current.Dispatcher.Invoke(() =>
+                                            {
+                                                //AlbumCoverObj = res.AlbumCover;
+                                                AlbumArtImage = res.AlbumCover.AlbumImageSource;
+                                                //AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
+                                                IsAlbumArtVisible = true;
+                                            });
+                                        }
+                                        else
+                                        {
+                                            Debug.WriteLine("if ! ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading))");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Debug.WriteLine("if ! (res.AlbumCover?.SongFilePath == CurrentSong.File)");
+                                    }
+                                }
+                                else
+                                {
+                                    Debug.WriteLine("MpdQueryAlbumArt not success. @UpdateStatus()");
+                                }
+                                */
+                                /*
+                                //await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                                var res = await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+
+                                if (res.AlbumCover?.SongFilePath == CurrentSong.File)
+                                {
+                                    if ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading))
+                                    {
+                                        AlbumCoverObj = res.AlbumCover;
+                                        //AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
+                                    }
+                                }
+                                */
                             }
                         }
                     }
@@ -4678,6 +4799,40 @@ public class MainViewModel : ViewModelBase
                 if (isAlbumArtChanged)
                     await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
         */
+    }
+
+    private async void GetAlbumPicture(string file)
+    {
+        var res = await _mpc.MpdQueryAlbumArt(file, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+        if (res.IsSuccess)
+        {
+            if (res.AlbumCover?.SongFilePath == file)
+            {
+                if ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading))
+                {
+                    if (Application.Current is null) { return; }
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        //AlbumCoverObj = res.AlbumCover;
+                        AlbumArtImage = res.AlbumCover.AlbumImageSource;
+                        //AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
+                        IsAlbumArtVisible = true;
+                    });
+                }
+                else
+                {
+                    Debug.WriteLine("if ! ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading))");
+                }
+            }
+            else
+            {
+                Debug.WriteLine("if ! (res.AlbumCover?.SongFilePath == CurrentSong.File)");
+            }
+        }
+        else
+        {
+            Debug.WriteLine("MpdQueryAlbumArt not success. @UpdateStatus()");
+        }
     }
 
     private async void UpdateCurrentQueue()
@@ -4864,7 +5019,7 @@ public class MainViewModel : ViewModelBase
                     var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
                     if (curitem is not null)
                     {
-                        if (CurrentSong is not null)
+                        if (CurrentSong is not null) // why doing this?
                         {
                             if (CurrentSong.Id != curitem.Id)
                             {
@@ -4874,8 +5029,40 @@ public class MainViewModel : ViewModelBase
                                 if (IsAutoScrollToNowPlaying)
                                     // ScrollIntoView while don't change the selection 
                                     ScrollIntoView?.Invoke(this, CurrentSong.Index);
+                            }
+                        }
+                        else
+                        {
+                            // needed this.
+                            CurrentSong = curitem;
+                            CurrentSong.IsPlaying = true;
 
+                            if (IsAutoScrollToNowPlaying)
+                                // ScrollIntoView while don't change the selection 
+                                ScrollIntoView?.Invoke(this, CurrentSong.Index);
 
+                            // AlbumArt
+                            if (!String.IsNullOrEmpty(CurrentSong.File))
+                            {
+                                //isAlbumArtChanged = true;
+                                if (IsDownloadAlbumArt)
+                                {
+                                    //Debug.WriteLine("getting album cover. @UpdateCurrentSong()");
+                                    GetAlbumPicture(CurrentSong.File);
+                                    /*
+                                    //await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                                    var res = await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+
+                                    if (res.AlbumCover?.SongFilePath == CurrentSong.File)
+                                    {
+                                        if ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading))
+                                        {
+                                            AlbumCoverObj = res.AlbumCover;
+                                            //AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
+                                        }
+                                    }
+                                    */
+                                }
                             }
                         }
                     }
@@ -4884,7 +5071,7 @@ public class MainViewModel : ViewModelBase
                         CurrentSong = null;
 
                         IsAlbumArtVisible = false;
-                        AlbumArt = _albumArtDefault;
+                        AlbumArtImage = _albumArtDefault;
                     }
 
                     UpdateProgress?.Invoke(this, "");
@@ -4978,16 +5165,18 @@ public class MainViewModel : ViewModelBase
                                         }
 
                                         // AlbumArt
+                                        /*
                                         if (_mpc.AlbumCover.SongFilePath != curitem.File)
                                         {
                                             IsAlbumArtVisible = false;
-                                            AlbumArt = _albumArtDefault;
+                                            AlbumArtImage = _albumArtDefault;
 
                                             if (!String.IsNullOrEmpty(CurrentSong.File))
                                             {
                                                 //isAlbumArtChanged = true;
                                             }
                                         }
+                                        */
                                     }
                                 }
                             }
@@ -5016,16 +5205,18 @@ public class MainViewModel : ViewModelBase
                             }
 
                             // AlbumArt
+                            /*
                             if (_mpc.AlbumCover.SongFilePath != curitem.File)
                             {
                                 IsAlbumArtVisible = false;
-                                AlbumArt = _albumArtDefault;
+                                AlbumArtImage = _albumArtDefault;
 
                                 if (!String.IsNullOrEmpty(CurrentSong.File))
                                 {
                                     //isAlbumArtChanged = true;
                                 }
                             }
+                            */
                         }
                         else
                         {
@@ -5033,7 +5224,7 @@ public class MainViewModel : ViewModelBase
                             CurrentSong = null;
 
                             IsAlbumArtVisible = false;
-                            AlbumArt = _albumArtDefault;
+                            AlbumArtImage = _albumArtDefault;
                         }
                     }
 
@@ -5551,10 +5742,21 @@ public class MainViewModel : ViewModelBase
 
     private void OnAlbumArtChanged(MpcService sender)
     {
+        //Debug.WriteLine("OnAlbumArtChanged");
+
         // AlbumArt
-        if (Application.Current is null) { return; }
-        Application.Current.Dispatcher.Invoke(() =>
-        {
+        //if (Application.Current is null) { return; }
+        //Application.Current.Dispatcher.Invoke(() =>
+        //{
+            /*
+            if ((_mpc.MpdCurrentSong?.File == AlbumCoverObj?.SongFilePath) || (CurrentSong?.File == AlbumCoverObj?.SongFilePath))
+            {
+                Debug.WriteLine("AlbumArt set");
+                AlbumArt = AlbumCoverObj?.AlbumImageSource;
+                IsAlbumArtVisible = true;
+            }
+            */
+            /*
             if ((!_mpc.AlbumCover.IsDownloading) && _mpc.AlbumCover.IsSuccess)
             {
                 if ((CurrentSong is not null) && (_mpc.AlbumCover.AlbumImageSource is not null))
@@ -5570,7 +5772,8 @@ public class MainViewModel : ViewModelBase
                     }
                 }
             }
-        });
+            */
+        //});
     }
 
     private void OnDebugCommandOutput(MpcService sender, string data)
@@ -7636,7 +7839,7 @@ public class MainViewModel : ViewModelBase
             SearchQuery = "";
 
             IsAlbumArtVisible = false;
-            AlbumArt = _albumArtDefault;
+            AlbumArtImage = _albumArtDefault;
 
             // TODO: more
         });
@@ -7777,7 +7980,7 @@ public class MainViewModel : ViewModelBase
             SearchQuery = "";
 
             IsAlbumArtVisible = false;
-            AlbumArt = _albumArtDefault;
+            AlbumArtImage = _albumArtDefault;
 
             HostIpAddress = null;
 

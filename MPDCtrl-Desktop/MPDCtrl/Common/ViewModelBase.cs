@@ -12,12 +12,13 @@ namespace MPDCtrl.Common
 
         protected void NotifyPropertyChanged(string propertyName)
         {
-            //this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            /*
             Application.Current?.Dispatcher.Invoke(() =>
                 {
                     this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
                 });
+            */
         }
 
         #endregion

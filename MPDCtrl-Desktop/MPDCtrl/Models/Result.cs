@@ -20,10 +20,17 @@ public class CommandResult : Result
 
 public class CommandBinaryResult : Result
 {
+    //public AlbumCoverObject AlbumCover = new();
+    public bool IsTimeOut = false;
     public int WholeSize;
     public int ChunkSize;
     public string Type = "";
     public byte[]? BinaryData;
+}
+public class CommandImageResult : Result
+{
+    public bool IsTimeOut = false;
+    public AlbumCoverObject AlbumCover = new();
 }
 
 public class CommandPlaylistResult : CommandResult

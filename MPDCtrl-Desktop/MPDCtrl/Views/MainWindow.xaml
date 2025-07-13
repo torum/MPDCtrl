@@ -378,7 +378,7 @@
                                     <Grid.OpacityMask>
                                         <VisualBrush Visual="{Binding ElementName=PicPrevMask}" />
                                     </Grid.OpacityMask>
-                                    <Image Source="{Binding AlbumArt, NotifyOnTargetUpdated=True}" Stretch="Uniform"  VerticalAlignment="Top" HorizontalAlignment="Left" Width="126" Height="126" Visibility="{Binding IsAlbumArtVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                                    <Image Source="{Binding AlbumArtImage, NotifyOnTargetUpdated=True}" Stretch="Uniform"  VerticalAlignment="Top" HorizontalAlignment="Left" Width="126" Height="126" Visibility="{Binding IsAlbumArtVisible, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
                                         <Image.Triggers>
                                             <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                                 <BeginStoryboard>
@@ -1750,7 +1750,7 @@
                                                 <Path Data="{Binding PathIcon}" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" />
                                             </Canvas>
                                         </Viewbox>
-                                        <TextBlock Text="{Binding Path=Name}" Padding="4"/>
+                                        <TextBlock Text="{Binding Path=Name}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" Padding="4"/>
                                     </StackPanel>
                                 </HierarchicalDataTemplate>
                             </TreeView.ItemTemplate>

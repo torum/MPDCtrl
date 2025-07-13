@@ -2,7 +2,7 @@
 
 namespace MPDCtrl.Models;
 
-public class AlbumImage
+public class AlbumCoverObject
 {
     public bool IsDownloading { get; set; } = false;
 

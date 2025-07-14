@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using Windows.System;
 
 namespace MPDCtrl.Services;
 
@@ -441,7 +442,9 @@ public class MpcService : IMpcService
             StringBuilder stringBuilder = new();
 
             bool isAck = false;
+            bool isErr = false;
             string ackText = "";
+            string errText = "";
 
             while (true)
             {
@@ -460,6 +463,16 @@ public class MpcService : IMpcService
                         ackText = line;
                         ret.ErrorMessage = line;
 
+                        break;
+                    }
+                    else if (line.StartsWith("error"))
+                    {
+                        Debug.WriteLine("error line @MpdIdleSendCommand: " + cmd.Trim() + " and " + line);
+
+                        isErr = true;
+                        errText = line.Replace("error:", string.Empty);
+                        errText = errText.Trim();
+                        ret.ErrorMessage = errText;
                         break;
                     }
                     else if (line.StartsWith("OK"))
@@ -511,6 +524,16 @@ public class MpcService : IMpcService
 
             if (isAck)
                 nowait = Task.Run(() => MpdAckError?.Invoke(this, ackText + " (@MISC)"));
+
+            if (isErr)
+            {
+                nowait = Task.Run(() => MpdAckError?.Invoke(this, errText));//MpdFatalError
+                ret.IsSuccess = false;
+
+                await MpdIdleSendCommand("clearerror");
+
+                return ret;
+            }
 
             ret.ResultText = stringBuilder.ToString();
 

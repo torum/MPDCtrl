@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows;
@@ -27,17 +28,29 @@ public class MainViewModel : ViewModelBase
 {
     #region == Basic ==  
 
-    // Application name
     const string _appName = "MPDCtrl";
 
-    // Application version
-    const string _appVer = "v3.2.2.0";
-
-    public static string AppVer
+    private string _appVersion = string.Empty;
+    public string AppVersion
     {
         get
         {
-            return _appVer;
+            if (string.IsNullOrEmpty(_appVersion))
+            {
+                var assembly = Assembly.GetExecutingAssembly().GetName();
+                var version = assembly.Version;
+                _appVersion = $"{version?.Major}.{version?.Minor}.{version?.Build}.{version?.Revision}";
+            }
+
+            return _appVersion;
+        }
+    }
+
+    public string AppVer
+    {
+        get
+        {
+            return "v" + AppVersion;
         }
     }
 
@@ -51,11 +64,11 @@ public class MainViewModel : ViewModelBase
     }
 
     // Application Window Title (for display)
-    public static string AppTitleVer
+    public string AppTitleVer
     {
         get
         {
-            return _appName + " " + _appVer;
+            return _appName + " " + AppVer;
         }
     }
 
@@ -3963,7 +3976,7 @@ public class MainViewModel : ViewModelBase
         doc.AppendChild(root);
 
         XmlAttribute attrs = doc.CreateAttribute("Version");
-        attrs.Value = _appVer;
+        attrs.Value = AppVer;
         root.SetAttributeNode(attrs);
 
         #region == Window settings ==

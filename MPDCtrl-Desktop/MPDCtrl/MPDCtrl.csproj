@@ -21,10 +21,22 @@
 	  <DefaultLanguage>en-US</DefaultLanguage>
 	  <Title>MPDCtrl</Title>
 	  <IncludeSymbols>False</IncludeSymbols>
-
 	  <EnableMsixTooling>true</EnableMsixTooling>
 	  <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+
+	  <IsAotCompatible>true</IsAotCompatible>
+	  <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+	  <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+
+	  <TrimmerSingleWarn>false</TrimmerSingleWarn>
+		<OptimizationPreference>speed</OptimizationPreference>
+		<TrimMode>partial</TrimMode>
+	</PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>

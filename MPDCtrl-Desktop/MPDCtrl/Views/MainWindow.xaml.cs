@@ -13,6 +13,23 @@ namespace MPDCtrl.Views;
 
 public partial class MainWindow : Window
 {
+    #region == Global Hotkey ==
+
+    // HotKey WM ID
+    private const int WM_HOTKEY = 0x0312;
+
+    private const int HOTKEY_ID1 = 0x0001; // play/pause
+    private const int HOTKEY_ID2 = 0x0002; // next
+    private const int HOTKEY_ID3 = 0x0003; // prev
+    private const int HOTKEY_ID4 = 0x0004; // vol up
+    private const int HOTKEY_ID5 = 0x0005; // vol up
+    private const int HOTKEY_ID6 = 0x0006; // vol down
+    private const int HOTKEY_ID7 = 0x0007; // vol down
+
+    private readonly IntPtr WindowHandle;
+
+    #endregion
+
     public MainWindow()
     {
         DataContext = App.GetService<MainViewModel>();
@@ -63,6 +80,16 @@ public partial class MainWindow : Window
 
         // Need this for starting maximized.
         Window_StateChanged(this, EventArgs.Empty);
+
+        #region == Global Hotkey ==
+
+        var host = new WindowInteropHelper(this);
+        WindowHandle = host.Handle;
+
+        SetUpHotKey();
+        ComponentDispatcher.ThreadPreprocessMessage += ComponentDispatcher_ThreadPreprocessMessage;
+
+        #endregion
     }
 
     public void OnScrollIntoView(int arg)
@@ -305,6 +332,44 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
+    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+        // It takes a few milliseconds to dispose TCPClient so, we don't want Window to hang around.
+        this.Hide();
+
+        if (this.DataContext is MainViewModel vm)
+        {
+            vm.OnWindowClosing(sender);
+        }
+
+        #region == Global Hotkey == 
+        
+        Unregister(HOTKEY_ID1);
+        Unregister(HOTKEY_ID2);
+        Unregister(HOTKEY_ID3);
+        Unregister(HOTKEY_ID4);
+        Unregister(HOTKEY_ID5);
+        Unregister(HOTKEY_ID6);
+        Unregister(HOTKEY_ID7);
+        ComponentDispatcher.ThreadPreprocessMessage -= ComponentDispatcher_ThreadPreprocessMessage;
+
+        #endregion
+    }
+
+    private void Window_Activated(object sender, EventArgs e)
+    {
+        AppTitleBar.Opacity = 1;
+        AppHeader.Opacity = 1;
+        StatusBar.Opacity = 1;
+    }
+
+    private void Window_Deactivated(object sender, EventArgs e)
+    {
+        AppTitleBar.Opacity = 0.7;
+        AppHeader.Opacity = 0.7;
+        StatusBar.Opacity = 0.7;
+    }
+
     #region == Size fix on window maximize ==
 
     // https://engy.us/blog/2020/01/01/implementing-a-custom-window-title-bar-in-wpf/
@@ -328,8 +393,10 @@ public partial class MainWindow : Window
 
             if (monitor != IntPtr.Zero)
             {
-                MONITORINFO monitorInfo = new();
-                monitorInfo.cbSize = Marshal.SizeOf(typeof(MONITORINFO));
+                MONITORINFO monitorInfo = new()
+                {
+                    cbSize = Marshal.SizeOf(typeof(MONITORINFO))
+                };
                 GetMonitorInfo(monitor, ref monitorInfo);
                 RECT rcWorkArea = monitorInfo.rcWork;
                 RECT rcMonitorArea = monitorInfo.rcMonitor;
@@ -357,20 +424,12 @@ public partial class MainWindow : Window
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct RECT
+    public struct RECT(int left, int top, int right, int bottom)
     {
-        public int Left;
-        public int Top;
-        public int Right;
-        public int Bottom;
-
-        public RECT(int left, int top, int right, int bottom)
-        {
-            this.Left = left;
-            this.Top = top;
-            this.Right = right;
-            this.Bottom = bottom;
-        }
+        public int Left = left;
+        public int Top = top;
+        public int Right = right;
+        public int Bottom = bottom;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -384,16 +443,10 @@ public partial class MainWindow : Window
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct POINT
+    public struct POINT(int x, int y)
     {
-        public int X;
-        public int Y;
-
-        public POINT(int x, int y)
-        {
-            this.X = x;
-            this.Y = y;
-        }
+        public int X = x;
+        public int Y = y;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -408,30 +461,103 @@ public partial class MainWindow : Window
 
     #endregion
 
-    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-    {
-        // It takes a few milliseconds to dispose TCPClient so, we don't want Window to hang around.
-        this.Hide();
+    #region == Global Hotkey == 
 
-        if (this.DataContext is MainViewModel vm)
+    private void SetUpHotKey()
+    {
+        var result1 = RegisterHotKey(WindowHandle, HOTKEY_ID1, (int)ModifierKeys.Control, KeyInterop.VirtualKeyFromKey(Key.Space));
+        if (result1 == 0)
         {
-            vm.OnWindowClosing(sender);
+            //MessageBox.Show("HotKey1 register failed.");
+        }
+
+        var result2 = RegisterHotKey(WindowHandle, HOTKEY_ID2, (int)ModifierKeys.Control, KeyInterop.VirtualKeyFromKey(Key.Right));
+        if (result2 == 0)
+        {
+            //MessageBox.Show("HotKey2 registet failed.");
+        }
+
+        var result3 = RegisterHotKey(WindowHandle, HOTKEY_ID3, (int)ModifierKeys.Control, KeyInterop.VirtualKeyFromKey(Key.Left));
+        if (result3 == 0)
+        {
+            //MessageBox.Show("HotKey3 registet failed.");
+        }
+
+        var result4 = RegisterHotKey(WindowHandle, HOTKEY_ID4, (int)ModifierKeys.Control, KeyInterop.VirtualKeyFromKey(Key.OemPlus));
+        if (result4 == 0)
+        {
+            //MessageBox.Show("HotKey4 registet failed.");
+        }
+
+        var result5 = RegisterHotKey(WindowHandle, HOTKEY_ID5, (int)ModifierKeys.Control, KeyInterop.VirtualKeyFromKey(Key.Add));
+        if (result5 == 0)
+        {
+            //MessageBox.Show("HotKey5 registet failed.");
+        }
+
+        var result6 = RegisterHotKey(WindowHandle, HOTKEY_ID6, (int)ModifierKeys.Control, KeyInterop.VirtualKeyFromKey(Key.OemMinus));
+        if (result6 == 0)
+        {
+            //MessageBox.Show("HotKey6 registet failed.");
+        }
+
+        var result7 = RegisterHotKey(WindowHandle, HOTKEY_ID7, (int)ModifierKeys.Control, KeyInterop.VirtualKeyFromKey(Key.Subtract));
+        if (result7 == 0)
+        {
+            //MessageBox.Show("HotKey7 registet failed.");
         }
     }
 
-    private void Window_Activated(object sender, EventArgs e)
+    void ComponentDispatcher_ThreadPreprocessMessage(ref MSG msg, ref bool handled)
     {
-        AppTitleBar.Opacity = 1;
-        AppHeader.Opacity = 1;
-        StatusBar.Opacity = 1;
+        if (msg.message != WM_HOTKEY) return;
+
+        if (this.DataContext is MainViewModel vm)
+        {
+            switch (msg.wParam.ToInt32())
+            {
+                case HOTKEY_ID1:
+                    vm.PlayCommand_ExecuteAsync();
+                    break;
+                case HOTKEY_ID2:
+                    vm.PlayNextCommand_ExecuteAsync();
+                    break;
+                case HOTKEY_ID3:
+                    vm.PlayPrevCommand_ExecuteAsync();
+                    break;
+                case HOTKEY_ID4:
+                    vm.VolumeUpCommand_Execute();
+                    break;
+                case HOTKEY_ID5:
+                    vm.VolumeUpCommand_Execute();
+                    break;
+                case HOTKEY_ID6:
+                    vm.VolumeDownCommand_Execute();
+                    break;
+                case HOTKEY_ID7:
+                    vm.VolumeDownCommand_Execute();
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
-    private void Window_Deactivated(object sender, EventArgs e)
+    [DllImport("user32.dll")]
+    private static extern int RegisterHotKey(IntPtr hWnd, int id, int modKey, int vKey);
+
+    [DllImport("user32.dll")]
+    private static extern int UnregisterHotKey(IntPtr hWnd, int id);
+
+    public bool Unregister(int id)
     {
-        AppTitleBar.Opacity = 0.7;
-        AppHeader.Opacity = 0.7;
-        StatusBar.Opacity = 0.7;
+        var ret = UnregisterHotKey(this.WindowHandle, id);
+        return ret == 0;
     }
+
+    #endregion
+
+    #region == Popups ==
 
     private void QueueListviewPopupConfirmDeleteSelected_Opened(object sender, EventArgs e)
     {
@@ -541,4 +667,5 @@ public partial class MainWindow : Window
         }
     }
 
+    #endregion
 }

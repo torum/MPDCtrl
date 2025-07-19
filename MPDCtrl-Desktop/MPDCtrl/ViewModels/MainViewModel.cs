@@ -6216,6 +6216,10 @@ public class MainViewModel : ViewModelBase
             Volume -= 10;
             //await _mpc.MpdSetVolume(Convert.ToInt32(_volume - 10));
         }
+        else
+        {
+            Volume = 0;
+        }
     }
 
     public ICommand VolumeUpCommand { get; }
@@ -6230,6 +6234,10 @@ public class MainViewModel : ViewModelBase
         {
             Volume += 10;
             //await _mpc.MpdSetVolume(Convert.ToInt32(_volume + 10));
+        }
+        else
+        {
+            Volume = 100;
         }
     }
 

@@ -1626,7 +1626,7 @@ public class MpcService : IMpcService
 
     }
 
-    private async Task<CommandBinaryResult> MpdBinarySendBinaryCommand(string cmd, AlbumCoverObject albumCover)
+    private static async Task<CommandBinaryResult> MpdBinarySendBinaryCommand(string cmd, AlbumCoverObject albumCover)
     {
         await _semaphore.WaitAsync();
 
@@ -1644,7 +1644,7 @@ public class MpcService : IMpcService
         return ret;
     }
 
-    private async Task<CommandBinaryResult> MpdBinarySendBinaryCommandProtected(string cmd, AlbumCoverObject albumCover)
+    private static async Task<CommandBinaryResult> MpdBinarySendBinaryCommandProtected(string cmd, AlbumCoverObject albumCover)
     {
 
         // TMP:
@@ -2994,9 +2994,9 @@ public class MpcService : IMpcService
 
                 // songID
                 MpdStatus.MpdSongID = "";
-                if (MpdStatusValues.ContainsKey("songid"))
+                if (MpdStatusValues.TryGetValue("songid", out string? songidvalue))
                 {
-                    MpdStatus.MpdSongID = MpdStatusValues["songid"];
+                    MpdStatus.MpdSongID = songidvalue;
                 }
 
                 // Repeat opt bool.
@@ -3101,29 +3101,29 @@ public class MpcService : IMpcService
                 }
 
                 // Song time elapsed.
-                if (MpdStatusValues.ContainsKey("elapsed"))
+                if (MpdStatusValues.TryGetValue("elapsed", out string? elapsedvalue))
                 {
                     try
                     {
-                        MpdStatus.MpdSongElapsed = Double.Parse(MpdStatusValues["elapsed"]);
+                        MpdStatus.MpdSongElapsed = Double.Parse(elapsedvalue);
                     }
                     catch { }
                 }
 
                 // Song duration.
-                if (MpdStatusValues.ContainsKey("duration"))
+                if (MpdStatusValues.TryGetValue("duration", out string? durationvalue))
                 {
                     try
                     {
-                        MpdStatus.MpdSongTime = Double.Parse(MpdStatusValues["duration"]);
+                        MpdStatus.MpdSongTime = Double.Parse(durationvalue);
                     }
                     catch { }
                 }
 
                 // Error
-                if (MpdStatusValues.ContainsKey("error"))
+                if (MpdStatusValues.TryGetValue("error", out string? errorvalue))
                 {
-                    MpdStatus.MpdError = MpdStatusValues["error"];
+                    MpdStatus.MpdError = errorvalue;
                 }
                 else
                 {
@@ -4139,7 +4139,7 @@ public class MpcService : IMpcService
         return sng;
     }
 
-    private CommandBinaryResult ParseAlbumImageData(byte[] data, AlbumCoverObject albumCover)
+    private static CommandBinaryResult ParseAlbumImageData(byte[] data, AlbumCoverObject albumCover)
     {
         CommandBinaryResult r = new();
 

@@ -5,7 +5,7 @@
     <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>MPDCtrl2.ico</ApplicationIcon>
-    <Version>3.2.2.0</Version>
+    <Version>3.2.3.0</Version>
     <Authors>torum</Authors>
     <Company>torum</Company>
     <Copyright></Copyright>
@@ -20,7 +20,7 @@
 	  <NeutralLanguage>en-US</NeutralLanguage>
 	  <DefaultLanguage>en-US</DefaultLanguage>
 	  <Title>MPDCtrl</Title>
-	  <IncludeSymbols>False</IncludeSymbols>
+	  <IncludeSymbols>True</IncludeSymbols>
 	  <EnableMsixTooling>true</EnableMsixTooling>
 	  <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
 	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -29,6 +29,7 @@
 	  <IsAotCompatible>true</IsAotCompatible>
 	  <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
 	  <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
@@ -93,8 +94,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7" />
   </ItemGroup>
 
   <ItemGroup>

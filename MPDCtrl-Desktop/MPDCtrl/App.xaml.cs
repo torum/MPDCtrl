@@ -232,7 +232,7 @@ public partial class App : Application
         }
         else
         {
-            _themeDict = new ResourceDictionary();
+            _themeDict = [];
             Application.Current.Resources.MergedDictionaries.Add(_themeDict);
         }
 

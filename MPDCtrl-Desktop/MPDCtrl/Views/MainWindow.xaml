@@ -42,6 +42,7 @@
                 <DataTrigger Binding="{Binding IsWorking}" Value="True">
                     <Setter Property="Cursor" Value="AppStarting" />
                 </DataTrigger>
+                <!--  
                 <DataTrigger Binding="{Binding WindowState}" Value="Maximized">
                     <Setter Property="WindowChrome.CaptionHeight" Value="32" />
                     <Setter Property="WindowChrome.ResizeBorderThickness" Value="0" />
@@ -50,7 +51,7 @@
                     <Setter Property="WindowChrome.CaptionHeight" Value="50" />
                     <Setter Property="WindowChrome.ResizeBorderThickness" Value="36" />
                 </DataTrigger>
-                <!--  -->
+                -->
             </Style.Triggers>
         </Style>
     </Window.Style>
@@ -59,7 +60,7 @@
         <WindowChrome CaptionHeight="32" ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}" GlassFrameThickness="0" CornerRadius="8" />
     </WindowChrome.WindowChrome> -->
     <Window.InputBindings>
-        <!-- Not good for listview's key bind to select row.
+        <!-- Not good for listview's key bind to select row. Handle with GlobalHotkey
         <KeyBinding Command="{Binding PlayCommand}" Modifiers="Ctrl" Key="Space" /> -->
         <KeyBinding Command="{Binding PlayCommand}" Key="Play" />
         <KeyBinding Command="{Binding PlayCommand}" Key="Space" />
@@ -68,10 +69,14 @@
         <KeyBinding Command="{Binding PlayCommand}" Key="MediaStop" />
         <KeyBinding Command="{Binding PlayNextCommand}" Key="MediaNextTrack" />
         <KeyBinding Command="{Binding PlayNextCommand}" Modifiers="Ctrl" Key="N" />
+        <!-- handle with Global Hotkey
         <KeyBinding Command="{Binding PlayNextCommand}" Modifiers="Ctrl" Key="Right" />
+        -->
         <KeyBinding Command="{Binding PlayPrevCommand}" Key="MediaPreviousTrack" />
         <KeyBinding Command="{Binding PlayPrevCommand}" Modifiers="Ctrl" Key="B" />
+        <!-- handle with Global Hotkey
         <KeyBinding Command="{Binding PlayPrevCommand}" Modifiers="Ctrl" Key="Left" />
+        -->
         <KeyBinding Command="{Binding VolumeMuteCommand}" Key="VolumeMute" />
         <KeyBinding Command="{Binding VolumeDownCommand}" Key="VolumeDown" />
         <KeyBinding Command="{Binding VolumeDownCommand}" Modifiers="Ctrl" Key="OemMinus" />

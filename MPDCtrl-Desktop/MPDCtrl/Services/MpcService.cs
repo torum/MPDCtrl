@@ -537,7 +537,8 @@ public class MpcService : IMpcService
 
             if (isAck || isErr)
             {
-                await MpdIdleSendCommand("clearerror");
+                // Don't 
+                //await MpdIdleSendCommand("clearerror");
             }
 
             ret.ResultText = stringBuilder.ToString();
@@ -838,7 +839,8 @@ public class MpcService : IMpcService
 
             if (isAck || isErr)
             {
-                await MpdIdleSendCommand("clearerror");
+                // Don't 
+                //await MpdIdleSendCommand("clearerror");
             }
 
             await ParseSubSystemsAndRaiseChangedEvent(result);

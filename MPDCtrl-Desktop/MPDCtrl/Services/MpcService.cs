@@ -21,30 +21,30 @@ public class MpcService : IMpcService
 {
     #region == Consts, Properties, etc == 
 
-    public string MpdHost { get; private set; } = "";
+    public string MpdHost { get; private set; } = string.Empty;
 
     public int MpdPort { get; private set; } = 6600;
 
-    public string MpdPassword { get; private set; } = "";
+    public string MpdPassword { get; private set; } = string.Empty;
 
-    public string MpdVerText { get; set; } = "";
+    public string MpdVerText { get; set; } = string.Empty;
 
     public Status MpdStatus { get; private set; } = new();
 
     public bool MpdStop { get; set; }
 
-    // You need to either get "status" and "queue" before hand, or "currentsong". 
+    // You need to either get "status" and "queue" before hand, or just get "currentsong". 
     public SongInfoEx? MpdCurrentSong { get; private set; }
 
-    public ObservableCollection<SongInfoEx> CurrentQueue { get; private set; } = new();
+    public ObservableCollection<SongInfoEx> CurrentQueue { get; private set; } = [];
 
-    public ObservableCollection<Playlist> Playlists { get; private set; } = new();
+    public ObservableCollection<Playlist> Playlists { get; private set; } = [];
 
-    public ObservableCollection<SongFile> LocalFiles { get; private set; } = new();
+    public ObservableCollection<SongFile> LocalFiles { get; private set; } = [];
 
-    public ObservableCollection<String> LocalDirectories { get; private set; } = new();
+    public ObservableCollection<String> LocalDirectories { get; private set; } = [];
 
-    public ObservableCollection<SongInfo> SearchResult { get; private set; } = new();
+    public ObservableCollection<SongInfo> SearchResult { get; private set; } = [];
 
     //public AlbumCoverObject AlbumCover { get; private set; } = new();
 

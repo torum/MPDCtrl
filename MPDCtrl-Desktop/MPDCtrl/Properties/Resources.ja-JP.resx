@@ -610,4 +610,7 @@ SOFTWARE.</value>
   <data name="QueueListviewColumnHeader_Track" xml:space="preserve">
     <value>トラック</value>
   </data>
+  <data name="QueueListviewColumnHeader_Any" xml:space="preserve">
+    <value>すべて</value>
+  </data>
 </root>

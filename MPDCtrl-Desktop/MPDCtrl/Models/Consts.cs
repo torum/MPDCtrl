@@ -2,6 +2,6 @@
 {
     public enum SearchTags
     {
-        Title, Artist, Album, Genre
+        Title, Artist, Album, Genre, Any
     }
 }

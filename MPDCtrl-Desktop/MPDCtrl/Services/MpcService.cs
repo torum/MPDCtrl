@@ -1179,18 +1179,19 @@ public class MpcService : IMpcService
 
     private async Task<CommandResult> MpdCommandSendCommand(string cmd, bool isAutoIdling = false)
     {
-        await _semaphore.WaitAsync();
-
         CommandResult ret = new();
 
-        try
+        if (await _semaphore.WaitAsync(TimeSpan.FromSeconds(5)))
         {
-            ret = await MpdCommandSendCommandProtected(cmd,false);
-        }
-        finally
-        {
-            _semaphore.Release();
-            
+            try
+            {
+                ret = await MpdCommandSendCommandProtected(cmd, false);
+            }
+            finally
+            {
+                _semaphore.Release();
+
+            }
         }
 
         return ret;
@@ -1630,17 +1631,18 @@ public class MpcService : IMpcService
 
     private static async Task<CommandBinaryResult> MpdBinarySendBinaryCommand(string cmd, AlbumCoverObject albumCover)
     {
-        await _semaphore.WaitAsync();
-
         var ret = new CommandBinaryResult();
 
-        try
+        if (await _semaphore.WaitAsync(TimeSpan.FromSeconds(5)))
         {
-            ret = await MpdBinarySendBinaryCommandProtected(cmd, albumCover);
-        }
-        finally
-        {
-            _semaphore.Release();
+            try
+            {
+                ret = await MpdBinarySendBinaryCommandProtected(cmd, albumCover);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
         return ret;

@@ -3274,7 +3274,7 @@ public class MainViewModel : ViewModelBase
         #region == Init Song's time elapsed timer. ==  
 
         // Init Song's time elapsed timer.
-        _elapsedTimer = new System.Timers.Timer(500);
+        _elapsedTimer = new System.Timers.Timer(100);
         _elapsedTimer.Elapsed += new System.Timers.ElapsedEventHandler(ElapsedTimer);
 
         #endregion
@@ -4539,9 +4539,9 @@ public class MainViewModel : ViewModelBase
                 NotifyPropertyChanged(nameof(Single));
 
                 // no need to care about "double" updates for time.
-                Time = _mpc.MpdStatus.MpdSongTime;
+                Time = _mpc.MpdStatus.MpdSongTime * 10;
 
-                _elapsed = _mpc.MpdStatus.MpdSongElapsed;
+                _elapsed = _mpc.MpdStatus.MpdSongElapsed * 10;
                 //NotifyPropertyChanged("Elapsed");
 
                 //start elapsed timer.
@@ -6011,7 +6011,7 @@ public class MainViewModel : ViewModelBase
     {
         if ((_elapsed < _time) && (_mpc.MpdStatus.MpdState == Status.MpdPlayState.Play))
         {
-            _elapsed += 0.5;
+            _elapsed += 1;
             NotifyPropertyChanged(nameof(Elapsed));
         }
         else
@@ -6189,7 +6189,8 @@ public class MainViewModel : ViewModelBase
     }
     public async void SetSeekCommand_ExecuteAsync()
     {
-        await _mpc.MpdPlaybackSeek(_mpc.MpdStatus.MpdSongID, Convert.ToInt32(_elapsed));
+        double elapsed = _elapsed / 10;
+        await _mpc.MpdPlaybackSeek(_mpc.MpdStatus.MpdSongID, elapsed);
     }
 
     public ICommand VolumeMuteCommand { get; }

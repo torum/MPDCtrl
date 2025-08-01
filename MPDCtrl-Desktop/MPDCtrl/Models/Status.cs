@@ -8,7 +8,7 @@ public class Status
     };
 
     private MpdPlayState _ps;
-    private int _volume = 50;
+    private int _volume = 20;
     private bool _volumeIsSet;
     private bool _repeat;
     private bool _random;
@@ -115,7 +115,7 @@ public class Status
 
     public void Reset()
     {
-        _volume = 50;
+        _volume = 20;
         _volumeIsSet = false;
         _repeat = false;
         _random = false;

@@ -64,7 +64,7 @@ public interface IMpcService
     Task<CommandResult> MpdPlaybackPlay(int volume, string songId = "");
     Task<CommandResult> MpdPlaybackPrev(int volume);
     Task<CommandResult> MpdPlaybackResume(int volume);
-    Task<CommandResult> MpdPlaybackSeek(string songId, int seekTime);
+    Task<CommandResult> MpdPlaybackSeek(string songId, double seekTime);
     Task<CommandResult> MpdPlaybackStop();
     Task<CommandResult> MpdPlaylistAdd(string playlistName, List<string> uris);
     Task<CommandResult> MpdPlaylistClear(string playlistName);

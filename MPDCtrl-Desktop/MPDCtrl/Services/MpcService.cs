@@ -2477,7 +2477,7 @@ public class MpcService : IMpcService
         return result;
     }
 
-    public async Task<CommandResult> MpdPlaybackSeek(string songId, int seekTime)
+    public async Task<CommandResult> MpdPlaybackSeek(string songId, double seekTime)
     {
         if ((songId == "") || (seekTime == 0))
         {
@@ -2983,7 +2983,7 @@ public class MpcService : IMpcService
                 {
                     try
                     {
-                        if (string.IsNullOrEmpty(valueVolume))
+                        if (!string.IsNullOrEmpty(valueVolume))
                         {
                             MpdStatus.MpdVolume = Int32.Parse(valueVolume);
 

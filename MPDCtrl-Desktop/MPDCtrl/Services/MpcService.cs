@@ -2989,11 +2989,21 @@ public class MpcService : IMpcService
 
                             MpdStatus.MpdVolumeIsSet = true;
                         }
+                        else
+                        {
+                            MpdStatus.MpdVolume = 20;
+                            MpdStatus.MpdVolumeIsSet = false;
+                        }
                     }
                     catch (FormatException e)
                     {
                         System.Diagnostics.Debug.WriteLine(e.Message);
                     }
+                }
+                else
+                {
+                    MpdStatus.MpdVolume = 20;
+                    MpdStatus.MpdVolumeIsSet = false;
                 }
 
                 // songID

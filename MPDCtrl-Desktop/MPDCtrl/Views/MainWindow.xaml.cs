@@ -26,6 +26,11 @@ public partial class MainWindow : Window
     private const int HOTKEY_ID6 = 0x0006; // vol down
     private const int HOTKEY_ID7 = 0x0007; // vol down
 
+    private const int HOTKEY_ID8 = 0x0008; // MediaPlayPause
+    private const int HOTKEY_ID9 = 0x0009; // MediaStop
+    private const int HOTKEY_ID10 = 0x0010; // MediaNextTrack
+    private const int HOTKEY_ID11 = 0x0011; // MediaPreviousTrack
+
     private readonly IntPtr WindowHandle;
 
     #endregion
@@ -351,6 +356,10 @@ public partial class MainWindow : Window
         Unregister(HOTKEY_ID5);
         Unregister(HOTKEY_ID6);
         Unregister(HOTKEY_ID7);
+        Unregister(HOTKEY_ID8);
+        Unregister(HOTKEY_ID9);
+        Unregister(HOTKEY_ID10);
+        Unregister(HOTKEY_ID11);
         ComponentDispatcher.ThreadPreprocessMessage -= ComponentDispatcher_ThreadPreprocessMessage;
 
         #endregion
@@ -506,6 +515,30 @@ public partial class MainWindow : Window
         {
             //MessageBox.Show("HotKey7 registet failed.");
         }
+
+        var result8 = RegisterHotKey(WindowHandle, HOTKEY_ID8, 0, KeyInterop.VirtualKeyFromKey(Key.MediaPlayPause));
+        if (result8 == 0)
+        {
+            //MessageBox.Show("HotKey8 registet failed.");
+        }
+
+        var result9 = RegisterHotKey(WindowHandle, HOTKEY_ID9, 0, KeyInterop.VirtualKeyFromKey(Key.MediaStop));
+        if (result9 == 0)
+        {
+            //MessageBox.Show("HotKey9 registet failed.");
+        }
+
+        var result10 = RegisterHotKey(WindowHandle, HOTKEY_ID10, 0, KeyInterop.VirtualKeyFromKey(Key.MediaNextTrack));
+        if (result10 == 0)
+        {
+            //MessageBox.Show("HotKey10 registet failed.");
+        }
+
+        var result11 = RegisterHotKey(WindowHandle, HOTKEY_ID11, 0, KeyInterop.VirtualKeyFromKey(Key.MediaPreviousTrack));
+        if (result11 == 0)
+        {
+            //MessageBox.Show("HotKey11 registet failed.");
+        }
     }
 
     void ComponentDispatcher_ThreadPreprocessMessage(ref MSG msg, ref bool handled)
@@ -536,6 +569,18 @@ public partial class MainWindow : Window
                     break;
                 case HOTKEY_ID7:
                     vm.VolumeDownCommand_Execute();
+                    break;
+                case HOTKEY_ID8:
+                    vm.PlayCommand_ExecuteAsync();
+                    break;
+                case HOTKEY_ID9:
+                    vm.PlayCommand_ExecuteAsync();
+                    break;
+                case HOTKEY_ID10:
+                    vm.PlayNextCommand_ExecuteAsync();
+                    break;
+                case HOTKEY_ID11:
+                    vm.PlayPrevCommand_ExecuteAsync();
                     break;
                 default:
                     break;

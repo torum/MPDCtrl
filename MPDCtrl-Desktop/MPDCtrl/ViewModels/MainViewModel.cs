@@ -4569,7 +4569,6 @@ public class MainViewModel : ViewModelBase
                 Time = _mpc.MpdStatus.MpdSongTime * 10;
 
                 _elapsed = _mpc.MpdStatus.MpdSongElapsed * 10;
-                //NotifyPropertyChanged("Elapsed");
 
                 //start elapsed timer.
                 if (_mpc.MpdStatus.MpdState == Status.MpdPlayState.Play)
@@ -4581,6 +4580,7 @@ public class MainViewModel : ViewModelBase
                 {
                     _elapsedTimer.Stop();
                 }
+                NotifyPropertyChanged(nameof(Elapsed));
 
                 //if (Application.Current is null) { return; }
                 //Application.Current.Dispatcher.Invoke(() => CommandManager.InvalidateRequerySuggested());

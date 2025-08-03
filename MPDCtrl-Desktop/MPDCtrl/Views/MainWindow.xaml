@@ -61,27 +61,28 @@
     </WindowChrome.WindowChrome> -->
     <Window.InputBindings>
         <!-- Not good for listview's key bind to select row. Handle with GlobalHotkey
-        <KeyBinding Command="{Binding PlayCommand}" Modifiers="Ctrl" Key="Space" /> -->
-        <KeyBinding Command="{Binding PlayCommand}" Key="Play" />
-        <KeyBinding Command="{Binding PlayCommand}" Key="Space" />
-        <KeyBinding Command="{Binding PlayCommand}" Modifiers="Ctrl" Key="P"/>
+        <KeyBinding Command="{Binding PlayCommand}" Modifiers="Ctrl" Key="Space"  -->
+        <!-- handle with Global Hotkey
+        <KeyBinding Command="{Binding PlayNextCommand}" Modifiers="Ctrl" Key="Right" />
+        <KeyBinding Command="{Binding PlayPrevCommand}" Modifiers="Ctrl" Key="Left" />
         <KeyBinding Command="{Binding PlayCommand}" Key="MediaPlayPause" />
         <KeyBinding Command="{Binding PlayCommand}" Key="MediaStop" />
         <KeyBinding Command="{Binding PlayNextCommand}" Key="MediaNextTrack" />
-        <KeyBinding Command="{Binding PlayNextCommand}" Modifiers="Ctrl" Key="N" />
-        <!-- handle with Global Hotkey
-        <KeyBinding Command="{Binding PlayNextCommand}" Modifiers="Ctrl" Key="Right" />
-        -->
         <KeyBinding Command="{Binding PlayPrevCommand}" Key="MediaPreviousTrack" />
-        <KeyBinding Command="{Binding PlayPrevCommand}" Modifiers="Ctrl" Key="B" />
-        <!-- handle with Global Hotkey
-        <KeyBinding Command="{Binding PlayPrevCommand}" Modifiers="Ctrl" Key="Left" />
         -->
+        <!-- this is not neccessary because change is done independently of the app
         <KeyBinding Command="{Binding VolumeMuteCommand}" Key="VolumeMute" />
         <KeyBinding Command="{Binding VolumeDownCommand}" Key="VolumeDown" />
+        <KeyBinding Command="{Binding VolumeUpCommand}" Key="VolumeUp" />
+        -->
+        <KeyBinding Command="{Binding PlayCommand}" Key="Play" />
+        <KeyBinding Command="{Binding PlayCommand}" Key="Space" />
+        <KeyBinding Command="{Binding PlayCommand}" Modifiers="Ctrl" Key="P"/>
+        <KeyBinding Command="{Binding PlayNextCommand}" Modifiers="Ctrl" Key="N" />
+        <KeyBinding Command="{Binding PlayPrevCommand}" Modifiers="Ctrl" Key="B" />
+
         <KeyBinding Command="{Binding VolumeDownCommand}" Modifiers="Ctrl" Key="OemMinus" />
         <KeyBinding Command="{Binding VolumeDownCommand}" Modifiers="Ctrl" Key="Subtract" />
-        <KeyBinding Command="{Binding VolumeUpCommand}" Key="VolumeUp" />
         <KeyBinding Command="{Binding VolumeUpCommand}" Modifiers="Ctrl" Key="OemPlus" />
         <KeyBinding Command="{Binding VolumeUpCommand}" Modifiers="Ctrl" Key="Add" />
         <KeyBinding Command="{Binding EscapeCommand}" Key="Esc" />

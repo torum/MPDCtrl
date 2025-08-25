@@ -1,0 +1,120 @@
+﻿<Page
+    x:Class="MPDCtrl.Views.ShellPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals" 
+    xmlns:vm="using:MPDCtrl.ViewModels"
+    xmlns:mod="using:MPDCtrl.Models" 
+    d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+    NavigationCacheMode="Required"
+    mc:Ignorable="d">
+    <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1000" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="False" />
+                        <Setter Target="NaviView.PaneDisplayMode" Value="Left" />
+                        <Setter Target="NaviView.IsPaneOpen" Value="True" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="True" />
+                        <Setter Target="NaviView.PaneDisplayMode" Value="CompactLeft" />
+                        <Setter Target="NaviView.IsPaneOpen" Value="False" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <!-- NavigationView.PaneToggleButton: None draggable area(48px). Exclude from TitleBar -->
+            </Grid>
+            <Grid x:Name="AppTitleBar" Grid.Column="1">
+                <!-- Application TitleBar: SetTitleBar in code behinde -->
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BorderThickness="0,0,0,0">
+
+            <NavigationView x:Name="NaviView" MenuItemsSource="{x:Bind ViewModel.MainMenuItems, Mode=OneWay}"
+                Margin="0"
+                IsTitleBarAutoPaddingEnabled="True"
+            IsBackButtonVisible="Collapsed"
+            IsPaneToggleButtonVisible="False"
+            IsSettingsVisible="True"
+            PaneDisplayMode="Left"
+            ExpandedModeThresholdWidth="1000"
+            CompactModeThresholdWidth="740" 
+            OpenPaneLength ="250"
+            IsPaneOpen="True"
+                Loaded="NavigationView_Loaded"
+                ItemInvoked="NavigationView_ItemInvoked">
+                <NavigationView.PaneHeader>
+                    <Grid Height="42" VerticalAlignment="Center">
+                        <StackPanel Margin="12,0,0,0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Image Source="/Assets/MPDCtrl.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Width="18" Height="18" Margin="0,0,0,0"/>
+                            <TextBlock Text="MPDCtrl" Margin="6,-2,0,0" VerticalAlignment="Center" Opacity="0.9"/>
+                        </StackPanel>
+                    </Grid>
+                </NavigationView.PaneHeader>
+
+                <NavigationView.MenuItemTemplate>
+                    <DataTemplate x:DataType="mod:NodeTree">
+                        <NavigationViewItem MenuItemsSource="{x:Bind Children, Mode=OneWay}" IsExpanded="{x:Bind Expanded, Mode=TwoWay}" IsSelected="{x:Bind Selected, Mode=TwoWay}" Tag="{x:Bind Tag, Mode=OneWay}">
+                            <!-- Not working due to WinUI3's bug/limitation.
+                            <NavigationViewItem.Icon>
+                                <IconSourceElement>
+                                    <PathIconSource Data="{x:Bind PathIcon, Mode=OneWay}"/>
+                                </IconSourceElement>
+                            </NavigationViewItem.Icon>
+                            -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0">
+                                <Viewbox Width="18" Height="18" HorizontalAlignment="Left" Margin="3,0,0,0">
+                                    <PathIcon Width="NaN" Height="NaN" Margin="0" Data="{x:Bind PathIcon, Mode=OneWay}"/>
+                                </Viewbox>
+                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" Margin="16,0,0,0"></TextBlock>
+                            </StackPanel>
+                        </NavigationViewItem>
+                    </DataTemplate>
+                </NavigationView.MenuItemTemplate>
+
+                <StackPanel Margin="0,0,0,0">
+                    <Grid Height="160">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="32"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel VerticalAlignment="Center" Margin="140,0,140,0">
+                            <TextBlock Text="Playback Controls" Margin="12,0,0,0" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                        
+                    </Grid>
+                    
+                    <Frame x:Name="NavigationFrame"/>
+                    
+                </StackPanel>
+            </NavigationView>
+
+        </Grid>
+    </Grid>
+</Page>

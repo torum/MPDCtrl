@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MPDCtrl (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "MPDCtrl (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

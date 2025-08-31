@@ -2,7 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Runtime.Versioning;
 using Microsoft.Windows.ApplicationModel.Resources;
-using MPDCtrlX.Models;
+using MPDCtrl.Models;
 
 namespace MPDCtrl.Models;
 
@@ -92,6 +92,7 @@ public partial class NodeMenuPlaylistItem : NodeMenu
 
     public NodeMenuPlaylistItem(string name) : base(name)
     {
+        Tag = "playlistItem";
         PathIcon = "M15,6V8H3V6H15M15,10V12H3V10H15M3,16V14H11V16H3M17,6H22V8H19V17A3,3 0 0,1 16,20A3,3 0 0,1 13,17A3,3 0 0,1 16,14C16.35,14 16.69,14.07 17,14.18V6M16,16A1,1 0 0,0 15,17A1,1 0 0,0 16,18A1,1 0 0,0 17,17A1,1 0 0,0 16,16Z";
         //PathIcon = "M15,6H3V8H15V6M15,10H3V12H15V10M3,16H11V14H3V16M17,6V14.18C16.69,14.07 16.35,14 16,14A3,3 0 0,0 13,17A3,3 0 0,0 16,20A3,3 0 0,0 19,17V8H22V6H17Z";
     }
@@ -153,11 +154,20 @@ public partial class MenuTreeBuilder : NodeTree
         }
     }
 
+    private readonly NodeMenuQueue _queueDirectory;
+    public NodeMenuQueue QueueDirectory
+    {
+        get
+        {
+            return _queueDirectory;
+        }
+    }
+
     public MenuTreeBuilder(string name) : base(name)
     {
         ResourceLoader resourceLoader = new();
 
-        String str = resourceLoader.GetString("MenuTreeItem_Queue");
+        string str = resourceLoader.GetString("MenuTreeItem_Queue");
         NodeMenuQueue queue = new(str)
         {
             Tag = "queue",
@@ -168,6 +178,7 @@ public partial class MenuTreeBuilder : NodeTree
             Parent = this
         };
         Children.Add(queue);
+        _queueDirectory = queue;
 
         str = resourceLoader.GetString("MenuTreeItem_Library");
         NodeMenuLibrary browse = new(str)
@@ -179,47 +190,7 @@ public partial class MenuTreeBuilder : NodeTree
             Parent = this
         };
         Children.Add(browse);
-
         _libraryDirectory = browse;
-
-        str = resourceLoader.GetString("MenuTreeItem_Albums");
-        NodeMenuAlbum albums = new(str)
-        {
-            Tag = "albums",
-            Selected = false,
-            Expanded = false,
-
-            Parent = this
-        };
-        browse.Children.Add(albums);
-
-        _albumsDirectory = albums;
-
-        str = resourceLoader.GetString("MenuTreeItem_Artists");
-        NodeMenuArtist artists = new(str)
-        {
-            Tag = "artists",
-            Selected = false,
-            Expanded = false,
-
-            Parent = this
-        };
-        browse.Children.Add(artists);
-
-        _artistsDirectory = artists;
-
-        str = resourceLoader.GetString("MenuTreeItem_Files");
-        NodeMenuFiles files = new(str)
-        {
-            Tag = "files",
-            Selected = false,
-            Expanded = false,
-
-            Parent = this
-        };
-        browse.Children.Add(files);
-
-        _filesDirectory = files;
 
         str = resourceLoader.GetString("MenuTreeItem_Search");
         NodeMenuSearch search = new(str)
@@ -231,8 +202,47 @@ public partial class MenuTreeBuilder : NodeTree
             Parent = this
         };
         browse.Children.Add(search);
-
+        //Children.Add(search);
         _searchDirectory = search;
+
+        str = resourceLoader.GetString("MenuTreeItem_Files");
+        NodeMenuFiles files = new(str)
+        {
+            Tag = "files",
+            Selected = false,
+            Expanded = false,
+
+            Parent = this
+        };
+        browse.Children.Add(files);
+        //Children.Add(files);
+        _filesDirectory = files;
+
+        str = resourceLoader.GetString("MenuTreeItem_Artists");
+        NodeMenuArtist artists = new(str)
+        {
+            Tag = "artists",
+            Selected = false,
+            Expanded = false,
+
+            Parent = this
+        };
+        browse.Children.Add(artists);
+        //Children.Add(artists);
+        _artistsDirectory = artists;
+
+        str = resourceLoader.GetString("MenuTreeItem_Albums");
+        NodeMenuAlbum albums = new(str)
+        {
+            Tag = "albums",
+            Selected = false,
+            Expanded = false,
+
+            Parent = this
+        };
+        browse.Children.Add(albums);
+        //Children.Add(albums);
+        _albumsDirectory = albums;
 
         str = resourceLoader.GetString("MenuTreeItem_Playlists");
         NodeMenuPlaylists playlists = new(str)
@@ -244,7 +254,6 @@ public partial class MenuTreeBuilder : NodeTree
             Parent = this
         };
         Children.Add(playlists);
-
         _playlistsDirectory = playlists;
     }
 }

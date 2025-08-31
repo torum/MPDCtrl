@@ -3,7 +3,7 @@ using MPDCtrl.ViewModels;
 using System;
 using System.Xml.Linq;
 
-namespace MPDCtrlX.Models;
+namespace MPDCtrl.Models;
 
 /// <summary>
 /// Generic song file class. (for listall)

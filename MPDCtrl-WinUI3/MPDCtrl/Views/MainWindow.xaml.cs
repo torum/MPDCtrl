@@ -1,3 +1,4 @@
+using Microsoft.UI;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -8,6 +9,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using MPDCtrl.Helpers;
+using MPDCtrl.Models;
 using MPDCtrl.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -38,6 +40,12 @@ public sealed partial class MainWindow : Window
 
     public MainWindow()
     {
+        if (this.AppWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.PreferredMinimumWidth = 500;
+            presenter.PreferredMinimumHeight = 780;
+        }
+
         InitializeComponent();
 
         this.ExtendsContentIntoTitleBar = true;
@@ -54,7 +62,7 @@ public sealed partial class MainWindow : Window
             root.RequestedTheme = theme;
 
             //TitleBarHelper.UpdateTitleBar(theme, this);
-            //SetCapitionButtonColorForWin11();
+            SetCapitionButtonColorForWin11();
 
             root.InitWhenMainWindowIsReady(this);
         }
@@ -70,12 +78,26 @@ public sealed partial class MainWindow : Window
 
         var vm = App.GetService<MainViewModel>();
 
+        if (Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController.IsSupported())
+        {
+            vm.IsAcrylicSupported = true;
+
+            vm.IsBackdropEnabled = true;
+        }
+        if (Microsoft.UI.Composition.SystemBackdrops.MicaController.IsSupported())
+        {
+            vm.IsMicaSupported = true;
+
+            vm.IsBackdropEnabled = true;
+        }
+
         if (!System.IO.File.Exists(filePath))
         {
             // Sets default.
 
             if (Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController.IsSupported())
             {
+                vm.IsAcrylicSupported = true;
                 SystemBackdrop = new DesktopAcrylicBackdrop();
                 vm.Material = SystemBackdropOption.Acrylic;
 
@@ -83,6 +105,7 @@ public sealed partial class MainWindow : Window
             }
             else if (Microsoft.UI.Composition.SystemBackdrops.MicaController.IsSupported())
             {
+                vm.IsMicaSupported = true;
                 SystemBackdrop = new MicaBackdrop()
                 {
                     Kind = MicaKind.Base
@@ -158,41 +181,26 @@ public sealed partial class MainWindow : Window
                         winState = OverlappedPresenterState.Restored;
                     }
                 }
-                /*
-                var xLeftPane = mainWindow.Element("LeftPane");
-                if (xLeftPane != null)
-                {
-                    if (xLeftPane.Attribute("width") != null)
-                    {
-                        var xvalue = xLeftPane.Attribute("width")?.Value;
-                        if (!string.IsNullOrEmpty(xvalue))
-                        {
-                            var w = double.Parse(xvalue);
-                            if (w > 256)
-                            {
-                                vm.WidthLeftPane = w;
-                            }
-                        }
-                    }
-                }
 
-                var xDetailPane = mainWindow.Element("DetailPane");
-                if (xDetailPane != null)
+                var xLay = mainWindow.Element("Layout");
+                if (xLay != null)
                 {
-                    if (xDetailPane.Attribute("width") != null)
+                    if (xLay.Attribute("navigationViewMenuOpen") != null)
                     {
-                        var xvalue = xDetailPane.Attribute("width")?.Value;
-                        if (!string.IsNullOrEmpty(xvalue))
+                        var xbool = xLay.Attribute("navigationViewMenuOpen")?.Value;
+                        if (!string.IsNullOrEmpty(xbool))
                         {
-                            var w = double.Parse(xvalue);
-                            if (w > 256)
+                            if (xbool.Equals("True"))
                             {
-                                vm.WidthDetailPane = w;
+                                vm.IsNavigationViewMenuOpen = true;
+                            }
+                            else
+                            {
+                                vm.IsNavigationViewMenuOpen = false;
                             }
                         }
                     }
                 }
-                */
             }
 
             // Themes
@@ -385,10 +393,38 @@ public sealed partial class MainWindow : Window
                 root.RequestedTheme = theme;
 
                 //TitleBarHelper.UpdateTitleBar(theme, this);
-                //SetCapitionButtonColorForWin11();
+                SetCapitionButtonColorForWin11();
             }
 
             this.SystemBackdrop = null;
+        }
+    }
+
+    public void SetCapitionButtonColorForWin11()
+    {
+        var currentTheme = ((FrameworkElement)Content).ActualTheme;
+        if (currentTheme == ElementTheme.Dark)
+        {
+            this.AppWindow.TitleBar.ButtonForegroundColor = Colors.White;
+            this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.White;
+        }
+        else if (currentTheme == ElementTheme.Light)
+        {
+            this.AppWindow.TitleBar.ButtonForegroundColor = Colors.Black;
+            this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.Black;
+        }
+        else
+        {
+            if (App.Current.RequestedTheme == ApplicationTheme.Dark)
+            {
+                this.AppWindow.TitleBar.ButtonForegroundColor = Colors.White;
+                this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.White;
+            }
+            else
+            {
+                this.AppWindow.TitleBar.ButtonForegroundColor = Colors.Black;
+                this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.Black;
+            }
         }
     }
 
@@ -529,21 +565,26 @@ public sealed partial class MainWindow : Window
         }
         mainWindow.SetAttributeNode(attrs);
 
-        /*
-        var xLeftPane = doc.CreateElement(string.Empty, "LeftPane", string.Empty);
-        var xAttrs = doc.CreateAttribute("width");
-        xAttrs.Value = vm.WidthLeftPane.ToString();
-        xLeftPane.SetAttributeNode(xAttrs);
 
-        mainWindow.AppendChild(xLeftPane);
+        #region == MainWindow.Layout ==
 
-        var xDetailPane = doc.CreateElement(string.Empty, "DetailPane", string.Empty);
-        xAttrs = doc.CreateAttribute("width");
-        xAttrs.Value = vm.WidthDetailPane.ToString();
-        xDetailPane.SetAttributeNode(xAttrs);
+        var xLay = doc.CreateElement(string.Empty, "Layout", string.Empty);
 
-        mainWindow.AppendChild(xDetailPane);
-        */
+        attrs = doc.CreateAttribute("navigationViewMenuOpen");
+        if (vm.IsNavigationViewMenuOpen)
+        {
+            attrs.Value = "True";
+        }
+        else
+        {
+            attrs.Value = "False";
+        }
+        xLay.SetAttributeNode(attrs);
+
+        mainWindow.AppendChild(xLay);
+
+        #endregion
+
 
         // set Main Window element to root.
         root.AppendChild(mainWindow);
@@ -563,10 +604,6 @@ public sealed partial class MainWindow : Window
 
         // Options
         var xOpts = doc.CreateElement(string.Empty, "Opts", string.Empty);
-
-        //attrs = doc.CreateAttribute("isChartTooltipVisible");
-        //attrs.Value = MainViewModel.IsChartTooltipVisible.ToString();
-        //xOpts.SetAttributeNode(attrs);
 
         //attrs = doc.CreateAttribute("isDebugSaveLog");
         //attrs.Value = MainViewModel.IsDebugSaveLog.ToString();

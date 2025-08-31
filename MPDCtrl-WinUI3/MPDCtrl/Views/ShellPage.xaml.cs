@@ -20,15 +20,17 @@ namespace MPDCtrl.Views;
 
 public sealed partial class ShellPage : Page
 {
-    private readonly MainViewModel _viewModel;
-    private Type? _currentPage;
+    public MainViewModel ViewModel
+    {
+        get;
+    }
 
-    public MainViewModel ViewModel => _viewModel;
+    private Type? _currentPage;
 
     public ShellPage()
     {
-        _viewModel = App.GetService<MainViewModel>();
-        
+        ViewModel = App.GetService<MainViewModel>();
+
         InitializeComponent();
 
         NavigationFrame.Content = App.GetService<QueuePage>();
@@ -50,7 +52,7 @@ public sealed partial class ShellPage : Page
             return;
         }
 
-        //App.MainWnd.SetCapitionButtonColorForWin11();
+        App.MainWnd.SetCapitionButtonColorForWin11();
     }
 
     private void NavigationView_Loaded(object sender, RoutedEventArgs e)
@@ -67,10 +69,63 @@ public sealed partial class ShellPage : Page
     {
         if (args.IsSettingsInvoked == true)
         {
-            NavigationFrame.Navigate(typeof(SettingsPage), null, args.RecommendedNavigationTransitionInfo);//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
-            _currentPage = typeof(SettingsPage);
+            if (NavigationFrame.Navigate(typeof(SettingsPage), null, args.RecommendedNavigationTransitionInfo))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
+            {
+                _currentPage = typeof(SettingsPage);
+            }
             return;
         }
+
+        // This won't work because somehow "args.InvokedItemContainer.DataContext" returns null.
+        /*
+        if (args.InvokedItemContainer is not NavigationViewItem item)
+        {
+            return;
+        }
+
+        if (item.DataContext is NodeMenuQueue)
+        {
+            if (NavigationFrame.Navigate(typeof(QueuePage), null, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(QueuePage);
+            }
+        }
+        else if (item.DataContext is NodeMenuAlbum)
+        {
+            if (NavigationFrame.Navigate(typeof(AlbumsPage), null, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(AlbumsPage);
+            }
+        }
+        else if (item.DataContext is NodeMenuArtist)
+        {
+            if (NavigationFrame.Navigate(typeof(ArtistsPage), null, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(ArtistsPage);
+            }
+        }
+        else if (item.DataContext is NodeMenuFiles)
+        {
+            if (NavigationFrame.Navigate(typeof(FilesPage), null, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(FilesPage);
+            }
+        }
+        else if (item.DataContext is NodeMenuSearch)
+        {
+            if (NavigationFrame.Navigate(typeof(SearchPage), null, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(SearchPage);
+            }
+        }
+        else if (item.DataContext is NodeMenuPlaylistItem)
+        {
+            if (NavigationFrame.Navigate(typeof(PlaylistItemPage), null, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(PlaylistItemPage);
+            }
+        }
+        */
 
         if (args.InvokedItemContainer.Tag is not string tag || string.IsNullOrWhiteSpace(tag))
         {
@@ -86,8 +141,10 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            NavigationFrame.Navigate(typeof(QueuePage), null, args.RecommendedNavigationTransitionInfo);//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
-            _currentPage = typeof(QueuePage);
+            if (NavigationFrame.Navigate(typeof(QueuePage), null, args.RecommendedNavigationTransitionInfo))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
+            {
+                _currentPage = typeof(QueuePage);
+            }
         }
         else if (pageTag == "albums")
         {
@@ -95,8 +152,10 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            NavigationFrame.Navigate(typeof(AlbumsPage), null, args.RecommendedNavigationTransitionInfo);
-            _currentPage = typeof(AlbumsPage);
+            if (NavigationFrame.Navigate(typeof(AlbumsPage), null, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(AlbumsPage);
+            }
         }
         else if (pageTag == "artists")
         {
@@ -104,8 +163,10 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            NavigationFrame.Navigate(typeof(ArtistsPage), null, args.RecommendedNavigationTransitionInfo);
-            _currentPage = typeof(ArtistsPage);
+            if (NavigationFrame.Navigate(typeof(ArtistsPage), null, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(ArtistsPage);
+            }
         }
         else if (pageTag == "files")
         {
@@ -113,8 +174,10 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            NavigationFrame.Navigate(typeof(FilesPage), null, args.RecommendedNavigationTransitionInfo);
-            _currentPage = typeof(FilesPage);
+            if (NavigationFrame.Navigate(typeof(FilesPage), null, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(FilesPage);
+            }
         }
         else if (pageTag == "search")
         {
@@ -122,8 +185,21 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            NavigationFrame.Navigate(typeof(SearchPage), null, args.RecommendedNavigationTransitionInfo);
-            _currentPage = typeof(SearchPage);
+            if (NavigationFrame.Navigate(typeof(SearchPage), null, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(SearchPage);
+            }
+        }
+        else if (pageTag == "playlistItem")
+        {
+            if (_currentPage == typeof(PlaylistItemPage))
+            {
+                return;
+            }
+            if (NavigationFrame.Navigate(typeof(PlaylistItemPage), null, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(PlaylistItemPage);
+            }
         }
 
     }

@@ -7,39 +7,19 @@
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals" 
     xmlns:vm="using:MPDCtrl.ViewModels"
     xmlns:mod="using:MPDCtrl.Models" 
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
     NavigationCacheMode="Required"
     mc:Ignorable="d">
     <Grid>
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup>
-                <VisualState>
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="1000" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="False" />
-                        <Setter Target="NaviView.PaneDisplayMode" Value="Left" />
-                        <Setter Target="NaviView.IsPaneOpen" Value="True" />
-                    </VisualState.Setters>
-                </VisualState>
-                <VisualState>
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="0" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="True" />
-                        <Setter Target="NaviView.PaneDisplayMode" Value="CompactLeft" />
-                        <Setter Target="NaviView.IsPaneOpen" Value="False" />
-                    </VisualState.Setters>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="1"/>
+            <RowDefinition Height="116"/>
         </Grid.RowDefinitions>
 
+        <!-- App dummy titlebar -->
         <Grid Grid.Row="0" Grid.Column="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="48"></ColumnDefinition>
@@ -53,22 +33,12 @@
             </Grid>
         </Grid>
 
-        <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BorderThickness="0,0,0,0">
+        <!-- NaviView -->
+        <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BorderBrush="{ThemeResource SmokeFillColorDefaultBrush}" BorderThickness="0,0,0,0">
 
-            <NavigationView x:Name="NaviView" MenuItemsSource="{x:Bind ViewModel.MainMenuItems, Mode=OneWay}"
-                Margin="0"
-                IsTitleBarAutoPaddingEnabled="True"
-            IsBackButtonVisible="Collapsed"
-            IsPaneToggleButtonVisible="False"
-            IsSettingsVisible="True"
-            PaneDisplayMode="Left"
-            ExpandedModeThresholdWidth="1000"
-            CompactModeThresholdWidth="740" 
-            OpenPaneLength ="250"
-            IsPaneOpen="True"
-                Loaded="NavigationView_Loaded"
-                ItemInvoked="NavigationView_ItemInvoked">
+            <NavigationView x:Name="NaviView" MenuItemsSource="{x:Bind ViewModel.MainMenuItems, Mode=OneWay}" IsTitleBarAutoPaddingEnabled="True" IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="False" IsSettingsVisible="True" PaneDisplayMode="Left" ExpandedModeThresholdWidth="1008" CompactModeThresholdWidth="640" OpenPaneLength ="320" IsPaneOpen="{x:Bind ViewModel.IsNavigationViewMenuOpen, Mode=TwoWay}" Loaded="NavigationView_Loaded" ItemInvoked="NavigationView_ItemInvoked">
                 <NavigationView.PaneHeader>
+                    <!-- App title and icon -->
                     <Grid Height="42" VerticalAlignment="Center">
                         <StackPanel Margin="12,0,0,0" Orientation="Horizontal" VerticalAlignment="Center">
                             <Image Source="/Assets/MPDCtrl.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Width="18" Height="18" Margin="0,0,0,0"/>
@@ -76,7 +46,7 @@
                         </StackPanel>
                     </Grid>
                 </NavigationView.PaneHeader>
-
+                <!-- Menu Items -->
                 <NavigationView.MenuItemTemplate>
                     <DataTemplate x:DataType="mod:NodeTree">
                         <NavigationViewItem MenuItemsSource="{x:Bind Children, Mode=OneWay}" IsExpanded="{x:Bind Expanded, Mode=TwoWay}" IsSelected="{x:Bind Selected, Mode=TwoWay}" Tag="{x:Bind Tag, Mode=OneWay}">
@@ -97,24 +67,180 @@
                     </DataTemplate>
                 </NavigationView.MenuItemTemplate>
 
-                <StackPanel Margin="0,0,0,0">
-                    <Grid Height="160">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="32"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-
-                        <StackPanel VerticalAlignment="Center" Margin="140,0,140,0">
-                            <TextBlock Text="Playback Controls" Margin="12,0,0,0" HorizontalAlignment="Center"/>
-                        </StackPanel>
+                <Grid Background="{ThemeResource LayerFillColorDefaultBrush}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="42"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Border Grid.Row="0">
                         
-                    </Grid>
-                    
-                    <Frame x:Name="NavigationFrame"/>
-                    
-                </StackPanel>
+                    </Border>
+                    <!-- NavigationView content frame -->
+                    <Frame x:Name="NavigationFrame" Grid.Row="1"/>
+                </Grid>
+
             </NavigationView>
 
         </Grid>
+
+        <Border Grid.Row="2" Opacity="0.1" BorderThickness="0,1,0,0" BorderBrush="{ThemeResource SmokeFillColorDefaultBrush}"></Border>
+        
+        <!-- Playback control area -->
+        <Grid Grid.Row="3" Background="{ThemeResource LayerFillColorAltBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                
+                <Grid Grid.Row="0" Grid.Column="0">
+                    <TextBlock Text="0:00:00" FontSize="12" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="14,0,18,0"></TextBlock>
+                </Grid>
+                <Border Grid.Row="0" Grid.Column="1" Margin="6,0,6,0">
+                    <Slider Margin="0" Padding="0"></Slider>
+                </Border>
+                <Grid Grid.Row="0" Grid.Column="2">
+                    <TextBlock Text="0:00:00" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="18,0,14,0"></TextBlock>
+                </Grid>
+                
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Row="0" Grid.Column="0" x:Name="AlbumCoverAndSongTitle" Height="82">
+
+                    <Border x:Name="AlbumCoverBackground" CornerRadius="2" Width="70" Height="70" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8,4,0,8" Background="{ThemeResource SmokeFillColorDefaultBrush}" Opacity="0.1">
+
+                        <Path RenderTransformOrigin="0,0" Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Opacity="0.6" Width="48" Height="48" Data="M12 15.5q1.471 0 2.486-1.014Q15.5 13.47 15.5 12t-1.014-2.485T12 8.5T9.515 9.515T8.5 12t1.015 2.486T12 15.5m0-2.5q-.425 0-.712-.288T11 12t.288-.712T12 11t.713.288T13 12t-.288.713T12 13m.003 8q-1.867 0-3.51-.708q-1.643-.709-2.859-1.924t-1.925-2.856T3 12.003t.709-3.51Q4.417 6.85 5.63 5.634t2.857-1.925T11.997 3t3.51.709q1.643.708 2.859 1.922t1.925 2.857t.709 3.509t-.708 3.51t-1.924 2.859t-2.856 1.925t-3.509.709M12 20q3.35 0 5.675-2.325T20 12t-2.325-5.675T12 4T6.325 6.325T4 12t2.325 5.675T12 20m0-8"/>
+
+                    </Border>
+                    <Border x:Name="AlbumCover" CornerRadius="2" Width="70" Height="70" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8,4,0,8">
+                        <Image Source="{x:Bind ViewModel.AlbumArtBitmapSource, Mode=OneWay}" Stretch="UniformToFill"></Image>
+                    </Border>
+                    <Border x:Name="AlbumCoverBorder" CornerRadius="2" Width="70" Height="70" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8,4,0,8" BorderBrush="Gray" BorderThickness="1" Opacity="0.1">
+
+                    </Border>
+                    <Button Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Stretch" BorderThickness="0" MinWidth="78" Margin="4,0,0,4" VerticalContentAlignment="Top">
+                        <StackPanel Margin="80,0,0,0" VerticalAlignment="Top">
+                            <TextBlock x:Name="CurrentSongTitle" Text="{x:Bind ViewModel.CurrentSongTitle, Mode=OneWay}" FontSize="20" FontWeight="Bold" Opacity="1" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"></TextBlock>
+                            <TextBlock Opacity="0.8" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" x:Name="CurrentSongArtist" Text="{x:Bind ViewModel.CurrentSongArtist, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsCurrentSongArtistNotNull, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"></TextBlock>
+                            <TextBlock Opacity="0.5" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" x:Name="CurrentSongAlbum" Text="{x:Bind ViewModel.CurrentSongAlbum, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsCurrentSongAlbumNotNull, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"></TextBlock>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+
+                <Grid Grid.Row="0" Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Row="0" Grid.Column="0" x:Name="PlaybackPrev" Command="{x:Bind ViewModel.PlayPrevCommand}" Width="30" Height="30" CornerRadius="3" Background="Transparent" BorderThickness="0" Margin="18,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="0">
+                        <Path RenderTransformOrigin="0,0" Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Width="18" Height="18" Data="M3 20.25a.75.75 0 0 0 1.5 0V3.75a.75.75 0 1 0-1.5 0v16.5ZM18.23 20.475c1.158.83 2.77.002 2.77-1.422V4.83c0-1.384-1.53-2.22-2.695-1.473l-10.47 6.716a1.75 1.75 0 0 0-.074 2.895l10.47 7.507Zm1.27-1.422a.25.25 0 0 1-.396.203l-10.47-7.507a.25.25 0 0 1 .011-.413l10.47-6.717a.25.25 0 0 1 .385.21v14.224Z"/>
+                    </Button>
+                    <Button Grid.Row="0" Grid.Column="1" x:Name="PlaybackPlay" Command="{x:Bind ViewModel.PlayCommand}" Width="54" Height="54" CornerRadius="27" Margin="18,0,18,0" VerticalAlignment="Center" Padding="0">
+                        <Path RenderTransformOrigin="0,0" Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Width="48" Height="48" Data="{x:Bind ViewModel.PlayButton, Mode=OneWay}"/>
+                    </Button>
+                    <Button Grid.Row="0" Grid.Column="2" x:Name="PlaybackBack" Command="{x:Bind ViewModel.PlayNextCommand}" Width="30" Height="30" CornerRadius="3" Background="Transparent" BorderThickness="0" Margin="0,0,18,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0">
+                        <Path RenderTransformOrigin="0,0" Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Width="18" Height="18" Data="M21 3.75a.75.75 0 0 0-1.5 0v16.5a.75.75 0 0 0 1.5 0V3.75ZM5.77 3.525C4.612 2.695 3 3.523 3 4.947V19.17c0 1.384 1.53 2.22 2.695 1.473l10.47-6.716a1.75 1.75 0 0 0 .074-2.895L5.77 3.525ZM4.5 4.947a.25.25 0 0 1 .396-.203l10.47 7.507a.25.25 0 0 1-.011.413l-10.47 6.717a.25.25 0 0 1-.385-.21V4.946Z"/>
+                    </Button>
+
+                </Grid>
+
+                <Grid Grid.Row="0" Grid.Column="2">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        
+                        <controls:WrapPanel Orientation="Horizontal" x:Name="PlaybackOptions" HorizontalSpacing="10" VerticalSpacing="6" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,48,0" Padding="12,0,0,4">
+                            <Button Width="24" Height="24" />
+                            <Button Width="24" Height="24" />
+                            <Button Width="24" Height="24" />
+                            <Button Width="24" Height="24" />
+                        </controls:WrapPanel>
+
+                        <Slider Orientation="Vertical" HorizontalAlignment="Right" Grid.Column="1" Margin="0,10,10,10"></Slider>
+
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+        </Grid>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1800" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="True" />
+                        <Setter Target="NaviView.PaneDisplayMode" Value="Left" />
+                        <Setter Target="NaviView.IsPaneOpen" Value="True" />
+                        <Setter Target="NaviView.OpenPaneLength" Value="320" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1008" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="True" />
+                        <Setter Target="NaviView.PaneDisplayMode" Value="Left" />
+                        <Setter Target="NaviView.IsPaneOpen" Value="True" />
+                        <Setter Target="NaviView.OpenPaneLength" Value="280" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="640" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="True" />
+                        <Setter Target="NaviView.PaneDisplayMode" Value="CompactLeft" />
+                        <Setter Target="NaviView.IsPaneOpen" Value="False" />
+                        <Setter Target="PlaybackOptions.Visibility" Value="Visible" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="340" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="True" />
+                        <Setter Target="NaviView.PaneDisplayMode" Value="CompactLeft" />
+                        <Setter Target="NaviView.IsPaneOpen" Value="False" />
+                        <Setter Target="PlaybackOptions.Visibility" Value="Collapsed" />
+                        <Setter Target="AlbumCoverAndSongTitle.Visibility" Value="Visible" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="True" />
+                        <Setter Target="NaviView.PaneDisplayMode" Value="CompactLeft" />
+                        <Setter Target="NaviView.IsPaneOpen" Value="False" />
+                        <Setter Target="AlbumCoverAndSongTitle.Visibility" Value="Collapsed" />
+                        <Setter Target="PlaybackOptions.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </Grid>
 </Page>

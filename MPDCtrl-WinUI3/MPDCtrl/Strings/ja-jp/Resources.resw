@@ -118,16 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AppDisplayName" xml:space="preserve">
-    <value>ZumenSearch</value>
+    <value>MPDCtrl</value>
   </data>
   <data name="AppDescription" xml:space="preserve">
-    <value>ZumenSearch</value>
+    <value>MPDCtrl</value>
   </data>
   <data name="Settings_Personalization.Text" xml:space="preserve">
     <value>Personalization</value>
-  </data>
-  <data name="Settings_Theme.Text" xml:space="preserve">
-    <value>Theme</value>
   </data>
   <data name="Settings_Theme_Light.Content" xml:space="preserve">
     <value>Light</value>
@@ -182,5 +179,56 @@
   </data>
   <data name="MenuTreeItem_Playlists" xml:space="preserve">
     <value>プレイリスト</value>
+  </data>
+  <data name="Settings_SystemBackdrop.Text" xml:space="preserve">
+    <value>ビジュアル効果</value>
+  </data>
+  <data name="Settings_SystemBackdrop_Acrylic.Content" xml:space="preserve">
+    <value>アクリル</value>
+  </data>
+  <data name="Settings_SystemBackdrop_Mica.Content" xml:space="preserve">
+    <value>マイカ</value>
+  </data>
+  <data name="Settings_SystemBackdrop_MicaAlt.Content" xml:space="preserve">
+    <value>マイカ (Alt)</value>
+  </data>
+  <data name="Settings_SystemBackdrop_None.Content" xml:space="preserve">
+    <value>なし</value>
+  </data>
+  <data name="Settings_Theme.Text" xml:space="preserve">
+    <value>テーマ</value>
+  </data>
+  <data name="QueuePage_SubTitle_SongCount" xml:space="preserve">
+    <value>{0}曲</value>
+  </data>
+  <data name="ListviewColumnHeader_Album.Text" xml:space="preserve">
+    <value>アルバム</value>
+  </data>
+  <data name="ListviewColumnHeader_Artist.Text" xml:space="preserve">
+    <value>アーティスト</value>
+  </data>
+  <data name="ListviewColumnHeader_Disc.Text" xml:space="preserve">
+    <value>ディスク</value>
+  </data>
+  <data name="ListviewColumnHeader_Genre.Text" xml:space="preserve">
+    <value>ジャンル</value>
+  </data>
+  <data name="ListviewColumnHeader_LastModified.Text" xml:space="preserve">
+    <value>最終更新日時</value>
+  </data>
+  <data name="ListviewColumnHeader_Time.Text" xml:space="preserve">
+    <value>時間</value>
+  </data>
+  <data name="ListviewColumnHeader_Title.Text" xml:space="preserve">
+    <value>タイトル</value>
+  </data>
+  <data name="ListviewColumnHeader_Track.Text" xml:space="preserve">
+    <value>トラック</value>
+  </data>
+  <data name="AlbumPage_SubTitle_AlbumCount" xml:space="preserve">
+    <value>{0}アルバム</value>
+  </data>
+  <data name="PageTitle_Queue.Text" xml:space="preserve">
+    <value>再生キュー</value>
   </data>
 </root>

@@ -12,7 +12,9 @@
     Closed="Window_Closed">
 
     <Window.SystemBackdrop>
-        <DesktopAcrylicBackdrop />
+        <!-- MicaBackdrop -->
+        <!-- DesktopAcrylicBackdrop -->
+        <MicaBackdrop />
     </Window.SystemBackdrop>
 
     <Grid>

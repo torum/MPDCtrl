@@ -4,13 +4,63 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:MPDCtrl.Views"
+    xmlns:xaml="using:Microsoft.UI.Xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:vm="using:MPDCtrl.ViewModels" 
+    d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
     mc:Ignorable="d"
     NavigationCacheMode="Required">
 
     <Grid>
-        <TextBlock Text="Settings Page"/>
 
+        <ScrollViewer>
+            <StackPanel Margin="24">
+
+                <TextBlock Text="Settings Page"/>
+                
+                <StackPanel>
+
+                    <StackPanel>
+
+                        <TextBlock x:Uid="Settings_Theme" Margin="0,0,0,12" />
+
+                        <RadioButton x:Uid="Settings_Theme_Light" IsEnabled="{x:Bind ViewModel.IsBackdropEnabled, Mode=OneWay}" Command="{x:Bind ViewModel.SwitchThemeCommand}" IsChecked="{x:Bind ViewModel.Theme, Converter={StaticResource ElementThemeEnumToBooleanConverter}, ConverterParameter=Light, Mode=OneWay}" FontSize="15" GroupName="AppTheme">
+                            <RadioButton.CommandParameter>
+                                <xaml:ElementTheme>Light</xaml:ElementTheme>
+                            </RadioButton.CommandParameter>
+                        </RadioButton>
+                        <RadioButton x:Uid="Settings_Theme_Dark" IsEnabled="{x:Bind ViewModel.IsBackdropEnabled, Mode=OneWay}" Command="{x:Bind ViewModel.SwitchThemeCommand}" IsChecked="{x:Bind ViewModel.Theme, Converter={StaticResource ElementThemeEnumToBooleanConverter}, ConverterParameter=Dark, Mode=OneWay}" FontSize="15" GroupName="AppTheme">
+                            <RadioButton.CommandParameter>
+                                <xaml:ElementTheme>Dark</xaml:ElementTheme>
+                            </RadioButton.CommandParameter>
+                        </RadioButton>
+                        <RadioButton x:Uid="Settings_Theme_Default" IsEnabled="True" Command="{x:Bind ViewModel.SwitchThemeCommand}" IsChecked="{x:Bind ViewModel.Theme, Converter={StaticResource ElementThemeEnumToBooleanConverter}, ConverterParameter=Default, Mode=OneWay}" FontSize="15" GroupName="AppTheme">
+                            <RadioButton.CommandParameter>
+                                <xaml:ElementTheme>Default</xaml:ElementTheme>
+                            </RadioButton.CommandParameter>
+                        </RadioButton>
+                    </StackPanel>
+
+                </StackPanel>
+
+                <StackPanel>
+
+                    <TextBlock x:Uid="Settings_SystemBackdrop" Margin="0,0,0,12"/>
+
+                    <StackPanel>
+
+                        <RadioButton x:Uid="Settings_SystemBackdrop_Acrylic" IsEnabled="{x:Bind ViewModel.IsAcrylicSupported,Mode=OneWay}" Command="{x:Bind ViewModel.SwitchSystemBackdropCommand}" CommandParameter="Acrylic" IsChecked="{x:Bind ViewModel.Material, Converter={StaticResource SystemBackdropEnumToBooleanConverter}, ConverterParameter=Acrylic, Mode=OneWay}" FontSize="15" GroupName="AppMaterial"/>
+                        <RadioButton x:Uid="Settings_SystemBackdrop_Mica" IsEnabled="{x:Bind ViewModel.IsMicaSupported,Mode=OneWay}" Command="{x:Bind ViewModel.SwitchSystemBackdropCommand}" CommandParameter="Mica" IsChecked="{x:Bind ViewModel.Material, Converter={StaticResource SystemBackdropEnumToBooleanConverter}, ConverterParameter=Mica, Mode=OneWay}" FontSize="15" GroupName="AppMaterial"/>
+                        <RadioButton x:Uid="Settings_SystemBackdrop_MicaAlt" IsEnabled="{x:Bind ViewModel.IsMicaSupported,Mode=OneWay}" Command="{x:Bind ViewModel.SwitchSystemBackdropCommand}" CommandParameter="MicaAlt" IsChecked="{x:Bind ViewModel.Material, Converter={StaticResource SystemBackdropEnumToBooleanConverter}, ConverterParameter=MicaAlt, Mode=OneWay}" FontSize="15" GroupName="AppMaterial"/>
+                        <RadioButton x:Uid="Settings_SystemBackdrop_None" IsEnabled="True" Command="{x:Bind ViewModel.SwitchSystemBackdropCommand}" CommandParameter="None" IsChecked="{x:Bind ViewModel.Material, Converter={StaticResource SystemBackdropEnumToBooleanConverter}, ConverterParameter=None, Mode=OneWay}" FontSize="15" GroupName="AppMaterial"/>
+
+                    </StackPanel>
+
+                </StackPanel>
+
+            </StackPanel>
+
+        </ScrollViewer>
     </Grid>
 </Page>

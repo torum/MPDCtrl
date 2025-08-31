@@ -8,8 +8,10 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
-using MPDCtrl.Views;
+using MPDCtrl.Services;
+using MPDCtrl.Services.Contracts;
 using MPDCtrl.ViewModels;
+using MPDCtrl.Views;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -37,26 +39,17 @@ public partial class App : Application
     public static string AppDataFolder { get; } = _envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
     public static string AppConfigFilePath { get; } = System.IO.Path.Combine(AppDataFolder, _appName + ".config");
 
+    // Temp album cover cache folder.
+    private static readonly string _envCacheFolder = System.IO.Path.GetTempPath();
+    public static string AppDataCacheFolder { get; } = System.IO.Path.Combine(_envCacheFolder, AppName + "_AlbumCoverCache");
+
     // DispatcherQueue
     private static readonly Microsoft.UI.Dispatching.DispatcherQueue _currentDispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
     public static Microsoft.UI.Dispatching.DispatcherQueue CurrentDispatcherQueue => _currentDispatcherQueue;
 
     // ErrorLog
-#if DEBUG
-    public bool IsSaveErrorLog = true;
-#else
-    public bool IsSaveErrorLog = false;
-#endif
-    public string LogFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl_errors.txt";
-    private readonly StringBuilder Errortxt = new();
+    private static readonly string _logFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl4_errors.txt";
 
-    //public const string BackdropSettingsKey = "AppSystemBackdropOption";
-    /*
-    public static UIElement? AppTitlebar
-    {
-        get; set;
-    }
-    */
     // MainWindow
     public static MainWindow? MainWnd
     {
@@ -100,17 +93,16 @@ public partial class App : Application
         UseContentRoot(AppContext.BaseDirectory).
         ConfigureServices((context, services) =>
         {
-            /*
-
             // Core Services
-            services.AddSingleton<IFileDialogService, FileDialogService>();
-            services.AddSingleton<IDataAccessService, DataAccessService>();
-            services.AddSingleton<IFeedClientService, FeedClientService>();
-            services.AddSingleton<IAutoDiscoveryService, AutoDiscoveryService>();
-            services.AddSingleton<IOpmlService, OpmlService>();
+            services.AddSingleton<IMpcService, MpcService>();
+            services.AddSingleton<IBinaryDownloader, BinaryDownloader>();
 
             // Views and ViewModels
-            */
+            services.AddSingleton<MainViewModel>();
+            services.AddSingleton<MainWindow>();
+            services.AddSingleton<ShellPage>();
+
+            // Pages
             services.AddSingleton<SettingsPage>();
             services.AddSingleton<QueuePage>();
             services.AddSingleton<AlbumsPage>();
@@ -118,10 +110,6 @@ public partial class App : Application
             services.AddSingleton<FilesPage>();
             services.AddSingleton<SearchPage>();
             services.AddTransient<PlaylistItemPage>();
-
-            services.AddSingleton<MainViewModel>();
-            services.AddSingleton<MainWindow>();
-            services.AddSingleton<ShellPage>();
 
             // Configuration
             //services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
@@ -207,8 +195,8 @@ public partial class App : Application
         }
 
         Debug.WriteLine("TaskScheduler_UnobservedTaskException: " + exception.Message);
-        //AppendErrorLog("TaskScheduler_UnobservedTaskException", exception.Message);
-        //SaveErrorLog();
+        AppendErrorLog("TaskScheduler_UnobservedTaskException", exception.Message);
+        SaveErrorLog();
 
         e.SetObserved();
     }
@@ -224,17 +212,19 @@ public partial class App : Application
         {
             // can ignore.
             Debug.WriteLine("CurrentDomain_UnhandledException (TaskCanceledException): " + exception.Message);
-            //AppendErrorLog("CurrentDomain_UnhandledException (TaskCanceledException)", exception.Message);
+            AppendErrorLog("CurrentDomain_UnhandledException (TaskCanceledException)", exception.Message);
         }
         else
         {
             Debug.WriteLine("CurrentDomain_UnhandledException: " + exception.Message);
-            //AppendErrorLog("CurrentDomain_UnhandledException", exception.Message);
-            //SaveErrorLog();
+            AppendErrorLog("CurrentDomain_UnhandledException", exception.Message);
+            SaveErrorLog();
         }
     }
-    /*
-    public void AppendErrorLog(string kindTxt, string errorTxt)
+
+    private static readonly StringBuilder Errortxt = new();
+
+    public static void AppendErrorLog(string kindTxt, string errorTxt)
     {
         Errortxt.AppendLine(kindTxt + ": " + errorTxt);
         var dt = DateTime.Now;
@@ -242,14 +232,9 @@ public partial class App : Application
         Errortxt.AppendLine("");
     }
 
-    public void SaveErrorLog()
+    public static void SaveErrorLog()
     {
-        if (!IsSaveErrorLog)
-        {
-            return;
-        }
-
-        if (string.IsNullOrEmpty(LogFilePath))
+        if (string.IsNullOrEmpty(_logFilePath))
         {
             return;
         }
@@ -263,11 +248,11 @@ public partial class App : Application
             var s = Errortxt.ToString();
             if (!string.IsNullOrEmpty(s))
             {
-                File.WriteAllText(LogFilePath, s);
+                File.WriteAllText(_logFilePath, s);
             }
         }
     }
-    */
+
     #endregion
 }
 

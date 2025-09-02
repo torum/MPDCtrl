@@ -173,7 +173,7 @@
                             <Button Width="24" Height="24" />
                         </controls:WrapPanel>
 
-                        <Slider Orientation="Vertical" HorizontalAlignment="Right" Grid.Column="1" Margin="0,10,10,10"></Slider>
+                        <Slider Orientation="Vertical" HorizontalAlignment="Right" Margin="0,10,10,10"></Slider>
 
                     </StackPanel>
                 </Grid>

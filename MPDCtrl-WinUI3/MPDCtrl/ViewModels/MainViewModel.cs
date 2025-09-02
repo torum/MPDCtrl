@@ -27,6 +27,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -646,6 +647,41 @@ public partial class MainViewModel : ObservableObject
 
             _time = value;
             OnPropertyChanged(nameof(Time));
+            OnPropertyChanged(nameof(TimeFormatted));
+        }
+    }
+
+    public string TimeFormatted
+    {
+        get
+        {
+            int sec, min, hour, s;
+
+            sec = Time / 10;
+
+            min = sec / 60;
+            s = sec % 60;
+            hour = min / 60;
+            min %= 60;
+            /*
+            if ((hour == 0) && min == 0)
+            {
+                _timeFormatted = String.Format("{0}", s);
+            }
+            else if ((hour == 0) && (min != 0))
+            {
+                _timeFormatted = String.Format("{0}:{1:00}", min, s);
+            }
+            else if ((hour != 0) && (min != 0))
+            {
+                _timeFormatted = String.Format("{0}:{1:00}:{2:00}", hour, min, s);
+            }
+            else if (hour != 0)
+            {
+                _timeFormatted = String.Format("{0}:{1:00}:{2:00}", hour, min, s);
+            }
+            */
+            return string.Format("{0}:{1:00}:{2:00}", hour, min, s);
         }
     }
 
@@ -662,6 +698,7 @@ public partial class MainViewModel : ObservableObject
             {
                 _elapsed = value;
                 OnPropertyChanged(nameof(Elapsed));
+                OnPropertyChanged(nameof(ElapsedFormatted));
 
                 // If we have a timer and we are in this event handler, a user is still interact with the slider
                 // we stop the timer
@@ -685,6 +722,24 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private string _elapsedFormatted = string.Empty;
+    public string ElapsedFormatted
+    {
+        get
+        {
+            int sec, min, hour, s;
+
+            sec = _elapsed / 10;
+
+            min = sec / 60;
+            s = sec % 60;
+            hour = min / 60;
+            min %= 60;
+
+            return _elapsedFormatted = String.Format("{0}:{1:00}:{2:00}", hour, min, s);
+        }
+    }
+
     private System.Timers.Timer? _elapsedDelayTimer = null;
     private void DoChangeElapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
@@ -703,6 +758,7 @@ public partial class MainViewModel : ObservableObject
         {
             _elapsed += 1;
             OnPropertyChanged(nameof(Elapsed));
+            OnPropertyChanged(nameof(ElapsedFormatted));
             //Debug.WriteLine($"ElapsedTimer: {_elapsed}/{_time}");
         }
         else
@@ -1203,6 +1259,156 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private string _infoBarInfoTitle = "";
+    public string InfoBarInfoTitle
+    {
+        get
+        {
+            return _infoBarInfoTitle;
+        }
+        set
+        {
+            _infoBarInfoTitle = value;
+            OnPropertyChanged(nameof(InfoBarInfoTitle));
+        }
+    }
+
+    private string _infoBarInfoMessage = "";
+    public string InfoBarInfoMessage
+    {
+        get
+        {
+            return _infoBarInfoMessage;
+        }
+        set
+        {
+            _infoBarInfoMessage = value;
+            OnPropertyChanged(nameof(InfoBarInfoMessage));
+        }
+    }
+
+    private bool _isShowInfoWindow;
+    public bool IsShowInfoWindow
+
+    {
+        get { return _isShowInfoWindow; }
+        set
+        {
+            if (_isShowInfoWindow == value)
+                return;
+
+            _isShowInfoWindow = value;
+
+            if (!_isShowInfoWindow)
+            {
+                InfoBarInfoTitle = string.Empty;
+                InfoBarInfoMessage = string.Empty;
+            }
+
+            OnPropertyChanged(nameof(IsShowInfoWindow));
+        }
+    }
+
+    private string _infoBarAckTitle = "";
+    public string InfoBarAckTitle
+    {
+        get
+        {
+            return _infoBarAckTitle;
+        }
+        set
+        {
+            _infoBarAckTitle = value;
+            OnPropertyChanged(nameof(InfoBarAckTitle));
+        }
+    }
+
+    private string _infoBarAckMessage = "";
+    public string InfoBarAckMessage
+    {
+        get
+        {
+            return _infoBarAckMessage;
+        }
+        set
+        {
+            _infoBarAckMessage = value;
+            OnPropertyChanged(nameof(InfoBarAckMessage));
+        }
+    }
+
+    private bool _isShowAckWindow;
+    public bool IsShowAckWindow
+
+    {
+        get { return _isShowAckWindow; }
+        set
+        {
+            if (_isShowAckWindow == value)
+                return;
+
+            _isShowAckWindow = value;
+
+            if (!_isShowAckWindow)
+            {
+                InfoBarAckTitle = string.Empty;
+                InfoBarAckMessage = string.Empty;
+            }
+
+            OnPropertyChanged(nameof(IsShowAckWindow));
+        }
+    }
+
+    private string _infoBarErrTitle = "";
+    public string InfoBarErrTitle
+    {
+        get
+        {
+            return _infoBarErrTitle;
+        }
+        set
+        {
+            _infoBarErrTitle = value;
+            OnPropertyChanged(nameof(InfoBarErrTitle));
+        }
+    }
+
+    private string _infoBarErrMessage = "";
+    public string InfoBarErrMessage
+    {
+        get
+        {
+            return _infoBarErrMessage;
+        }
+        set
+        {
+            _infoBarErrMessage = value;
+            OnPropertyChanged(nameof(InfoBarErrMessage));
+        }
+    }
+
+    private bool _isShowErrWindow;
+    public bool IsShowErrWindow
+
+    {
+        get { return _isShowErrWindow; }
+        set
+        {
+            if (_isShowErrWindow == value)
+                return;
+
+            _isShowErrWindow = value;
+
+            if (!_isShowErrWindow)
+            {
+                InfoBarErrTitle = string.Empty;
+                InfoBarErrMessage = string.Empty;
+            }
+
+            OnPropertyChanged(nameof(IsShowErrWindow));
+        }
+    }
+
     #endregion
 
     #region == Options ==
@@ -1479,7 +1685,12 @@ public partial class MainViewModel : ObservableObject
             {
                 // TODO::
                 ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
-                StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
+                //StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
+                
+                InfoBarAckTitle = "Error";
+                InfoBarAckMessage = "Could not retrive IP Address from the hostname.";
+                IsShowAckWindow = true;
+
                 return;
             }
         }
@@ -1487,7 +1698,12 @@ public partial class MainViewModel : ObservableObject
         {
             // TODO::
             ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
-            StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
+            //StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
+            
+            InfoBarAckTitle = "Error";
+            InfoBarAckMessage = "Could not retrive IP Address from the hostname.";
+            IsShowAckWindow = true;
+
             return;
         }
 
@@ -1645,20 +1861,28 @@ public partial class MainViewModel : ObservableObject
                                 //Debug.WriteLine("getting album cover. @UpdateStatus()");
                                 var res = await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
 
-                                if (res.AlbumCover?.SongFilePath == CurrentSong.File)
+                                if (res != null)
                                 {
-                                    if ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading))
+                                    if (res.IsSuccess && (res.AlbumCover?.SongFilePath != null) && (CurrentSong.File != null))
                                     {
-                                        App.CurrentDispatcherQueue?.TryEnqueue(() =>
+                                        if (res.AlbumCover?.SongFilePath == CurrentSong.File)
                                         {
-                                            AlbumCover = res.AlbumCover;
-                                            AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
-                                            //SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                        });
+                                            if ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading))
+                                            {
+                                                App.CurrentDispatcherQueue?.TryEnqueue(async () =>
+                                                {
+                                                    AlbumCover = res.AlbumCover;
+                                                    AlbumArtBitmapSource = await BitmapSourceFromByteArray(AlbumCover.BinaryData);
+                                                    //IsAlbumArtVisible = true;
+                                                    SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
+                                                });
+                                            }
+                                        }
+                                        CurrentSong.IsAlbumCoverNeedsUpdate = false;
                                     }
                                 }
 
-                                CurrentSong.IsAlbumCoverNeedsUpdate = false;
+                                //CurrentSong.IsAlbumCoverNeedsUpdate = false;
                             }
                         }
                     }
@@ -1765,10 +1989,10 @@ public partial class MainViewModel : ObservableObject
                 if (_mpc.MpdStatus.MpdState == Status.MpdPlayState.Play)
                 {
                     // no need to care about "double" updates for time.
-                    Time = Convert.ToInt32(_mpc.MpdStatus.MpdSongTime * 10);
-
-                    _elapsed = Convert.ToInt32(_mpc.MpdStatus.MpdSongElapsed * 10);
-
+                    Time = Convert.ToInt32(_mpc.MpdStatus.MpdSongTime);
+                    Time *= 10;
+                    _elapsed = Convert.ToInt32(_mpc.MpdStatus.MpdSongElapsed);
+                    _elapsed *= 10;
                     if (!_elapsedTimer.Enabled)
                         _elapsedTimer.Start();
                 }
@@ -1777,9 +2001,10 @@ public partial class MainViewModel : ObservableObject
                     _elapsedTimer.Stop();
 
                     // no need to care about "double" updates for time.
-                    Time = Convert.ToInt32(_mpc.MpdStatus.MpdSongTime * 10);
-
-                    _elapsed = Convert.ToInt32(_mpc.MpdStatus.MpdSongElapsed * 10);
+                    Time = Convert.ToInt32(_mpc.MpdStatus.MpdSongTime);
+                    Time *= 10;
+                    _elapsed = Convert.ToInt32(_mpc.MpdStatus.MpdSongElapsed);
+                    _elapsed *= 10;
                     OnPropertyChanged(nameof(Elapsed));
                 }
 
@@ -1839,17 +2064,16 @@ public partial class MainViewModel : ObservableObject
                             if (IsDownloadAlbumArt)
                             {
                                 var res = await _mpc.MpdQueryAlbumArt(_mpc.MpdCurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
-
-                                if (res.AlbumCover?.SongFilePath == _mpc.MpdCurrentSong.File)
+                                if ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading) && (res.AlbumCover?.SongFilePath != null))
                                 {
-                                    if ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading))
+                                    if (res.AlbumCover?.SongFilePath == _mpc.MpdCurrentSong.File)
                                     {
-                                        App.CurrentDispatcherQueue?.TryEnqueue(() =>
+                                        App.CurrentDispatcherQueue?.TryEnqueue(async () =>
                                         {
                                             AlbumCover = res.AlbumCover;
-                                            AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
-                                            
-                                            //SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
+                                            //AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
+                                            AlbumArtBitmapSource = await BitmapSourceFromByteArray(AlbumCover.BinaryData);
+                                            SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
                                         });
                                     }
                                 }
@@ -2563,10 +2787,12 @@ public partial class MainViewModel : ObservableObject
 
                         //Dispatcher.UIThread.Post(() =>
                         //{
-                        album.AlbumImage = r.AlbumCover.AlbumImageSource;
+                        //album.AlbumImage = r.AlbumCover.AlbumImageSource;
+                        album.AlbumImage = await BitmapSourceFromByteArray(r.AlbumCover.BinaryData);
+                        //
                         //});
 
-                        
+
                         if (r.AlbumCover.BinaryData is not null)
                         {
                             Directory.CreateDirectory(strDirPath);
@@ -2637,6 +2863,114 @@ public partial class MainViewModel : ObservableObject
         //IsBusy = false;
         //IsWorking = false;
 
+    }
+
+    private static async Task<BitmapImage?> BitmapSourceFromByteArray(byte[]? buffer)
+    {
+        if (buffer == null)
+        {
+            Debug.WriteLine("buffer == null) @BitmapSourceFromByteArray");
+            return null;
+        }
+
+        // Bug in MPD 0.23.5 
+        if (buffer?.Length <= 0)
+        {
+            Debug.WriteLine("if (buffer?.Length > 0) @BitmapSourceFromByteArray");
+
+            return null;
+        }
+
+        try
+        {
+            /*
+            SoftwareBitmap? softwareBitmap = null;
+
+            using (InMemoryRandomAccessStream stream = new InMemoryRandomAccessStream())
+            {
+                // Write the byte array to the stream
+                await stream.WriteAsync(buffer.AsBuffer());
+                stream.Seek(0); // Reset stream position to the beginning
+
+                // Create a BitmapDecoder from the stream
+                BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
+
+                // Get the SoftwareBitmap
+                softwareBitmap = await decoder.GetSoftwareBitmapAsync();
+            }
+
+            return softwareBitmap;
+            */
+
+            var bitmapImage = new BitmapImage();
+            using (var stream = new InMemoryRandomAccessStream())
+            {
+                // Write the byte array to the in-memory stream.
+                await stream.WriteAsync(buffer.AsBuffer());
+                stream.Seek(0); // Reset the stream position to the beginning.
+
+                // Set the BitmapImage source from the stream.
+                await bitmapImage.SetSourceAsync(stream);
+            }
+
+            return bitmapImage;
+        }
+        catch
+        {
+            Debug.WriteLine("Exception Bitmap.DecodeToWidth @BitmapSourceFromByteArray");
+
+        }
+
+        return null;
+    }
+
+    private static void SaveAlbumCoverImage(SongInfoEx? current, AlbumImage? album)
+    {
+        App.CurrentDispatcherQueue?.TryEnqueue(() =>
+        {
+            if ((current?.File) != (album?.SongFilePath))
+            {
+                Debug.WriteLine($"NOT ({current?.File} == {album?.SongFilePath})");
+                return;
+            }
+
+            // save album cover to cache.
+            var strAlbum = current?.Album ?? string.Empty;
+            if (!string.IsNullOrEmpty(strAlbum.Trim()))
+            {
+                var aat = current?.AlbumArtist.Trim();
+                if (string.IsNullOrEmpty(aat))
+                {
+                    aat = current?.Artist.Trim();
+                }
+                var strArtist = aat;
+                if (string.IsNullOrEmpty(strArtist))
+                {
+                    strArtist = "Unknown Artist";
+                }
+                strArtist = EscapeFilePathNames(strArtist).Trim();
+                strAlbum = EscapeFilePathNames(strAlbum).Trim();
+
+                string strDirPath = System.IO.Path.Combine(App.AppDataCacheFolder, strArtist);
+                string filePath = System.IO.Path.Combine(App.AppDataCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".bmp";
+                try
+                {
+                    Directory.CreateDirectory(strDirPath);
+                    //album?.AlbumImageSource?.Save(filePath, 100);
+                    if (album?.BinaryData is not null)
+                    {
+                        Directory.CreateDirectory(strDirPath);
+                        File.WriteAllBytes(filePath, album.BinaryData);
+                        //Debug.WriteLine($"SaveAlbumCoverImage: Successfully saved album art for {filePath}");
+                    }
+                    //Debug.WriteLine($"SaveAlbumCoverImage: saved album art {strArtist}, {strAlbum}");
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine("SaveAlbumCoverImage: Exception while saving album art: " + e.Message);
+                }
+            }
+        });
     }
 
     private static string EscapeFilePathNames(string str)

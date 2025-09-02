@@ -901,13 +901,13 @@ public class BinaryDownloader : IBinaryDownloader
                 if (albm.BinaryData is not null)
                 {
                     //_albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
-                    b.AlbumCover.AlbumImageSource = await BitmapSourceFromByteArray(albm.BinaryData);
+                    //b.AlbumCover.AlbumImageSource = await BitmapSourceFromByteArray(albm.BinaryData);
 
                     // For winui3
                     b.AlbumCover.BinaryData = albm.BinaryData;
+                    albm.IsSuccess = true;
                 }
-
-                //if (_albumCover.AlbumImageSource is not null)
+                /*
                 if (b.AlbumCover.AlbumImageSource is not null)
                 {
                     albm.IsSuccess = true;
@@ -917,6 +917,7 @@ public class BinaryDownloader : IBinaryDownloader
                     Debug.WriteLine("_albumCover.IsSuccess == false; BitmaSourceFromByteArray@MpdQueryAlbumArt");
                     albm.IsSuccess = false;
                 }
+                */
 
                 albm.IsDownloading = false;
 
@@ -949,14 +950,14 @@ public class BinaryDownloader : IBinaryDownloader
                             */
                             if (albm.BinaryData is not null)
                             {
-                                //_albumCover.AlbumImageSource = BitmaSourceFromByteArray(_albumCover.BinaryData);
-                                b.AlbumCover.AlbumImageSource = await BitmapSourceFromByteArray(albm.BinaryData);
+                                //b.AlbumCover.AlbumImageSource = await BitmapSourceFromByteArray(albm.BinaryData);
 
                                 // For winui3
                                 b.AlbumCover.BinaryData = albm.BinaryData;
+                                albm.IsSuccess = true;
                             }
 
-                            //if (_albumCover.AlbumImageSource is not null)
+                            /*
                             if (b.AlbumCover.AlbumImageSource is not null)
                             {
                                 albm.IsSuccess = true;
@@ -967,6 +968,7 @@ public class BinaryDownloader : IBinaryDownloader
                                 Debug.WriteLine("BitmaSourceFromByteArray(_albumCover.BinaryData) returned null.");
                                 albm.IsSuccess = false;
                             }
+                            */
                             albm.IsDownloading = false;
 
                             r = true;
@@ -1061,74 +1063,6 @@ public class BinaryDownloader : IBinaryDownloader
     private static int CompareVersionString(string a, string b)
     {
         return (new System.Version(a)).CompareTo(new System.Version(b));
-    }
-
-    //private static readonly System.Threading.SemaphoreSlim _semaphore = new(1, 1);
-
-    private static async Task<BitmapImage?> BitmapSourceFromByteArray(byte[] buffer)
-    {
-        // Bug in MPD 0.23.5 
-        if (buffer?.Length <= 0)
-        {
-            Debug.WriteLine("if (buffer?.Length > 0) @BitmapSourceFromByteArray");
-
-            return null;
-        }
-
-        if (buffer == null)
-        {
-            Debug.WriteLine("buffer == null) @BitmapSourceFromByteArray");
-            return null;
-        }
-
-        //await _semaphore.WaitAsync();
-
-        try
-        {
-            /*
-            SoftwareBitmap? softwareBitmap = null;
-
-            using (InMemoryRandomAccessStream stream = new InMemoryRandomAccessStream())
-            {
-                // Write the byte array to the stream
-                await stream.WriteAsync(buffer.AsBuffer());
-                stream.Seek(0); // Reset stream position to the beginning
-
-                // Create a BitmapDecoder from the stream
-                BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
-
-                // Get the SoftwareBitmap
-                softwareBitmap = await decoder.GetSoftwareBitmapAsync();
-            }
-
-            return softwareBitmap;
-            */
-
-            var bitmapImage = new BitmapImage();
-            using (var stream = new InMemoryRandomAccessStream())
-            {
-                // Write the byte array to the in-memory stream.
-                await stream.WriteAsync(buffer.AsBuffer());
-                stream.Seek(0); // Reset the stream position to the beginning.
-
-                // Set the BitmapImage source from the stream.
-                await bitmapImage.SetSourceAsync(stream);
-            }
-
-            return bitmapImage;
-        }
-        catch
-        {
-            Debug.WriteLine("Exception Bitmap.DecodeToWidth @BitmapSourceFromByteArray");
-
-        }
-        finally
-        {
-            //_semaphore.Release();
-
-        }
-
-        return null;
     }
 
     public void MpdBinaryConnectionDisconnect()

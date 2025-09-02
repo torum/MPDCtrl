@@ -66,6 +66,12 @@ public static class ListViewBehavior
                         UpdateVisibleItems(listView, scrollViewer);
                     };
 
+                    scrollViewer.SizeChanged += (sender, eventArgs) =>
+                    {
+                        //UpdateVisibleItems(listView, scrollViewer, newCollection);
+                        UpdateVisibleItems(listView, scrollViewer);
+                    };
+
                     //UpdateVisibleItems(listView, scrollViewer, newCollection);
                     UpdateVisibleItems(listView, scrollViewer);
                 }

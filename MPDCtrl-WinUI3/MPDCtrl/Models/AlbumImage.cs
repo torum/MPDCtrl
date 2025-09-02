@@ -17,5 +17,6 @@ public class AlbumImage
 
     public int BinarySize { get; set; }
 
-    public BitmapImage? AlbumImageSource { get; set; }
+    // Let's remove this because WinUI3's bitmap is kind of messed up. Use ByteArray directly. It's easier and simpler when saving to a file.
+    //public BitmapImage? AlbumImageSource { get; set; }
 }

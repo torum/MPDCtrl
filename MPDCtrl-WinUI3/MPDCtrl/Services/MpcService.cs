@@ -1480,6 +1480,8 @@ public partial class MpcService : IMpcService
             bool isAck = false;
             string ackText = "";
             bool isNullReturn = false;
+            bool isErr = false;
+            string errText = "";
 
             while (true)
             {
@@ -1489,7 +1491,7 @@ public partial class MpcService : IMpcService
                 {
                     if (line.StartsWith("ACK"))
                     {
-                        Debug.WriteLine("ACK line @MpdSendCommand: " + cmd.Trim() + " and " + line);
+                        Debug.WriteLine("ACK line @MpdCommandSendCommand: " + cmd.Trim() + " and " + line);
 
                         if (!string.IsNullOrEmpty(line))
                             stringBuilder.Append(line + "\n");
@@ -1499,6 +1501,17 @@ public partial class MpcService : IMpcService
                         isAck = true;
 
                         break;
+                    }
+                    else if (line.StartsWith("error"))
+                    {
+                        Debug.WriteLine("Error line @MpdCommandSendCommand: " + cmd.Trim() + " and " + line);
+
+                        isErr = true;
+                        errText = line;
+                        ret.ErrorMessage = line;
+
+                        if (!string.IsNullOrEmpty(line))
+                            stringBuilder.Append(line + "\n");
                     }
                     else if (line.StartsWith("OK"))
                     {
@@ -1623,7 +1636,14 @@ public partial class MpcService : IMpcService
                 Task nowait = Task.Run(() => DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n"));
 
                 if (isAck)
+                {
                     nowait = Task.Run(() => MpdAckError?.Invoke(this, ackText, "Command"));
+                }
+
+                if (isErr)
+                {
+                    nowait = Task.Run(() => MpdFatalError?.Invoke(this, errText, "Command"));
+                }
 
                 ret.ResultText = stringBuilder.ToString();
 
@@ -1967,7 +1987,6 @@ public partial class MpcService : IMpcService
         {
             try
             {
-
                 res = await _binaryDownloader.MpdQueryAlbumArt(uri, isUsingReadpicture);
 
                 if (res.IsSuccess)
@@ -1994,34 +2013,6 @@ public partial class MpcService : IMpcService
                     //await Task.Delay(200);
                     MpdAlbumArtChanged?.Invoke(this);
 
-                    if (res.IsTimeOut)
-                    {
-                        if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
-                        {
-
-                            Debug.WriteLine("MpdQueryAlbumArt@Timeout. Disconnecting...");
-                            IsBusy?.Invoke(this, false);
-
-                            return res;
-                        }
-                        else
-                        {
-                            DebugCommandOutput?.Invoke(this, "MpdQueryAlbumArt@Timeout. Reconnecting...");
-                            // re-connect
-                            var b = await _binaryDownloader.MpdBinaryConnectionStart(MpdHost, MpdPort, MpdPassword);
-                            if (b)
-                            {
-                                DebugCommandOutput?.Invoke(this, "MpdQueryAlbumArt@Timeout. Reconnecting success.");
-                                Debug.WriteLine("MpdQueryAlbumArt@Timeout. Reconnecting success.");
-                                // retry for the timeout.
-                                return await MpdQueryAlbumArt(uri, isUsingReadpicture);
-                            }
-                            else
-                            {
-                                Debug.WriteLine("MpdQueryAlbumArt@Timeout. Reconnecting failed.");
-                            }
-                        }
-                    }
                     /*
                     App.CurrentDispatcherQueue?.TryEnqueue(() =>
                     {
@@ -2042,6 +2033,35 @@ public partial class MpcService : IMpcService
             res.ErrorMessage = "WaitAsync failed. @MpdQueryAlbumArt";
         }
 
+        if ((!res.IsSuccess) && res.IsTimeOut)
+        {
+            if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
+            {
+                Debug.WriteLine("MpdQueryAlbumArt@Timeout. Disconnecting...");
+                IsBusy?.Invoke(this, false);
+
+                return res;
+            }
+            else
+            {
+                DebugCommandOutput?.Invoke(this, "MpdQueryAlbumArt@Timeout. Reconnecting...");
+                // re-connect
+                var b = await _binaryDownloader.MpdBinaryConnectionStart(MpdHost, MpdPort, MpdPassword);
+                if (b)
+                {
+                    DebugCommandOutput?.Invoke(this, "MpdQueryAlbumArt@Timeout. Reconnecting success.");
+                    Debug.WriteLine("MpdQueryAlbumArt@Timeout. Reconnecting success.");
+                    // retry for the timeout.
+                    //_semaphoreBinary.Release();
+                    return await MpdQueryAlbumArt(uri, isUsingReadpicture);
+                }
+                else
+                {
+                    Debug.WriteLine("MpdQueryAlbumArt@Timeout. Reconnecting failed.");
+                }
+            }
+        }
+
         return res;
     }
 
@@ -2055,7 +2075,7 @@ public partial class MpcService : IMpcService
             return res;
         }
 
-        if (await _semaphoreBinary.WaitAsync(TimeSpan.FromSeconds(3)))
+        if (await _semaphoreBinary.WaitAsync(TimeSpan.FromSeconds(2)))
         {
             try
             {
@@ -2096,6 +2116,7 @@ public partial class MpcService : IMpcService
                                 Debug.WriteLine("MpdQueryAlbumArt@Timeout. Reconnecting success.");
                                 DebugCommandOutput?.Invoke(this, "MpdQueryAlbumArt@Timeout. Reconnecting success.");
                                 // retry for the timeout.
+                                //_semaphoreBinary.Release();
                                 return await MpdQueryAlbumArtForAlbumView(uri, isUsingReadpicture);
                             }
                             else

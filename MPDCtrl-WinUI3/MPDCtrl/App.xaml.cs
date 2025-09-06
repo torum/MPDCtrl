@@ -43,9 +43,6 @@ public partial class App : Application
     private static readonly string _envCacheFolder = System.IO.Path.GetTempPath();
     public static string AppDataCacheFolder { get; } = System.IO.Path.Combine(_envCacheFolder, AppName + "_AlbumCoverCache");
 
-    // DispatcherQueue
-    private static readonly Microsoft.UI.Dispatching.DispatcherQueue _currentDispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
-    public static Microsoft.UI.Dispatching.DispatcherQueue CurrentDispatcherQueue => _currentDispatcherQueue;
 
     // ErrorLog
     private static readonly string _logFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl4_errors.txt";
@@ -116,12 +113,10 @@ public partial class App : Application
         }).
         Build();
 
-
         Microsoft.UI.Xaml.Application.Current.UnhandledException += App_UnhandledException;
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
     }
-
 
     protected async override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
@@ -159,7 +154,7 @@ public partial class App : Application
 
     private void App_Activated(object? sender, Microsoft.Windows.AppLifecycle.AppActivationArguments e)
     {
-        CurrentDispatcherQueue?.TryEnqueue(() =>
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
             MainWnd?.Activate();
             // TODO:

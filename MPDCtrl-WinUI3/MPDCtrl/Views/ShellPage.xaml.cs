@@ -30,17 +30,24 @@ public sealed partial class ShellPage : Page
     public ShellPage()
     {
         ViewModel = App.GetService<MainViewModel>();
+        
+        //DataContext = ViewModel;
 
         InitializeComponent();
 
-        NavigationFrame.Content = App.GetService<QueuePage>();
-        //NavigationFrame.Navigate(typeof(QueuePage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom });
-        _currentPage = typeof(QueuePage);
+        //NavigationFrame.Content = App.GetService<QueuePage>(); <- not good because this create instance addition to navigation view.
+        if (NavigationFrame.Navigate(typeof(QueuePage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
+        {
+            _currentPage = typeof(QueuePage);
+        }
 
         this.ActualThemeChanged += this.This_ActualThemeChanged;
+
+        //
+        ViewModel.StartMPC();
     }
 
-    public void InitWhenMainWindowIsReady(MainWindow wnd)
+    public void CallMeWhenMainWindowIsReady(MainWindow wnd)
     {
         wnd.SetTitleBar(AppTitleBar);
     }
@@ -127,6 +134,11 @@ public sealed partial class ShellPage : Page
         }
         */
 
+        if (_currentPage is null)
+        {
+            return;
+        }
+
         if (args.InvokedItemContainer.Tag is not string tag || string.IsNullOrWhiteSpace(tag))
         {
             Debug.WriteLine("NavigationViewControl_ItemInvoked: Invalid tag or null.");
@@ -202,5 +214,38 @@ public sealed partial class ShellPage : Page
             }
         }
 
+    }
+
+    private void NaviView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+    {
+        if (sender is null)
+        {
+            return;
+        }
+
+        if (ViewModel is not MainViewModel vm)
+        {
+            return;
+        }
+
+        if (args.SelectedItem is NodeMenuPlaylists)
+        {
+            // don't change page here.
+        }
+        else if (args.SelectedItem is NodeMenuLibrary)
+        {
+            // don't change page here.
+        }
+        else
+        {
+            if (args.SelectedItem is not null)
+            {
+                vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
+            }
+            else
+            {
+                vm.SelectedNodeMenu = null;
+            }
+        }
     }
 }

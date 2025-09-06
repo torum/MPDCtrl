@@ -231,4 +231,52 @@
   <data name="PageTitle_Queue.Text" xml:space="preserve">
     <value>再生キュー</value>
   </data>
+  <data name="PageTitle_Search.Text" xml:space="preserve">
+    <value>検索</value>
+  </data>
+  <data name="PageTitle_Albums.Text" xml:space="preserve">
+    <value>アルバム</value>
+  </data>
+  <data name="PageTitle_Artists.Text" xml:space="preserve">
+    <value>アーティスト</value>
+  </data>
+  <data name="PageTitle_Files.Text" xml:space="preserve">
+    <value>ファイル</value>
+  </data>
+  <data name="PageTitle_Playlists.Text" xml:space="preserve">
+    <value>プレイリスト</value>
+  </data>
+  <data name="PageTitle_Settings.Text" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="FilesPage_SubTitle_FileCount" xml:space="preserve">
+    <value>{0}ファイル</value>
+  </data>
+  <data name="PlaylistPage_SubTitle_SongCount" xml:space="preserve">
+    <value>{0}曲</value>
+  </data>
+  <data name="SearchTag_Any" xml:space="preserve">
+    <value>すべて</value>
+  </data>
+  <data name="SearchTag_Title" xml:space="preserve">
+    <value>タイトル</value>
+  </data>
+  <data name="SearchPage_SubTitle_ResultCount" xml:space="preserve">
+    <value>{0}件</value>
+  </data>
+  <data name="SearchTag_Genre" xml:space="preserve">
+    <value>ジャンル</value>
+  </data>
+  <data name="SearchTag_Album" xml:space="preserve">
+    <value>アルバム</value>
+  </data>
+  <data name="SearchTag_Artist" xml:space="preserve">
+    <value>アーティスト</value>
+  </data>
+  <data name="Search_Shiki_Contains" xml:space="preserve">
+    <value>含む</value>
+  </data>
+  <data name="Search_Shiki_Equals" xml:space="preserve">
+    <value>同じ</value>
+  </data>
 </root>

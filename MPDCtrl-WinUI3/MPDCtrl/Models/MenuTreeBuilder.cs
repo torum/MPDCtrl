@@ -180,6 +180,20 @@ public partial class MenuTreeBuilder : NodeTree
         Children.Add(queue);
         _queueDirectory = queue;
 
+
+        str = resourceLoader.GetString("MenuTreeItem_Search");
+        NodeMenuSearch search = new(str)
+        {
+            Tag = "search",
+            Selected = false,
+            Expanded = false,
+
+            Parent = this
+        };
+        Children.Add(search);
+        _searchDirectory = search;
+
+
         str = resourceLoader.GetString("MenuTreeItem_Library");
         NodeMenuLibrary browse = new(str)
         {
@@ -192,31 +206,20 @@ public partial class MenuTreeBuilder : NodeTree
         Children.Add(browse);
         _libraryDirectory = browse;
 
-        str = resourceLoader.GetString("MenuTreeItem_Search");
-        NodeMenuSearch search = new(str)
+
+        str = resourceLoader.GetString("MenuTreeItem_Albums");
+        NodeMenuAlbum albums = new(str)
         {
-            Tag = "search",
+            Tag = "albums",
             Selected = false,
             Expanded = false,
 
             Parent = this
         };
-        browse.Children.Add(search);
-        //Children.Add(search);
-        _searchDirectory = search;
+        browse.Children.Add(albums);
+        //Children.Add(albums);
+        _albumsDirectory = albums;
 
-        str = resourceLoader.GetString("MenuTreeItem_Files");
-        NodeMenuFiles files = new(str)
-        {
-            Tag = "files",
-            Selected = false,
-            Expanded = false,
-
-            Parent = this
-        };
-        browse.Children.Add(files);
-        //Children.Add(files);
-        _filesDirectory = files;
 
         str = resourceLoader.GetString("MenuTreeItem_Artists");
         NodeMenuArtist artists = new(str)
@@ -231,18 +234,20 @@ public partial class MenuTreeBuilder : NodeTree
         //Children.Add(artists);
         _artistsDirectory = artists;
 
-        str = resourceLoader.GetString("MenuTreeItem_Albums");
-        NodeMenuAlbum albums = new(str)
+
+        str = resourceLoader.GetString("MenuTreeItem_Files");
+        NodeMenuFiles files = new(str)
         {
-            Tag = "albums",
+            Tag = "files",
             Selected = false,
             Expanded = false,
 
             Parent = this
         };
-        browse.Children.Add(albums);
-        //Children.Add(albums);
-        _albumsDirectory = albums;
+        browse.Children.Add(files);
+        //Children.Add(files);
+        _filesDirectory = files;
+
 
         str = resourceLoader.GetString("MenuTreeItem_Playlists");
         NodeMenuPlaylists playlists = new(str)

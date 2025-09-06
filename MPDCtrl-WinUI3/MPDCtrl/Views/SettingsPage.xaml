@@ -17,7 +17,7 @@
         <ScrollViewer>
             <StackPanel Margin="24">
 
-                <TextBlock Text="Settings Page"/>
+                <TextBlock x:Uid="PageTitle_Settings"/>
                 
                 <StackPanel>
 

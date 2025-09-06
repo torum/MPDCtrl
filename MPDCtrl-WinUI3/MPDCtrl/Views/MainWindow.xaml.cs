@@ -28,6 +28,10 @@ namespace MPDCtrl.Views;
 
 public sealed partial class MainWindow : Window
 {
+    // DispatcherQueue
+    private Microsoft.UI.Dispatching.DispatcherQueue? _currentDispatcherQueue;// = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+    public Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue => _currentDispatcherQueue;
+
     // Window position and size
     // TODO: Change this lator.1920x1080
     private int winRestoreWidth = 1024;//1024;
@@ -40,6 +44,8 @@ public sealed partial class MainWindow : Window
 
     public MainWindow()
     {
+        _currentDispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+
         if (this.AppWindow.Presenter is OverlappedPresenter presenter)
         {
             presenter.PreferredMinimumWidth = 500;
@@ -64,7 +70,7 @@ public sealed partial class MainWindow : Window
             //TitleBarHelper.UpdateTitleBar(theme, this);
             SetCapitionButtonColorForWin11();
 
-            root.InitWhenMainWindowIsReady(this);
+            root.CallMeWhenMainWindowIsReady(this);
         }
     }
 
@@ -454,6 +460,9 @@ public sealed partial class MainWindow : Window
 
     private void Window_Closed(object sender, WindowEventArgs args)
     {
+        // For some stupid reason, we needed this, otherwise we get COM error.
+        _currentDispatcherQueue = null;
+
         SaveSettings();
     }
 

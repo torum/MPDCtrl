@@ -5,51 +5,132 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:MPDCtrl.Views"
     xmlns:mod="using:MPDCtrl.Models"
+    xmlns:vm="using:MPDCtrl.ViewModels"
     xmlns:helper="using:MPDCtrl.Helpers"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:animations="using:CommunityToolkit.WinUI.Animations"
+    xmlns:triggers="using:CommunityToolkit.WinUI"
+    d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
     mc:Ignorable="d"
     NavigationCacheMode="Required">
+    <Page.Resources>
+        <animations:ImplicitAnimationSet x:Name="ShowTransitions">
+            <animations:OffsetAnimation EasingMode="EaseOut" From="0,24,0" To="0" Duration="0:0:0.4" />
+            <animations:OpacityAnimation EasingMode="EaseOut" From="0" To="1" Duration="0:0:0.2" />
+        </animations:ImplicitAnimationSet>
+        <animations:ImplicitAnimationSet x:Name="HideTransitions">
+            <animations:OffsetAnimation EasingMode="EaseOut" From="0" To="0,24,0" Duration="0:0:0.2" />
+            <animations:OpacityAnimation EasingMode="EaseOut" From="1" To="0" Duration="0:0:0.1" />
+        </animations:ImplicitAnimationSet>
+    </Page.Resources>
+    <Grid x:Name="ContentGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-    <Grid>
-        <ListView x:Name="AlbumListView" ItemsSource="{x:Bind ViewModel.Albums}" helper:ListViewBehavior.VisibleItems="{x:Bind ViewModel.VisibleItemsAlbumsEx, Mode=TwoWay}" SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <ListView.Resources>
-                <x:Boolean x:Key="ListViewItemSelectionIndicatorVisualEnabled">False</x:Boolean>
-            </ListView.Resources>
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsWrapGrid Orientation="Horizontal"></ItemsWrapGrid>
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="mod:AlbumEx">
-                    <Grid Width="210" Height="226">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="184"/>
-                            <RowDefinition Height="42"/>
-                        </Grid.RowDefinitions>
-                        <Border Grid.Row="0" CornerRadius="6" Width="184" Height="184" VerticalAlignment="Top" Background="Pink" PointerEntered="Border_PointerEntered" PointerExited="Border_PointerExited">
-                            <Image Stretch="UniformToFill" Source="{x:Bind AlbumImage, Mode=OneWay}" Width="184" Height="184"/>
-                        </Border>
-                        <StackPanel Grid.Row="1">
-                            <TextBlock Text="{x:Bind Name, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="16,6,16,0"/>
-                            <TextBlock Text="{x:Bind AlbumArtist, Mode=OneWay}" Opacity="0.6" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="16,0,16,0"/>
-                        </StackPanel>
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-            <ListView.ItemContainerStyle>
-                <Style BasedOn="{StaticResource DefaultListViewItemStyle}" TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    <Setter Property="VerticalAlignment" Value="Top" />
-                    <Setter Property="Height" Value="260" />
-                    <Setter Property="Width" Value="230" />
-                    <Setter Property="Padding" Value="10,10,10,0" />
-                    <Setter Property="Margin" Value="6,12,6,12" />
-                </Style>
-            </ListView.ItemContainerStyle>
-        </ListView>
+        <Border Grid.Row="0" x:Name="HeaderGrid" Margin="24,0,24,0">
+            <TextBlock x:Uid="PageTitle_Albums" FontSize="{StaticResource FontSizePageTitle}" FontWeight="SemiBold"/>
+        </Border>
 
+        <Grid Grid.Row="1" x:Name="BodyGrid" Margin="24,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="1">
+                <ListView x:Name="AlbumListView" ItemsSource="{x:Bind ViewModel.Albums}" helper:ListViewBehavior.VisibleItems="{x:Bind ViewModel.VisibleItemsAlbumsEx, Mode=TwoWay}" SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                        animations:Implicit.HideAnimations="{StaticResource HideTransitions}" animations:Implicit.ShowAnimations="{StaticResource ShowTransitions}" IsMultiSelectCheckBoxEnabled="False" Padding="0,0,24,0">
+                    <ListView.Resources>
+                        <x:Boolean x:Key="ListViewItemSelectionIndicatorVisualEnabled">False</x:Boolean>
+                    </ListView.Resources>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid Orientation="Horizontal"></ItemsWrapGrid>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="mod:AlbumEx">
+                            <Grid Width="210" Height="226">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="184"/>
+                                    <RowDefinition Height="42"/>
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" x:Name="AlbumCoverBackground" CornerRadius="6" Width="184" Height="184" VerticalAlignment="Top" Background="{ThemeResource SmokeFillColorDefaultBrush}" Opacity="0.1">
+                                    <Path Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Opacity="0.6" Width="100" Height="100" Data="M12 15.5q1.471 0 2.486-1.014Q15.5 13.47 15.5 12t-1.014-2.485T12 8.5T9.515 9.515T8.5 12t1.015 2.486T12 15.5m0-2.5q-.425 0-.712-.288T11 12t.288-.712T12 11t.713.288T13 12t-.288.713T12 13m.003 8q-1.867 0-3.51-.708q-1.643-.709-2.859-1.924t-1.925-2.856T3 12.003t.709-3.51Q4.417 6.85 5.63 5.634t2.857-1.925T11.997 3t3.51.709q1.643.708 2.859 1.922t1.925 2.857t.709 3.509t-.708 3.51t-1.924 2.859t-2.856 1.925t-3.509.709M12 20q3.35 0 5.675-2.325T20 12t-2.325-5.675T12 4T6.325 6.325T4 12t2.325 5.675T12 20m0-8"/>
+                                </Border>
+                                <Border Grid.Row="0" x:Name="AlbumCover" CornerRadius="6" Width="184" Height="184" VerticalAlignment="Top" Background="{ThemeResource LayerFillColorAltBrush}" PointerEntered="Border_PointerEntered" PointerExited="Border_PointerExited">
+                                    <Image Stretch="UniformToFill" Source="{x:Bind AlbumImage, Mode=OneWay}" Width="184" Height="184"/>
+                                </Border>
+                                <StackPanel Grid.Row="1">
+                                    <TextBlock Text="{x:Bind Name, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="16,6,16,0"/>
+                                    <TextBlock Text="{x:Bind AlbumArtist, Mode=OneWay}" Opacity="0.6" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="16,0,16,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style BasedOn="{StaticResource DefaultListViewItemStyle}" TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="VerticalAlignment" Value="Top" />
+                            <Setter Property="Height" Value="260" />
+                            <Setter Property="Width" Value="230" />
+                            <Setter Property="Padding" Value="10,10,10,0" />
+                            <Setter Property="Margin" Value="6,12,6,12" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+            </Grid>
+
+        </Grid>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1008" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="HeaderGrid.Margin" Value="48,0,48,0" />
+                        <Setter Target="BodyGrid.Margin" Value="20,0,0,0" />
+                        <Setter Target="AlbumListView.Padding" Value="0,0,12,0" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="640" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="HeaderGrid.Margin" Value="24,0,24,0" />
+                        <Setter Target="BodyGrid.Margin" Value="0,0,0,0" />
+                        <Setter Target="AlbumListView.Padding" Value="0,0,12,0" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="340" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="HeaderGrid.Margin" Value="16,0,16,0" />
+                        <Setter Target="BodyGrid.Margin" Value="0,0,0,0" />
+                        <Setter Target="AlbumListview.Padding" Value="0,0,12,0" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="HeaderGrid.Margin" Value="16,0,16,0" />
+                        <Setter Target="BodyGrid.Margin" Value="0,0,0,0" />
+                        <Setter Target="AlbumListview.Padding" Value="0,0,12,0" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </Grid>
 </Page>

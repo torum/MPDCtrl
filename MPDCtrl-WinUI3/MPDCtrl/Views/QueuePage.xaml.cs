@@ -11,17 +11,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using System.Diagnostics;
+using MPDCtrl.Models;
 
 namespace MPDCtrl.Views;
 
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
 public sealed partial class QueuePage : Page
 {
     public MainViewModel ViewModel
@@ -34,5 +31,51 @@ public sealed partial class QueuePage : Page
         ViewModel = App.GetService<MainViewModel>();
 
         InitializeComponent();
+
+        ViewModel.ScrollIntoView += (sender, arg) => { this.OnScrollIntoView(arg); };
+        ViewModel.ScrollIntoViewAndSelect += (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
+    }
+
+    private void OnScrollIntoView(object obj)
+    {
+        if (obj == null) { return; }
+        /*
+        await Task.Yield();
+        await Task.Delay(100); // Wait for UI to update
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        {
+            if (this.QueueListview is ListView lb)
+            {
+                //lb.AutoScrollToSelectedItem = true;
+                lb.ScrollIntoView(ind);
+            }
+        });
+        */
+        if (this.QueueListview is ListView lb)
+        {
+            lb.ScrollIntoView(obj, ScrollIntoViewAlignment.Leading);
+        }
+    }
+
+    private async void OnScrollIntoViewAndSelect(object obj)
+    {
+        await Task.Yield();
+        await Task.Delay(800); // Need to wait for UI to update
+        /*
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        {
+
+        });
+        */
+        if (this.QueueListview is ListView lb)
+        {
+            lb.ScrollIntoView(obj, ScrollIntoViewAlignment.Leading);
+
+            if (obj is SongInfoEx song)
+            {
+                //song.IsSelected = true; This won't work in Winui3?
+                lb.SelectedItem = song;
+            }
+        }
     }
 }

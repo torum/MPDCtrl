@@ -30,7 +30,7 @@ public static class ListViewBehavior
         "VisibleItems",
         typeof(ObservableCollection<object>),
         typeof(ListViewBehavior),
-        new PropertyMetadata(null, OnVisibleItemsChanged));
+        new PropertyMetadata(null, OnPropertyChanged));
 
     // Get accessor for the attached property
     public static ObservableCollection<object> GetVisibleItems(DependencyObject obj)
@@ -45,7 +45,7 @@ public static class ListViewBehavior
     }
 
     // This is called when the property is set in XAML.
-    private static void OnVisibleItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is not ListView listView)
         {
@@ -55,6 +55,8 @@ public static class ListViewBehavior
         //if (e.NewValue is ObservableCollection<object> newCollection && e.OldValue == null)
         if (e.OldValue == null)
         {
+            //Debug.WriteLine("listView.Loaded @OnVisibleItemsChanged");
+            
             listView.Loaded += (s, args) =>
             {
                 var scrollViewer = FindScrollViewer(listView);
@@ -68,6 +70,7 @@ public static class ListViewBehavior
 
                     scrollViewer.SizeChanged += (sender, eventArgs) =>
                     {
+                        //Debug.WriteLine("scrollViewer.SizeChanged");
                         //UpdateVisibleItems(listView, scrollViewer, newCollection);
                         UpdateVisibleItems(listView, scrollViewer);
                     };

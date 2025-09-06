@@ -564,6 +564,8 @@ public class BinaryDownloader : IBinaryDownloader
 
                 ret.ErrorMessage = "ReadAsync@MpdBinarySendBinaryCommand received null data";
                 ret.IsSuccess = false;
+                ret.IsTimeOut = true; // re-try.
+
                 return ret;
             }
             else

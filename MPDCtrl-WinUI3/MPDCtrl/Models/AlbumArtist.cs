@@ -15,16 +15,8 @@ public partial class Album : ObservableObject
 
     public bool IsSongsAcquired { get; set; } = false;
 
-    public ObservableCollection<SongInfo> Songs { get; set; } = [];
+    public ObservableCollection<SongInfo> Songs { get; private set; } = [];
 }
-
-public class AlbumArtist
-{
-    public string Name { get; set; } = "";
-
-    public ObservableCollection<Album> Albums { get; private set; } = [];
-}
-
 
 public partial class AlbumEx :Album
 {
@@ -37,14 +29,22 @@ public partial class AlbumEx :Album
         get => _albumImage; 
         set
         {
-            if (_albumImage != value)
+            if (_albumImage == value)
             {
-                _albumImage = value;
-                OnPropertyChanged(nameof(AlbumImage));
+                return;
             }
+            _albumImage = value;
+            OnPropertyChanged(nameof(AlbumImage));
         }
     }
 
     public bool IsImageAcquired { get; set; } = false;
     public bool IsImageLoading { get; set; } = false;
+}
+
+public class AlbumArtist
+{
+    public string Name { get; set; } = "";
+
+    public ObservableCollection<AlbumEx> Albums { get; private set; } = [];
 }

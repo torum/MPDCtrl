@@ -35,7 +35,7 @@ public sealed partial class ShellPage : Page
 
         InitializeComponent();
 
-        //NavigationFrame.Content = App.GetService<QueuePage>(); <- not good because this create instance addition to navigation view.
+        //NavigationFrame.Content = App.GetService<QueuePage>(); <- not good because this create instance in addition to navigation view.
         if (NavigationFrame.Navigate(typeof(QueuePage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
         {
             _currentPage = typeof(QueuePage);
@@ -247,5 +247,50 @@ public sealed partial class ShellPage : Page
                 vm.SelectedNodeMenu = null;
             }
         }
+    }
+
+    private void Page_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        Windows.System.VirtualKey releasedKey = e.OriginalKey;
+
+        if (releasedKey != Windows.System.VirtualKey.Space)
+        {
+            return;
+        }
+
+        XamlRoot currentXamlRoot = this.Content.XamlRoot;
+        var focusedElement = FocusManager.GetFocusedElement(currentXamlRoot);
+        if ((focusedElement is TextBox) || (focusedElement is ListView) || (focusedElement is ListViewItem))
+        {
+            // Do nothing.
+            return;
+        }
+
+        // Disable space key down.
+        e.Handled = true;
+
+        //
+        Task.Run(ViewModel.Play);
+    }
+
+    private void Page_PreviewKeyUp(object sender, KeyRoutedEventArgs e)
+    {
+        Windows.System.VirtualKey releasedKey = e.OriginalKey;
+
+        if (releasedKey != Windows.System.VirtualKey.Space)
+        {
+            return;
+        }
+
+        XamlRoot currentXamlRoot = this.Content.XamlRoot;
+        var focusedElement = FocusManager.GetFocusedElement(currentXamlRoot);
+        if (focusedElement is TextBox || (focusedElement is ListView) || (focusedElement is ListViewItem))
+        {
+            // Do nothing.
+            return;
+        }
+
+        // Disable space key down.
+        e.Handled = true;
     }
 }

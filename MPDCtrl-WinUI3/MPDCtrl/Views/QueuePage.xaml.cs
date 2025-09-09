@@ -1,3 +1,4 @@
+using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -5,17 +6,17 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using MPDCtrl.Models;
 using MPDCtrl.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
-using System.Diagnostics;
-using MPDCtrl.Models;
 
 namespace MPDCtrl.Views;
 
@@ -39,42 +40,208 @@ public sealed partial class QueuePage : Page
     private void OnScrollIntoView(object obj)
     {
         if (obj == null) { return; }
-        /*
-        await Task.Yield();
-        await Task.Delay(100); // Wait for UI to update
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-        {
-            if (this.QueueListview is ListView lb)
-            {
-                //lb.AutoScrollToSelectedItem = true;
-                lb.ScrollIntoView(ind);
-            }
-        });
-        */
+
         if (this.QueueListview is ListView lb)
         {
-            lb.ScrollIntoView(obj, ScrollIntoViewAlignment.Leading);
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                lb.ScrollIntoView(obj, ScrollIntoViewAlignment.Default);
+            });
         }
     }
 
-    private async void OnScrollIntoViewAndSelect(object obj)
+    private void OnScrollIntoViewAndSelect(object obj)
     {
-        await Task.Yield();
-        await Task.Delay(800); // Need to wait for UI to update
-        /*
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-        {
+        if (obj == null) { return; }
 
-        });
-        */
-        if (this.QueueListview is ListView lb)
+        if (this.QueueListview is not ListView lb)
+        {
+            return;
+        }
+
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
             lb.ScrollIntoView(obj, ScrollIntoViewAlignment.Leading);
 
-            if (obj is SongInfoEx song)
+            if (obj is not SongInfoEx song)
             {
-                //song.IsSelected = true; This won't work in Winui3?
+                return;
+            }
+
+            //song.IsSelected = true; //This won't work in Winui3?
+            lb.SelectedItem = song;
+            //lb.Focus(FocusState.Programmatic);
+
+            ListViewItem? selectedItemContainer = lb.ContainerFromIndex(lb.SelectedIndex) as ListViewItem;
+            selectedItemContainer?.Focus(FocusState.Programmatic);
+        });
+    }
+
+    private async void QueueListview_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        //ListView listView = (ListView)sender;
+        if (sender is not ListView listView)
+        {
+            return;
+        }
+
+        // UI element that was right-clicked
+        FrameworkElement element = (FrameworkElement)e.OriginalSource;
+
+        var container = FindParent<ListViewItem>(element);
+
+        if (container is null)
+        {
+            return;
+        }
+
+        if (listView.SelectedItem != container.Content)
+        {
+            return;
+        }
+
+        if (ViewModel is null)
+        {
+            return;
+        }
+
+        if (listView.SelectedItem is not SongInfoEx song)
+        {
+            return;
+        }
+
+        await ViewModel.QueueSelectedPlay(song);
+    }
+
+    private async void QueueListview_KeyUp(object sender, KeyRoutedEventArgs e)
+    {
+        if (sender is not ListView listView)
+        {
+            return;
+        }
+
+        if (e.OriginalSource is not Microsoft.UI.Xaml.Controls.ListViewItem)
+        {
+            return;
+        }
+
+        if (ViewModel is null)
+        {
+            return;
+        }
+
+        if (listView.SelectedItem is not SongInfoEx song)
+        {
+            return;
+        }
+
+        Windows.System.VirtualKey releasedKey = e.OriginalKey;
+
+        if (releasedKey != Windows.System.VirtualKey.Enter)
+        {
+            return;
+        }
+
+        await ViewModel.QueueSelectedPlay(song);
+    }
+
+    private void QueueListview_RightTapped(object sender, RightTappedRoutedEventArgs e)
+    {
+        //ListView listView = (ListView)sender;
+        if (sender is not ListView listView)
+        {
+            return;
+        }
+
+        FrameworkElement element = (FrameworkElement)e.OriginalSource;
+
+        var container = FindParent<ListViewItem>(element);
+
+        if (container != null)
+        {
+            object dataItem = container.Content;
+
+            if (listView.SelectedItem == dataItem)
+            {
+                return;
+            }
+
+            if (listView.SelectedItems.IndexOf(dataItem) > -1)
+            {
+                return;
+            }
+
+            if (listView.SelectedItems.Count > 1)
+            {
+                listView.SelectedItems.Clear();
+            }
+
+            listView.SelectedItem = dataItem;
+        }
+    }
+
+    private static T? FindParent<T>(DependencyObject child) where T : DependencyObject
+    {
+        DependencyObject parent = VisualTreeHelper.GetParent(child);
+        while (parent != null && parent is not T)
+        {
+            parent = VisualTreeHelper.GetParent(parent);
+        }
+
+        if (parent is not null)
+        {
+            return parent as T;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private void FilterQueueListBox_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        if (sender is not ListView)
+        {
+            return;
+        }
+
+        FrameworkElement element = (FrameworkElement)e.OriginalSource;
+
+        var container = FindParent<ListViewItem>(element);
+
+        if (container is null)
+        {
+            return;
+        }
+
+        if (container.Content is not SongInfoEx song)
+        {
+            return;
+        }
+
+        if (this.QueueListview is ListView lb)
+        {
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                lb.ScrollIntoView(song, ScrollIntoViewAlignment.Default);
+
+                //song.IsSelected = true;//This won't work in Winui3?
                 lb.SelectedItem = song;
+            });
+        }
+    }
+
+    private void TglButtonQueueFilter_Click(object sender, RoutedEventArgs e)
+    {
+        if (this.TglButtonQueueFilter is ToggleButton tb)
+        {
+            if (tb.IsChecked == true)
+            {
+                this.FilterQueueQueryTextBox.Focus(FocusState.Programmatic);
+            }
+            else
+            {
+                this.TglButtonQueueFilter.Focus(FocusState.Programmatic);
             }
         }
     }

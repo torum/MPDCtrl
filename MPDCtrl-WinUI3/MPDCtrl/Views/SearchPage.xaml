@@ -27,7 +27,7 @@
     </Page.Resources>
     <Grid x:Name="ContentGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="118"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>

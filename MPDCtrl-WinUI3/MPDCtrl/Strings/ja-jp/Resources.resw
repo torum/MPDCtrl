@@ -279,4 +279,58 @@
   <data name="Search_Shiki_Equals" xml:space="preserve">
     <value>同じ</value>
   </data>
+  <data name="ListViewItemContextMenu_Play.Text" xml:space="preserve">
+    <value>再生</value>
+  </data>
+  <data name="PageMenu_Find.ToolTipService.ToolTip" xml:space="preserve">
+    <value>検索 (Ctrl+F)</value>
+  </data>
+  <data name="PageMenu_Clear.Text" xml:space="preserve">
+    <value>クリア</value>
+  </data>
+  <data name="PageMenu_AddTo.Text" xml:space="preserve">
+    <value>追加先</value>
+  </data>
+  <data name="PageMenu_Reorder.ToolTipService.ToolTip" xml:space="preserve">
+    <value>順序変更</value>
+  </data>
+  <data name="PageMenu_Sort.Text" xml:space="preserve">
+    <value>ソート</value>
+  </data>
+  <data name="ConnectionStatus_ConnectionError" xml:space="preserve">
+    <value>通信エラー</value>
+  </data>
+  <data name="MPD_CommandResponse" xml:space="preserve">
+    <value>MPD コマンド応答</value>
+  </data>
+  <data name="MPD_IdleResponse" xml:space="preserve">
+    <value>MPD 応答</value>
+  </data>
+  <data name="PageMenu_ReverseSort.Text" xml:space="preserve">
+    <value>逆順に並べ替え</value>
+  </data>
+  <data name="PageMenu_ScrollIntoNowPlaying.Text" xml:space="preserve">
+    <value>現在の曲へスクロール</value>
+  </data>
+  <data name="Dialog_CreateNewPlaylist.Content" xml:space="preserve">
+    <value>新規プレイリスト作成</value>
+  </data>
+  <data name="Dialog_EnterNewPlaylistName.PlaceholderText" xml:space="preserve">
+    <value>新規プレイリスト名の入力</value>
+  </data>
+  <data name="Dialog_Title_SelectPlaylist" xml:space="preserve">
+    <value>プレイリストを選択</value>
+  </data>
+  <data name="Dialog_Ok" xml:space="preserve">
+    <value>OK (&amp;O)</value>
+  </data>
+  <data name="Dialog_Cancel" xml:space="preserve">
+    <value>キャンセル (Esc)</value>
+  </data>
+  <data name="ListviewItemContextMenu_AddToPlaylist.Text" xml:space="preserve">
+    <value>プレイリストに追加</value>
+  </data>
+  <data name="ListviewItemContextMenu_Remove.Text" xml:space="preserve">
+    <value>削除</value>
+  </data>
 </root>

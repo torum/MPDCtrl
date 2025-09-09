@@ -106,8 +106,8 @@ public partial class MpcService : IMpcService
         }
     }
 
-    private static readonly CancellationTokenSource cts = new();
-    private static readonly CancellationToken token = cts.Token;
+    private static readonly CancellationTokenSource _cts = new();
+    //private static readonly CancellationToken token = _cts.Token;
 
     // TODO: Not really used...
     public bool IsMpdCommandConnected { get; set; }
@@ -275,7 +275,6 @@ public partial class MpcService : IMpcService
                         ConnectionError?.Invoke(this, "TCP connection error: MPD did not respond with proper respose.");
                     }
                 }
-
                 else
                 {
                     DebugIdleOutput?.Invoke(this, "TCP Idle Connection: MPD did not respond with proper respose." + "\n" + "\n");
@@ -308,7 +307,7 @@ public partial class MpcService : IMpcService
 
             ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
-            ConnectionError?.Invoke(this, "TCP connection error: " + e.Message);
+            ConnectionError?.Invoke(this, "TCP connection failed to establish (SocketException): " + e.Message);
         }
         catch (Exception e)
         {
@@ -790,7 +789,7 @@ public partial class MpcService : IMpcService
                     break;
                 }
 
-                string? line = await _idleReader.ReadLineAsync(token);
+                string? line = await _idleReader.ReadLineAsync(_cts.Token);
 
                 if (line is not null)
                 {
@@ -2197,27 +2196,31 @@ public partial class MpcService : IMpcService
 
         if ((MpdStatus.MpdState == Status.MpdPlayState.Play) || (MpdStatus.MpdState == Status.MpdPlayState.Pause))
         {
-            // stop
+            // stop?
         }
-        /*
-        if (MpdStatus.MpdVolumeIsSet)
+        else if (MpdStatus.MpdState == Status.MpdPlayState.Stop)
         {
-            CommandResult result = await MpdCommandSendCommand(cmd);
 
-            return result;
         }
-        else
-        {
-            string cmdList = "command_list_begin" + "\n";
-            cmdList = cmdList + cmd + "\n";
-            cmdList = cmdList + "setvol " + volume.ToString() + "\n";
-            cmdList = cmdList + "command_list_end" + "\n";
+            /*
+            if (MpdStatus.MpdVolumeIsSet)
+            {
+                CommandResult result = await MpdCommandSendCommand(cmd);
 
-            CommandResult result = await MpdCommandSendCommand(cmdList);
+                return result;
+            }
+            else
+            {
+                string cmdList = "command_list_begin" + "\n";
+                cmdList = cmdList + cmd + "\n";
+                cmdList = cmdList + "setvol " + volume.ToString() + "\n";
+                cmdList = cmdList + "command_list_end" + "\n";
 
-            return result;
-        }
-        */
+                CommandResult result = await MpdCommandSendCommand(cmdList);
+
+                return result;
+            }
+            */
 
         string cmdList = "command_list_begin" + "\n";
         cmdList = cmdList + cmd + "\n";
@@ -4284,10 +4287,12 @@ public partial class MpcService : IMpcService
 
             ConnectionState = ConnectionStatus.Disconnecting;
             //
-            cts.Cancel();
+            _cts.Cancel();
 
             _idleConnection.Client?.Shutdown(SocketShutdown.Both);
             _idleConnection.Close();
+
+            _cts.Dispose();
         }
         catch { }
         finally

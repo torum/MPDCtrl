@@ -16,7 +16,7 @@
 
     <Grid x:Name="ContentGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="118"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -31,7 +31,7 @@
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0">
-                <ListView ItemsSource="{x:Bind ViewModel.Artists, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAlbumArtist, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="ArtistsListView_SelectionChanged" SelectionMode="Single" Background="Transparent">
+                <ListView Padding="0,0,0,0" Margin="0,0,0,0" ItemsSource="{x:Bind ViewModel.Artists, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAlbumArtist, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="ArtistsListView_SelectionChanged" SelectionMode="Single" Background="Transparent">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel />
@@ -67,6 +67,17 @@
                 </ListView>
             </Grid>
 
+            <!-- Column Grid Splitter  -->
+            <controls:GridSplitter x:Name="LeftPaneColumnGridSplitter" Grid.Column="1" Visibility="Collapsed"
+                               Width="12"
+                               HorizontalAlignment="Left"
+                               ResizeBehavior="BasedOnAlignment"
+                               ResizeDirection="Auto">
+                <controls:GridSplitter.RenderTransform>
+                    <TranslateTransform X="-5" />
+                </controls:GridSplitter.RenderTransform>
+            </controls:GridSplitter>
+            
             <Grid Grid.Column="1">
                 <ScrollViewer x:Name="SelectedArtistAlbumsScrollViewer">
                     <ItemsControl ItemsSource="{x:Bind ViewModel.SelectedArtistAlbums, Mode=OneWay}">

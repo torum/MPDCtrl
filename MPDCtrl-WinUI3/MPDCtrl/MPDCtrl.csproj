@@ -6,7 +6,7 @@
     <RootNamespace>MPDCtrl</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x86;x64;ARM64</Platforms>
-	  <PlatformTarget>AnyCPU</PlatformTarget>
+	  <PlatformTarget>x64</PlatformTarget>
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
     <PublishProfile>win-$(Platform).pubxml</PublishProfile>
     <UseWinUI>true</UseWinUI>
@@ -17,6 +17,7 @@
 	  <ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Views\Dialogs\AddToDialog.xaml" />
     <None Remove="Views\ShellPage.xaml" />
   </ItemGroup>
 
@@ -73,6 +74,11 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\QueuePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Dialogs\AddToDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

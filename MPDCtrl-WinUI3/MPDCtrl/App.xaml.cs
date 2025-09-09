@@ -93,6 +93,7 @@ public partial class App : Application
             // Core Services
             services.AddSingleton<IMpcService, MpcService>();
             services.AddSingleton<IBinaryDownloader, BinaryDownloader>();
+            services.AddSingleton<IDialogService, DialogService>();
 
             // Views and ViewModels
             services.AddSingleton<MainViewModel>();
@@ -172,14 +173,19 @@ public partial class App : Application
         // This does not fire...because of winui3 bugs. should be fixed in v1.2.2 WinAppSDK
         // see https://github.com/microsoft/microsoft-ui-xaml/issues/5221
 
+        // This kills app... 
+        // https://github.com/microsoft/microsoft-ui-xaml/issues/10447
+
         Debug.WriteLine("App_UnhandledException", e.Message + $"StackTrace: {e.Exception.StackTrace}, Source: {e.Exception.Source}");
-        //AppendErrorLog("App_UnhandledException", e.Message + $"StackTrace: {e.Exception.StackTrace}, Source: {e.Exception.Source}");
+        AppendErrorLog("App_UnhandledException", e.Message + $"StackTrace: {e.Exception.StackTrace}, Source: {e.Exception.Source}");
 
         try
         {
-            //SaveErrorLog();
+            SaveErrorLog();
         }
         catch (Exception) { }
+
+        e.Handled = true;
     }
 
     private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)

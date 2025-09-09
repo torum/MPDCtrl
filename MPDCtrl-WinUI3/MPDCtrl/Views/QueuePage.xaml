@@ -6,6 +6,7 @@
     xmlns:local="using:MPDCtrl.Views"
     xmlns:mod="using:MPDCtrl.Models"
     xmlns:vm="using:MPDCtrl.ViewModels"
+    xmlns:helper="using:MPDCtrl.Helpers"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
@@ -18,6 +19,9 @@
     mc:Ignorable="d"
     NavigationCacheMode="Required">
     <Page.Resources>
+        <x:Boolean x:Key="True">True</x:Boolean>
+        <x:Boolean x:Key="False">False</x:Boolean>
+
         <animations:ImplicitAnimationSet x:Name="ShowTransitions">
             <animations:OffsetAnimation EasingMode="EaseOut" From="0,24,0" To="0" Duration="0:0:0.4" />
             <animations:OpacityAnimation EasingMode="EaseOut" From="0" To="1" Duration="0:0:0.2" />
@@ -29,38 +33,145 @@
     </Page.Resources>
     <Grid x:Name="ContentGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="118"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" x:Name="HeaderGrid" Margin="24,0,24,0">
-            <TextBlock x:Uid="PageTitle_Queue" FontSize="{StaticResource FontSizePageTitle}" FontWeight="SemiBold"/>
-        </Border>
-        <!--  Background="{ThemeResource LayerFillColorDefaultBrush}" {ThemeResource SmokeFillColorDefaultBrush}  LayerFillColorDefaultBrush LayerFillColorAltBrush -->
+        <Grid Grid.Row="0" x:Name="HeaderGrid" Margin="24,0,24,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" x:Uid="PageTitle_Queue" FontSize="{StaticResource FontSizePageTitle}" FontWeight="SemiBold"/>
+                <TextBlock Grid.Column="1" FontSize="{StaticResource FontSizePageSubTitle}" Text="{x:Bind ViewModel.QueuePageSubTitleSongCount, Mode=OneWay}" VerticalAlignment="Bottom" Padding="48,0,0,4" Opacity="0.7" Visibility="Collapsed"/>
+            </Grid>
+            
+            <Grid Grid.Row="1" Margin="0,24,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <!-- Clear -->
+                    <Button Margin="0,0,8,0" Height="36" AccessKey="D" Command="{x:Bind ViewModel.QueueClearWithoutPromptCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <Viewbox Width="14" Height="14">
+                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M7 3H9C9 2.44772 8.55228 2 8 2C7.44772 2 7 2.44772 7 3ZM6 3C6 1.89543 6.89543 1 8 1C9.10457 1 10 1.89543 10 3H14C14.2761 3 14.5 3.22386 14.5 3.5C14.5 3.77614 14.2761 4 14 4H13.4364L12.2313 12.8378C12.0624 14.0765 11.0044 15 9.75422 15H6.24578C4.99561 15 3.93762 14.0765 3.76871 12.8378L2.56355 4H2C1.72386 4 1.5 3.77614 1.5 3.5C1.5 3.22386 1.72386 3 2 3H6ZM7 6.5C7 6.22386 6.77614 6 6.5 6C6.22386 6 6 6.22386 6 6.5V11.5C6 11.7761 6.22386 12 6.5 12C6.77614 12 7 11.7761 7 11.5V6.5ZM9.5 6C9.77614 6 10 6.22386 10 6.5V11.5C10 11.7761 9.77614 12 9.5 12C9.22386 12 9 11.7761 9 11.5V6.5C9 6.22386 9.22386 6 9.5 6ZM4.75954 12.7027C4.86089 13.4459 5.49568 14 6.24578 14H9.75422C10.5043 14 11.1391 13.4459 11.2405 12.7027L12.4272 4H3.57281L4.75954 12.7027Z"/>
+                            </Viewbox>
+                            <TextBlock x:Uid="PageMenu_Clear" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/> 
+                        </StackPanel>
+                    </Button>
+                    <!-- Add to -->
+                    <Button Margin="8,0,8,0" Height="36" AccessKey="A" Command="{x:Bind ViewModel.QueueAddToCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <Viewbox Width="14" Height="14">
+                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z"/>
+                            </Viewbox>
+                            <TextBlock x:Uid="PageMenu_AddTo" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <!-- Find -->
+                    <ToggleButton x:Name="TglButtonQueueFilter" x:Uid="PageMenu_Find" AccessKey="F" Height="36" Width="38" Margin="4,0,4,0" IsChecked="{x:Bind ViewModel.IsQueueFindVisible, Mode=TwoWay}" Click="TglButtonQueueFilter_Click">
+                        <ToggleButton.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="F" Modifiers="Control"/>
+                        </ToggleButton.KeyboardAccelerators>
+                        <Viewbox Width="14" Height="14">
+                            <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M10.0195 10.7266C9.06578 11.5217 7.83875 12 6.5 12C3.46243 12 1 9.53757 1 6.5C1 3.46243 3.46243 1 6.5 1C9.53757 1 12 3.46243 12 6.5C12 7.83875 11.5217 9.06578 10.7266 10.0195L13.8535 13.1464C14.0488 13.3417 14.0488 13.6583 13.8535 13.8536C13.6583 14.0488 13.3417 14.0488 13.1464 13.8536L10.0195 10.7266ZM11 6.5C11 4.01472 8.98528 2 6.5 2C4.01472 2 2 4.01472 2 6.5C2 8.98528 4.01472 11 6.5 11C8.98528 11 11 8.98528 11 6.5Z"/>
+                        </Viewbox>
+                    </ToggleButton>
+                    <!-- Reorder -->
+                    <ToggleButton x:Name="SortToggleButton" x:Uid="PageMenu_Reorder" Height="36" Width="38" Margin="4,0,4,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Viewbox Width="14" Height="14" Margin="-2,0,2,0">
+                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M4.85355 5.85355C4.65829 6.04882 4.34171 6.04882 4.14645 5.85355C3.95118 5.65829 3.95118 5.34171 4.14645 5.14645L7.14645 2.14645C7.34171 1.95118 7.65829 1.95118 7.85355 2.14645L10.8536 5.14645C11.0488 5.34171 11.0488 5.65829 10.8536 5.85355C10.6583 6.04882 10.3417 6.04882 10.1464 5.85355L8 3.70711V12.2929L10.1464 10.1464C10.3417 9.95118 10.6583 9.95118 10.8536 10.1464C11.0488 10.3417 11.0488 10.6583 10.8536 10.8536L7.85355 13.8536C7.65829 14.0488 7.34171 14.0488 7.14645 13.8536L4.14645 10.8536C3.95118 10.6583 3.95118 10.3417 4.14645 10.1464C4.34171 9.95118 4.65829 9.95118 4.85355 10.1464L7 12.2929V3.70711L4.85355 5.85355Z"/>
+                            </Viewbox>
+                            <TextBlock x:Uid="PageMenu_Reorder" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center" Visibility="Collapsed"/>
+                        </StackPanel>
+                    </ToggleButton>
+                    <!-- Sort -->
+                    <Button Height="36" Width="38" Margin="4,0,4,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Viewbox Width="14" Height="14" Margin="0,0,6,0">
+                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M4.85355 2.14645C4.65829 1.95118 4.34171 1.95118 4.14645 2.14645L1.14645 5.14645C0.951184 5.34171 0.951184 5.65829 1.14645 5.85355C1.34171 6.04882 1.65829 6.04882 1.85355 5.85355L4 3.70711V13.5C4 13.7761 4.22386 14 4.5 14C4.77614 14 5 13.7761 5 13.5V3.70711L7.14645 5.85355C7.34171 6.04882 7.65829 6.04882 7.85355 5.85355C8.04882 5.65829 8.04882 5.34171 7.85355 5.14645L4.85355 2.14645ZM11.1525 13.8595C11.3463 14.0468 11.6537 14.0468 11.8475 13.8595L14.8475 10.9594C15.0461 10.7675 15.0514 10.4509 14.8595 10.2524C14.6676 10.0538 14.351 10.0485 14.1525 10.2404L12 12.3212L12 2.5001C12 2.22395 11.7761 2.0001 11.5 2.0001C11.2239 2.0001 11 2.22395 11 2.5001L11 12.3212L8.84752 10.2404C8.64898 10.0485 8.33244 10.0538 8.14051 10.2524C7.94858 10.4509 7.95394 10.7675 8.15248 10.9594L11.1525 13.8595Z"/>
+                            </Viewbox>
+                            <TextBlock x:Uid="PageMenu_Sort" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center" Visibility="Collapsed"/>
+                        </StackPanel>
+                        <Button.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Title" Command="{x:Bind ViewModel.QueueListviewSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="title"/>
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Time" Command="{x:Bind ViewModel.QueueListviewSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="time" />
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Artist" Command="{x:Bind ViewModel.QueueListviewSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="artist" />
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Album" Command="{x:Bind ViewModel.QueueListviewSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="album" />
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Disc" Command="{x:Bind ViewModel.QueueListviewSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="disc" />
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Track" Command="{x:Bind ViewModel.QueueListviewSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="track" />
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Genre" Command="{x:Bind ViewModel.QueueListviewSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="genre" />
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_LastModified" Command="{x:Bind ViewModel.QueueListviewSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="lastmodified" />
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem x:Uid="PageMenu_ReverseSort" Command="{x:Bind ViewModel.QueueListviewSortReverseCommand}" />
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                    <!-- More -->
+                    <Button Height="36" Width="38" Margin="4,0,4,0">
+                        <Viewbox Width="14" Height="14" Margin="-6,0,2,0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M10 6C9.30964 6 8.75 5.44036 8.75 4.75C8.75 4.05964 9.30964 3.5 10 3.5C10.6904 3.5 11.25 4.05964 11.25 4.75C11.25 5.44036 10.6904 6 10 6ZM10 11.25C9.30964 11.25 8.75 10.6904 8.75 10C8.75 9.30964 9.30964 8.75 10 8.75C10.6904 8.75 11.25 9.30964 11.25 10C11.25 10.6904 10.6904 11.25 10 11.25ZM8.75 15.25C8.75 15.9404 9.30964 16.5 10 16.5C10.6904 16.5 11.25 15.9404 11.25 15.25C11.25 14.5596 10.6904 14 10 14C9.30964 14 8.75 14.5596 8.75 15.25Z"/>
+                        </Viewbox>
+                        <Button.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuFlyoutItem x:Uid="PageMenu_ScrollIntoNowPlaying" Command="{x:Bind ViewModel.ScrollIntoNowPlayingCommand}">
+                                    <!--
+                                    <MenuFlyoutItem.Icon>
+                                        <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm0 5a.75.75 0 0 0-.743.648l-.007.102v3.5h-3.5a.75.75 0 0 0-.102 1.493l.102.007h3.5v3.5a.75.75 0 0 0 1.493.102l.007-.102v-3.5h3.5a.75.75 0 0 0 .102-1.493l-.102-.007h-3.5v-3.5A.75.75 0 0 0 12 7Z"/>
+                                    </MenuFlyoutItem.Icon>
+                                    -->
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
+            </Grid>
+            
+        </Grid>
+        <!--  Background="{ThemeResource LayerFillColorDefaultBrush}" SmokeFillColorDefaultBrush LayerFillColorAltBrush -->
         <Grid Grid.Row="1" x:Name="BodyGrid" Margin="24,0,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Grid x:Name="QueueListviewDummyHeader" Grid.Row="0" Height="48" ColumnSpacing="8" Margin="0,0,48,12">
+            <Grid x:Name="QueueListviewDummyHeader" Grid.Row="0" Height="48" ColumnSpacing="8" Margin="0,0,48,4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="24" />
-                    <ColumnDefinition Width="3*" MinWidth="160"/>
-                    <ColumnDefinition Width="70" MinWidth="70"/>
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="50" MinWidth="50" />
-                    <ColumnDefinition Width="50" MinWidth="50"/>
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="0" />
+                    <ColumnDefinition Width="Auto" x:Name="DummyHeaderColumn_Reorder"/>
+                    <ColumnDefinition Width="24" x:Name="DummyHeaderColumn_NowPlaying"/>
+                    <ColumnDefinition Width="3*" MinWidth="160" x:Name="DummyHeaderColumn_Title"/>
+                    <ColumnDefinition Width="70" MinWidth="70" x:Name="DummyHeaderColumn_Time"/>
+                    <ColumnDefinition Width="2*" x:Name="DummyHeaderColumn_Artist" />
+                    <ColumnDefinition Width="2*" x:Name="DummyHeaderColumn_Album" />
+                    <ColumnDefinition Width="50" MinWidth="50" x:Name="DummyHeaderColumn_Disc" />
+                    <ColumnDefinition Width="50" MinWidth="50" x:Name="DummyHeaderColumn_Track"/>
+                    <ColumnDefinition Width="1*" x:Name="DummyHeaderColumn_Genre" />
+                    <ColumnDefinition Width="0" x:Name="DummyHeaderColumn_LastModified"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0"></StackPanel>
-                <StackPanel Grid.Column="1"></StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Width="80" HorizontalAlignment="Center" Visibility="{Binding ElementName=SortToggleButton,Path=IsChecked, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Path HorizontalAlignment="Center" Stretch="Uniform" Fill="{ThemeResource TextFillColorSecondaryBrush}" Opacity="0.4" Margin="14,0" Width="14" Height="14" Data="M4.85355 5.85355C4.65829 6.04882 4.34171 6.04882 4.14645 5.85355C3.95118 5.65829 3.95118 5.34171 4.14645 5.14645L7.14645 2.14645C7.34171 1.95118 7.65829 1.95118 7.85355 2.14645L10.8536 5.14645C11.0488 5.34171 11.0488 5.65829 10.8536 5.85355C10.6583 6.04882 10.3417 6.04882 10.1464 5.85355L8 3.70711V12.2929L10.1464 10.1464C10.3417 9.95118 10.6583 9.95118 10.8536 10.1464C11.0488 10.3417 11.0488 10.6583 10.8536 10.8536L7.85355 13.8536C7.65829 14.0488 7.34171 14.0488 7.14645 13.8536L4.14645 10.8536C3.95118 10.6583 3.95118 10.3417 4.14645 10.1464C4.34171 9.95118 4.65829 9.95118 4.85355 10.1464L7 12.2929V3.70711L4.85355 5.85355Z">
+                    </Path>
+                </StackPanel>
                 <Border Grid.Column="2">
-                    <Path RenderTransformOrigin="0,0" Stretch="Uniform" Fill="{ThemeResource TextFillColorSecondaryBrush}" Opacity="0.4" Margin="0" Width="16" Height="16" Data="M296.494737,3608.57322 L292.500752,3606.14219 C291.83208,3605.73542 291,3606.25002 291,3607.06891 L291,3611.93095 C291,3612.7509 291.83208,3613.26444 292.500752,3612.85767 L296.494737,3610.42771 C297.168421,3610.01774 297.168421,3608.98319 296.494737,3608.57322">
+                    <Path RenderTransformOrigin="0,0" Stretch="Uniform" Fill="{ThemeResource TextFillColorSecondaryBrush}" Opacity="0.4" Margin="0" Width="14" Height="14" Data="M296.494737,3608.57322 L292.500752,3606.14219 C291.83208,3605.73542 291,3606.25002 291,3607.06891 L291,3611.93095 C291,3612.7509 291.83208,3613.26444 292.500752,3612.85767 L296.494737,3610.42771 C297.168421,3610.01774 297.168421,3608.98319 296.494737,3608.57322">
                         <Path.RenderTransform>
                             <ScaleTransform ScaleX="1" ScaleY="1" />
                         </Path.RenderTransform>
@@ -77,9 +188,9 @@
             </Grid>
 
             <Grid Grid.Row="1">
-                <ListView x:Name="QueueListview" ItemsSource="{x:Bind Path=ViewModel.Queue, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedQueueSong,Mode=TwoWay}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                <ListView x:Name="QueueListview" ItemsSource="{x:Bind Path=ViewModel.Queue, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedQueueSong,Mode=TwoWay}" AccessKey="L" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                                   ScrollViewer.VerticalScrollBarVisibility="Visible" animations:Implicit.HideAnimations="{StaticResource HideTransitions}"
-                            animations:Implicit.ShowAnimations="{StaticResource ShowTransitions}" SelectionMode="Extended" IsMultiSelectCheckBoxEnabled="False" Padding="0,0,24,0">
+                            animations:Implicit.ShowAnimations="{StaticResource ShowTransitions}" SelectionMode="Extended" IsMultiSelectCheckBoxEnabled="False" Padding="0,0,24,0" IsDoubleTapEnabled="True" IsRightTapEnabled="True" DoubleTapped="QueueListview_DoubleTapped" RightTapped="QueueListview_RightTapped">
                     <ListView.Header>
                         <Grid Height="48" ColumnSpacing="8" Margin="0,0,0,0" Visibility="Collapsed">
                             <interactivity:Interaction.Behaviors>
@@ -100,7 +211,7 @@
                                 <ColumnDefinition Width="50" MinWidth="50" />
                                 <ColumnDefinition Width="50" MinWidth="50"/>
                                 <ColumnDefinition Width="1*" />
-                                <ColumnDefinition Width="0" />
+                                <ColumnDefinition Width="1*"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0"></StackPanel>
                             <StackPanel Grid.Column="1"></StackPanel>
@@ -121,51 +232,178 @@
                             <TextBlock Grid.Column="10" x:Uid="ListviewColumnHeader_LastModified" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
                         </Grid>
                     </ListView.Header>
-                    <!--
-                <ListView.ContextFlyout>
-                    <MenuFlyout>
-                        <MenuFlyoutItem x:Uid="OrdersListview_CancelOrder" Command="{x:Bind ViewModel.CancelOrderCommand}" CommandParameter="{x:Bind OrdersListview.SelectedItems}">
-                            <MenuFlyoutItem.Icon>
-                                <PathIcon Margin="0,0,0,0" Data="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z">
-                                </PathIcon>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                    </MenuFlyout>
-                </ListView.ContextFlyout>
-                -->
+                    <ListView.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem x:Uid="ListViewItemContextMenu_Play" Command="{x:Bind ViewModel.QueueSelectedPlayCommand}" CommandParameter="{x:Bind QueueListview.SelectedItem, Mode=OneWay}">
+                                <MenuFlyoutItem.Icon>
+                                    <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm8.856-3.845A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189Z"/>
+                                </MenuFlyoutItem.Icon>
+                                <MenuFlyoutItem.KeyboardAccelerators>
+                                    <KeyboardAccelerator Key="Enter" />
+                                </MenuFlyoutItem.KeyboardAccelerators>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutItem x:Uid="ListviewItemContextMenu_AddToPlaylist" Command="{x:Bind ViewModel.QueueListviewAddSelectedItemsToCommand}" CommandParameter="{x:Bind QueueListview.SelectedItems, Mode=OneWay}">
+                                <MenuFlyoutItem.Icon>
+                                    <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm0 5a.75.75 0 0 0-.743.648l-.007.102v3.5h-3.5a.75.75 0 0 0-.102 1.493l.102.007h3.5v3.5a.75.75 0 0 0 1.493.102l.007-.102v-3.5h3.5a.75.75 0 0 0 .102-1.493l-.102-.007h-3.5v-3.5A.75.75 0 0 0 12 7Z"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem x:Uid="ListviewItemContextMenu_Remove" Command="{x:Bind ViewModel.QueueListviewRemoveSelectedItemsCommand}" CommandParameter="{x:Bind QueueListview.SelectedItems, Mode=OneWay}">
+                                <MenuFlyoutItem.Icon>
+                                    <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M7 3H9C9 2.44772 8.55228 2 8 2C7.44772 2 7 2.44772 7 3ZM6 3C6 1.89543 6.89543 1 8 1C9.10457 1 10 1.89543 10 3H14C14.2761 3 14.5 3.22386 14.5 3.5C14.5 3.77614 14.2761 4 14 4H13.4364L12.2313 12.8378C12.0624 14.0765 11.0044 15 9.75422 15H6.24578C4.99561 15 3.93762 14.0765 3.76871 12.8378L2.56355 4H2C1.72386 4 1.5 3.77614 1.5 3.5C1.5 3.22386 1.72386 3 2 3H6ZM7 6.5C7 6.22386 6.77614 6 6.5 6C6.22386 6 6 6.22386 6 6.5V11.5C6 11.7761 6.22386 12 6.5 12C6.77614 12 7 11.7761 7 11.5V6.5ZM9.5 6C9.77614 6 10 6.22386 10 6.5V11.5C10 11.7761 9.77614 12 9.5 12C9.22386 12 9 11.7761 9 11.5V6.5C9 6.22386 9.22386 6 9.5 6ZM4.75954 12.7027C4.86089 13.4459 5.49568 14 6.24578 14H9.75422C10.5043 14 11.1391 13.4459 11.2405 12.7027L12.4272 4H3.57281L4.75954 12.7027Z"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                        </MenuFlyout>
+                    </ListView.ContextFlyout>
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="mod:SongInfoEx">
                             <Grid ColumnSpacing="8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="24" />
-                                    <ColumnDefinition Width="3*" MinWidth="160"/>
-                                    <ColumnDefinition Width="70" MinWidth="70"/>
-                                    <ColumnDefinition Width="2*"/>
-                                    <ColumnDefinition Width="2*" />
-                                    <ColumnDefinition Width="50" MinWidth="50" />
-                                    <ColumnDefinition Width="50" MinWidth="50"/>
-                                    <ColumnDefinition Width="1*" />
-                                    <ColumnDefinition Width="0" />
+                                    <ColumnDefinition Width="{Binding ElementName=DummyHeaderColumn_Reorder, Path=Width ,Mode=OneWay}" />
+                                    <ColumnDefinition Width="24" /> 
+                                    <ColumnDefinition Width="{Binding ElementName=DummyHeaderColumn_Title, Path=Width ,Mode=OneWay}" MinWidth="160"/>
+                                    <ColumnDefinition Width="{Binding ElementName=DummyHeaderColumn_Time, Path=Width ,Mode=OneWay}" MinWidth="70"/>
+                                    <ColumnDefinition Width="{Binding ElementName=DummyHeaderColumn_Artist, Path=Width ,Mode=OneWay}"/>
+                                    <ColumnDefinition Width="{Binding ElementName=DummyHeaderColumn_Album, Path=Width ,Mode=OneWay}" />
+                                    <ColumnDefinition Width="{Binding ElementName=DummyHeaderColumn_Disc, Path=Width ,Mode=OneWay}" MinWidth="50" />
+                                    <ColumnDefinition Width="{Binding ElementName=DummyHeaderColumn_Track, Path=Width ,Mode=OneWay}" MinWidth="50"/>
+                                    <ColumnDefinition Width="{Binding ElementName=DummyHeaderColumn_Genre, Path=Width ,Mode=OneWay}" />
+                                    <ColumnDefinition Width="{Binding ElementName=DummyHeaderColumn_LastModified, Path=Width, Mode=OneWay}" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="" />
-                                <TextBlock Grid.Column="1" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="" />
+
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Width="80" HorizontalAlignment="Center" Visibility="{Binding ElementName=SortToggleButton,Path=IsChecked, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <!--  -->
+                                    <Button Margin="4,0,0,0" Height="30" Command="{x:Bind ParentViewModel.QueueListviewMoveUpCommand}" CommandParameter="{x:Bind}" Background="Transparent" BorderThickness="0">
+                                        <Viewbox Width="12" Height="12" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Path Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Data="M7.5 13.5C7.5 13.7761 7.72386 14 8 14C8.27614 14 8.5 13.7761 8.5 13.5V3.80298L12.1283 7.83448C12.3131 8.03974 12.6292 8.05638 12.8345 7.87165C13.0397 7.68692 13.0564 7.37077 12.8716 7.16552L8.37165 2.16552C8.27683 2.06016 8.14174 2 8 2C7.85826 2 7.72317 2.06016 7.62835 2.16552L3.12836 7.16552C2.94363 7.37077 2.96027 7.68692 3.16552 7.87165C3.37078 8.05638 3.68692 8.03974 3.87165 7.83448L7.5 3.80298V13.5Z" Width="NaN" Height="NaN" Margin="0">
+                                            </Path>
+                                        </Viewbox>
+                                    </Button>
+                                    <Button Margin="4,0,0,0" Height="30" Command="{x:Bind ParentViewModel.QueueListviewMoveDownCommand}" CommandParameter="{x:Bind}" Background="Transparent" BorderThickness="0">
+                                        <Viewbox Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Path Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Data="M8.5 2.5C8.5 2.22386 8.27615 2 8 2C7.72386 2 7.5 2.22386 7.5 2.5V12.197L3.87165 8.16552C3.68692 7.96026 3.37078 7.94362 3.16552 8.12835C2.96027 8.31308 2.94363 8.62923 3.12836 8.83448L7.62836 13.8345C7.72318 13.9398 7.85826 14 8 14C8.14175 14 8.27683 13.9398 8.37165 13.8345L12.8717 8.83448C13.0564 8.62923 13.0397 8.31308 12.8345 8.12835C12.6292 7.94362 12.3131 7.96026 12.1284 8.16552L8.5 12.197V2.5Z" Width="NaN" Height="NaN" Margin="0">
+                                            </Path>
+                                        </Viewbox>
+                                    </Button>
+                                </StackPanel>
+                                
                                 <Border Grid.Column="2">
-                                    <Path RenderTransformOrigin="0,0" Stretch="Uniform" Fill="{ThemeResource AccentFillColorDefaultBrush}" Opacity="1" Margin="0" Width="16" Height="16" Visibility="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" Data="M296.494737,3608.57322 L292.500752,3606.14219 C291.83208,3605.73542 291,3606.25002 291,3607.06891 L291,3611.93095 C291,3612.7509 291.83208,3613.26444 292.500752,3612.85767 L296.494737,3610.42771 C297.168421,3610.01774 297.168421,3608.98319 296.494737,3608.57322">
+                                    <Path RenderTransformOrigin="0,0" Stretch="Uniform" Fill="{ThemeResource AccentFillColorDefaultBrush}" Opacity="1" Margin="0" Width="14" Height="14" Visibility="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" Data="M296.494737,3608.57322 L292.500752,3606.14219 C291.83208,3605.73542 291,3606.25002 291,3607.06891 L291,3611.93095 C291,3612.7509 291.83208,3613.26444 292.500752,3612.85767 L296.494737,3610.42771 C297.168421,3610.01774 297.168421,3608.98319 296.494737,3608.57322">
                                         <Path.RenderTransform>
                                             <ScaleTransform ScaleX="1" ScaleY="1" />
                                         </Path.RenderTransform>
                                     </Path>
                                 </Border>
-                                <TextBlock Grid.Column="3" Text="{x:Bind Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
-                                <TextBlock Grid.Column="4" Text="{x:Bind TimeFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
-                                <TextBlock Grid.Column="5" Text="{x:Bind Artist, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
-                                <TextBlock Grid.Column="6" Text="{x:Bind Album, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
-                                <TextBlock Grid.Column="7" Text="{x:Bind Disc, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
-                                <TextBlock Grid.Column="8" Text="{x:Bind Track, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
-                                <TextBlock Grid.Column="9" Text="{x:Bind Genre, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
-                                <TextBlock Grid.Column="10" Text="{x:Bind LastModifiedFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
+                                <TextBlock Grid.Column="3" x:Name="TextBlock_Title" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Title, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0">
+                                    <!-- This won't work properly. Somehow FontWeight becomes very thin regardless of the value. Probably a bug in XamlBehaviors or WinUI3.
+                                        <interactivity:Interaction.Behaviors>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Title}" PropertyName="FontWeight" 
+                                                                                    Value="{x:Bind IsPlaying, Converter={StaticResource BooleanToFontWeightConverter}, Mode=OneWay}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Title}" PropertyName="FontWeight" 
+                                                                                    Value="{x:Bind IsPlaying, Converter={StaticResource BooleanToFontWeightConverter}, Mode=OneWay}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                        </interactivity:Interaction.Behaviors>
+                                    -->
+                                    <!-- This won't work properly. When Queue page is invisible (ex other page is shown) this does not update the color and leave old color. 
+                                        <interactivity:Interaction.Behaviors>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Title}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Title}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                        </interactivity:Interaction.Behaviors>
+                                    -->
+                                </TextBlock>
+                                <TextBlock Grid.Column="4" x:Name="TextBlock_Time" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind TimeFormated, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="6,0,4,0">
+                                    <!-- 
+                                        <interactivity:Interaction.Behaviors>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Time}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Time}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                        </interactivity:Interaction.Behaviors>
+                                    -->
+                                </TextBlock>
+                                <TextBlock Grid.Column="5" x:Name="TextBlock_Artist" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Artist, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0">
+                                    <!--    
+                                        <interactivity:Interaction.Behaviors>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Artist}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Artist}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                        </interactivity:Interaction.Behaviors>
+                                    -->
+                                </TextBlock>
+                                <TextBlock Grid.Column="6" x:Name="TextBlock_Album" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Album, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0">
+                                    <!--
+                                        <interactivity:Interaction.Behaviors>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Album}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Album}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                        </interactivity:Interaction.Behaviors>
+                                    -->
+                                </TextBlock>
+                                <TextBlock Grid.Column="7" x:Name="TextBlock_Disc" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Disc, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="6,0,4,0">
+                                    <!--
+                                        <interactivity:Interaction.Behaviors>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Disc}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Disc}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                        </interactivity:Interaction.Behaviors>
+                                    -->
+                                </TextBlock>
+                                <TextBlock Grid.Column="8" x:Name="TextBlock_Track" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Track, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="6,0,4,0">
+                                    <!-- 
+                                        <interactivity:Interaction.Behaviors>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Track}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Track}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                        </interactivity:Interaction.Behaviors>
+                                    -->
+                                </TextBlock>
+                                <TextBlock Grid.Column="9" x:Name="TextBlock_Genre" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Genre, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0">
+                                    <!-- 
+                                        <interactivity:Interaction.Behaviors>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Genre}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Genre}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                        </interactivity:Interaction.Behaviors>
+                                    -->
+                                </TextBlock>
+                                <TextBlock Grid.Column="10" x:Name="TextBlock_LastModifiedFormated" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind LastModifiedFormated, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0">
+                                    <!--  
+                                        <interactivity:Interaction.Behaviors>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_LastModifiedFormated}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
+                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_LastModifiedFormated}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                            </interactivity:DataTriggerBehavior>
+                                        </interactivity:Interaction.Behaviors>
+                                    -->
+                                </TextBlock>
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
@@ -180,10 +418,61 @@
                 </ListView>
             </Grid>
 
+            <Border Grid.Row="1" Margin="0" Padding="6" HorizontalAlignment="Right" VerticalAlignment="Top" Width="350" MinWidth="280" CornerRadius="3" Visibility="{x:Bind TglButtonQueueFilter.IsChecked, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" BorderThickness="1" BorderBrush="{ThemeResource LayerFillColorAltBrush}">
+                <StackPanel>
+                    <TextBox x:Name="FilterQueueQueryTextBox" Text="{x:Bind ViewModel.FilterQueueQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="0,0,0,0"></TextBox>
+                    <ListView Name="FilterQueueListBox" ItemsSource="{x:Bind ViewModel.QueueForFilter, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedQueueFilterSong,Mode=TwoWay}" IsDoubleTapEnabled="True" DoubleTapped="FilterQueueListBox_DoubleTapped" SelectionMode="Single" MaxHeight="240" BorderThickness="0" Padding="0,3,0,0">
+
+                        <ListView.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Command="{x:Bind ViewModel.QueueFilterSelectCommand}" CommandParameter="{x:Bind FilterQueueListBox.SelectedItem, Mode=OneWay}">
+                                    <MenuFlyoutItem.Icon>
+                                        <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm8.856-3.845A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189Z"/>
+                                    </MenuFlyoutItem.Icon>
+                                    <MenuFlyoutItem.KeyboardAccelerators>
+                                        <KeyboardAccelerator Key="Enter" />
+                                    </MenuFlyoutItem.KeyboardAccelerators>
+                                </MenuFlyoutItem>
+
+                            </MenuFlyout>
+                        </ListView.ContextFlyout>
+
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="mod:SongInfoEx">
+                                <StackPanel>
+                                    <TextBlock x:Name="filterListBoxTitle" Text="{x:Bind Path=Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="12 0 3 0" />
+                                    <!--
+									<TextBlock x:Name="filterListBoxArtist" Text="{Binding Path=Artist, Mode=OneWay}" TextWrapping="Wrap" Margin="0" Padding="3 0 3 0"/>
+									<TextBlock x:Name="fitterListBoxAlbum" Text="{Binding Path=Album, Mode=OneWay}" TextWrapping="Wrap" FontStyle="Italic" Margin="0" Padding="3 0 3 0"/>
+
+									<StackPanel Orientation="Horizontal">
+										<TextBlock x:Name="fitterListBoxGenre" Text="{Binding Path=Genre, Mode=OneWay}" TextWrapping="Wrap" FontStyle="Italic" Margin="0" Padding="3 0 3 0"/>
+									</StackPanel>
+									<TextBlock x:Name="fitterListBoxNewsTimeStamp" Text="{Binding Path=LastModifiedFormated, Mode=OneWay}" Margin="0" Padding="3 0 3 0" HorizontalAlignment="Right"/>
+									-->
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+            </Border>
+            
         </Grid>
         
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="2000" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="HeaderGrid.Margin" Value="48,0,48,0" />
+                        <Setter Target="BodyGrid.Margin" Value="48,0,0,0" />
+                        <Setter Target="QueueListview.Padding" Value="0,0,48,0" />
+                        <Setter Target="QueueListviewDummyHeader.Margin" Value="0,0,48,4" />
+                        <Setter Target="DummyHeaderColumn_LastModified.Width" Value="1*" />
+                    </VisualState.Setters>
+                </VisualState>
                 <VisualState>
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="1008" />
@@ -192,7 +481,8 @@
                         <Setter Target="HeaderGrid.Margin" Value="48,0,48,0" />
                         <Setter Target="BodyGrid.Margin" Value="48,0,0,0" />
                         <Setter Target="QueueListview.Padding" Value="0,0,48,0" />
-                        <Setter Target="QueueListviewDummyHeader.Margin" Value="0,0,48,6" />
+                        <Setter Target="QueueListviewDummyHeader.Margin" Value="0,0,48,4" />
+                        <Setter Target="DummyHeaderColumn_LastModified.Width" Value="0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -203,7 +493,8 @@
                         <Setter Target="HeaderGrid.Margin" Value="24,0,24,0" />
                         <Setter Target="BodyGrid.Margin" Value="24,0,0,0" />
                         <Setter Target="QueueListview.Padding" Value="0,0,24,0" />
-                        <Setter Target="QueueListviewDummyHeader.Margin" Value="0,0,24,6" />
+                        <Setter Target="QueueListviewDummyHeader.Margin" Value="0,0,24,4" />
+                        <Setter Target="DummyHeaderColumn_LastModified.Width" Value="0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -214,7 +505,8 @@
                         <Setter Target="HeaderGrid.Margin" Value="16,0,16,0" />
                         <Setter Target="BodyGrid.Margin" Value="16,0,0,0" />
                         <Setter Target="QueueListview.Padding" Value="0,0,16,0" />
-                        <Setter Target="QueueListviewDummyHeader.Margin" Value="0,0,16,6" />
+                        <Setter Target="QueueListviewDummyHeader.Margin" Value="0,0,16,4" />
+                        <Setter Target="DummyHeaderColumn_LastModified.Width" Value="0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -225,7 +517,8 @@
                         <Setter Target="HeaderGrid.Margin" Value="16,0,16,0" />
                         <Setter Target="BodyGrid.Margin" Value="16,0,0,0" />
                         <Setter Target="QueueListview.Padding" Value="0,0,16,0" />
-                        <Setter Target="QueueListviewDummyHeader.Margin" Value="0,0,16,6" />
+                        <Setter Target="QueueListviewDummyHeader.Margin" Value="0,0,16,4" />
+                        <Setter Target="DummyHeaderColumn_LastModified.Width" Value="0" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

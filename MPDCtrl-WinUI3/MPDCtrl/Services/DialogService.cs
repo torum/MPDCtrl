@@ -1,0 +1,100 @@
+﻿using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.Windows.ApplicationModel.Resources;
+using MPDCtrl.Models;
+using MPDCtrl.Services.Contracts;
+using MPDCtrl.Views;
+using MPDCtrl.Views.Dialogs;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MPDCtrl.Services;
+
+public class DialogService : IDialogService
+{
+    private readonly ResourceLoader _resourceLoader = new();
+
+    public record AddToDialogResult(string PlaylistName, bool AsNew);
+
+    public DialogService()
+    {
+       
+    }
+
+    public async Task<AddToDialogResult?> ShowAddToDialog(ViewModels.MainViewModel vm)
+    {
+        if (App.MainWnd is null)
+        {
+            return null;
+        }
+
+        if (App.MainWnd?.Content is not ShellPage)
+        {
+            return null;
+        }
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = App.MainWnd?.Content.XamlRoot,
+            Title = _resourceLoader.GetString("Dialog_Title_SelectPlaylist"),
+            IsPrimaryButtonEnabled = true,
+            PrimaryButtonText = _resourceLoader.GetString("Dialog_Ok"),
+            DefaultButton = ContentDialogButton.Primary,
+            IsSecondaryButtonEnabled = false,
+            CloseButtonText = _resourceLoader.GetString("Dialog_Cancel"),
+            Content = new Views.Dialogs.AddToDialog()
+            {
+                //DataContext = new DialogViewModel()
+            }
+        };
+
+        if (dialog.Content is not AddToDialog dialogContent)
+        {
+            return null;
+        }
+
+        // Sort
+        CultureInfo ci = CultureInfo.CurrentCulture;
+        StringComparer comp = StringComparer.Create(ci, true);
+
+        //dialogContent.PlaylistComboBox.ItemsSource = new ObservableCollection<Playlist>(vm.Playlists.OrderBy(x => x.Name, comp));
+        dialogContent.SetPlaylists(new ObservableCollection<Playlist>(vm.Playlists.OrderBy(x => x.Name, comp)));
+
+        var result = await dialog.ShowAsync();
+
+        if (result == ContentDialogResult.Primary)
+        {
+            if (dialogContent.CreateNewCheckBoxIsChecked)
+            {
+                var str = dialogContent.TextBoxPlaylistNameText ?? string.Empty;
+
+                if (!string.IsNullOrEmpty(str.Trim()))
+                {
+                    return new AddToDialogResult(str.Trim(), true);
+                }
+            }
+            else
+            {
+                var plselitem = dialogContent.PlaylistComboBoxSelectedItem;
+
+                if (plselitem is Models.Playlist pl)
+                {
+                    if (!string.IsNullOrWhiteSpace(pl.Name))
+                    {
+                        return new AddToDialogResult(pl.Name, true);
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+}

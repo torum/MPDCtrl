@@ -45,15 +45,25 @@ public sealed partial class AlbumsPage : Page
 
     private void Border_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        CreateOrUpdateSpringAnimation(1.02f);
+        if (sender is not FrameworkElement ele)
+        {
+            return;
+        }
 
-        (sender as UIElement)?.StartAnimation(_springAnimation);
+        CreateOrUpdateSpringAnimation(1.05f);
+        ele.CenterPoint = new Vector3((float)(ele.ActualWidth / 2.0), (float)(ele.ActualHeight / 2.0), 1f);
+        ele.StartAnimation(_springAnimation);
     }
     private void Border_PointerExited(object sender, PointerRoutedEventArgs e)
     {
-        CreateOrUpdateSpringAnimation(1.0f);
+        if (sender is not FrameworkElement ele)
+        {
+            return;
+        }
 
-        (sender as UIElement)?.StartAnimation(_springAnimation);
+        CreateOrUpdateSpringAnimation(1.0f);
+        ele.CenterPoint = new Vector3((float)(ele.ActualWidth / 2.0), (float)(ele.ActualHeight / 2.0), 1f);
+        ele.StartAnimation(_springAnimation);
     }
 
     public AlbumsPage()

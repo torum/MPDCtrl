@@ -19,13 +19,20 @@ public partial class SongFile : ObservableObject
 
 public partial class SongInfo : SongFile
 {
+    // Workaround for WinUI3's limitation or lack of features. 
+    public MainViewModel? ParentViewModel { get; set; }
+
     public string Title { get; set; } = "";
     public string Track { get; set; } = "";
-    public double TrackSort
+    public int TrackSort
     {
         get
         {
             int iTrack = 0;
+            if (string.IsNullOrEmpty(Disc))
+            {
+                return iTrack;
+            }
             try
             {
                 iTrack = int.Parse(Track);
@@ -35,11 +42,15 @@ public partial class SongInfo : SongFile
         }
     }
     public string Disc { get; set; } = "";
-    public double DiscSort
+    public int DiscSort
     {
         get
         {
             int iDisc = 0;
+            if (string.IsNullOrEmpty(Disc))
+            {
+                return iDisc;
+            }
             try
             {
                 iDisc = int.Parse(Disc);

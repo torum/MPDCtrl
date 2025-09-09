@@ -1,10 +1,28 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
+using System.Xml.Linq;
 
 namespace MPDCtrl.Models;
 
-public class Playlist
+public partial class Playlist : ObservableObject
 {
-    public string Name { get; set; } = "";
+    private string _name = string.Empty;
+    public string Name
+    {
+        get
+        {
+            return _name;
+        }
+        set
+        {
+            if (_name == value)
+                return;
+
+            _name = value;
+
+            OnPropertyChanged(nameof(Name));
+        }
+    }
 
     private string _lastModified = "";
     public string LastModified

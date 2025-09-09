@@ -13,8 +13,9 @@
             <Thickness x:Key="NavigationViewBorderThickness">0</Thickness>
             <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent"/>
 
-
             <x:Double x:Key="FontSizePageTitle">32</x:Double>
+            <x:Double x:Key="FontSizePageSubTitle">12</x:Double>
+            <x:Double x:Key="FontSizePageMenuControlText">12</x:Double>
 
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 

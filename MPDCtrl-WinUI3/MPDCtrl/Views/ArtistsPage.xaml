@@ -32,11 +32,13 @@
 
             <Grid Grid.Column="0">
                 <ListView Padding="0,0,0,0" Margin="0,0,0,0" ItemsSource="{x:Bind ViewModel.Artists, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAlbumArtist, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="ArtistsListView_SelectionChanged" SelectionMode="Single" Background="Transparent">
+                    <!--
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel />
                         </ItemsPanelTemplate>
                     </ListView.ItemsPanel>
+                    -->
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="mod:AlbumArtist">
                             <Grid>
@@ -44,11 +46,14 @@
                                     <ColumnDefinition Width="48"></ColumnDefinition>
                                     <ColumnDefinition MinWidth="128"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
+                                <PersonPicture DisplayName="{x:Bind Name, Mode=OneTime}" Width="36" Height="36" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <!--
                                 <Canvas Background="Transparent" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <Ellipse Fill="Gray" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Canvas>
+                                -->
                                 <Border Name="bdrArtistName" Grid.Row="0" Grid.Column="1">
-                                    <TextBlock Text="{x:Bind Name}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="0,0,0,0" Opacity="0.9"/>
+                                    <TextBlock Text="{x:Bind Name, Mode=OneTime}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="0,0,0,0" Opacity="0.9"/>
                                 </Border>
                             </Grid>
                         </DataTemplate>

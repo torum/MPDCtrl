@@ -37,6 +37,9 @@ public sealed partial class ArtistsPage : Page
             return;
         }
 
-        this.SelectedArtistAlbumsScrollViewer.ChangeView(0,0,null);
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        {
+            this.SelectedArtistAlbumsScrollViewer.ChangeView(0, 0, null);
+        });
     }
 }

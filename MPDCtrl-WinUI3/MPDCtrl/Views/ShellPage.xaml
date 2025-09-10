@@ -14,7 +14,7 @@
     PreviewKeyDown="Page_PreviewKeyDown" PreviewKeyUp="Page_PreviewKeyUp">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="32"/>
+            <RowDefinition Height="42"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="1"/>
@@ -29,6 +29,7 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <!-- NavigationView.PaneToggleButton: None draggable area(48px). Exclude from TitleBar -->
+                <Button x:Name="DummyButton" Height="36" Width="40" Margin="3,6,0,0" Visibility="Collapsed"/>
             </Grid>
             <Grid x:Name="AppTitleBar" Grid.Column="1">
                 <!-- Application TitleBar: SetTitleBar in code behinde -->
@@ -74,12 +75,13 @@
                         <RowDefinition Height="42"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    
-                    <Border Grid.Row="0">
-                        
+
+                    <Border Grid.Row="0" SizeChanged="AppTitleBar_SizeChanged">
+                        <Button x:Name="BackButton" x:Uid="GoBackButton" Height="36" Width="40" Margin="3,6,0,0" Click="BackButton_Click" Style="{StaticResource TitleBarBackButtonStyle}"  Visibility="{x:Bind ViewModel.IsGoBackButtonVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     </Border>
+                    
                     <!-- NavigationView content frame -->
-                    <Frame x:Name="NavigationFrame" Grid.Row="1"/>
+                    <Frame x:Name="NavigationFrame" Grid.Row="1" Navigated="NavigationFrame_Navigated"/>
                 </Grid>
 
             </NavigationView>

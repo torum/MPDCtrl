@@ -43,7 +43,7 @@
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="1">
-                <ListView x:Name="AlbumListView" ItemsSource="{x:Bind ViewModel.Albums}" helper:ListViewBehavior.VisibleItems="{x:Bind ViewModel.VisibleItemsAlbumsEx, Mode=TwoWay}" SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                <ListView x:Name="AlbumListView" ItemsSource="{x:Bind ViewModel.Albums, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAlbum, Mode=TwoWay}" helper:ListViewBehavior.VisibleItems="{x:Bind ViewModel.VisibleItemsAlbumsEx, Mode=TwoWay}" SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                         animations:Implicit.HideAnimations="{StaticResource HideTransitions}" animations:Implicit.ShowAnimations="{StaticResource ShowTransitions}" IsMultiSelectCheckBoxEnabled="False" Padding="0,0,24,0">
                     <ListView.Resources>
                         <x:Boolean x:Key="ListViewItemSelectionIndicatorVisualEnabled">False</x:Boolean>
@@ -51,6 +51,9 @@
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <ItemsWrapGrid Orientation="Horizontal"></ItemsWrapGrid>
+                            <!-- No virtualization
+                            <controls:UniformGrid Orientation="Horizontal" ColumnSpacing="24" RowSpacing="24"/>
+                            -->
                         </ItemsPanelTemplate>
                     </ListView.ItemsPanel>
                     <ListView.ItemTemplate>

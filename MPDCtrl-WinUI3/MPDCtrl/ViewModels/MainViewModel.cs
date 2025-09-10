@@ -661,7 +661,7 @@ public partial class MainViewModel : ObservableObject
         {
             int sec, min, hour, s;
 
-            sec = Time / 10;
+            sec = Time / _elapsedTimeMultiplier;
 
             min = sec / 60;
             s = sec % 60;
@@ -671,6 +671,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private int _elapsedTimeMultiplier = 1;
     private int _elapsed = 0;
     public int Elapsed
     {
@@ -718,7 +719,7 @@ public partial class MainViewModel : ObservableObject
         {
             int sec, min, hour, s;
 
-            sec = _elapsed / 10;
+            sec = _elapsed / _elapsedTimeMultiplier;
 
             min = sec / 60;
             s = sec % 60;
@@ -739,7 +740,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private readonly System.Timers.Timer _elapsedTimer = new(100);
+    private readonly System.Timers.Timer _elapsedTimer = new(1000); // when using _elapsedTimeMultiplier(other than 1), change this accordingly.
     private void ElapsedTimer(object? sender, System.Timers.ElapsedEventArgs e)
     {
         if ((_elapsed < _time) && (_mpc.MpdStatus.MpdState == Status.MpdPlayState.Play))
@@ -1222,20 +1223,6 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private bool _isAlbumContentPanelVisible = false;
-    public bool IsAlbumContentPanelVisible
-    {
-        get { return _isAlbumContentPanelVisible; }
-        set
-        {
-            if (_isAlbumContentPanelVisible == value)
-                return;
-
-            _isAlbumContentPanelVisible = value;
-            OnPropertyChanged(nameof(IsAlbumContentPanelVisible));
-        }
-    }
-
     private AlbumEx? _selectedAlbum = new();
     public AlbumEx? SelectedAlbum
     {
@@ -1243,11 +1230,23 @@ public partial class MainViewModel : ObservableObject
         set
         {
             if (_selectedAlbum == value)
+            {
                 return;
+            }
 
             _selectedAlbum = value;
             OnPropertyChanged(nameof(SelectedAlbum));
             OnPropertyChanged(nameof(SelectedAlbumSongs));
+
+            if (_selectedAlbum is null)
+            {
+                return;
+            }
+
+            //_ = Task.Run(async () => { await GetAlbumSongs(_selectedAlbum); });
+            GetAlbumSongs(_selectedAlbum);
+
+            AlbumSelected?.Invoke(this,EventArgs.Empty);
         }
     }
 
@@ -1877,6 +1876,24 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private bool _isGoBackButtonVisible = false;
+    public bool IsGoBackButtonVisible
+    {
+        get { return _isGoBackButtonVisible; }
+        set
+        {
+            if (_isGoBackButtonVisible == value)
+                return;
+
+            _isGoBackButtonVisible = value;
+            OnPropertyChanged(nameof(IsGoBackButtonVisible));
+
+            // Update RegionsForCustomTitleBar.
+            GoBackButtonVisibilityChanged?.Invoke(this,EventArgs.Empty);
+        }
+    }
+
+
     #endregion
 
     #region == Theme ==
@@ -1945,13 +1962,18 @@ public partial class MainViewModel : ObservableObject
 
     #region == Events ==
 
-    // Queue listview ScrollIntoView
+    // Queue listview ScrollIntoView.
     public event EventHandler<object>? ScrollIntoView;
 
-    // Queue listview ScrollIntoView and select (for filter and first time loading the queue)
+    // Queue listview ScrollIntoView and select (for filter and first time loading the queue).
     public event EventHandler<object>? ScrollIntoViewAndSelect;
 
+    // For status bar message.
     public event EventHandler<string>? UpdateProgress;
+
+    public event EventHandler? AlbumSelected;
+    public event EventHandler? GoBackButtonVisibilityChanged;
+
 
     #endregion
 
@@ -2373,9 +2395,9 @@ public partial class MainViewModel : ObservableObject
                 {
                     // no need to care about "double" updates for time.
                     Time = Convert.ToInt32(_mpc.MpdStatus.MpdSongTime);
-                    Time *= 10;
+                    Time *= _elapsedTimeMultiplier;
                     _elapsed = Convert.ToInt32(_mpc.MpdStatus.MpdSongElapsed);
-                    _elapsed *= 10;
+                    _elapsed *= _elapsedTimeMultiplier;
                     if (!_elapsedTimer.Enabled)
                         _elapsedTimer.Start();
                 }
@@ -2385,9 +2407,9 @@ public partial class MainViewModel : ObservableObject
 
                     // no need to care about "double" updates for time.
                     Time = Convert.ToInt32(_mpc.MpdStatus.MpdSongTime);
-                    Time *= 10;
+                    Time *= _elapsedTimeMultiplier;
                     _elapsed = Convert.ToInt32(_mpc.MpdStatus.MpdSongElapsed);
-                    _elapsed *= 10;
+                    _elapsed *= _elapsedTimeMultiplier;
                     OnPropertyChanged(nameof(Elapsed));
                 }
 
@@ -3403,6 +3425,94 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
+
+    private void GetAlbumSongs(AlbumEx album)
+    {
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        {
+            if (!album.IsSongsAcquired)
+            {
+                if (!string.IsNullOrEmpty(album.AlbumArtist.Trim()))
+                {
+                    //Debug.WriteLine($"GetAlbumSongs: Album artist is not empty, searching by album artist. ({album.AlbumArtist})");
+                    var r = await SearchArtistSongs(album.AlbumArtist);//.ConfigureAwait(ConfigureAwaitOptions.None);// no trim() here.
+
+                    if (r.IsSuccess)
+                    {
+                        if (r.SearchResult is null)
+                        {
+                            Debug.WriteLine("GetAlbumSongs: SearchResult is null, returning.");
+                            return;
+                        }
+
+                        foreach (var song in r.SearchResult)
+                        {
+                            if ((song.AlbumArtist.Equals(album.AlbumArtist)) || (song.Artist.Equals(album.AlbumArtist)))
+                            {
+                                //if (song.Album.Trim() == album.Name.Trim())
+                                if (song.Album.Equals(album.Name))
+                                {
+                                    //Debug.WriteLine($"{song.Album}=={album.Name}?...{song.Title}");
+                                    album.Songs.Add(song);
+                                }
+                            }
+                        }
+                        album.IsSongsAcquired = true;
+
+                        //SelectedAlbum = album;
+                        await Task.Yield();
+
+                    }
+                    else
+                    {
+                        Debug.WriteLine("GetAlbumSongs: SearchArtistSongs returned false, returning.");
+                        return;
+                    }
+                }
+                else
+                {
+                    Debug.WriteLine($"GetAlbumSongs: No album artist, trying to search by album name. ({album.Name})");
+
+                    if (!string.IsNullOrEmpty(album.Name.Trim()))
+                    {
+                        var r = await SearchAlbumSongs(album.Name); // no trim() here.
+                        if (r.IsSuccess)
+                        {
+                            if (r.SearchResult is null)
+                            {
+                                Debug.WriteLine("GetAlbumSongs: SearchResult is null, returning.");
+                                return;
+                            }
+
+                            foreach (var song in r.SearchResult)
+                            {
+                                album.Songs.Add(song);
+                            }
+                            album.IsSongsAcquired = true;
+
+                            //SelectedAlbum = album;
+                            await Task.Yield();
+                        }
+                        else
+                        {
+                            Debug.WriteLine("GetAlbumSongs: SearchArtistSongs returned false, returning.");
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("GetAlbumSongs: No album name, no artist name.");
+                        // This should not happen.
+                    }
+                }
+            }
+            else
+            {
+                //SelectedAlbum = album;
+                await Task.Delay(50);
+            }
+        });
+    }
 
     private async void GetArtistSongs(AlbumArtist? artist)
     {
@@ -4423,10 +4533,28 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    public async Task Stop()
+    {
+        if (IsBusy) return;
+        if (Queue.Count < 1) { return; }
+
+        await _mpc.MpdPlaybackStop();
+    }
+
+    [RelayCommand]
+    public async Task Pause()
+    {
+        if (IsBusy) return;
+        if (Queue.Count < 1) { return; }
+
+        await _mpc.MpdPlaybackPause();
+    }
+
+    [RelayCommand]
     public async Task SetSeek()
     {
         if (IsBusy) return;
-        double elapsed = _elapsed / 10;
+        double elapsed = _elapsed / _elapsedTimeMultiplier;
         await _mpc.MpdPlaybackSeek(_mpc.MpdStatus.MpdSongID, elapsed);
     }
 
@@ -4457,6 +4585,41 @@ public partial class MainViewModel : ObservableObject
         if (IsBusy) return;
         await _mpc.MpdSetSingle(_single);
     }
+
+    [RelayCommand]
+    public void VolumeDown()
+    {
+        if (_volume >= 10)
+        {
+            Volume -= 10;
+            //await _mpc.MpdSetVolume(Convert.ToInt32(_volume - 10));
+        }
+        else
+        {
+            Volume = 0;
+        }
+    }
+
+    [RelayCommand]
+    public void VolumeUp()
+    {
+        if (_volume <= 90)
+        {
+            Volume += 10;
+            //await _mpc.MpdSetVolume(Convert.ToInt32(_volume + 10));
+        }
+        else
+        {
+            Volume = 100;
+        }
+    }
+
+    [RelayCommand]
+    public async Task VolumeMute()
+    {
+        await _mpc.MpdSetVolume(0);
+    }
+
 
     [RelayCommand]
     public async Task SearchExec()

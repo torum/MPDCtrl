@@ -15,7 +15,20 @@ public partial class Album : ObservableObject
 
     public bool IsSongsAcquired { get; set; } = false;
 
-    public ObservableCollection<SongInfo> Songs { get; private set; } = [];
+    public ObservableCollection<SongInfo> _songs = [];
+    public ObservableCollection<SongInfo> Songs
+    {
+        get => _songs;
+        set
+        {
+            if (_songs == value)
+            {
+                return;
+            }
+            _songs = value;
+            OnPropertyChanged(nameof(Songs));
+        }
+    }
 }
 
 public partial class AlbumEx :Album

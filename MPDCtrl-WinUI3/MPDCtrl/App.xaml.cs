@@ -104,6 +104,7 @@ public partial class App : Application
             services.AddSingleton<SettingsPage>();
             services.AddSingleton<QueuePage>();
             services.AddSingleton<AlbumsPage>();
+            services.AddSingleton<AlbumDetailPage>();
             services.AddSingleton<ArtistsPage>();
             services.AddSingleton<FilesPage>();
             services.AddSingleton<SearchPage>();

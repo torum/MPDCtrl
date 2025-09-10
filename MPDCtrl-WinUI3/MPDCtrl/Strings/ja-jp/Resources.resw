@@ -333,4 +333,7 @@
   <data name="ListviewItemContextMenu_Remove.Text" xml:space="preserve">
     <value>削除</value>
   </data>
+  <data name="GoBackButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>戻る</value>
+  </data>
 </root>

@@ -1,3 +1,4 @@
+using CommunityToolkit.WinUI;
 using Microsoft.UI;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
@@ -17,20 +18,35 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Media;
+using Windows.Media.Core;
+using Windows.Media.Playback;
 using Windows.Storage;
+using Windows.System;
 
 namespace MPDCtrl.Views;
 
 public sealed partial class MainWindow : Window
 {
+    private readonly MainViewModel _vm;
+
     // DispatcherQueue
     private Microsoft.UI.Dispatching.DispatcherQueue? _currentDispatcherQueue;// = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
     public Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue => _currentDispatcherQueue;
+    
+    // WinUI3 workaround.
+    private readonly MediaPlayer? _mediaPlayer;
+    private readonly SystemMediaTransportControls? _smtc;
+    private readonly bool _isMediaTransportControlEnable = false;
+
+    private readonly WindowMessageHook _hook;
 
     // Window position and size
     // TODO: Change this lator.1920x1080
@@ -44,6 +60,9 @@ public sealed partial class MainWindow : Window
 
     public MainWindow()
     {
+        var vm = App.GetService<MainViewModel>();
+        _vm = vm;
+
         _currentDispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 
         if (this.AppWindow.Presenter is OverlappedPresenter presenter)
@@ -72,6 +91,62 @@ public sealed partial class MainWindow : Window
 
             root.CallMeWhenMainWindowIsReady(this);
         }
+
+        WindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        _hook = new WindowMessageHook(this);
+        _hook.Message += OnWindowMessage;
+
+        SetUpHotKey();
+
+        this.Closed += (s, e) => 
+        {
+            CleanUpHotKey();
+            _hook.Dispose();
+        };
+
+        _isMediaTransportControlEnable = false;
+
+        if (_isMediaTransportControlEnable)
+        {
+            // WinUI3 workaround for media key control. Only works in packaged environment.
+            //_smtc = SystemMediaTransportControls.GetForCurrentView(); //<- this is only works in UWP.
+            // So, get the SystemMediaTransportControls from the MediaPlayer instance for workaround.
+            _mediaPlayer = new MediaPlayer();
+            //_mediaPlayer.CommandManager.IsEnabled = false; <- not good if false.
+            _smtc = _mediaPlayer.SystemMediaTransportControls;
+            _smtc.IsPlayEnabled = true;
+            _smtc.IsPauseEnabled = true;
+            _smtc.IsNextEnabled = true;
+            _smtc.IsPreviousEnabled = true;
+            _smtc.IsStopEnabled = true;
+
+            var mlist = new MediaPlaybackList();
+            var mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromUri(new Uri("ms-appx:///Assets/dummy.mp3")));
+            var props = mediaPlaybackItem.GetDisplayProperties();
+            props.Type = Windows.Media.MediaPlaybackType.Music;
+            props.MusicProperties.Title = "Song title";
+            props.MusicProperties.Artist = "Song artist";
+            props.MusicProperties.Genres.Add("Blues");
+            //props.Thumbnail
+            mediaPlaybackItem.ApplyDisplayProperties(props);
+
+            // To enable prev and back button, make it a playlist.
+            mlist.Items.Add(mediaPlaybackItem);
+            mlist.AutoRepeatEnabled = true;
+
+            // set dummy playlist to the player.
+            _mediaPlayer.Source = mlist;
+
+            // update info.
+            props.MusicProperties.Title = "Song title2222222";
+            mediaPlaybackItem.ApplyDisplayProperties(props);
+
+
+            _smtc.PlaybackStatus = MediaPlaybackStatus.Paused;
+
+            //
+            _smtc.ButtonPressed += Smtc_ButtonPressed;
+        }
     }
 
     private void LoadSettings()
@@ -82,19 +157,17 @@ public sealed partial class MainWindow : Window
             filePath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.AppName + ".config");
         }
 
-        var vm = App.GetService<MainViewModel>();
-
         if (Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController.IsSupported())
         {
-            vm.IsAcrylicSupported = true;
+            _vm.IsAcrylicSupported = true;
 
-            vm.IsBackdropEnabled = true;
+            _vm.IsBackdropEnabled = true;
         }
         if (Microsoft.UI.Composition.SystemBackdrops.MicaController.IsSupported())
         {
-            vm.IsMicaSupported = true;
+            _vm.IsMicaSupported = true;
 
-            vm.IsBackdropEnabled = true;
+            _vm.IsBackdropEnabled = true;
         }
 
         if (!System.IO.File.Exists(filePath))
@@ -103,22 +176,22 @@ public sealed partial class MainWindow : Window
 
             if (Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController.IsSupported())
             {
-                vm.IsAcrylicSupported = true;
+                _vm.IsAcrylicSupported = true;
                 SystemBackdrop = new DesktopAcrylicBackdrop();
-                vm.Material = SystemBackdropOption.Acrylic;
+                _vm.Material = SystemBackdropOption.Acrylic;
 
-                vm.IsBackdropEnabled = true;
+                _vm.IsBackdropEnabled = true;
             }
             else if (Microsoft.UI.Composition.SystemBackdrops.MicaController.IsSupported())
             {
-                vm.IsMicaSupported = true;
+                _vm.IsMicaSupported = true;
                 SystemBackdrop = new MicaBackdrop()
                 {
                     Kind = MicaKind.Base
                 };
-                vm.Material = SystemBackdropOption.Mica;
+                _vm.Material = SystemBackdropOption.Mica;
 
-                vm.IsBackdropEnabled = true;
+                _vm.IsBackdropEnabled = true;
             }
 
             theme = ElementTheme.Default;
@@ -198,11 +271,11 @@ public sealed partial class MainWindow : Window
                         {
                             if (xbool.Equals("True"))
                             {
-                                vm.IsNavigationViewMenuOpen = true;
+                                _vm.IsNavigationViewMenuOpen = true;
                             }
                             else
                             {
-                                vm.IsNavigationViewMenuOpen = false;
+                                _vm.IsNavigationViewMenuOpen = false;
                             }
                         }
                     }
@@ -336,9 +409,9 @@ public sealed partial class MainWindow : Window
         if (bd != SystemBackdropOption.None)
         {
             theme = eleThme;
-            vm.Theme = eleThme;
+            _vm.Theme = eleThme;
         }
-        vm.Material = bd;
+        _vm.Material = bd;
         SwitchBackdrop(bd);
     }
 
@@ -641,4 +714,249 @@ public sealed partial class MainWindow : Window
         }
 
     }
+
+    #region == Global Hotkey == 
+
+    // HotKey WM ID
+    private const int WM_HOTKEY = 0x0312;
+
+    private const int HOTKEY_ID1 = 0x0001; // play/pause
+    private const int HOTKEY_ID2 = 0x0002; // next
+    private const int HOTKEY_ID3 = 0x0003; // prev
+    private const int HOTKEY_ID4 = 0x0004; // vol up
+    private const int HOTKEY_ID5 = 0x0005; // vol up
+    private const int HOTKEY_ID6 = 0x0006; // vol down
+    private const int HOTKEY_ID7 = 0x0007; // vol down
+
+    // 
+    private const int HOTKEY_ID8 = 0x0008; // MediaPlayPause
+    private const int HOTKEY_ID9 = 0x0009; // MediaStop
+    private const int HOTKEY_ID10 = 0x0010; // MediaNextTrack
+    private const int HOTKEY_ID11 = 0x0011; // MediaPreviousTrack
+
+    private readonly IntPtr WindowHandle;
+    private const int MOD_CONTROL = 0x0002;
+    private const int MOD_SHIFT = 0x0004;
+
+    private void SetUpHotKey()
+    {
+        var result1 = RegisterHotKey(WindowHandle, HOTKEY_ID1, MOD_CONTROL, (int)Windows.System.VirtualKey.Space);
+        if (result1 == 0)
+        {
+            Debug.WriteLine("HotKey1(Space) register failed.");
+        }
+
+        var result2 = RegisterHotKey(WindowHandle, HOTKEY_ID2, MOD_CONTROL, (int)Windows.System.VirtualKey.Right);
+        if (result2 == 0)
+        {
+            Debug.WriteLine("HotKey2(Right) register failed.");
+        }
+
+        var result3 = RegisterHotKey(WindowHandle, HOTKEY_ID3, MOD_CONTROL, (int)Windows.System.VirtualKey.Left);
+        if (result3 == 0)
+        {
+            Debug.WriteLine("HotKey3(Left) register failed.");
+        }
+
+        var result4 = RegisterHotKey(WindowHandle, HOTKEY_ID4, MOD_CONTROL, (int)Windows.System.VirtualKey.Up);
+        if (result4 == 0)
+        {
+            Debug.WriteLine("HotKey4(Up) register failed.");
+        }
+
+        var result5 = RegisterHotKey(WindowHandle, HOTKEY_ID5, MOD_CONTROL, (int)Windows.System.VirtualKey.Add);
+        if (result5 == 0)
+        {
+            Debug.WriteLine("HotKey5(Add) register failed.");
+        }
+
+        var result6 = RegisterHotKey(WindowHandle, HOTKEY_ID6, MOD_CONTROL, (int)Windows.System.VirtualKey.Down);
+        if (result6 == 0)
+        {
+            Debug.WriteLine("HotKey6(Down) register failed.");
+        }
+
+        var result7 = RegisterHotKey(WindowHandle, HOTKEY_ID7, MOD_CONTROL, (int)Windows.System.VirtualKey.Subtract);
+        if (result7 == 0)
+        {
+            Debug.WriteLine("HotKey7(Subtract) register failed.");
+        }
+    }
+
+    private void CleanUpHotKey()
+    {
+        Unregister(HOTKEY_ID1);
+        Unregister(HOTKEY_ID2);
+        Unregister(HOTKEY_ID3);
+        Unregister(HOTKEY_ID4);
+        Unregister(HOTKEY_ID5);
+        Unregister(HOTKEY_ID6);
+        Unregister(HOTKEY_ID7);
+        //Unregister(HOTKEY_ID8);
+        //Unregister(HOTKEY_ID9);
+        //Unregister(HOTKEY_ID10);
+        //Unregister(HOTKEY_ID11);
+    }
+
+    private void OnWindowMessage(object? sender, WindowMessageHook.MessageEventArgs e)
+    {
+        if (e.Message != WM_HOTKEY) return;
+
+        switch (e.WParam.ToInt32())
+        {
+            case HOTKEY_ID1:
+                Task.Run(_vm.Play);
+                break;
+            case HOTKEY_ID2:
+                Task.Run(_vm.PlayNext);
+                break;
+            case HOTKEY_ID3:
+                Task.Run(_vm.PlayPrev);
+                break;
+            case HOTKEY_ID4:
+                _vm.VolumeUp();
+                break;
+            case HOTKEY_ID5:
+                _vm.VolumeUp();
+                break;
+            case HOTKEY_ID6:
+                _vm.VolumeDown();
+                break;
+            case HOTKEY_ID7:
+                _vm.VolumeDown();
+                break;
+            case HOTKEY_ID8:
+                Task.Run(_vm.Play);
+                break;
+            case HOTKEY_ID9:
+                Task.Run(_vm.Play);
+                break;
+            case HOTKEY_ID10:
+                Task.Run(_vm.PlayNext);
+                break;
+            case HOTKEY_ID11:
+                Task.Run(_vm.PlayPrev);
+                break;
+            default:
+                break;
+        }
+    }
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    private static partial int RegisterHotKey(IntPtr hWnd, int id, int modKey, int vKey);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    private static partial int UnregisterHotKey(IntPtr hWnd, int id);
+
+    public bool Unregister(int id)
+    {
+        var ret = UnregisterHotKey(WindowHandle, id);
+        return ret == 0;
+    }
+
+    public partial class WindowMessageHook : IDisposable
+    {
+        private readonly nint _hwnd;
+        private readonly SUBCLASSPROC _subclassProc;
+        private bool _isHooked;
+
+        private const uint WM_HOTKEY = 0x0312;
+
+        public event EventHandler<MessageEventArgs>? Message;
+
+        public WindowMessageHook(Window window)
+        {
+            _hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+            _subclassProc = new SUBCLASSPROC(SubclassProc);
+            _isHooked = SetWindowSubclass(_hwnd, _subclassProc, 0, 0);
+        }
+
+        private nint SubclassProc(nint hWnd, uint uMsg, nint wParam, nint lParam, nint uIdSubclass, nint dwRefData)
+        {
+            if (uMsg == WM_HOTKEY)
+            {
+                Message?.Invoke(this, new MessageEventArgs(uMsg, wParam, lParam));
+            }
+
+            return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+        }
+
+        public void Dispose()
+        {
+            if (_isHooked)
+            {
+                RemoveWindowSubclass(_hwnd, _subclassProc, 0);
+                _isHooked = false;
+            }
+
+            GC.SuppressFinalize(this);
+        }
+
+        public class MessageEventArgs(uint message, nint wParam, nint lParam) : EventArgs
+        {
+            public uint Message { get; } = message;
+            public nint WParam { get; } = wParam;
+            public nint LParam { get; } = lParam;
+        }
+
+        [LibraryImport("Comctl32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool SetWindowSubclass(nint hWnd, SUBCLASSPROC pfnSubclass, nint uIdSubclass, nint dwRefData);
+
+        [LibraryImport("Comctl32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool RemoveWindowSubclass(nint hWnd, SUBCLASSPROC pfnSubclass, nint uIdSubclass);
+
+        [LibraryImport("Comctl32.dll")]
+        private static partial nint DefSubclassProc(nint hWnd, uint uMsg, nint wParam, nint lParam);
+
+        private delegate nint SUBCLASSPROC(nint hWnd, uint uMsg, nint wParam, nint lParam, nint uIdSubclass, nint dwRefData);
+    }
+
+    #endregion
+
+    #region == Windows.Media.SystemMediaTransportControls ==
+
+    private async void Smtc_ButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
+    {
+        Debug.WriteLine("Smtc_ButtonPressed");
+
+        if (_smtc is null) return;
+
+        if (CurrentDispatcherQueue is null)
+        {
+            return;
+        }
+
+        // Media key events are dispatched on a background thread.
+        // Use the DispatcherQueue to execute code on the UI thread.
+        await CurrentDispatcherQueue.EnqueueAsync(() =>
+        {
+            switch (args.Button)
+            {
+                case SystemMediaTransportControlsButton.Play:
+                    Task.Run(_vm.Play);
+                    _smtc.PlaybackStatus = MediaPlaybackStatus.Playing;
+                    break;
+                case SystemMediaTransportControlsButton.Pause:
+                    Task.Run(_vm.Pause);
+                    _smtc.PlaybackStatus = MediaPlaybackStatus.Paused;
+                    break;
+                case SystemMediaTransportControlsButton.Next:
+                    Task.Run(_vm.PlayNext);
+                    _smtc.PlaybackStatus = MediaPlaybackStatus.Playing;
+                    break;
+                case SystemMediaTransportControlsButton.Previous:
+                    Task.Run(_vm.PlayPrev);
+                    _smtc.PlaybackStatus = MediaPlaybackStatus.Playing;
+                    break;
+                case SystemMediaTransportControlsButton.Stop:
+                    Task.Run(_vm.Stop);
+                    _smtc.PlaybackStatus = MediaPlaybackStatus.Stopped;
+                    break;
+            }
+        });
+    }
+
+    #endregion
 }

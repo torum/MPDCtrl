@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Input;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Markup;
@@ -14,6 +15,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using Windows.Foundation;
 using Windows.UI.ApplicationSettings;
 
 namespace MPDCtrl.Views;
@@ -35,8 +37,13 @@ public sealed partial class ShellPage : Page
 
         InitializeComponent();
 
+        //AppTitleBar.SizeChanged += AppTitleBar_SizeChanged; <-This does not allways fire. Use diffrent grid and use navigated event.
+
+        ViewModel.AlbumSelected += this.OnAlbumSelected;
+        ViewModel.GoBackButtonVisibilityChanged += this.OnGoBackButtonVisibilityChanged;
+
         //NavigationFrame.Content = App.GetService<QueuePage>(); <- not good because this create instance in addition to navigation view.
-        if (NavigationFrame.Navigate(typeof(QueuePage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
+        if (NavigationFrame.Navigate(typeof(QueuePage), NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
         {
             _currentPage = typeof(QueuePage);
         }
@@ -47,9 +54,98 @@ public sealed partial class ShellPage : Page
         ViewModel.StartMPC();
     }
 
+    private void AppTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        // Update interactive regions if the size of the window changes.
+        SetRegionsForCustomTitleBar();
+    }
+
+    private void OnGoBackButtonVisibilityChanged(object? sender, System.EventArgs e)
+    {
+        // Update interactive regions if the size of the window changes.
+        SetRegionsForCustomTitleBar();
+    }
+
+    private void SetRegionsForCustomTitleBar()
+    {
+        var m_AppWindow = App.MainWnd?.AppWindow;
+
+        if (m_AppWindow is null)
+        {
+            return;
+        }
+
+        if (App.MainWnd?.ExtendsContentIntoTitleBar != true)
+        {
+            return;
+        }
+
+        double scaleAdjustment = AppTitleBar.XamlRoot.RasterizationScale;
+
+        //
+        /*
+        GeneralTransform transform = this.SearchBox.TransformToVisual(null);
+        Rect bounds = transform.TransformBounds(new Rect(0, 0,
+                                                         this.SearchBox.ActualWidth,
+                                                         this.SearchBox.ActualHeight));
+        Windows.Graphics.RectInt32 SearchBoxRect = GetRect(bounds, scaleAdjustment);
+
+        GeneralTransform transform = this.DummyButton.TransformToVisual(null);
+        Rect bounds = transform.TransformBounds(new Rect(0, 0,
+                                                         this.DummyButton.ActualWidth,
+                                                         this.DummyButton.ActualHeight));
+        Windows.Graphics.RectInt32 DummyButtonRect = GetRect(bounds, scaleAdjustment);
+        */
+        //
+
+        double width = this.BackButton.Width;//ActualWidth won't work in certain cases.
+        double height = this.BackButton.Height;//ActualHeight won't work in certain cases.
+
+        if (this.BackButton.Visibility != Visibility.Visible)
+        {
+            //Debug.WriteLine("BackButton.Visibility != Visibility.Visible");
+            width = 0;
+            height = 0;
+        }
+
+        GeneralTransform transform = this.BackButton.TransformToVisual(null);
+        Rect bounds = transform.TransformBounds(new Rect(0, 0,
+                                                    width,
+                                                    height));
+        Windows.Graphics.RectInt32 BackButtonRect = GetRect(bounds, scaleAdjustment);
+
+        //
+        //var rectArray = new Windows.Graphics.RectInt32[] { SearchBoxRect, BackButtonRect };
+        var rectArray = new Windows.Graphics.RectInt32[] { BackButtonRect };
+
+        InputNonClientPointerSource nonClientInputSrc =
+            InputNonClientPointerSource.GetForWindowId(m_AppWindow.Id);
+        nonClientInputSrc.SetRegionRects(NonClientRegionKind.Passthrough, rectArray);
+    }
+
+    private static Windows.Graphics.RectInt32 GetRect(Rect bounds, double scale)
+    {
+        return new Windows.Graphics.RectInt32(
+            _X: (int)Math.Round(bounds.X * scale),
+            _Y: (int)Math.Round(bounds.Y * scale),
+            _Width: (int)Math.Round(bounds.Width * scale),
+            _Height: (int)Math.Round(bounds.Height * scale)
+        );
+    }
+
+    public void OnAlbumSelected(object? sender, System.EventArgs e)
+    {
+        if (this.NavigationFrame.Navigate(typeof(AlbumDetailPage), this.NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight }))
+        {
+            _currentPage = typeof(AlbumDetailPage);
+        }
+    }
+
     public void CallMeWhenMainWindowIsReady(MainWindow wnd)
     {
         wnd.SetTitleBar(AppTitleBar);
+
+        //SetRegionsForCustomTitleBar();
     }
 
     private void This_ActualThemeChanged(FrameworkElement sender, object args)
@@ -76,7 +172,7 @@ public sealed partial class ShellPage : Page
     {
         if (args.IsSettingsInvoked == true)
         {
-            if (NavigationFrame.Navigate(typeof(SettingsPage), null, args.RecommendedNavigationTransitionInfo))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
+            if (this.NavigationFrame.Navigate(typeof(SettingsPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
             {
                 _currentPage = typeof(SettingsPage);
             }
@@ -153,7 +249,7 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            if (NavigationFrame.Navigate(typeof(QueuePage), null, args.RecommendedNavigationTransitionInfo))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
+            if (this.NavigationFrame.Navigate(typeof(QueuePage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
             {
                 _currentPage = typeof(QueuePage);
             }
@@ -164,7 +260,7 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            if (NavigationFrame.Navigate(typeof(AlbumsPage), null, args.RecommendedNavigationTransitionInfo))
+            if (this.NavigationFrame.Navigate(typeof(AlbumsPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
             {
                 _currentPage = typeof(AlbumsPage);
             }
@@ -175,7 +271,7 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            if (NavigationFrame.Navigate(typeof(ArtistsPage), null, args.RecommendedNavigationTransitionInfo))
+            if (this.NavigationFrame.Navigate(typeof(ArtistsPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
             {
                 _currentPage = typeof(ArtistsPage);
             }
@@ -186,7 +282,7 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            if (NavigationFrame.Navigate(typeof(FilesPage), null, args.RecommendedNavigationTransitionInfo))
+            if (this.NavigationFrame.Navigate(typeof(FilesPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
             {
                 _currentPage = typeof(FilesPage);
             }
@@ -197,7 +293,7 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            if (NavigationFrame.Navigate(typeof(SearchPage), null, args.RecommendedNavigationTransitionInfo))
+            if (this.NavigationFrame.Navigate(typeof(SearchPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
             {
                 _currentPage = typeof(SearchPage);
             }
@@ -208,7 +304,7 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            if (NavigationFrame.Navigate(typeof(PlaylistItemPage), null, args.RecommendedNavigationTransitionInfo))
+            if (this.NavigationFrame.Navigate(typeof(PlaylistItemPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
             {
                 _currentPage = typeof(PlaylistItemPage);
             }
@@ -246,6 +342,38 @@ public sealed partial class ShellPage : Page
             {
                 vm.SelectedNodeMenu = null;
             }
+        }
+    }
+
+    private void BackButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (this.NavigationFrame is null)
+        {
+            return;
+        }
+
+        if (this.NavigationFrame.CanGoBack)
+        {
+            this.NavigationFrame.GoBack();
+        }
+    }
+
+    private void NavigationFrame_Navigated(object sender, NavigationEventArgs e)
+    {
+        if (this.NavigationFrame is null)
+        {
+            return;
+        }
+
+        if (this.NavigationFrame.CanGoBack)
+        {
+            //this.BackButton.Visibility = Visibility.Visible;
+            this.BackButton.IsEnabled = true;
+        }
+        else
+        {
+            //this.BackButton.Visibility = Visibility.Collapsed;
+            this.BackButton.IsEnabled = false;
         }
     }
 
@@ -293,4 +421,4 @@ public sealed partial class ShellPage : Page
         // Disable space key down.
         e.Handled = true;
     }
-}
+    }

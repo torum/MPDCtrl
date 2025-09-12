@@ -41,12 +41,18 @@ public sealed partial class ShellPage : Page
 
         ViewModel.AlbumSelected += this.OnAlbumSelected;
         ViewModel.GoBackButtonVisibilityChanged += this.OnGoBackButtonVisibilityChanged;
-
+        /*
         //NavigationFrame.Content = App.GetService<QueuePage>(); <- not good because this create instance in addition to navigation view.
         if (NavigationFrame.Navigate(typeof(QueuePage), NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
         {
             _currentPage = typeof(QueuePage);
+            var queuepage = ViewModel.MainMenuItems.FirstOrDefault();
+            if (queuepage != null)
+            {
+                queuepage.Selected = true;
+            }
         }
+        */
 
         this.ActualThemeChanged += this.This_ActualThemeChanged;
 
@@ -155,16 +161,27 @@ public sealed partial class ShellPage : Page
             return;
         }
 
-        App.MainWnd.SetCapitionButtonColorForWin11();
+        App.MainWnd.SetCapitionButtonColor();
     }
 
     private void NavigationView_Loaded(object sender, RoutedEventArgs e)
     {
+        /*
         var selected = ViewModel.MainMenuItems.FirstOrDefault();
         if (selected != null)
         {
             selected.Selected = true;
             //Debug.WriteLine("NavigationView_Loaded and selected");
+        }
+        */
+        if (NavigationFrame.Navigate(typeof(QueuePage), NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
+        {
+            _currentPage = typeof(QueuePage);
+            var queuepage = ViewModel.MainMenuItems.FirstOrDefault();
+            if (queuepage != null)
+            {
+                queuepage.Selected = true;
+            }
         }
     }
 
@@ -179,62 +196,12 @@ public sealed partial class ShellPage : Page
             return;
         }
 
-        // This won't work because somehow "args.InvokedItemContainer.DataContext" returns null.
-        /*
-        if (args.InvokedItemContainer is not NavigationViewItem item)
-        {
-            return;
-        }
-
-        if (item.DataContext is NodeMenuQueue)
-        {
-            if (NavigationFrame.Navigate(typeof(QueuePage), null, args.RecommendedNavigationTransitionInfo))
-            {
-                _currentPage = typeof(QueuePage);
-            }
-        }
-        else if (item.DataContext is NodeMenuAlbum)
-        {
-            if (NavigationFrame.Navigate(typeof(AlbumsPage), null, args.RecommendedNavigationTransitionInfo))
-            {
-                _currentPage = typeof(AlbumsPage);
-            }
-        }
-        else if (item.DataContext is NodeMenuArtist)
-        {
-            if (NavigationFrame.Navigate(typeof(ArtistsPage), null, args.RecommendedNavigationTransitionInfo))
-            {
-                _currentPage = typeof(ArtistsPage);
-            }
-        }
-        else if (item.DataContext is NodeMenuFiles)
-        {
-            if (NavigationFrame.Navigate(typeof(FilesPage), null, args.RecommendedNavigationTransitionInfo))
-            {
-                _currentPage = typeof(FilesPage);
-            }
-        }
-        else if (item.DataContext is NodeMenuSearch)
-        {
-            if (NavigationFrame.Navigate(typeof(SearchPage), null, args.RecommendedNavigationTransitionInfo))
-            {
-                _currentPage = typeof(SearchPage);
-            }
-        }
-        else if (item.DataContext is NodeMenuPlaylistItem)
-        {
-            if (NavigationFrame.Navigate(typeof(PlaylistItemPage), null, args.RecommendedNavigationTransitionInfo))
-            {
-                _currentPage = typeof(PlaylistItemPage);
-            }
-        }
-        */
-
         if (_currentPage is null)
         {
             return;
         }
 
+        /*
         if (args.InvokedItemContainer.Tag is not string tag || string.IsNullOrWhiteSpace(tag))
         {
             Debug.WriteLine("NavigationViewControl_ItemInvoked: Invalid tag or null.");
@@ -309,7 +276,7 @@ public sealed partial class ShellPage : Page
                 _currentPage = typeof(PlaylistItemPage);
             }
         }
-
+        */
     }
 
     private void NaviView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -324,16 +291,93 @@ public sealed partial class ShellPage : Page
             return;
         }
 
-        if (args.SelectedItem is NodeMenuPlaylists)
+        if (args.SelectedItem is NodeMenuQueue)
         {
-            // don't change page here.
+            if (_currentPage == typeof(QueuePage))
+            {
+                return;
+            }
+            if (this.NavigationFrame.Navigate(typeof(QueuePage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
+            {
+                _currentPage = typeof(QueuePage);
+                vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
+            }
+        }
+        else if (args.SelectedItem is NodeMenuSearch)
+        {
+            if (_currentPage == typeof(SearchPage))
+            {
+                return;
+            }
+            if (this.NavigationFrame.Navigate(typeof(SearchPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(SearchPage);
+                vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
+            }
         }
         else if (args.SelectedItem is NodeMenuLibrary)
         {
             // don't change page here.
         }
+        else if (args.SelectedItem is NodeMenuAlbum)
+        {
+            if (_currentPage == typeof(AlbumsPage))
+            {
+                return;
+            }
+            if (this.NavigationFrame.Navigate(typeof(AlbumsPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(AlbumsPage);
+                vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
+            }
+        }
+        else if (args.SelectedItem is NodeMenuArtist)
+        {
+            if (_currentPage == typeof(ArtistsPage))
+            {
+                return;
+            }
+            if (this.NavigationFrame.Navigate(typeof(ArtistsPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(ArtistsPage);
+                vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
+            }
+        }
+        else if (args.SelectedItem is NodeMenuFiles)
+        {
+            if (_currentPage == typeof(FilesPage))
+            {
+                return;
+            }
+            if (this.NavigationFrame.Navigate(typeof(FilesPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(FilesPage);
+                vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
+            }
+        }
+        else if (args.SelectedItem is NodeMenuPlaylists)
+        {
+            // don't change page here.
+        }
+        else if (args.SelectedItem is NodeMenuPlaylistItem)
+        {
+            if (_currentPage == typeof(PlaylistItemPage))
+            {
+                // Set SelectedNodeMenu here. Don't JUST return for PlaylistItemPage, otherwise it won't load playlist.
+                vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
+                return;
+            }
+
+            // TODO: I wanna show NavigationTransition animation....
+            if (this.NavigationFrame.Navigate(typeof(PlaylistItemPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
+            {
+                _currentPage = typeof(PlaylistItemPage);
+                vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
+            }
+        }
         else
         {
+            /*
             if (args.SelectedItem is not null)
             {
                 vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
@@ -342,6 +386,7 @@ public sealed partial class ShellPage : Page
             {
                 vm.SelectedNodeMenu = null;
             }
+            */
         }
     }
 

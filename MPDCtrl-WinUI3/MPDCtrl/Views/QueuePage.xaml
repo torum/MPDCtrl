@@ -43,6 +43,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
+            <!-- Page title -->
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -50,19 +51,20 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0" x:Uid="PageTitle_Queue" FontSize="{StaticResource FontSizePageTitle}" FontWeight="SemiBold"/>
-                <TextBlock Grid.Column="1" FontSize="{StaticResource FontSizePageSubTitle}" Text="{x:Bind ViewModel.QueuePageSubTitleSongCount, Mode=OneWay}" VerticalAlignment="Bottom" Padding="48,0,0,4" Opacity="0.7" Visibility="Collapsed"/>
+                <TextBlock Grid.Column="1" FontSize="{StaticResource FontSizePageSubTitle}" Text="{x:Bind ViewModel.QueuePageSubTitleSongCount, Mode=OneWay}" VerticalAlignment="Bottom" Padding="48,0,0,4" Opacity="0.7"/>
             </Grid>
-            
+
+            <!-- Page controls -->
             <Grid Grid.Row="1" Margin="0,24,0,14">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                
+                <!-- Clear and AddToPlaylist buttons -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
                     <!-- Clear -->
-                    <Button Margin="0,0,8,0" Height="36" AccessKey="D" Command="{x:Bind ViewModel.QueueClearWithoutPromptCommand}">
+                    <Button Margin="0,0,8,0" Height="36" Command="{x:Bind ViewModel.QueueClearWithoutPromptCommand}">
                         <StackPanel Orientation="Horizontal">
                             <Viewbox Width="14" Height="14">
                                 <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M7 3H9C9 2.44772 8.55228 2 8 2C7.44772 2 7 2.44772 7 3ZM6 3C6 1.89543 6.89543 1 8 1C9.10457 1 10 1.89543 10 3H14C14.2761 3 14.5 3.22386 14.5 3.5C14.5 3.77614 14.2761 4 14 4H13.4364L12.2313 12.8378C12.0624 14.0765 11.0044 15 9.75422 15H6.24578C4.99561 15 3.93762 14.0765 3.76871 12.8378L2.56355 4H2C1.72386 4 1.5 3.77614 1.5 3.5C1.5 3.22386 1.72386 3 2 3H6ZM7 6.5C7 6.22386 6.77614 6 6.5 6C6.22386 6 6 6.22386 6 6.5V11.5C6 11.7761 6.22386 12 6.5 12C6.77614 12 7 11.7761 7 11.5V6.5ZM9.5 6C9.77614 6 10 6.22386 10 6.5V11.5C10 11.7761 9.77614 12 9.5 12C9.22386 12 9 11.7761 9 11.5V6.5C9 6.22386 9.22386 6 9.5 6ZM4.75954 12.7027C4.86089 13.4459 5.49568 14 6.24578 14H9.75422C10.5043 14 11.1391 13.4459 11.2405 12.7027L12.4272 4H3.57281L4.75954 12.7027Z"/>
@@ -70,17 +72,18 @@
                             <TextBlock x:Uid="PageMenu_Clear" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/> 
                         </StackPanel>
                     </Button>
-                    <!-- Add to -->
-                    <Button Margin="8,0,8,0" Height="36" AccessKey="A" Command="{x:Bind ViewModel.QueueAddToCommand}">
+                    <!-- Add to playlist -->
+                    <Button Margin="8,0,8,0" Height="36" Command="{x:Bind ViewModel.QueueAddToPlaylistCommand}">
                         <StackPanel Orientation="Horizontal">
                             <Viewbox Width="14" Height="14">
                                 <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z"/>
                             </Viewbox>
-                            <TextBlock x:Uid="PageMenu_AddTo" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
+                            <TextBlock x:Uid="PageMenu_AddToPlaylist" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
                 
+                <!-- Find, Reorder, Sort, etc buttons -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                     <!-- Find -->
                     <ToggleButton x:Name="TglButtonQueueFilter" x:Uid="PageMenu_Find" AccessKey="F" Height="36" Width="38" Margin="4,0,4,0" IsChecked="{x:Bind ViewModel.IsQueueFindVisible, Mode=TwoWay}" Click="TglButtonQueueFilter_Click">
@@ -131,11 +134,9 @@
                         <Button.Flyout>
                             <MenuFlyout Placement="Bottom">
                                 <MenuFlyoutItem x:Uid="PageMenu_ScrollIntoNowPlaying" Command="{x:Bind ViewModel.ScrollIntoNowPlayingCommand}">
-                                    <!--
                                     <MenuFlyoutItem.Icon>
-                                        <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm0 5a.75.75 0 0 0-.743.648l-.007.102v3.5h-3.5a.75.75 0 0 0-.102 1.493l.102.007h3.5v3.5a.75.75 0 0 0 1.493.102l.007-.102v-3.5h3.5a.75.75 0 0 0 .102-1.493l-.102-.007h-3.5v-3.5A.75.75 0 0 0 12 7Z"/>
+                                        <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M5 5.274c0-1.707 1.826-2.792 3.325-1.977l12.362 6.726c1.566.853 1.566 3.101 0 3.953L8.325 20.702C6.826 21.518 5 20.432 5 18.726V5.274Z"/>
                                     </MenuFlyoutItem.Icon>
-                                    -->
                                 </MenuFlyoutItem>
                             </MenuFlyout>
                         </Button.Flyout>
@@ -188,7 +189,8 @@
             </Grid>
 
             <Grid Grid.Row="1">
-                <ListView x:Name="QueueListview" ItemsSource="{x:Bind Path=ViewModel.Queue, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedQueueSong,Mode=TwoWay}" AccessKey="L" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+
+                <ListView x:Name="QueueListview" ItemsSource="{x:Bind Path=ViewModel.Queue, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedQueueSong,Mode=TwoWay}" AccessKey="L"
                                   ScrollViewer.VerticalScrollBarVisibility="Visible" animations:Implicit.HideAnimations="{StaticResource HideTransitions}"
                             animations:Implicit.ShowAnimations="{StaticResource ShowTransitions}" SelectionMode="Extended" IsMultiSelectCheckBoxEnabled="False" Padding="0,0,24,0" IsDoubleTapEnabled="True" IsRightTapEnabled="True" DoubleTapped="QueueListview_DoubleTapped" RightTapped="QueueListview_RightTapped">
                     <ListView.Header>
@@ -242,11 +244,24 @@
                                     <KeyboardAccelerator Key="Enter" />
                                 </MenuFlyoutItem.KeyboardAccelerators>
                             </MenuFlyoutItem>
-                            <MenuFlyoutItem x:Uid="ListviewItemContextMenu_AddToPlaylist" Command="{x:Bind ViewModel.QueueListviewAddSelectedItemsToCommand}" CommandParameter="{x:Bind QueueListview.SelectedItems, Mode=OneWay}">
+                            <MenuFlyoutItem x:Uid="ListviewItemContextMenu_AddToPlaylist" Command="{x:Bind ViewModel.QueueListviewAddSelectedItemsToPlaylistCommand}" CommandParameter="{x:Bind QueueListview.SelectedItems, Mode=OneWay}">
                                 <MenuFlyoutItem.Icon>
                                     <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm0 5a.75.75 0 0 0-.743.648l-.007.102v3.5h-3.5a.75.75 0 0 0-.102 1.493l.102.007h3.5v3.5a.75.75 0 0 0 1.493.102l.007-.102v-3.5h3.5a.75.75 0 0 0 .102-1.493l-.102-.007h-3.5v-3.5A.75.75 0 0 0 12 7Z"/>
                                 </MenuFlyoutItem.Icon>
                             </MenuFlyoutItem>
+
+                            <MenuFlyoutItem x:Uid="ListviewItemContextMenu_GoToAlbumPage" Command="{x:Bind ViewModel.ListviewGoToAlbumPageCommand}" CommandParameter="{x:Bind QueueListview.SelectedItem, Mode=OneWay}">
+                                <MenuFlyoutItem.Icon>
+                                    <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M12,11A1,1 0 0,0 11,12A1,1 0 0,0 12,13A1,1 0 0,0 13,12A1,1 0 0,0 12,11M12,16.5C9.5,16.5 7.5,14.5 7.5,12C7.5,9.5 9.5,7.5 12,7.5C14.5,7.5 16.5,9.5 16.5,12C16.5,14.5 14.5,16.5 12,16.5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutItem x:Uid="ListviewItemContextMenu_GoToArtistPage" Command="{x:Bind ViewModel.ListviewGoToArtistPageCommand}" CommandParameter="{x:Bind QueueListview.SelectedItem, Mode=OneWay}">
+                                <MenuFlyoutItem.Icon>
+                                    <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M11,4A4,4 0 0,1 15,8A4,4 0 0,1 11,12A4,4 0 0,1 7,8A4,4 0 0,1 11,4M11,6A2,2 0 0,0 9,8A2,2 0 0,0 11,10A2,2 0 0,0 13,8A2,2 0 0,0 11,6M11,13C12.1,13 13.66,13.23 15.11,13.69C14.5,14.07 14,14.6 13.61,15.23C12.79,15.03 11.89,14.9 11,14.9C8.03,14.9 4.9,16.36 4.9,17V18.1H13.04C13.13,18.8 13.38,19.44 13.76,20H3V17C3,14.34 8.33,13 11,13M18.5,10H20L22,10V12H20V17.5A2.5,2.5 0 0,1 17.5,20A2.5,2.5 0 0,1 15,17.5A2.5,2.5 0 0,1 17.5,15C17.86,15 18.19,15.07 18.5,15.21V10Z"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+
+
                             <MenuFlyoutSeparator/>
                             <MenuFlyoutItem x:Uid="ListviewItemContextMenu_Remove" Command="{x:Bind ViewModel.QueueListviewRemoveSelectedItemsCommand}" CommandParameter="{x:Bind QueueListview.SelectedItems, Mode=OneWay}">
                                 <MenuFlyoutItem.Icon>

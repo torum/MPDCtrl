@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace MPDCtrl.Models;
 
 public class Status
@@ -31,6 +33,7 @@ public class Status
         set
         {
             _volume = value;
+            MpdVolumeIsSet = true;
         }
     }
 

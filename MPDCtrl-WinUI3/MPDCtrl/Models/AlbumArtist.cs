@@ -53,6 +53,9 @@ public partial class AlbumEx :Album
 
     public bool IsImageAcquired { get; set; } = false;
     public bool IsImageLoading { get; set; } = false;
+
+    // Workaround for WinUI3's limitation or lack of features. 
+    public MainViewModel? ParentViewModel { get; set; }
 }
 
 public class AlbumArtist

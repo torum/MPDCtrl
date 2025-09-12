@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using MPDCtrl.Models;
 using MPDCtrl.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -32,14 +33,104 @@ public sealed partial class ArtistsPage : Page
 
     private void ArtistsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (SelectedArtistAlbumsScrollViewer is null)
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        {
+            if (sender is not ListView listview)
+            {
+                return;
+            }
+
+            if (listview.SelectedItem is not null)
+            {
+                listview.ScrollIntoView(listview.SelectedItem, ScrollIntoViewAlignment.Default);
+            }
+
+            if (SelectedArtistAlbumsScrollViewer is not null)
+            {
+                this.SelectedArtistAlbumsScrollViewer.ChangeView(0, 0, null);
+            }
+        });
+    }
+
+    private void ListView_RightTapped(object sender, RightTappedRoutedEventArgs e)
+    {
+        //ListView listView = (ListView)sender;
+        if (sender is not ListView listView)
         {
             return;
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        // When multiple items are selected, right click clears that selection. That is not good when trying to do multile items operation with popup menu. So, preserve SelectedItems value.
+        FrameworkElement element = (FrameworkElement)e.OriginalSource;
+
+        var container = FindParent<ListViewItem>(element);
+
+        if (container == null)
         {
-            this.SelectedArtistAlbumsScrollViewer.ChangeView(0, 0, null);
-        });
+            return;
+        }
+
+        if (container.Content is not SongInfo song)
+        {
+            return;
+        }
+        //var song = container.Content;
+
+        if (listView.SelectedItem == song)
+        {
+            return;
+        }
+
+        // For AOT compatibility, use IList<object> for SelectedItems.
+        if (listView.SelectedItems is IList<object> list)
+        {
+            // Cast and ToList to use "Count" lator on.
+            var collection = list.Cast<SongInfo>().ToList();
+
+            if (collection.IndexOf(song) > -1)
+            {
+                return;
+            }
+
+            // For AOT compatibility..
+            if (collection.Count > 1)
+            {
+                collection.Clear();
+            }
+        }
+
+        listView.SelectedItem = song;
+
+        /*
+        if (e.OriginalSource is not FrameworkElement element)
+        {
+            return;
+        }
+        if (element.DataContext is SongInfoEx item)
+        {
+            if (listView.SelectedItem != item)
+            {
+                listView.SelectedItem = item;
+            }
+        }
+        */
+    }
+
+    private static T? FindParent<T>(DependencyObject child) where T : DependencyObject
+    {
+        DependencyObject parent = VisualTreeHelper.GetParent(child);
+        while (parent != null && parent is not T)
+        {
+            parent = VisualTreeHelper.GetParent(parent);
+        }
+
+        if (parent is not null)
+        {
+            return parent as T;
+        }
+        else
+        {
+            return null;
+        }
     }
 }

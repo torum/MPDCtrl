@@ -25,41 +25,58 @@
         </Border>
 
         <Grid Grid.Row="1" x:Name="BodyGrid" Margin="24,0,0,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+            <ListView x:Name="PlaylistListview" ItemsSource="{x:Bind ViewModel.PlaylistSongs, Mode=OneWay}" SelectionMode="Single" SelectedItem="{x:Bind ViewModel.SelectedPlaylistSong, Mode=TwoWay}" BorderThickness="0" Margin="0,24,0,0" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Padding="0,0,24,0">
+                <ListView.Header>
+                    <Grid Height="48" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0" />
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition Width="0" />
+                            <ColumnDefinition Width="3*" MinWidth="160"/>
+                            <ColumnDefinition Width="70" MinWidth="70"/>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="50" MinWidth="50" />
+                            <ColumnDefinition Width="50" MinWidth="50"/>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="0" />
+                        </Grid.ColumnDefinitions>
 
-            <ListView Grid.Row="1" x:Name="PlaylistListview" ItemsSource="{x:Bind ViewModel.PlaylistSongs, Mode=OneWay}" SelectionMode="Single" SelectedItem="{x:Bind ViewModel.SelectedPlaylistSong, Mode=TwoWay}" BorderThickness="0" Margin="0,3,0,4" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Padding="0,0,24,0">
+                        <TextBlock Grid.Column="3" x:Uid="ListviewColumnHeader_Title" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="4" x:Uid="ListviewColumnHeader_Time" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="5" x:Uid="ListviewColumnHeader_Artist" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="6" x:Uid="ListviewColumnHeader_Album" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="7" x:Uid="ListviewColumnHeader_Disc" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="8" x:Uid="ListviewColumnHeader_Track" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="9" x:Uid="ListviewColumnHeader_Genre" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="10" x:Uid="ListviewColumnHeader_LastModified" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                    </Grid>
+                </ListView.Header>
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="mod:SongInfo">
-                        <Grid>
+                        <Grid ColumnSpacing="8">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="80"></ColumnDefinition>
-                                <ColumnDefinition Width="0"></ColumnDefinition>
-                                <ColumnDefinition Width="6*"></ColumnDefinition>
-                                <ColumnDefinition Width="70"></ColumnDefinition>
-                                <ColumnDefinition Width="3*"></ColumnDefinition>
-                                <ColumnDefinition Width="3*"></ColumnDefinition>
-                                <ColumnDefinition Width="65"></ColumnDefinition>
-                                <ColumnDefinition Width="65"></ColumnDefinition>
-                                <ColumnDefinition Width="2*"></ColumnDefinition>
-                                <ColumnDefinition Width="2*"></ColumnDefinition>
-
-                                <ColumnDefinition Width="24"></ColumnDefinition>
-                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="0" />
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition Width="0" />
+                                <ColumnDefinition Width="3*" MinWidth="160"/>
+                                <ColumnDefinition Width="70" MinWidth="70"/>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="50" MinWidth="50" />
+                                <ColumnDefinition Width="50" MinWidth="50"/>
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="0" />
                             </Grid.ColumnDefinitions>
 
-                            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Button Margin="2,0,0,0" Background="Transparent" BorderThickness="0" Command="{x:Bind ParentViewModel.SongsListviewPlayThisCommand}" CommandParameter="{x:Bind}">
-                                    <!--  Command="{Binding $parent[ListBox].((vm:MainViewModel)DataContext).SongsListviewPlayThisCommand}" CommandParameter="{Binding}" ToolTip.Tip="{x:Static prop:Resources.ListViewItemContextMenu_Play}" -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Width="80">
+                                <Button Margin="4,0,0,0" Height="30" Background="Transparent" BorderThickness="0" Command="{x:Bind ParentViewModel.SongsListviewPlayThisCommand}" CommandParameter="{x:Bind}">
                                     <Viewbox Width="12" Height="12" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center">
                                         <PathIcon Data="M5.74514 3.06445C5.41183 2.87696 5 3.11781 5 3.50023V12.5005C5 12.8829 5.41182 13.1238 5.74512 12.9363L13.7454 8.43631C14.0852 8.24517 14.0852 7.75589 13.7454 7.56474L5.74514 3.06445ZM4 3.50023C4 2.35298 5.2355 1.63041 6.23541 2.19288L14.2357 6.69317C15.2551 7.26664 15.2551 8.73446 14.2356 9.3079L6.23537 13.8079C5.23546 14.3703 4 13.6477 4 12.5005V3.50023Z" Width="NaN" Height="NaN" Margin="0">
                                         </PathIcon>
                                     </Viewbox>
                                 </Button>
-                                <Button Margin="3,0,0,0" Background="Transparent" BorderThickness="0" Command="{x:Bind ParentViewModel.SongsListviewAddThisCommand}" CommandParameter="{x:Bind}">
-                                    <!-- Command="{Binding $parent[ListBox].((vm:MainViewModel)DataContext).SongsListviewAddThisCommand}" CommandParameter="{Binding}" ToolTip.Tip="{x:Static prop:Resources.ListviewItemContextMenu_AddToQueue}"  -->
+                                <Button Margin="4,0,0,0" Height="30" Background="Transparent" BorderThickness="0" Command="{x:Bind ParentViewModel.SongsListviewAddThisCommand}" CommandParameter="{x:Bind}">
                                     <Viewbox Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center">
                                         <PathIcon Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z" Width="NaN" Height="NaN" Margin="0">
                                         </PathIcon>
@@ -67,28 +84,14 @@
                                 </Button>
                             </StackPanel>
 
-                            <Grid Grid.Column="1">
-                                <Viewbox Width="14" Height="14" Margin="0" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                </Viewbox>
-                            </Grid>
-
-                            <TextBlock Grid.Column="2" Text="{x:Bind Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
-                            </TextBlock>
-                            <TextBlock Grid.Column="3" Text="{x:Bind TimeFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
-                            </TextBlock>
-                            <TextBlock Grid.Column="4" Text="{x:Bind Artist, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
-                            </TextBlock>
-                            <TextBlock Grid.Column="5" Text="{x:Bind Album, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
-                            </TextBlock>
-                            <TextBlock Grid.Column="6" Text="{x:Bind Disc, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
-                            </TextBlock>
-                            <TextBlock Grid.Column="7" Text="{x:Bind Track, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
-                            </TextBlock>
-                            <TextBlock Grid.Column="8" Text="{x:Bind Genre, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
-                            </TextBlock>
-                            <TextBlock Grid.Column="9" Text="{x:Bind LastModifiedFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9">
-                            </TextBlock>
-
+                            <TextBlock Grid.Column="3" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="4" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind TimeFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Artist, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="6" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Album, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="7" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Disc, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="8" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Track, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="9" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Genre, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind LastModifiedFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
@@ -104,7 +107,6 @@
                     </Style>
                 </ListView.ItemContainerStyle>
             </ListView>
-
         </Grid>
 
         <VisualStateManager.VisualStateGroups>

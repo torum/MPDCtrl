@@ -17,6 +17,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -31,6 +32,52 @@ public sealed partial class AlbumsPage : Page
 
     private readonly Compositor _compositor = Microsoft.UI.Xaml.Media.CompositionTarget.GetCompositorForCurrentThread();
     private SpringVector3NaturalMotionAnimation? _springAnimation;
+
+    public AlbumsPage()
+    {
+        ViewModel = App.GetService<MainViewModel>();
+
+        InitializeComponent();
+
+        ViewModel.AlbumsCollectionHasBeenReset += this.OnAlbumsCollectionHasBeenReset;
+    }
+
+    public void OnAlbumsCollectionHasBeenReset(object? sender, System.EventArgs e)
+    {
+        // Need this to load image.
+        // Albums sort resets ObservableCollection which is not recognized by ListViewBehavior and does not UpdateVisibleItems,
+        // so forcibly fire scroll event.
+        if (this.AlbumListView is ListView lb)
+        {
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+            {
+                var scrollViewer = FindScrollViewer(lb);
+                if (scrollViewer is null)
+                {
+                    return;
+                }
+                
+                scrollViewer.ChangeView(null, 12, null);
+                await Task.Delay(300);
+                //scrollViewer.ChangeView(null, scrollViewer.ScrollableHeight, null);
+                scrollViewer.ChangeView(null, 0, null);
+            });
+        }
+    }
+
+    // Find the ScrollViewer in the visual tree
+    private static ScrollViewer? FindScrollViewer(DependencyObject obj)
+    {
+        if (obj is ScrollViewer scrollViewer) return scrollViewer;
+
+        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+        {
+            var child = VisualTreeHelper.GetChild(obj, i);
+            var result = FindScrollViewer(child);
+            if (result is not null) return result;
+        }
+        return null;
+    }
 
     private void CreateOrUpdateSpringAnimation(float finalValue)
     {
@@ -65,102 +112,4 @@ public sealed partial class AlbumsPage : Page
         ele.CenterPoint = new Vector3((float)(ele.ActualWidth / 2.0), (float)(ele.ActualHeight / 2.0), 1f);
         ele.StartAnimation(_springAnimation);
     }
-
-    public AlbumsPage()
-    {
-        ViewModel = App.GetService<MainViewModel>();
-
-        InitializeComponent();
-    }
-
-    /*
-    private void QueueListView_Loaded(object sender, RoutedEventArgs e)
-    {
-        var myListViewScrollViewer = FindScrollViewer(this.QueueListView);
-        if (myListViewScrollViewer is not null)
-        {
-            myListViewScrollViewer.ViewChanged += QueueListView_ViewChanged;
-        }
-    }
-    private void QueueListView_ViewChanged(object? sender, ScrollViewerViewChangedEventArgs e)
-    {
-        if (sender is not ScrollViewer scrollViewer)
-        {
-            return;
-        }
-
-        var visibleItems = GetVisibleDataItems(this.QueueListView, scrollViewer);
-        // Do something with the visible data items, e.g., logging
-        System.Diagnostics.Debug.WriteLine($"--- Scroll View Changed ---");
-        foreach (var item in visibleItems)
-        {
-            System.Diagnostics.Debug.WriteLine($"Visible item: {item.Name}");
-        }
-    }
-
-
-    /// <summary>
-    /// Finds the data items that are currently visible within the ListView's viewport.
-    /// </summary>
-    /// <param name="listView">The ListView control.</param>
-    /// <returns>A list of data items that are visible.</returns>
-    public static List<AlbumEx> GetVisibleDataItems(ListView listView, ScrollViewer scrollViewer)
-    {
-        var visibleDataItems = new List<AlbumEx>();
-
-        if (listView.ItemsPanelRoot is ItemsWrapGrid itemsPanel)
-        {
-            //var scrollViewer = FindScrollViewer(listView);
-            if (scrollViewer is not null)
-            {
-                var viewport = new Rect(0, 0, scrollViewer.ViewportWidth, scrollViewer.ViewportHeight);
-
-                foreach (var container in itemsPanel.Children)
-                {
-                    if (container is ListViewItem listViewItem)
-                    {
-                        var transform = listViewItem.TransformToVisual(scrollViewer);
-                        var itemBounds = transform.TransformBounds(new Rect(0, 0, listViewItem.ActualWidth, listViewItem.ActualHeight));
-
-                        if (viewport.IntersectsWith(itemBounds))
-                        {
-                            if (listViewItem.Content is AlbumEx dataItem)
-                            {
-                                visibleDataItems.Add(dataItem);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return visibleDataItems;
-    }
-
-    /// <summary>
-    /// Finds the ScrollViewer within the Visual Tree of a control.
-    /// </summary>
-    /// <param name="obj">The dependency object to search from.</param>
-    /// <returns>The ScrollViewer, or null if not found.</returns>
-    private static ScrollViewer? FindScrollViewer(DependencyObject obj)
-    {
-        if (obj is ScrollViewer scrollViewer)
-        {
-            return scrollViewer;
-        }
-
-        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-        {
-            var child = VisualTreeHelper.GetChild(obj, i);
-            var result = FindScrollViewer(child);
-            if (result is not null)
-            {
-                return result;
-            }
-        }
-
-        return null;
-    }
-    */
-
 }

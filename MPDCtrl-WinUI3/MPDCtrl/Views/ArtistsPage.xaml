@@ -20,9 +20,44 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" x:Name="HeaderGrid" Margin="24,0,24,0">
-            <TextBlock x:Uid="PageTitle_Artists" FontSize="{StaticResource FontSizePageTitle}" FontWeight="SemiBold"/>
-        </Border>
+        <Grid Grid.Row="0" x:Name="HeaderGrid" Margin="24,0,24,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Page title -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" x:Uid="PageTitle_Artists" FontSize="{StaticResource FontSizePageTitle}" FontWeight="SemiBold"/>
+                <TextBlock Grid.Column="1" FontSize="{StaticResource FontSizePageSubTitle}" Text="{x:Bind ViewModel.ArtistPageSubTitleArtistCount, Mode=OneWay}" VerticalAlignment="Bottom" Padding="48,0,0,4" Opacity="0.7"/>
+            </Grid>
+
+            <!-- Page controls -->
+            <Grid Grid.Row="1" Margin="0,24,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!--  buttons -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+
+                </StackPanel>
+
+                <!--  buttons-->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+
+                </StackPanel>
+            </Grid>
+
+
+
+        </Grid>
         
         <Grid Grid.Row="1" x:Name="BodyGrid" Margin="24,0,0,0">
             <Grid.ColumnDefinitions>
@@ -31,7 +66,7 @@
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0">
-                <ListView Padding="0,0,0,0" Margin="0,0,0,0" ItemsSource="{x:Bind ViewModel.Artists, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAlbumArtist, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="ArtistsListView_SelectionChanged" SelectionMode="Single" Background="Transparent">
+                <ListView Padding="0,0,0,0" Margin="0,24,0,0" ItemsSource="{x:Bind ViewModel.Artists, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAlbumArtist, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="ArtistsListView_SelectionChanged" SelectionMode="Single" Background="Transparent">
                     <!--
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -84,7 +119,7 @@
             </controls:GridSplitter>
             
             <Grid Grid.Column="1">
-                <ScrollViewer x:Name="SelectedArtistAlbumsScrollViewer">
+                <ScrollViewer x:Name="SelectedArtistAlbumsScrollViewer" Margin="0,24,0,0">
                     <ItemsControl ItemsSource="{x:Bind ViewModel.SelectedArtistAlbums, Mode=OneWay}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -119,77 +154,81 @@
                                             <RowDefinition Height="*"></RowDefinition>
                                         </Grid.RowDefinitions>
 
-                                        <StackPanel Margin="16,16,16,16">
-                                            <TextBlock Grid.Row="0" Text="{x:Bind Name, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="4" Opacity="0.9">
-											<!--
-                                            <Interaction.Behaviors>
-													<DataTriggerBehavior Binding="{Binding Name}" ComparisonCondition="Equal" Value="">
-														<ChangePropertyAction PropertyName="Text" Value="Unknown Album" />
-													</DataTriggerBehavior>
-												</Interaction.Behaviors>
-                                            -->
-                                            </TextBlock>
+                                        <StackPanel Margin="0,0,0,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" FontSize="24" FontWeight="SemiBold" TextWrapping="WrapWholeWords" Opacity="0.9" Visibility="{x:Bind Name, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=False}"/>
+                                                <TextBlock x:Uid="Text_UnknownAlbum" FontSize="24" TextWrapping="WrapWholeWords" Opacity="0.6" Visibility="{x:Bind Name, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=True}" />
+                                            </StackPanel>
                                         </StackPanel>
 
-                                        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="24" Margin="16,0,16,16" HorizontalAlignment="Left">
-                                            <!-- Play button -->
-                                            <!--
-                                        <SplitButton VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0" Height="34" ToolTip.Tip="{x:Static prop:Resources.PageMenu_PlayAll}" Command="{Binding Path=$parent[ItemsControl].((vm:MainViewModel)DataContext).SongsPlayCommand}" CommandParameter="{Binding Songs}">
-                                            <Viewbox Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                                                <PathIcon Width="NaN" Height="NaN"
-														Data="M5.74514 3.06445C5.41183 2.87696 5 3.11781 5 3.50023V12.5005C5 12.8829 5.41182 13.1238 5.74512 12.9363L13.7454 8.43631C14.0852 8.24517 14.0852 7.75589 13.7454 7.56474L5.74514 3.06445ZM4 3.50023C4 2.35298 5.2355 1.63041 6.23541 2.19288L14.2357 6.69317C15.2551 7.26664 15.2551 8.73446 14.2356 9.3079L6.23537 13.8079C5.23546 14.3703 4 13.6477 4 12.5005V3.50023Z">
-                                                </PathIcon>
-                                            </Viewbox>
-                                            
-                                            <SplitButton.Flyout>
-                                                <MenuFlyout Placement="Bottom">
-                                                    <MenuItem Header="{x:Static prop:Resources.PageMenu_QueueAll}" Command="{Binding Path=$parent[UserControl].((vm:MainViewModel)DataContext).SongsAddToQueueCommand}" CommandParameter="{Binding Songs}">
-                                                        <MenuItem.Icon>
-                                                            <PathIcon Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z" Width="NaN" Height="NaN" Margin="0" Padding="0">
-                                                            </PathIcon>
-                                                        </MenuItem.Icon>
-                                                    </MenuItem>
-                                                </MenuFlyout>
-                                            </SplitButton.Flyout>
-                                            
-                                        </SplitButton>
-                                        -->
-                                            <!-- More options button -->
-                                            <Button Margin="0,0,0,0" Width="34" Height="34" HorizontalAlignment="Left" VerticalAlignment="Bottom" Visibility="Collapsed">
-                                                <Viewbox Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                                                    <PathIcon Width="NaN" Height="NaN"
-														Data="M10 6C9.30964 6 8.75 5.44036 8.75 4.75C8.75 4.05964 9.30964 3.5 10 3.5C10.6904 3.5 11.25 4.05964 11.25 4.75C11.25 5.44036 10.6904 6 10 6ZM10 11.25C9.30964 11.25 8.75 10.6904 8.75 10C8.75 9.30964 9.30964 8.75 10 8.75C10.6904 8.75 11.25 9.30964 11.25 10C11.25 10.6904 10.6904 11.25 10 11.25ZM8.75 15.25C8.75 15.9404 9.30964 16.5 10 16.5C10.6904 16.5 11.25 15.9404 11.25 15.25C11.25 14.5596 10.6904 14 10 14C9.30964 14 8.75 14.5596 8.75 15.25Z">
-                                                    </PathIcon>
-                                                </Viewbox>
-                                                <!--
-										<Button.Flyout>
-											<MenuFlyout>
-												<MenuItem Header="{x:Static prop:Resources.PlaylistItemMenu_Rename}" Command="{Binding PlaylistRenamePlaylistCommand}" CommandParameter="{Binding SelectedPlaylistName}"/>
-												<Separator/>
-												<MenuItem Header="{x:Static prop:Resources.PlaylistItemMenu_Clear}" Command="{Binding PlaylistClearPlaylistWithoutPromptCommand}" CommandParameter="{Binding SelectedPlaylistName}"/>
-												<Separator/>
-												<MenuItem Header="{x:Static prop:Resources.PlaylistItemMenu_Remove}" Command="{Binding PlaylistRemovePlaylistWithoutPromptCommand}" CommandParameter="{Binding SelectedPlaylistName}"/>
-											</MenuFlyout>
-										</Button.Flyout>
-										-->
-                                            </Button>
-                                        </StackPanel>
+                                        <!-- Page controls -->
+                                        <Grid Grid.Row="1" Margin="0,24,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Play and AddTo buttons -->
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,0,0" VerticalAlignment="Bottom">
+                                                <!-- Play -->
+                                                <Button Margin="0,0,8,0" Height="36" Command="{x:Bind ParentViewModel.SongsPlayAllCommand, Mode=OneWay}" CommandParameter="{x:Bind Songs, Mode=OneWay}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Viewbox Width="14" Height="14">
+                                                            <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M5.74514 3.06445C5.41183 2.87696 5 3.11781 5 3.50023V12.5005C5 12.8829 5.41182 13.1238 5.74512 12.9363L13.7454 8.43631C14.0852 8.24517 14.0852 7.75589 13.7454 7.56474L5.74514 3.06445ZM4 3.50023C4 2.35298 5.2355 1.63041 6.23541 2.19288L14.2357 6.69317C15.2551 7.26664 15.2551 8.73446 14.2356 9.3079L6.23537 13.8079C5.23546 14.3703 4 13.6477 4 12.5005V3.50023Z"/>
+                                                        </Viewbox>
+                                                        <TextBlock x:Uid="PageMenu_PlayAll" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
+                                                <!-- Add to queue-->
+                                                <Button Margin="8,0,8,0" Height="36" Command="{x:Bind ParentViewModel.SongsAddToQueueCommand}" CommandParameter="{x:Bind Songs, Mode=OneWay}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Viewbox Width="14" Height="14">
+                                                            <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z"/>
+                                                        </Viewbox>
+                                                        <TextBlock x:Uid="PageMenu_AddToQueue" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
+                                                <!-- Add to playlist -->
+                                                <Button Margin="8,0,8,0" Height="36" Command="{x:Bind ParentViewModel.SongsAddToPlaylistCommand}" CommandParameter="{x:Bind Songs, Mode=OneWay}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Viewbox Width="14" Height="14">
+                                                            <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z"/>
+                                                        </Viewbox>
+                                                        <TextBlock x:Uid="PageMenu_AddToPlaylist" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
+                                            </StackPanel>
+
+                                        </Grid>
 
                                         <Border Grid.Row="2">
-                                            <!--<TransitioningContentControl x:Name="ContentAlbumSongs" Content="ArtistAlbumSongs"/>-->
-                                            <!--  Content="{Binding CurrentAlbumSongs}" -->
-                                            <!-- " SelectedItem="{Binding SelectedSong}" -->
-                                            <ListView ItemsSource="{x:Bind Songs, Mode=OneWay}" SelectionMode="Single" BorderThickness="0" Margin="16,3,0,0">
-                                                <!--<ListBox.ItemsPanel>
-												<ItemsPanelTemplate>
-													<VirtualizingStackPanel />
-												</ItemsPanelTemplate>
-											</ListBox.ItemsPanel>-->
+                                            <ListView ItemsSource="{x:Bind Songs, Mode=OneWay}" SelectionMode="Extended" BorderThickness="0" Margin="0,6,0,36" RightTapped="ListView_RightTapped">
+                                                <ListView.Header>
+                                                    <Grid Height="48" ColumnSpacing="8">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="0" />
+                                                            <ColumnDefinition Width="80" MinWidth="80"/>
+                                                            <ColumnDefinition Width="0" />
+                                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                                            <ColumnDefinition Width="70"></ColumnDefinition>
+                                                            <ColumnDefinition Width="42"></ColumnDefinition>
+                                                            <ColumnDefinition Width="62"></ColumnDefinition>
+                                                            <ColumnDefinition Width="12" MinWidth="12"></ColumnDefinition>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <TextBlock Grid.Column="3" x:Uid="ListviewColumnHeader_Title" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                                                        <TextBlock Grid.Column="4" x:Uid="ListviewColumnHeader_Time" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                                                        <TextBlock Grid.Column="5" x:Uid="ListviewColumnHeader_Disc" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                                                        <TextBlock Grid.Column="6" x:Uid="ListviewColumnHeader_Track" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                                                    </Grid>
+                                                </ListView.Header>
                                                 <ListView.ItemTemplate>
                                                     <DataTemplate x:DataType="mod:SongInfo">
-                                                        <Grid>
+                                                        <Grid ColumnSpacing="8">
                                                             <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="76" MinWidth="76"></ColumnDefinition>
+                                                                <ColumnDefinition Width="0"></ColumnDefinition>
+                                                                <ColumnDefinition Width="80" MinWidth="80"></ColumnDefinition>
+                                                                <ColumnDefinition Width="0" ></ColumnDefinition>
                                                                 <ColumnDefinition Width="*"></ColumnDefinition>
                                                                 <ColumnDefinition Width="70"></ColumnDefinition>
                                                                 <ColumnDefinition Width="42"></ColumnDefinition>
@@ -197,30 +236,41 @@
                                                                 <ColumnDefinition Width="12" MinWidth="12"></ColumnDefinition>
                                                             </Grid.ColumnDefinitions>
 
-                                                            <TextBlock Grid.Column="1" Text="{x:Bind Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9"></TextBlock>
-                                                            <TextBlock Grid.Column="2" Text="{x:Bind TimeFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9"></TextBlock>
-                                                            <TextBlock Grid.Column="3" Text="{x:Bind Disc, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9"></TextBlock>
-                                                            <TextBlock Grid.Column="4" Text="{x:Bind Track, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9"></TextBlock>
-                                                            
-                                                            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
-                                                                <Button Margin="2,0,0,0" Background="Transparent" BorderThickness="0">
-                                                                    <!--  Command="{x:Bind $parent[UserControl].((vm:MainViewModel)DataContext).SongsListviewPlayThisCommand}" CommandParameter="{Binding}" ToolTip.Tip="{x:Static prop:Resources.ListViewItemContextMenu_Play}"  -->
+                                                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Width="80">
+                                                                <Button Margin="4,0,0,0" Height="30" Background="Transparent" BorderThickness="0" Command="{x:Bind ParentViewModel.SongsListviewPlayThisCommand}" CommandParameter="{x:Bind}">
                                                                     <Viewbox Width="12" Height="12" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                                         <PathIcon Data="M5.74514 3.06445C5.41183 2.87696 5 3.11781 5 3.50023V12.5005C5 12.8829 5.41182 13.1238 5.74512 12.9363L13.7454 8.43631C14.0852 8.24517 14.0852 7.75589 13.7454 7.56474L5.74514 3.06445ZM4 3.50023C4 2.35298 5.2355 1.63041 6.23541 2.19288L14.2357 6.69317C15.2551 7.26664 15.2551 8.73446 14.2356 9.3079L6.23537 13.8079C5.23546 14.3703 4 13.6477 4 12.5005V3.50023Z" Width="NaN" Height="NaN" Margin="0">
                                                                         </PathIcon>
                                                                     </Viewbox>
                                                                 </Button>
-                                                                <Button Margin="3,0,0,0"  Background="Transparent" BorderThickness="0">
-                                                                    <!-- Command="{x:Bind $parent[UserControl].((vm:MainViewModel)DataContext).SongsListviewAddThisCommand}" CommandParameter="{Binding}" ToolTip.Tip="{x:Static prop:Resources.ListviewItemContextMenu_AddToQueue}" -->
+                                                                <Button Margin="4,0,0,0" Height="30" Background="Transparent" BorderThickness="0" Command="{x:Bind ParentViewModel.SongsListviewAddThisCommand}" CommandParameter="{x:Bind}">
                                                                     <Viewbox Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                                         <PathIcon Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z" Width="NaN" Height="NaN" Margin="0">
                                                                         </PathIcon>
                                                                     </Viewbox>
                                                                 </Button>
                                                             </StackPanel>
+
+                                                            <TextBlock Grid.Column="3" Text="{x:Bind Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0,4,0" Opacity="0.9"></TextBlock>
+                                                            <TextBlock Grid.Column="4" Text="{x:Bind TimeFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0,4,0" Opacity="0.9"></TextBlock>
+                                                            <TextBlock Grid.Column="5" Text="{x:Bind Disc, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0,4,0" Opacity="0.9"></TextBlock>
+                                                            <TextBlock Grid.Column="6" Text="{x:Bind Track, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4,0,4,0" Opacity="0.9"></TextBlock>
+
                                                         </Grid>
                                                     </DataTemplate>
                                                 </ListView.ItemTemplate>
+                                                <ListView.ItemContainerStyle>
+                                                    <Style BasedOn="{StaticResource DefaultListViewItemStyle}" TargetType="ListViewItem">
+                                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                                        <Setter Property="Height" Value="48" />
+                                                        <Setter Property="Padding" Value="0" />
+                                                        <Setter Property="Margin" Value="0" />
+                                                        <!-- not possible in winui3?
+                        <Setter Property="IsSelected" Value="{x:Bind IsSelected, Mode=TwoWay}" />
+                        -->
+                                                    </Style>
+                                                </ListView.ItemContainerStyle>
                                             </ListView>
 
                                         </Border>

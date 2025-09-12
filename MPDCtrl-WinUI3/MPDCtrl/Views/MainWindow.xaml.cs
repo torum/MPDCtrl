@@ -20,12 +20,14 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Media;
+using Windows.Media.Control;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
@@ -40,13 +42,14 @@ public sealed partial class MainWindow : Window
     // DispatcherQueue
     private Microsoft.UI.Dispatching.DispatcherQueue? _currentDispatcherQueue;// = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
     public Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue => _currentDispatcherQueue;
-    
+
     // WinUI3 workaround.
     private readonly MediaPlayer? _mediaPlayer;
     private readonly SystemMediaTransportControls? _smtc;
     private readonly bool _isMediaTransportControlEnable = false;
 
-    private readonly WindowMessageHook _hook;
+    private readonly WindowMessageHook? _hook;
+    private readonly bool _isGlobalHotKeyEnable = false;
 
     // Window position and size
     // TODO: Change this lator.1920x1080
@@ -87,28 +90,53 @@ public sealed partial class MainWindow : Window
             root.RequestedTheme = theme;
 
             //TitleBarHelper.UpdateTitleBar(theme, this);
-            SetCapitionButtonColorForWin11();
+            SetCapitionButtonColor();
 
             root.CallMeWhenMainWindowIsReady(this);
         }
 
-        WindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
-        _hook = new WindowMessageHook(this);
-        _hook.Message += OnWindowMessage;
+        _isGlobalHotKeyEnable = false;
 
-        SetUpHotKey();
-
-        this.Closed += (s, e) => 
+        if (_isGlobalHotKeyEnable)
         {
-            CleanUpHotKey();
-            _hook.Dispose();
-        };
+            WindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            _hook = new WindowMessageHook(this);
+            _hook.Message += OnWindowMessage;
 
-        _isMediaTransportControlEnable = false;
+            SetUpHotKey();
+
+            this.Closed += (s, e) =>
+            {
+                CleanUpHotKey();
+                _hook.Dispose();
+            };
+        }
+
+        _isMediaTransportControlEnable = true;
 
         if (_isMediaTransportControlEnable)
         {
-            // WinUI3 workaround for media key control. Only works in packaged environment.
+            //ISystemMediaTransportControlsInterop
+            /*
+            // The GUID for ISystemMediaTransportControls
+            var iid = new Guid("98b3c67f-44e2-411a-8260-26243265882b");
+
+            // SystemMediaTransportControls‚ÌCLSID
+            //var clsid = typeof(SystemMediaTransportControls).GetCOMServerGUID();
+
+            var interop = (ISystemMediaTransportControlsInterop)Activator.CreateInstance(Type.GetTypeFromCLSID(iid));
+
+            //var interop = WinRT.Activation.Activate<ISystemMediaTransportControlsInterop>("Windows.Media.Control.SystemMediaTransportControls");
+            if (interop is null) return;
+            var smtcPtr = interop.GetForWindow(WindowHandle, ref iid);
+
+            _smtc = CastExtensions.As<SystemMediaTransportControls>(smtcPtr);//Marshal.GetObjectForIUnknown(smtcPtr) as SystemMediaTransportControls;
+            Marshal.ReleaseComObject(smtcPtr);
+
+            if (_smtc is null) return;
+            */
+            
+            // WinUI3 workaround for media key control. 
             //_smtc = SystemMediaTransportControls.GetForCurrentView(); //<- this is only works in UWP.
             // So, get the SystemMediaTransportControls from the MediaPlayer instance for workaround.
             _mediaPlayer = new MediaPlayer();
@@ -119,7 +147,7 @@ public sealed partial class MainWindow : Window
             _smtc.IsNextEnabled = true;
             _smtc.IsPreviousEnabled = true;
             _smtc.IsStopEnabled = true;
-
+            /*
             var mlist = new MediaPlaybackList();
             var mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromUri(new Uri("ms-appx:///Assets/dummy.mp3")));
             var props = mediaPlaybackItem.GetDisplayProperties();
@@ -135,18 +163,25 @@ public sealed partial class MainWindow : Window
             mlist.AutoRepeatEnabled = true;
 
             // set dummy playlist to the player.
-            _mediaPlayer.Source = mlist;
+            //_mediaPlayer.Source = mlist;
 
             // update info.
             props.MusicProperties.Title = "Song title2222222";
             mediaPlaybackItem.ApplyDisplayProperties(props);
-
+            */
 
             _smtc.PlaybackStatus = MediaPlaybackStatus.Paused;
 
             //
             _smtc.ButtonPressed += Smtc_ButtonPressed;
+
+
+            var updater = _smtc.DisplayUpdater;
+            updater.Type = MediaPlaybackType.Music;
+            updater.MusicProperties.Title = "a title";
+            updater.Update();
         }
+
     }
 
     private void LoadSettings()
@@ -472,14 +507,14 @@ public sealed partial class MainWindow : Window
                 root.RequestedTheme = theme;
 
                 //TitleBarHelper.UpdateTitleBar(theme, this);
-                SetCapitionButtonColorForWin11();
+                SetCapitionButtonColor();
             }
 
             this.SystemBackdrop = null;
         }
     }
 
-    public void SetCapitionButtonColorForWin11()
+    public void SetCapitionButtonColor()
     {
         var currentTheme = ((FrameworkElement)Content).ActualTheme;
         if (currentTheme == ElementTheme.Dark)
@@ -957,6 +992,6 @@ public sealed partial class MainWindow : Window
             }
         });
     }
+}
 
     #endregion
-}

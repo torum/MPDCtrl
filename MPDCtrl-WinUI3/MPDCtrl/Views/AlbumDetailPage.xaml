@@ -23,8 +23,13 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" x:Name="HeaderGrid" Margin="24,24,24,0">
-            <BreadcrumbBar x:Name="BreadcrumbBar1" Margin="0,0,0,0" ItemsSource="{x:Bind BreadcrumbItems, Mode=OneWay}" ItemClicked="BreadcrumbBar_ItemClicked">
+        <Grid Grid.Row="0" x:Name="HeaderGrid" Margin="24,24,24,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <BreadcrumbBar Grid.Row="0" x:Name="BreadcrumbBar1" Margin="0,0,0,0" ItemsSource="{x:Bind BreadcrumbItems, Mode=OneWay}" ItemClicked="BreadcrumbBar_ItemClicked" Visibility="Collapsed">
                 <BreadcrumbBar.Resources>
                     <x:Double x:Key="BreadcrumbBarChevronFontSize">24</x:Double>
                 </BreadcrumbBar.Resources>
@@ -34,125 +39,187 @@
                     </DataTemplate>
                 </BreadcrumbBar.ItemTemplate>
             </BreadcrumbBar>
-        </Border>
+
+            <!-- Album Name, Artist Name -->
+            <Border Grid.Row="1" Margin="0,24,0,0" CornerRadius="6" Background="{ThemeResource LayerFillColorAltBrush}" BorderThickness="1" BorderBrush="{ThemeResource  ControlStrokeColorDefaultBrush}" Padding="12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Album Image -->
+                    <Border Grid.Row="0" Grid.Column="0" Margin="0" Width="184" Height="184" HorizontalAlignment="Left" VerticalAlignment="Top" CornerRadius="6">
+                        <Grid Background="{ThemeResource LayerFillColorDefaultBrush}">
+                            <Border x:Name="AlbumCoverBackground" CornerRadius="6" Width="120" Height="120" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8" Opacity="0.1">
+                                <Path Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Opacity="0.6" Width="120" Height="120" Data="M12 15.5q1.471 0 2.486-1.014Q15.5 13.47 15.5 12t-1.014-2.485T12 8.5T9.515 9.515T8.5 12t1.015 2.486T12 15.5m0-2.5q-.425 0-.712-.288T11 12t.288-.712T12 11t.713.288T13 12t-.288.713T12 13m.003 8q-1.867 0-3.51-.708q-1.643-.709-2.859-1.924t-1.925-2.856T3 12.003t.709-3.51Q4.417 6.85 5.63 5.634t2.857-1.925T11.997 3t3.51.709q1.643.708 2.859 1.922t1.925 2.857t.709 3.509t-.708 3.51t-1.924 2.859t-2.856 1.925t-3.509.709M12 20q3.35 0 5.675-2.325T20 12t-2.325-5.675T12 4T6.325 6.325T4 12t2.325 5.675T12 20m0-8"/>
+                            </Border>
+                            <Image Stretch="UniformToFill" Source="{x:Bind ViewModel.SelectedAlbum.AlbumImage, Mode=OneWay}" Width="184" Height="184"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Album Name and Artist Name -->
+                    <Grid Grid.Row="0" Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Margin="24,0,0,0" Spacing="4">
+                            <TextBlock Text="{x:Bind ViewModel.SelectedAlbum.Name, Mode=OneWay}" FontSize="24" FontWeight="Bold" TextWrapping="WrapWholeWords"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay}" FontWeight="SemiBold" TextWrapping="WrapWholeWords" Opacity="0.9" Visibility="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=False}"/>
+                                <TextBlock x:Uid="Text_UnknownArtist" TextWrapping="WrapWholeWords" Opacity="0.6" Visibility="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=True}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Page controls -->
+                        <Grid Grid.Row="1" Margin="0,24,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Play and AddTo buttons -->
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="24,0,0,0" VerticalAlignment="Bottom">
+                                <!-- Play -->
+                                <Button Margin="0,0,8,0" Height="36" Command="{x:Bind ViewModel.SongsPlayAllCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.SelectedAlbumSongs, Mode=OneWay}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Viewbox Width="14" Height="14">
+                                            <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M5.74514 3.06445C5.41183 2.87696 5 3.11781 5 3.50023V12.5005C5 12.8829 5.41182 13.1238 5.74512 12.9363L13.7454 8.43631C14.0852 8.24517 14.0852 7.75589 13.7454 7.56474L5.74514 3.06445ZM4 3.50023C4 2.35298 5.2355 1.63041 6.23541 2.19288L14.2357 6.69317C15.2551 7.26664 15.2551 8.73446 14.2356 9.3079L6.23537 13.8079C5.23546 14.3703 4 13.6477 4 12.5005V3.50023Z"/>
+                                        </Viewbox>
+                                        <TextBlock x:Uid="PageMenu_PlayAll" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                                <!-- Add to queue-->
+                                <Button Margin="8,0,8,0" Height="36" Command="{x:Bind ViewModel.SongsAddToQueueCommand}" CommandParameter="{x:Bind ViewModel.SelectedAlbumSongs, Mode=OneWay}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Viewbox Width="14" Height="14">
+                                            <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z"/>
+                                        </Viewbox>
+                                        <TextBlock x:Uid="PageMenu_AddToQueue" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                                <!-- Add to playlist -->
+                                <Button Margin="8,0,8,0" Height="36" Command="{x:Bind ViewModel.SongsAddToPlaylistCommand}" CommandParameter="{x:Bind ViewModel.SelectedAlbumSongs, Mode=OneWay}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Viewbox Width="14" Height="14">
+                                            <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z"/>
+                                        </Viewbox>
+                                        <TextBlock x:Uid="PageMenu_AddToPlaylist" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+
+                            <!-- etc buttons -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+
+                            </StackPanel>
+
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
 
         <Grid Grid.Row="1" x:Name="BodyGrid">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+            <ListView x:Name="AlbumSongsListView" ItemsSource="{x:Bind ViewModel.SelectedAlbumSongs, Mode=OneWay}" SelectionMode="Extended" IsMultiSelectCheckBoxEnabled="False" RightTapped="AlbumSongsListView_RightTapped" AccessKey="L" BorderThickness="0" Margin="0,24,0,0" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListView.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem x:Uid="ListviewItemContextMenu_AddToPlaylist" Command="{x:Bind ViewModel.SongsAddSelectedItemsToPlaylistCommand, Mode=OneWay}" CommandParameter="{x:Bind AlbumSongsListView.SelectedItems}">
+                            <MenuFlyoutItem.Icon>
+                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm0 5a.75.75 0 0 0-.743.648l-.007.102v3.5h-3.5a.75.75 0 0 0-.102 1.493l.102.007h3.5v3.5a.75.75 0 0 0 1.493.102l.007-.102v-3.5h3.5a.75.75 0 0 0 .102-1.493l-.102-.007h-3.5v-3.5A.75.75 0 0 0 12 7Z"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem x:Uid="ListviewItemContextMenu_AddToQueue" Command="{x:Bind ViewModel.SongsAddSelectedItemsToQueueCommand, Mode=OneWay}" CommandParameter="{x:Bind AlbumSongsListView.SelectedItems}">
+                            <MenuFlyoutItem.Icon>
+                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm0 5a.75.75 0 0 0-.743.648l-.007.102v3.5h-3.5a.75.75 0 0 0-.102 1.493l.102.007h3.5v3.5a.75.75 0 0 0 1.493.102l.007-.102v-3.5h3.5a.75.75 0 0 0 .102-1.493l-.102-.007h-3.5v-3.5A.75.75 0 0 0 12 7Z"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </ListView.ContextFlyout>
+                <ListView.Header>
+                    <Grid Height="48" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0" />
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition Width="0" />
+                            <ColumnDefinition Width="3*" MinWidth="160"/>
+                            <ColumnDefinition Width="70" MinWidth="70"/>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="50" MinWidth="50" />
+                            <ColumnDefinition Width="50" MinWidth="50"/>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="0" />
+                        </Grid.ColumnDefinitions>
 
-            <!-- Album Name, Artist Name and close button -->
-            <Grid Grid.Row="0" Margin="0,24,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                
-                <!-- Album Image -->
-
-                <Border Grid.Row="0" Grid.Column="0" Margin="0" Width="184" Height="184" HorizontalAlignment="Left" VerticalAlignment="Top" CornerRadius="6">
-                    <Grid>
-                        <Viewbox Margin="0" Width="184" Height="184" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <PathIcon Width="NaN" Height="NaN" Margin="8" Opacity="0.1" HorizontalAlignment="Center" VerticalAlignment="Center"
-													Data="M12 15.5q1.471 0 2.486-1.014Q15.5 13.47 15.5 12t-1.014-2.485T12 8.5T9.515 9.515T8.5 12t1.015 2.486T12 15.5m0-2.5q-.425 0-.712-.288T11 12t.288-.712T12 11t.713.288T13 12t-.288.713T12 13m.003 8q-1.867 0-3.51-.708q-1.643-.709-2.859-1.924t-1.925-2.856T3 12.003t.709-3.51Q4.417 6.85 5.63 5.634t2.857-1.925T11.997 3t3.51.709q1.643.708 2.859 1.922t1.925 2.857t.709 3.509t-.708 3.51t-1.924 2.859t-2.856 1.925t-3.509.709M12 20q3.35 0 5.675-2.325T20 12t-2.325-5.675T12 4T6.325 6.325T4 12t2.325 5.675T12 20m0-8">
-                            </PathIcon>
-                        </Viewbox>
-                        <Image Stretch="UniformToFill" Source="{x:Bind ViewModel.SelectedAlbum.AlbumImage, Mode=OneWay}" Width="184" Height="184"/>
+                        <TextBlock Grid.Column="3" x:Uid="ListviewColumnHeader_Title" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="4" x:Uid="ListviewColumnHeader_Time" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="5" x:Uid="ListviewColumnHeader_Artist" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="6" x:Uid="ListviewColumnHeader_Album" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="7" x:Uid="ListviewColumnHeader_Disc" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="8" x:Uid="ListviewColumnHeader_Track" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="9" x:Uid="ListviewColumnHeader_Genre" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="10" x:Uid="ListviewColumnHeader_LastModified" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
                     </Grid>
-                </Border>
+                </ListView.Header>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="mod:SongInfo">
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0" />
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition Width="0" />
+                                <ColumnDefinition Width="3*" MinWidth="160"/>
+                                <ColumnDefinition Width="70" MinWidth="70"/>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="50" MinWidth="50" />
+                                <ColumnDefinition Width="50" MinWidth="50"/>
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="0" />
+                            </Grid.ColumnDefinitions>
 
-                <!-- Album Name and Artist Name -->
-                <Grid Grid.Row="0" Grid.Column="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="*"></RowDefinition>
-                    </Grid.RowDefinitions>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Width="80">
+                                <Button Margin="4,0,0,0" Height="30" Background="Transparent" BorderThickness="0" Command="{x:Bind ParentViewModel.SongsListviewPlayThisCommand}" CommandParameter="{x:Bind}">
+                                    <Viewbox Width="12" Height="12" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <PathIcon Data="M5.74514 3.06445C5.41183 2.87696 5 3.11781 5 3.50023V12.5005C5 12.8829 5.41182 13.1238 5.74512 12.9363L13.7454 8.43631C14.0852 8.24517 14.0852 7.75589 13.7454 7.56474L5.74514 3.06445ZM4 3.50023C4 2.35298 5.2355 1.63041 6.23541 2.19288L14.2357 6.69317C15.2551 7.26664 15.2551 8.73446 14.2356 9.3079L6.23537 13.8079C5.23546 14.3703 4 13.6477 4 12.5005V3.50023Z" Width="NaN" Height="NaN" Margin="0">
+                                        </PathIcon>
+                                    </Viewbox>
+                                </Button>
+                                <Button Margin="4,0,0,0" Height="30" Background="Transparent" BorderThickness="0" Command="{x:Bind ParentViewModel.SongsListviewAddThisCommand}" CommandParameter="{x:Bind}">
+                                    <Viewbox Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <PathIcon Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z" Width="NaN" Height="NaN" Margin="0">
+                                        </PathIcon>
+                                    </Viewbox>
+                                </Button>
+                            </StackPanel>
 
-                    <StackPanel Grid.Row="0" Margin="16,16,16,16" Spacing="4">
-                        <TextBlock Text="{x:Bind ViewModel.SelectedAlbum.Name, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="0" Opacity="0.9">
-
-                        </TextBlock>
-                        <TextBlock Text="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="0" Opacity="0.7">
-
-                        </TextBlock>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" Spacing="24" Grid.Row="1" Margin="16,16,16,16" HorizontalAlignment="Left">
-                        <!-- Play button
-                        <SplitButton VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0" Height="34" ToolTip.Tip="{x:Static prop:Resources.PageMenu_PlayAll}" Command="{Binding SongsPlayCommand}" CommandParameter="{Binding SelectedAlbumSongs}">
-                            <Viewbox Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                                <PathIcon Background="Transparent" Width="NaN" Height="NaN"
-												Data="M5.74514 3.06445C5.41183 2.87696 5 3.11781 5 3.50023V12.5005C5 12.8829 5.41182 13.1238 5.74512 12.9363L13.7454 8.43631C14.0852 8.24517 14.0852 7.75589 13.7454 7.56474L5.74514 3.06445ZM4 3.50023C4 2.35298 5.2355 1.63041 6.23541 2.19288L14.2357 6.69317C15.2551 7.26664 15.2551 8.73446 14.2356 9.3079L6.23537 13.8079C5.23546 14.3703 4 13.6477 4 12.5005V3.50023Z">
-                                </PathIcon>
-                            </Viewbox>
-                            <SplitButton.Flyout>
-                                <MenuFlyout Placement="Bottom">
-                                    <MenuItem Header="{x:Static prop:Resources.PageMenu_QueueAll}" Command="{Binding SongsAddToQueueCommand}" CommandParameter="{Binding SelectedAlbumSongs}">
-                                        <MenuItem.Icon>
-                                            <PathIcon Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z" Width="NaN" Height="NaN" Margin="0" Padding="0">
-                                            </PathIcon>
-                                        </MenuItem.Icon>
-                                    </MenuItem>
-                                </MenuFlyout>
-                            </SplitButton.Flyout>
-                        </SplitButton>
+                            <TextBlock Grid.Column="3" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="4" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind TimeFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Artist, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="6" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Album, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="7" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Disc, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="8" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Track, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="9" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Genre, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind LastModifiedFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style BasedOn="{StaticResource DefaultListViewItemStyle}" TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="Height" Value="48" />
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Margin" Value="0" />
+                        <!-- not possible in winui3?
+                        <Setter Property="IsSelected" Value="{x:Bind IsSelected, Mode=TwoWay}" />
                         -->
-                        <!-- More options button 
-                        <Button Margin="0,0,0,0" Width="34" Height="34" HorizontalAlignment="Left" VerticalAlignment="Bottom" IsVisible="False">
-                            <Viewbox Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                                <PathIcon Width="NaN" Height="NaN"
-												Data="M10 6C9.30964 6 8.75 5.44036 8.75 4.75C8.75 4.05964 9.30964 3.5 10 3.5C10.6904 3.5 11.25 4.05964 11.25 4.75C11.25 5.44036 10.6904 6 10 6ZM10 11.25C9.30964 11.25 8.75 10.6904 8.75 10C8.75 9.30964 9.30964 8.75 10 8.75C10.6904 8.75 11.25 9.30964 11.25 10C11.25 10.6904 10.6904 11.25 10 11.25ZM8.75 15.25C8.75 15.9404 9.30964 16.5 10 16.5C10.6904 16.5 11.25 15.9404 11.25 15.25C11.25 14.5596 10.6904 14 10 14C9.30964 14 8.75 14.5596 8.75 15.25Z">
-                                </PathIcon>
-                            </Viewbox>
-                        </Button> -->
-                    </StackPanel>
-
-                </Grid>
-            </Grid>
-
-            <!-- Song ListView -->
-            <Grid Grid.Row="1">
-                <ListView x:Name="AlbumSongsListBox" ItemsSource="{x:Bind ViewModel.SelectedAlbumSongs, Mode=OneWay}" SelectionMode="Single" BorderThickness="0" Margin="0,24,0,0" ScrollViewer.VerticalScrollBarVisibility="Auto">
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="mod:SongInfo">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="76" MinWidth="76"></ColumnDefinition>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                    <ColumnDefinition Width="70"></ColumnDefinition>
-                                    <ColumnDefinition Width="42"></ColumnDefinition>
-                                    <ColumnDefinition Width="62"></ColumnDefinition>
-                                    <ColumnDefinition Width="12" MinWidth="12"></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-
-
-                                <TextBlock Grid.Column="1" Text="{x:Bind Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9"></TextBlock>
-                                <TextBlock Grid.Column="2" Text="{x:Bind TimeFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9"></TextBlock>
-                                <TextBlock Grid.Column="3" Text="{x:Bind Disc, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9"></TextBlock>
-                                <TextBlock Grid.Column="4" Text="{x:Bind Track, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="12,0,0,0" Opacity="0.9"></TextBlock>
-                                <!--
-                                    <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
-                                        <Button Margin="2,0,0,0" Command="{Binding $parent[ListBox].((vm:MainViewModel)DataContext).SongsListviewPlayThisCommand}" CommandParameter="{Binding}" ToolTip.Tip="{x:Static prop:Resources.ListViewItemContextMenu_Play}" Background="Transparent" BorderThickness="0">
-                                            <Viewbox Width="12" Height="12" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                <PathIcon Data="M5.74514 3.06445C5.41183 2.87696 5 3.11781 5 3.50023V12.5005C5 12.8829 5.41182 13.1238 5.74512 12.9363L13.7454 8.43631C14.0852 8.24517 14.0852 7.75589 13.7454 7.56474L5.74514 3.06445ZM4 3.50023C4 2.35298 5.2355 1.63041 6.23541 2.19288L14.2357 6.69317C15.2551 7.26664 15.2551 8.73446 14.2356 9.3079L6.23537 13.8079C5.23546 14.3703 4 13.6477 4 12.5005V3.50023Z" Width="NaN" Height="NaN" Margin="0" Padding="0">
-                                                </PathIcon>
-                                            </Viewbox>
-                                        </Button>
-                                        <Button Margin="3,0,0,0" Command="{Binding $parent[ListBox].((vm:MainViewModel)DataContext).SongsListviewAddThisCommand}" CommandParameter="{Binding}" ToolTip.Tip="{x:Static prop:Resources.ListviewItemContextMenu_AddToQueue}" Background="Transparent" BorderThickness="0">
-                                            <Viewbox Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                <PathIcon Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z" Width="NaN" Height="NaN" Margin="0" Padding="0">
-                                                </PathIcon>
-                                            </Viewbox>
-                                        </Button>
-                                    </StackPanel>
-                                    -->
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </Grid>
-
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
         </Grid>
 
         <VisualStateManager.VisualStateGroups>

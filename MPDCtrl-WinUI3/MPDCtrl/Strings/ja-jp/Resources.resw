@@ -283,13 +283,13 @@
     <value>再生</value>
   </data>
   <data name="PageMenu_Find.ToolTipService.ToolTip" xml:space="preserve">
-    <value>検索 (Ctrl+F)</value>
+    <value>検索</value>
   </data>
   <data name="PageMenu_Clear.Text" xml:space="preserve">
     <value>クリア</value>
   </data>
-  <data name="PageMenu_AddTo.Text" xml:space="preserve">
-    <value>追加先</value>
+  <data name="PageMenu_AddToPlaylist.Text" xml:space="preserve">
+    <value>プレイリストに追加</value>
   </data>
   <data name="PageMenu_Reorder.ToolTipService.ToolTip" xml:space="preserve">
     <value>順序変更</value>
@@ -335,5 +335,32 @@
   </data>
   <data name="GoBackButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>戻る</value>
+  </data>
+  <data name="PageMenu_PlayAll.Text" xml:space="preserve">
+    <value>すべて再生</value>
+  </data>
+  <data name="PageMenu_AddToQueue.Text" xml:space="preserve">
+    <value>再生キューに追加</value>
+  </data>
+  <data name="ListviewItemContextMenu_AddToQueue.Text" xml:space="preserve">
+    <value>再生キューに追加</value>
+  </data>
+  <data name="Text_UnknownArtist.Text" xml:space="preserve">
+    <value>不明なアーティスト</value>
+  </data>
+  <data name="Text_UnknownAlbum.Text" xml:space="preserve">
+    <value>不明なアルバム</value>
+  </data>
+  <data name="ArtistPage_SubTitle_ArtistCount" xml:space="preserve">
+    <value>{0}アーティスト</value>
+  </data>
+  <data name="ListviewItemContextMenu_GoToAlbumPage.Text" xml:space="preserve">
+    <value>アルバムページへ移動</value>
+  </data>
+  <data name="ListviewItemContextMenu_GoToArtistPage.Text" xml:space="preserve">
+    <value>アーティストページへ移動</value>
+  </data>
+  <data name="StatusBarMsg_MPDVersionIsOld" xml:space="preserve">
+    <value>MPD プロトコルのバージョン（{0}）が古いため、 幾つかの機能は正しく動作しない可能性があります。</value>
   </data>
 </root>

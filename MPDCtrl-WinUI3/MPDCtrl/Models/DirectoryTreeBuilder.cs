@@ -1,4 +1,5 @@
 
+using MPDCtrl.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -43,6 +44,9 @@ public partial class NodeFile : Node
             }
         }
     }
+
+    // Workaround for WinUI3's limitation or lack of features. 
+    public MainViewModel? ParentViewModel { get; set; }
 
     public NodeFile(string name, Uri fileUri, string originalFileUri) : base(name)
     {

@@ -15,81 +15,187 @@
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
     mc:Ignorable="d"
     NavigationCacheMode="Required">
-    <Page.Resources>
-        <animations:ImplicitAnimationSet x:Name="ShowTransitions">
-            <animations:OffsetAnimation EasingMode="EaseOut" From="0,24,0" To="0" Duration="0:0:0.4" />
-            <animations:OpacityAnimation EasingMode="EaseOut" From="0" To="1" Duration="0:0:0.2" />
-        </animations:ImplicitAnimationSet>
-        <animations:ImplicitAnimationSet x:Name="HideTransitions">
-            <animations:OffsetAnimation EasingMode="EaseOut" From="0" To="0,24,0" Duration="0:0:0.2" />
-            <animations:OpacityAnimation EasingMode="EaseOut" From="1" To="0" Duration="0:0:0.1" />
-        </animations:ImplicitAnimationSet>
-    </Page.Resources>
     <Grid x:Name="ContentGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="118"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="164"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" x:Name="HeaderGrid" Margin="24,0,24,0">
-            <TextBlock x:Uid="PageTitle_Search" FontSize="{StaticResource FontSizePageTitle}" FontWeight="SemiBold"/>
-        </Border>
-
-        <Grid Grid.Row="1" x:Name="HeaderSubGrid" Margin="24,0,24,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-
-            <!-- Search tag combobox -->
-            <ComboBox Grid.Column="0" SelectedIndex="0" MinWidth="140" Margin="6,0,0,0" ItemsSource="{x:Bind ViewModel.SearchTagList,Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedSearchTag,Mode=TwoWay}" VerticalAlignment="Bottom">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate x:DataType="mod:SearchOption">
-                        <TextBlock Text="{x:Bind Label}" VerticalAlignment="Center"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-
-            <!-- Search Shiki combobox -->
-            <ComboBox Grid.Column="1" SelectedIndex="0" MinWidth="140" Margin="6,0,0,0" ItemsSource="{x:Bind ViewModel.SearchShikiList,Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedSearchShiki,Mode=TwoWay}" VerticalAlignment="Bottom">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate x:DataType="mod:SearchWith">
-                        <TextBlock Text="{x:Bind Label}" VerticalAlignment="Center"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-
-            <!--Search query input textbox -->
-            <StackPanel Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
-                <TextBox MinWidth="100" Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="6,0,0,0" HorizontalAlignment="Stretch"></TextBox>
-            </StackPanel>
-
-            <!-- Search button -->
-            <Button Grid.Column="3" Command="{x:Bind ViewModel.SearchExecCommand}" Margin="6,0,0,0" Padding="0" HorizontalAlignment="Center" Height="32" Width="32" VerticalAlignment="Bottom">
-                <Path Stretch="Uniform" Fill="{ThemeResource TextFillColorSecondaryBrush}" Opacity="0.9" Margin="0" Width="14" Height="14" Data="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
-            </Button>
-        </Grid>
-        
-        <Grid Grid.Row="2" x:Name="BodyGrid" Margin="24,0,0,0">
+        <Grid Grid.Row="0" x:Name="HeaderGrid" Margin="24,0,24,0">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="1">
-                <!--  ItemsSource="{x:Bind Path=ViewModel.SearchResult, Mode=OneWay}" -->
-                <ListView x:Name="SearchListview" ItemsSource="{x:Bind ViewModel.SearchResult, Mode=OneWay}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                  ScrollViewer.VerticalScrollBarVisibility="Visible" animations:Implicit.HideAnimations="{StaticResource HideTransitions}"
-                            animations:Implicit.ShowAnimations="{StaticResource ShowTransitions}" SelectionMode="Extended" IsMultiSelectCheckBoxEnabled="False" Padding="0,0,24,0">
-                    <ListView.Header>
-                        <Grid Height="48" ColumnSpacing="8" Margin="0,0,0,0">
+            <!-- Page title -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" x:Uid="PageTitle_Search" FontSize="{StaticResource FontSizePageTitle}" FontWeight="SemiBold"/>
+                <TextBlock Grid.Column="1" FontSize="{StaticResource FontSizePageSubTitle}" Text="{x:Bind ViewModel.SearchPageSubTitleResultCount, Mode=OneWay}" VerticalAlignment="Bottom" Padding="48,0,0,4" Opacity="0.7"/>
+            </Grid>
+
+            <!-- Page controls -->
+            <Grid Grid.Row="1" Margin="0,24,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Play and AddTo buttons -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <!-- Play -->
+                    <Button Margin="0,0,8,0" Height="36" Command="{x:Bind ViewModel.SongsPlayAllCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.SearchResult, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsSearchControlEnabled,Mode=TwoWay}">
+                        <StackPanel Orientation="Horizontal">
+                            <Viewbox Width="14" Height="14">
+                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M5.74514 3.06445C5.41183 2.87696 5 3.11781 5 3.50023V12.5005C5 12.8829 5.41182 13.1238 5.74512 12.9363L13.7454 8.43631C14.0852 8.24517 14.0852 7.75589 13.7454 7.56474L5.74514 3.06445ZM4 3.50023C4 2.35298 5.2355 1.63041 6.23541 2.19288L14.2357 6.69317C15.2551 7.26664 15.2551 8.73446 14.2356 9.3079L6.23537 13.8079C5.23546 14.3703 4 13.6477 4 12.5005V3.50023Z"/>
+                            </Viewbox>
+                            <TextBlock x:Uid="PageMenu_PlayAll" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <!-- Add to queue-->
+                    <Button Margin="8,0,8,0" Height="36" Command="{x:Bind ViewModel.SongsAddToQueueCommand}" CommandParameter="{x:Bind ViewModel.SearchResult, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsSearchControlEnabled,Mode=TwoWay}">
+                        <StackPanel Orientation="Horizontal">
+                            <Viewbox Width="14" Height="14">
+                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z"/>
+                            </Viewbox>
+                            <TextBlock x:Uid="PageMenu_AddToQueue" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <!-- Add to playlist -->
+                    <Button Margin="8,0,8,0" Height="36" Command="{x:Bind ViewModel.SongsAddToPlaylistCommand}" CommandParameter="{x:Bind ViewModel.SearchResult, Mode=OneWay}" IsEnabled="{x:Bind ViewModel.IsSearchControlEnabled,Mode=TwoWay}">
+                        <StackPanel Orientation="Horizontal">
+                            <Viewbox Width="14" Height="14">
+                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z"/>
+                            </Viewbox>
+                            <TextBlock x:Uid="PageMenu_AddToPlaylist" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- etc buttons -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <!-- Sort -->
+                    <Button Height="36" Width="38" Margin="4,0,0,0" HorizontalAlignment="Right" IsEnabled="{x:Bind ViewModel.IsSearchControlEnabled,Mode=TwoWay}">
+                        <StackPanel Orientation="Horizontal">
+                            <Viewbox Width="14" Height="14" Margin="0,0,6,0">
+                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M4.85355 2.14645C4.65829 1.95118 4.34171 1.95118 4.14645 2.14645L1.14645 5.14645C0.951184 5.34171 0.951184 5.65829 1.14645 5.85355C1.34171 6.04882 1.65829 6.04882 1.85355 5.85355L4 3.70711V13.5C4 13.7761 4.22386 14 4.5 14C4.77614 14 5 13.7761 5 13.5V3.70711L7.14645 5.85355C7.34171 6.04882 7.65829 6.04882 7.85355 5.85355C8.04882 5.65829 8.04882 5.34171 7.85355 5.14645L4.85355 2.14645ZM11.1525 13.8595C11.3463 14.0468 11.6537 14.0468 11.8475 13.8595L14.8475 10.9594C15.0461 10.7675 15.0514 10.4509 14.8595 10.2524C14.6676 10.0538 14.351 10.0485 14.1525 10.2404L12 12.3212L12 2.5001C12 2.22395 11.7761 2.0001 11.5 2.0001C11.2239 2.0001 11 2.22395 11 2.5001L11 12.3212L8.84752 10.2404C8.64898 10.0485 8.33244 10.0538 8.14051 10.2524C7.94858 10.4509 7.95394 10.7675 8.15248 10.9594L11.1525 13.8595Z"/>
+                            </Viewbox>
+                            <TextBlock x:Uid="PageMenu_Sort" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Button.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Title" Command="{x:Bind ViewModel.SearchSongsSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="title"/>
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Time" Command="{x:Bind ViewModel.SearchSongsSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="time" />
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Artist" Command="{x:Bind ViewModel.SearchSongsSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="artist" />
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Album" Command="{x:Bind ViewModel.SearchSongsSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="album" />
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Disc" Command="{x:Bind ViewModel.SearchSongsSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="disc" />
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Track" Command="{x:Bind ViewModel.SearchSongsSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="track" />
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Genre" Command="{x:Bind ViewModel.SearchSongsSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="genre" />
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_LastModified" Command="{x:Bind ViewModel.SearchSongsSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="lastmodified" />
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem x:Uid="PageMenu_ReverseSort" Command="{x:Bind ViewModel.SearchSongsSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="reverse" />
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
+
+            </Grid>
+
+            <!-- Search TextBox -->
+            <Grid Grid.Row="2" x:Name="HeaderSubGrid" Margin="0,24,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <!-- Search tag combobox -->
+                <ComboBox Grid.Column="0" SelectedIndex="0" MinWidth="140" Margin="0,0,0,0" ItemsSource="{x:Bind ViewModel.SearchTagList,Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedSearchTag,Mode=TwoWay}" VerticalAlignment="Bottom">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="mod:SearchOption">
+                            <TextBlock Text="{x:Bind Label}" VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <!-- Search Shiki combobox -->
+                <ComboBox Grid.Column="1" SelectedIndex="0" MinWidth="140" Margin="6,0,0,0" ItemsSource="{x:Bind ViewModel.SearchShikiList,Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedSearchShiki,Mode=TwoWay}" VerticalAlignment="Bottom">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="mod:SearchWith">
+                            <TextBlock Text="{x:Bind Label}" VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <!--Search query input textbox -->
+                <StackPanel Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+                    <TextBox MinWidth="100" Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="6,0,0,0" HorizontalAlignment="Stretch"></TextBox>
+                </StackPanel>
+
+                <!-- Search button -->
+                <Button Grid.Column="3" Command="{x:Bind ViewModel.SearchExecCommand}" Margin="6,0,0,0" Padding="0" HorizontalAlignment="Center" Height="36" Width="38" VerticalAlignment="Bottom">
+                    <Path Stretch="Uniform" Fill="{ThemeResource TextFillColorSecondaryBrush}" Opacity="0.9" Margin="0" Width="14" Height="14" Data="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
+                </Button>
+            </Grid>
+
+        </Grid>
+
+        <Grid Grid.Row="1" x:Name="BodyGrid" Margin="24,0,0,0">
+            <ListView x:Name="SearchListview" ItemsSource="{x:Bind ViewModel.SearchResult, Mode=OneWay}" AccessKey="L"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto" SelectionMode="Extended" IsMultiSelectCheckBoxEnabled="False" RightTapped="SearchListview_RightTapped" Padding="0,0,24,0" Margin="0,24,0,0">
+                <ListView.Header>
+                    <Grid Height="48" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0" />
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition Width="0" />
+                            <ColumnDefinition Width="3*" MinWidth="160"/>
+                            <ColumnDefinition Width="70" MinWidth="70"/>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="50" MinWidth="50" />
+                            <ColumnDefinition Width="50" MinWidth="50"/>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="0" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="3" x:Uid="ListviewColumnHeader_Title" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="4" x:Uid="ListviewColumnHeader_Time" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="5" x:Uid="ListviewColumnHeader_Artist" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="6" x:Uid="ListviewColumnHeader_Album" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="7" x:Uid="ListviewColumnHeader_Disc" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="8" x:Uid="ListviewColumnHeader_Track" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="9" x:Uid="ListviewColumnHeader_Genre" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="10" x:Uid="ListviewColumnHeader_LastModified" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                    </Grid>
+                </ListView.Header>
+                <ListView.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem x:Uid="ListviewItemContextMenu_AddToPlaylist" Command="{x:Bind ViewModel.SongsAddSelectedItemsToPlaylistCommand, Mode=OneWay}" CommandParameter="{x:Bind SearchListview.SelectedItems}">
+                            <MenuFlyoutItem.Icon>
+                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm0 5a.75.75 0 0 0-.743.648l-.007.102v3.5h-3.5a.75.75 0 0 0-.102 1.493l.102.007h3.5v3.5a.75.75 0 0 0 1.493.102l.007-.102v-3.5h3.5a.75.75 0 0 0 .102-1.493l-.102-.007h-3.5v-3.5A.75.75 0 0 0 12 7Z"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem x:Uid="ListviewItemContextMenu_AddToQueue" Command="{x:Bind ViewModel.SongsAddSelectedItemsToQueueCommand, Mode=OneWay}" CommandParameter="{x:Bind SearchListview.SelectedItems}">
+                            <MenuFlyoutItem.Icon>
+                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm0 5a.75.75 0 0 0-.743.648l-.007.102v3.5h-3.5a.75.75 0 0 0-.102 1.493l.102.007h3.5v3.5a.75.75 0 0 0 1.493.102l.007-.102v-3.5h3.5a.75.75 0 0 0 .102-1.493l-.102-.007h-3.5v-3.5A.75.75 0 0 0 12 7Z"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </ListView.ContextFlyout>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="mod:SongInfo">
+                        <Grid ColumnSpacing="8">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="0" />
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition Width="0" />
                                 <ColumnDefinition Width="3*" MinWidth="160"/>
                                 <ColumnDefinition Width="70" MinWidth="70"/>
                                 <ColumnDefinition Width="2*" />
@@ -99,79 +205,46 @@
                                 <ColumnDefinition Width="1*" />
                                 <ColumnDefinition Width="0" />
                             </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0"></StackPanel>
-                            <StackPanel Grid.Column="1"></StackPanel>
-                            <Border Grid.Column="2">
 
-                            </Border>
-                            <TextBlock Grid.Column="3" x:Uid="ListviewColumnHeader_Title" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="4" x:Uid="ListviewColumnHeader_Time" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="5" x:Uid="ListviewColumnHeader_Artist" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="6" x:Uid="ListviewColumnHeader_Album" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="7" x:Uid="ListviewColumnHeader_Disc" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="8" x:Uid="ListviewColumnHeader_Track" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="9" x:Uid="ListviewColumnHeader_Genre" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="10" x:Uid="ListviewColumnHeader_LastModified" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Opacity="0.5" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Width="80">
+                                <Button Margin="4,0,0,0" Height="30" Background="Transparent" BorderThickness="0" Command="{x:Bind ParentViewModel.SongsListviewPlayThisCommand}" CommandParameter="{x:Bind}">
+                                    <Viewbox Width="12" Height="12" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <PathIcon Data="M5.74514 3.06445C5.41183 2.87696 5 3.11781 5 3.50023V12.5005C5 12.8829 5.41182 13.1238 5.74512 12.9363L13.7454 8.43631C14.0852 8.24517 14.0852 7.75589 13.7454 7.56474L5.74514 3.06445ZM4 3.50023C4 2.35298 5.2355 1.63041 6.23541 2.19288L14.2357 6.69317C15.2551 7.26664 15.2551 8.73446 14.2356 9.3079L6.23537 13.8079C5.23546 14.3703 4 13.6477 4 12.5005V3.50023Z" Width="NaN" Height="NaN" Margin="0">
+                                        </PathIcon>
+                                    </Viewbox>
+                                </Button>
+                                <Button Margin="4,0,0,0" Height="30" Background="Transparent" BorderThickness="0" Command="{x:Bind ParentViewModel.SongsListviewAddThisCommand}" CommandParameter="{x:Bind}">
+                                    <Viewbox Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <PathIcon Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z" Width="NaN" Height="NaN" Margin="0">
+                                        </PathIcon>
+                                    </Viewbox>
+                                </Button>
+                            </StackPanel>
+
+                            <TextBlock Grid.Column="3" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="4" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind TimeFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Artist, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="6" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Album, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="7" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Disc, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="8" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Track, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="9" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Genre, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind LastModifiedFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
                         </Grid>
-                    </ListView.Header>
-                    <!--
-                <ListView.ContextFlyout>
-                    <MenuFlyout>
-                        <MenuFlyoutItem x:Uid="OrdersListview_CancelOrder" Command="{x:Bind ViewModel.CancelOrderCommand}" CommandParameter="{x:Bind OrdersListview.SelectedItems}">
-                            <MenuFlyoutItem.Icon>
-                                <PathIcon Margin="0,0,0,0" Data="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z">
-                                </PathIcon>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-                    </MenuFlyout>
-                </ListView.ContextFlyout>
-                -->
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="mod:SongInfo">
-                            <Grid ColumnSpacing="8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="3*" MinWidth="160"/>
-                                    <ColumnDefinition Width="70" MinWidth="70"/>
-                                    <ColumnDefinition Width="2*" />
-                                    <ColumnDefinition Width="2*" />
-                                    <ColumnDefinition Width="50" MinWidth="50" />
-                                    <ColumnDefinition Width="50" MinWidth="50"/>
-                                    <ColumnDefinition Width="1*" />
-                                    <ColumnDefinition Width="0" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="" />
-                                <TextBlock Grid.Column="1" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="" />
-                                <Border Grid.Column="2">
-
-                                </Border>
-                                <TextBlock Grid.Column="3" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
-                                <TextBlock Grid.Column="4" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind TimeFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
-                                <TextBlock Grid.Column="5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Artist, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
-                                <TextBlock Grid.Column="6" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Album, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
-                                <TextBlock Grid.Column="7" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Disc, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
-                                <TextBlock Grid.Column="8" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Track, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
-                                <TextBlock Grid.Column="9" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Genre, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
-                                <TextBlock Grid.Column="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind LastModifiedFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                    <ListView.ItemContainerStyle>
-                        <Style BasedOn="{StaticResource DefaultListViewItemStyle}" TargetType="ListViewItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            <Setter Property="VerticalAlignment" Value="Center" />
-                            <Setter Property="Height" Value="48" />
-                            <Setter Property="Padding" Value="0" />
-                            <!-- no possible in winui3?
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style BasedOn="{StaticResource DefaultListViewItemStyle}" TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="Height" Value="48" />
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Margin" Value="0" />
+                        <!-- not possible in winui3?
                         <Setter Property="IsSelected" Value="{x:Bind IsSelected, Mode=TwoWay}" />
                         -->
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                </ListView>
-            </Grid>
-
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
         </Grid>
 
         <VisualStateManager.VisualStateGroups>
@@ -182,7 +255,6 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="48,0,48,0" />
-                        <Setter Target="HeaderSubGrid.Margin" Value="48,0,48,0" />
                         <Setter Target="BodyGrid.Margin" Value="48,0,0,0" />
                         <Setter Target="SearchListview.Padding" Value="0,0,48,0" />
                     </VisualState.Setters>
@@ -193,7 +265,6 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="24,0,24,0" />
-                        <Setter Target="HeaderSubGrid.Margin" Value="24,0,24,0" />
                         <Setter Target="BodyGrid.Margin" Value="24,0,0,0" />
                         <Setter Target="SearchListview.Padding" Value="0,0,24,0" />
                     </VisualState.Setters>
@@ -204,7 +275,6 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="16,0,16,0" />
-                        <Setter Target="HeaderSubGrid.Margin" Value="16,0,16,0" />
                         <Setter Target="BodyGrid.Margin" Value="16,0,0,0" />
                         <Setter Target="SearchListview.Padding" Value="0,0,16,0" />
                     </VisualState.Setters>
@@ -215,7 +285,6 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="16,0,16,0" />
-                        <Setter Target="HeaderSubGrid.Margin" Value="16,0,16,0" />
                         <Setter Target="BodyGrid.Margin" Value="16,0,0,0" />
                         <Setter Target="SearchListview.Padding" Value="0,0,16,0" />
                     </VisualState.Setters>

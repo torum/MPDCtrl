@@ -89,7 +89,7 @@ public class DialogService : IDialogService
                 {
                     if (!string.IsNullOrWhiteSpace(pl.Name))
                     {
-                        return new AddToDialogResult(pl.Name, true);
+                        return new AddToDialogResult(pl.Name, false);
                     }
                 }
             }

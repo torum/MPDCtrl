@@ -214,7 +214,7 @@
     <value>Genre</value>
   </data>
   <data name="ListviewColumnHeader_LastModified.Text" xml:space="preserve">
-    <value>Last Modified</value>
+    <value>Last modified</value>
   </data>
   <data name="ListviewColumnHeader_Time.Text" xml:space="preserve">
     <value>Time</value>
@@ -283,13 +283,13 @@
     <value>Play</value>
   </data>
   <data name="PageMenu_Find.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Find (Ctrl+F)</value>
+    <value>Find</value>
   </data>
   <data name="PageMenu_Clear.Text" xml:space="preserve">
     <value>Clear</value>
   </data>
-  <data name="PageMenu_AddTo.Text" xml:space="preserve">
-    <value>Add to</value>
+  <data name="PageMenu_AddToPlaylist.Text" xml:space="preserve">
+    <value>Add to playlist</value>
   </data>
   <data name="PageMenu_Reorder.ToolTipService.ToolTip" xml:space="preserve">
     <value>Reorder</value>
@@ -298,13 +298,13 @@
     <value>Sort</value>
   </data>
   <data name="ConnectionStatus_ConnectionError" xml:space="preserve">
-    <value>Connection Error</value>
+    <value>Connection error</value>
   </data>
   <data name="MPD_CommandResponse" xml:space="preserve">
-    <value>MPD Command Response</value>
+    <value>MPD command response</value>
   </data>
   <data name="MPD_IdleResponse" xml:space="preserve">
-    <value>MPD Response</value>
+    <value>MPD response</value>
   </data>
   <data name="PageMenu_ReverseSort.Text" xml:space="preserve">
     <value>Reverse order</value>
@@ -335,5 +335,32 @@
   </data>
   <data name="GoBackButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>Back</value>
+  </data>
+  <data name="PageMenu_PlayAll.Text" xml:space="preserve">
+    <value>Play all</value>
+  </data>
+  <data name="PageMenu_AddToQueue.Text" xml:space="preserve">
+    <value>Add to queue</value>
+  </data>
+  <data name="ListviewItemContextMenu_AddToQueue.Text" xml:space="preserve">
+    <value>Add to queue</value>
+  </data>
+  <data name="Text_UnknownArtist.Text" xml:space="preserve">
+    <value>Unknown Artist</value>
+  </data>
+  <data name="Text_UnknownAlbum.Text" xml:space="preserve">
+    <value>Unknown Album</value>
+  </data>
+  <data name="ArtistPage_SubTitle_ArtistCount" xml:space="preserve">
+    <value>{0} artists</value>
+  </data>
+  <data name="ListviewItemContextMenu_GoToAlbumPage.Text" xml:space="preserve">
+    <value>Go to album page</value>
+  </data>
+  <data name="ListviewItemContextMenu_GoToArtistPage.Text" xml:space="preserve">
+    <value>Go to artist page</value>
+  </data>
+  <data name="StatusBarMsg_MPDVersionIsOld" xml:space="preserve">
+    <value>The MPD protocol version {0} is old. Some of the functionalities may not work properly.</value>
   </data>
 </root>

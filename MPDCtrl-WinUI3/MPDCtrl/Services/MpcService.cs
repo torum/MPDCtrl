@@ -1414,14 +1414,12 @@ public partial class MpcService : IMpcService
 
                 DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
                 Debug.WriteLine($"Looks like Connection Timeout. Reconnecting...  @IOExceptionOfWriteAsync:  {e.Message}" + Environment.NewLine + cmd);
-                /*
                 try
                 {
-                    _commandConnection.Client.Shutdown(SocketShutdown.Both);
+                    //_commandConnection.Client.Shutdown(SocketShutdown.Both);
                     _commandConnection.Close();
                 }
                 catch { }
-                */
 
                 ConnectionResult newCon = await MpdCommandConnect(MpdHost, MpdPort);
 
@@ -1442,8 +1440,8 @@ public partial class MpcService : IMpcService
                         ret = await MpdCommandSendCommandProtected(cmd, isAutoIdling, reTryCount++);
 
                         // Fixing the MPD's volume 100% on re-connect problem once on for all...with dirty hack. 
-                        Debug.WriteLine($"setvol {MpdStatus.MpdVolume.ToString()}.  @IOExceptionOfWriteAsync");
-                        ret = await MpdCommandSendCommandProtected(("setvol " + MpdStatus.MpdVolume.ToString()), isAutoIdling, reTryCount++);
+                        //Debug.WriteLine($"setvol {MpdStatus.MpdVolume}.  @IOExceptionOfWriteAsync");
+                        //ret = await MpdCommandSendCommandProtected(("setvol " + MpdStatus.MpdVolume.ToString()), isAutoIdling, reTryCount++);
 
                         //}
                     }
@@ -1481,6 +1479,7 @@ public partial class MpcService : IMpcService
             {
                 DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "WriteAsync@MpdSendCommand", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
 
+                // TODO:
                 //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
                 //ConnectionError?.Invoke(this, "The connection (command) has been terminated (Exception): " + e.Message);
@@ -1620,7 +1619,7 @@ public partial class MpcService : IMpcService
                 try
                 {
                     //_commandConnection.Client.Shutdown(SocketShutdown.Both);
-                    //_commandConnection.Close();
+                    _commandConnection.Close();
                 }
                 catch { }
 
@@ -1644,8 +1643,8 @@ public partial class MpcService : IMpcService
                         ret = await MpdCommandSendCommandProtected(cmd, isAutoIdling, reTryCount++);
 
                         // Fixing the MPD's volume 100% on re-connect problem once on for all...with dirty hack. 
-                        Debug.WriteLine($"setvol {MpdStatus.MpdVolume.ToString()}.  @isNullReturn");
-                        ret = await MpdCommandSendCommandProtected(("setvol " + MpdStatus.MpdVolume.ToString()), isAutoIdling, reTryCount++);
+                        //Debug.WriteLine($"setvol {MpdStatus.MpdVolume}.  @isNullReturn");
+                        //ret = await MpdCommandSendCommandProtected(("setvol " + MpdStatus.MpdVolume.ToString()), isAutoIdling, reTryCount++);
 
                         //}
                     }
@@ -1760,7 +1759,7 @@ public partial class MpcService : IMpcService
                 try
                 {
                     //_commandConnection.Client.Shutdown(SocketShutdown.Both);
-                    //_commandConnection.Close();
+                    _commandConnection.Close();
                 }
                 catch { }
 
@@ -1784,8 +1783,8 @@ public partial class MpcService : IMpcService
                         ret = await MpdCommandSendCommandProtected(cmd, isAutoIdling, reTryCount++);
 
                         // Fixing the MPD's volume 100% on re-connect problem once on for all...with dirty hack. 
-                        Debug.WriteLine($"setvol {MpdStatus.MpdVolume.ToString()}.  @IOExceptionOfReadLineAsync");
-                        ret = await MpdCommandSendCommandProtected(("setvol " + MpdStatus.MpdVolume.ToString()), isAutoIdling, reTryCount++);
+                        //Debug.WriteLine($"setvol {MpdStatus.MpdVolume}.  @IOExceptionOfReadLineAsync");
+                        //ret = await MpdCommandSendCommandProtected(("setvol " + MpdStatus.MpdVolume.ToString()), isAutoIdling, reTryCount++);
 
                         //}
                     }
@@ -2942,12 +2941,20 @@ public partial class MpcService : IMpcService
                     //Debug.WriteLine("volume is set to " + valueVolume + " @ParseStatus()");
                     MpdStatus.MpdVolume = Int32.Parse(valueVolume);
 
-                    //MpdStatus.MpdVolumeIsSet = true;
+                    MpdStatus.MpdVolumeIsReturned = true;
+                }
+                else
+                {
+                    MpdStatus.MpdVolumeIsReturned = false;
                 }
             }
+            else
+            {
+                MpdStatus.MpdVolumeIsReturned = false;
+            }
 
-            // songID
-            MpdStatus.MpdSongID = "";
+                // songID
+                MpdStatus.MpdSongID = "";
             if (MpdStatusValues.TryGetValue("songid", out string? value))
             {
                 MpdStatus.MpdSongID = value;
@@ -4235,7 +4242,7 @@ public partial class MpcService : IMpcService
 
             ConnectionState = ConnectionStatus.Disconnecting;
 
-            _commandConnection.Client?.Shutdown(SocketShutdown.Both);
+            //_commandConnection.Client?.Shutdown(SocketShutdown.Both);
             _commandConnection.Close();
         }
         catch { }
@@ -4253,7 +4260,7 @@ public partial class MpcService : IMpcService
             //
             _cts.Cancel();
 
-            _idleConnection.Client?.Shutdown(SocketShutdown.Both);
+            //_idleConnection.Client?.Shutdown(SocketShutdown.Both);
             _idleConnection.Close();
 
             _cts.Dispose();

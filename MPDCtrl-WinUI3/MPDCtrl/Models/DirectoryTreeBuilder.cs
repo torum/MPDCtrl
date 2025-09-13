@@ -144,7 +144,7 @@ public partial class DirectoryTreeBuilder(string name) : NodeTree(name)
                             NodeDirectory hoge = new(asdf.Trim(), new Uri(@"file:///" + pathDir.Trim()))
                             {
                                 Selected = false,
-                                Expanded = true,
+                                Expanded = false,
                                 Parent = parent
                             };
                             //parent.Children.Add(hoge);
@@ -167,7 +167,7 @@ public partial class DirectoryTreeBuilder(string name) : NodeTree(name)
                     NodeDirectory hoge = new(ValuePair[0].Trim(), new Uri(@"file:///" + pathDir.Trim()))
                     {
                         Selected = false,
-                        Expanded = true,
+                        Expanded = false,
                         Parent = root
                     };
                     //root.Children.Add(hoge);

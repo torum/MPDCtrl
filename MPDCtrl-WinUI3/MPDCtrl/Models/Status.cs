@@ -11,7 +11,8 @@ public class Status
 
     private MpdPlayState _ps;
     private int _volume = 20;
-    private bool _volumeIsSet;
+    private bool _volumeIsSet = false;
+    private bool _volumeIsReturned;
     private bool _repeat;
     private bool _random;
     private bool _consume;
@@ -33,7 +34,15 @@ public class Status
         set
         {
             _volume = value;
-            MpdVolumeIsSet = true;
+        }
+    }
+
+    public bool MpdVolumeIsReturned
+    {
+        get { return _volumeIsReturned; }
+        set
+        {
+            _volumeIsReturned = value;
         }
     }
 
@@ -120,6 +129,7 @@ public class Status
     {
         _volume = 20;
         _volumeIsSet = false;
+        _volumeIsReturned = false;
         _repeat = false;
         _random = false;
         _consume = false;

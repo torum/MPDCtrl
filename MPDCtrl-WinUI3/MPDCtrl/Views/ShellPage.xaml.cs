@@ -12,11 +12,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using Windows.Foundation;
 using Windows.UI.ApplicationSettings;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MPDCtrl.Views;
 
@@ -41,6 +43,13 @@ public sealed partial class ShellPage : Page
 
         ViewModel.AlbumSelected += this.OnAlbumSelected;
         ViewModel.GoBackButtonVisibilityChanged += this.OnGoBackButtonVisibilityChanged;
+
+        ViewModel.DebugWindowShowHide += this.OnDebugWindowShowHide;
+        ViewModel.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
+        ViewModel.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
+        ViewModel.DebugCommandClear += this.OnDebugCommandClear;
+        ViewModel.DebugIdleClear += this.OnDebugIdleClear;
+
         /*
         //NavigationFrame.Content = App.GetService<QueuePage>(); <- not good because this create instance in addition to navigation view.
         if (NavigationFrame.Navigate(typeof(QueuePage), NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
@@ -154,6 +163,75 @@ public sealed partial class ShellPage : Page
         //SetRegionsForCustomTitleBar();
     }
 
+    public void OnDebugWindowShowHide(object? sender, System.EventArgs e)
+    {
+        if (this.DebugWindow.Visibility == Visibility.Visible)
+        {
+            this.DebugWindow.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            this.DebugWindow.Visibility = Visibility.Visible;
+        }
+    }
+
+    private readonly StringBuilder _sbCommandOutput = new();
+    public void OnDebugCommandOutput(string arg)
+    {
+        // WPF's AppendText() is much faster than data binding.
+        //DebugCommandTextBox.AppendText(arg);
+        //DebugCommandTextBox.CaretIndex = DebugCommandTextBox.Text.Length;
+        //DebugCommandTextBox.ScrollToEnd();
+
+        _sbCommandOutput.Append(arg);
+
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        {
+            //DebugCommandTextBox.Text += arg;
+            DebugCommandTextBox.Text = _sbCommandOutput.ToString();
+
+            // No CaretIndex, No ScrollToEnd.
+            //DebugCommandTextBox.SelectionStart = DebugCommandTextBox.Text.Length;
+            // Needed to this to acutually scrol to the end.
+            //DebugCommandTextBox.Focus(FocusState.Programmatic);
+        });
+    }
+
+    private readonly StringBuilder _sbIdleOutput = new();
+    public void OnDebugIdleOutput(string arg)
+    {
+        // WPF's AppendText() is much faster than data binding.
+        //DebugIdleTextBox.AppendText(arg);
+        //DebugIdleTextBox.CaretIndex = DebugIdleTextBox.Text.Length;
+        //DebugIdleTextBox.ScrollToEnd();
+
+        _sbIdleOutput.Append(arg);
+
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        {
+            //DebugIdleTextBox.Text += arg;
+            DebugIdleTextBox.Text = _sbIdleOutput.ToString();
+
+            // No CaretIndex, No ScrollToEnd.
+            //DebugIdleTextBox.SelectionStart = DebugIdleTextBox.Text.Length;
+            // Needed to this to acutually scrol to the end.
+            //DebugIdleTextBox.Focus(FocusState.Programmatic);
+        });
+    }
+
+    public void OnDebugCommandClear(object? sender, System.EventArgs e)
+    {
+        _sbCommandOutput.Clear();
+        DebugCommandTextBox.Text = string.Empty;
+    }
+
+    public void OnDebugIdleClear(object? sender, System.EventArgs e)
+    {
+        _sbIdleOutput.Clear();
+        DebugIdleTextBox.Text = string.Empty;
+    }
+
+
     private void This_ActualThemeChanged(FrameworkElement sender, object args)
     {
         if (App.MainWnd is null)
@@ -202,6 +280,8 @@ public sealed partial class ShellPage : Page
         }
 
         /*
+         * Now uses Selection changed event.
+         * 
         if (args.InvokedItemContainer.Tag is not string tag || string.IsNullOrWhiteSpace(tag))
         {
             Debug.WriteLine("NavigationViewControl_ItemInvoked: Invalid tag or null.");
@@ -368,7 +448,7 @@ public sealed partial class ShellPage : Page
                 return;
             }
 
-            // TODO: I wanna show NavigationTransition animation....
+            // TODO: I just wanna show NavigationTransition animation without navigation....
             if (this.NavigationFrame.Navigate(typeof(PlaylistItemPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
             {
                 _currentPage = typeof(PlaylistItemPage);
@@ -377,6 +457,14 @@ public sealed partial class ShellPage : Page
         }
         else
         {
+            if (_currentPage == typeof(SettingsPage))
+            {
+                //
+            }
+
+            // clear vm selected just in case.
+            vm.SelectedNodeMenu = null;
+
             /*
             if (args.SelectedItem is not null)
             {

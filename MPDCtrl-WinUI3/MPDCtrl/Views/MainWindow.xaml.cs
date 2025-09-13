@@ -362,7 +362,104 @@ public sealed partial class MainWindow : Window
                 }
                 */
             }
+
+            #region == Profiles  ==
+
+            var xProfiles = xdoc.Root.Element("Profiles");
+            if (xProfiles is not null)
+            {
+                var profileList = xProfiles.Elements("Profile");
+
+                foreach (var p in profileList)
+                {
+                    Profile pro = new();
+
+                    if (p.Attribute("Name") is not null)
+                    {
+                        var s = p.Attribute("Name")?.Value;
+                        if (!string.IsNullOrEmpty(s))
+                            pro.Name = s;
+                    }
+                    if (p.Attribute("Host") is not null)
+                    {
+                        var s = p.Attribute("Host")?.Value;
+                        if (!string.IsNullOrEmpty(s))
+                            pro.Host = s;
+                    }
+                    if (p.Attribute("Port") is not null)
+                    {
+                        var s = p.Attribute("Port")?.Value;
+                        if (!string.IsNullOrEmpty(s))
+                        {
+                            try
+                            {
+                                pro.Port = Int32.Parse(s);
+                            }
+                            catch
+                            {
+                                pro.Port = 6600;
+                            }
+                        }
+                    }
+                    if (p.Attribute("Password") is not null)
+                    {
+                        var s = p.Attribute("Password")?.Value;
+                        if (!string.IsNullOrEmpty(s))
+                            pro.Password = MainViewModel.Decrypt(s);
+                    }
+                    if (p.Attribute("IsDefault") is not null)
+                    {
+                        var s = p.Attribute("IsDefault")?.Value;
+                        if (!string.IsNullOrEmpty(s))
+                        {
+                            if (s == "True")
+                            {
+                                pro.IsDefault = true;
+
+                            }
+                        }
+                    }
+                    if (p.Attribute("Volume") is not null)
+                    {
+                        var s = p.Attribute("Volume")?.Value;
+                        if (!string.IsNullOrEmpty(s))
+                        {
+                            try
+                            {
+                                pro.Volume = double.Parse(s);
+                            }
+                            catch
+                            {
+                                pro.Volume = 50;
+                            }
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(pro.Host.Trim()))
+                    {
+                        if (pro.IsDefault)
+                        {
+                            _vm.CurrentProfile = pro;
+
+                            //NotifyPropertyChanged(nameof(IsCurrentProfileSet));
+                            //_vm.IsCurrentProfileSet = true;
+                            _vm.Profiles.Add(pro);
+                        }
+                    }
+                }
+            }
+            #endregion
         }
+
+        if (_vm.Profiles.Count > 0)
+        {
+            if (_vm.CurrentProfile is null)
+            {
+                var prof = _vm.Profiles.FirstOrDefault(x => x.IsDefault);
+                _vm.CurrentProfile = prof ?? _vm.Profiles[0];
+                //NotifyPropertyChanged(nameof(IsCurrentProfileSet));
+            }
+        } 
 
         winRestoreWidth = (int)width;
         winRestoreHeight = (int)height;
@@ -576,7 +673,7 @@ public sealed partial class MainWindow : Window
 
     private void SaveSettings()
     {
-        var vm = App.GetService<MainViewModel>();
+        //var vm = App.GetService<MainViewModel>();
 
         XmlDocument doc = new();
         var xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
@@ -688,7 +785,7 @@ public sealed partial class MainWindow : Window
         var xLay = doc.CreateElement(string.Empty, "Layout", string.Empty);
 
         attrs = doc.CreateAttribute("navigationViewMenuOpen");
-        if (vm.IsNavigationViewMenuOpen)
+        if (_vm.IsNavigationViewMenuOpen)
         {
             attrs.Value = "True";
         }
@@ -700,21 +797,21 @@ public sealed partial class MainWindow : Window
 
         mainWindow.AppendChild(xLay);
 
-        #endregion
-
-
         // set Main Window element to root.
         root.AppendChild(mainWindow);
+
+        #endregion
+
 
         // Themes
         var xTheme = doc.CreateElement(string.Empty, "Theme", string.Empty);
 
         attrs = doc.CreateAttribute("current");
-        attrs.Value = vm.Theme.ToString();
+        attrs.Value = _vm.Theme.ToString();
         xTheme.SetAttributeNode(attrs);
 
         attrs = doc.CreateAttribute("backdrop");
-        attrs.Value = vm.Material.ToString();
+        attrs.Value = _vm.Material.ToString();
         xTheme.SetAttributeNode(attrs);
 
         root.AppendChild(xTheme);
@@ -728,6 +825,65 @@ public sealed partial class MainWindow : Window
 
         root.AppendChild(xOpts);
 
+        #region == Profiles  ==
+
+        XmlElement xProfiles = doc.CreateElement(string.Empty, "Profiles", string.Empty);
+
+        XmlElement xProfile;
+        XmlAttribute xAttrs;
+
+        if (_vm.Profiles.Count == 1)
+            _vm.Profiles[0].IsDefault = true;
+
+        foreach (var p in _vm.Profiles)
+        {
+            xProfile = doc.CreateElement(string.Empty, "Profile", string.Empty);
+
+            xAttrs = doc.CreateAttribute("Name");
+            xAttrs.Value = p.Name;
+            xProfile.SetAttributeNode(xAttrs);
+
+            xAttrs = doc.CreateAttribute("Host");
+            xAttrs.Value = p.Host;
+            xProfile.SetAttributeNode(xAttrs);
+
+            xAttrs = doc.CreateAttribute("Port");
+            xAttrs.Value = p.Port.ToString();
+            xProfile.SetAttributeNode(xAttrs);
+
+            xAttrs = doc.CreateAttribute("Password");
+            xAttrs.Value = MainViewModel.Encrypt(p.Password);
+
+            xProfile.SetAttributeNode(xAttrs);
+
+            if (p.IsDefault)
+            {
+                xAttrs = doc.CreateAttribute("IsDefault");
+                xAttrs.Value = "True";
+                xProfile.SetAttributeNode(xAttrs);
+            }
+
+            xAttrs = doc.CreateAttribute("Volume");
+            if (p == _vm.CurrentProfile)
+            {
+                xAttrs.Value = _vm.Volume.ToString();
+            }
+            else
+            {
+                xAttrs.Value = p.Volume.ToString();
+            }
+            xProfile.SetAttributeNode(xAttrs);
+
+
+            xProfiles.AppendChild(xProfile);
+        }
+
+        if (_vm.IsRememberAsProfile)
+        {
+            root.AppendChild(xProfiles);
+        }
+
+        #endregion
 
         var filePath = App.AppConfigFilePath;
         if (RuntimeHelper.IsMSIX)

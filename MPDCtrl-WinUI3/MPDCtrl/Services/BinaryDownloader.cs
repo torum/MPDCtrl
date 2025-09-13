@@ -1071,7 +1071,7 @@ public class BinaryDownloader : IBinaryDownloader
     {
         try
         {
-            _binaryConnection.Client?.Shutdown(SocketShutdown.Both);
+            //_binaryConnection.Client?.Shutdown(SocketShutdown.Both);
             _binaryConnection.Close();
         }
         catch { }

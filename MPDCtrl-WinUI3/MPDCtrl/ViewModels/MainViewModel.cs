@@ -28,7 +28,10 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -121,6 +124,27 @@ public partial class MainViewModel : ObservableObject
                 Port = _currentProfile.Port.ToString();
                 _password = _currentProfile.Password;
             }
+            else
+            {
+                Debug.WriteLine("(_currentProfile is not null)");
+            }
+        }
+    }
+
+    private bool _isRememberAsProfile = true;
+    public bool IsRememberAsProfile
+    {
+        get
+        {
+            return _isRememberAsProfile;
+        }
+        set
+        {
+            if (_isRememberAsProfile == value)
+                return;
+
+            _isRememberAsProfile = value;
+            OnPropertyChanged(nameof(IsRememberAsProfile));
         }
     }
 
@@ -228,6 +252,96 @@ public partial class MainViewModel : ObservableObject
             _password = value;
 
             OnPropertyChanged(nameof(Password));
+        }
+    }
+
+    public static string Encrypt(string s)
+    {
+        if (string.IsNullOrEmpty(s)) { return ""; }
+
+        byte[] entropy = [0x72, 0xa2, 0x12, 0x04];
+
+        // Uses System.Security.Cryptography.ProtectedData
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            try
+            {
+                byte[] userData = System.Text.Encoding.UTF8.GetBytes(s);
+                byte[] encryptedData = System.Security.Cryptography.ProtectedData.Protect(userData, entropy, System.Security.Cryptography.DataProtectionScope.CurrentUser);
+
+                return System.Convert.ToBase64String(encryptedData);
+            }
+            catch
+            {
+                Debug.WriteLine($"Encrypt fail.");
+                return s;
+            }
+        }
+        //else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        else
+        {
+            string EncryptionKey = "withas";
+            byte[] sBytes = Encoding.Unicode.GetBytes(s);
+            using (System.Security.Cryptography.Aes encryptor = System.Security.Cryptography.Aes.Create())
+            {
+                Rfc2898DeriveBytes pdb = new(EncryptionKey, entropy, 10000, HashAlgorithmName.SHA1);
+                encryptor.Key = pdb.GetBytes(32);
+                encryptor.IV = pdb.GetBytes(16);
+                using MemoryStream ms = new();
+                using (CryptoStream cs = new(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
+                {
+                    cs.Write(sBytes, 0, sBytes.Length);
+                    cs.Close();
+                }
+                s = Convert.ToBase64String(ms.ToArray());
+            }
+            return s;
+        }
+    }
+
+    public static string Decrypt(string s)
+    {
+        if (string.IsNullOrEmpty(s)) { return ""; }
+
+        byte[] entropy = [0x72, 0xa2, 0x12, 0x04];
+
+        // Uses System.Security.Cryptography.ProtectedData
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            try
+            {
+                byte[] encryptedData = System.Convert.FromBase64String(s);
+                byte[] userData = System.Security.Cryptography.ProtectedData.Unprotect(encryptedData, entropy, DataProtectionScope.CurrentUser);
+
+                return System.Text.Encoding.UTF8.GetString(userData);
+            }
+            catch
+            {
+                Debug.WriteLine($"Decrypt fail.");
+                return "";
+            }
+        }
+        //else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        else
+        {
+            string EncryptionKey = "withas";
+            s = s.Replace(" ", "+");
+            byte[] sBytes = Convert.FromBase64String(s);
+            using (System.Security.Cryptography.Aes encryptor = System.Security.Cryptography.Aes.Create())
+            {
+                Rfc2898DeriveBytes pdb = new(EncryptionKey, entropy, 10000, HashAlgorithmName.SHA1);
+                encryptor.Key = pdb.GetBytes(32);
+                encryptor.IV = pdb.GetBytes(16);
+                using MemoryStream ms = new();
+                using (CryptoStream cs = new(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
+                {
+                    cs.Write(sBytes, 0, sBytes.Length);
+                    cs.Close();
+                }
+                s = Encoding.Unicode.GetString(ms.ToArray());
+            }
+
+            return s;
         }
     }
 
@@ -515,7 +629,7 @@ public partial class MainViewModel : ObservableObject
 
             if (Convert.ToDouble(_mpc.MpdStatus.MpdVolume) == _volume)
             {
-                return;
+                //return;
             }
 
             // If we have a timer and we are in this event handler, a user is still interact with the slider
@@ -1287,7 +1401,7 @@ public partial class MainViewModel : ObservableObject
             //_ = Task.Run(async () => { await GetAlbumSongs(_selectedAlbum); });
             GetAlbumSongs(_selectedAlbum);
 
-            AlbumSelected?.Invoke(this,EventArgs.Empty);
+            AlbumSelected?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -1335,7 +1449,7 @@ public partial class MainViewModel : ObservableObject
 
             _visibleItemsAlbumsEx = value;
             //OnPropertyChanged(nameof(VisibleItemsAlbumsEx));
-            
+
             if (_visibleItemsAlbumsEx is null)
             {
                 return;
@@ -1884,6 +1998,62 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    //
+    private bool _isDebugWindowEnabled;
+    public bool IsDebugWindowEnabled
+
+    {
+        get { return _isDebugWindowEnabled; }
+        set
+        {
+            if (_isDebugWindowEnabled == value)
+                return;
+
+            _isDebugWindowEnabled = value;
+
+            OnPropertyChanged(nameof(IsDebugWindowEnabled));
+        }
+    }
+
+    private bool _isShowDebugWindow;
+    public bool IsShowDebugWindow
+
+    {
+        get { return _isShowDebugWindow; }
+        set
+        {
+            if (_isShowDebugWindow == value)
+                return;
+
+            _isShowDebugWindow = value;
+
+            OnPropertyChanged(nameof(IsShowDebugWindow));
+
+            if (_isShowDebugWindow)
+            {
+                /*
+                //Application.Current.Dispatcher.Invoke(() =>
+                Dispatcher.UIThread.Post(() =>
+                {
+                    //DebugWindowShowHide?.Invoke
+                    DebugWindowShowHide2?.Invoke(this, true);
+                });
+                */
+            }
+            else
+            {
+                /*
+                //Application.Current.Dispatcher.Invoke(() =>
+                Dispatcher.UIThread.Post(() =>
+                {
+                    //DebugWindowShowHide?.Invoke();
+                    DebugWindowShowHide2?.Invoke(this, false);
+                });
+                */
+            }
+        }
+
+    }
     #endregion
 
     #region == Layout ==
@@ -1930,7 +2100,7 @@ public partial class MainViewModel : ObservableObject
             OnPropertyChanged(nameof(IsGoBackButtonVisible));
 
             // Update RegionsForCustomTitleBar.
-            GoBackButtonVisibilityChanged?.Invoke(this,EventArgs.Empty);
+            GoBackButtonVisibilityChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -2016,6 +2186,11 @@ public partial class MainViewModel : ObservableObject
     public event EventHandler? AlbumsCollectionHasBeenReset;
     public event EventHandler? GoBackButtonVisibilityChanged;
 
+    public event EventHandler? DebugWindowShowHide;
+    public event EventHandler<string>? DebugCommandOutput;
+    public event EventHandler<string>? DebugIdleOutput;
+    public event EventHandler? DebugCommandClear;
+    public event EventHandler? DebugIdleClear;
 
     #endregion
 
@@ -2033,9 +2208,10 @@ public partial class MainViewModel : ObservableObject
 
 
 #if DEBUG
-        //IsDebugWindowEnabled = true;
+        IsDebugWindowEnabled = true;
 #else
-        //IsDebugWindowEnabled = false;
+        IsDebugWindowEnabled = false;
+        IsShowDebugWindow = false;
 #endif
     }
 
@@ -2093,7 +2269,9 @@ public partial class MainViewModel : ObservableObject
     public void StartMPC()
     {
         _password = "hoge";
-        Start("127.0.0.1", 6600);
+        _host = "127.0.0.1";
+        _port = 6600;
+        Start(_host, _port);
     }
 
     private async void Start(string host, int port)
@@ -2111,7 +2289,7 @@ public partial class MainViewModel : ObservableObject
                 // TODO::
                 ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
                 //StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
-                
+
                 InfoBarAckTitle = "Error";
                 InfoBarAckMessage = "Could not retrive IP Address from the hostname.";
                 IsShowAckWindow = true;
@@ -2124,7 +2302,7 @@ public partial class MainViewModel : ObservableObject
             // TODO::
             ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
             //StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
-            
+
             InfoBarAckTitle = "Error";
             InfoBarAckMessage = "Could not retrive IP Address from the hostname.";
             IsShowAckWindow = true;
@@ -2178,7 +2356,7 @@ public partial class MainViewModel : ObservableObject
                     await _mpc.MpdIdleQueryCurrentQueue();
                     UpdateCurrentQueue();
 
-                    await Task.Delay(200);
+                    await Task.Delay(300);
                     await _mpc.MpdQueryListAlbumArtists();
                     UpdateAlbumsAndArtists();
 
@@ -2336,7 +2514,7 @@ public partial class MainViewModel : ObservableObject
                         // TODO:
                         CurrentSong = null;
                         AlbumCover = null;
-                        
+
                         AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
                     }
                 }
@@ -2346,7 +2524,7 @@ public partial class MainViewModel : ObservableObject
                 //Debug.WriteLine("Queue.Count == 0. @UpdateStatus()");
                 // TODO:
                 AlbumCover = null;
-                
+
                 AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
             }
         });
@@ -2382,7 +2560,7 @@ public partial class MainViewModel : ObservableObject
                         //_pathStopButton
                 }
 
-                if (_mpc.MpdStatus.MpdVolumeIsSet)
+                if (_mpc.MpdStatus.MpdVolumeIsReturned)
                 {
                     //Debug.WriteLine($"Volume is set to {_mpc.MpdStatus.MpdVolume} @UpdateButtonStatus()");
 
@@ -2393,28 +2571,12 @@ public partial class MainViewModel : ObservableObject
                         _volume = tmpVol;
                         OnPropertyChanged(nameof(Volume));
 
-                        // save
-                        if (_currentProfile is not null)
-                        {
-                            _currentProfile.Volume = _volume;
-                        }
+                        //// save
+                        //if (_currentProfile is not null)
+                        //{
+                        //    _currentProfile.Volume = _volume;
+                        //}
                     }
-                }
-                else
-                {
-                    Debug.WriteLine("Volume is NOT set. @UpdateButtonStatus()");
-
-                    if (_currentProfile is not null)
-                    {
-                        //Debug.WriteLine($"Volume is set to _currentProfile {_currentProfile.Volume}. @UpdateButtonStatus()");
-                        //_volume = _currentProfile.Volume;
-                    }
-                    else
-                    {
-                        //Debug.WriteLine("Volume is set to default 20. @UpdateButtonStatus()");
-                        //_volume = 20; // default volume.
-                    }
-                    //NotifyPropertyChanged(nameof(Volume));
                 }
 
                 _random = _mpc.MpdStatus.MpdRandom;
@@ -3006,7 +3168,7 @@ public partial class MainViewModel : ObservableObject
                             // just in case.
                             CurrentSong = null;
                             AlbumCover = null;
-                            
+
                             AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
                         }
                     }
@@ -3204,7 +3366,7 @@ public partial class MainViewModel : ObservableObject
             }
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() => 
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
             //IsBusy = true;
             IsWorking = true;
@@ -3242,7 +3404,7 @@ public partial class MainViewModel : ObservableObject
             tmpMusicDirectories.Load(_mpc.LocalDirectories);
 
             UpdateProgress?.Invoke(this, "[UI] Library directories loading...");
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() => 
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
             {
                 IsWorking = true;
 
@@ -3518,7 +3680,7 @@ public partial class MainViewModel : ObservableObject
             Debug.WriteLine("GetArtistSongs: artist is null, returning.");
             return;
         }
-        
+
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
             IsWorking = true;
@@ -3628,7 +3790,7 @@ public partial class MainViewModel : ObservableObject
 
             if (album.IsImageAcquired)
             {
-                 //Debug.WriteLine($"GetAlbumPictures: {album.Name} IsImageAcquired is true, skipping.");
+                //Debug.WriteLine($"GetAlbumPictures: {album.Name} IsImageAcquired is true, skipping.");
                 continue;
             }
 
@@ -3951,7 +4113,7 @@ public partial class MainViewModel : ObservableObject
             };
             return result;
         }
-        
+
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
             IsWorking = true;
@@ -3965,7 +4127,7 @@ public partial class MainViewModel : ObservableObject
         {
             Debug.WriteLine("SearchAlbumSongs failed: " + res.ErrorMessage);
         }
-        
+
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
             IsWorking = false;
@@ -4128,28 +4290,29 @@ public partial class MainViewModel : ObservableObject
 
     private void OnDebugCommandOutput(MpcService sender, string data)
     {
-        /*
-        if (IsShowDebugWindow)
+        if (IsDebugWindowEnabled && IsShowDebugWindow)
         {
+            DebugCommandOutput?.Invoke(this, data);
+            /*
+             *  this won't work.
             App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
             {
-                //DebugCommandOutput?.Invoke(this, data);
             });
+            */
         }
-        */
     }
 
     private void OnDebugIdleOutput(MpcService sender, string data)
     {
-        /*
-        if (IsShowDebugWindow)
+        if (IsDebugWindowEnabled && IsShowDebugWindow)
         {
+            DebugIdleOutput?.Invoke(this, data);
+            /*
             App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
             {
-                DebugIdleOutput?.Invoke(this, data);
             });
+            */
         }
-        */
     }
 
     private void OnConnectionError(MpcService sender, string msg)
@@ -4172,7 +4335,7 @@ public partial class MainViewModel : ObservableObject
             InfoBarAckTitle = _resourceLoader.GetString("ConnectionStatus_ConnectionError");
             InfoBarAckMessage = msg;
             IsShowAckWindow = true;
-        });  
+        });
     }
 
     private void OnConnectionStatusChanged(MpcService sender, MpcService.ConnectionStatus status)
@@ -4696,17 +4859,22 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public async Task SongsListviewPlayThis(object obj)
+    public void SongsListviewPlayThis(object obj)
     {
         if (obj is null) return;
 
-        if (obj is SongInfo song)
+        if (obj is not SongInfo song)
+        {
+            return;
+        }
+
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
         {
             Queue.Clear();
             CurrentSong = null;
 
             await _mpc.MpdSinglePlay(song.File, Convert.ToInt32(_volume));
-        }
+        });
     }
 
     [RelayCommand]
@@ -4820,7 +4988,7 @@ public partial class MainViewModel : ObservableObject
         {
             return;
         }
-            
+
         if (string.IsNullOrEmpty(key))
         {
             return;
@@ -5005,18 +5173,12 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public async Task SongsPlayAll(object obj)
+    public void SongsPlayAll(object obj)
     {
         if (obj is null) return;
 
         if (obj is not ObservableCollection<SongInfo> list) return;
         if (list.Count <= 0) return;
-
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-        {
-            Queue.Clear();
-            CurrentSong = null;
-        });
 
         List<string> uriList = [];
 
@@ -5025,7 +5187,12 @@ public partial class MainViewModel : ObservableObject
             uriList.Add(song.File);
         }
 
-        await _mpc.MpdMultiplePlay(uriList, Convert.ToInt32(_volume));
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        {
+            Queue.Clear();
+            CurrentSong = null; 
+            await _mpc.MpdMultiplePlay(uriList, Convert.ToInt32(_volume));
+        });
 
         // get album cover.
         //await Task.Yield();
@@ -5154,7 +5321,7 @@ public partial class MainViewModel : ObservableObject
         {
             await _mpc.MpdAdd(selectedList[0]);
         }
-        else if (selectedList.Count > 1) 
+        else if (selectedList.Count > 1)
         {
             await _mpc.MpdAdd(selectedList);
         }
@@ -5442,7 +5609,7 @@ public partial class MainViewModel : ObservableObject
             {
                 if (item.AlbumArtist != asdf) continue;
                 // found it
-                
+
                 if (item is not null)
                 {
                     GoToAlbumPage();
@@ -5476,6 +5643,250 @@ public partial class MainViewModel : ObservableObject
         if (item is null) return;
         GoToArtistPage();
         SelectedAlbumArtist = item;
+    }
+
+    [RelayCommand]
+    public void SelectedAlbumArtistPlayAll(object obj)
+    {
+        if (obj is null) return;
+        if (SelectedAlbumArtist is null) return;
+
+        if (obj is not AlbumArtist selectedArtist)
+        {
+            return;
+        }
+
+        if (SelectedAlbumArtist != selectedArtist)
+        {
+            return;
+        }
+
+        var uriList = new List<string>();
+
+        foreach (var hoge in selectedArtist.Albums)
+        {
+            if (hoge is null) continue;
+
+            foreach (var song in hoge.Songs)
+            {
+                uriList.Add(song.File);
+            }
+        }
+
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        {
+            Queue.Clear();
+            CurrentSong = null;
+            await _mpc.MpdMultiplePlay(uriList, Convert.ToInt32(_volume));
+        });
+    }
+
+
+    [RelayCommand]
+    public async Task SelectedAlbumArtistAddToQueue(object obj) 
+    {
+        if (obj is null) return;
+        if (SelectedAlbumArtist is null) return;
+
+        if (obj is not AlbumArtist selectedArtist)
+        {
+            return;
+        }
+
+        if (SelectedAlbumArtist != selectedArtist)
+        {
+            return;
+        }
+
+        var uriList = new List<string>();
+
+        foreach (var hoge in selectedArtist.Albums)
+        {
+            if (hoge is null) continue;
+
+            foreach (var song in hoge.Songs)
+            {
+                uriList.Add(song.File);
+            }
+        }
+
+        if (uriList.Count > 1)
+        {
+            await _mpc.MpdAdd(uriList);
+        }
+        else if (uriList.Count == 1)
+        {
+            await _mpc.MpdAdd(uriList[0]);
+        }
+    }
+
+    [RelayCommand]
+    public async Task SelectedAlbumArtistAddToPlaylist(object obj)
+    {
+        if (obj is null) return;
+        if (SelectedAlbumArtist is null) return;
+
+        if (obj is not AlbumArtist selectedArtist)
+        {
+            return;
+        }
+
+        if (SelectedAlbumArtist != selectedArtist)
+        {
+            return;
+        }
+
+        var uriList = new List<string>();
+
+        foreach (var hoge in selectedArtist.Albums)
+        {
+            if (hoge is null) continue;
+
+            foreach (var song in hoge.Songs)
+            {
+                uriList.Add(song.File);
+            }
+        }
+
+        if (uriList.Count > 0)
+        {
+            var result = await _dialog.ShowAddToDialog(this);
+
+            if (result is null)
+            {
+                return;
+            }
+
+            _ = AddToPlaylist(result.PlaylistName, uriList);
+        }
+    }
+
+    [RelayCommand]
+    public void FireDebugCommandClear()
+    {
+        DebugCommandClear?.Invoke(this,EventArgs.Empty);
+    }
+
+    [RelayCommand]
+    public void FireDebugIdleClear()
+    {
+        DebugIdleClear?.Invoke(this, EventArgs.Empty);
+    }
+
+    [RelayCommand]
+    public void FireDebugWindowShowHide()
+    {
+        //DebugWindowShowHide?.Invoke(this, EventArgs.Empty);
+        IsShowDebugWindow = !IsShowDebugWindow;
+    }
+
+    [RelayCommand]
+    public void SelectedDirectoryPlayAll(object obj)
+    {
+        if (obj is null) return;
+
+        if (obj is not ObservableCollection<NodeFile> list) return;
+        if (list.Count <= 0) return;
+
+        List<string> uriList = [];
+
+        foreach (var song in list)
+        {
+            uriList.Add(song.OriginalFileUri);
+        }
+
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        {
+            Queue.Clear();
+            CurrentSong = null;
+            await _mpc.MpdMultiplePlay(uriList, Convert.ToInt32(_volume));
+        });
+    }
+
+    [RelayCommand]
+    public async Task SelectedDirectoryAddToQueue(object obj)
+    {
+        if (obj is null) return;
+
+        if (obj is not ObservableCollection<NodeFile> list) return;
+        switch (list.Count)
+        {
+            case > 1:
+                {
+                    List<string> uriList = [];
+
+                    foreach (var song in list)
+                    {
+                        uriList.Add(song.OriginalFileUri);
+                    }
+                    //uriList.AddRange(list.Select(song => song.File));
+
+                    await _mpc.MpdAdd(uriList);
+                    break;
+                }
+            case 1 when (list[0] is NodeFile si):
+                await _mpc.MpdAdd(si.OriginalFileUri);
+                break;
+        }
+    }
+
+    [RelayCommand]
+    public async Task SelectedDirectoryAddToPlaylist(object obj)
+    {
+        if (obj is null) return;
+
+        if (obj is ObservableCollection<NodeFile> list)
+        {
+            List<string> uriList = [];
+
+            foreach (var item in list)
+            {
+                uriList.Add(item.OriginalFileUri);
+            }
+
+            if (uriList.Count > 0)
+            {
+                //SearchPageAddToPlaylistDialogShow?.Invoke(this, uriList);
+                var result = await _dialog.ShowAddToDialog(this);
+
+                if (result is null)
+                {
+                    return;
+                }
+
+                _ = AddToPlaylist(result.PlaylistName, uriList);
+            }
+        }
+    }
+
+    [RelayCommand]
+    public void FilesListviewPlayThis(object obj)
+    {
+        if (obj is null) return;
+
+        if (obj is not NodeFile song)
+        {
+            return;
+        }
+
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        {
+            Queue.Clear();
+            CurrentSong = null;
+
+            await _mpc.MpdSinglePlay(song.OriginalFileUri, Convert.ToInt32(_volume));
+        });
+    }
+
+    [RelayCommand]
+    public async Task FilesListviewAddThis(object obj)
+    {
+        if (obj is null) return;
+
+        if (obj is NodeFile song)
+        {
+            await _mpc.MpdAdd(song.OriginalFileUri);
+        }
     }
 
 

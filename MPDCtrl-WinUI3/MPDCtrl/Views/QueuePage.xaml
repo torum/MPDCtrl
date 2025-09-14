@@ -66,8 +66,11 @@
                     <!-- Clear -->
                     <Button Margin="0,0,8,0" Height="36" Command="{x:Bind ViewModel.QueueClearWithoutPromptCommand}">
                         <StackPanel Orientation="Horizontal">
-                            <Viewbox Width="14" Height="14">
+                            <Viewbox Width="14" Height="14" Margin="-6,-2,0,0">
+                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M3.50159 11H8.50159C8.77773 11 9.00159 11.2239 9.00159 11.5C9.00159 11.7455 8.82471 11.9496 8.59146 11.9919L8.50159 12H3.50159C3.22544 12 3.00159 11.7761 3.00159 11.5C3.00159 11.2545 3.17846 11.0504 3.41171 11.0081L3.50159 11H8.50159H3.50159ZM5.1481 5.14638C5.3217 4.97285 5.59113 4.95361 5.78597 5.08865L5.85521 5.14651L9.85368 9.14651C10.0489 9.34181 10.0488 9.6584 9.85355 9.85362C9.67995 10.0272 9.41052 10.0464 9.21568 9.91136L9.14644 9.85349L5.14797 5.85349C4.95274 5.65819 4.9528 5.3416 5.1481 5.14638ZM11.5016 3C11.747 3 11.9512 3.17688 11.9935 3.41012L12.0016 3.5V8.5C12.0016 8.77614 11.7777 9 11.5016 9C11.2561 9 11.052 8.82312 11.0096 8.58988L11.0016 8.5V3.5C11.0016 3.22386 11.2254 3 11.5016 3Z"/>
+                                <!--
                                 <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M7 3H9C9 2.44772 8.55228 2 8 2C7.44772 2 7 2.44772 7 3ZM6 3C6 1.89543 6.89543 1 8 1C9.10457 1 10 1.89543 10 3H14C14.2761 3 14.5 3.22386 14.5 3.5C14.5 3.77614 14.2761 4 14 4H13.4364L12.2313 12.8378C12.0624 14.0765 11.0044 15 9.75422 15H6.24578C4.99561 15 3.93762 14.0765 3.76871 12.8378L2.56355 4H2C1.72386 4 1.5 3.77614 1.5 3.5C1.5 3.22386 1.72386 3 2 3H6ZM7 6.5C7 6.22386 6.77614 6 6.5 6C6.22386 6 6 6.22386 6 6.5V11.5C6 11.7761 6.22386 12 6.5 12C6.77614 12 7 11.7761 7 11.5V6.5ZM9.5 6C9.77614 6 10 6.22386 10 6.5V11.5C10 11.7761 9.77614 12 9.5 12C9.22386 12 9 11.7761 9 11.5V6.5C9 6.22386 9.22386 6 9.5 6ZM4.75954 12.7027C4.86089 13.4459 5.49568 14 6.24578 14H9.75422C10.5043 14 11.1391 13.4459 11.2405 12.7027L12.4272 4H3.57281L4.75954 12.7027Z"/>
+                            -->
                             </Viewbox>
                             <TextBlock x:Uid="PageMenu_Clear" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/> 
                         </StackPanel>
@@ -104,12 +107,12 @@
                         </StackPanel>
                     </ToggleButton>
                     <!-- Sort -->
-                    <Button Height="36" Width="38" Margin="4,0,4,0">
+                    <Button Height="36" Width="38" Margin="4,0,4,0" x:Uid="PageMenu_Sort">
                         <StackPanel Orientation="Horizontal">
                             <Viewbox Width="14" Height="14" Margin="0,0,6,0">
                                 <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M4.85355 2.14645C4.65829 1.95118 4.34171 1.95118 4.14645 2.14645L1.14645 5.14645C0.951184 5.34171 0.951184 5.65829 1.14645 5.85355C1.34171 6.04882 1.65829 6.04882 1.85355 5.85355L4 3.70711V13.5C4 13.7761 4.22386 14 4.5 14C4.77614 14 5 13.7761 5 13.5V3.70711L7.14645 5.85355C7.34171 6.04882 7.65829 6.04882 7.85355 5.85355C8.04882 5.65829 8.04882 5.34171 7.85355 5.14645L4.85355 2.14645ZM11.1525 13.8595C11.3463 14.0468 11.6537 14.0468 11.8475 13.8595L14.8475 10.9594C15.0461 10.7675 15.0514 10.4509 14.8595 10.2524C14.6676 10.0538 14.351 10.0485 14.1525 10.2404L12 12.3212L12 2.5001C12 2.22395 11.7761 2.0001 11.5 2.0001C11.2239 2.0001 11 2.22395 11 2.5001L11 12.3212L8.84752 10.2404C8.64898 10.0485 8.33244 10.0538 8.14051 10.2524C7.94858 10.4509 7.95394 10.7675 8.15248 10.9594L11.1525 13.8595Z"/>
                             </Viewbox>
-                            <TextBlock x:Uid="PageMenu_Sort" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center" Visibility="Collapsed"/>
+                            <TextBlock Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center" Visibility="Collapsed"/>
                         </StackPanel>
                         <Button.Flyout>
                             <MenuFlyout Placement="Bottom">
@@ -263,7 +266,7 @@
 
 
                             <MenuFlyoutSeparator/>
-                            <MenuFlyoutItem x:Uid="ListviewItemContextMenu_Remove" Command="{x:Bind ViewModel.QueueListviewRemoveSelectedItemsCommand}" CommandParameter="{x:Bind QueueListview.SelectedItems, Mode=OneWay}">
+                            <MenuFlyoutItem x:Uid="ListviewItemContextMenu_RemoveSelectedFromQueue" Command="{x:Bind ViewModel.QueueListviewRemoveSelectedItemsCommand}" CommandParameter="{x:Bind QueueListview.SelectedItems, Mode=OneWay}">
                                 <MenuFlyoutItem.Icon>
                                     <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M7 3H9C9 2.44772 8.55228 2 8 2C7.44772 2 7 2.44772 7 3ZM6 3C6 1.89543 6.89543 1 8 1C9.10457 1 10 1.89543 10 3H14C14.2761 3 14.5 3.22386 14.5 3.5C14.5 3.77614 14.2761 4 14 4H13.4364L12.2313 12.8378C12.0624 14.0765 11.0044 15 9.75422 15H6.24578C4.99561 15 3.93762 14.0765 3.76871 12.8378L2.56355 4H2C1.72386 4 1.5 3.77614 1.5 3.5C1.5 3.22386 1.72386 3 2 3H6ZM7 6.5C7 6.22386 6.77614 6 6.5 6C6.22386 6 6 6.22386 6 6.5V11.5C6 11.7761 6.22386 12 6.5 12C6.77614 12 7 11.7761 7 11.5V6.5ZM9.5 6C9.77614 6 10 6.22386 10 6.5V11.5C10 11.7761 9.77614 12 9.5 12C9.22386 12 9 11.7761 9 11.5V6.5C9 6.22386 9.22386 6 9.5 6ZM4.75954 12.7027C4.86089 13.4459 5.49568 14 6.24578 14H9.75422C10.5043 14 11.1391 13.4459 11.2405 12.7027L12.4272 4H3.57281L4.75954 12.7027Z"/>
                                 </MenuFlyoutItem.Icon>

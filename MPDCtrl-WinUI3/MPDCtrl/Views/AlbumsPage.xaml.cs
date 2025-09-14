@@ -40,6 +40,37 @@ public sealed partial class AlbumsPage : Page
         InitializeComponent();
 
         ViewModel.AlbumsCollectionHasBeenReset += this.OnAlbumsCollectionHasBeenReset;
+        ViewModel.AlbumScrollIntoView += this.OnAlbumScrollIntoView;
+    }
+
+    public void OnAlbumScrollIntoView(object? sender, AlbumEx album)
+    {
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        {
+            if (this.AlbumListView is not ListView lb)
+            {
+                return;
+            }
+
+            if (album is null)
+            {
+                return;
+            }
+
+            lb.ScrollIntoView(album, ScrollIntoViewAlignment.Default);
+
+            // below is a trick to show album cover images.
+            var scrollViewer = FindScrollViewer(lb);
+            if (scrollViewer is null)
+            {
+                return;
+            }
+
+            // trick to simulate scrollviewer scrol event.
+            scrollViewer.ChangeView(null, scrollViewer.VerticalOffset+12, null);
+            await Task.Delay(300);
+            scrollViewer.ChangeView(null, scrollViewer.VerticalOffset-12, null);
+        });
     }
 
     public void OnAlbumsCollectionHasBeenReset(object? sender, System.EventArgs e)

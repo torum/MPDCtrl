@@ -23,6 +23,7 @@ public class DialogService : IDialogService
     private readonly ResourceLoader _resourceLoader = new();
 
     public record AddToDialogResult(string PlaylistName, bool AsNew);
+    public record RenameDialogResult(string PlaylistName);
 
     public DialogService()
     {
@@ -92,6 +93,53 @@ public class DialogService : IDialogService
                         return new AddToDialogResult(pl.Name, false);
                     }
                 }
+            }
+        }
+
+        return null;
+    }
+
+    public async Task<RenameDialogResult?> ShowRenameDialog(ViewModels.MainViewModel vm)
+    {
+        if (App.MainWnd is null)
+        {
+            return null;
+        }
+
+        if (App.MainWnd?.Content is not ShellPage)
+        {
+            return null;
+        }
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = App.MainWnd?.Content.XamlRoot,
+            Title = _resourceLoader.GetString("Dialog_Title_NewPlaylistName"),
+            IsPrimaryButtonEnabled = true,
+            PrimaryButtonText = _resourceLoader.GetString("Dialog_Ok"),
+            DefaultButton = ContentDialogButton.Primary,
+            IsSecondaryButtonEnabled = false,
+            CloseButtonText = _resourceLoader.GetString("Dialog_Cancel"),
+            Content = new Views.Dialogs.RenameDialog()
+            {
+                //DataContext = new DialogViewModel()
+            }
+        };
+
+        if (dialog.Content is not RenameDialog dialogContent)
+        {
+            return null;
+        }
+
+        var result = await dialog.ShowAsync();
+
+        if (result == ContentDialogResult.Primary)
+        {
+            var str = dialogContent.TextBoxPlaylistNameText ?? string.Empty;
+
+            if (!string.IsNullOrEmpty(str.Trim()))
+            {
+                return new RenameDialogResult(str.Trim());
             }
         }
 

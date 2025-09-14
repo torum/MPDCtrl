@@ -294,9 +294,6 @@
   <data name="PageMenu_Reorder.ToolTipService.ToolTip" xml:space="preserve">
     <value>Reorder</value>
   </data>
-  <data name="PageMenu_Sort.Text" xml:space="preserve">
-    <value>Sort</value>
-  </data>
   <data name="ConnectionStatus_ConnectionError" xml:space="preserve">
     <value>Connection error</value>
   </data>
@@ -316,7 +313,7 @@
     <value>Create new playlist</value>
   </data>
   <data name="Dialog_EnterNewPlaylistName.PlaceholderText" xml:space="preserve">
-    <value>Enter a new playlist name</value>
+    <value>Enter new playlist name</value>
   </data>
   <data name="Dialog_Title_SelectPlaylist" xml:space="preserve">
     <value>Select playlist</value>
@@ -330,8 +327,8 @@
   <data name="ListviewItemContextMenu_AddToPlaylist.Text" xml:space="preserve">
     <value>Add to playlist</value>
   </data>
-  <data name="ListviewItemContextMenu_Remove.Text" xml:space="preserve">
-    <value>Remove</value>
+  <data name="ListviewItemContextMenu_RemoveSelectedFromQueue.Text" xml:space="preserve">
+    <value>Remove from queue</value>
   </data>
   <data name="GoBackButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>Back</value>
@@ -362,5 +359,29 @@
   </data>
   <data name="StatusBarMsg_MPDVersionIsOld" xml:space="preserve">
     <value>The MPD protocol version {0} is old. Some of the functionalities may not work properly.</value>
+  </data>
+  <data name="ListviewItemContextMenu_RemoveSelectedFromPlaylist.Text" xml:space="preserve">
+    <value>Remove from playlist</value>
+  </data>
+  <data name="PageMenu_ClearPlaylist.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Clear playlist</value>
+  </data>
+  <data name="PageMenu_RemovePlaylist.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Remove playlist</value>
+  </data>
+  <data name="PageMenu_RenamePlaylist.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Rename playlist</value>
+  </data>
+  <data name="PageMenu_Sort.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Sort</value>
+  </data>
+  <data name="Dialog_EnterNewRenamedPlaylistName.PlaceholderText" xml:space="preserve">
+    <value>Enter new playlist name</value>
+  </data>
+  <data name="Dialog_Title_NewPlaylistName" xml:space="preserve">
+    <value>Rename playlist</value>
+  </data>
+  <data name="Dialog_PlaylistNameAlreadyExists" xml:space="preserve">
+    <value>Playlist name already exists.</value>
   </data>
 </root>

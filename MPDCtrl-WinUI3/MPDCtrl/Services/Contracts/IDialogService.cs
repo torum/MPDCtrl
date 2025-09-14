@@ -10,5 +10,7 @@ namespace MPDCtrl.Services.Contracts;
 
 public interface IDialogService
 {
-    Task<AddToDialogResult?> ShowAddToDialog(MainViewModel vm);
+    Task<AddToDialogResult?> ShowAddToDialog(ViewModels.MainViewModel vm);
+
+    Task<RenameDialogResult?> ShowRenameDialog(ViewModels.MainViewModel vm);
 }

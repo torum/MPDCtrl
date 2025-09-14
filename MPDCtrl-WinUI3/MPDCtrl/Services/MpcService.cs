@@ -79,10 +79,10 @@ public partial class MpcService : IMpcService
         Connected,
         DisconnectedByUser,
         DisconnectedByHost,
-        ConnectFail_Timeout,
-        ReceiveFail_Timeout,
-        SendFail_Timeout,
-        SendFail_NotConnected,
+        ConnectFailTimeout,
+        ReceiveFailTimeout,
+        SendFailTimeout,
+        SendFailNotConnected,
         Disconnecting,
         Disconnected,
         SeeConnectionErrorEvent
@@ -686,6 +686,7 @@ public partial class MpcService : IMpcService
         MpcProgress?.Invoke(this, "[Background] Querying files and directories...");
 
         CommandResult result = await MpdIdleSendCommand("listall");
+        //CommandResult result = await MpdIdleSendCommand("listallinfo");
         if (result.IsSuccess)
         {
             MpcProgress?.Invoke(this, "[Background] Parsing files and directories...");
@@ -1405,7 +1406,7 @@ public partial class MpcService : IMpcService
             }
             else
             {
-                ConnectionState = ConnectionStatus.ConnectFail_Timeout;
+                ConnectionState = ConnectionStatus.ConnectFailTimeout;
                 DebugCommandOutput?.Invoke(this, string.Format("################ Error@{0}, Reason:{1}, Data:{2}, {3} Exception: {4} {5}", "WriteAsync@MpdSendCommand", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
 
                 // タイムアウトしていたらここで「も」エラーになる模様。
@@ -1745,7 +1746,7 @@ public partial class MpcService : IMpcService
             }
             else
             {
-                ConnectionState = ConnectionStatus.ConnectFail_Timeout;
+                ConnectionState = ConnectionStatus.ConnectFailTimeout;
 
                 DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}Reason: {1}Data: {2}{3}Exception: {4} {5}", "ReadLineAsync@MpdSendCommand" + Environment.NewLine, "IOException" + Environment.NewLine, cmd.Trim() + Environment.NewLine, Environment.NewLine, e.Message, Environment.NewLine));
 
@@ -1885,10 +1886,12 @@ public partial class MpcService : IMpcService
     {
         MpcProgress?.Invoke(this, "[Background] Querying files and directories...");
 
+        //CommandResult result = await MpdCommandSendCommand("listallinfo");
         CommandResult result = await MpdCommandSendCommand("listall");
         if (result.IsSuccess)
         {
             MpcProgress?.Invoke(this, "[Background] Parsing files and directories...");
+            Debug.WriteLine(result.ResultText);
             result.IsSuccess = await ParseListAll(result.ResultText);
             MpcProgress?.Invoke(this, "[Background] Files and directories updated.");
         }

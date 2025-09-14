@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Views\Dialogs\AddToDialog.xaml" />
+    <None Remove="Views\Dialogs\RenameDialog.xaml" />
     <None Remove="Views\ShellPage.xaml" />
   </ItemGroup>
 
@@ -117,6 +118,11 @@
     <Content Update="Assets\Teeth.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Dialogs\RenameDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\AlbumDetailPage.xaml">

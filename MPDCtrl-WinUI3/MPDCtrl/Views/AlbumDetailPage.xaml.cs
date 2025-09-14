@@ -105,7 +105,10 @@ public sealed partial class AlbumDetailPage : Page
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
     {
-        // Needed to invoke the same album in AlbumListView
+        // 
+
+
+        // Needed this to invoke the same album in AlbumListView
         ViewModel.SelectedAlbum = null;
 
         ViewModel.IsGoBackButtonVisible = false;

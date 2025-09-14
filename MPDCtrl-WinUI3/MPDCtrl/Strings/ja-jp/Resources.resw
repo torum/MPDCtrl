@@ -294,9 +294,6 @@
   <data name="PageMenu_Reorder.ToolTipService.ToolTip" xml:space="preserve">
     <value>順序変更</value>
   </data>
-  <data name="PageMenu_Sort.Text" xml:space="preserve">
-    <value>ソート</value>
-  </data>
   <data name="ConnectionStatus_ConnectionError" xml:space="preserve">
     <value>通信エラー</value>
   </data>
@@ -330,8 +327,8 @@
   <data name="ListviewItemContextMenu_AddToPlaylist.Text" xml:space="preserve">
     <value>プレイリストに追加</value>
   </data>
-  <data name="ListviewItemContextMenu_Remove.Text" xml:space="preserve">
-    <value>削除</value>
+  <data name="ListviewItemContextMenu_RemoveSelectedFromQueue.Text" xml:space="preserve">
+    <value>再生キューから削除</value>
   </data>
   <data name="GoBackButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>戻る</value>
@@ -362,5 +359,29 @@
   </data>
   <data name="StatusBarMsg_MPDVersionIsOld" xml:space="preserve">
     <value>MPD プロトコルのバージョン（{0}）が古いため、 幾つかの機能は正しく動作しない可能性があります。</value>
+  </data>
+  <data name="ListviewItemContextMenu_RemoveSelectedFromPlaylist.Text" xml:space="preserve">
+    <value>プレイリストから削除</value>
+  </data>
+  <data name="PageMenu_ClearPlaylist.ToolTipService.ToolTip" xml:space="preserve">
+    <value>プレイリストをクリア</value>
+  </data>
+  <data name="PageMenu_RemovePlaylist.ToolTipService.ToolTip" xml:space="preserve">
+    <value>プレイリストを削除</value>
+  </data>
+  <data name="PageMenu_RenamePlaylist.ToolTipService.ToolTip" xml:space="preserve">
+    <value>プレイリスト名を変更</value>
+  </data>
+  <data name="PageMenu_Sort.ToolTipService.ToolTip" xml:space="preserve">
+    <value>ソート</value>
+  </data>
+  <data name="Dialog_EnterNewRenamedPlaylistName.PlaceholderText" xml:space="preserve">
+    <value>新規プレイリスト名の入力</value>
+  </data>
+  <data name="Dialog_Title_NewPlaylistName" xml:space="preserve">
+    <value>プレイリスト名の変更</value>
+  </data>
+  <data name="Dialog_PlaylistNameAlreadyExists" xml:space="preserve">
+    <value>既に同じ名前のプレイリストが存在します。</value>
   </data>
 </root>

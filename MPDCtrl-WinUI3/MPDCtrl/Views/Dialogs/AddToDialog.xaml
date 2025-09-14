@@ -23,7 +23,7 @@
 
             <CheckBox x:Uid="Dialog_CreateNewPlaylist" x:Name="CreateNewCheckBox" Click="CreateNewCheckBox_Click" ClickMode="Release" Margin="0,12,0,0" HorizontalAlignment="Left"></CheckBox>
 
-            <TextBox x:Uid="Dialog_EnterNewPlaylistName" Name="TextBoxPlaylistName" TextChanged="TextBoxPlaylistName_TextChanged" Margin="0,12,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Top"  Visibility="Collapsed"/>
+            <TextBox x:Uid="Dialog_EnterNewPlaylistName" x:Name="TextBoxPlaylistName" TextChanged="TextBoxPlaylistName_TextChanged" Margin="0,12,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Top"  Visibility="Collapsed"/>
 
         </StackPanel>
     </Grid>

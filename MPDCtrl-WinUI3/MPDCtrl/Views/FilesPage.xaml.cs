@@ -98,4 +98,14 @@ public sealed partial class FilesPage : Page
             return null;
         }
     }
+
+    private void TglButtonFilesItemsFilter_Click(object sender, RoutedEventArgs e)
+    {
+        FilesFilterQueryTextBox.Text = string.Empty;
+
+        if (FilesFilterQueryTextBox.Visibility == Visibility.Visible)
+        {
+            FilesFilterQueryTextBox.Focus(FocusState.Programmatic);
+        }
+    }
 }

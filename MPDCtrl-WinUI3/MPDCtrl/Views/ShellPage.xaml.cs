@@ -43,8 +43,6 @@ public sealed partial class ShellPage : Page
 
         ViewModel.AlbumSelected += this.OnAlbumSelected;
         ViewModel.GoBackButtonVisibilityChanged += this.OnGoBackButtonVisibilityChanged;
-
-        ViewModel.DebugWindowShowHide += this.OnDebugWindowShowHide;
         ViewModel.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
         ViewModel.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
         ViewModel.DebugCommandClear += this.OnDebugCommandClear;
@@ -161,18 +159,6 @@ public sealed partial class ShellPage : Page
         wnd.SetTitleBar(AppTitleBar);
 
         //SetRegionsForCustomTitleBar();
-    }
-
-    public void OnDebugWindowShowHide(object? sender, System.EventArgs e)
-    {
-        if (this.DebugWindow.Visibility == Visibility.Visible)
-        {
-            this.DebugWindow.Visibility = Visibility.Collapsed;
-        }
-        else
-        {
-            this.DebugWindow.Visibility = Visibility.Visible;
-        }
     }
 
     private readonly StringBuilder _sbCommandOutput = new();

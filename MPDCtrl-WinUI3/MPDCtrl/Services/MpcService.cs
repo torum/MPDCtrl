@@ -992,27 +992,32 @@ public partial class MpcService : IMpcService
 
             foreach (string line in SubSystems)
             {
-                if (line.ToLower() == "changed: playlist")
+                //if (line.ToLower() == "changed: playlist")
+                if (string.Equals(line, "changed: playlist", StringComparison.OrdinalIgnoreCase))
                 {
                     // playlist: the queue (i.e.the current playlist) has been modified
                     isCurrentQueue = true;
                 }
-                if (line.ToLower() == "changed: player")
+                //if (line.ToLower() == "changed: player")
+                if (string.Equals(line, "changed: player", StringComparison.OrdinalIgnoreCase))
                 {
                     // player: the player has been started, stopped or seeked
                     isPlayer = true;
                 }
-                if (line.ToLower() == "changed: options")
+                //if (line.ToLower() == "changed: options")
+                if (string.Equals(line, "changed: options", StringComparison.OrdinalIgnoreCase))
                 {
                     // options: options like repeat, random, crossfade, replay gain
                     isPlayer = true;
                 }
-                if (line.ToLower() == "changed: mixer")
+                //if (line.ToLower() == "changed: mixer")
+                if (string.Equals(line, "changed: mixer", StringComparison.OrdinalIgnoreCase))
                 {
                     // mixer: the volume has been changed
                     isPlayer = true;
                 }
-                if (line.ToLower() == "changed: stored_playlist")
+                //if (line.ToLower() == "changed: stored_playlist")
+                if (string.Equals(line, "changed: stored_playlist", StringComparison.OrdinalIgnoreCase))
                 {
                     // stored_playlist: a stored playlist has been modified, renamed, created or deleted
                     isStoredPlaylist = true;
@@ -1414,7 +1419,7 @@ public partial class MpcService : IMpcService
                 IsMpdCommandConnected = false;
 
                 DebugCommandOutput?.Invoke(this, string.Format("Reconnecting... " + Environment.NewLine + Environment.NewLine));
-                Debug.WriteLine($"Looks like Connection Timeout. Reconnecting...  @IOExceptionOfWriteAsync:  {e.Message}" + Environment.NewLine + cmd);
+                Debug.WriteLine($"Looks like Connection Timeout. Reconnecting...  @IOExceptionOfWriteAsync:  {e.Message}" + Environment.NewLine + cmd.Trim());
                 try
                 {
                     //_commandConnection.Client.Shutdown(SocketShutdown.Both);
@@ -1891,7 +1896,6 @@ public partial class MpcService : IMpcService
         if (result.IsSuccess)
         {
             MpcProgress?.Invoke(this, "[Background] Parsing files and directories...");
-            Debug.WriteLine(result.ResultText);
             result.IsSuccess = await ParseListAll(result.ResultText);
             MpcProgress?.Invoke(this, "[Background] Files and directories updated.");
         }

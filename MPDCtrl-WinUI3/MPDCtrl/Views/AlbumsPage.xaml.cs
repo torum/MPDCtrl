@@ -57,8 +57,14 @@ public sealed partial class AlbumsPage : Page
                 return;
             }
 
-            lb.ScrollIntoView(album, ScrollIntoViewAlignment.Default);
+            await Task.Delay(300);
 
+            lb.ScrollIntoView(album, ScrollIntoViewAlignment.Leading);
+
+            await Task.Yield();
+
+
+            // TODO: rewrite this lator.
             // below is a trick to show album cover images.
             var scrollViewer = FindScrollViewer(lb);
             if (scrollViewer is null)
@@ -75,6 +81,7 @@ public sealed partial class AlbumsPage : Page
 
     public void OnAlbumsCollectionHasBeenReset(object? sender, System.EventArgs e)
     {
+        // TODO: need to rewrite this lator.
         // Need this to load image.
         // Albums sort resets ObservableCollection which is not recognized by ListViewBehavior and does not UpdateVisibleItems,
         // so forcibly fire scroll event.

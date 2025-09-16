@@ -130,7 +130,8 @@ public partial class DirectoryTreeBuilder(string name) : NodeTree(name)
                         bool found = false;
                         foreach (var child in parent.Children)
                         {
-                            if (child.Name.ToLower() == asdf.ToLower())
+                            //if (child.Name.ToLower() == asdf.ToLower())
+                            if (string.Equals(child.Name, asdf, StringComparison.CurrentCultureIgnoreCase))
                             {
                                 // set parent node
                                 parent = child as NodeDirectory;

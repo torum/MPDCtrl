@@ -598,11 +598,7 @@ public partial class MainViewModel : ObservableObject
                 return;
 
             _playButton = value;
-
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-            {
-                OnPropertyChanged(nameof(PlayButton));
-            });
+            OnPropertyChanged(nameof(PlayButton));
         }
     }
 
@@ -761,12 +757,8 @@ public partial class MainViewModel : ObservableObject
                 return;
 
             _time = value;
-
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-            {
-                OnPropertyChanged(nameof(Time));
-                OnPropertyChanged(nameof(TimeFormatted));
-            });
+            OnPropertyChanged(nameof(Time));
+            OnPropertyChanged(nameof(TimeFormatted));
         }
     }
 
@@ -901,6 +893,13 @@ public partial class MainViewModel : ObservableObject
 
             _selectedNodeMenu = value;
             OnPropertyChanged(nameof(SelectedNodeMenu));
+
+            // Testing
+            var onUIThread = App.MainWnd?.CurrentDispatcherQueue?.HasThreadAccess;
+            if ((onUIThread is not null) && (onUIThread == false))
+            {
+                Debug.WriteLine("SelectedNodeMenu set HasNoThreadAccess");
+            }
 
             if (value is null)
             {
@@ -1061,7 +1060,7 @@ public partial class MainViewModel : ObservableObject
 
     private bool FilterSongInfoEx(SongInfoEx song)
     {
-        return song.Title.Contains(FilterQueueQuery, StringComparison.InvariantCultureIgnoreCase);
+        return song.Title.Contains(FilterQueueQuery, StringComparison.CurrentCultureIgnoreCase);// InvariantCultureIgnoreCase
     }
 
     private ObservableCollection<SongInfoEx> _queueForFilter = [];
@@ -1308,9 +1307,9 @@ public partial class MainViewModel : ObservableObject
             _artists = value;
             OnPropertyChanged(nameof(Artists));
             OnPropertyChanged(nameof(ArtistPageSubTitleArtistCount));
+            OnPropertyChanged(nameof(ArtistPageSubTitleArtistAlbumCount));
         }
     }
-
 
     private string _artistPageSubTitleArtistCount = "";
     public string ArtistPageSubTitleArtistCount
@@ -1323,25 +1322,44 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private string _artistPageSubTitleArtistAlbumCount = "";
+    public string ArtistPageSubTitleArtistAlbumCount
+    {
+        get
+        {
+            if (_selectedAlbumArtist is null)
+            {
+                return string.Empty;
+            }
+
+            string str = _resourceLoader.GetString("ArtistPage_SubTitle_ArtistAlbumCount");
+            _artistPageSubTitleArtistAlbumCount = string.Format(str, _selectedAlbumArtist.Albums.Count);
+            return _artistPageSubTitleArtistAlbumCount;
+        }
+    }
+
     private AlbumArtist? _selectedAlbumArtist;
     public AlbumArtist? SelectedAlbumArtist
     {
         get { return _selectedAlbumArtist; }
         set
         {
-            if (_selectedAlbumArtist != value)
+            if (_selectedAlbumArtist == value)
             {
-                _selectedAlbumArtist = value;
-
-                OnPropertyChanged(nameof(SelectedAlbumArtist));
-
-                SelectedArtistAlbums = _selectedAlbumArtist?.Albums;
-
-                _ = Task.Run(() => GetArtistSongs(_selectedAlbumArtist));
-
-                //_ = Task.Run(() => GetAlbumPictures(SelectedArtistAlbums));
-                GetAlbumPictures(SelectedArtistAlbums);
+                return;
             }
+
+            _selectedAlbumArtist = value;
+
+            OnPropertyChanged(nameof(SelectedAlbumArtist));
+
+            SelectedArtistAlbums = _selectedAlbumArtist?.Albums;
+            OnPropertyChanged(nameof(ArtistPageSubTitleArtistAlbumCount));
+
+            _ = Task.Run(() => GetArtistSongs(_selectedAlbumArtist));
+
+            //_ = Task.Run(() => GetAlbumPictures(SelectedArtistAlbums));
+            GetAlbumPictures(SelectedArtistAlbums);
         }
     }
 
@@ -1391,6 +1409,17 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private string _albumPageSubTitleAlbumCount = "";
+    public string AlbumPageSubTitleAlbumCount
+    {
+        get
+        {
+            string str = _resourceLoader.GetString("AlbumPage_SubTitle_AlbumCount");
+            _albumPageSubTitleAlbumCount = string.Format(str, Albums.Count);
+            return _albumPageSubTitleAlbumCount;
+        }
+    }
+
     private AlbumEx? _selectedAlbum = new();
     public AlbumEx? SelectedAlbum
     {
@@ -1404,17 +1433,24 @@ public partial class MainViewModel : ObservableObject
 
             _selectedAlbum = value;
             OnPropertyChanged(nameof(SelectedAlbum));
-            OnPropertyChanged(nameof(SelectedAlbumSongs));
+            //OnPropertyChanged(nameof(SelectedAlbumSongs));
+            //OnPropertyChanged(nameof(AlbumPageSubTitleSelectedAlbumSongsCount));
 
             if (_selectedAlbum is null)
             {
+                //SelectedAlbumSongs = [];
                 return;
             }
 
+            /*
+             *  do this at GetAlbumSongs(_selectedAlbum);
+            SelectedAlbumSongs = _selectedAlbum.Songs;
+            */
             //_ = Task.Run(async () => { await GetAlbumSongs(_selectedAlbum); });
             GetAlbumSongs(_selectedAlbum);
 
-            AlbumSelected?.Invoke(this, EventArgs.Empty);
+            AlbumSelectedNavigateToDetailsPage?.Invoke(this, EventArgs.Empty);
+
         }
     }
 
@@ -1430,6 +1466,7 @@ public partial class MainViewModel : ObservableObject
 
             return _selectedAlbumSongs;
         }
+        /*
         set
         {
             if (_selectedAlbumSongs == value)
@@ -1437,17 +1474,29 @@ public partial class MainViewModel : ObservableObject
 
             _selectedAlbumSongs = value;
             OnPropertyChanged(nameof(SelectedAlbumSongs));
+            OnPropertyChanged(nameof(AlbumPageSubTitleSelectedAlbumSongsCount));
         }
+        */
     }
 
-    private string _albumPageSubTitleAlbumCount = "";
-    public string AlbumPageSubTitleAlbumCount
+    public string AlbumPageSubTitleSelectedAlbumSongsCount
     {
         get
         {
-            string str = _resourceLoader.GetString("AlbumPage_SubTitle_AlbumCount");
-            _albumPageSubTitleAlbumCount = string.Format(str, Albums.Count);
-            return _albumPageSubTitleAlbumCount;
+            if (_selectedAlbumSongs is null)
+            {
+                return string.Empty;
+            }
+
+            string str = _resourceLoader.GetString("AlbumPage_SubTitle_SelectedAlbumSongsCount");
+            if (_selectedAlbum is not null)
+            {
+                return string.Format(str, _selectedAlbum.Songs.Count); ;
+            }
+            else
+            {
+                return string.Format(str, _selectedAlbumSongs.Count); ;
+            }
         }
     }
 
@@ -2179,7 +2228,7 @@ public partial class MainViewModel : ObservableObject
     // For status bar message.
     public event EventHandler<string>? UpdateProgress;
 
-    public event EventHandler? AlbumSelected;
+    public event EventHandler? AlbumSelectedNavigateToDetailsPage;
     public event EventHandler<AlbumEx>? AlbumScrollIntoView;
     public event EventHandler? AlbumsCollectionHasBeenReset;
     public event EventHandler? GoBackButtonVisibilityChanged;
@@ -2212,7 +2261,7 @@ public partial class MainViewModel : ObservableObject
 #endif
     }
 
-    #region == Methods ==
+    #region == Private Methods ==
 
     private void InitializeAndSubscribe()
     {
@@ -2269,6 +2318,7 @@ public partial class MainViewModel : ObservableObject
     {
         _password = "hoge";
         _host = "127.0.0.1";
+        //_host = "192.168.";
         _port = 6600;
         Start(_host, _port);
     }
@@ -2392,10 +2442,10 @@ public partial class MainViewModel : ObservableObject
     {
         UpdateButtonStatus();
 
-        UpdateProgress?.Invoke(this, "[UI] Status updating...");
-
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
         {
+            UpdateProgress?.Invoke(this, "[UI] Status updating...");
+
             bool isSongChanged = false;
             bool isCurrentSongWasNull = false;
 
@@ -2468,14 +2518,11 @@ public partial class MainViewModel : ObservableObject
                                         {
                                             if ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading))
                                             {
-                                                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
-                                                {
-                                                    AlbumCover = res.AlbumCover;
-                                                    AlbumArtBitmapSource = await BitmapSourceFromByteArray(AlbumCover.BinaryData);
-                                                    //IsAlbumArtVisible = true;
-                                                    SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                                    CurrentSong.IsAlbumCoverNeedsUpdate = false;
-                                                });
+                                                AlbumCover = res.AlbumCover;
+                                                AlbumArtBitmapSource = await BitmapSourceFromByteArray(AlbumCover.BinaryData);
+                                                //IsAlbumArtVisible = true;
+                                                SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
+                                                CurrentSong.IsAlbumCoverNeedsUpdate = false;
                                             }
                                             else
                                             {
@@ -2527,9 +2574,9 @@ public partial class MainViewModel : ObservableObject
 
                 AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
             }
-        });
 
-        UpdateProgress?.Invoke(this, "");
+            UpdateProgress?.Invoke(this, "");
+        });
     }
 
     private void UpdateButtonStatus()
@@ -2612,6 +2659,7 @@ public partial class MainViewModel : ObservableObject
                     _elapsed = Convert.ToInt32(_mpc.MpdStatus.MpdSongElapsed);
                     _elapsed *= _elapsedTimeMultiplier;
                     OnPropertyChanged(nameof(Elapsed));
+                    OnPropertyChanged(nameof(ElapsedFormatted));
                 }
 
                 //
@@ -2626,7 +2674,7 @@ public partial class MainViewModel : ObservableObject
 
     private void UpdateCurrentSong()
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue( () =>
         {
             bool isSongChanged = false;
             bool isCurrentSongWasNull = false;
@@ -2666,6 +2714,8 @@ public partial class MainViewModel : ObservableObject
                 {
                     if (isSongChanged || isCurrentSongWasNull)
                     {
+                        /*
+                         * looks like no need to.
                         // AlbumArt
                         if (!string.IsNullOrEmpty(_mpc.MpdCurrentSong.File))
                         {
@@ -2676,21 +2726,19 @@ public partial class MainViewModel : ObservableObject
                                 {
                                     if (res.AlbumCover?.SongFilePath == _mpc.MpdCurrentSong.File)
                                     {
-                                        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+                                        AlbumCover = res.AlbumCover;
+                                        //AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
+                                        AlbumArtBitmapSource = await BitmapSourceFromByteArray(AlbumCover.BinaryData);
+                                        if (CurrentSong is not null)
                                         {
-                                            AlbumCover = res.AlbumCover;
-                                            //AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
-                                            AlbumArtBitmapSource = await BitmapSourceFromByteArray(AlbumCover.BinaryData);
-                                            if (CurrentSong is not null)
-                                            {
-                                                SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                                CurrentSong.IsAlbumCoverNeedsUpdate = false;
-                                            }
-                                        });
+                                            SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
+                                            CurrentSong.IsAlbumCoverNeedsUpdate = false;
+                                        }
                                     }
                                 }
                             }
                         }
+                        */
                     }
                     else
                     {
@@ -2709,104 +2757,101 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    private async void UpdateCurrentQueue()
+    private void UpdateCurrentQueue()
     {
-        IsQueueFindVisible = false;
-
-        if (Queue.Count > 0)
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
         {
-            UpdateProgress?.Invoke(this, "[UI] Updating the queue...");
-            await Task.Delay(20);
+            IsQueueFindVisible = false;
 
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            if (Queue.Count > 0)
             {
+                UpdateProgress?.Invoke(this, "[UI] Updating the queue...");
+                await Task.Delay(20);
+
                 IsWorking = true;
-            });
 
-            try
-            {
-                // The simplest way, but all the selections and listview position will be cleared. Kind of annoying when editing items list.
-                #region == simple & fast == 
-                /*
-                UpdateProgress?.Invoke(this, "[UI] Loading the queue...");
-
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+                try
                 {
-                    Queue = new ObservableCollection<SongInfoEx>(_mpc.CurrentQueue);
-                    foreach (var sng in Queue)
+                    // The simplest way, but all the selections and listview position will be cleared. Kind of annoying when editing items list.
+                    #region == simple & fast == 
+                    /*
+                    UpdateProgress?.Invoke(this, "[UI] Loading the queue...");
+
+                    App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
                     {
-                        //UpdateProgress?.Invoke(this, "[UI] Queue list updating...(fixing)");
-
-                        // Workaround for WinUI3's limitation or lack of features.
-                        sng.ParentViewModel = this;
-                    }
-
-                    UpdateProgress?.Invoke(this, "[UI] Checking current song after Queue update.");
-
-                    // Set Current and NowPlaying.
-                    var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
-                    if (curitem is not null)
-                    {
-                        if (CurrentSong is not null)
+                        Queue = new ObservableCollection<SongInfoEx>(_mpc.CurrentQueue);
+                        foreach (var sng in Queue)
                         {
-                            bool asdf = false;
-                            if (CurrentSong.Id == curitem.Id)
+                            //UpdateProgress?.Invoke(this, "[UI] Queue list updating...(fixing)");
+
+                            // Workaround for WinUI3's limitation or lack of features.
+                            sng.ParentViewModel = this;
+                        }
+
+                        UpdateProgress?.Invoke(this, "[UI] Checking current song after Queue update.");
+
+                        // Set Current and NowPlaying.
+                        var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
+                        if (curitem is not null)
+                        {
+                            if (CurrentSong is not null)
                             {
-                                asdf = curitem.IsAlbumCoverNeedsUpdate;
-                            }
-                            CurrentSong = curitem;
-                            CurrentSong.IsPlaying = true;
-                            CurrentSong.IsAlbumCoverNeedsUpdate = asdf;
-                        }
-                        else
-                        {
-                            CurrentSong = curitem;
-                            CurrentSong.IsPlaying = true;
-                            CurrentSong.IsAlbumCoverNeedsUpdate = true;
-                        }
-
-                        if (IsAutoScrollToNowPlaying)
-                        {
-                            // ScrollIntoView while don't change the selection 
-                            ScrollIntoView?.Invoke(this, CurrentSong);
-                        }
-
-                        // AlbumArt
-                        if (IsDownloadAlbumArt && CurrentSong.IsAlbumCoverNeedsUpdate)
-                        {
-                            var res = await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
-                            if ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading) && (res.AlbumCover?.SongFilePath != null))
-                            {
-                                if (res.AlbumCover?.SongFilePath == CurrentSong.File)
+                                bool asdf = false;
+                                if (CurrentSong.Id == curitem.Id)
                                 {
-                                    AlbumCover = res.AlbumCover;
-                                    //AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
-                                    AlbumArtBitmapSource = await BitmapSourceFromByteArray(AlbumCover.BinaryData);
-                                    SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                    CurrentSong.IsAlbumCoverNeedsUpdate = false;
+                                    asdf = curitem.IsAlbumCoverNeedsUpdate;
+                                }
+                                CurrentSong = curitem;
+                                CurrentSong.IsPlaying = true;
+                                CurrentSong.IsAlbumCoverNeedsUpdate = asdf;
+                            }
+                            else
+                            {
+                                CurrentSong = curitem;
+                                CurrentSong.IsPlaying = true;
+                                CurrentSong.IsAlbumCoverNeedsUpdate = true;
+                            }
+
+                            if (IsAutoScrollToNowPlaying)
+                            {
+                                // ScrollIntoView while don't change the selection 
+                                ScrollIntoView?.Invoke(this, CurrentSong);
+                            }
+
+                            // AlbumArt
+                            if (IsDownloadAlbumArt && CurrentSong.IsAlbumCoverNeedsUpdate)
+                            {
+                                var res = await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                                if ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading) && (res.AlbumCover?.SongFilePath != null))
+                                {
+                                    if (res.AlbumCover?.SongFilePath == CurrentSong.File)
+                                    {
+                                        AlbumCover = res.AlbumCover;
+                                        //AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
+                                        AlbumArtBitmapSource = await BitmapSourceFromByteArray(AlbumCover.BinaryData);
+                                        SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
+                                        CurrentSong.IsAlbumCoverNeedsUpdate = false;
+                                    }
                                 }
                             }
                         }
-                    }
-                    else
-                    {
-                        CurrentSong = null;
+                        else
+                        {
+                            CurrentSong = null;
 
-                        //IsAlbumArtVisible = false;
-                        AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
-                    }
+                            //IsAlbumArtVisible = false;
+                            AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
+                        }
 
-                    IsWorking = false;
+                        IsWorking = false;
 
-                    UpdateProgress?.Invoke(this, "");
-                });
-                */
-                #endregion
+                        UpdateProgress?.Invoke(this, "");
+                    });
+                    */
+                    #endregion
 
-                #region == better way (only for wpf and avaloniaui) ==
+                    #region == better way (only for wpf and avaloniaui) ==
 
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
-                {
                     IsWorking = true;
 
                     UpdateProgress?.Invoke(this, "[UI] Updating the queue...");
@@ -2977,55 +3022,40 @@ public partial class MainViewModel : ObservableObject
                     UpdateProgress?.Invoke(this, "");
 
                     IsWorking = false;
-                });
 
-                #endregion
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine("Exception@UpdateCurrentQueue: " + e.Message);
-
-                UpdateProgress?.Invoke(this, "Exception@UpdateCurrentQueue: " + e.Message);
-
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                    #endregion
+                }
+                catch (Exception e)
                 {
+                    Debug.WriteLine("Exception@UpdateCurrentQueue: " + e.Message);
+
+                    UpdateProgress?.Invoke(this, "Exception@UpdateCurrentQueue: " + e.Message);
+
                     IsWorking = false;
                     App.AppendErrorLog("Exception@UpdateCurrentQueue", e.Message);
-                });
 
-                return;
-            }
-            finally
-            {
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                    return;
+                }
+                finally
                 {
                     IsWorking = false;
-                });
-                UpdateProgress?.Invoke(this, "");
-            }
+                    UpdateProgress?.Invoke(this, "");
+                }
 
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-            {
                 IsWorking = false;
-            });
-        }
-        else
-        {
-            UpdateProgress?.Invoke(this, "[UI] Loading the queue...");
-            await Task.Delay(20);
-            /*
-            if (IsSwitchingProfile)
-                return;
-            */
-
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            }
+            else
             {
+                UpdateProgress?.Invoke(this, "[UI] Loading the queue...");
+                await Task.Delay(20);
+                /*
+                if (IsSwitchingProfile)
+                    return;
+                */
+
                 IsWorking = true;
-            });
 
-            try
-            {
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+                try
                 {
                     IsWorking = true;
 
@@ -3174,50 +3204,40 @@ public partial class MainViewModel : ObservableObject
                     }
 
                     UpdateProgress?.Invoke(this, "");
-                });
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine("Exception@UpdateCurrentQueue: " + e.Message);
-
-                StatusBarMessage = "Exception@UpdateCurrentQueue: " + e.Message;
-
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                }
+                catch (Exception e)
                 {
+                    Debug.WriteLine("Exception@UpdateCurrentQueue: " + e.Message);
+
+                    StatusBarMessage = "Exception@UpdateCurrentQueue: " + e.Message;
+
                     IsWorking = false;
 
                     App.AppendErrorLog("Exception@UpdateCurrentQueue", e.Message);
-                });
 
-                return;
-            }
-            finally
-            {
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                    return;
+                }
+                finally
                 {
                     IsWorking = false;
-                });
-                UpdateProgress?.Invoke(this, "");
+                    UpdateProgress?.Invoke(this, "");
+                }
             }
 
-        }
-
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-        {
             IsWorking = false;
 
             OnPropertyChanged(nameof(QueuePageSubTitleSongCount));
         });
     }
 
-    private async void UpdatePlaylists()
+    private void UpdatePlaylists()
     {
-        UpdateProgress?.Invoke(this, "[UI] Playlists loading...");
-
-        await Task.Delay(10);
+        //await Task.Delay(10);
 
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
+            UpdateProgress?.Invoke(this, "[UI] Playlists loading...");
+
             bool isListChanged = false;
             //IsBusy = true;
             IsWorking = true;
@@ -3329,7 +3349,7 @@ public partial class MainViewModel : ObservableObject
                 foreach (var fuga in hoge.Children)
                 {
                     if (fuga is not NodeMenuPlaylistItem) continue;
-                    if (!fuga.Equals(playlist)) continue;
+                    if (fuga != playlist) continue;
                     if (!IsNavigationViewMenuOpen) continue;
                     fuga.Selected = true;
                     SelectedNodeMenu = fuga;
@@ -3356,7 +3376,7 @@ public partial class MainViewModel : ObservableObject
                 {
                     if (fuga is not NodeMenuPlaylistItem) continue;
 
-                    if (string.Equals(playlist, fuga.Name))
+                    if (string.Equals(playlist, fuga.Name, StringComparison.CurrentCulture))
                     {
                         await Task.Yield();
                         await Task.Delay(1000); // needed this for WinUI3.
@@ -3376,11 +3396,11 @@ public partial class MainViewModel : ObservableObject
 
     private Task UpdateLibraryMusicAsync()
     {
-        UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
-
-        //IsBusy = true;
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
         {
+            UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
+
+            //IsBusy = true;
             IsWorking = true;
             await Task.Yield();
 
@@ -3443,7 +3463,6 @@ public partial class MainViewModel : ObservableObject
     private Task UpdateLibraryDirectoriesAsync()
     {
         // Directories
-
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
         {
             UpdateProgress?.Invoke(this, "[UI] Library directories loading...");
@@ -3603,18 +3622,17 @@ public partial class MainViewModel : ObservableObject
         {
             IsWorking = true;
             await Task.Yield();
-        });
 
-        UpdateProgress?.Invoke(this, "[UI] Updating the AlbumArtists...");
-        Artists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists);// COPY. //.OrderBy(x => x.Name, comp)
 
-        UpdateProgress?.Invoke(this, "[UI] Updating the Albums...");
-        Albums = new ObservableCollection<AlbumEx>(_mpc.Albums); // COPY. // Sort .OrderBy(x => x.Name, comp)
+            UpdateProgress?.Invoke(this, "[UI] Updating the AlbumArtists...");
+            Artists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists);// COPY. //.OrderBy(x => x.Name, comp)
 
-        UpdateProgress?.Invoke(this, "");
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
-        {
-            IsWorking = false; 
+            UpdateProgress?.Invoke(this, "[UI] Updating the Albums...");
+            Albums = new ObservableCollection<AlbumEx>(_mpc.Albums); // COPY. // Sort .OrderBy(x => x.Name, comp)
+
+            UpdateProgress?.Invoke(this, "");
+
+            IsWorking = false;
             await Task.Yield();
         });
     }
@@ -3643,10 +3661,10 @@ public partial class MainViewModel : ObservableObject
 
                         foreach (var song in r.SearchResult)
                         {
-                            if ((song.AlbumArtist.Equals(album.AlbumArtist)) || (song.Artist.Equals(album.AlbumArtist)))
+                            if ((song.AlbumArtist.Equals(album.AlbumArtist, StringComparison.CurrentCulture)) || (song.Artist.Equals(album.AlbumArtist, StringComparison.CurrentCulture)))
                             {
                                 //if (song.Album.Trim() == album.Name.Trim())
-                                if (song.Album.Equals(album.Name))
+                                if (song.Album.Equals(album.Name, StringComparison.CurrentCulture))
                                 {
                                     // WInUI3's walkaround.
                                     song.ParentViewModel = this;
@@ -3668,6 +3686,14 @@ public partial class MainViewModel : ObservableObject
                         Debug.WriteLine("GetAlbumSongs: SearchArtistSongs returned false, returning.");
                         return;
                     }
+
+                    ////
+                    ///
+                    /*
+                    SelectedAlbumSongs = album.Songs;
+                    */
+                    OnPropertyChanged(nameof(SelectedAlbumSongs));
+                    OnPropertyChanged(nameof(AlbumPageSubTitleSelectedAlbumSongsCount));
                 }
                 else
                 {
@@ -3702,6 +3728,13 @@ public partial class MainViewModel : ObservableObject
                             Debug.WriteLine("GetAlbumSongs: SearchArtistSongs returned false, returning.");
                             return;
                         }
+
+                        ////
+                        /*
+                        SelectedAlbumSongs = album.Songs;
+                        */
+                        OnPropertyChanged(nameof(SelectedAlbumSongs));
+                        OnPropertyChanged(nameof(AlbumPageSubTitleSelectedAlbumSongsCount));
                     }
                     else
                     {
@@ -3721,41 +3754,37 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    private async Task GetArtistSongs(AlbumArtist? artist)
+    private void GetArtistSongs(AlbumArtist? artist)
     {
-        if (artist is null)
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
         {
-            Debug.WriteLine("GetArtistSongs: artist is null, returning.");
-            return;
-        }
+            if (artist is null)
+            {
+                Debug.WriteLine("GetArtistSongs: artist is null, returning.");
+                return;
+            }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-        {
             IsWorking = true;
             //UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
-        });
 
-        var r = await SearchArtistSongs(artist.Name).ConfigureAwait(ConfigureAwaitOptions.None);
+            var r = await SearchArtistSongs(artist.Name);
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-        {
             IsWorking = true;
             //UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
-        });
 
-        if (!r.IsSuccess)
-        {
-            Debug.WriteLine("GetArtistSongs: SearchArtistSongs returned false, returning.");
-            return;
-        }
-        if (artist is null)
-        {
-            Debug.WriteLine("GetArtistSongs: SelectedAlbumArtist is null, returning.");
-            return;
-        }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-        {
+            if (!r.IsSuccess)
+            {
+                Debug.WriteLine("GetArtistSongs: SearchArtistSongs returned false, returning.");
+                return;
+            }
+            if (artist is null)
+            {
+                Debug.WriteLine("GetArtistSongs: SelectedAlbumArtist is null, returning.");
+                return;
+            }
+
+
             if (r.SearchResult is null)
             {
                 Debug.WriteLine("GetArtistSongs: SearchResult is null, returning.");
@@ -3785,7 +3814,7 @@ public partial class MainViewModel : ObservableObject
 
                 foreach (var song in r.SearchResult)
                 {
-                    if (song.Album.Equals(slbm.Name))
+                    if (song.Album.Equals(slbm.Name, StringComparison.CurrentCulture))
                     {
                         // WInUI3's walkaround.
                         song.ParentViewModel = this;
@@ -3803,22 +3832,23 @@ public partial class MainViewModel : ObservableObject
 
     private void GetAlbumPictures(IEnumerable<object>? AlbumExItems)
     {
-        if (AlbumExItems is null)
-        {
-            Debug.WriteLine("GetAlbumPictures: (AlbumExItems is null)");
-            return;
-        }
-
-        if (Albums.Count < 1)
-        {
-            Debug.WriteLine("GetAlbumPictures: Albums.Count < 1, returning.");
-            return;
-        }
-
-        UpdateProgress?.Invoke(this, "[UI] Loading album covers ...");
-        //IsBusy = true;
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
         {
+            if (AlbumExItems is null)
+            {
+                Debug.WriteLine("GetAlbumPictures: (AlbumExItems is null)");
+                return;
+            }
+
+            if (Albums.Count < 1)
+            {
+                Debug.WriteLine("GetAlbumPictures: Albums.Count < 1, returning.");
+                return;
+            }
+
+            UpdateProgress?.Invoke(this, "[UI] Loading album covers ...");
+            //IsBusy = true;
+
             IsWorking = true;
             await Task.Yield();
 
@@ -3866,6 +3896,8 @@ public partial class MainViewModel : ObservableObject
 
                 if (File.Exists(filePath))
                 {
+                    album.IsImageLoading = true;
+
                     try
                     {
                         BitmapImage? bitmap = new(new Uri(filePath));
@@ -3875,19 +3907,26 @@ public partial class MainViewModel : ObservableObject
                     }
                     catch (Exception e)
                     {
+                        album.IsImageLoading = false;
                         Debug.WriteLine("GetAlbumPictures: Exception while loading: " + filePath + Environment.NewLine + e.Message);
                         continue;
                     }
+                    
+                    await Task.Delay(5);
 
+                    album.IsImageLoading = false;
                     //Debug.WriteLine($"GetAlbumPictures: Successfully loaded album art from cache {filePath}");
                 }
                 else
                 {
+                    album.IsImageLoading = true;
+
                     string fileTempPath = System.IO.Path.Combine(App.AppDataCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".tmp";
                     string strDirPath = System.IO.Path.Combine(App.AppDataCacheFolder, strArtist);
 
                     if (File.Exists(fileTempPath))
                     {
+                        album.IsImageLoading = false;
                         continue; // Skip if temp file exists, it means the album art has found to have no image.
                     }
 
@@ -3902,6 +3941,7 @@ public partial class MainViewModel : ObservableObject
 
                     if (ret.SearchResult is null)
                     {
+                        album.IsImageLoading = false;
                         Debug.WriteLine("GetAlbumPictures: ret.SearchResult is null, skipping.");
                         continue;
                     }
@@ -3909,6 +3949,7 @@ public partial class MainViewModel : ObservableObject
                     var sresult = new ObservableCollection<SongInfo>(ret.SearchResult);
                     if (sresult.Count < 1)
                     {
+                        album.IsImageLoading = false;
                         Debug.WriteLine("GetAlbumPictures: ret.SearchResult.Count < 1, skipping. -> " + album.Name);
                         continue;
                     }
@@ -3929,7 +3970,8 @@ public partial class MainViewModel : ObservableObject
                         {
                             aat = albumsong.Artist.Trim();
                         }
-                        if (aat == album.AlbumArtist)
+                        //if (aat == album.AlbumArtist)
+                        if (string.Equals(aat, album.AlbumArtist, StringComparison.CurrentCulture))
                         {
                             //Debug.WriteLine($"GetAlbumPictures: Processing song {albumsong.File} from album {album.Name}");
                             var r = await _mpc.MpdQueryAlbumArtForAlbumView(albumsong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
@@ -4014,7 +4056,12 @@ public partial class MainViewModel : ObservableObject
                         {
                             Debug.WriteLine("GetAlbumPictures: Exception while saving album art DUMMY file: " + e.Message);
                         }
+
                     }
+
+                    album.IsImageLoading = false;
+
+                    await Task.Yield();
                 }
             }
 
@@ -4074,9 +4121,9 @@ public partial class MainViewModel : ObservableObject
 
             return bitmapImage;
         }
-        catch
+        catch (Exception e)
         {
-            Debug.WriteLine("Exception Bitmap.DecodeToWidth @BitmapSourceFromByteArray");
+            Debug.WriteLine($"Exception {e} @BitmapSourceFromByteArray");
 
         }
 
@@ -4238,17 +4285,17 @@ public partial class MainViewModel : ObservableObject
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
             MpdVersion = _mpc.MpdVerText;
+
+            ////MpdStatusMessage = MpdVersion;// + ": " + MPDCtrlX.Properties.Resources.MPD_StatusConnected;
+
+            //MpdStatusButton = _pathMpdOkButton;
+
+            // 
+            //IsConnected = true;
+
+            IsShowAckWindow = false;
+            IsShowErrWindow = false;
         });
-
-        ////MpdStatusMessage = MpdVersion;// + ": " + MPDCtrlX.Properties.Resources.MPD_StatusConnected;
-
-        //MpdStatusButton = _pathMpdOkButton;
-
-        // 
-        //IsConnected = true;
-
-        IsShowAckWindow = false;
-        IsShowErrWindow = false;
 
         /*
         // Connected from InitWindow, so save and clean up. 
@@ -4566,11 +4613,11 @@ public partial class MainViewModel : ObservableObject
             s = s.Replace("ACK ", string.Empty);
             s = s.Replace("{} ", string.Empty);
 
-            if (origin.Equals("Command"))
+            if (origin.Equals("Command", StringComparison.OrdinalIgnoreCase))
             {
                 InfoBarAckTitle = MpdVersion + " " + _resourceLoader.GetString("MPD_CommandResponse");
             }
-            else if (origin.Equals("Idle"))
+            else if (origin.Equals("Idle", StringComparison.OrdinalIgnoreCase))
             {
                 InfoBarAckTitle = MpdVersion + " " + _resourceLoader.GetString("MPD_IdleResponse");
             }
@@ -4600,11 +4647,11 @@ public partial class MainViewModel : ObservableObject
 
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
-            if (origin.Equals("Command"))
+            if (origin.Equals("Command", StringComparison.OrdinalIgnoreCase))
             {
                 InfoBarErrTitle = MpdVersion + " " + _resourceLoader.GetString("MPD_CommandResponse");
             }
-            else if (origin.Equals("Idle"))
+            else if (origin.Equals("Idle", StringComparison.OrdinalIgnoreCase))
             {
                 InfoBarErrTitle = MpdVersion + " " + _resourceLoader.GetString("MPD_IdleResponse");
             }
@@ -5596,19 +5643,40 @@ public partial class MainViewModel : ObservableObject
 
     private void GoToAlbumDetailsPage(AlbumEx album)
     {
-        // go to album page.
-        GoToAlbumPage();
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        {
+            // First, go to album page so that "Back" mean back to AlbumPage.
+            GoToAlbumPage();
 
-        // scroll to the item (required a little trick to actually show images)
-        AlbumScrollIntoView?.Invoke(this, album);
+            // ensure scroll to the item.
+            await Task.Yield();
+            //await Task.Delay(500);
 
-        // go to album detail page.
-        SelectedAlbum = album;
+            // Do this below when navigateFrom details page (by calling GoBackFromAlbumDetailsPage()).
+            // scroll to the item (required a little trick to actually show images)
+            //AlbumScrollIntoView?.Invoke(this, album);
 
-        // Fetch album cover if not.
-        // Use a tmp collection to use existing method.
-        var tmpCollection = new ObservableCollection<AlbumEx> { album };
-        GetAlbumPictures(tmpCollection);
+            // go to album detail page.
+            SelectedAlbum = album;
+
+            // Fetch album cover if not.
+            // Use a tmp collection to use existing method.
+            var tmpCollection = new ObservableCollection<AlbumEx> { album };
+            GetAlbumPictures(tmpCollection);
+        });
+    }
+
+    public void GoBackFromAlbumDetailsPage(AlbumEx album)
+    {
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        {
+            //
+            await Task.Yield();
+            //await Task.Delay(500);
+
+            // scroll to the item (required a little trick to actually show images)
+            AlbumScrollIntoView?.Invoke(this, album);
+        });
     }
 
     [RelayCommand]
@@ -5717,6 +5785,26 @@ public partial class MainViewModel : ObservableObject
             asdf = CurrentSong.Artist;
         }
 
+        if (string.IsNullOrEmpty(asdf.Trim()))
+        {
+            return;
+        }
+
+        var item = Artists.FirstOrDefault(i => i.Name == asdf);
+        if (item is null) return;
+        GoToArtistPage();
+        SelectedAlbumArtist = item;
+    }
+
+    [RelayCommand]
+    public void SelectedAlbumGoToArtistPage(AlbumEx album)
+    {
+        if (album is null)
+        {
+            return;
+        }
+
+        var asdf = album.AlbumArtist;
         if (string.IsNullOrEmpty(asdf.Trim()))
         {
             return;
@@ -6124,7 +6212,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        if (!_selectedPlaylistName.Equals(playlist))
+        if (!_selectedPlaylistName.Equals(playlist, StringComparison.CurrentCulture))
         {
             Debug.WriteLine($"({_selectedPlaylistName} != {playlist})");
             return;

@@ -384,4 +384,10 @@
   <data name="Dialog_PlaylistNameAlreadyExists" xml:space="preserve">
     <value>Playlist name already exists.</value>
   </data>
+  <data name="ArtistPage_SubTitle_ArtistAlbumCount" xml:space="preserve">
+    <value>{0} albums</value>
+  </data>
+  <data name="AlbumPage_SubTitle_SelectedAlbumSongsCount" xml:space="preserve">
+    <value>{0} songs</value>
+  </data>
 </root>

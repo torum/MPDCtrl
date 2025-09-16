@@ -149,7 +149,7 @@
                     <TextBlock Text="{x:Bind ViewModel.ElapsedFormatted, Mode=OneWay}" FontSize="12" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="14,0,18,0"></TextBlock>
                 </Grid>
                 <Border Grid.Row="0" Grid.Column="1" Margin="6,0,6,0">
-                    <Slider Margin="0" Padding="0" AccessKey="T" Minimum="0" Value="{x:Bind Mode=TwoWay,Path=ViewModel.Elapsed,UpdateSourceTrigger=PropertyChanged}" Maximum="{x:Bind Mode=OneWay,Path=ViewModel.Time}"></Slider>
+                    <Slider x:Name="SeekSlider" PointerWheelChanged="SeekSlider_PointerWheelChanged"  Margin="0" Padding="0" AccessKey="T" Minimum="0" Value="{x:Bind Mode=TwoWay,Path=ViewModel.Elapsed,UpdateSourceTrigger=PropertyChanged}" Maximum="{x:Bind Mode=OneWay,Path=ViewModel.Time}"></Slider>
                 </Border>
                 <Grid Grid.Row="0" Grid.Column="2">
                     <TextBlock Text="{x:Bind ViewModel.TimeFormatted, Mode=OneWay}" FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="18,0,14,0"></TextBlock>
@@ -263,7 +263,7 @@
                             </ToggleButton>
                         </controls:WrapPanel>
 
-                        <Slider Orientation="Vertical" ToolTipService.ToolTip="Ctrl+Up/Ctrl+Down, Ctrl+Plus/Ctrl+Minus" AccessKey="V" Value="{x:Bind ViewModel.Volume,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" HorizontalAlignment="Right" Margin="0,10,10,10">
+                        <Slider x:Name="VolumeSlider" Orientation="Vertical" PointerWheelChanged="VolumeSlider_PointerWheelChanged"  ToolTipService.ToolTip="Ctrl+Up/Ctrl+Down, Ctrl+Plus/Ctrl+Minus" AccessKey="V" Value="{x:Bind ViewModel.Volume,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" HorizontalAlignment="Right" Margin="0,10,10,10">
                             <Slider.KeyboardAccelerators>
                                 <KeyboardAccelerator Key="Up" Modifiers="Control"/>
                                 <KeyboardAccelerator Key="Down" Modifiers="Control"/>

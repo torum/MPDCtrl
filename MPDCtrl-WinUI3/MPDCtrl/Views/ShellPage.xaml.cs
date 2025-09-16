@@ -41,7 +41,7 @@ public sealed partial class ShellPage : Page
 
         //AppTitleBar.SizeChanged += AppTitleBar_SizeChanged; <-This does not allways fire. Use diffrent grid and use navigated event.
 
-        ViewModel.AlbumSelected += this.OnAlbumSelected;
+        ViewModel.AlbumSelectedNavigateToDetailsPage += this.OnAlbumSelectedNavigateToDetailsPage;
         ViewModel.GoBackButtonVisibilityChanged += this.OnGoBackButtonVisibilityChanged;
         ViewModel.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
         ViewModel.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
@@ -146,7 +146,7 @@ public sealed partial class ShellPage : Page
         );
     }
 
-    public void OnAlbumSelected(object? sender, System.EventArgs e)
+    public void OnAlbumSelectedNavigateToDetailsPage(object? sender, System.EventArgs e)
     {
         if (this.NavigationFrame.Navigate(typeof(AlbumDetailPage), this.NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight }))
         {
@@ -216,7 +216,6 @@ public sealed partial class ShellPage : Page
         _sbIdleOutput.Clear();
         DebugIdleTextBox.Text = string.Empty;
     }
-
 
     private void This_ActualThemeChanged(FrameworkElement sender, object args)
     {
@@ -540,4 +539,32 @@ public sealed partial class ShellPage : Page
         // Disable space key down.
         e.Handled = true;
     }
+
+    private void VolumeSlider_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+    {
+        var pointerPoint = e.GetCurrentPoint(sender as UIElement);
+        var delta = pointerPoint.Properties.MouseWheelDelta; // +120 for scroll up, -120 for scroll down
+
+        // Adjust the Slider's Value based on the mouse wheel delta
+        // You might want to add a step value or sensitivity factor here
+        VolumeSlider.Value += (delta > 0) ? VolumeSlider.SmallChange : -VolumeSlider.SmallChange;
+
+        // Optional: Prevent the event from bubbling up to parent controls
+        e.Handled = true;
     }
+
+    private void SeekSlider_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+    {
+        var pointerPoint = e.GetCurrentPoint(sender as UIElement);
+        var delta = pointerPoint.Properties.MouseWheelDelta; // +120 for scroll up, -120 for scroll down
+
+        double step = 10.0; // Adjust this value as needed for the desired scroll sensitivity
+
+        // Adjust the Slider's Value based on the mouse wheel delta
+        // You might want to add a step value or sensitivity factor here
+        SeekSlider.Value += (delta > 0) ? SeekSlider.SmallChange + step : -SeekSlider.SmallChange + step;
+
+        // Optional: Prevent the event from bubbling up to parent controls
+        e.Handled = true;
+    }
+}

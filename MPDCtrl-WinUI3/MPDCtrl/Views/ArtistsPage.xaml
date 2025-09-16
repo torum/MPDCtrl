@@ -16,7 +16,7 @@
 
     <Grid x:Name="ContentGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="118"/>
+            <RowDefinition Height="43"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -35,52 +35,8 @@
 
                 <TextBlock Grid.Column="0" x:Uid="PageTitle_Artists" FontSize="{StaticResource FontSizePageTitle}" FontWeight="SemiBold"/>
                 <TextBlock Grid.Column="1" FontSize="{StaticResource FontSizePageSubTitle}" Text="{x:Bind ViewModel.ArtistPageSubTitleArtistCount, Mode=OneWay}" VerticalAlignment="Bottom" Padding="48,0,0,4" Opacity="0.7"/>
+                
             </Grid>
-
-            <!-- Page controls -->
-            <Grid Grid.Row="1" Margin="0,24,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <!-- Play and AddTo buttons -->
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <!-- Play -->
-                    <Button Margin="0,0,8,0" Height="36" Command="{x:Bind ViewModel.SelectedAlbumArtistPlayAllCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.SelectedAlbumArtist, Mode=OneWay}">
-                        <StackPanel Orientation="Horizontal">
-                            <Viewbox Width="14" Height="14">
-                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M5.74514 3.06445C5.41183 2.87696 5 3.11781 5 3.50023V12.5005C5 12.8829 5.41182 13.1238 5.74512 12.9363L13.7454 8.43631C14.0852 8.24517 14.0852 7.75589 13.7454 7.56474L5.74514 3.06445ZM4 3.50023C4 2.35298 5.2355 1.63041 6.23541 2.19288L14.2357 6.69317C15.2551 7.26664 15.2551 8.73446 14.2356 9.3079L6.23537 13.8079C5.23546 14.3703 4 13.6477 4 12.5005V3.50023Z"/>
-                            </Viewbox>
-                            <TextBlock x:Uid="PageMenu_PlayAll" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                    <!-- Add to queue-->
-                    <Button Margin="8,0,8,0" Height="36" Command="{x:Bind ViewModel.SelectedAlbumArtistAddToQueueCommand}" CommandParameter="{x:Bind ViewModel.SelectedAlbumArtist, Mode=OneWay}" >
-                        <StackPanel Orientation="Horizontal">
-                            <Viewbox Width="14" Height="14">
-                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z"/>
-                            </Viewbox>
-                            <TextBlock x:Uid="PageMenu_AddToQueue" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                    <!-- Add to playlist -->
-                    <Button Margin="8,0,8,0" Height="36" Command="{x:Bind ViewModel.SelectedAlbumArtistAddToPlaylistCommand}" CommandParameter="{x:Bind ViewModel.SelectedAlbumArtist, Mode=OneWay}">
-                        <StackPanel Orientation="Horizontal">
-                            <Viewbox Width="14" Height="14">
-                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z"/>
-                            </Viewbox>
-                            <TextBlock x:Uid="PageMenu_AddToPlaylist" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-
-                <!-- etc buttons-->
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-
-                </StackPanel>
-            </Grid>
-
         </Grid>
         
         <Grid Grid.Row="1" x:Name="BodyGrid" Margin="24,0,0,0">
@@ -90,14 +46,7 @@
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0">
-                <ListView Padding="0,0,0,0" Margin="0,24,0,0" ItemsSource="{x:Bind ViewModel.Artists, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAlbumArtist, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="ArtistsListView_SelectionChanged" SelectionMode="Single" Background="Transparent">
-                    <!--
-                    <ListView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel />
-                        </ItemsPanelTemplate>
-                    </ListView.ItemsPanel>
-                    -->
+                <ListView x:Name="ArtistsListView" Padding="0,0,0,0" Margin="0,24,0,0" ItemsSource="{x:Bind ViewModel.Artists, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAlbumArtist, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="ArtistsListView_SelectionChanged" SelectionMode="Single" Background="Transparent">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="mod:AlbumArtist">
                             <Grid>
@@ -127,7 +76,6 @@
                         -->
                         </Style>
                     </ListView.ItemContainerStyle>
-
                 </ListView>
             </Grid>
 
@@ -143,7 +91,66 @@
             </controls:GridSplitter>
             
             <Grid Grid.Column="1">
-                <ScrollViewer x:Name="SelectedArtistAlbumsScrollViewer" Margin="0,24,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Column="0" Margin="24,24,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{x:Bind ViewModel.SelectedAlbumArtist.Name, Mode=OneWay}" FontSize="{StaticResource FontSizePageTitle}" FontWeight="SemiBold" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Column="1" FontSize="{StaticResource FontSizePageSubTitle}" Text="{x:Bind ViewModel.ArtistPageSubTitleArtistAlbumCount, Mode=OneWay}" VerticalAlignment="Bottom" Padding="48,0,0,4" Opacity="0.7"/>
+                </Grid>
+                
+                <!-- Page controls -->
+                <Grid Grid.Row="1" Margin="24,12,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Play and AddTo buttons -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <!-- Play -->
+                        <Button Margin="0,0,8,0" Height="36" Command="{x:Bind ViewModel.SelectedAlbumArtistPlayAllCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.SelectedAlbumArtist, Mode=OneWay}">
+                            <StackPanel Orientation="Horizontal">
+                                <Viewbox Width="14" Height="14">
+                                    <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M5.74514 3.06445C5.41183 2.87696 5 3.11781 5 3.50023V12.5005C5 12.8829 5.41182 13.1238 5.74512 12.9363L13.7454 8.43631C14.0852 8.24517 14.0852 7.75589 13.7454 7.56474L5.74514 3.06445ZM4 3.50023C4 2.35298 5.2355 1.63041 6.23541 2.19288L14.2357 6.69317C15.2551 7.26664 15.2551 8.73446 14.2356 9.3079L6.23537 13.8079C5.23546 14.3703 4 13.6477 4 12.5005V3.50023Z"/>
+                                </Viewbox>
+                                <TextBlock x:Uid="PageMenu_PlayAll" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <!-- Add to queue-->
+                        <Button Margin="8,0,8,0" Height="36" Command="{x:Bind ViewModel.SelectedAlbumArtistAddToQueueCommand}" CommandParameter="{x:Bind ViewModel.SelectedAlbumArtist, Mode=OneWay}" >
+                            <StackPanel Orientation="Horizontal">
+                                <Viewbox Width="14" Height="14">
+                                    <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z"/>
+                                </Viewbox>
+                                <TextBlock x:Uid="PageMenu_AddToQueue" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <!-- Add to playlist -->
+                        <Button Margin="8,0,8,0" Height="36" Command="{x:Bind ViewModel.SelectedAlbumArtistAddToPlaylistCommand}" CommandParameter="{x:Bind ViewModel.SelectedAlbumArtist, Mode=OneWay}">
+                            <StackPanel Orientation="Horizontal">
+                                <Viewbox Width="14" Height="14">
+                                    <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z"/>
+                                </Viewbox>
+                                <TextBlock x:Uid="PageMenu_AddToPlaylist" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- etc buttons-->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+
+                    </StackPanel>
+                </Grid>
+
+                <ScrollViewer x:Name="SelectedArtistAlbumsScrollViewer" Grid.Row="2" Margin="10,36,0,0">
                     <ItemsControl ItemsSource="{x:Bind ViewModel.SelectedArtistAlbums, Mode=OneWay}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -337,7 +344,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="48,0,48,0" />
-                        <Setter Target="BodyGrid.Margin" Value="20,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="44,0,0,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -346,7 +353,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="24,0,24,0" />
-                        <Setter Target="BodyGrid.Margin" Value="0,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="20,0,0,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -355,7 +362,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="16,0,16,0" />
-                        <Setter Target="BodyGrid.Margin" Value="0,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="13,0,0,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -364,7 +371,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="16,0,16,0" />
-                        <Setter Target="BodyGrid.Margin" Value="0,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="13,0,0,0" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

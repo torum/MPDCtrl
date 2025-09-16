@@ -28,29 +28,50 @@
     </Page.Resources>
     <Grid x:Name="ContentGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="118"/>
+            <RowDefinition Height="43"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" x:Name="HeaderGrid" Margin="24,0,24,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <!-- Page title -->
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0" x:Uid="PageTitle_Albums" FontSize="{StaticResource FontSizePageTitle}" FontWeight="SemiBold"/>
                 <TextBlock Grid.Column="1" FontSize="{StaticResource FontSizePageSubTitle}" Text="{x:Bind ViewModel.AlbumPageSubTitleAlbumCount, Mode=OneWay}" VerticalAlignment="Bottom" Padding="48,0,0,4" Opacity="0.7"/>
+
+                <!-- Sort-->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <Button Height="36" Width="38" Margin="0" x:Uid="PageMenu_Sort">
+                        <StackPanel Orientation="Horizontal">
+                            <Viewbox Width="14" Height="14" Margin="0,0,6,0">
+                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M4.85355 2.14645C4.65829 1.95118 4.34171 1.95118 4.14645 2.14645L1.14645 5.14645C0.951184 5.34171 0.951184 5.65829 1.14645 5.85355C1.34171 6.04882 1.65829 6.04882 1.85355 5.85355L4 3.70711V13.5C4 13.7761 4.22386 14 4.5 14C4.77614 14 5 13.7761 5 13.5V3.70711L7.14645 5.85355C7.34171 6.04882 7.65829 6.04882 7.85355 5.85355C8.04882 5.65829 8.04882 5.34171 7.85355 5.14645L4.85355 2.14645ZM11.1525 13.8595C11.3463 14.0468 11.6537 14.0468 11.8475 13.8595L14.8475 10.9594C15.0461 10.7675 15.0514 10.4509 14.8595 10.2524C14.6676 10.0538 14.351 10.0485 14.1525 10.2404L12 12.3212L12 2.5001C12 2.22395 11.7761 2.0001 11.5 2.0001C11.2239 2.0001 11 2.22395 11 2.5001L11 12.3212L8.84752 10.2404C8.64898 10.0485 8.33244 10.0538 8.14051 10.2524C7.94858 10.4509 7.95394 10.7675 8.15248 10.9594L11.1525 13.8595Z"/>
+                            </Viewbox>
+                            <TextBlock x:Uid="PageMenu_Sort" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center" Visibility="Collapsed"/>
+                        </StackPanel>
+                        <Button.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Album" Command="{x:Bind ViewModel.AlbumsSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="album" />
+                                <MenuFlyoutItem x:Uid="ListviewColumnHeader_Artist" Command="{x:Bind ViewModel.AlbumsSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="artist" />
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem x:Uid="PageMenu_ReverseSort" Command="{x:Bind ViewModel.AlbumsSortByCommand}" CommandParameter="{Binding  Path=Tag, RelativeSource={RelativeSource Self}}" Tag="reverse" />
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
             </Grid>
 
             <!-- Page controls -->
-            <Grid Grid.Row="1" Margin="0,24,0,14">
+            <Grid Grid.Row="1" Margin="0,24,0,14" Background="Red" Visibility="Collapsed">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />

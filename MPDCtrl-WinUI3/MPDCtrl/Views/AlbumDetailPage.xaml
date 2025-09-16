@@ -68,9 +68,18 @@
                         <StackPanel Grid.Row="0" Margin="24,0,0,0" Spacing="4">
                             <TextBlock Text="{x:Bind ViewModel.SelectedAlbum.Name, Mode=OneWay}" FontSize="24" FontWeight="Bold" TextWrapping="WrapWholeWords"/>
                             <StackPanel Orientation="Horizontal">
+                                <!--
                                 <TextBlock Text="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay}" FontWeight="SemiBold" TextWrapping="WrapWholeWords" Opacity="0.9" Visibility="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=False}"/>
-                                <TextBlock x:Uid="Text_UnknownArtist" TextWrapping="WrapWholeWords" Opacity="0.6" Visibility="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=True}" />
+                                -->
+                                <Button Command="{x:Bind ViewModel.SelectedAlbumGoToArtistPageCommand}" CommandParameter="{x:Bind ViewModel.SelectedAlbum, Mode=OneWay}" Visibility="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=False}" Background="Transparent" BorderThickness="0">
+                                    <TextBlock Text="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay}" FontWeight="SemiBold" TextWrapping="WrapWholeWords" Opacity="0.9"/>
+                                </Button>
+
+                                <TextBlock x:Uid="Text_UnknownArtist" TextWrapping="WrapWholeWords" Opacity="0.6" Margin="12,0,0,0" Visibility="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=True}" />
                             </StackPanel>
+
+                            <TextBlock FontSize="{StaticResource FontSizePageSubTitle}" Text="{x:Bind ViewModel.AlbumPageSubTitleSelectedAlbumSongsCount, Mode=OneWay}" Opacity="0.9" Margin="12,0,0,0"/>
+
                         </StackPanel>
 
                         <!-- Page controls -->
@@ -238,7 +247,8 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="48,0,48,0" />
-                        <Setter Target="BodyGrid.Margin" Value="48,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="44,0,0,0" />
+                        <Setter Target="AlbumSongsListView.Padding" Value="0,0,44,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -247,7 +257,8 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="48,0,48,0" />
-                        <Setter Target="BodyGrid.Margin" Value="48,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="44,0,0,0" />
+                        <Setter Target="AlbumSongsListView.Padding" Value="0,0,44,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -256,7 +267,8 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="24,0,24,0" />
-                        <Setter Target="BodyGrid.Margin" Value="24,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="20,0,0,0" />
+                        <Setter Target="AlbumSongsListView.Padding" Value="0,0,20,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -265,7 +277,8 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="16,0,16,0" />
-                        <Setter Target="BodyGrid.Margin" Value="16,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="13,0,0,0" />
+                        <Setter Target="AlbumSongsListView.Padding" Value="0,0,13,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -274,7 +287,8 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="16,0,16,0" />
-                        <Setter Target="BodyGrid.Margin" Value="16,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="13,0,0,0" />
+                        <Setter Target="AlbumSongsListView.Padding" Value="0,0,13,0" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

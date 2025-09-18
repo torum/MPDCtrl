@@ -28,7 +28,6 @@ public sealed partial class SearchPage : Page
     public SearchPage()
     {
         ViewModel = App.GetService<MainViewModel>();
-
         InitializeComponent();
     }
 

@@ -45,13 +45,15 @@
                     <!-- App title and icon -->
                     <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0" Margin="12,0,0,0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- App icon and app name -->
+                        <StackPanel Grid.Column="0" Margin="12,0,0,0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                             <Image Source="/Assets/MPDCtrl.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Width="18" Height="18" Margin="0,0,0,0"/>
-                            <TextBlock Text="MPDCtrl" Margin="6,-2,0,0" VerticalAlignment="Center" Opacity="0.9"/>
+                            <TextBlock Text="MPDCtrl" Margin="6,0,0,0" VerticalAlignment="Center" Opacity="0.9" FontSize="12"/>
                         </StackPanel>
+                        <!-- Progress ring -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="12,0,12,0">
 
                             <ProgressRing IsActive="{x:Bind ViewModel.IsWorking, Mode=OneWay}" Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center" />

@@ -33,6 +33,7 @@ using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Input;
@@ -1454,7 +1455,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private ObservableCollection<SongInfo>? _selectedAlbumSongs = [];
+    private readonly ObservableCollection<SongInfo>? _selectedAlbumSongs = [];
     public ObservableCollection<SongInfo>? SelectedAlbumSongs
     {
         get
@@ -3884,12 +3885,31 @@ public partial class MainViewModel : ObservableObject
                     Debug.WriteLine($"GetAlbumPictures: album.Name is null or empty, skipping. {album.AlbumArtist}");
                     continue;
                 }
-
-                var strArtist = EscapeFilePathNames(album.AlbumArtist).Trim();
-                var strAlbum = EscapeFilePathNames(album.Name).Trim();
+                /*
+                var strArtist = SanitizeFilename(album.AlbumArtist).Trim();
+                var strAlbum = SanitizeFilename(album.Name).Trim();
                 if (string.IsNullOrEmpty(strArtist))
                 {
                     strArtist = "Unknown Artist";
+                }
+                */
+                var strArtist = album.AlbumArtist.Trim();
+                var strAlbum = album.Name.Trim();
+                if (string.IsNullOrEmpty(strArtist))
+                {
+                    strArtist = "Unknown Artist";
+                }
+                else
+                {
+                    strArtist = SanitizeFilename(strArtist);
+                }
+                if (string.IsNullOrEmpty(strAlbum))
+                {
+                    strAlbum = "Unknown Album";
+                }
+                else
+                {
+                    strAlbum = SanitizeFilename(strAlbum);
                 }
 
                 string filePath = System.IO.Path.Combine(App.AppDataCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".bmp";
@@ -4140,6 +4160,45 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
 
+            var strArtist = current?.AlbumArtist.Trim();
+            var strAlbum = current?.Album ?? string.Empty;
+            if (string.IsNullOrEmpty(strArtist))
+            {
+                strArtist = "Unknown Artist";
+            }
+            else
+            {
+                strArtist = SanitizeFilename(strArtist);
+            }
+            if (string.IsNullOrEmpty(strAlbum))
+            {
+                strAlbum = "Unknown Album";
+            }
+            else
+            {
+                strAlbum = SanitizeFilename(strAlbum);
+            }
+
+            string strDirPath = System.IO.Path.Combine(App.AppDataCacheFolder, strArtist);
+            string filePath = System.IO.Path.Combine(App.AppDataCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".bmp";
+            try
+            {
+                
+                //album?.AlbumImageSource?.Save(filePath, 100);
+                if (album?.BinaryData is not null)
+                {
+                    Directory.CreateDirectory(strDirPath);
+                    File.WriteAllBytes(filePath, album.BinaryData);
+                    //Debug.WriteLine($"SaveAlbumCoverImage: Successfully saved album art for {filePath}");
+                }
+                //Debug.WriteLine($"SaveAlbumCoverImage: saved album art {strArtist}, {strAlbum}");
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("SaveAlbumCoverImage: Exception while saving album art: " + e.Message);
+            }
+
+            /*
             // save album cover to cache.
             var strAlbum = current?.Album ?? string.Empty;
             if (!string.IsNullOrEmpty(strAlbum.Trim()))
@@ -4154,8 +4213,12 @@ public partial class MainViewModel : ObservableObject
                 {
                     strArtist = "Unknown Artist";
                 }
-                strArtist = EscapeFilePathNames(strArtist).Trim();
-                strAlbum = EscapeFilePathNames(strAlbum).Trim();
+                if (string.IsNullOrEmpty(strAlbum))
+                {
+                    strAlbum = "Unknown Album";
+                }
+                strArtist = SanitizeFilename(strArtist).Trim();
+                strAlbum = SanitizeFilename(strAlbum).Trim();
 
                 string strDirPath = System.IO.Path.Combine(App.AppDataCacheFolder, strArtist);
                 string filePath = System.IO.Path.Combine(App.AppDataCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".bmp";
@@ -4176,9 +4239,11 @@ public partial class MainViewModel : ObservableObject
                     Debug.WriteLine("SaveAlbumCoverImage: Exception while saving album art: " + e.Message);
                 }
             }
+            */
         });
     }
 
+    /*
     private static string EscapeFilePathNames(string str)
     {
         string s = str.Replace("<", "LT");
@@ -4191,8 +4256,42 @@ public partial class MainViewModel : ObservableObject
         s = s.Replace("|", "PIP");
         s = s.Replace("?", "QM");
         s = s.Replace("*", "ASTR");
+        s = s.Replace("@", "AT");
 
         return s;
+    }
+    */
+
+    public static string SanitizeFilename(string name)
+    {
+        // 1. Get the list of invalid characters for the current system
+        // and add additional common invalid path characters.
+        char[] invalidChars = Path.GetInvalidFileNameChars();
+
+        // 2. Create a regex pattern to match invalid characters.
+        // We escape the characters to ensure they are interpreted literally.
+        string invalidCharsPattern = "[" + Regex.Escape(new string(invalidChars)) + "]";
+
+        // 3. Replace all invalid characters with the replacement character.
+        string sanitizedName = Regex.Replace(name, invalidCharsPattern, "_");
+
+        // 4. Handle reserved Windows filenames (e.g., CON, PRN, NUL).
+        string[] reservedNames = ["CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"];
+        if (Array.Exists(reservedNames, s => s.Equals(sanitizedName, StringComparison.OrdinalIgnoreCase)))
+        {
+            sanitizedName = $"_{sanitizedName}_";
+        }
+
+        // 5. Trim trailing periods and spaces, which are invalid on Windows.
+        sanitizedName = sanitizedName.TrimEnd('.', ' ');
+
+        // 6. Ensure the filename isn't empty after sanitizing.
+        if (string.IsNullOrWhiteSpace(sanitizedName))
+        {
+            return "Untitled";
+        }
+
+        return sanitizedName;
     }
 
     private async Task<CommandSearchResult> SearchAlbumSongs(string name)

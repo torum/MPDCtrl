@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.ApplicationSettings;
+using WinRT.Interop;
 
 namespace MPDCtrl;
 
@@ -44,7 +46,6 @@ public partial class App : Application
     private static readonly string _envAppLocalAppFolder = System.IO.Path.Combine((System.IO.Path.Combine(_envAppLocalFolder, _appDeveloper)), AppName);
     public static string AppDataCacheFolder { get; } = System.IO.Path.Combine(_envAppLocalAppFolder, "AlbumCoverCache");
 
-
     // ErrorLog
     private static readonly string _logFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl4_errors.txt";
 
@@ -53,7 +54,6 @@ public partial class App : Application
     {
         get; private set;
     }
-
 
     public IHost Host
     {
@@ -157,13 +157,38 @@ public partial class App : Application
 
     private void App_Activated(object? sender, Microsoft.Windows.AppLifecycle.AppActivationArguments e)
     {
+        if (MainWnd is null)
+        {
+            return;
+        }
+
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
             MainWnd?.Activate();
-            // TODO:
+
             //MainWindow?.BringToFront();
+            if (MainWnd is not null)
+            {
+                IntPtr hWnd = WindowNative.GetWindowHandle(MainWnd);
+                ShowWindow(hWnd, SW_RESTORE); // Ensure it's not minimized
+                SetForegroundWindow(hWnd); // Attempt to set it as the foreground window
+            }
         });
     }
+
+    #region ==  ==
+
+    const int SW_RESTORE = 9; // Restores a minimized window and brings it to the foreground.
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool SetForegroundWindow(IntPtr hWnd);
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    #endregion
 
     #region == UnhandledException ==
 

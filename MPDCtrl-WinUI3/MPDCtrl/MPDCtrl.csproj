@@ -13,8 +13,19 @@
     <Nullable>enable</Nullable>
 	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 
+	  <PublishAot>true</PublishAot>
+	  <SelfContained>true</SelfContained>
+
+
 	  <ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
   </PropertyGroup>
+  <!--
+	<PropertyGroup>
+	  <PublishSingleFile>true</PublishSingleFile>
+		<WindowsPackageType>None</WindowsPackageType>
+	</PropertyGroup>
+  -->
+	
   <ItemGroup>
     <Content Remove="Assets\BadgeLogo.scale-100.png" />
     <Content Remove="Assets\BadgeLogo.scale-125.png" />

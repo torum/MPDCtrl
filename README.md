@@ -2,7 +2,7 @@
 
 MPDCtrl is a Windows desktop client app for [MPD (Music player daemon)](http://www.musicpd.org/). 
 
-MPDCtrl v4 is comming! It is entirely rewritten with latest WinUI3.
+MPDCtrl v4 is comming! The GUI is entirely rewritten with latest WinUI3.
 
 ![MPDCtrl4](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v4/MPDCtrl4.png?raw=true) 
 

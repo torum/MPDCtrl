@@ -99,7 +99,7 @@ public class DialogService : IDialogService
         return null;
     }
 
-    public async Task<RenameDialogResult?> ShowRenameDialog(ViewModels.MainViewModel vm)
+    public async Task<RenameDialogResult?> ShowRenameToDialog(ViewModels.MainViewModel vm)
     {
         if (App.MainWnd is null)
         {
@@ -120,13 +120,13 @@ public class DialogService : IDialogService
             DefaultButton = ContentDialogButton.Primary,
             IsSecondaryButtonEnabled = false,
             CloseButtonText = _resourceLoader.GetString("Dialog_Cancel"),
-            Content = new Views.Dialogs.RenameDialog()
+            Content = new Views.Dialogs.RenameToDialog()
             {
                 //DataContext = new DialogViewModel()
             }
         };
 
-        if (dialog.Content is not RenameDialog dialogContent)
+        if (dialog.Content is not RenameToDialog dialogContent)
         {
             return null;
         }

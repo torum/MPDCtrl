@@ -93,7 +93,7 @@ public partial class App : Application
         {
             // Core Services
             services.AddSingleton<IMpcService, MpcService>();
-            services.AddSingleton<IBinaryDownloader, BinaryDownloader>();
+            services.AddSingleton<IMpcBinaryService, MpcBinaryService>();
             services.AddSingleton<IDialogService, DialogService>();
 
             // Views and ViewModels

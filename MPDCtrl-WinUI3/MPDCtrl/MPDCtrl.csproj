@@ -85,7 +85,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Views\Dialogs\AddToDialog.xaml" />
-    <None Remove="Views\Dialogs\RenameDialog.xaml" />
     <None Remove="Views\ShellPage.xaml" />
   </ItemGroup>
 
@@ -130,7 +129,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Dialogs\RenameDialog.xaml">
+    <Page Update="Views\Dialogs\RenameToDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

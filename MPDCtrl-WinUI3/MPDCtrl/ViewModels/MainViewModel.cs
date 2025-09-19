@@ -29,7 +29,6 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography;
 using System.Text;
@@ -40,7 +39,6 @@ using System.Windows.Input;
 using System.Xml;
 using System.Xml.Linq;
 using Windows.ApplicationModel;
-using Windows.ApplicationModel.ConversationalAgent;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
 using Windows.Media.Core;
@@ -48,7 +46,6 @@ using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using WinRT.Interop;
-using static CommunityToolkit.WinUI.Animations.Expressions.ExpressionValues;
 
 namespace MPDCtrl.ViewModels;
 
@@ -2244,12 +2241,12 @@ public partial class MainViewModel : ObservableObject
     private readonly ResourceLoader _resourceLoader = new();
 
     private readonly IMpcService _mpc;
-    private readonly IDialogService _dialog;
+    private readonly IDialogService _dialogs;
 
     public MainViewModel(IMpcService mpcService, IDialogService dialogService)
     {
         _mpc = mpcService;
-        _dialog = dialogService;
+        _dialogs = dialogService;
 
         InitializeAndSubscribe();
 
@@ -2420,7 +2417,7 @@ public partial class MainViewModel : ObservableObject
 
         IsBusy = false;
 
-        await Task.Delay(500);
+        await Task.Delay(300);
 
         // MPD protocol ver check.
         if (_mpc.MpdVerText != "")
@@ -5270,7 +5267,7 @@ public partial class MainViewModel : ObservableObject
     {
         if (Queue.Count == 0) return;
 
-        var result = await _dialog.ShowAddToDialog(this);
+        var result = await _dialogs.ShowAddToDialog(this);
 
         if (result is null)
         {
@@ -5322,7 +5319,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var result = await _dialog.ShowAddToDialog(this);
+        var result = await _dialogs.ShowAddToDialog(this);
 
         if (result is null)
         {
@@ -5437,7 +5434,7 @@ public partial class MainViewModel : ObservableObject
             if (uriList.Count > 0)
             {
                 //SearchPageAddToPlaylistDialogShow?.Invoke(this, uriList);
-                var result = await _dialog.ShowAddToDialog(this);
+                var result = await _dialogs.ShowAddToDialog(this);
 
                 if (result is null)
                 {
@@ -5513,7 +5510,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var result = await _dialog.ShowAddToDialog(this);
+        var result = await _dialogs.ShowAddToDialog(this);
 
         if (result is null)
         {
@@ -6020,7 +6017,7 @@ public partial class MainViewModel : ObservableObject
 
         if (uriList.Count > 0)
         {
-            var result = await _dialog.ShowAddToDialog(this);
+            var result = await _dialogs.ShowAddToDialog(this);
 
             if (result is null)
             {
@@ -6117,7 +6114,7 @@ public partial class MainViewModel : ObservableObject
             if (uriList.Count > 0)
             {
                 //SearchPageAddToPlaylistDialogShow?.Invoke(this, uriList);
-                var result = await _dialog.ShowAddToDialog(this);
+                var result = await _dialogs.ShowAddToDialog(this);
 
                 if (result is null)
                 {
@@ -6223,7 +6220,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var result = await _dialog.ShowAddToDialog(this);
+        var result = await _dialogs.ShowAddToDialog(this);
 
         if (result is null)
         {
@@ -6317,7 +6314,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var result = await _dialog.ShowRenameDialog(this);
+        var result = await _dialogs.ShowRenameToDialog(this);
 
         if (result is null)
         {

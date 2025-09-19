@@ -20,7 +20,7 @@ using Windows.Storage.Streams;
 
 namespace MPDCtrl.Services;
 
-public class BinaryDownloader : IBinaryDownloader
+public class MpcBinaryService : IMpcBinaryService
 {
     private static TcpClient _binaryConnection = new();
     private StreamReader? _binaryReader;
@@ -34,7 +34,7 @@ public class BinaryDownloader : IBinaryDownloader
 
     private string? MpdVersion { get; set; }
 
-    public BinaryDownloader()
+    public MpcBinaryService()
     {
 
     }

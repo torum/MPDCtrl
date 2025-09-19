@@ -15,11 +15,11 @@ using Windows.Foundation.Collections;
 
 namespace MPDCtrl.Views.Dialogs;
 
-public sealed partial class RenameDialog : Page
+public sealed partial class RenameToDialog : Page
 {
     public string TextBoxPlaylistNameText = string.Empty;
 
-    public RenameDialog()
+    public RenameToDialog()
     {
         InitializeComponent();
     }

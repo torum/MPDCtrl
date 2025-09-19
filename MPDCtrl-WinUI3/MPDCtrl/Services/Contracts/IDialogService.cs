@@ -12,5 +12,5 @@ public interface IDialogService
 {
     Task<AddToDialogResult?> ShowAddToDialog(ViewModels.MainViewModel vm);
 
-    Task<RenameDialogResult?> ShowRenameDialog(ViewModels.MainViewModel vm);
+    Task<RenameDialogResult?> ShowRenameToDialog(ViewModels.MainViewModel vm);
 }

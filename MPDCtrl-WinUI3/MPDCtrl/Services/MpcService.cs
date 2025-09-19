@@ -164,9 +164,9 @@ public partial class MpcService : IMpcService
     private static readonly System.Threading.SemaphoreSlim _semaphoreCommand = new(1, 1);
     private static readonly System.Threading.SemaphoreSlim _semaphoreBinary = new(1, 1);
 
-    private readonly IBinaryDownloader _binaryDownloader;
+    private readonly IMpcBinaryService _binaryDownloader;
 
-    public MpcService(IBinaryDownloader binaryDownloader)
+    public MpcService(IMpcBinaryService binaryDownloader)
     {
         _binaryDownloader = binaryDownloader;
     }

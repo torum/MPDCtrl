@@ -390,4 +390,19 @@
   <data name="AlbumPage_SubTitle_SelectedAlbumSongsCount" xml:space="preserve">
     <value>{0}曲</value>
   </data>
+  <data name="ConnectionSettings_Host.Header" xml:space="preserve">
+    <value>ホスト</value>
+  </data>
+  <data name="ConnectionSettings_Port.Header" xml:space="preserve">
+    <value>ポート</value>
+  </data>
+  <data name="ConnectionSettings_Password.Header" xml:space="preserve">
+    <value>パスワード</value>
+  </data>
+  <data name="InitialSetupWindow_Subtitle.Text" xml:space="preserve">
+    <value>初期設定</value>
+  </data>
+  <data name="InitialSetupWindow_Description.Text" xml:space="preserve">
+    <value>MPDCtrlを利用するには、MPD (Music Player Daemon)がローカルPCまたはリモートサーバー等で（できればサービス・デーモンとして）動作している必要があります。</value>
+  </data>
 </root>

@@ -11,6 +11,7 @@
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
     NavigationCacheMode="Required"
     mc:Ignorable="d"
+    Loaded="Page_Loaded"
     PreviewKeyDown="Page_PreviewKeyDown" PreviewKeyUp="Page_PreviewKeyUp">
     <Grid>
         <Grid.RowDefinitions>

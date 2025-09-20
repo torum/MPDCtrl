@@ -34,12 +34,9 @@ public sealed partial class ShellPage : Page
     public ShellPage()
     {
         ViewModel = App.GetService<MainViewModel>();
-        
         //DataContext = ViewModel;
 
         InitializeComponent();
-
-        //AppTitleBar.SizeChanged += AppTitleBar_SizeChanged; <-This does not allways fire. Use diffrent grid and use navigated event.
 
         ViewModel.AlbumSelectedNavigateToDetailsPage += this.OnAlbumSelectedNavigateToDetailsPage;
         ViewModel.GoBackButtonVisibilityChanged += this.OnGoBackButtonVisibilityChanged;
@@ -48,28 +45,30 @@ public sealed partial class ShellPage : Page
         ViewModel.DebugCommandClear += this.OnDebugCommandClear;
         ViewModel.DebugIdleClear += this.OnDebugIdleClear;
 
-        /*
-        //NavigationFrame.Content = App.GetService<QueuePage>(); <- not good because this create instance in addition to navigation view.
+        this.ActualThemeChanged += this.This_ActualThemeChanged;
+
+        // Not good because this create instance in addition to navigation view.
+        //NavigationFrame.Content = App.GetService<QueuePage>(); 
+
         if (NavigationFrame.Navigate(typeof(QueuePage), NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
         {
             _currentPage = typeof(QueuePage);
-            var queuepage = ViewModel.MainMenuItems.FirstOrDefault();
-            if (queuepage != null)
+            var queuePage = ViewModel.MainMenuItems.FirstOrDefault();
+            if (queuePage != null)
             {
-                queuepage.Selected = true;
+                queuePage.Selected = true;
             }
         }
-        */
 
-        this.ActualThemeChanged += this.This_ActualThemeChanged;
-
-        //
-        ViewModel.StartMPC();
+        // Do this at shell page loaded event after everything is initilized even App.MainWnd in app.xaml.cs.
+        // It is too early here to show dialogs.
+        //ViewModel.StartMPC();
     }
 
     private void AppTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        // Update interactive regions if the size of the window changes.
+        // This does not allways fire. We might need to use diffrent grid and use navigated event.
+        // Update interactive regions (for backbutton) if the size of the window changes.
         SetRegionsForCustomTitleBar();
     }
 
@@ -159,6 +158,9 @@ public sealed partial class ShellPage : Page
         wnd.SetTitleBar(AppTitleBar);
 
         //SetRegionsForCustomTitleBar();
+
+        // Do this after everything is initilized even App.MainWnd in app.xaml.cs.
+        //ViewModel.StartMPC(this.XamlRoot);
     }
 
     private readonly StringBuilder _sbCommandOutput = new();
@@ -230,22 +232,17 @@ public sealed partial class ShellPage : Page
     private void NavigationView_Loaded(object sender, RoutedEventArgs e)
     {
         /*
-        var selected = ViewModel.MainMenuItems.FirstOrDefault();
-        if (selected != null)
-        {
-            selected.Selected = true;
-            //Debug.WriteLine("NavigationView_Loaded and selected");
-        }
-        */
+         *  Move to constructor. It should be fine.
         if (NavigationFrame.Navigate(typeof(QueuePage), NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
         {
             _currentPage = typeof(QueuePage);
-            var queuepage = ViewModel.MainMenuItems.FirstOrDefault();
-            if (queuepage != null)
+            var queuePage = ViewModel.MainMenuItems.FirstOrDefault();
+            if (queuePage != null)
             {
-                queuepage.Selected = true;
+                queuePage.Selected = true;
             }
         }
+        */
     }
 
     private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
@@ -566,5 +563,12 @@ public sealed partial class ShellPage : Page
 
         // Optional: Prevent the event from bubbling up to parent controls
         e.Handled = true;
+    }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage)
+        // is loaded, initialized, set, drawn, navigated. So start the connection.
+        ViewModel.StartMPC();
     }
 }

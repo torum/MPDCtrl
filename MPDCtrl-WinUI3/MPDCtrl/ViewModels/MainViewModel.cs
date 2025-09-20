@@ -129,6 +129,40 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private Profile? _selectedProfile;
+    public Profile? SelectedProfile
+    {
+        get
+        {
+            return _selectedProfile;
+        }
+        set
+        {
+            if (_selectedProfile == value)
+                return;
+
+            _selectedProfile = value;
+
+            OnPropertyChanged(nameof(SelectedProfile));
+        }
+    }
+
+    private bool _setIsDefault = true;
+    public bool SetIsDefault
+    {
+        get { return _setIsDefault; }
+        set
+        {
+            if (_setIsDefault == value)
+                return;
+
+            _setIsDefault = value;
+
+            OnPropertyChanged(nameof(SetIsDefault));
+        }
+    }
+
+    /*
     private bool _isRememberAsProfile = true;
     public bool IsRememberAsProfile
     {
@@ -145,6 +179,7 @@ public partial class MainViewModel : ObservableObject
             OnPropertyChanged(nameof(IsRememberAsProfile));
         }
     }
+    */
 
     private string _host = "";
     public string Host
@@ -2312,13 +2347,42 @@ public partial class MainViewModel : ObservableObject
             ];
     }
 
-    public void StartMPC()
+    public async void StartMPC()
     {
+        if (CurrentProfile is null)
+        {
+            //ConnectionStatusMessage = MPDCtrlX.Properties.Resources.Init_NewConnectionSetting; // no need. 
+
+            //StatusButton = _pathNewConnectionButton;
+
+            var pro = await _dialogs.ShowInitDialog(this);
+            if (pro is null)
+            {
+                return;
+            }
+
+            _password = pro.Password;
+            _host = pro.Host;
+            _port = pro.Port;
+
+            CurrentProfile = pro;
+
+            Start(_host, _port);
+
+            return;
+        }
+
+
+        //return;
+
+
+        /*
         _password = "hoge";
         _host = "127.0.0.1";
         //_host = "192.168.";
         _port = 6600;
         Start(_host, _port);
+        */
     }
 
     private async void Start(string host, int port)
@@ -4240,25 +4304,6 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    /*
-    private static string EscapeFilePathNames(string str)
-    {
-        string s = str.Replace("<", "LT");
-        s = s.Replace(">", "GT");
-        s = s.Replace(":", "COL");
-        s = s.Replace("\"", "DQ");
-        s = s.Replace("/", "FS");
-        s = s.Replace("\\", "BS");
-        s = s.Replace("/", "FS");
-        s = s.Replace("|", "PIP");
-        s = s.Replace("?", "QM");
-        s = s.Replace("*", "ASTR");
-        s = s.Replace("@", "AT");
-
-        return s;
-    }
-    */
-
     public static string SanitizeFilename(string name)
     {
         // 1. Get the list of invalid characters for the current system
@@ -4378,7 +4423,8 @@ public partial class MainViewModel : ObservableObject
     {
         Debug.WriteLine("OK MPD " + _mpc.MpdVerText + " @OnMpdConnected");
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        // TODO: this won't be called because MainWnd is not yet init.
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue( () =>
         {
             MpdVersion = _mpc.MpdVerText;
 
@@ -4391,7 +4437,9 @@ public partial class MainViewModel : ObservableObject
 
             IsShowAckWindow = false;
             IsShowErrWindow = false;
+
         });
+
 
         /*
         // Connected from InitWindow, so save and clean up. 
@@ -6496,6 +6544,8 @@ public partial class MainViewModel : ObservableObject
             return;
         }
     }
+
+
 
     #endregion
 }

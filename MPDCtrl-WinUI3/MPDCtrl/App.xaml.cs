@@ -71,7 +71,6 @@ public partial class App : Application
         return service;
     }
 
-
     public App()
     {
         // Only works in packaged environment.
@@ -151,7 +150,7 @@ public partial class App : Application
         // Too late here. In order to set themes, sets content in MainWindow constructor.
         //MainWnd.Content = App.GetService<ShellPage>();
 
-        //MainWindow?.Activate(); // Activate won't work..
+        //MainWnd.Activate(); // Activate won't work..
         MainWnd.AppWindow.Show();
     }
 
@@ -164,11 +163,11 @@ public partial class App : Application
 
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
-            MainWnd?.Activate();
-
-            //MainWindow?.BringToFront();
             if (MainWnd is not null)
             {
+                MainWnd.Activate();
+
+                //MainWindow?.BringToFront();
                 IntPtr hWnd = WindowNative.GetWindowHandle(MainWnd);
                 ShowWindow(hWnd, SW_RESTORE); // Ensure it's not minimized
                 SetForegroundWindow(hWnd); // Attempt to set it as the foreground window
@@ -176,7 +175,7 @@ public partial class App : Application
         });
     }
 
-    #region ==  ==
+    #region == BringToFront ==
 
     const int SW_RESTORE = 9; // Restores a minimized window and brings it to the foreground.
 

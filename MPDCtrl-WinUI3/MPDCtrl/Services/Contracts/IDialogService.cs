@@ -1,4 +1,6 @@
-﻿using MPDCtrl.ViewModels;
+﻿using Microsoft.UI.Xaml;
+using MPDCtrl.Models;
+using MPDCtrl.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +12,8 @@ namespace MPDCtrl.Services.Contracts;
 
 public interface IDialogService
 {
+    Task<Profile?> ShowInitDialog(ViewModels.MainViewModel vm);
+
     Task<AddToDialogResult?> ShowAddToDialog(ViewModels.MainViewModel vm);
 
     Task<RenameDialogResult?> ShowRenameToDialog(ViewModels.MainViewModel vm);

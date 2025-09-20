@@ -63,11 +63,11 @@ public sealed partial class MainWindow : Window
 
     public MainWindow()
     {
-        var vm = App.GetService<MainViewModel>();
-        _vm = vm;
-
         // This DispatcherQueue should be alive as long as MainWindow is alive. Make sure to clear when the window is closed.
         _currentDispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+
+        var vm = App.GetService<MainViewModel>();
+        _vm = vm;
 
         if (this.AppWindow.Presenter is OverlappedPresenter presenter)
         {
@@ -95,6 +95,7 @@ public sealed partial class MainWindow : Window
 
             root.CallMeWhenMainWindowIsReady(this);
         }
+
 
         _isGlobalHotKeyEnable = false;
 
@@ -875,14 +876,16 @@ public sealed partial class MainWindow : Window
             }
             xProfile.SetAttributeNode(xAttrs);
 
-
             xProfiles.AppendChild(xProfile);
         }
 
+        root.AppendChild(xProfiles);
+        /*
         if (_vm.IsRememberAsProfile)
         {
             root.AppendChild(xProfiles);
         }
+        */
 
         #endregion
 

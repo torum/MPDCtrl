@@ -30,6 +30,52 @@ public class DialogService : IDialogService
        
     }
 
+    public async Task<Profile?> ShowInitDialog(ViewModels.MainViewModel vm)
+    {
+        if (App.MainWnd is null)
+        {
+            Debug.WriteLine("App.MainWnd is null");
+            return null;
+        }
+
+        if (App.MainWnd.Content is not ShellPage)
+        {
+            Debug.WriteLine("App.MainWnd?.Content is not ShellPage");
+            return null;
+        }
+
+        Debug.WriteLine("ShowInitDialog");
+        var dialog = new ContentDialog
+        {
+            XamlRoot = App.MainWnd.Content.XamlRoot,
+            Title = "MPDCtrl",//_resourceLoader.GetString("Dialog_Title_SelectPlaylist")
+            IsPrimaryButtonEnabled = true,
+            PrimaryButtonText = "Connect",//_resourceLoader.GetString("Dialog_Ok")
+            DefaultButton = ContentDialogButton.Primary,
+            IsSecondaryButtonEnabled = false,
+            CloseButtonText = "Cancel",//_resourceLoader.GetString("Dialog_Cancel")
+            Content = new Views.Dialogs.InitDialog(vm)
+            {
+                //DataContext = vm
+            }
+        };
+
+        if (dialog.Content is not InitDialog dialogContent)
+        {
+            return null;
+        }
+
+        var result = await dialog.ShowAsync();
+
+        if (result != ContentDialogResult.Primary)
+        {
+            return null;
+        }
+
+        return dialogContent.GetProfile();
+
+    }
+
     public async Task<AddToDialogResult?> ShowAddToDialog(ViewModels.MainViewModel vm)
     {
         if (App.MainWnd is null)
@@ -37,14 +83,14 @@ public class DialogService : IDialogService
             return null;
         }
 
-        if (App.MainWnd?.Content is not ShellPage)
+        if (App.MainWnd.Content is not ShellPage)
         {
             return null;
         }
 
         var dialog = new ContentDialog
         {
-            XamlRoot = App.MainWnd?.Content.XamlRoot,
+            XamlRoot = App.MainWnd.Content.XamlRoot,
             Title = _resourceLoader.GetString("Dialog_Title_SelectPlaylist"),
             IsPrimaryButtonEnabled = true,
             PrimaryButtonText = _resourceLoader.GetString("Dialog_Ok"),
@@ -106,14 +152,14 @@ public class DialogService : IDialogService
             return null;
         }
 
-        if (App.MainWnd?.Content is not ShellPage)
+        if (App.MainWnd.Content is not ShellPage)
         {
             return null;
         }
 
         var dialog = new ContentDialog
         {
-            XamlRoot = App.MainWnd?.Content.XamlRoot,
+            XamlRoot = App.MainWnd.Content.XamlRoot,
             Title = _resourceLoader.GetString("Dialog_Title_NewPlaylistName"),
             IsPrimaryButtonEnabled = true,
             PrimaryButtonText = _resourceLoader.GetString("Dialog_Ok"),

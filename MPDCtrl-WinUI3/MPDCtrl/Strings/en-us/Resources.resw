@@ -390,4 +390,34 @@
   <data name="AlbumPage_SubTitle_SelectedAlbumSongsCount" xml:space="preserve">
     <value>{0} songs</value>
   </data>
+  <data name="ConnectionSettings_Host.Header" xml:space="preserve">
+    <value>Host</value>
+  </data>
+  <data name="ConnectionSettings_Port.Header" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="ConnectionSettings_Password.Header" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="InitialSetupWindow_Subtitle.Text" xml:space="preserve">
+    <value>Initial configuration</value>
+  </data>
+  <data name="InitialSetupWindow_Description.Text" xml:space="preserve">
+    <value>MPDCtrl requires MPD (Music Player Daemon) to be installed (localy or remotely) and running preferably as a service (aka daemon).</value>
+  </data>
+  <data name="ConnectionSettings_Host.PlaceholderText" xml:space="preserve">
+    <value>IP address or PC/Server name</value>
+  </data>
+  <data name="ConnectionSettings_Port.PlaceholderText" xml:space="preserve">
+    <value>Default is 6600</value>
+  </data>
+  <data name="ConnectionSettings_Password.PlaceholderText" xml:space="preserve">
+    <value>Optional unless configured otherwise</value>
+  </data>
+  <data name="Dialog_Connect" xml:space="preserve">
+    <value>Connect</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Version</value>
+  </data>
 </root>

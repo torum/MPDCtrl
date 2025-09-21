@@ -63,11 +63,11 @@ public sealed partial class MainWindow : Window
 
     public MainWindow()
     {
-        var vm = App.GetService<MainViewModel>();
-        _vm = vm;
-
         // This DispatcherQueue should be alive as long as MainWindow is alive. Make sure to clear when the window is closed.
         _currentDispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+
+        var vm = App.GetService<MainViewModel>();
+        _vm = vm;
 
         if (this.AppWindow.Presenter is OverlappedPresenter presenter)
         {
@@ -95,6 +95,7 @@ public sealed partial class MainWindow : Window
 
             root.CallMeWhenMainWindowIsReady(this);
         }
+
 
         _isGlobalHotKeyEnable = false;
 
@@ -187,12 +188,13 @@ public sealed partial class MainWindow : Window
 
     private void LoadSettings()
     {
+/*
         var filePath = App.AppConfigFilePath;
         if (RuntimeHelper.IsMSIX)
         {
             filePath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.AppName + ".config");
         }
-
+*/
         if (Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController.IsSupported())
         {
             _vm.IsAcrylicSupported = true;
@@ -206,7 +208,7 @@ public sealed partial class MainWindow : Window
             _vm.IsBackdropEnabled = true;
         }
 
-        if (!System.IO.File.Exists(filePath))
+        if (!System.IO.File.Exists(App.AppConfigFilePath))
         {
             // Sets default.
 
@@ -246,7 +248,7 @@ public sealed partial class MainWindow : Window
         double height = 768;
         double width = 1024;
 
-        var xdoc = XDocument.Load(filePath);
+        var xdoc = XDocument.Load(App.AppConfigFilePath);
 
         // Main window
         if (xdoc.Root != null)
@@ -437,18 +439,18 @@ public sealed partial class MainWindow : Window
                     }
 
                     if (!string.IsNullOrEmpty(pro.Host.Trim()))
-                    {
-                        if (pro.IsDefault)
                         {
-                            _vm.CurrentProfile = pro;
+                            if (pro.IsDefault)
+                            {
+                                _vm.CurrentProfile = pro;
 
-                            //NotifyPropertyChanged(nameof(IsCurrentProfileSet));
-                            //_vm.IsCurrentProfileSet = true;
-                            _vm.Profiles.Add(pro);
+                                // Only add if Hot is present?
+                                _vm.Profiles.Add(pro);
+                            }
                         }
-                    }
                 }
             }
+
             #endregion
         }
 
@@ -458,7 +460,6 @@ public sealed partial class MainWindow : Window
             {
                 var prof = _vm.Profiles.FirstOrDefault(x => x.IsDefault);
                 _vm.CurrentProfile = prof ?? _vm.Profiles[0];
-                //NotifyPropertyChanged(nameof(IsCurrentProfileSet));
             }
         } 
 
@@ -666,6 +667,9 @@ public sealed partial class MainWindow : Window
 
     private void Window_Closed(object sender, WindowEventArgs args)
     {
+        // Disconnect from MPD and close socket connection.
+        _vm.CleanUp();
+
         // For some stupid reason, we needed this, otherwise we get COM error.
         _currentDispatcherQueue = null;
 
@@ -674,8 +678,6 @@ public sealed partial class MainWindow : Window
 
     private void SaveSettings()
     {
-        //var vm = App.GetService<MainViewModel>();
-
         XmlDocument doc = new();
         var xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
         doc.InsertBefore(xmlDeclaration, doc.DocumentElement);
@@ -689,7 +691,8 @@ public sealed partial class MainWindow : Window
         //root.SetAttributeNode(attrs);
         XmlAttribute attrs;
 
-        // Main window
+        #region == Main window ==
+
         // Main Window element
         var mainWindow = doc.CreateElement(string.Empty, "MainWindow", string.Empty);
 
@@ -780,6 +783,7 @@ public sealed partial class MainWindow : Window
         }
         mainWindow.SetAttributeNode(attrs);
 
+        #endregion
 
         #region == MainWindow.Layout ==
 
@@ -803,6 +807,7 @@ public sealed partial class MainWindow : Window
 
         #endregion
 
+        #region == Theme ==
 
         // Themes
         var xTheme = doc.CreateElement(string.Empty, "Theme", string.Empty);
@@ -817,6 +822,10 @@ public sealed partial class MainWindow : Window
 
         root.AppendChild(xTheme);
 
+        #endregion
+
+        #region == Options ==
+
         // Options
         var xOpts = doc.CreateElement(string.Empty, "Opts", string.Empty);
 
@@ -825,6 +834,8 @@ public sealed partial class MainWindow : Window
         //xOpts.SetAttributeNode(attrs);
 
         root.AppendChild(xOpts);
+
+        #endregion
 
         #region == Profiles  ==
 
@@ -875,17 +886,20 @@ public sealed partial class MainWindow : Window
             }
             xProfile.SetAttributeNode(xAttrs);
 
-
             xProfiles.AppendChild(xProfile);
         }
 
+        root.AppendChild(xProfiles);
+        /*
         if (_vm.IsRememberAsProfile)
         {
             root.AppendChild(xProfiles);
         }
+        */
 
         #endregion
 
+        /*
         var filePath = App.AppConfigFilePath;
         if (RuntimeHelper.IsMSIX)
         {
@@ -895,16 +909,21 @@ public sealed partial class MainWindow : Window
         {
             System.IO.Directory.CreateDirectory(App.AppDataFolder);
         }
+        */
+
+        if (!Directory.Exists(App.AppDataFolder))
+        {
+            System.IO.Directory.CreateDirectory(App.AppDataFolder);
+        }
 
         try
         {
-            doc.Save(filePath);
+            doc.Save(App.AppConfigFilePath);
         }
         catch (Exception ex)
         {
-            Debug.WriteLine("MainWindow_Closed: " + ex + " while saving : " + filePath);
+            Debug.WriteLine("MainWindow_Closed: " + ex + " while saving : " + App.AppConfigFilePath);
         }
-
     }
 
     #region == Global Hotkey == 

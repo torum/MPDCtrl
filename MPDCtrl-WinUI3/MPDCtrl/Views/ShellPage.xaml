@@ -11,6 +11,7 @@
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
     NavigationCacheMode="Required"
     mc:Ignorable="d"
+    Loaded="Page_Loaded"
     PreviewKeyDown="Page_PreviewKeyDown" PreviewKeyUp="Page_PreviewKeyUp">
     <Grid>
         <Grid.RowDefinitions>
@@ -227,7 +228,9 @@
                         <Path RenderTransformOrigin="0,0" Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Width="48" Height="48" Data="{x:Bind ViewModel.PlayButton, Mode=OneWay}"/>
                         <Button.KeyboardAccelerators>
                             <KeyboardAccelerator Key="P" Modifiers="Control"/>
+                            <!-- not good with listview selection's default/built-in keybind.
                             <KeyboardAccelerator Key="Space"/>
+                            -->
                         </Button.KeyboardAccelerators>
                     </Button>
                     <Button Grid.Row="0" Grid.Column="2" x:Name="PlaybackNext" ToolTipService.ToolTip="Ctrl+Right" AccessKey="N" Command="{x:Bind ViewModel.PlayNextCommand}" Width="30" Height="30" CornerRadius="3" Background="Transparent" BorderThickness="0" Margin="0,0,18,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0">

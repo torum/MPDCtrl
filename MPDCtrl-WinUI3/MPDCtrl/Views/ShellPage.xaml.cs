@@ -17,7 +17,9 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using Windows.Foundation;
+using Windows.System;
 using Windows.UI.ApplicationSettings;
+using Windows.UI.Core;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MPDCtrl.Views;
@@ -34,12 +36,9 @@ public sealed partial class ShellPage : Page
     public ShellPage()
     {
         ViewModel = App.GetService<MainViewModel>();
-        
         //DataContext = ViewModel;
 
         InitializeComponent();
-
-        //AppTitleBar.SizeChanged += AppTitleBar_SizeChanged; <-This does not allways fire. Use diffrent grid and use navigated event.
 
         ViewModel.AlbumSelectedNavigateToDetailsPage += this.OnAlbumSelectedNavigateToDetailsPage;
         ViewModel.GoBackButtonVisibilityChanged += this.OnGoBackButtonVisibilityChanged;
@@ -48,28 +47,75 @@ public sealed partial class ShellPage : Page
         ViewModel.DebugCommandClear += this.OnDebugCommandClear;
         ViewModel.DebugIdleClear += this.OnDebugIdleClear;
 
+        this.ActualThemeChanged += this.This_ActualThemeChanged;
+
+        // Not good because this create instance in addition to navigation view.
+        //NavigationFrame.Content = App.GetService<QueuePage>(); 
+
         /*
-        //NavigationFrame.Content = App.GetService<QueuePage>(); <- not good because this create instance in addition to navigation view.
+         * Not good when queuePage.Selected = true;. Better do it in loaded.
         if (NavigationFrame.Navigate(typeof(QueuePage), NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
         {
             _currentPage = typeof(QueuePage);
-            var queuepage = ViewModel.MainMenuItems.FirstOrDefault();
-            if (queuepage != null)
+            var queuePage = ViewModel.MainMenuItems.FirstOrDefault();
+            if (queuePage != null)
             {
-                queuepage.Selected = true;
+                queuePage.Selected = true;
             }
         }
         */
 
-        this.ActualThemeChanged += this.This_ActualThemeChanged;
+        // Do this at shell page loaded event after everything is initilized even App.MainWnd in app.xaml.cs.
+        // It is too early here to show dialogs.
+        //ViewModel.StartMPC();
 
-        //
+        // Not working.
+        this.PlaybackPlay.Loaded += (s, e) =>
+        {
+            this.PlaybackPlay.Focus(FocusState.Programmatic);
+        };
+    }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage)
+        // is loaded, initialized, set, drawn, navigated. So start the connection.
         ViewModel.StartMPC();
+
+        // Not working.
+        this.PlaybackPlay.Focus(FocusState.Programmatic);
+    }
+
+    private void NavigationView_Loaded(object sender, RoutedEventArgs e)
+    {
+        /*
+         *  Move to constructor. It should be fine. or not?.. This right here is better. the initial Selected = .. messed up in constructor.
+        */
+        if (NavigationFrame.Navigate(typeof(QueuePage), NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
+        {
+            _currentPage = typeof(QueuePage);
+            var queuePage = ViewModel.MainMenuItems.FirstOrDefault();
+            if (queuePage != null)
+            {
+                queuePage.Selected = true;
+            }
+        }
+
+        // Not working.
+        this.PlaybackPlay.Focus(FocusState.Programmatic);
+
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        {
+            await Task.Delay(1000);// needed this.
+
+            this.PlaybackPlay.Focus(FocusState.Programmatic);
+        });
     }
 
     private void AppTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        // Update interactive regions if the size of the window changes.
+        // This does not allways fire. We might need to use diffrent grid and use navigated event.
+        // Update interactive regions (for backbutton) if the size of the window changes.
         SetRegionsForCustomTitleBar();
     }
 
@@ -159,6 +205,9 @@ public sealed partial class ShellPage : Page
         wnd.SetTitleBar(AppTitleBar);
 
         //SetRegionsForCustomTitleBar();
+
+        // Do this after everything is initilized even App.MainWnd in app.xaml.cs.
+        //ViewModel.StartMPC(this.XamlRoot);
     }
 
     private readonly StringBuilder _sbCommandOutput = new();
@@ -225,27 +274,6 @@ public sealed partial class ShellPage : Page
         }
 
         App.MainWnd.SetCapitionButtonColor();
-    }
-
-    private void NavigationView_Loaded(object sender, RoutedEventArgs e)
-    {
-        /*
-        var selected = ViewModel.MainMenuItems.FirstOrDefault();
-        if (selected != null)
-        {
-            selected.Selected = true;
-            //Debug.WriteLine("NavigationView_Loaded and selected");
-        }
-        */
-        if (NavigationFrame.Navigate(typeof(QueuePage), NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
-        {
-            _currentPage = typeof(QueuePage);
-            var queuepage = ViewModel.MainMenuItems.FirstOrDefault();
-            if (queuepage != null)
-            {
-                queuepage.Selected = true;
-            }
-        }
     }
 
     private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
@@ -506,7 +534,17 @@ public sealed partial class ShellPage : Page
 
         XamlRoot currentXamlRoot = this.Content.XamlRoot;
         var focusedElement = FocusManager.GetFocusedElement(currentXamlRoot);
-        if ((focusedElement is TextBox) || (focusedElement is ListView) || (focusedElement is ListViewItem))
+        if ((focusedElement is TextBox) || (focusedElement is ListView) || (focusedElement is ListViewItem))//
+        {
+            // Do nothing.
+            return;
+        }
+
+        // Get the state of the Alt key for the current thread
+        var altKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Menu);
+        // Check if the Alt key is in the "Down" state
+        bool isAltPressed = altKeyState.HasFlag(CoreVirtualKeyStates.Down);
+        if (isAltPressed)
         {
             // Do nothing.
             return;
@@ -530,7 +568,17 @@ public sealed partial class ShellPage : Page
 
         XamlRoot currentXamlRoot = this.Content.XamlRoot;
         var focusedElement = FocusManager.GetFocusedElement(currentXamlRoot);
-        if (focusedElement is TextBox || (focusedElement is ListView) || (focusedElement is ListViewItem))
+        if ((focusedElement is TextBox) || (focusedElement is ListView) || (focusedElement is ListViewItem))//
+        {
+            // Do nothing.
+            return;
+        }
+
+        // Get the state of the Alt key for the current thread
+        var altKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Menu);
+        // Check if the Alt key is in the "Down" state
+        bool isAltPressed = altKeyState.HasFlag(CoreVirtualKeyStates.Down);
+        if (isAltPressed)
         {
             // Do nothing.
             return;
@@ -567,4 +615,5 @@ public sealed partial class ShellPage : Page
         // Optional: Prevent the event from bubbling up to parent controls
         e.Handled = true;
     }
+
 }

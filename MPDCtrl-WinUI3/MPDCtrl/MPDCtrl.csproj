@@ -77,6 +77,7 @@
     <Content Remove="Assets\StoreLogo.scale-150.png" />
     <Content Remove="Assets\StoreLogo.scale-200.png" />
     <Content Remove="Assets\StoreLogo.scale-400.png" />
+    <Content Remove="Assets\SvgIcons\ic_fluent_error_circle_16_color.svg" />
     <Content Remove="Assets\Wide310x150Logo.scale-100.png" />
     <Content Remove="Assets\Wide310x150Logo.scale-125.png" />
     <Content Remove="Assets\Wide310x150Logo.scale-150.png" />
@@ -85,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Views\Dialogs\AddToDialog.xaml" />
+    <None Remove="Views\Dialogs\InitDialog.xaml" />
     <None Remove="Views\ShellPage.xaml" />
   </ItemGroup>
 
@@ -127,6 +129,16 @@
     <Content Update="Assets\Teeth.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Assets\SvgIcons\ic_fluent_error_circle_16_color.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Dialogs\InitDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Dialogs\RenameToDialog.xaml">

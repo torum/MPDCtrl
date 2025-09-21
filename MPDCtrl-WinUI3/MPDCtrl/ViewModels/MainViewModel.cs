@@ -27,6 +27,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -111,7 +112,7 @@ public partial class MainViewModel : ObservableObject
             _currentProfile = value;
             OnPropertyChanged(nameof(CurrentProfile));
 
-            //SelectedProfile = _currentProfile;
+            SelectedProfile = _currentProfile;
 
             if (_currentProfile is not null)
             {
@@ -121,6 +122,7 @@ public partial class MainViewModel : ObservableObject
                 Host = _currentProfile.Host;
                 Port = _currentProfile.Port.ToString();
                 _password = _currentProfile.Password;
+                OnPropertyChanged(nameof(Password));
             }
             else
             {
@@ -129,6 +131,40 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private Profile? _selectedProfile;
+    public Profile? SelectedProfile
+    {
+        get
+        {
+            return _selectedProfile;
+        }
+        set
+        {
+            if (_selectedProfile == value)
+                return;
+
+            _selectedProfile = value;
+
+            OnPropertyChanged(nameof(SelectedProfile));
+        }
+    }
+
+    private bool _setIsDefault = true;
+    public bool SetIsDefault
+    {
+        get { return _setIsDefault; }
+        set
+        {
+            if (_setIsDefault == value)
+                return;
+
+            _setIsDefault = value;
+
+            OnPropertyChanged(nameof(SetIsDefault));
+        }
+    }
+
+    /*
     private bool _isRememberAsProfile = true;
     public bool IsRememberAsProfile
     {
@@ -145,6 +181,7 @@ public partial class MainViewModel : ObservableObject
             OnPropertyChanged(nameof(IsRememberAsProfile));
         }
     }
+    */
 
     private string _host = "";
     public string Host
@@ -907,16 +944,17 @@ public partial class MainViewModel : ObservableObject
                     RenamedSelectPendingPlaylistName = string.Empty;
                     PlaylistSongs.Clear();
                 });
+
                 return;
             }
 
             if (value is NodeMenuQueue)
             {
-
+                //
             }
             else if (value is NodeMenuSearch)
             {
-
+                //
             }
             else if (value is NodeMenuArtist)
             {
@@ -930,7 +968,7 @@ public partial class MainViewModel : ObservableObject
             }
             else if (value is NodeMenuAlbum)
             {
-
+                //
             }
             else if (value is NodeMenuFiles nml)
             {
@@ -1354,10 +1392,15 @@ public partial class MainViewModel : ObservableObject
             SelectedArtistAlbums = _selectedAlbumArtist?.Albums;
             OnPropertyChanged(nameof(ArtistPageSubTitleArtistAlbumCount));
 
-            _ = Task.Run(() => GetArtistSongs(_selectedAlbumArtist));
+            //_ = Task.Run(() => GetArtistSongs(_selectedAlbumArtist));
+            ////_ = Task.Run(() => GetAlbumPictures(SelectedArtistAlbums));
+            //GetAlbumPictures(SelectedArtistAlbums);
 
-            //_ = Task.Run(() => GetAlbumPictures(SelectedArtistAlbums));
-            GetAlbumPictures(SelectedArtistAlbums);
+            Task.Run(() =>
+            {
+                GetArtistSongs(_selectedAlbumArtist);
+                GetAlbumPictures(SelectedArtistAlbums);
+            });
         }
     }
 
@@ -1445,10 +1488,15 @@ public partial class MainViewModel : ObservableObject
             SelectedAlbumSongs = _selectedAlbum.Songs;
             */
             //_ = Task.Run(async () => { await GetAlbumSongs(_selectedAlbum); });
-            GetAlbumSongs(_selectedAlbum);
 
-            AlbumSelectedNavigateToDetailsPage?.Invoke(this, EventArgs.Empty);
-
+            Task.Run(() => 
+            {
+                GetAlbumSongs(_selectedAlbum);
+                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                {
+                    AlbumSelectedNavigateToDetailsPage?.Invoke(this, EventArgs.Empty);
+                });
+            });
         }
     }
 
@@ -1515,8 +1563,8 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
 
-            //_ = Task.Run(() => GetAlbumPictures(VisibleItemsAlbumsEx));
-            GetAlbumPictures(VisibleItemsAlbumsEx); 
+            Task.Run(() => GetAlbumPictures(VisibleItemsAlbumsEx));
+            //GetAlbumPictures(VisibleItemsAlbumsEx); 
         }
     }
 
@@ -1963,6 +2011,187 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    public string ShortStatusWIthMpdVersion
+    {
+        get
+        {
+            if (IsConnected)
+            {
+                if (!string.IsNullOrEmpty(_mpdVersion))
+                {
+                    if (CurrentProfile is not null)
+                    {
+                        return $"Connected to {CurrentProfile.Name} with MPD Protocol v{_mpdVersion}";
+                    }
+                    else
+                    {
+                        return $"Connected with MPD Protocol v{_mpdVersion}";
+                    }
+                }
+                else
+                {
+                    if (CurrentProfile is not null)
+                    {
+                        return $"Connected to {CurrentProfile.Name}";
+                    }
+                    else
+                    {
+                        return "Connected";
+                    }
+                }
+            }
+            else if (IsConnecting)
+            {
+                if (CurrentProfile is not null)
+                {
+                    return $"Connecting to {CurrentProfile.Name}...";
+                }
+                else
+                {
+                    return "Connecting...";
+                }
+            }
+            else
+            {
+                if (IsNotConnectingNorConnected)
+                {
+                    return "Not connected";
+                }
+
+
+                return "Not connected";
+            }
+
+
+        }
+    }
+
+#pragma warning disable IDE0079
+#pragma warning disable CA1822
+    public string VersionText
+#pragma warning restore CA1822
+#pragma warning restore IDE0079
+    {
+        get
+        {
+            Version version;
+
+            if (RuntimeHelper.IsMSIX)
+            {
+                var packageVersion = Package.Current.Id.Version;
+
+                version = new(packageVersion.Major, packageVersion.Minor, packageVersion.Build, packageVersion.Revision);
+            }
+            else
+            {
+                version = Assembly.GetExecutingAssembly().GetName().Version!;
+            }
+
+            return $"{"Version".GetLocalized()} - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+        }
+    }
+
+    #endregion
+
+    #region == Status flags ==
+
+    private bool _isConnected;
+    public bool IsConnected
+    {
+        get => _isConnected;
+        set
+        {
+            if (_isConnected == value)
+                return;
+
+            _isConnected = value;
+            OnPropertyChanged(nameof(IsConnected));
+            OnPropertyChanged(nameof(ShortStatusWIthMpdVersion));
+            OnPropertyChanged(nameof(IsNotConnecting));
+
+            IsConnecting = !_isConnected;
+
+            if (!_isConnected)
+            {
+                IsNotConnectingNorConnected = true;
+            }
+            if (_isConnected)
+            {
+                IsConnectButtonEnabled = true;
+            }
+        }
+    }
+
+    private bool _isConnecting;
+    public bool IsConnecting
+    {
+        get
+        {
+            return _isConnecting;
+        }
+        set
+        {
+            if (_isConnecting == value)
+                return;
+
+            _isConnecting = value;
+            OnPropertyChanged(nameof(IsConnecting));
+            OnPropertyChanged(nameof(IsNotConnecting));
+            OnPropertyChanged(nameof(ShortStatusWIthMpdVersion));
+
+            if (_isConnecting)
+            {
+                IsConnectButtonEnabled = false;
+            }
+        }
+    }
+
+    private bool _isNotConnectingNorConnected = true;
+    public bool IsNotConnectingNorConnected
+    {
+        get
+        {
+            return _isNotConnectingNorConnected;
+        }
+        set
+        {
+            if (_isNotConnectingNorConnected == value)
+                return;
+
+            _isNotConnectingNorConnected = value;
+            OnPropertyChanged(nameof(IsNotConnectingNorConnected));
+            OnPropertyChanged(nameof(ShortStatusWIthMpdVersion));
+
+            if (_isNotConnectingNorConnected)
+            {
+                IsConnectButtonEnabled = true;
+            }
+        }
+    }
+
+    private bool _isConnectButtonEnabled = true;
+    public bool IsConnectButtonEnabled
+    {
+        get { return _isConnectButtonEnabled; }
+        set
+        {
+            if (_isConnectButtonEnabled == value)
+                return;
+
+            _isConnectButtonEnabled = value;
+
+            OnPropertyChanged(nameof(IsConnectButtonEnabled));
+        }
+    }
+
+    public bool IsNotConnecting
+    {
+        get
+        {
+            return !_isConnecting;
+        }
+    }
+
     #endregion
 
     #region == Options ==
@@ -2188,31 +2417,6 @@ public partial class MainViewModel : ObservableObject
         set => SetProperty(ref _isMicaSupported, value);
     }
 
-#pragma warning disable IDE0079
-#pragma warning disable CA1822
-    public string VersionText
-#pragma warning restore CA1822
-#pragma warning restore IDE0079
-    {
-        get
-        {
-            Version version;
-
-            if (RuntimeHelper.IsMSIX)
-            {
-                var packageVersion = Package.Current.Id.Version;
-
-                version = new(packageVersion.Major, packageVersion.Minor, packageVersion.Build, packageVersion.Revision);
-            }
-            else
-            {
-                version = Assembly.GetExecutingAssembly().GetName().Version!;
-            }
-
-            return $"{"Version".GetLocalized()} - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
-        }
-    }
-
     #endregion
 
     #region == Events ==
@@ -2257,6 +2461,48 @@ public partial class MainViewModel : ObservableObject
         IsDebugWindowEnabled = false;
         IsShowDebugWindow = false;
 #endif
+    }
+
+    public async void StartMPC()
+    {
+        if (CurrentProfile is null)
+        {
+            //ConnectionStatusMessage = MPDCtrlX.Properties.Resources.Init_NewConnectionSetting; // no need. 
+
+            //StatusButton = _pathNewConnectionButton;
+
+            var pro = await _dialogs.ShowInitDialog(this);
+            if (pro is null)
+            {
+                return;
+            }
+
+            _password = pro.Password;
+            _host = pro.Host;
+            _port = pro.Port;
+
+            CurrentProfile = pro;
+
+            Start(_host, _port);
+
+            return;
+        }
+
+        Start(_host, _port);
+    }
+
+    public void CleanUp()
+    {
+        try
+        {
+            if (IsConnected)
+            {
+                _mpc.MpdStop = true;
+
+                _mpc.MpdDisconnect(false);
+            }
+        }
+        catch { }
     }
 
     #region == Private Methods ==
@@ -2312,21 +2558,12 @@ public partial class MainViewModel : ObservableObject
             ];
     }
 
-    public void StartMPC()
-    {
-        _password = "hoge";
-        _host = "127.0.0.1";
-        //_host = "192.168.";
-        _port = 6600;
-        Start(_host, _port);
-    }
-
     private async void Start(string host, int port)
     {
         HostIpAddress = null;
         try
         {
-            var addresses = await Dns.GetHostAddressesAsync(host);
+            var addresses = await Dns.GetHostAddressesAsync(host, AddressFamily.InterNetwork);
             if (addresses.Length > 0)
             {
                 HostIpAddress = addresses[0];
@@ -2366,7 +2603,7 @@ public partial class MainViewModel : ObservableObject
         IsBusy = true;
 
         await Task.Delay(5);
-        await Task.Yield();
+        //await Task.Yield();
 
         CommandResult result = await _mpc.MpdIdleSendPassword(_password);
 
@@ -3515,6 +3752,8 @@ public partial class MainViewModel : ObservableObject
 
     private void GetFiles(NodeMenuFiles filestNode)
     {
+        // TODO: fix this
+
         if (filestNode is null)
             return;
 
@@ -3533,8 +3772,8 @@ public partial class MainViewModel : ObservableObject
 
         Task.Run(async () =>
         {
-            await Task.Delay(10);
-            //await Task.Yield();
+            //await Task.Delay(10);
+            await Task.Yield();
 
             App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
             {
@@ -3840,7 +4079,6 @@ public partial class MainViewModel : ObservableObject
 
             if (Albums.Count < 1)
             {
-                Debug.WriteLine("GetAlbumPictures: Albums.Count < 1, returning.");
                 return;
             }
 
@@ -4240,25 +4478,6 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    /*
-    private static string EscapeFilePathNames(string str)
-    {
-        string s = str.Replace("<", "LT");
-        s = s.Replace(">", "GT");
-        s = s.Replace(":", "COL");
-        s = s.Replace("\"", "DQ");
-        s = s.Replace("/", "FS");
-        s = s.Replace("\\", "BS");
-        s = s.Replace("/", "FS");
-        s = s.Replace("|", "PIP");
-        s = s.Replace("?", "QM");
-        s = s.Replace("*", "ASTR");
-        s = s.Replace("@", "AT");
-
-        return s;
-    }
-    */
-
     public static string SanitizeFilename(string name)
     {
         // 1. Get the list of invalid characters for the current system
@@ -4378,7 +4597,8 @@ public partial class MainViewModel : ObservableObject
     {
         Debug.WriteLine("OK MPD " + _mpc.MpdVerText + " @OnMpdConnected");
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        // ATTN: this won't be called if we etablishe the connection before MainWnd is initialized.
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue( () =>
         {
             MpdVersion = _mpc.MpdVerText;
 
@@ -4387,54 +4607,21 @@ public partial class MainViewModel : ObservableObject
             //MpdStatusButton = _pathMpdOkButton;
 
             // 
-            //IsConnected = true;
+            IsConnected = true;
+            IsConnecting = false;
+            IsNotConnectingNorConnected = false;
 
+            // Just in case.
             IsShowAckWindow = false;
             IsShowErrWindow = false;
-        });
 
-        /*
-        // Connected from InitWindow, so save and clean up. 
-        App.CurrentDispatcherQueue ?
-        {
-            if (_initWin is not null)
+            // Add newly created Profile in the InitDialog to Profiles because connection was successfully established.
+            if ((Profiles.Count <= 0) && (CurrentProfile is not null))
             {
-                if (_initWin.IsActive || _initWin.IsVisible)
-                {
-                    if (IsRememberAsProfile)
-                    {
-                        var prof = new Profile
-                        {
-                            Name = _host,
-                            Host = _host,
-                            Port = _port,
-                            Password = _password,
-                            IsDefault = true,
-                            Volume = _volume
-                        };
-
-                        if (!string.IsNullOrEmpty(prof.Host.Trim()))
-                        {
-                            CurrentProfile = prof;
-                            Profiles.Add(prof);
-
-                            NotifyPropertyChanged(nameof(IsCurrentProfileSet));
-                        }
-                        else
-                        {
-                            Debug.WriteLine("Host info is empty. @OnMpdIdleConnected");
-                        }
-                        Debug.WriteLine($"Password = {_password}");
-                    }
-
-                    Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        _initWin.Close();
-                    });
-                }
+                Profiles.Add(CurrentProfile);
             }
         });
-        */
+
         // 
         _ = Task.Run(LoadInitialData);
     }
@@ -4509,11 +4696,12 @@ public partial class MainViewModel : ObservableObject
     {
         if (string.IsNullOrEmpty(msg))
             return;
+
         /*
+         *  ?
         IsConnected = false;
         IsConnecting = false;
-        IsConnectionSettingShow = true;
-        
+
         StatusButton = _pathErrorInfoButton;
         */
 
@@ -4532,10 +4720,10 @@ public partial class MainViewModel : ObservableObject
     {
         if (status == MpcService.ConnectionStatus.NeverConnected)
         {
-            /*
             IsConnected = false;
             IsConnecting = false;
             IsNotConnectingNorConnected = true;
+            /*
             IsConnectionSettingShow = true;
             StatusButton = _pathDisconnectedButton;
             */
@@ -4545,10 +4733,10 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.Connected)
         {
-            /*
             IsConnected = true;
             IsConnecting = false;
             IsNotConnectingNorConnected = false;
+            /*
             IsConnectionSettingShow = false;
             StatusButton = _pathConnectedButton;
             */
@@ -4558,10 +4746,10 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.Connecting)
         {
-            /*
             IsConnected = false;
             IsConnecting = true;
             IsNotConnectingNorConnected = false;
+            /*
             //IsConnectionSettingShow = true;
             StatusButton = _pathConnectingButton;
             */
@@ -4573,10 +4761,10 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.ConnectFailTimeout)
         {
-            /*
             IsConnected = false;
             IsConnecting = false;
             IsNotConnectingNorConnected = true;
+            /*
             IsConnectionSettingShow = true;
 
             Debug.WriteLine("ConnectionStatus_ConnectFail_Timeout");
@@ -4590,10 +4778,10 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.SeeConnectionErrorEvent)
         {
-            /*
             IsConnected = false;
             IsConnecting = false;
             IsNotConnectingNorConnected = true;
+            /*
             IsConnectionSettingShow = true;
             StatusButton = _pathErrorInfoButton;
             */
@@ -4603,10 +4791,10 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.Disconnected)
         {
-            /*
             IsConnected = false;
             IsConnecting = false;
             IsNotConnectingNorConnected = true;
+            /*
             IsConnectionSettingShow = true;
             ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_Disconnected;
             StatusButton = _pathErrorInfoButton;
@@ -4618,11 +4806,11 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.DisconnectedByHost)
         {
-            // TODO: not really usued now...
-            /*
             IsConnected = false;
             IsConnecting = false;
             IsNotConnectingNorConnected = true;
+            // TODO: not really usued now...
+            /*
             IsConnectionSettingShow = true;
 
             ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_DisconnectedByHost;
@@ -4634,10 +4822,10 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.Disconnecting)
         {
-            /*
             IsConnected = false;
             IsConnecting = false;
             IsNotConnectingNorConnected = false;
+            /*
             //IsConnectionSettingShow = true;
 
             ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_Disconnecting;
@@ -4645,14 +4833,14 @@ public partial class MainViewModel : ObservableObject
 
             StatusBarMessage = ConnectionStatusMessage;
             */
-            Debug.WriteLine("ConnectionStatus_Disconnecting");
+            //Debug.WriteLine("ConnectionStatus_Disconnecting");
         }
         else if (status == MpcService.ConnectionStatus.DisconnectedByUser)
         {
-            /*
             IsConnected = false;
             IsConnecting = false;
             IsNotConnectingNorConnected = true;
+            /*
             //IsConnectionSettingShow = true;
 
             ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_DisconnectedByUser;
@@ -4660,14 +4848,14 @@ public partial class MainViewModel : ObservableObject
 
             StatusBarMessage = ConnectionStatusMessage;
             */
-            Debug.WriteLine("ConnectionStatus_DisconnectedByUser");
+            //Debug.WriteLine("ConnectionStatus_DisconnectedByUser");
         }
         else if (status == MpcService.ConnectionStatus.SendFailNotConnected)
         {
-            /*
             IsConnected = false;
             IsConnecting = false;
             IsNotConnectingNorConnected = true;
+            /*
             IsConnectionSettingShow = true;
             ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_SendFail_NotConnected;
             StatusButton = _pathErrorInfoButton;
@@ -4679,10 +4867,10 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.SendFailTimeout)
         {
-            /*
             IsConnected = false;
             IsConnecting = false;
             IsNotConnectingNorConnected = true;
+            /*
             IsConnectionSettingShow = true;
 
             ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_SendFail_Timeout;
@@ -6496,6 +6684,8 @@ public partial class MainViewModel : ObservableObject
             return;
         }
     }
+
+
 
     #endregion
 }

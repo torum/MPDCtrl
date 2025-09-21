@@ -17,7 +17,9 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using Windows.Foundation;
+using Windows.System;
 using Windows.UI.ApplicationSettings;
+using Windows.UI.Core;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MPDCtrl.Views;
@@ -50,6 +52,45 @@ public sealed partial class ShellPage : Page
         // Not good because this create instance in addition to navigation view.
         //NavigationFrame.Content = App.GetService<QueuePage>(); 
 
+        /*
+         * Not good when queuePage.Selected = true;. Better do it in loaded.
+        if (NavigationFrame.Navigate(typeof(QueuePage), NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
+        {
+            _currentPage = typeof(QueuePage);
+            var queuePage = ViewModel.MainMenuItems.FirstOrDefault();
+            if (queuePage != null)
+            {
+                queuePage.Selected = true;
+            }
+        }
+        */
+
+        // Do this at shell page loaded event after everything is initilized even App.MainWnd in app.xaml.cs.
+        // It is too early here to show dialogs.
+        //ViewModel.StartMPC();
+
+        // Not working.
+        this.PlaybackPlay.Loaded += (s, e) =>
+        {
+            this.PlaybackPlay.Focus(FocusState.Programmatic);
+        };
+    }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage)
+        // is loaded, initialized, set, drawn, navigated. So start the connection.
+        ViewModel.StartMPC();
+
+        // Not working.
+        this.PlaybackPlay.Focus(FocusState.Programmatic);
+    }
+
+    private void NavigationView_Loaded(object sender, RoutedEventArgs e)
+    {
+        /*
+         *  Move to constructor. It should be fine. or not?.. This right here is better. the initial Selected = .. messed up in constructor.
+        */
         if (NavigationFrame.Navigate(typeof(QueuePage), NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
         {
             _currentPage = typeof(QueuePage);
@@ -60,9 +101,15 @@ public sealed partial class ShellPage : Page
             }
         }
 
-        // Do this at shell page loaded event after everything is initilized even App.MainWnd in app.xaml.cs.
-        // It is too early here to show dialogs.
-        //ViewModel.StartMPC();
+        // Not working.
+        this.PlaybackPlay.Focus(FocusState.Programmatic);
+
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        {
+            await Task.Delay(1000);// needed this.
+
+            this.PlaybackPlay.Focus(FocusState.Programmatic);
+        });
     }
 
     private void AppTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -227,22 +274,6 @@ public sealed partial class ShellPage : Page
         }
 
         App.MainWnd.SetCapitionButtonColor();
-    }
-
-    private void NavigationView_Loaded(object sender, RoutedEventArgs e)
-    {
-        /*
-         *  Move to constructor. It should be fine.
-        if (NavigationFrame.Navigate(typeof(QueuePage), NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
-        {
-            _currentPage = typeof(QueuePage);
-            var queuePage = ViewModel.MainMenuItems.FirstOrDefault();
-            if (queuePage != null)
-            {
-                queuePage.Selected = true;
-            }
-        }
-        */
     }
 
     private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
@@ -503,7 +534,17 @@ public sealed partial class ShellPage : Page
 
         XamlRoot currentXamlRoot = this.Content.XamlRoot;
         var focusedElement = FocusManager.GetFocusedElement(currentXamlRoot);
-        if ((focusedElement is TextBox) || (focusedElement is ListView) || (focusedElement is ListViewItem))
+        if ((focusedElement is TextBox) || (focusedElement is ListView) || (focusedElement is ListViewItem))//
+        {
+            // Do nothing.
+            return;
+        }
+
+        // Get the state of the Alt key for the current thread
+        var altKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Menu);
+        // Check if the Alt key is in the "Down" state
+        bool isAltPressed = altKeyState.HasFlag(CoreVirtualKeyStates.Down);
+        if (isAltPressed)
         {
             // Do nothing.
             return;
@@ -527,7 +568,17 @@ public sealed partial class ShellPage : Page
 
         XamlRoot currentXamlRoot = this.Content.XamlRoot;
         var focusedElement = FocusManager.GetFocusedElement(currentXamlRoot);
-        if (focusedElement is TextBox || (focusedElement is ListView) || (focusedElement is ListViewItem))
+        if ((focusedElement is TextBox) || (focusedElement is ListView) || (focusedElement is ListViewItem))//
+        {
+            // Do nothing.
+            return;
+        }
+
+        // Get the state of the Alt key for the current thread
+        var altKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Menu);
+        // Check if the Alt key is in the "Down" state
+        bool isAltPressed = altKeyState.HasFlag(CoreVirtualKeyStates.Down);
+        if (isAltPressed)
         {
             // Do nothing.
             return;
@@ -565,10 +616,4 @@ public sealed partial class ShellPage : Page
         e.Handled = true;
     }
 
-    private void Page_Loaded(object sender, RoutedEventArgs e)
-    {
-        // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage)
-        // is loaded, initialized, set, drawn, navigated. So start the connection.
-        ViewModel.StartMPC();
-    }
 }

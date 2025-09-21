@@ -51,7 +51,7 @@ public interface IMpcService
     Task<CommandResult> MpdCommandSendPassword(string password = "");
     Task<CommandResult> MpdDeleteId(List<string> ids);
     Task<CommandResult> MpdDeleteId(string id);
-    void MpdDisconnect();
+    void MpdDisconnect(bool isReconnect);
     Task<ConnectionResult> MpdIdleConnect(string host, int port);
     //Task<ConnectionResult> MpdIdleConnectionStart(string host, int port, string password);
     Task<CommandResult> MpdIdleQueryCurrentQueue();

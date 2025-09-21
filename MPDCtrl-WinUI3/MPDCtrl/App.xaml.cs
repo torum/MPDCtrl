@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
+using MPDCtrl.Helpers;
 using MPDCtrl.Services;
 using MPDCtrl.Services.Contracts;
 using MPDCtrl.ViewModels;
@@ -38,13 +39,13 @@ public partial class App : Application
     private static readonly string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
     public static readonly string AppName = _appName;
-    public static string AppDataFolder { get; } = _envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
-    public static string AppConfigFilePath { get; } = System.IO.Path.Combine(AppDataFolder, _appName + ".config");
+    public static string AppDataFolder { get; private set; } = System.IO.Path.Combine(System.IO.Path.Combine(_envDataFolder, _appDeveloper), _appName);//_envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
+    public static string AppConfigFilePath { get; private set; } = System.IO.Path.Combine(AppDataFolder, _appName + ".config");
 
     // Temp album cover cache folder.
-    private static readonly string _envAppLocalFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData); // Use Local. //System.IO.Path.GetTempPath();
+    private static readonly string _envAppLocalFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData); // Use Local instead of temp path. //System.IO.Path.GetTempPath();
     private static readonly string _envAppLocalAppFolder = System.IO.Path.Combine((System.IO.Path.Combine(_envAppLocalFolder, _appDeveloper)), AppName);
-    public static string AppDataCacheFolder { get; } = System.IO.Path.Combine(_envAppLocalAppFolder, "AlbumCoverCache");
+    public static string AppDataCacheFolder { get; private set; } = System.IO.Path.Combine(_envAppLocalAppFolder, "AlbumCoverCache");
 
     // ErrorLog
     private static readonly string _logFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl4_errors.txt";
@@ -73,6 +74,25 @@ public partial class App : Application
 
     public App()
     {
+        if (RuntimeHelper.IsMSIX)
+        {
+            Debug.WriteLine("IsMSIX");
+            var envDataFolder = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
+            AppDataFolder = System.IO.Path.Combine(System.IO.Path.Combine(envDataFolder, _appDeveloper), _appName);
+            AppConfigFilePath = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.AppName + ".config");
+            var envAppLocalCahceFolder = Windows.Storage.ApplicationData.Current.LocalCacheFolder.Path;
+            AppDataCacheFolder = System.IO.Path.Combine(System.IO.Path.Combine((System.IO.Path.Combine(envAppLocalCahceFolder, _appDeveloper)), AppName), "AlbumCoverCache");
+        }
+        else
+        {
+            /*
+            Debug.WriteLine("Not IsMSIX");
+            AppDataFolder = System.IO.Path.Combine(System.IO.Path.Combine(_envDataFolder, _appDeveloper), _appName);
+            AppConfigFilePath = System.IO.Path.Combine(AppDataFolder, _appName + ".config");
+            AppDataCacheFolder = System.IO.Path.Combine(_envAppLocalAppFolder, "AlbumCoverCache");
+            */
+        }
+
         // Only works in packaged environment.
         //Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = "en-US";
         //System.Globalization.CultureInfo.CurrentUICulture = new System.Globalization.CultureInfo("en-US", false);

@@ -22,7 +22,6 @@
 
                 <StackPanel>
                     <TextBlock x:Uid="InitialSetupWindow_Subtitle" FontWeight="SemiBold"/>
-
                 </StackPanel>
 
                 <StackPanel Orientation="Vertical" Spacing="12">

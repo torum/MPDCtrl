@@ -50,10 +50,10 @@ public class DialogService : IDialogService
             XamlRoot = App.MainWnd.Content.XamlRoot,
             Title = "MPDCtrl",//_resourceLoader.GetString("Dialog_Title_SelectPlaylist")
             IsPrimaryButtonEnabled = true,
-            PrimaryButtonText = "Connect",//_resourceLoader.GetString("Dialog_Ok")
+            PrimaryButtonText = _resourceLoader.GetString("Dialog_Connect"),
             DefaultButton = ContentDialogButton.Primary,
             IsSecondaryButtonEnabled = false,
-            CloseButtonText = "Cancel",//_resourceLoader.GetString("Dialog_Cancel")
+            CloseButtonText = _resourceLoader.GetString("Dialog_Cancel"),//
             Content = new Views.Dialogs.InitDialog(vm)
             {
                 //DataContext = vm

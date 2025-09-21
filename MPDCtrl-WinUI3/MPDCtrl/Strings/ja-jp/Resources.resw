@@ -405,4 +405,19 @@
   <data name="InitialSetupWindow_Description.Text" xml:space="preserve">
     <value>MPDCtrlを利用するには、MPD (Music Player Daemon)がローカルPCまたはリモートサーバー等で（できればサービス・デーモンとして）動作している必要があります。</value>
   </data>
+  <data name="ConnectionSettings_Host.PlaceholderText" xml:space="preserve">
+    <value>IPアドレスまたはPC・サーバー名</value>
+  </data>
+  <data name="ConnectionSettings_Port.PlaceholderText" xml:space="preserve">
+    <value>規定値は6600</value>
+  </data>
+  <data name="ConnectionSettings_Password.PlaceholderText" xml:space="preserve">
+    <value>オプション（MPDの設定で指定していない限り）</value>
+  </data>
+  <data name="Dialog_Connect" xml:space="preserve">
+    <value>接続</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>バージョン</value>
+  </data>
 </root>

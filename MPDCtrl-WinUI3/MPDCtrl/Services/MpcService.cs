@@ -106,7 +106,7 @@ public partial class MpcService : IMpcService
         }
     }
 
-    private static readonly CancellationTokenSource _cts = new();
+    private CancellationTokenSource? _cts;// = new();
     //private static readonly CancellationToken token = _cts.Token;
 
     // TODO: Not really used...
@@ -194,6 +194,8 @@ public partial class MpcService : IMpcService
 
     public async Task<ConnectionResult> MpdIdleConnect(string host, int port)
     {
+        _cts = new CancellationTokenSource();
+
         ConnectionResult result = new();
 
         IsMpdIdleConnected = false;
@@ -708,6 +710,12 @@ public partial class MpcService : IMpcService
         if (MpdStop)
         {
             Debug.WriteLine("@MpdIdle: MpdStop1");
+            return;
+        }
+
+        if (_cts is null)
+        {
+            Debug.WriteLine("@MpdIdle: _cts is null)");
             return;
         }
 
@@ -4241,7 +4249,7 @@ public partial class MpcService : IMpcService
 
     #endregion
 
-    public void MpdDisconnect()
+    public void MpdDisconnect(bool isReconnect)
     {
         try
         {
@@ -4265,12 +4273,17 @@ public partial class MpcService : IMpcService
 
             ConnectionState = ConnectionStatus.Disconnecting;
             //
-            _cts.Cancel();
+            _cts?.Cancel();
 
             //_idleConnection.Client?.Shutdown(SocketShutdown.Both);
             _idleConnection.Close();
 
-            _cts.Dispose();
+            _cts?.Dispose();
+
+            if (isReconnect)
+            {
+                _cts = new CancellationTokenSource();
+            }
         }
         catch { }
         finally

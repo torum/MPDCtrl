@@ -4079,6 +4079,7 @@ public partial class MainViewModel : ObservableObject
 
             if (Albums.Count < 1)
             {
+                Debug.WriteLine("GetAlbumPictures: (Albums.Count < 1)");
                 return;
             }
 
@@ -4120,16 +4121,8 @@ public partial class MainViewModel : ObservableObject
                     Debug.WriteLine($"GetAlbumPictures: album.Name is null or empty, skipping. {album.AlbumArtist}");
                     continue;
                 }
-                /*
-                var strArtist = SanitizeFilename(album.AlbumArtist).Trim();
-                var strAlbum = SanitizeFilename(album.Name).Trim();
-                if (string.IsNullOrEmpty(strArtist))
-                {
-                    strArtist = "Unknown Artist";
-                }
-                */
-                var strArtist = album.AlbumArtist.Trim();
-                var strAlbum = album.Name.Trim();
+
+                var strArtist = album.AlbumArtist.Trim(); // album.AlbumArtist already fallback to Artist if none.
                 if (string.IsNullOrEmpty(strArtist))
                 {
                     strArtist = "Unknown Artist";
@@ -4138,6 +4131,8 @@ public partial class MainViewModel : ObservableObject
                 {
                     strArtist = SanitizeFilename(strArtist);
                 }
+
+                var strAlbum = album.Name.Trim();
                 if (string.IsNullOrEmpty(strAlbum))
                 {
                     strAlbum = "Unknown Album";
@@ -4151,6 +4146,8 @@ public partial class MainViewModel : ObservableObject
 
                 if (File.Exists(filePath))
                 {
+                    // Load cached album cover.
+
                     album.IsImageLoading = true;
 
                     try
@@ -4225,7 +4222,7 @@ public partial class MainViewModel : ObservableObject
                         {
                             aat = albumsong.Artist.Trim();
                         }
-                        //if (aat == album.AlbumArtist)
+                        
                         if (string.Equals(aat, album.AlbumArtist, StringComparison.CurrentCulture))
                         {
                             //Debug.WriteLine($"GetAlbumPictures: Processing song {albumsong.File} from album {album.Name}");
@@ -4273,10 +4270,6 @@ public partial class MainViewModel : ObservableObject
 
                             isCoverExists = true;
 
-                            // Testing
-                            //await Task.Delay(10);
-                            //await Task.Yield();
-
                             break; // Break after first successful album art retrieval.
                         }
                         else
@@ -4293,6 +4286,7 @@ public partial class MainViewModel : ObservableObject
 
                     if (isNoAlbumCover)
                     {
+                        // Writes tmp file indicating there was no album cover.
                         try
                         {
                             Directory.CreateDirectory(strDirPath);
@@ -4305,13 +4299,11 @@ public partial class MainViewModel : ObservableObject
                             file.Close();
                             // Testing
                             await Task.Delay(10);
-                            await Task.Yield();
                         }
                         catch (Exception e)
                         {
                             Debug.WriteLine("GetAlbumPictures: Exception while saving album art DUMMY file: " + e.Message);
                         }
-
                     }
 
                     album.IsImageLoading = false;
@@ -4394,9 +4386,8 @@ public partial class MainViewModel : ObservableObject
                 Debug.WriteLine($"NOT ({current?.File} == {album?.SongFilePath})");
                 return;
             }
-
+            /*
             var strArtist = current?.AlbumArtist.Trim();
-            var strAlbum = current?.Album ?? string.Empty;
             if (string.IsNullOrEmpty(strArtist))
             {
                 strArtist = "Unknown Artist";
@@ -4405,6 +4396,20 @@ public partial class MainViewModel : ObservableObject
             {
                 strArtist = SanitizeFilename(strArtist);
             }
+            */
+            var strArtist = current?.AlbumArtist.Trim();
+            if (string.IsNullOrEmpty(strArtist))
+            {
+                // Manually fallback to Artist. The same way Album class does.
+                strArtist = current?.Artist.Trim();
+                if (string.IsNullOrEmpty(strArtist))
+                {
+                    strArtist = "Unknown Artist";
+                }
+            }
+            strArtist = SanitizeFilename(strArtist);
+
+            var strAlbum = current?.Album ?? string.Empty;
             if (string.IsNullOrEmpty(strAlbum))
             {
                 strAlbum = "Unknown Album";
@@ -4418,7 +4423,6 @@ public partial class MainViewModel : ObservableObject
             string filePath = System.IO.Path.Combine(App.AppDataCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".bmp";
             try
             {
-                
                 //album?.AlbumImageSource?.Save(filePath, 100);
                 if (album?.BinaryData is not null)
                 {
@@ -4432,49 +4436,6 @@ public partial class MainViewModel : ObservableObject
             {
                 Debug.WriteLine("SaveAlbumCoverImage: Exception while saving album art: " + e.Message);
             }
-
-            /*
-            // save album cover to cache.
-            var strAlbum = current?.Album ?? string.Empty;
-            if (!string.IsNullOrEmpty(strAlbum.Trim()))
-            {
-                var aat = current?.AlbumArtist.Trim();
-                if (string.IsNullOrEmpty(aat))
-                {
-                    aat = current?.Artist.Trim();
-                }
-                var strArtist = aat;
-                if (string.IsNullOrEmpty(strArtist))
-                {
-                    strArtist = "Unknown Artist";
-                }
-                if (string.IsNullOrEmpty(strAlbum))
-                {
-                    strAlbum = "Unknown Album";
-                }
-                strArtist = SanitizeFilename(strArtist).Trim();
-                strAlbum = SanitizeFilename(strAlbum).Trim();
-
-                string strDirPath = System.IO.Path.Combine(App.AppDataCacheFolder, strArtist);
-                string filePath = System.IO.Path.Combine(App.AppDataCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".bmp";
-                try
-                {
-                    Directory.CreateDirectory(strDirPath);
-                    //album?.AlbumImageSource?.Save(filePath, 100);
-                    if (album?.BinaryData is not null)
-                    {
-                        Directory.CreateDirectory(strDirPath);
-                        File.WriteAllBytes(filePath, album.BinaryData);
-                        //Debug.WriteLine($"SaveAlbumCoverImage: Successfully saved album art for {filePath}");
-                    }
-                    //Debug.WriteLine($"SaveAlbumCoverImage: saved album art {strArtist}, {strAlbum}");
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine("SaveAlbumCoverImage: Exception while saving album art: " + e.Message);
-                }
-            }
-            */
         });
     }
 

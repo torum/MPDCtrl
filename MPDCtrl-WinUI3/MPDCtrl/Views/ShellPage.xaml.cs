@@ -68,12 +68,6 @@ public sealed partial class ShellPage : Page
         // Do this at shell page loaded event after everything is initilized even App.MainWnd in app.xaml.cs.
         // It is too early here to show dialogs.
         //ViewModel.StartMPC();
-
-        // Not working.
-        this.PlaybackPlay.Loaded += (s, e) =>
-        {
-            this.PlaybackPlay.Focus(FocusState.Programmatic);
-        };
     }
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -82,15 +76,13 @@ public sealed partial class ShellPage : Page
         // is loaded, initialized, set, drawn, navigated. So start the connection.
         ViewModel.StartMPC();
 
-        // Not working.
+        // Set focus so that space shortcut works.
         this.PlaybackPlay.Focus(FocusState.Programmatic);
     }
 
     private void NavigationView_Loaded(object sender, RoutedEventArgs e)
     {
-        /*
-         *  Move to constructor. It should be fine. or not?.. This right here is better. the initial Selected = .. messed up in constructor.
-        */
+        // This right here is better. the initial Selected = .. messed up in the constructor.
         if (NavigationFrame.Navigate(typeof(QueuePage), NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
         {
             _currentPage = typeof(QueuePage);
@@ -100,16 +92,6 @@ public sealed partial class ShellPage : Page
                 queuePage.Selected = true;
             }
         }
-
-        // Not working.
-        this.PlaybackPlay.Focus(FocusState.Programmatic);
-
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
-        {
-            await Task.Delay(1000);// needed this.
-
-            this.PlaybackPlay.Focus(FocusState.Programmatic);
-        });
     }
 
     private void AppTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)

@@ -73,8 +73,9 @@ public sealed partial class QueuePage : Page
             lb.SelectedItem = song;
             //lb.Focus(FocusState.Programmatic);
 
-            ListViewItem? selectedItemContainer = lb.ContainerFromIndex(lb.SelectedIndex) as ListViewItem;
-            selectedItemContainer?.Focus(FocusState.Programmatic);
+            // Let's not set focus here.
+            //ListViewItem? selectedItemContainer = lb.ContainerFromIndex(lb.SelectedIndex) as ListViewItem;
+            //selectedItemContainer?.Focus(FocusState.Programmatic);
         });
     }
 

@@ -72,7 +72,7 @@
                                 <TextBlock Text="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay}" FontWeight="SemiBold" TextWrapping="WrapWholeWords" Opacity="0.9" Visibility="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=False}"/>
                                 -->
                                 <Button Command="{x:Bind ViewModel.SelectedAlbumGoToArtistPageCommand}" CommandParameter="{x:Bind ViewModel.SelectedAlbum, Mode=OneWay}" Visibility="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=False}" Background="Transparent" BorderThickness="0">
-                                    <TextBlock Text="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay}" FontWeight="SemiBold" TextWrapping="WrapWholeWords" Opacity="0.9"/>
+                                    <TextBlock Text="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay}" FontWeight="SemiBold" TextWrapping="WrapWholeWords" Opacity="0.9" Foreground="{ThemeResource AccentFillColorDefaultBrush}"/>
                                 </Button>
 
                                 <TextBlock x:Uid="Text_UnknownArtist" TextWrapping="WrapWholeWords" Opacity="0.6" Margin="12,0,0,0" Visibility="{x:Bind ViewModel.SelectedAlbum.AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=True}" />

@@ -189,23 +189,28 @@ public partial class App : Application
 
                 //MainWindow?.BringToFront();
                 IntPtr hWnd = WindowNative.GetWindowHandle(MainWnd);
-                ShowWindow(hWnd, SW_RESTORE); // Ensure it's not minimized
-                SetForegroundWindow(hWnd); // Attempt to set it as the foreground window
+                NativeMethods.ShowWindow(hWnd, NativeMethods.SW_RESTORE); // Ensure it's not minimized
+                NativeMethods.SetForegroundWindow(hWnd); // Attempt to set it as the foreground window
             }
         });
     }
 
     #region == BringToFront ==
 
-    const int SW_RESTORE = 9; // Restores a minimized window and brings it to the foreground.
+    private static partial class NativeMethods
+    {
 
-    [LibraryImport("user32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool SetForegroundWindow(IntPtr hWnd);
+        internal const int SW_RESTORE = 9; // Restores a minimized window and brings it to the foreground.
 
-    [LibraryImport("user32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        [LibraryImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static partial bool SetForegroundWindow(IntPtr hWnd);
+
+        [LibraryImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static partial bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    }
 
     #endregion
 

@@ -2463,7 +2463,7 @@ public partial class MainViewModel : ObservableObject
 #endif
     }
 
-    public async void StartMPC()
+    public async Task StartMPC()
     {
         if (CurrentProfile is null)
         {
@@ -2483,12 +2483,12 @@ public partial class MainViewModel : ObservableObject
 
             CurrentProfile = pro;
 
-            Start(_host, _port);
+            _ = Task.Run(() => Start(_host, _port));
 
             return;
         }
 
-        Start(_host, _port);
+        _ = Task.Run(() => Start(_host, _port));
     }
 
     public void CleanUp()
@@ -2558,7 +2558,7 @@ public partial class MainViewModel : ObservableObject
             ];
     }
 
-    private async void Start(string host, int port)
+    private async Task Start(string host, int port)
     {
         HostIpAddress = null;
         try
@@ -2598,7 +2598,7 @@ public partial class MainViewModel : ObservableObject
         _ = Task.Run(() => _mpc.MpdIdleConnect(HostIpAddress.ToString(), port));
     }
 
-    private async void LoadInitialData()
+    private async Task LoadInitialData()
     {
         IsBusy = true;
 

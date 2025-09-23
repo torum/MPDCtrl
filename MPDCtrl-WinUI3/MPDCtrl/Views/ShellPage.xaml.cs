@@ -74,7 +74,7 @@ public sealed partial class ShellPage : Page
     {
         // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage)
         // is loaded, initialized, set, drawn, navigated. So start the connection.
-        ViewModel.StartMPC();
+        _ = Task.Run(()=>ViewModel.StartMPC());
 
         // Set focus so that space shortcut works.
         this.PlaybackPlay.Focus(FocusState.Programmatic);

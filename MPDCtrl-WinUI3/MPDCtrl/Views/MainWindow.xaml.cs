@@ -32,6 +32,8 @@ using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.System;
+using WinRT;
+using WinRT.Interop;
 
 namespace MPDCtrl.Views;
 
@@ -66,8 +68,7 @@ public sealed partial class MainWindow : Window
         // This DispatcherQueue should be alive as long as MainWindow is alive. Make sure to clear when the window is closed.
         _currentDispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 
-        var vm = App.GetService<MainViewModel>();
-        _vm = vm;
+        _vm = App.GetService<MainViewModel>();
 
         if (this.AppWindow.Presenter is OverlappedPresenter presenter)
         {
@@ -96,7 +97,6 @@ public sealed partial class MainWindow : Window
             root.CallMeWhenMainWindowIsReady(this);
         }
 
-
         _isGlobalHotKeyEnable = false;
 
         if (_isGlobalHotKeyEnable)
@@ -118,66 +118,27 @@ public sealed partial class MainWindow : Window
 
         if (_isMediaTransportControlEnable)
         {
-            //ISystemMediaTransportControlsInterop
-            /*
-            // The GUID for ISystemMediaTransportControls
-            var iid = new Guid("98b3c67f-44e2-411a-8260-26243265882b");
-
-            // SystemMediaTransportControls‚ÌCLSID
-            //var clsid = typeof(SystemMediaTransportControls).GetCOMServerGUID();
-
-            var interop = (ISystemMediaTransportControlsInterop)Activator.CreateInstance(Type.GetTypeFromCLSID(iid));
-
-            //var interop = WinRT.Activation.Activate<ISystemMediaTransportControlsInterop>("Windows.Media.Control.SystemMediaTransportControls");
-            if (interop is null) return;
-            var smtcPtr = interop.GetForWindow(WindowHandle, ref iid);
-
-            _smtc = CastExtensions.As<SystemMediaTransportControls>(smtcPtr);//Marshal.GetObjectForIUnknown(smtcPtr) as SystemMediaTransportControls;
-            Marshal.ReleaseComObject(smtcPtr);
-
-            if (_smtc is null) return;
-            */
-            
-            // WinUI3 workaround for media key control. 
+            // Stupid WinAppSDK and WinUI3 needs workaround for media key control. 
             //_smtc = SystemMediaTransportControls.GetForCurrentView(); //<- this is only works in UWP.
             // So, get the SystemMediaTransportControls from the MediaPlayer instance for workaround.
+            // This is just so stupid.
+
             _mediaPlayer = new MediaPlayer();
             //_mediaPlayer.CommandManager.IsEnabled = false; <- not good if false.
             _smtc = _mediaPlayer.SystemMediaTransportControls;
+
             _smtc.IsPlayEnabled = true;
             _smtc.IsPauseEnabled = true;
             _smtc.IsNextEnabled = true;
             _smtc.IsPreviousEnabled = true;
             _smtc.IsStopEnabled = true;
-            /*
-            var mlist = new MediaPlaybackList();
-            var mediaPlaybackItem = new MediaPlaybackItem(MediaSource.CreateFromUri(new Uri("ms-appx:///Assets/dummy.mp3")));
-            var props = mediaPlaybackItem.GetDisplayProperties();
-            props.Type = Windows.Media.MediaPlaybackType.Music;
-            props.MusicProperties.Title = "Song title";
-            props.MusicProperties.Artist = "Song artist";
-            props.MusicProperties.Genres.Add("Blues");
-            //props.Thumbnail
-            mediaPlaybackItem.ApplyDisplayProperties(props);
-
-            // To enable prev and back button, make it a playlist.
-            mlist.Items.Add(mediaPlaybackItem);
-            mlist.AutoRepeatEnabled = true;
-
-            // set dummy playlist to the player.
-            //_mediaPlayer.Source = mlist;
-
-            // update info.
-            props.MusicProperties.Title = "Song title2222222";
-            mediaPlaybackItem.ApplyDisplayProperties(props);
-            */
 
             _smtc.PlaybackStatus = MediaPlaybackStatus.Paused;
 
             //
             _smtc.ButtonPressed += Smtc_ButtonPressed;
 
-
+            //
             var updater = _smtc.DisplayUpdater;
             updater.Type = MediaPlaybackType.Music;
             updater.MusicProperties.Title = "a title";
@@ -1168,6 +1129,7 @@ public sealed partial class MainWindow : Window
             }
         });
     }
-}
 
     #endregion
+}
+

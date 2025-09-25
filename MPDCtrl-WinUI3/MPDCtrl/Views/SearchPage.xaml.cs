@@ -112,4 +112,9 @@ public sealed partial class SearchPage : Page
             return null;
         }
     }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        this.SearchTextBox.Focus(FocusState.Programmatic);
+    }
 }

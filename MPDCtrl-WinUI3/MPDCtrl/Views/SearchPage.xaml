@@ -14,7 +14,8 @@
     xmlns:triggers="using:CommunityToolkit.WinUI"
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
     mc:Ignorable="d"
-    NavigationCacheMode="Required">
+    NavigationCacheMode="Required"
+    Loaded="Page_Loaded">
 
     <Grid x:Name="ContentGrid">
         <Grid.RowDefinitions>
@@ -117,7 +118,7 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Search tag combobox -->
-                <ComboBox Grid.Column="0" SelectedIndex="0" MinWidth="140" Margin="0,0,0,0" ItemsSource="{x:Bind ViewModel.SearchTagList,Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedSearchTag,Mode=TwoWay}" VerticalAlignment="Bottom">
+                <ComboBox x:Name="SearchTagComboBox" Grid.Column="0" SelectedIndex="0" MinWidth="140" Margin="0,0,0,0" ItemsSource="{x:Bind ViewModel.SearchTagList,Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedSearchTag,Mode=TwoWay}" VerticalAlignment="Bottom">
                     <ComboBox.ItemTemplate>
                         <DataTemplate x:DataType="mod:SearchOption">
                             <TextBlock Text="{x:Bind Label}" VerticalAlignment="Center"/>
@@ -136,7 +137,7 @@
 
                 <!--Search query input textbox -->
                 <StackPanel Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
-                    <TextBox MinWidth="100" Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="6,0,0,0" HorizontalAlignment="Stretch"></TextBox>
+                    <TextBox x:Name="SearchTextBox" MinWidth="100" Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="6,0,0,0" HorizontalAlignment="Stretch"></TextBox>
                 </StackPanel>
 
                 <!-- Search button -->

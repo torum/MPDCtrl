@@ -13,14 +13,28 @@
     <Nullable>enable</Nullable>
 	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 
-	  <PublishAot>true</PublishAot>
-	  <SelfContained>true</SelfContained>
+
+	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 
 
 	  <ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
+	  <DebugType>embedded</DebugType>
   </PropertyGroup>
+
+	<!-- Publish Properties -->
+	<PropertyGroup>
+		<PublishAot>True</PublishAot>
+		<SelfContained>true</SelfContained>
+		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+		<DebugType>embedded</DebugType>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<PublishTrimmed>True</PublishTrimmed>
+	</PropertyGroup>
+	
   <!--
 	<PropertyGroup>
+	
 	  <PublishSingleFile>true</PublishSingleFile>
 		<WindowsPackageType>None</WindowsPackageType>
 	</PropertyGroup>
@@ -189,24 +203,29 @@
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
   </PropertyGroup>
 
-  <!-- Publish Properties -->
-  <PropertyGroup>
-    <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
-    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
-    <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">True</PublishTrimmed>
-    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
-	  <PublishAot>True</PublishAot>
 
-	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	  <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <Optimize>False</Optimize>
+    <IsPublishable>True</IsPublishable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Optimize>False</Optimize>
+    <IsPublishable>True</IsPublishable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <Optimize>False</Optimize>
+    <IsPublishable>True</IsPublishable>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <Optimize>False</Optimize>
+    <IsPublishable>True</IsPublishable>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Optimize>False</Optimize>
+    <IsPublishable>True</IsPublishable>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <Optimize>False</Optimize>
+    <IsPublishable>True</IsPublishable>
   </PropertyGroup>
 </Project>

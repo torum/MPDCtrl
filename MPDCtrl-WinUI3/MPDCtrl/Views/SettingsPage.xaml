@@ -10,6 +10,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:vm="using:MPDCtrl.ViewModels" 
+    xmlns:mod="using:MPDCtrl.Models" 
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
     mc:Ignorable="d"
     NavigationCacheMode="Required">
@@ -42,80 +43,130 @@
         <Grid Grid.Row="1" x:Name="BodyGrid" Margin="24,0,0,0">
             <ScrollViewer Margin="0,24,0,0">
                 <StackPanel Spacing="24">
-                    <controls:SettingsExpander x:Name="settingsCardTheme"
+
+                    <!-- Themes -->
+                    <controls:SettingsExpander x:Name="SettingsCardTheme"
                             VerticalAlignment="Top"
-                            Header=""
-                            Description="asdf"
-                            HeaderIcon="{ui:FontIcon Glyph=&#xE91B;}"
+                            x:Uid="Settings_VisualPreferences"
                             IsEnabled="True"
                             IsExpanded="False">
-                        <!--  TODO:   -->
+                        <controls:SettingsExpander.HeaderIcon>
+                            <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Zm0-2V4a8 8 0 1 1 0 16Z"/>
+                        </controls:SettingsExpander.HeaderIcon>
 
                         <controls:SettingsExpander.Items>
 
-                            <controls:SettingsCard Header="asdfsadf" HorizontalContentAlignment="Left" ContentAlignment="Vertical" Description="fdasa">
-                                <TextBox MinWidth="300" Width="500" PlaceholderText="" HorizontalAlignment="Stretch" Text="ddsaf"/>
+                            <controls:SettingsCard x:Uid="Settings_Theme" HorizontalContentAlignment="Left" ContentAlignment="Vertical" Description="">
+                                <StackPanel Orientation="Horizontal" Spacing="24">
+
+                                    <RadioButton x:Uid="Settings_Theme_Light" IsEnabled="{x:Bind ViewModel.IsBackdropEnabled, Mode=OneWay}" Command="{x:Bind ViewModel.SwitchThemeCommand}" IsChecked="{x:Bind ViewModel.Theme, Converter={StaticResource ElementThemeEnumToBooleanConverter}, ConverterParameter=Light, Mode=OneWay}" FontSize="15" GroupName="AppTheme">
+                                        <RadioButton.CommandParameter>
+                                            <xaml:ElementTheme>Light</xaml:ElementTheme>
+                                        </RadioButton.CommandParameter>
+                                    </RadioButton>
+                                    <RadioButton x:Uid="Settings_Theme_Dark" IsEnabled="{x:Bind ViewModel.IsBackdropEnabled, Mode=OneWay}" Command="{x:Bind ViewModel.SwitchThemeCommand}" IsChecked="{x:Bind ViewModel.Theme, Converter={StaticResource ElementThemeEnumToBooleanConverter}, ConverterParameter=Dark, Mode=OneWay}" FontSize="15" GroupName="AppTheme">
+                                        <RadioButton.CommandParameter>
+                                            <xaml:ElementTheme>Dark</xaml:ElementTheme>
+                                        </RadioButton.CommandParameter>
+                                    </RadioButton>
+                                    <RadioButton x:Uid="Settings_Theme_Default" IsEnabled="True" Command="{x:Bind ViewModel.SwitchThemeCommand}" IsChecked="{x:Bind ViewModel.Theme, Converter={StaticResource ElementThemeEnumToBooleanConverter}, ConverterParameter=Default, Mode=OneWay}" FontSize="15" GroupName="AppTheme">
+                                        <RadioButton.CommandParameter>
+                                            <xaml:ElementTheme>Default</xaml:ElementTheme>
+                                        </RadioButton.CommandParameter>
+                                    </RadioButton>
+                                </StackPanel>
                             </controls:SettingsCard>
 
-                            <controls:SettingsCard HorizontalContentAlignment="Left" ContentAlignment="Vertical" Header="sadfs">
-                                <ComboBox x:Name="ComboBoxKind" PlaceholderText="選択" MinWidth="300" Margin="0,0,0,0" SelectedIndex="-1" >
-                                    <!-- ItemsSource="{x:Bind ViewModel.Kinds, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" -->
-                                    <!--<ComboBox.ItemTemplate>
-                                        
-                                        <DataTemplate x:DataType="modres:Kind">
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="{x:Bind Label, Mode=OneWay}" Margin="0,0,5,0"/>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                        
-                                    </ComboBox.ItemTemplate>-->
-                                </ComboBox>
-                            </controls:SettingsCard>
+                            <controls:SettingsCard x:Uid="Settings_SystemBackdrop" HorizontalContentAlignment="Left" ContentAlignment="Vertical" Description="">
 
-                            <controls:SettingsCard Header="afd" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
-                                <CheckBox Content="hoge" IsChecked="False"/>
+                                <StackPanel Orientation="Horizontal" Spacing="24">
+
+                                    <RadioButton x:Uid="Settings_SystemBackdrop_Acrylic" IsEnabled="{x:Bind ViewModel.IsAcrylicSupported,Mode=OneWay}" Command="{x:Bind ViewModel.SwitchSystemBackdropCommand}" CommandParameter="Acrylic" IsChecked="{x:Bind ViewModel.Material, Converter={StaticResource SystemBackdropEnumToBooleanConverter}, ConverterParameter=Acrylic, Mode=OneWay}" FontSize="15" GroupName="AppMaterial"/>
+                                    <RadioButton x:Uid="Settings_SystemBackdrop_Mica" IsEnabled="{x:Bind ViewModel.IsMicaSupported,Mode=OneWay}" Command="{x:Bind ViewModel.SwitchSystemBackdropCommand}" CommandParameter="Mica" IsChecked="{x:Bind ViewModel.Material, Converter={StaticResource SystemBackdropEnumToBooleanConverter}, ConverterParameter=Mica, Mode=OneWay}" FontSize="15" GroupName="AppMaterial"/>
+                                    <RadioButton x:Uid="Settings_SystemBackdrop_MicaAlt" IsEnabled="{x:Bind ViewModel.IsMicaSupported,Mode=OneWay}" Command="{x:Bind ViewModel.SwitchSystemBackdropCommand}" CommandParameter="MicaAlt" IsChecked="{x:Bind ViewModel.Material, Converter={StaticResource SystemBackdropEnumToBooleanConverter}, ConverterParameter=MicaAlt, Mode=OneWay}" FontSize="15" GroupName="AppMaterial"/>
+                                    <RadioButton x:Uid="Settings_SystemBackdrop_None" IsEnabled="True" Command="{x:Bind ViewModel.SwitchSystemBackdropCommand}" CommandParameter="None" IsChecked="{x:Bind ViewModel.Material, Converter={StaticResource SystemBackdropEnumToBooleanConverter}, ConverterParameter=None, Mode=OneWay}" FontSize="15" GroupName="AppMaterial"/>
+
+                                </StackPanel>
                             </controls:SettingsCard>
 
                         </controls:SettingsExpander.Items>
 
                     </controls:SettingsExpander>
+
+                    <!-- MPD -->
+                    <controls:SettingsExpander x:Name="SettingsCardMPD"
+                            VerticalAlignment="Top"
+                            x:Uid="Settings_MPD"
+                            IsEnabled="True"
+                            IsExpanded="False">
+                        
+                        <TextBlock Text="{x:Bind ViewModel.ShortStatusWithMpdVersion, Mode=OneWay}"></TextBlock>
+                        
+                        <controls:SettingsExpander.Items>
+                            <controls:SettingsCard HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Header="@Connection Profile">
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <StackPanel Grid.Column="0" Spacing="12" Orientation="Horizontal" HorizontalAlignment="Left">
+
+                                        <ComboBox PlaceholderText="@Select" MinWidth="300" Margin="0,0,0,0" SelectedIndex="-1" VerticalAlignment="Center"
+                                           ItemsSource="{x:Bind ViewModel.Profiles, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedProfile, Mode=TwoWay}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:DataType="mod:Profile">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <Viewbox Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,2,0,0">
+                                                            <PathIcon Width="NaN" Height="NaN" Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" Visibility="{x:Bind IsDefault, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"></PathIcon>
+                                                        </Viewbox>
+                                                        <TextBlock Text="{x:Bind Name, Mode=OneWay}" Margin="12,0,0,0" VerticalAlignment="Center"></TextBlock>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+
+                                        <Button Command="{x:Bind ViewModel.ShowProfileEditDialogCommand}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="39" Height="36">
+                                            <Viewbox Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,2,0,0">
+                                                <PathIcon Width="NaN" Height="NaN" Data="m13.94 5 5.061 5.06-.962.962a6.5 6.5 0 0 0-7.016 7.016l-1.96 1.96a2.25 2.25 0 0 1-1 .58l-5.115 1.395a.75.75 0 0 1-.92-.92l1.394-5.116a2.25 2.25 0 0 1 .58-1L13.94 5Zm7.091-2.03a3.579 3.579 0 0 1 0 5.06l-.97.97L15 3.94l.97-.97a3.578 3.578 0 0 1 5.061 0ZM14.28 13.974a2 2 0 0 1-1.441 2.497l-.584.144a5.729 5.729 0 0 0 .006 1.807l.54.13a2 2 0 0 1 1.45 2.51l-.187.632c.44.386.94.699 1.484.921l.494-.518a2 2 0 0 1 2.899 0l.498.525a5.28 5.28 0 0 0 1.483-.913l-.198-.686a2 2 0 0 1 1.442-2.496l.583-.144a5.729 5.729 0 0 0-.006-1.808l-.54-.13a2 2 0 0 1-1.45-2.51l.187-.63a5.28 5.28 0 0 0-1.484-.923l-.493.519a2 2 0 0 1-2.9 0l-.498-.525c-.544.22-1.044.53-1.483.912l.198.686ZM17.501 19c-.8 0-1.45-.672-1.45-1.5 0-.829.65-1.5 1.45-1.5.8 0 1.45.671 1.45 1.5 0 .828-.65 1.5-1.45 1.5Z"></PathIcon>
+                                            </Viewbox>
+                                        </Button>
+
+                                        <Button Command="{x:Bind ViewModel.ShowProfileRemoveNoneDialogCommand}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="39" Height="36">
+                                            <Viewbox Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,2,0,0">
+                                                <PathIcon Width="NaN" Height="NaN" Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm-4.25 9.25a.75.75 0 0 0-.102 1.493l.102.007h8.5a.75.75 0 0 0 .102-1.493l-.102-.007h-8.5Z"></PathIcon>
+                                            </Viewbox>
+                                        </Button>
+
+                                        <Button Command="{x:Bind ViewModel.ShowProfileAddDialogCommand}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="39" Height="36">
+                                            <Viewbox Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,2,0,0">
+                                                <PathIcon Width="NaN" Height="NaN" Data="M11.883 3.007 12 3a1 1 0 0 1 .993.883L13 4v7h7a1 1 0 0 1 .993.883L21 12a1 1 0 0 1-.883.993L20 13h-7v7a1 1 0 0 1-.883.993L12 21a1 1 0 0 1-.993-.883L11 20v-7H4a1 1 0 0 1-.993-.883L3 12a1 1 0 0 1 .883-.993L4 11h7V4a1 1 0 0 1 .883-.993L12 3l-.117.007Z"></PathIcon>
+                                            </Viewbox>
+                                        </Button>
+
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Spacing="12" Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button MinWidth="84" Width="150" Height="36" x:Uid="Settings_MPD_Reconnect" Command="{x:Bind ViewModel.ReConnectWithSelectedProfileCommand}" IsEnabled="{x:Bind ViewModel.IsConnectButtonEnabled,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center"></Button>
+                                    </StackPanel>
+
+                                </Grid>
+
+                            </controls:SettingsCard>
+                            
+                            <controls:SettingsCard Header="afd" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
+                                <CheckBox Content="hoge" IsChecked="False"/>
+                            </controls:SettingsCard>
+
+                            <controls:SettingsCard Header="asdfsadf" HorizontalContentAlignment="Left" ContentAlignment="Vertical" Description="fdasa">
+                                <CheckBox Content="hoge" IsChecked="False"/>
+                            </controls:SettingsCard>
+                            
+                        </controls:SettingsExpander.Items>
+
+                    </controls:SettingsExpander>
                     
-                    
-                    <StackPanel>
-                        <TextBlock x:Uid="Settings_Theme" Margin="0,0,0,12" />
-
-                        <RadioButton x:Uid="Settings_Theme_Light" IsEnabled="{x:Bind ViewModel.IsBackdropEnabled, Mode=OneWay}" Command="{x:Bind ViewModel.SwitchThemeCommand}" IsChecked="{x:Bind ViewModel.Theme, Converter={StaticResource ElementThemeEnumToBooleanConverter}, ConverterParameter=Light, Mode=OneWay}" FontSize="15" GroupName="AppTheme">
-                            <RadioButton.CommandParameter>
-                                <xaml:ElementTheme>Light</xaml:ElementTheme>
-                            </RadioButton.CommandParameter>
-                        </RadioButton>
-                        <RadioButton x:Uid="Settings_Theme_Dark" IsEnabled="{x:Bind ViewModel.IsBackdropEnabled, Mode=OneWay}" Command="{x:Bind ViewModel.SwitchThemeCommand}" IsChecked="{x:Bind ViewModel.Theme, Converter={StaticResource ElementThemeEnumToBooleanConverter}, ConverterParameter=Dark, Mode=OneWay}" FontSize="15" GroupName="AppTheme">
-                            <RadioButton.CommandParameter>
-                                <xaml:ElementTheme>Dark</xaml:ElementTheme>
-                            </RadioButton.CommandParameter>
-                        </RadioButton>
-                        <RadioButton x:Uid="Settings_Theme_Default" IsEnabled="True" Command="{x:Bind ViewModel.SwitchThemeCommand}" IsChecked="{x:Bind ViewModel.Theme, Converter={StaticResource ElementThemeEnumToBooleanConverter}, ConverterParameter=Default, Mode=OneWay}" FontSize="15" GroupName="AppTheme">
-                            <RadioButton.CommandParameter>
-                                <xaml:ElementTheme>Default</xaml:ElementTheme>
-                            </RadioButton.CommandParameter>
-                        </RadioButton>
-                    </StackPanel>
-
-                    <StackPanel>
-
-                        <TextBlock x:Uid="Settings_SystemBackdrop" Margin="0,0,0,12"/>
-
-                        <StackPanel>
-
-                            <RadioButton x:Uid="Settings_SystemBackdrop_Acrylic" IsEnabled="{x:Bind ViewModel.IsAcrylicSupported,Mode=OneWay}" Command="{x:Bind ViewModel.SwitchSystemBackdropCommand}" CommandParameter="Acrylic" IsChecked="{x:Bind ViewModel.Material, Converter={StaticResource SystemBackdropEnumToBooleanConverter}, ConverterParameter=Acrylic, Mode=OneWay}" FontSize="15" GroupName="AppMaterial"/>
-                            <RadioButton x:Uid="Settings_SystemBackdrop_Mica" IsEnabled="{x:Bind ViewModel.IsMicaSupported,Mode=OneWay}" Command="{x:Bind ViewModel.SwitchSystemBackdropCommand}" CommandParameter="Mica" IsChecked="{x:Bind ViewModel.Material, Converter={StaticResource SystemBackdropEnumToBooleanConverter}, ConverterParameter=Mica, Mode=OneWay}" FontSize="15" GroupName="AppMaterial"/>
-                            <RadioButton x:Uid="Settings_SystemBackdrop_MicaAlt" IsEnabled="{x:Bind ViewModel.IsMicaSupported,Mode=OneWay}" Command="{x:Bind ViewModel.SwitchSystemBackdropCommand}" CommandParameter="MicaAlt" IsChecked="{x:Bind ViewModel.Material, Converter={StaticResource SystemBackdropEnumToBooleanConverter}, ConverterParameter=MicaAlt, Mode=OneWay}" FontSize="15" GroupName="AppMaterial"/>
-                            <RadioButton x:Uid="Settings_SystemBackdrop_None" IsEnabled="True" Command="{x:Bind ViewModel.SwitchSystemBackdropCommand}" CommandParameter="None" IsChecked="{x:Bind ViewModel.Material, Converter={StaticResource SystemBackdropEnumToBooleanConverter}, ConverterParameter=None, Mode=OneWay}" FontSize="15" GroupName="AppMaterial"/>
-
-                        </StackPanel>
-
-                    </StackPanel>
-
                 </StackPanel>
             </ScrollViewer>
         </Grid>
@@ -128,7 +179,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="48,0,48,0" />
-                        <Setter Target="BodyGrid.Margin" Value="48,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="48,0,48,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -137,7 +188,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="24,0,24,0" />
-                        <Setter Target="BodyGrid.Margin" Value="24,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="24,0,24,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -146,7 +197,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="16,0,16,0" />
-                        <Setter Target="BodyGrid.Margin" Value="16,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="16,0,16,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -155,7 +206,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="16,0,16,0" />
-                        <Setter Target="BodyGrid.Margin" Value="16,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="16,0,16,0" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

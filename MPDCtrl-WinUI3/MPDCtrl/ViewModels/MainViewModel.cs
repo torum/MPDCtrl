@@ -1546,8 +1546,8 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private ObservableCollection<Object>? _visibleItemsAlbumsEx = [];
-    public ObservableCollection<Object>? VisibleItemsAlbumsEx
+    private ObservableCollection<AlbumEx>? _visibleItemsAlbumsEx = [];
+    public ObservableCollection<AlbumEx>? VisibleItemsAlbumsEx
     {
         get => _visibleItemsAlbumsEx;
         set
@@ -2011,8 +2011,9 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    public string ShortStatusWIthMpdVersion
+    public string ShortStatusWithMpdVersion
     {
+        // TODO: localize.
         get
         {
             if (IsConnected)
@@ -2106,7 +2107,7 @@ public partial class MainViewModel : ObservableObject
 
             _isConnected = value;
             OnPropertyChanged(nameof(IsConnected));
-            OnPropertyChanged(nameof(ShortStatusWIthMpdVersion));
+            OnPropertyChanged(nameof(ShortStatusWithMpdVersion));
             OnPropertyChanged(nameof(IsNotConnecting));
 
             IsConnecting = !_isConnected;
@@ -2137,7 +2138,7 @@ public partial class MainViewModel : ObservableObject
             _isConnecting = value;
             OnPropertyChanged(nameof(IsConnecting));
             OnPropertyChanged(nameof(IsNotConnecting));
-            OnPropertyChanged(nameof(ShortStatusWIthMpdVersion));
+            OnPropertyChanged(nameof(ShortStatusWithMpdVersion));
 
             if (_isConnecting)
             {
@@ -2160,7 +2161,7 @@ public partial class MainViewModel : ObservableObject
 
             _isNotConnectingNorConnected = value;
             OnPropertyChanged(nameof(IsNotConnectingNorConnected));
-            OnPropertyChanged(nameof(ShortStatusWIthMpdVersion));
+            OnPropertyChanged(nameof(ShortStatusWithMpdVersion));
 
             if (_isNotConnectingNorConnected)
             {
@@ -2503,6 +2504,13 @@ public partial class MainViewModel : ObservableObject
             }
         }
         catch { }
+    }
+
+    public void SetError(string error)
+    {
+        InfoBarErrMessage = error;
+
+        IsShowErrWindow = true;
     }
 
     #region == Private Methods ==
@@ -4567,7 +4575,6 @@ public partial class MainViewModel : ObservableObject
 
             //MpdStatusButton = _pathMpdOkButton;
 
-            // 
             IsConnected = true;
             IsConnecting = false;
             IsNotConnectingNorConnected = false;
@@ -4681,22 +4688,31 @@ public partial class MainViewModel : ObservableObject
     {
         if (status == MpcService.ConnectionStatus.NeverConnected)
         {
-            IsConnected = false;
-            IsConnecting = false;
-            IsNotConnectingNorConnected = true;
-            /*
-            IsConnectionSettingShow = true;
-            StatusButton = _pathDisconnectedButton;
-            */
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                IsConnected = false;
+                IsConnecting = false;
+                IsNotConnectingNorConnected = true;
+
+                /*
+                IsConnectionSettingShow = true;
+                StatusButton = _pathDisconnectedButton;
+                */
+
+            });
 
             //ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_NeverConnected;
             Debug.WriteLine("ConnectionStatus_NeverConnected");
         }
         else if (status == MpcService.ConnectionStatus.Connected)
         {
-            IsConnected = true;
-            IsConnecting = false;
-            IsNotConnectingNorConnected = false;
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                IsConnected = true;
+                IsConnecting = false;
+                IsNotConnectingNorConnected = false;
+            });
+
             /*
             IsConnectionSettingShow = false;
             StatusButton = _pathConnectedButton;
@@ -4707,9 +4723,12 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.Connecting)
         {
-            IsConnected = false;
-            IsConnecting = true;
-            IsNotConnectingNorConnected = false;
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                IsConnected = false;
+                IsConnecting = true;
+                IsNotConnectingNorConnected = false;
+            });
             /*
             //IsConnectionSettingShow = true;
             StatusButton = _pathConnectingButton;
@@ -4722,9 +4741,12 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.ConnectFailTimeout)
         {
-            IsConnected = false;
-            IsConnecting = false;
-            IsNotConnectingNorConnected = true;
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                IsConnected = false;
+                IsConnecting = false;
+                IsNotConnectingNorConnected = true;
+            });
             /*
             IsConnectionSettingShow = true;
 
@@ -4739,9 +4761,12 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.SeeConnectionErrorEvent)
         {
-            IsConnected = false;
-            IsConnecting = false;
-            IsNotConnectingNorConnected = true;
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                IsConnected = false;
+                IsConnecting = false;
+                IsNotConnectingNorConnected = true;
+            });
             /*
             IsConnectionSettingShow = true;
             StatusButton = _pathErrorInfoButton;
@@ -4752,9 +4777,13 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.Disconnected)
         {
-            IsConnected = false;
-            IsConnecting = false;
-            IsNotConnectingNorConnected = true;
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                IsConnected = false;
+                IsConnecting = false;
+                IsNotConnectingNorConnected = true;
+            });
+
             /*
             IsConnectionSettingShow = true;
             ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_Disconnected;
@@ -4767,9 +4796,13 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.DisconnectedByHost)
         {
-            IsConnected = false;
-            IsConnecting = false;
-            IsNotConnectingNorConnected = true;
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                IsConnected = false;
+                IsConnecting = false;
+                IsNotConnectingNorConnected = true;
+            });
+
             // TODO: not really usued now...
             /*
             IsConnectionSettingShow = true;
@@ -4783,9 +4816,12 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.Disconnecting)
         {
-            IsConnected = false;
-            IsConnecting = false;
-            IsNotConnectingNorConnected = false;
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                IsConnected = false;
+                IsConnecting = false;
+                IsNotConnectingNorConnected = false;
+            });
             /*
             //IsConnectionSettingShow = true;
 
@@ -4798,9 +4834,12 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.DisconnectedByUser)
         {
-            IsConnected = false;
-            IsConnecting = false;
-            IsNotConnectingNorConnected = true;
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                IsConnected = false;
+                IsConnecting = false;
+                IsNotConnectingNorConnected = true;
+            });
             /*
             //IsConnectionSettingShow = true;
 
@@ -4813,9 +4852,12 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.SendFailNotConnected)
         {
-            IsConnected = false;
-            IsConnecting = false;
-            IsNotConnectingNorConnected = true;
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                IsConnected = false;
+                IsConnecting = false;
+                IsNotConnectingNorConnected = true;
+            });
             /*
             IsConnectionSettingShow = true;
             ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_SendFail_NotConnected;
@@ -4828,9 +4870,12 @@ public partial class MainViewModel : ObservableObject
         }
         else if (status == MpcService.ConnectionStatus.SendFailTimeout)
         {
-            IsConnected = false;
-            IsConnecting = false;
-            IsNotConnectingNorConnected = true;
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                IsConnected = false;
+                IsConnecting = false;
+                IsNotConnectingNorConnected = true;
+            });
             /*
             IsConnectionSettingShow = true;
 
@@ -4965,6 +5010,7 @@ public partial class MainViewModel : ObservableObject
             rootElement.RequestedTheme = Theme;
 
             //TitleBarHelper.UpdateTitleBar(Theme, App.MainWnd);
+
             App.MainWnd.SetCapitionButtonColor();
         }
     }
@@ -6646,7 +6692,29 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    [RelayCommand]
+    public void ReConnectWithSelectedProfile()
+    {
+        Debug.WriteLine("ReConnectWithSelectedProfile");
+    }
 
+    [RelayCommand]
+    public void ShowProfileEditDialog()
+    {
+        Debug.WriteLine("ShowProfileEditDialog");
+    }
+
+    [RelayCommand]
+    public void ShowProfileRemoveNoneDialog()
+    {
+        Debug.WriteLine("ShowProfileRemoveNoneDialog");
+    }
+
+    [RelayCommand]
+    public void ShowProfileAddDialog()
+    {
+        Debug.WriteLine("ShowProfileAddDialog");
+    }
 
     #endregion
 }

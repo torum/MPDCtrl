@@ -108,8 +108,13 @@
         </Grid>
 
         <Grid Grid.Row="1" x:Name="BodyGrid" Margin="24,0,0,0">
-            <ListView x:Name="AlbumListView" AccessKey="L" ItemsSource="{x:Bind ViewModel.Albums, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAlbum, Mode=TwoWay}" helper:ListViewBehavior.VisibleItems="{x:Bind ViewModel.VisibleItemsAlbumsEx, Mode=TwoWay}" SelectionMode="Single" SingleSelectionFollowsFocus="False" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                        IsMultiSelectCheckBoxEnabled="False">
+            <ListView x:Name="AlbumListView" AccessKey="L" ItemsSource="{x:Bind ViewModel.Albums, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAlbum, Mode=TwoWay}" SelectionMode="Single" SingleSelectionFollowsFocus="False" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                        IsMultiSelectCheckBoxEnabled="False" Loaded="AlbumListView_Loaded">
+                
+                <!-- AOT problem
+                 helper:ListViewBehavior.VisibleItems="{x:Bind ViewModel.VisibleItemsAlbumsEx, Mode=TwoWay}"
+                -->
+                
                 <ListView.Resources>
                     <x:Boolean x:Key="ListViewItemSelectionIndicatorVisualEnabled">False</x:Boolean>
                 </ListView.Resources>

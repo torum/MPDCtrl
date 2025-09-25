@@ -12,6 +12,7 @@ using MPDCtrl.Models;
 using MPDCtrl.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -20,6 +21,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Web;
 
 namespace MPDCtrl.Views;
 
@@ -149,5 +151,87 @@ public sealed partial class AlbumsPage : Page
         CreateOrUpdateSpringAnimation(1.0f);
         ele.CenterPoint = new Vector3((float)(ele.ActualWidth / 2.0), (float)(ele.ActualHeight / 2.0), 1f);
         ele.StartAnimation(_springAnimation);
+    }
+
+    private void AlbumListView_Loaded(object sender, RoutedEventArgs e)
+    {
+        // Already subscribed, returning.
+        if (this.AlbumListView.Tag != null)
+        {
+            //Debug.WriteLine("(ListView.Tag != null) @ListViewBehaviors");
+            return;
+        }
+
+        this.AlbumListView.Tag = "LoadedEvent_ListViewBehaviors";
+
+        //Debug.WriteLine("listView.Loaded and subscribing. @OnPropertyChanged");
+
+        var scrollViewer = FindScrollViewer(this.AlbumListView);
+        if (scrollViewer is null)
+        {
+            return;
+        }
+
+        scrollViewer.ViewChanged += (sender, eventArgs) =>
+        {
+            UpdateVisibleItems(this.AlbumListView, scrollViewer);
+        };
+
+        scrollViewer.SizeChanged += (sender, eventArgs) =>
+        {
+            //Debug.WriteLine("scrollViewer.SizeChanged");
+            UpdateVisibleItems(this.AlbumListView, scrollViewer);
+        };
+
+        UpdateVisibleItems(this.AlbumListView, scrollViewer);
+    }
+
+    private void UpdateVisibleItems(ListView listView, ScrollViewer scrollViewer)//, ObservableCollection<object> visibleItems
+    {
+        //visibleItems.Clear();
+        ObservableCollection<AlbumEx> visibleItems = [];
+
+        /*
+        if (listView.ItemsPanelRoot is not ItemsWrapGrid itemsPanel)
+        {
+            Debug.WriteLine($"ItemsPanelRoot is null or not ItemsWrapGrid");
+            ViewModel.SetError($"ItemsWrapGrid is not it. {listView.ItemsPanelRoot}");
+            return;
+        }
+        */
+        // AOT
+        if (listView.ItemsPanelRoot is not Microsoft.UI.Xaml.Controls.Panel itemsPanel)
+        {
+            Debug.WriteLine($"ItemsPanelRoot is null or not ItemsWrapGrid");
+            ViewModel.SetError($"ItemsWrapGrid is not it. {listView.ItemsPanelRoot}");
+            return;
+        }
+
+        //var scrollViewer = FindScrollViewer(listView);
+        if (scrollViewer is null) 
+        {
+            return;
+        }
+
+        var viewport = new Rect(0, 0, scrollViewer.ViewportWidth, scrollViewer.ViewportHeight);
+        foreach (var container in itemsPanel.Children)
+        {
+            if (container is not ListViewItem listViewItem) continue;
+
+            var transform = listViewItem.TransformToVisual(scrollViewer);
+            var itemBounds = transform.TransformBounds(new Rect(0, 0, listViewItem.ActualWidth, listViewItem.ActualHeight));
+
+            if (viewport.IntersectsWith(itemBounds))
+            {
+                if (listViewItem.Content is AlbumEx dataItem)
+                {
+                    visibleItems.Add(dataItem);
+                }
+            }
+        }
+
+        //listView.SetValue(VisibleItemsProperty, visibleItems);
+
+        ViewModel.VisibleItemsAlbumsEx = visibleItems;
     }
 }

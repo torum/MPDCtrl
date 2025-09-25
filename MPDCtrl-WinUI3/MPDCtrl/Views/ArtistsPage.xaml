@@ -233,6 +233,9 @@
 
                                         <Border Grid.Row="2">
                                             <ListView x:Name="ArtistAlbumSongsListView" ItemsSource="{x:Bind Songs, Mode=OneWay}" SelectionMode="Extended" BorderThickness="0" Margin="0,6,0,36" RightTapped="ListView_RightTapped">
+                                                <!--
+                                                    AOT problem, Stupid WinUI bug/limitation.
+                                                
                                                 <ListView.ContextFlyout>
                                                     <MenuFlyout>
                                                         <MenuFlyoutItem x:Uid="ListViewItemContextMenu_Play" Command="{x:Bind ParentViewModel.SongsSelectedItemsPlayCommand, Mode=OneWay}" CommandParameter="{x:Bind ArtistAlbumSongsListView.SelectedItems, Mode=OneWay}">
@@ -255,6 +258,8 @@
                                                         </MenuFlyoutItem>
                                                     </MenuFlyout>
                                                 </ListView.ContextFlyout>
+                                                -->
+
                                                 <ListView.Header>
                                                     <Grid Height="48" ColumnSpacing="8">
                                                         <Grid.ColumnDefinitions>

@@ -127,13 +127,13 @@
     <value>Personalization</value>
   </data>
   <data name="Settings_Theme_Light.Content" xml:space="preserve">
-    <value>Light</value>
+    <value>ライト</value>
   </data>
   <data name="Settings_Theme_Dark.Content" xml:space="preserve">
-    <value>Dark</value>
+    <value>ダーク</value>
   </data>
   <data name="Settings_Theme_Default.Content" xml:space="preserve">
-    <value>Default</value>
+    <value>既定</value>
   </data>
   <data name="Settings_About.Text" xml:space="preserve">
     <value>About this application</value>
@@ -180,9 +180,6 @@
   <data name="MenuTreeItem_Playlists" xml:space="preserve">
     <value>プレイリスト</value>
   </data>
-  <data name="Settings_SystemBackdrop.Text" xml:space="preserve">
-    <value>ビジュアル効果</value>
-  </data>
   <data name="Settings_SystemBackdrop_Acrylic.Content" xml:space="preserve">
     <value>アクリル</value>
   </data>
@@ -195,7 +192,7 @@
   <data name="Settings_SystemBackdrop_None.Content" xml:space="preserve">
     <value>なし</value>
   </data>
-  <data name="Settings_Theme.Text" xml:space="preserve">
+  <data name="Settings_Theme.Header" xml:space="preserve">
     <value>テーマ</value>
   </data>
   <data name="QueuePage_SubTitle_SongCount" xml:space="preserve">
@@ -419,5 +416,23 @@
   </data>
   <data name="Version" xml:space="preserve">
     <value>バージョン</value>
+  </data>
+  <data name="Settings_SystemBackdrop.Header" xml:space="preserve">
+    <value>背景</value>
+  </data>
+  <data name="Settings_VisualPreferences.Description" xml:space="preserve">
+    <value>テーマと背景</value>
+  </data>
+  <data name="Settings_MPD_Reconnect.Content" xml:space="preserve">
+    <value>再接続</value>
+  </data>
+  <data name="Settings_VisualPreferences.Header" xml:space="preserve">
+    <value>外観</value>
+  </data>
+  <data name="Settings_MPD.Header" xml:space="preserve">
+    <value>MPD (Music Player Daemon)</value>
+  </data>
+  <data name="Settings_MPD.Description" xml:space="preserve">
+    <value>コネクション設定とオプション</value>
   </data>
 </root>

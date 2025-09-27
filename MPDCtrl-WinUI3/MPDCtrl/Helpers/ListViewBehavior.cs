@@ -101,7 +101,11 @@ public static class ListViewBehavior
     {
         //visibleItems.Clear();
         ObservableCollection<object> visibleItems = [];
+
         /*
+         * AOT bad
+         * https://github.com/microsoft/microsoft-ui-xaml/issues/10604
+         * ItemsPanelRoot.As<ItemsWrapGrid>()
         if (listView.ItemsPanelRoot is not ItemsWrapGrid itemsPanel)
         {
             Debug.WriteLine($"ItemsPanelRoot is null or not ItemsWrapGrid");
@@ -115,7 +119,6 @@ public static class ListViewBehavior
             return;
         }
 
-        //var scrollViewer = FindScrollViewer(listView);
         if (scrollViewer is null) return;
 
         var viewport = new Rect(0, 0, scrollViewer.ViewportWidth, scrollViewer.ViewportHeight);

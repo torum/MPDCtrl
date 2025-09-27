@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="MPDCtrl.Views.Dialogs.ProfileDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MPDCtrl.Views.Dialogs"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+     xmlns:vm="using:MPDCtrl.ViewModels"
+    xmlns:mod="using:MPDCtrl.Models"
+    mc:Ignorable="d">
+
+    <Grid>
+        <StackPanel Margin="10" Width="250">
+            <!--
+            <StackPanel Spacing="3" HorizontalAlignment="Left">
+                <TextBlock Text="{x:Static prop:Resources.Host}"></TextBlock>
+                <TextBox x:Name="HostTextBox" Text="" Watermark="IP address or PC name" Width="250"></TextBox>
+
+            </StackPanel>
+            <StackPanel Spacing="3" HorizontalAlignment="Left">
+                <TextBlock Text="{x:Static prop:Resources.Port}"></TextBlock>
+                <TextBox x:Name="PortTextBox" Text="" Watermark="Default is 6600" Width="250"></TextBox>
+            </StackPanel>
+            <StackPanel Spacing="3" HorizontalAlignment="Left">
+                <TextBlock Text="{x:Static prop:Resources.Password}"></TextBlock>
+                <StackPanel Spacing="24" Orientation="Horizontal">
+                    <TextBox x:Name="PasswordBox" Watermark="Optional unless configred otherwise" PasswordChar="*" Text="" Width="250"></TextBox>
+                    <TextBlock Text="" VerticalAlignment="Bottom"></TextBlock>
+                </StackPanel>
+            </StackPanel>
+            -->
+            <StackPanel Spacing="3" HorizontalAlignment="Left">
+                <CheckBox x:Name="IsDefaultCheckBox" Content="IsDefault" HorizontalAlignment="Left" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Page>

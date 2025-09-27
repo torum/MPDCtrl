@@ -191,4 +191,88 @@ public class DialogService : IDialogService
 
         return null;
     }
+
+    public async Task<Profile?> ShowProfileAddDialog()
+    {
+        var dialog = new ContentDialog
+        {
+            XamlRoot = App.MainWnd.Content.XamlRoot,
+            Title = "ADD",
+            IsPrimaryButtonEnabled = true,
+            PrimaryButtonText = "Dialog_Ok",
+            DefaultButton = ContentDialogButton.Primary,
+            IsSecondaryButtonEnabled = false,
+            CloseButtonText = "Dialog_CancelClose",
+            Content = new Views.Dialogs.ProfileDialog()
+            {
+                //DataContext = new DialogViewModel()
+            }
+        };
+
+        if (dialog.Content is not Views.Dialogs.ProfileDialog dlg)
+        {
+            return null;
+        }
+
+        var result = await dialog.ShowAsync();
+
+        if (result != ContentDialogResult.Primary)
+        {
+            return null;
+        }
+
+        var ret = dlg.GetProfileAsNew();
+        if (ret is not null)
+        {
+            return ret;
+        }
+
+        return null;
+    }
+
+    public async Task<Profile?> ShowProfileEditDialog(Profile selectedProfile)
+    {
+        if (selectedProfile is null)
+        {
+            return null;
+        }
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = App.MainWnd.Content.XamlRoot,
+            Title = "EDIT",
+            IsPrimaryButtonEnabled = true,
+            PrimaryButtonText = "Dialog_Ok",
+            DefaultButton = ContentDialogButton.Primary,
+            IsSecondaryButtonEnabled = false,
+            CloseButtonText = "Dialog_CancelClose",
+            Content = new Views.Dialogs.ProfileDialog()
+            {
+                //DataContext = new DialogViewModel()
+            }
+        };
+
+        if (dialog.Content is not Views.Dialogs.ProfileDialog dlg)
+        {
+            return null;
+        }
+
+        dlg.SetProfile(selectedProfile);
+
+        var result = await dialog.ShowAsync();
+
+        if (result != ContentDialogResult.Primary)
+        {
+            return null;
+        }
+
+        return dlg.GetProfile();
+        /*
+        if (ret is not null)
+        {
+            selectedProfile = ret;
+        }
+        */
+    }
+
 }

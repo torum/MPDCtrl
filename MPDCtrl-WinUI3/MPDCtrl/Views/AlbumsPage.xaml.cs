@@ -61,7 +61,7 @@ public sealed partial class AlbumsPage : Page
 
             await Task.Delay(300);
 
-            lb.ScrollIntoView(album, ScrollIntoViewAlignment.Leading);
+            lb.ScrollIntoView(album, ScrollIntoViewAlignment.Default);//Leading
 
             await Task.Yield();
 
@@ -74,10 +74,15 @@ public sealed partial class AlbumsPage : Page
                 return;
             }
 
+            await Task.Delay(300); // This is needed.
+            UpdateVisibleItems(lb, scrollViewer);
+
+            /*
             // trick to simulate scrollviewer scrol event.
             scrollViewer.ChangeView(null, scrollViewer.VerticalOffset+12, null);
             await Task.Delay(300);
             scrollViewer.ChangeView(null, scrollViewer.VerticalOffset-12, null);
+            */
         });
     }
 
@@ -96,11 +101,16 @@ public sealed partial class AlbumsPage : Page
                 {
                     return;
                 }
-                
+
+                await Task.Delay(300);
+                UpdateVisibleItems(lb, scrollViewer);
+
+                /*
                 scrollViewer.ChangeView(null, 12, null);
                 await Task.Delay(300);
                 //scrollViewer.ChangeView(null, scrollViewer.ScrollableHeight, null);
                 scrollViewer.ChangeView(null, 0, null);
+                */
             });
         }
     }
@@ -192,6 +202,8 @@ public sealed partial class AlbumsPage : Page
         ObservableCollection<AlbumEx> visibleItems = [];
 
         /*
+         * AOT bad 
+         * https://github.com/microsoft/microsoft-ui-xaml/issues/10604
         if (listView.ItemsPanelRoot is not ItemsWrapGrid itemsPanel)
         {
             Debug.WriteLine($"ItemsPanelRoot is null or not ItemsWrapGrid");
@@ -199,11 +211,11 @@ public sealed partial class AlbumsPage : Page
             return;
         }
         */
+
         // AOT
         if (listView.ItemsPanelRoot is not Microsoft.UI.Xaml.Controls.Panel itemsPanel)
         {
             Debug.WriteLine($"ItemsPanelRoot is null or not ItemsWrapGrid");
-            ViewModel.SetError($"ItemsWrapGrid is not it. {listView.ItemsPanelRoot}");
             return;
         }
 

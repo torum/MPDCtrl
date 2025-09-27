@@ -129,8 +129,9 @@
     <PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.2.250402" />
     <PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.2.250402" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4948" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250907003" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6584" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250916003" />
+    <PackageReference Include="System.Private.Uri" Version="4.3.2" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.9" />
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +153,9 @@
   <ItemGroup>
     <Page Update="Views\Dialogs\InitDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\Dialogs\ProfileDialog.xaml">
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -228,4 +232,9 @@
     <Optimize>False</Optimize>
     <IsPublishable>True</IsPublishable>
   </PropertyGroup>
+  <ItemGroup>
+    <Reference Update="Microsoft.Windows.AI.MachineLearning.Projection">
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
 </Project>

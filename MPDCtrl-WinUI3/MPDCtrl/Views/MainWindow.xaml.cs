@@ -19,21 +19,18 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Media;
-using Windows.Media.Control;
-using Windows.Media.Core;
-using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.System;
 using WinRT;
 using WinRT.Interop;
+using Windows.Media;
+using Windows.Media.Control;
+using Windows.Media.Core;
+using Windows.Media.Playback;
 
 namespace MPDCtrl.Views;
 
@@ -127,22 +124,26 @@ public sealed partial class MainWindow : Window
             //_mediaPlayer.CommandManager.IsEnabled = false; <- not good if false.
             _smtc = _mediaPlayer.SystemMediaTransportControls;
 
-            _smtc.IsPlayEnabled = true;
-            _smtc.IsPauseEnabled = true;
-            _smtc.IsNextEnabled = true;
-            _smtc.IsPreviousEnabled = true;
-            _smtc.IsStopEnabled = true;
+            if (_smtc is not null)
+            {
+                _smtc.IsPlayEnabled = true;
+                _smtc.IsPauseEnabled = true;
+                _smtc.IsNextEnabled = true;
+                _smtc.IsPreviousEnabled = true;
+                _smtc.IsStopEnabled = true;
 
-            _smtc.PlaybackStatus = MediaPlaybackStatus.Paused;
+                _smtc.PlaybackStatus = MediaPlaybackStatus.Paused;
 
-            //
-            _smtc.ButtonPressed += Smtc_ButtonPressed;
+                //
+                _smtc.ButtonPressed += Smtc_ButtonPressed;
 
-            //
-            var updater = _smtc.DisplayUpdater;
-            updater.Type = MediaPlaybackType.Music;
-            updater.MusicProperties.Title = "a title";
-            updater.Update();
+                //
+                var updater = _smtc.DisplayUpdater;
+                updater.Type = MediaPlaybackType.Music;
+                updater.MusicProperties.Title = "a title";
+                updater.Update();
+            }
+
         }
 
     }
@@ -198,7 +199,7 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        var winState = OverlappedPresenterState.Restored;
+        OverlappedPresenterState? winState = null; // For AOT workaround, don't set default, = OverlappedPresenterState.Restored;
 
         ElementTheme eleThme = ElementTheme.Default;
         SystemBackdropOption bd = SystemBackdropOption.None;
@@ -256,6 +257,10 @@ public sealed partial class MainWindow : Window
                     else if (hoge.Value == "Minimized")
                     {
                         winState = OverlappedPresenterState.Minimized;
+                    }
+                    else
+                    {
+                        winState = null;
                     }
                 }
 
@@ -453,28 +458,36 @@ public sealed partial class MainWindow : Window
             if (appWindow.Presenter is OverlappedPresenter presenter)
             {
                 // AOT bad
+                // https://github.com/microsoft/CsWinRT/issues/1930
             }
 
-            if (winState == OverlappedPresenterState.Maximized)
+            if (winState is null)
             {
-                // Sets restore size and position.
-                appWindow.MoveAndResize(new Windows.Graphics.RectInt32(winRestoreleft, winRestoreTop, winRestoreWidth, winRestoreHeight));
-                // Maximize the window.
-                (appWindow.Presenter as OverlappedPresenter)!.Maximize();
-            }
-            else if (winState == OverlappedPresenterState.Minimized)
-            {
-                // This should not happen.
-                //(appWindow.Presenter as OverlappedPresenter)!.Restore();
-
-                // DONT restore minimized size and pos. bad.
-                appWindow.MoveAndResize(new Windows.Graphics.RectInt32(winRestoreleft, winRestoreTop, winRestoreWidth, winRestoreHeight));
-                //appWindow.ShowOnceWithRequestedStartupState();
+                // do nothing.
             }
             else
             {
-                // Sets restore size and position.
-                appWindow.MoveAndResize(new Windows.Graphics.RectInt32(winRestoreleft, winRestoreTop, winRestoreWidth, winRestoreHeight));
+                if (winState == OverlappedPresenterState.Maximized)
+                {
+                    // Sets restore size and position.
+                    appWindow.MoveAndResize(new Windows.Graphics.RectInt32(winRestoreleft, winRestoreTop, winRestoreWidth, winRestoreHeight));
+                    // Maximize the window.
+                    (appWindow.Presenter as OverlappedPresenter)!.Maximize();
+                }
+                else if (winState == OverlappedPresenterState.Minimized)
+                {
+                    // DONT restore minimized size and pos. bad.
+                    //appWindow.MoveAndResize(new Windows.Graphics.RectInt32(winRestoreleft, winRestoreTop, winRestoreWidth, winRestoreHeight));
+                    //appWindow.ShowOnceWithRequestedStartupState();
+
+                    // This should not happen.
+                    //(appWindow.Presenter as OverlappedPresenter)!.Restore();
+                }
+                else if (winState == OverlappedPresenterState.Restored)
+                {
+                    // Sets restore size and position.
+                    appWindow.MoveAndResize(new Windows.Graphics.RectInt32(winRestoreleft, winRestoreTop, winRestoreWidth, winRestoreHeight));
+                }
             }
         }
 
@@ -684,17 +697,16 @@ public sealed partial class MainWindow : Window
         // Main Window element
         var mainWindow = doc.CreateElement(string.Empty, "MainWindow", string.Empty);
 
-        OverlappedPresenterState? winState = null;// = OverlappedPresenterState.Restored;
+        OverlappedPresenterState? winState = null; // For AOT workaround, don't set default.  = OverlappedPresenterState.Restored;
 
         Microsoft.UI.Windowing.AppWindow? appWindow = this.AppWindow;
         if (appWindow != null)
         {
             // AOT bad
+            // https://github.com/microsoft/CsWinRT/issues/1930
             if (appWindow.Presenter is OverlappedPresenter presenter)
-            //if (appWindow.Presenter.Kind is AppWindowPresenterKind.Overlapped)
             {
                 // AOT bad
-
                 //OverlappedPresenter? presenter = appWindow.Presenter as OverlappedPresenter;
 
                 if (presenter?.State == OverlappedPresenterState.Maximized)
@@ -709,22 +721,39 @@ public sealed partial class MainWindow : Window
                 {
                     winState = OverlappedPresenterState.Restored;
                 }
-                else
-                {
-                    //App.AppendErrorLog("AOT Error1", $"{appWindow.Presenter.ToString()}"); //Microsoft.UI.Windowing.AppWindowPresenter
-                    //App.SaveErrorLog();
-                }
             }
             else
             {
-                //App.AppendErrorLog("AOT Error2",$"{appWindow.Presenter.ToString()}"); //Microsoft.UI.Windowing.AppWindowPresenter
+                //App.AppendErrorLog("AOT Error",$"{appWindow.Presenter}"); //Microsoft.UI.Windowing.AppWindowPresenter
                 //App.SaveErrorLog();
+
+                try
+                {
+                    // For AOT tmp workaround
+                    OverlappedPresenter presenterAOT = this.AppWindow.Presenter.As<OverlappedPresenter>();
+
+                    if (presenterAOT.State == OverlappedPresenterState.Maximized)
+                    {
+                        winState = OverlappedPresenterState.Maximized;
+                    }
+                    else if (presenterAOT.State == OverlappedPresenterState.Minimized)
+                    {
+                        winState = OverlappedPresenterState.Minimized;
+                    }
+                    else if (presenterAOT.State == OverlappedPresenterState.Restored)
+                    {
+                        winState = OverlappedPresenterState.Restored;
+                    }
+                }
+                catch (Exception ex) 
+                {
+                    App.AppendErrorLog("AOT Error",$"{ex}");
+                    App.SaveErrorLog();
+                }
+
             }
-            /*
 
-            */
-            // For AOT.
-
+            // For AOT, check if winState is null or not.
             if (winState != null)
             {
                 // Main Window attributes
@@ -793,8 +822,6 @@ public sealed partial class MainWindow : Window
                 mainWindow.SetAttributeNode(attrs);
 
             }
-
-
         }
 
         #endregion

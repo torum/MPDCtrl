@@ -17,4 +17,8 @@ public interface IDialogService
     Task<AddToDialogResult?> ShowAddToDialog(ViewModels.MainViewModel vm);
 
     Task<RenameDialogResult?> ShowRenameToDialog(ViewModels.MainViewModel vm);
+
+    Task<Profile?> ShowProfileAddDialog();
+
+    Task<Profile?> ShowProfileEditDialog(Profile selectedProfile);
 }

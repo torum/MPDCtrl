@@ -20,7 +20,6 @@ using Windows.Foundation;
 using Windows.System;
 using Windows.UI.ApplicationSettings;
 using Windows.UI.Core;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MPDCtrl.Views;
 
@@ -78,12 +77,27 @@ public sealed partial class ShellPage : Page
 
         // Set focus so that space shortcut works.
         this.PlaybackPlay.Focus(FocusState.Programmatic);
+
+        // 
+        if (App.MainWnd is not null)
+        {
+            App.MainWnd.Activated += MainWindow_Activated;
+        }
     }
 
     private void NavigationView_Loaded(object sender, RoutedEventArgs e)
     {
+        /*
+        if (this.NavigationFrame.Navigate(typeof(SettingsPage), this.NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
+        {
+            _currentPage = typeof(SettingsPage);
+        }
+        return;
+        */
+        
         // This right here is better. the initial Selected = .. messed up in the constructor.
-        if (NavigationFrame.Navigate(typeof(QueuePage), NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
+        if (this.NavigationFrame.Navigate(typeof(QueuePage), this.NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
+
         {
             _currentPage = typeof(QueuePage);
             var queuePage = ViewModel.MainMenuItems.FirstOrDefault();
@@ -256,6 +270,17 @@ public sealed partial class ShellPage : Page
         }
 
         App.MainWnd.SetCapitionButtonColor();
+    }
+
+    private void MainWindow_Activated(object sender, Microsoft.UI.Xaml.WindowActivatedEventArgs args)
+    {
+        //var resource = args.WindowActivationState == WindowActivationState.Deactivated ? "WindowCaptionForegroundDisabled" : "WindowCaptionForeground";
+        // Stupid workaround for stupid WinUI3 bug. This changes color regardless of theme dark/light setting. so use dummy. Applying this changes button's color too. But cause error in AOT...
+        //this.AppTitleDummyTextBlock.Foreground = (SolidColorBrush)App.Current.Resources[resource];
+
+        //this.AppTitleTextBlock.Opacity = args.WindowActivationState == WindowActivationState.Deactivated ? 0.3 : 1;
+        //this.AppTitleIcon.Opacity = args.WindowActivationState == WindowActivationState.Deactivated ? 0.3 : 1;
+        this.Opacity = args.WindowActivationState == WindowActivationState.Deactivated ? 0.7 : 1;
     }
 
     private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)

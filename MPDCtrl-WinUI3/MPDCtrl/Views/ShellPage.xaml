@@ -35,6 +35,7 @@
             </Grid>
             <Grid x:Name="AppTitleBar" Grid.Column="1">
                 <!-- Application TitleBar: SetTitleBar in code behinde -->
+                <TextBlock x:Name="AppTitleDummyTextBlock" Text="" Margin="0,0,0,0" Opacity="0.9" Visibility="Collapsed"/>
             </Grid>
         </Grid>
 
@@ -51,8 +52,8 @@
                         </Grid.ColumnDefinitions>
                         <!-- App icon and app name -->
                         <StackPanel Grid.Column="0" Margin="12,0,0,0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <Image Source="/Assets/MPDCtrl.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Width="18" Height="18" Margin="0,0,0,0"/>
-                            <TextBlock Text="MPDCtrl" Margin="6,0,0,0" VerticalAlignment="Center" Opacity="0.9" FontSize="12"/>
+                            <Image x:Name="AppTitleIcon" Source="/Assets/MPDCtrl.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Width="18" Height="18" Margin="0,0,0,0"/>
+                            <TextBlock x:Name="AppTitleTextBlock" Text="MPDCtrl" Margin="6,0,0,0" VerticalAlignment="Center" Opacity="0.9" FontSize="12"/>
                         </StackPanel>
                         <!-- Progress ring -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="12,0,12,0">

@@ -180,9 +180,6 @@
   <data name="MenuTreeItem_Playlists" xml:space="preserve">
     <value>Playlists</value>
   </data>
-  <data name="Settings_SystemBackdrop.Text" xml:space="preserve">
-    <value>Visual effect</value>
-  </data>
   <data name="Settings_SystemBackdrop_Acrylic.Content" xml:space="preserve">
     <value>Acrylic</value>
   </data>
@@ -195,7 +192,7 @@
   <data name="Settings_SystemBackdrop_None.Content" xml:space="preserve">
     <value>None</value>
   </data>
-  <data name="Settings_Theme.Text" xml:space="preserve">
+  <data name="Settings_Theme.Header" xml:space="preserve">
     <value>Theme</value>
   </data>
   <data name="QueuePage_SubTitle_SongCount" xml:space="preserve">
@@ -419,5 +416,23 @@
   </data>
   <data name="Version" xml:space="preserve">
     <value>Version</value>
+  </data>
+  <data name="Settings_SystemBackdrop.Header" xml:space="preserve">
+    <value>Backdrop</value>
+  </data>
+  <data name="Settings_VisualPreferences.Description" xml:space="preserve">
+    <value>Themes and Backdrops</value>
+  </data>
+  <data name="Settings_MPD_Reconnect.Content" xml:space="preserve">
+    <value>Reconnect</value>
+  </data>
+  <data name="Settings_VisualPreferences.Header" xml:space="preserve">
+    <value>Visual preferences</value>
+  </data>
+  <data name="Settings_MPD.Header" xml:space="preserve">
+    <value>MPD (Music Player Daemon)</value>
+  </data>
+  <data name="Settings_MPD.Description" xml:space="preserve">
+    <value>Connection Profiles and Options</value>
   </data>
 </root>

@@ -34,9 +34,9 @@ public static class ListViewBehavior
         new PropertyMetadata(null, OnPropertyChanged));
 
     // Get accessor for the attached property
-    public static ObservableCollection<object> GetVisibleItems(DependencyObject obj)
+    public static ObservableCollection<object>? GetVisibleItems(DependencyObject obj)
     {
-        return (ObservableCollection<object>)obj.GetValue(VisibleItemsProperty);
+        return obj.GetValue(VisibleItemsProperty) as ObservableCollection<object>;//(ObservableCollection<object>)obj.GetValue(VisibleItemsProperty);
     }
 
     // Set accessor for the attached property
@@ -101,13 +101,24 @@ public static class ListViewBehavior
     {
         //visibleItems.Clear();
         ObservableCollection<object> visibleItems = [];
+
+        /*
+         * AOT bad
+         * https://github.com/microsoft/microsoft-ui-xaml/issues/10604
+         * ItemsPanelRoot.As<ItemsWrapGrid>()
         if (listView.ItemsPanelRoot is not ItemsWrapGrid itemsPanel)
         {
             Debug.WriteLine($"ItemsPanelRoot is null or not ItemsWrapGrid");
             return;
         }
+        */
+        // AOT
+        if (listView.ItemsPanelRoot is not Microsoft.UI.Xaml.Controls.Panel itemsPanel)
+        {
+            Debug.WriteLine($"ItemsPanelRoot is null or not Panel");
+            return;
+        }
 
-        //var scrollViewer = FindScrollViewer(listView);
         if (scrollViewer is null) return;
 
         var viewport = new Rect(0, 0, scrollViewer.ViewportWidth, scrollViewer.ViewportHeight);

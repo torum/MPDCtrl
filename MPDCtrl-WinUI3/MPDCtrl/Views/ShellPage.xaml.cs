@@ -97,7 +97,6 @@ public sealed partial class ShellPage : Page
         
         // This right here is better. the initial Selected = .. messed up in the constructor.
         if (this.NavigationFrame.Navigate(typeof(QueuePage), this.NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
-
         {
             _currentPage = typeof(QueuePage);
             var queuePage = ViewModel.MainMenuItems.FirstOrDefault();

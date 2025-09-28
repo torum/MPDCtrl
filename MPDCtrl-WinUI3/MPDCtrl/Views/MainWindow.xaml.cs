@@ -31,6 +31,10 @@ using Windows.Media;
 using Windows.Media.Control;
 using Windows.Media.Core;
 using Windows.Media.Playback;
+using Windows.Storage;
+using Windows.System;
+using WinRT;
+using WinRT.Interop;
 
 namespace MPDCtrl.Views;
 
@@ -143,7 +147,6 @@ public sealed partial class MainWindow : Window
                 updater.MusicProperties.Title = "a title";
                 updater.Update();
             }
-
         }
 
     }
@@ -1211,6 +1214,5 @@ public sealed partial class MainWindow : Window
     }
 
     #endregion
-
 }
 

@@ -43,16 +43,47 @@
         <Grid Grid.Row="1" x:Name="BodyGrid" Margin="24,0,0,0">
             <ScrollViewer Margin="0,24,0,0">
                 <StackPanel Spacing="24">
-
-                    <!-- Themes -->
-                    <controls:SettingsExpander x:Name="SettingsCardTheme"
+                    <controls:SettingsExpander x:Name="settingsCardTheme"
                             VerticalAlignment="Top"
-                            x:Uid="Settings_VisualPreferences"
+                            Header=""
+                            Description="asdf"
+                            HeaderIcon="{ui:FontIcon Glyph=&#xE91B;}"
                             IsEnabled="True"
                             IsExpanded="False">
-                        <controls:SettingsExpander.HeaderIcon>
-                            <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Zm0-2V4a8 8 0 1 1 0 16Z"/>
-                        </controls:SettingsExpander.HeaderIcon>
+                        <!--  TODO:   -->
+
+                        <controls:SettingsExpander.Items>
+
+                            <controls:SettingsCard Header="asdfsadf" HorizontalContentAlignment="Left" ContentAlignment="Vertical" Description="fdasa">
+                                <TextBox MinWidth="300" Width="500" PlaceholderText="" HorizontalAlignment="Stretch" Text="ddsaf"/>
+                            </controls:SettingsCard>
+
+                            <controls:SettingsCard HorizontalContentAlignment="Left" ContentAlignment="Vertical" Header="sadfs">
+                                <ComboBox x:Name="ComboBoxKind" PlaceholderText="選択" MinWidth="300" Margin="0,0,0,0" SelectedIndex="-1" >
+                                    <!-- ItemsSource="{x:Bind ViewModel.Kinds, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedKind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" -->
+                                    <!--<ComboBox.ItemTemplate>
+                                        
+                                        <DataTemplate x:DataType="modres:Kind">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{x:Bind Label, Mode=OneWay}" Margin="0,0,5,0"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                        
+                                    </ComboBox.ItemTemplate>-->
+                                </ComboBox>
+                            </controls:SettingsCard>
+
+                            <controls:SettingsCard Header="afd" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
+                                <CheckBox Content="hoge" IsChecked="False"/>
+                            </controls:SettingsCard>
+
+                        </controls:SettingsExpander.Items>
+
+                    </controls:SettingsExpander>
+                    
+                    
+                    <StackPanel>
+                        <TextBlock x:Uid="Settings_Theme" Margin="0,0,0,12" />
 
                         <controls:SettingsExpander.Items>
 

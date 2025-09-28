@@ -196,7 +196,7 @@ public class DialogService : IDialogService
     {
         var dialog = new ContentDialog
         {
-            XamlRoot = App.MainWnd.Content.XamlRoot,
+            XamlRoot = App.MainWnd?.Content.XamlRoot,
             Title = "ADD",
             IsPrimaryButtonEnabled = true,
             PrimaryButtonText = "Dialog_Ok",
@@ -239,7 +239,7 @@ public class DialogService : IDialogService
 
         var dialog = new ContentDialog
         {
-            XamlRoot = App.MainWnd.Content.XamlRoot,
+            XamlRoot = App.MainWnd?.Content.XamlRoot,
             Title = "EDIT",
             IsPrimaryButtonEnabled = true,
             PrimaryButtonText = "Dialog_Ok",

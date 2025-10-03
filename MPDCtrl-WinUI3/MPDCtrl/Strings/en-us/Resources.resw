@@ -435,4 +435,16 @@
   <data name="Settings_MPD.Description" xml:space="preserve">
     <value>Connection Profiles and Options</value>
   </data>
+  <data name="Settings_MPD_Opts_UpdateDatabaseOnStartup.Content" xml:space="preserve">
+    <value>Update MPD database on startup. (It may take a while to update)</value>
+  </data>
+  <data name="Settings_MPD_Opts_UseReadPicture.Content" xml:space="preserve">
+    <value>Use "readpicture" command instead of "albumart". (applicable when MPD protocol version is 0.22.0 or up)</value>
+  </data>
+  <data name="Settings_Options.Header" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="Settings_Opts_AutoScrollToNowPlaying.Content" xml:space="preserve">
+    <value>Auto scroll to current song</value>
+  </data>
 </root>

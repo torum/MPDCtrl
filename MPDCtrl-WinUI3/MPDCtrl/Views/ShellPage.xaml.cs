@@ -291,13 +291,15 @@ public sealed partial class ShellPage : Page
         this.Opacity = args.WindowActivationState == WindowActivationState.Deactivated ? 0.7 : 1;
     }
 
-    private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+    private async void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
         if (args.IsSettingsInvoked == true)
         {
             if (this.NavigationFrame.Navigate(typeof(SettingsPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
             {
                 _currentPage = typeof(SettingsPage);
+
+                await ViewModel.GetCacheFolderSize();
             }
             return;
         }
@@ -631,7 +633,7 @@ public sealed partial class ShellPage : Page
         e.Handled = true;
     }
 
-    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    private async void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
         //
         if (this.NavigationFrame.Navigate(typeof(SettingsPage), this.NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
@@ -641,6 +643,8 @@ public sealed partial class ShellPage : Page
             ViewModel.SelectedNodeMenu = null;
 
             NaviView.SelectedItem = null;
+
+            await ViewModel.GetCacheFolderSize();
         }
     }
 }

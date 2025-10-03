@@ -112,7 +112,7 @@
                                     
                                     <StackPanel Grid.Column="0" Spacing="12" Orientation="Horizontal" HorizontalAlignment="Left">
 
-                                        <ComboBox PlaceholderText="@Select" MinWidth="300" Margin="0,0,0,0" SelectedIndex="-1" VerticalAlignment="Center"
+                                        <ComboBox PlaceholderText="" MinWidth="300" Margin="0,0,0,0" SelectedIndex="-1" VerticalAlignment="Center"
                                            ItemsSource="{x:Bind ViewModel.Profiles, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedProfile, Mode=TwoWay}">
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate x:DataType="mod:Profile">
@@ -153,19 +153,61 @@
                                 </Grid>
 
                             </controls:SettingsCard>
-                            
-                            <controls:SettingsCard Header="afd" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
-                                <CheckBox Content="hoge" IsChecked="False"/>
+
+                            <controls:SettingsCard Header="afd" HorizontalContentAlignment="Left" ContentAlignment="Vertical" Description="fddfasa">
+                                <CheckBox x:Uid="Settings_MPD_Opts_UpdateDatabaseOnStartup" IsChecked="{x:Bind ViewModel.IsUpdateOnStartup, Mode=TwoWay}"/>
                             </controls:SettingsCard>
 
                             <controls:SettingsCard Header="asdfsadf" HorizontalContentAlignment="Left" ContentAlignment="Vertical" Description="fdasa">
-                                <CheckBox Content="hoge" IsChecked="False"/>
+                                <CheckBox x:Uid="Settings_MPD_Opts_UseReadPicture" IsChecked="{x:Bind ViewModel.IsDownloadAlbumArtEmbeddedUsingReadPicture, Mode=TwoWay}"/>
                             </controls:SettingsCard>
                             
                         </controls:SettingsExpander.Items>
 
                     </controls:SettingsExpander>
-                    
+
+                    <!-- Options -->
+                    <controls:SettingsExpander x:Name="SettingsCardOptions"
+                            VerticalAlignment="Top"
+                            x:Uid="Settings_Options"
+                            IsEnabled="True"
+                            IsExpanded="False">
+                        <controls:SettingsExpander.Items>
+                            
+                            <controls:SettingsCard Header="afd" HorizontalContentAlignment="Left" ContentAlignment="Vertical" Description="fddfasa">
+                            <CheckBox x:Uid="Settings_Opts_AutoScrollToNowPlaying" IsChecked="{x:Bind ViewModel.IsAutoScrollToNowPlaying, Mode=TwoWay}"/>
+                        </controls:SettingsCard>
+
+                        </controls:SettingsExpander.Items>
+                    </controls:SettingsExpander>
+
+                    <!-- Local strage usage -->
+                    <controls:SettingsExpander x:Name="SettingsCardLocalStrage"
+                            VerticalAlignment="Top"
+Header="Local storage usage" Description="Cache folder/directory for album cover/art images"
+                            IsEnabled="True"
+                            IsExpanded="False">
+                        <controls:SettingsExpander.Items>
+
+                            <controls:SettingsCard Header="afd" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="fddfasa">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Stretch">
+                                        <HyperlinkButton NavigateUri="{x:Bind ViewModel.AlbumCacheFolderPath, Mode=OneTime}" Content="{x:Bind ViewModel.AlbumCacheFolderPath, Mode=OneWay}" Click="HyperlinkButton_AlbumCacheFolderPath_Click" Margin="0,0,24,0"></HyperlinkButton>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <TextBlock Text="{x:Bind ViewModel.AlbumCacheFolderSizeFormatted, Mode=OneWay}" VerticalAlignment="Center" MinWidth="84"></TextBlock>
+                                        <Button Content="Clear" Command="{x:Bind ViewModel.ClearAlbumCacheFolderCommand}" VerticalAlignment="Center" HorizontalAlignment="Right"></Button>
+                                    </StackPanel>
+                                </Grid>
+                            </controls:SettingsCard>
+
+                        </controls:SettingsExpander.Items>
+                    </controls:SettingsExpander>
+
                 </StackPanel>
             </ScrollViewer>
         </Grid>

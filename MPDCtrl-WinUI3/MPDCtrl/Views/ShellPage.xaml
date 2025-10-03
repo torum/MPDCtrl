@@ -55,8 +55,8 @@
                             <Image x:Name="AppTitleIcon" Source="/Assets/MPDCtrl.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Width="17" Height="17" Margin="0,0,0,0"/>
                             <TextBlock x:Name="AppTitleTextBlock" Text="MPDCtrl" FontWeight="SemiBold" Margin="6,0,0,0" VerticalAlignment="Center" Opacity="0.9"/>
                         </StackPanel>
-                        <!-- Progress ring -->
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="12,0,12,0">
+                        <!-- Progress ring, Settings, etc -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="12,0,6,0">
 
                             <ProgressRing IsActive="{x:Bind ViewModel.IsWorking, Mode=OneWay}" Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center" />
 
@@ -66,7 +66,7 @@
                                     </Path>
                                 </Viewbox>
                             </Button>
-                            <!-- I want to have settings button right here. -->
+                            <!-- I want to have a settings button right here. -->
                             <Button x:Name="SettingsButton" Click="SettingsButton_Click" Width="40" Height="36" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0">
                                 <AnimatedIcon Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <AnimatedIcon.Source>
@@ -101,7 +101,7 @@
                     </Grid.RowDefinitions>
 
                     <Border Grid.Row="0" SizeChanged="AppTitleBar_SizeChanged">
-                        <Button x:Name="BackButton" x:Uid="GoBackButton" Height="36" Width="40" Margin="3,6,0,0" Click="BackButton_Click" Style="{StaticResource TitleBarBackButtonStyle}" Visibility="{x:Bind ViewModel.IsGoBackButtonVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <Button x:Name="BackButton" x:Uid="GoBackButton" Height="36" Width="40" Margin="6,6,0,0" Click="BackButton_Click" Style="{StaticResource TitleBarBackButtonStyle}" Visibility="{x:Bind ViewModel.IsGoBackButtonVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     </Border>
                     
                     <!-- NavigationView content frame -->

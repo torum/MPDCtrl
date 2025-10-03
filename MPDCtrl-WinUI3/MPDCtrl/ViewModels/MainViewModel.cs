@@ -2332,6 +2332,29 @@ public partial class MainViewModel : ObservableObject
     }
     #endregion
 
+    #region == Settings ==
+
+#pragma warning disable CA1822 
+    public string AlbumCacheFolderPath => App.AppDataCacheFolder;
+#pragma warning restore CA1822
+
+    private string _albumCacheFolderSizeFormatted = string.Empty;
+
+    public string AlbumCacheFolderSizeFormatted
+    {
+        get => _albumCacheFolderSizeFormatted;
+        set
+        {
+            if (_albumCacheFolderSizeFormatted == value)
+                return;
+
+            _albumCacheFolderSizeFormatted = value;
+            OnPropertyChanged(nameof(AlbumCacheFolderSizeFormatted));
+        }
+    }
+
+    #endregion
+
     #region == Layout ==
 
     private bool _isNavigationViewMenuOpen = true;
@@ -2511,6 +2534,11 @@ public partial class MainViewModel : ObservableObject
         InfoBarErrMessage = error;
 
         IsShowErrWindow = true;
+    }
+
+    public async Task GetCacheFolderSize()
+    {
+        AlbumCacheFolderSizeFormatted = ToFileSizeString(await GetFolderSize(App.AppDataCacheFolder).ConfigureAwait(true));
     }
 
     #region == Private Methods ==
@@ -4556,6 +4584,91 @@ public partial class MainViewModel : ObservableObject
     private static int CompareVersionString(string a, string b)
     {
         return (new System.Version(a)).CompareTo(new System.Version(b));
+    }
+
+    private static async Task<long> GetFolderSize(string path)
+    {
+        long totalSize = 0;
+
+        if (!Directory.Exists(path))
+        {
+            return totalSize;
+        }
+
+        DirectoryInfo directoryInfo = new(path);
+
+        // Add the size of files in the current directory
+        foreach (FileInfo file in directoryInfo.GetFiles())
+        {
+            totalSize += file.Length;
+        }
+
+        // Recursively add the size of files in subdirectories
+        foreach (DirectoryInfo subDirectory in directoryInfo.GetDirectories())
+        {
+            totalSize += await GetFolderSize(subDirectory.FullName);
+        }
+
+        //long totalSize = dInfo.EnumerateFiles().Sum(file => file.Length);
+        //totalSize += dInfo.EnumerateDirectories().Sum(dir => GetDirectorySize(dir.FullName));
+
+        return totalSize;
+    }
+
+    private static string ToFileSizeString(long size)
+    {
+        if (size < 1024)
+        {
+            return size.ToString("F0") + " bytes";
+        }
+        else if ((size >> 10) < 1024)
+        {
+            return (size / 1024F).ToString("F1") + " KB";
+        }
+        else if ((size >> 20) < 1024)
+        {
+            return ((size >> 10) / 1024F).ToString("F1") + " MB";
+        }
+        else if ((size >> 30) < 1024)
+        {
+            return ((size >> 20) / 1024F).ToString("F1") + " GB";
+        }
+        else if ((size >> 40) < 1024)
+        {
+            return ((size >> 30) / 1024F).ToString("F1") + " TB";
+        }
+        else if ((size >> 50) < 1024)
+        {
+            return ((size >> 40) / 1024F).ToString("F1") + " PB";
+        }
+        else
+        {
+            return ((size >> 50) / 1024F).ToString("F0") + " EB";
+        }
+    }
+
+    private static void DeleteAllContents(string directoryPath)
+    {
+        if (Directory.Exists(directoryPath))
+        {
+            try
+            {
+                Directory.Delete(directoryPath, true);
+                System.Console.WriteLine($"Successfully deleted directory and its contents: {directoryPath}");
+            }
+            catch (IOException e)
+            {
+                System.Console.WriteLine($"Error deleting directory: {e.Message}");
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                System.Console.WriteLine($"Access denied to directory: {e.Message}");
+            }
+        }
+        else
+        {
+            System.Console.WriteLine($"Directory not found: {directoryPath}");
+        }
     }
 
     #endregion
@@ -6899,6 +7012,15 @@ public partial class MainViewModel : ObservableObject
         {
             IsConnectButtonEnabled = true;
         }
+    }
+
+    [RelayCommand]
+    public async Task ClearAlbumCacheFolder()
+    {
+        DeleteAllContents(App.AppDataCacheFolder);
+
+        // Update folder size.
+        await GetCacheFolderSize();
     }
 
     #endregion

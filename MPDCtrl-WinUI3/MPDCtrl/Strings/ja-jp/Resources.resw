@@ -476,10 +476,19 @@ SOFTWARE.</value>
   <data name="Settings_PrivacyPolicy.Description" xml:space="preserve">
     <value>いかなる情報も収集しません</value>
   </data>
-  <data name="Settings_LocalStrage.Header" xml:space="preserve">
+  <data name="Settings_LocalStorage.Header" xml:space="preserve">
     <value>ローカルストレージ</value>
   </data>
-  <data name="Settings_LocalStrage.Description" xml:space="preserve">
+  <data name="Settings_LocalStorage.Description" xml:space="preserve">
     <value>アルバムカバー画像のローカル保存用フォルダ</value>
+  </data>
+  <data name="Settings_MPD_Connection_Status_IsConnected" xml:space="preserve">
+    <value>接続済み</value>
+  </data>
+  <data name="Settings_MPD_Connection_Status_IsNotConnected" xml:space="preserve">
+    <value>未接続</value>
+  </data>
+  <data name="Settings_MPD_Connection_Status_IsConnecting" xml:space="preserve">
+    <value>接続中</value>
   </data>
 </root>

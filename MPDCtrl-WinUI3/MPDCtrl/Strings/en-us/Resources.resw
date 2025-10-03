@@ -475,10 +475,19 @@ SOFTWARE.</value>
   <data name="Settings_PrivacyPolicy.Description" xml:space="preserve">
     <value>Nothing Is Collected</value>
   </data>
-  <data name="Settings_LocalStrage.Header" xml:space="preserve">
+  <data name="Settings_LocalStorage.Header" xml:space="preserve">
     <value>Local storage</value>
   </data>
-  <data name="Settings_LocalStrage.Description" xml:space="preserve">
+  <data name="Settings_LocalStorage.Description" xml:space="preserve">
     <value>Cache folder for album cover/art images</value>
+  </data>
+  <data name="Settings_MPD_Connection_Status_IsConnected" xml:space="preserve">
+    <value>Connected</value>
+  </data>
+  <data name="Settings_MPD_Connection_Status_IsNotConnected" xml:space="preserve">
+    <value>Not Connected</value>
+  </data>
+  <data name="Settings_MPD_Connection_Status_IsConnecting" xml:space="preserve">
+    <value>Connecting</value>
   </data>
 </root>

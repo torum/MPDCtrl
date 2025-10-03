@@ -2020,49 +2020,55 @@ public partial class MainViewModel : ObservableObject
         {
             if (IsConnected)
             {
+                var connected = _resourceLoader.GetString("Settings_MPD_Connection_Status_IsConnected");
+
                 if (!string.IsNullOrEmpty(_mpdVersion))
                 {
                     if (CurrentProfile is not null)
                     {
-                        return $"Connected to {CurrentProfile.Name} with MPD Protocol v{_mpdVersion}";
+                        return $"{connected} ({CurrentProfile.Name} with MPD Protocol v{_mpdVersion})";
                     }
                     else
                     {
-                        return $"Connected with MPD Protocol v{_mpdVersion}";
+                        return $"{connected} (MPD Protocol v{_mpdVersion})";
                     }
                 }
                 else
                 {
                     if (CurrentProfile is not null)
                     {
-                        return $"Connected to {CurrentProfile.Name}";
+                        return $"{connected} ({CurrentProfile.Name})";
                     }
                     else
                     {
-                        return "Connected";
+                        return $"{connected}";
                     }
                 }
             }
             else if (IsConnecting)
             {
+                var connecting = _resourceLoader.GetString("Settings_MPD_Connection_Status_IsConnecting");
+
                 if (CurrentProfile is not null)
                 {
-                    return $"Connecting to {CurrentProfile.Name}...";
+                    return $"{connecting} ({CurrentProfile.Name})...";
                 }
                 else
                 {
-                    return "Connecting...";
+                    return $"{connecting}...";
                 }
             }
             else
             {
+                var notConnected = _resourceLoader.GetString("Settings_MPD_Connection_Status_IsNotConnected");
+
                 if (IsNotConnectingNorConnected)
                 {
-                    return "Not connected";
+                    return $"{notConnected}";
                 }
 
 
-                return "Not connected";
+                return $"{notConnected}";
             }
 
 

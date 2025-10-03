@@ -57,7 +57,7 @@
                         <controls:SettingsExpander.Items>
 
                             <controls:SettingsCard x:Uid="Settings_Theme" HorizontalContentAlignment="Left" ContentAlignment="Vertical" Description="">
-                                <StackPanel Orientation="Horizontal" Spacing="24">
+                                <StackPanel Orientation="Horizontal" Spacing="24" Margin="0,6,0,12">
 
                                     <RadioButton x:Uid="Settings_Theme_Light" IsEnabled="{x:Bind ViewModel.IsBackdropEnabled, Mode=OneWay}" Command="{x:Bind ViewModel.SwitchThemeCommand}" IsChecked="{x:Bind ViewModel.Theme, Converter={StaticResource ElementThemeEnumToBooleanConverter}, ConverterParameter=Light, Mode=OneWay}" FontSize="15" GroupName="AppTheme">
                                         <RadioButton.CommandParameter>
@@ -79,7 +79,7 @@
 
                             <controls:SettingsCard x:Uid="Settings_SystemBackdrop" HorizontalContentAlignment="Left" ContentAlignment="Vertical" Description="">
 
-                                <StackPanel Orientation="Horizontal" Spacing="24">
+                                <StackPanel Orientation="Horizontal" Spacing="24" Margin="0,6,0,12">
 
                                     <RadioButton x:Uid="Settings_SystemBackdrop_Acrylic" IsEnabled="{x:Bind ViewModel.IsAcrylicSupported,Mode=OneWay}" Command="{x:Bind ViewModel.SwitchSystemBackdropCommand}" CommandParameter="Acrylic" IsChecked="{x:Bind ViewModel.Material, Converter={StaticResource SystemBackdropEnumToBooleanConverter}, ConverterParameter=Acrylic, Mode=OneWay}" FontSize="15" GroupName="AppMaterial"/>
                                     <RadioButton x:Uid="Settings_SystemBackdrop_Mica" IsEnabled="{x:Bind ViewModel.IsMicaSupported,Mode=OneWay}" Command="{x:Bind ViewModel.SwitchSystemBackdropCommand}" CommandParameter="Mica" IsChecked="{x:Bind ViewModel.Material, Converter={StaticResource SystemBackdropEnumToBooleanConverter}, ConverterParameter=Mica, Mode=OneWay}" FontSize="15" GroupName="AppMaterial"/>
@@ -102,7 +102,7 @@
                         <TextBlock Text="{x:Bind ViewModel.ShortStatusWithMpdVersion, Mode=OneWay}"></TextBlock>
                         
                         <controls:SettingsExpander.Items>
-                            <controls:SettingsCard HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Header="@Connection Profile">
+                            <controls:SettingsCard Header="" Description="" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical">
 
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -110,7 +110,7 @@
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
                                     
-                                    <StackPanel Grid.Column="0" Spacing="12" Orientation="Horizontal" HorizontalAlignment="Left">
+                                    <StackPanel Grid.Column="0" Spacing="12" Margin="0,12,0,12" Orientation="Horizontal" HorizontalAlignment="Left">
 
                                         <ComboBox PlaceholderText="" MinWidth="300" Margin="0,0,0,0" SelectedIndex="-1" VerticalAlignment="Center"
                                            ItemsSource="{x:Bind ViewModel.Profiles, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedProfile, Mode=TwoWay}">
@@ -126,19 +126,19 @@
                                             </ComboBox.ItemTemplate>
                                         </ComboBox>
 
-                                        <Button Command="{x:Bind ViewModel.ShowProfileAddDialogCommand}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="39" Height="36">
+                                        <Button Command="{x:Bind ViewModel.ShowProfileAddDialogCommand}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="39" Height="36" Margin="0,12,0,12">
                                             <Viewbox Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,2,0,0">
                                                 <PathIcon Width="NaN" Height="NaN" Data="M11.883 3.007 12 3a1 1 0 0 1 .993.883L13 4v7h7a1 1 0 0 1 .993.883L21 12a1 1 0 0 1-.883.993L20 13h-7v7a1 1 0 0 1-.883.993L12 21a1 1 0 0 1-.993-.883L11 20v-7H4a1 1 0 0 1-.993-.883L3 12a1 1 0 0 1 .883-.993L4 11h7V4a1 1 0 0 1 .883-.993L12 3l-.117.007Z"></PathIcon>
                                             </Viewbox>
                                         </Button>
-                                        
-                                        <Button Command="{x:Bind ViewModel.ShowProfileEditDialogCommand}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="39" Height="36">
+
+                                        <Button Command="{x:Bind ViewModel.ShowProfileEditDialogCommand}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="39" Height="36" Margin="0,12,0,12">
                                             <Viewbox Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,2,0,0">
                                                 <PathIcon Width="NaN" Height="NaN" Data="m13.94 5 5.061 5.06-.962.962a6.5 6.5 0 0 0-7.016 7.016l-1.96 1.96a2.25 2.25 0 0 1-1 .58l-5.115 1.395a.75.75 0 0 1-.92-.92l1.394-5.116a2.25 2.25 0 0 1 .58-1L13.94 5Zm7.091-2.03a3.579 3.579 0 0 1 0 5.06l-.97.97L15 3.94l.97-.97a3.578 3.578 0 0 1 5.061 0ZM14.28 13.974a2 2 0 0 1-1.441 2.497l-.584.144a5.729 5.729 0 0 0 .006 1.807l.54.13a2 2 0 0 1 1.45 2.51l-.187.632c.44.386.94.699 1.484.921l.494-.518a2 2 0 0 1 2.899 0l.498.525a5.28 5.28 0 0 0 1.483-.913l-.198-.686a2 2 0 0 1 1.442-2.496l.583-.144a5.729 5.729 0 0 0-.006-1.808l-.54-.13a2 2 0 0 1-1.45-2.51l.187-.63a5.28 5.28 0 0 0-1.484-.923l-.493.519a2 2 0 0 1-2.9 0l-.498-.525c-.544.22-1.044.53-1.483.912l.198.686ZM17.501 19c-.8 0-1.45-.672-1.45-1.5 0-.829.65-1.5 1.45-1.5.8 0 1.45.671 1.45 1.5 0 .828-.65 1.5-1.45 1.5Z"></PathIcon>
                                             </Viewbox>
                                         </Button>
 
-                                        <Button Command="{x:Bind ViewModel.ShowProfileRemoveNoneDialogCommand}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="39" Height="36">
+                                        <Button Command="{x:Bind ViewModel.ShowProfileRemoveNoneDialogCommand}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="39" Height="36" Margin="0,12,0,12">
                                             <Viewbox Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,2,0,0">
                                                 <PathIcon Width="NaN" Height="NaN" Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm-4.25 9.25a.75.75 0 0 0-.102 1.493l.102.007h8.5a.75.75 0 0 0 .102-1.493l-.102-.007h-8.5Z"></PathIcon>
                                             </Viewbox>
@@ -154,12 +154,12 @@
 
                             </controls:SettingsCard>
 
-                            <controls:SettingsCard Header="afd" HorizontalContentAlignment="Left" ContentAlignment="Vertical" Description="fddfasa">
-                                <CheckBox x:Uid="Settings_MPD_Opts_UpdateDatabaseOnStartup" IsChecked="{x:Bind ViewModel.IsUpdateOnStartup, Mode=TwoWay}"/>
+                            <controls:SettingsCard Header="" Description="" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
+                                <CheckBox x:Uid="Settings_MPD_Opts_UpdateDatabaseOnStartup" IsChecked="{x:Bind ViewModel.IsUpdateOnStartup, Mode=TwoWay}" Margin="0,12,0,12"/>
                             </controls:SettingsCard>
 
-                            <controls:SettingsCard Header="asdfsadf" HorizontalContentAlignment="Left" ContentAlignment="Vertical" Description="fdasa">
-                                <CheckBox x:Uid="Settings_MPD_Opts_UseReadPicture" IsChecked="{x:Bind ViewModel.IsDownloadAlbumArtEmbeddedUsingReadPicture, Mode=TwoWay}"/>
+                            <controls:SettingsCard Header="" Description="" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
+                                <CheckBox x:Uid="Settings_MPD_Opts_UseReadPicture" IsChecked="{x:Bind ViewModel.IsDownloadAlbumArtEmbeddedUsingReadPicture, Mode=TwoWay}" Margin="0,12,0,12"/>
                             </controls:SettingsCard>
                             
                         </controls:SettingsExpander.Items>
@@ -173,24 +173,23 @@
                             IsEnabled="True"
                             IsExpanded="False">
                         <controls:SettingsExpander.Items>
-                            
-                            <controls:SettingsCard Header="afd" HorizontalContentAlignment="Left" ContentAlignment="Vertical" Description="fddfasa">
-                            <CheckBox x:Uid="Settings_Opts_AutoScrollToNowPlaying" IsChecked="{x:Bind ViewModel.IsAutoScrollToNowPlaying, Mode=TwoWay}"/>
-                        </controls:SettingsCard>
+                            <controls:SettingsCard Header="" Description="" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
+                                <CheckBox x:Uid="Settings_Opts_AutoScrollToNowPlaying" IsChecked="{x:Bind ViewModel.IsAutoScrollToNowPlaying, Mode=TwoWay}" Margin="0,12,0,12"/>
+                            </controls:SettingsCard>
 
                         </controls:SettingsExpander.Items>
                     </controls:SettingsExpander>
 
-                    <!-- Local strage usage -->
-                    <controls:SettingsExpander x:Name="SettingsCardLocalStrage"
+                    <!-- Local storage usage -->
+                    <controls:SettingsExpander x:Name="SettingsCardLocalStorage"
                             VerticalAlignment="Top"
-                            x:Uid="Settings_LocalStrage"
+                            x:Uid="Settings_LocalStorage"
                             IsEnabled="True"
                             IsExpanded="False">
                         <controls:SettingsExpander.Items>
 
-                            <controls:SettingsCard Header="afd" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="fddfasa">
-                                <Grid>
+                            <controls:SettingsCard Header="" Description="" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical">
+                                <Grid Margin="0,12,0,12">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
@@ -212,7 +211,7 @@
                     <controls:SettingsExpander x:Uid="Settings_ProjectPage">
                         <controls:SettingsExpander.Items>
                             <controls:SettingsCard Header="Project Page" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="@Github">
-                                <HyperlinkButton NavigateUri="https://github.com/torum/MPDCtrl">https://github.com/torum/MPDCtrl</HyperlinkButton>
+                                <HyperlinkButton NavigateUri="https://github.com/torum/MPDCtrl/">https://github.com/torum/MPDCtrl/</HyperlinkButton>
                             </controls:SettingsCard>
                             <controls:SettingsCard Header="App Page" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="@Github">
                                 <HyperlinkButton NavigateUri="https://torum.github.io/MPDCtrl/">https://torum.github.io/MPDCtrl/</HyperlinkButton>
@@ -228,7 +227,7 @@
 
                         <controls:SettingsExpander.Items>
                             <controls:SettingsCard Header="The MIT License" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="Copyright (c) 2018~ torum">
-                                <TextBlock x:Uid="Settings_LicenseText" TextWrapping="Wrap"></TextBlock>
+                                <TextBlock x:Uid="Settings_LicenseText" TextWrapping="Wrap" Margin="0,12,0,12"></TextBlock>
                             </controls:SettingsCard>
                         </controls:SettingsExpander.Items>
 
@@ -239,7 +238,7 @@
 
                         <controls:SettingsExpander.Items>
                             <controls:SettingsCard Header="" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="">
-                                <TextBlock  x:Uid="Settings_PrivacyPolicyText" TextWrapping="Wrap"></TextBlock>
+                                <TextBlock  x:Uid="Settings_PrivacyPolicyText" TextWrapping="Wrap" Margin="0,12,0,12"></TextBlock>
                             </controls:SettingsCard>
                         </controls:SettingsExpander.Items>
                         
@@ -250,7 +249,7 @@
 
                         <controls:SettingsExpander.Items>
                             <controls:SettingsCard Header="Microsoft" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="The MIT License">
-                                <StackPanel Spacing="12">
+                                <StackPanel Spacing="12" Margin="0,12,0,12">
                                     <HyperlinkButton NavigateUri="https://github.com/CommunityToolkit/Windows">CommunityToolkit.Mvvm/WinUI</HyperlinkButton>
                                     <HyperlinkButton NavigateUri="https://www.nuget.org/packages/microsoft.extensions.dependencyinjection/">Microsoft.Extensions.DependencyInjection</HyperlinkButton>
                                     <HyperlinkButton NavigateUri="https://www.nuget.org/packages/Microsoft.Extensions.Hosting">Microsoft.Extensions.Hosting</HyperlinkButton>

@@ -12,33 +12,42 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
 	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-
+	  
+	  <PlatformTarget>x64</PlatformTarget>
 
 	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 
 
 	  <ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
 	  <DebugType>embedded</DebugType>
+
+	  <VersionPrefix>4.0.0.0</VersionPrefix>
+	  <VersionSuffix>RC1</VersionSuffix>
+	  <FileVersion>4.0.0.0</FileVersion>
+	  
   </PropertyGroup>
 
 	<!-- Publish Properties -->
 	<PropertyGroup>
-		<PublishAot>True</PublishAot>
 		<SelfContained>true</SelfContained>
 		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 		<DebugType>embedded</DebugType>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-		<PublishTrimmed>True</PublishTrimmed>
+
+
+		<SelfContained>true</SelfContained>
+		<NeutralLanguage>en</NeutralLanguage>
 	</PropertyGroup>
-	
-  <!--
+
 	<PropertyGroup>
-	
-	  <PublishSingleFile>true</PublishSingleFile>
+		<PublishTrimmed>True</PublishTrimmed>
+		<PublishAot>True</PublishAot>
+		<!--
+		<PublishSingleFile>true</PublishSingleFile>
 		<WindowsPackageType>None</WindowsPackageType>
+		-->
 	</PropertyGroup>
-  -->
 	
   <ItemGroup>
     <Content Remove="Assets\BadgeLogo.scale-100.png" />
@@ -134,9 +143,6 @@
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.9" />
   </ItemGroup>
   <ItemGroup>
-    <Content Update="Assets\dummy.mp3">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Update="Assets\MPDCtrl.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

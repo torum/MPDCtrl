@@ -2096,7 +2096,7 @@ public partial class MainViewModel : ObservableObject
                 version = Assembly.GetExecutingAssembly().GetName().Version!;
             }
 
-            return $"{"Version".GetLocalized()} - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+            return $"MPDCtrl {"Version".GetLocalized()} - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
         }
     }
 

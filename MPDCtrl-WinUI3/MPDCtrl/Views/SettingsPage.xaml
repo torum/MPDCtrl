@@ -42,7 +42,7 @@
 
         <Grid Grid.Row="1" x:Name="BodyGrid" Margin="24,0,0,0">
             <ScrollViewer Margin="0,24,0,0">
-                <StackPanel Spacing="24">
+                <StackPanel Spacing="24" Padding="0,0,0,24">
 
                     <!-- Themes -->
                     <controls:SettingsExpander x:Name="SettingsCardTheme"
@@ -184,7 +184,7 @@
                     <!-- Local strage usage -->
                     <controls:SettingsExpander x:Name="SettingsCardLocalStrage"
                             VerticalAlignment="Top"
-Header="Local storage usage" Description="Cache folder/directory for album cover/art images"
+                            x:Uid="Settings_LocalStrage"
                             IsEnabled="True"
                             IsExpanded="False">
                         <controls:SettingsExpander.Items>
@@ -206,6 +206,61 @@ Header="Local storage usage" Description="Cache folder/directory for album cover
                             </controls:SettingsCard>
 
                         </controls:SettingsExpander.Items>
+                    </controls:SettingsExpander>
+
+                    <!-- Project info -->
+                    <controls:SettingsExpander x:Uid="Settings_ProjectPage">
+                        <controls:SettingsExpander.Items>
+                            <controls:SettingsCard Header="Project Page" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="@Github">
+                                <HyperlinkButton NavigateUri="https://github.com/torum/MPDCtrl">https://github.com/torum/MPDCtrl</HyperlinkButton>
+                            </controls:SettingsCard>
+                            <controls:SettingsCard Header="App Page" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="@Github">
+                                <HyperlinkButton NavigateUri="https://torum.github.io/MPDCtrl/">https://torum.github.io/MPDCtrl/</HyperlinkButton>
+                            </controls:SettingsCard>
+                            <controls:SettingsCard Header="Microsoft App Store Page" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="@Microsoft">
+                                <HyperlinkButton NavigateUri="https://apps.microsoft.com/detail/9nv2bbj82brx">https://apps.microsoft.com/detail/9nv2bbj82brx</HyperlinkButton>
+                            </controls:SettingsCard>
+                        </controls:SettingsExpander.Items>
+                    </controls:SettingsExpander>
+
+                    <!-- License -->
+                    <controls:SettingsExpander x:Uid="Settings_License">
+
+                        <controls:SettingsExpander.Items>
+                            <controls:SettingsCard Header="The MIT License" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="Copyright (c) 2018~ torum">
+                                <TextBlock x:Uid="Settings_LicenseText" TextWrapping="Wrap"></TextBlock>
+                            </controls:SettingsCard>
+                        </controls:SettingsExpander.Items>
+
+                    </controls:SettingsExpander>
+                    
+                    <!-- PrivacyPolicy -->
+                    <controls:SettingsExpander x:Uid="Settings_PrivacyPolicy">
+
+                        <controls:SettingsExpander.Items>
+                            <controls:SettingsCard Header="" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="">
+                                <TextBlock  x:Uid="Settings_PrivacyPolicyText" TextWrapping="Wrap"></TextBlock>
+                            </controls:SettingsCard>
+                        </controls:SettingsExpander.Items>
+                        
+                    </controls:SettingsExpander>
+
+                    <!-- Third party -->
+                    <controls:SettingsExpander Header="Third-Party Dependency &amp; Libraries" Description="Built with C#/.NET">
+
+                        <controls:SettingsExpander.Items>
+                            <controls:SettingsCard Header="Microsoft" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="The MIT License">
+                                <StackPanel Spacing="12">
+                                    <HyperlinkButton NavigateUri="https://github.com/CommunityToolkit/Windows">CommunityToolkit.Mvvm/WinUI</HyperlinkButton>
+                                    <HyperlinkButton NavigateUri="https://www.nuget.org/packages/microsoft.extensions.dependencyinjection/">Microsoft.Extensions.DependencyInjection</HyperlinkButton>
+                                    <HyperlinkButton NavigateUri="https://www.nuget.org/packages/Microsoft.Extensions.Hosting">Microsoft.Extensions.Hosting</HyperlinkButton>
+                                    <HyperlinkButton NavigateUri="https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/">System.Security.Cryptography.ProtectedData</HyperlinkButton>
+                                    <HyperlinkButton NavigateUri="https://github.com/microsoft/WindowsAppSDK">WindowsAppSDK</HyperlinkButton>
+                                    <HyperlinkButton NavigateUri="https://github.com/microsoft/microsoft-ui-xaml">WinUI3</HyperlinkButton>
+                                </StackPanel>
+                            </controls:SettingsCard>
+                        </controls:SettingsExpander.Items>
+
                     </controls:SettingsExpander>
 
                 </StackPanel>

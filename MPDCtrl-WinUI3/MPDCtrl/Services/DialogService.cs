@@ -76,7 +76,7 @@ public class DialogService : IDialogService
 
     }
 
-    public async Task<AddToDialogResult?> ShowAddToDialog(ViewModels.MainViewModel vm)
+    public async Task<AddToDialogResult?> ShowSongsAddToDialog(ViewModels.MainViewModel vm)
     {
         if (App.MainWnd is null)
         {
@@ -97,13 +97,13 @@ public class DialogService : IDialogService
             DefaultButton = ContentDialogButton.Primary,
             IsSecondaryButtonEnabled = false,
             CloseButtonText = _resourceLoader.GetString("Dialog_Cancel"),
-            Content = new Views.Dialogs.AddToDialog()
+            Content = new Views.Dialogs.SongsAddToDialog()
             {
                 //DataContext = new DialogViewModel()
             }
         };
 
-        if (dialog.Content is not AddToDialog dialogContent)
+        if (dialog.Content is not SongsAddToDialog dialogContent)
         {
             return null;
         }
@@ -145,7 +145,7 @@ public class DialogService : IDialogService
         return null;
     }
 
-    public async Task<RenameDialogResult?> ShowRenameToDialog(ViewModels.MainViewModel vm)
+    public async Task<RenameDialogResult?> ShowPlaylistRenameToDialog(ViewModels.MainViewModel vm)
     {
         if (App.MainWnd is null)
         {
@@ -166,13 +166,13 @@ public class DialogService : IDialogService
             DefaultButton = ContentDialogButton.Primary,
             IsSecondaryButtonEnabled = false,
             CloseButtonText = _resourceLoader.GetString("Dialog_Cancel"),
-            Content = new Views.Dialogs.RenameToDialog()
+            Content = new Views.Dialogs.PlaylistRenameToDialog()
             {
                 //DataContext = new DialogViewModel()
             }
         };
 
-        if (dialog.Content is not RenameToDialog dialogContent)
+        if (dialog.Content is not PlaylistRenameToDialog dialogContent)
         {
             return null;
         }

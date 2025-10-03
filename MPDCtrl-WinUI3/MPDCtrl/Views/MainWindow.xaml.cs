@@ -52,10 +52,10 @@ public sealed partial class MainWindow : Window
 
     // Window position and size
     // TODO: Change this lator.1920x1080
-    private int winRestoreWidth = 1024;//1024;
-    private int winRestoreHeight = 768;//768;
-    private int winRestoreTop = 100;
-    private int winRestoreleft = 100;
+    private int _winRestoreWidth = 1024;//1024;
+    private int _winRestoreHeight = 768;//768;
+    private int _winRestoreTop = 100;
+    private int _winRestoreLeft = 100;
 
     //private readonly UISettings settings;
     private ElementTheme theme = ElementTheme.Default;
@@ -373,7 +373,9 @@ public sealed partial class MainWindow : Window
                     {
                         var s = p.Attribute("Password")?.Value;
                         if (!string.IsNullOrEmpty(s))
+                        {
                             pro.Password = MainViewModel.Decrypt(s);
+                        }
                     }
                     if (p.Attribute("IsDefault") is not null)
                     {
@@ -404,15 +406,33 @@ public sealed partial class MainWindow : Window
                     }
 
                     if (!string.IsNullOrEmpty(pro.Host.Trim()))
+                    {
+                        if (pro.IsDefault)
                         {
-                            if (pro.IsDefault)
-                            {
-                                _vm.CurrentProfile = pro;
-
-                                // Only add if Hot is present?
-                                _vm.Profiles.Add(pro);
-                            }
+                            _vm.CurrentProfile = pro;
+                            _vm.SelectedProfile = _vm.CurrentProfile;
                         }
+
+                        // Only add if Hot is present?
+                        _vm.Profiles.Add(pro);
+                    }
+                }
+
+                if (_vm.Profiles.Count > 0)
+                {
+                    if (_vm.CurrentProfile is null)
+                    {
+                        _vm.CurrentProfile = _vm.Profiles.FirstOrDefault();
+                        if (_vm.CurrentProfile is not null)
+                        {
+                            _vm.CurrentProfile.IsDefault = true;
+                        }
+                    }
+                    
+                    if (_vm.CurrentProfile is not null)
+                    {
+                        _vm.SelectedProfile = _vm.CurrentProfile;
+                    }
                 }
             }
 
@@ -428,26 +448,26 @@ public sealed partial class MainWindow : Window
             }
         }
 
-        winRestoreWidth = (int)width;
-        winRestoreHeight = (int)height;
-        winRestoreTop = (int)top;
-        winRestoreleft = (int)left;
+        _winRestoreWidth = (int)width;
+        _winRestoreHeight = (int)height;
+        _winRestoreTop = (int)top;
+        _winRestoreLeft = (int)left;
 
-        if (winRestoreWidth < 500)
+        if (_winRestoreWidth < 500)
         {
-            winRestoreWidth = 500;
+            _winRestoreWidth = 500;
         }
-        if (winRestoreHeight < 500)
+        if (_winRestoreHeight < 500)
         {
-            winRestoreHeight = 500;
+            _winRestoreHeight = 500;
         }
-        if (winRestoreTop < 0)
+        if (_winRestoreTop < 0)
         {
-            winRestoreTop = 0;
+            _winRestoreTop = 0;
         }
-        if (winRestoreleft < 0)
+        if (_winRestoreLeft < 0)
         {
-            winRestoreleft = 0;
+            _winRestoreLeft = 0;
         }
 
         // Restore window size and position
@@ -470,7 +490,7 @@ public sealed partial class MainWindow : Window
                 if (winState == OverlappedPresenterState.Maximized)
                 {
                     // Sets restore size and position.
-                    appWindow.MoveAndResize(new Windows.Graphics.RectInt32(winRestoreleft, winRestoreTop, winRestoreWidth, winRestoreHeight));
+                    appWindow.MoveAndResize(new Windows.Graphics.RectInt32(_winRestoreLeft, _winRestoreTop, _winRestoreWidth, _winRestoreHeight));
                     // Maximize the window.
                     (appWindow.Presenter as OverlappedPresenter)!.Maximize();
                 }
@@ -486,7 +506,7 @@ public sealed partial class MainWindow : Window
                 else if (winState == OverlappedPresenterState.Restored)
                 {
                     // Sets restore size and position.
-                    appWindow.MoveAndResize(new Windows.Graphics.RectInt32(winRestoreleft, winRestoreTop, winRestoreWidth, winRestoreHeight));
+                    appWindow.MoveAndResize(new Windows.Graphics.RectInt32(_winRestoreLeft, _winRestoreTop, _winRestoreWidth, _winRestoreHeight));
                 }
             }
         }
@@ -655,12 +675,12 @@ public sealed partial class MainWindow : Window
                 else if (presenter.State == OverlappedPresenterState.Minimized)
                 {
                 }
-                else
+                else if (presenter.State == OverlappedPresenterState.Restored)
                 {
-                    winRestoreHeight = (int)appWindow.Size.Height;
-                    winRestoreWidth = (int)appWindow.Size.Width;
-                    winRestoreTop = (int)appWindow.Position.Y;
-                    winRestoreleft = (int)appWindow.Position.X;
+                    _winRestoreHeight = (int)appWindow.Size.Height;
+                    _winRestoreWidth = (int)appWindow.Size.Width;
+                    _winRestoreTop = (int)appWindow.Position.Y;
+                    _winRestoreLeft = (int)appWindow.Position.X;
                 }
             }
         }
@@ -764,7 +784,7 @@ public sealed partial class MainWindow : Window
                 }
                 else
                 {
-                    attrs.Value = winRestoreWidth.ToString();
+                    attrs.Value = _winRestoreWidth.ToString();
                 }
                 //attrs.Value = this.AppWindow.Size.Width.ToString();
                 mainWindow.SetAttributeNode(attrs);
@@ -776,7 +796,7 @@ public sealed partial class MainWindow : Window
                 }
                 else
                 {
-                    attrs.Value = winRestoreHeight.ToString();
+                    attrs.Value = _winRestoreHeight.ToString();
                 }
                 //attrs.Value = App.MainWindow.AppWindow.Size.Height.ToString();//App.MainWindow.GetAppWindow().Size.Height.ToString();
                 mainWindow.SetAttributeNode(attrs);
@@ -788,7 +808,7 @@ public sealed partial class MainWindow : Window
                 }
                 else
                 {
-                    attrs.Value = winRestoreTop.ToString();
+                    attrs.Value = _winRestoreTop.ToString();
                 }
                 //attrs.Value = App.MainWindow.AppWindow.Position.Y.ToString();
                 mainWindow.SetAttributeNode(attrs);
@@ -800,7 +820,7 @@ public sealed partial class MainWindow : Window
                 }
                 else
                 {
-                    attrs.Value = winRestoreleft.ToString();
+                    attrs.Value = _winRestoreLeft.ToString();
                 }
                 //attrs.Value = App.MainWindow.AppWindow.Position.X.ToString();
                 mainWindow.SetAttributeNode(attrs);

@@ -10,9 +10,14 @@
     xmlns:mod="using:MPDCtrl.Models"
     mc:Ignorable="d">
 
-    <Grid>
-        <StackPanel Margin="10" Width="250">
-            <!--
+    <Grid Width="330">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto" HorizontalScrollBarVisibility="Disabled" HorizontalScrollMode="Disabled">
+            <StackPanel Margin="10" Spacing="24" HorizontalAlignment="Stretch">
+                <!--
             <StackPanel Spacing="3" HorizontalAlignment="Left">
                 <TextBlock Text="{x:Static prop:Resources.Host}"></TextBlock>
                 <TextBox x:Name="HostTextBox" Text="" Watermark="IP address or PC name" Width="250"></TextBox>
@@ -30,9 +35,34 @@
                 </StackPanel>
             </StackPanel>
             -->
-            <StackPanel Spacing="3" HorizontalAlignment="Left">
-                <CheckBox x:Name="IsDefaultCheckBox" Content="IsDefault" HorizontalAlignment="Left" />
+
+                <StackPanel Spacing="3" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <TextBox x:Name="TextBoxHost" x:Uid="ConnectionSettings_Host" Text="localhost" TextChanged="TextBoxHost_TextChanged" PlaceholderText="InitialSetupWindow_Watermark_IPAddressOrServerName" Width="280"></TextBox>
+                    <!--  (127.0.0.1 or localhost for Local PC) -->
+                    <Viewbox x:Name="IconHostOK" Width="12" Height="12" Margin="12,24,0,0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Path Stretch="UniformToFill" Fill="{ThemeResource AccentTextFillColorPrimaryBrush}" Data="M14.0458 3.4856C14.3299 3.78703 14.3158 4.26169 14.0144 4.54579L6.08456 12.0197C5.74829 12.3366 5.22042 12.3269 4.89609 11.9977L2.21576 9.27737C1.92504 8.98231 1.92856 8.50745 2.22361 8.21674C2.51867 7.92602 2.99353 7.92954 3.28424 8.22459L5.51839 10.4921L12.9856 3.45421C13.287 3.17011 13.7617 3.18416 14.0458 3.4856Z" Width="NaN" Height="NaN" Margin="0"></Path>
+                    </Viewbox>
+                    <ImageIcon x:Name="IconHostError" Source="ms-appx:///Assets/SvgIcons/ic_fluent_error_circle_16_color.svg" Width="16" Height="16" Margin="12,24,0,0"/>
+                </StackPanel>
+
+                <StackPanel Spacing="3" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <TextBox x:Name="TextBoxPort" x:Uid="ConnectionSettings_Port" Text="6600" TextChanged="TextBoxPort_TextChanged" PlaceholderText="InitialSetupWindow_Watermark_DefaultIs6600" Width="280"></TextBox>
+                    <Viewbox x:Name="IconPortOK" Width="12" Height="12" Margin="12,24,0,0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Path Stretch="UniformToFill" Fill="{ThemeResource AccentTextFillColorPrimaryBrush}" Data="M14.0458 3.4856C14.3299 3.78703 14.3158 4.26169 14.0144 4.54579L6.08456 12.0197C5.74829 12.3366 5.22042 12.3269 4.89609 11.9977L2.21576 9.27737C1.92504 8.98231 1.92856 8.50745 2.22361 8.21674C2.51867 7.92602 2.99353 7.92954 3.28424 8.22459L5.51839 10.4921L12.9856 3.45421C13.287 3.17011 13.7617 3.18416 14.0458 3.4856Z" Width="NaN" Height="NaN" Margin="0"></Path>
+                    </Viewbox>
+                    <ImageIcon x:Name="IconPortError" Source="ms-appx:///Assets/SvgIcons/ic_fluent_error_circle_16_color.svg" Width="16" Height="16" Margin="12,24,0,0"/>
+                </StackPanel>
+
+                <StackPanel Spacing="3" HorizontalAlignment="Left">
+                    <PasswordBox x:Name="PasswordBox" x:Uid="ConnectionSettings_Password" Password="" PlaceholderText="InitialSetupWindow_Watermark_OptionalUnlessConfiguredOtherwise" Width="280"></PasswordBox>
+                </StackPanel>
+
+                <StackPanel Spacing="3" HorizontalAlignment="Left">
+                    <CheckBox x:Name="IsDefaultCheckBox" Content="IsDefault" HorizontalAlignment="Left" />
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
+        </ScrollViewer>
+        
     </Grid>
+
 </Page>

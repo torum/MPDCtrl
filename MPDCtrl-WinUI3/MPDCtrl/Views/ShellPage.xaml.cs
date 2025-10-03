@@ -71,12 +71,12 @@ public sealed partial class ShellPage : Page
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
-        // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage)
-        // is loaded, initialized, set, drawn, navigated. So start the connection.
-        _ = Task.Run(()=>ViewModel.StartMPC());
-
         // Set focus so that space shortcut works.
         this.PlaybackPlay.Focus(FocusState.Programmatic);
+
+        // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage)
+        // is loaded, initialized, set, drawn, navigated. So start the connection.
+        _ = ViewModel.StartMPC();
 
         // 
         if (App.MainWnd is not null)
@@ -150,8 +150,17 @@ public sealed partial class ShellPage : Page
                                                          this.DummyButton.ActualHeight));
         Windows.Graphics.RectInt32 DummyButtonRect = GetRect(bounds, scaleAdjustment);
         */
-        //
+        
+        
+        // Settings button
+        GeneralTransform transform1 = this.SettingsButton.TransformToVisual(null);
+        Rect bounds1 = transform1.TransformBounds(new Rect(0, 0,
+                                                         this.SettingsButton.ActualWidth,
+                                                         this.SettingsButton.ActualHeight));
+        Windows.Graphics.RectInt32 SettingsButton = GetRect(bounds1, scaleAdjustment);
 
+
+        // Back button
         double width = this.BackButton.Width;//ActualWidth won't work in certain cases.
         double height = this.BackButton.Height;//ActualHeight won't work in certain cases.
 
@@ -170,7 +179,7 @@ public sealed partial class ShellPage : Page
 
         //
         //var rectArray = new Windows.Graphics.RectInt32[] { SearchBoxRect, BackButtonRect };
-        var rectArray = new Windows.Graphics.RectInt32[] { BackButtonRect };
+        var rectArray = new Windows.Graphics.RectInt32[] { BackButtonRect, SettingsButton };
 
         InputNonClientPointerSource nonClientInputSrc =
             InputNonClientPointerSource.GetForWindowId(m_AppWindow.Id);
@@ -622,4 +631,16 @@ public sealed partial class ShellPage : Page
         e.Handled = true;
     }
 
+    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        //
+        if (this.NavigationFrame.Navigate(typeof(SettingsPage), this.NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
+        {
+            _currentPage = typeof(SettingsPage);
+
+            ViewModel.SelectedNodeMenu = null;
+
+            NaviView.SelectedItem = null;
+        }
+    }
 }

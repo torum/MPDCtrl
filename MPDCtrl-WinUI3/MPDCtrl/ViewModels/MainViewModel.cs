@@ -112,7 +112,9 @@ public partial class MainViewModel : ObservableObject
             _currentProfile = value;
             OnPropertyChanged(nameof(CurrentProfile));
 
+            /*
             SelectedProfile = _currentProfile;
+            */
 
             if (_currentProfile is not null)
             {
@@ -2457,7 +2459,7 @@ public partial class MainViewModel : ObservableObject
 
 
 #if DEBUG
-        IsDebugWindowEnabled = true;
+        IsDebugWindowEnabled = false;
 #else
         IsDebugWindowEnabled = false;
         IsShowDebugWindow = false;
@@ -2466,11 +2468,9 @@ public partial class MainViewModel : ObservableObject
 
     public async Task StartMPC()
     {
-        if (CurrentProfile is null)
+        if ((CurrentProfile is null) || (Profiles.Count < 1))
         {
-            //ConnectionStatusMessage = MPDCtrlX.Properties.Resources.Init_NewConnectionSetting; // no need. 
-
-            //StatusButton = _pathNewConnectionButton;
+            //Debug.WriteLine("(CurrentProfile is null) || (Profiles.Count < 1)");
 
             var pro = await _dialogs.ShowInitDialog(this);
             if (pro is null)
@@ -3205,7 +3205,7 @@ public partial class MainViewModel : ObservableObject
                     // This is not good, all the selections will be cleared and position will be reset, but ...
                     //Queue = new ObservableCollection<SongInfoEx>(Queue.OrderBy(n => n.Index));
 
-                    Debug.WriteLine("Queue sort.");
+                    //Debug.WriteLine("Queue sort.");
                     Queue.Sort((a, b) => { return a.Index.CompareTo(b.Index); });
 
                     UpdateProgress?.Invoke(this, "[UI] Checking current song after Queue update.");
@@ -5168,7 +5168,6 @@ public partial class MainViewModel : ObservableObject
         await _mpc.MpdSetVolume(0);
     }
 
-
     [RelayCommand]
     public async Task SearchExec()
     {
@@ -5462,7 +5461,7 @@ public partial class MainViewModel : ObservableObject
     {
         if (Queue.Count == 0) return;
 
-        var result = await _dialogs.ShowAddToDialog(this);
+        var result = await _dialogs.ShowSongsAddToDialog(this);
 
         if (result is null)
         {
@@ -5514,7 +5513,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var result = await _dialogs.ShowAddToDialog(this);
+        var result = await _dialogs.ShowSongsAddToDialog(this);
 
         if (result is null)
         {
@@ -5629,7 +5628,7 @@ public partial class MainViewModel : ObservableObject
             if (uriList.Count > 0)
             {
                 //SearchPageAddToPlaylistDialogShow?.Invoke(this, uriList);
-                var result = await _dialogs.ShowAddToDialog(this);
+                var result = await _dialogs.ShowSongsAddToDialog(this);
 
                 if (result is null)
                 {
@@ -5705,7 +5704,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var result = await _dialogs.ShowAddToDialog(this);
+        var result = await _dialogs.ShowSongsAddToDialog(this);
 
         if (result is null)
         {
@@ -6145,7 +6144,6 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-
     [RelayCommand]
     public async Task SelectedAlbumArtistAddToQueue(object obj) 
     {
@@ -6214,7 +6212,7 @@ public partial class MainViewModel : ObservableObject
 
         if (uriList.Count > 0)
         {
-            var result = await _dialogs.ShowAddToDialog(this);
+            var result = await _dialogs.ShowSongsAddToDialog(this);
 
             if (result is null)
             {
@@ -6311,7 +6309,7 @@ public partial class MainViewModel : ObservableObject
             if (uriList.Count > 0)
             {
                 //SearchPageAddToPlaylistDialogShow?.Invoke(this, uriList);
-                var result = await _dialogs.ShowAddToDialog(this);
+                var result = await _dialogs.ShowSongsAddToDialog(this);
 
                 if (result is null)
                 {
@@ -6417,7 +6415,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var result = await _dialogs.ShowAddToDialog(this);
+        var result = await _dialogs.ShowSongsAddToDialog(this);
 
         if (result is null)
         {
@@ -6511,7 +6509,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var result = await _dialogs.ShowRenameToDialog(this);
+        var result = await _dialogs.ShowPlaylistRenameToDialog(this);
 
         if (result is null)
         {
@@ -6697,7 +6695,6 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void ReConnectWithSelectedProfile()
     {
-        Debug.WriteLine("ReConnectWithSelectedProfile");
         if (IsBusy) return;
         if (IsConnecting) return;
         if (SelectedProfile is null) return;
@@ -6716,7 +6713,12 @@ public partial class MainViewModel : ObservableObject
         // Save volume.
         SelectedProfile.Volume = Convert.ToInt32(Volume);
         // Set current.
+
         CurrentProfile = SelectedProfile;
+
+        _host = SelectedProfile.Host;
+        _port = SelectedProfile.Port;
+        _password = SelectedProfile.Password;
 
         // Clearing values
         MpdVersion = string.Empty;
@@ -6789,8 +6791,6 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public async Task ShowProfileEditDialog()
     {
-        Debug.WriteLine("ShowProfileEditDialog");
-
         if (SelectedProfile is null)
         {
             return;
@@ -6830,7 +6830,6 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void ShowProfileRemoveNoneDialog()
     {
-        Debug.WriteLine("ShowProfileRemoveNoneDialog");
         if (Profiles.Count <= 0)
         {
             return;
@@ -6869,7 +6868,6 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public async Task ShowProfileAddDialog()
     {
-        Debug.WriteLine("ShowProfileAddDialog");
         var pro = await _dialogs.ShowProfileAddDialog();
 
         if (pro is null)

@@ -14,9 +14,9 @@ public interface IDialogService
 {
     Task<Profile?> ShowInitDialog(ViewModels.MainViewModel vm);
 
-    Task<AddToDialogResult?> ShowAddToDialog(ViewModels.MainViewModel vm);
+    Task<AddToDialogResult?> ShowSongsAddToDialog(ViewModels.MainViewModel vm);
 
-    Task<RenameDialogResult?> ShowRenameToDialog(ViewModels.MainViewModel vm);
+    Task<RenameDialogResult?> ShowPlaylistRenameToDialog(ViewModels.MainViewModel vm);
 
     Task<Profile?> ShowProfileAddDialog();
 

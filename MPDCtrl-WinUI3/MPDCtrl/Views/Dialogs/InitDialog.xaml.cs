@@ -48,7 +48,7 @@ public sealed partial class InitDialog : Page
     private async void ValidateHostInput()
     {
         // validate and show ok icon
-        bool isError = true;
+        bool isError;
         string hostText = this.TextBoxHost.Text;
         hostText = hostText.Trim();
 
@@ -64,11 +64,10 @@ public sealed partial class InitDialog : Page
             }
             else
             {
-                IPAddress? ipAddress = null;
                 try
                 {
                     //ipAddress = IPAddress.Parse(hostText);
-                    if (IPAddress.TryParse(hostText, out ipAddress))
+                    if (IPAddress.TryParse(hostText, out IPAddress? ipAddress))
                     {
                         if (ipAddress is not null)
                         {
@@ -91,7 +90,7 @@ public sealed partial class InitDialog : Page
 
                 if (isError)
                 {
-                    ipAddress = null;
+                   
                     try
                     {
                         var addresses = await Dns.GetHostAddressesAsync(hostText, AddressFamily.InterNetwork);
@@ -133,7 +132,7 @@ public sealed partial class InitDialog : Page
     private void ValidatePortInput()
     {
         // validate and show ok icon
-        bool isError = true;
+        bool isError;
         string portText = this.TextBoxPort.Text;
 
         if (portText.Equals("6600"))

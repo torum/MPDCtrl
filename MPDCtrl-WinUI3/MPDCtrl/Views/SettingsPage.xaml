@@ -36,7 +36,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0" x:Uid="PageTitle_Settings" FontSize="{StaticResource FontSizePageTitle}" FontWeight="SemiBold"/>
-                <TextBlock Grid.Column="1" FontSize="{StaticResource FontSizePageSubTitle}" Text="" VerticalAlignment="Bottom" Padding="48,0,0,4" Opacity="0.7"/>
+                <TextBlock Grid.Column="1" FontSize="{StaticResource FontSizePageSubTitle}" Text="{x:Bind ViewModel.VersionText, Mode=OneWay}" VerticalAlignment="Bottom" Padding="48,0,0,4" Opacity="0.7"/>
             </Grid>
         </Grid>
 

@@ -42,7 +42,7 @@
         <!-- NaviView -->
         <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BorderBrush="{ThemeResource SmokeFillColorDefaultBrush}" BorderThickness="0,0,0,0">
 
-            <NavigationView x:Name="NaviView" AccessKey="H" MenuItemsSource="{x:Bind ViewModel.MainMenuItems, Mode=OneWay}" IsTitleBarAutoPaddingEnabled="True" IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="False" IsSettingsVisible="True" PaneDisplayMode="Left" ExpandedModeThresholdWidth="1008" CompactModeThresholdWidth="640" OpenPaneLength ="320" IsPaneOpen="{x:Bind ViewModel.IsNavigationViewMenuOpen, Mode=TwoWay}" Loaded="NavigationView_Loaded" ItemInvoked="NavigationView_ItemInvoked" SelectionChanged="NaviView_SelectionChanged">
+            <NavigationView x:Name="NaviView" AccessKey="H" MenuItemsSource="{x:Bind ViewModel.MainMenuItems, Mode=OneWay}" IsTitleBarAutoPaddingEnabled="True" IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="False" IsSettingsVisible="False" PaneDisplayMode="Left" ExpandedModeThresholdWidth="1008" CompactModeThresholdWidth="640" OpenPaneLength ="320" IsPaneOpen="{x:Bind ViewModel.IsNavigationViewMenuOpen, Mode=TwoWay}" Loaded="NavigationView_Loaded" ItemInvoked="NavigationView_ItemInvoked" SelectionChanged="NaviView_SelectionChanged">
                 <NavigationView.PaneHeader>
                     <!-- App title and icon -->
                     <Grid VerticalAlignment="Center">
@@ -52,19 +52,30 @@
                         </Grid.ColumnDefinitions>
                         <!-- App icon and app name -->
                         <StackPanel Grid.Column="0" Margin="12,0,0,0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <Image x:Name="AppTitleIcon" Source="/Assets/MPDCtrl.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Width="18" Height="18" Margin="0,0,0,0"/>
-                            <TextBlock x:Name="AppTitleTextBlock" Text="MPDCtrl" Margin="6,0,0,0" VerticalAlignment="Center" Opacity="0.9" FontSize="12"/>
+                            <Image x:Name="AppTitleIcon" Source="/Assets/MPDCtrl.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Width="17" Height="17" Margin="0,0,0,0"/>
+                            <TextBlock x:Name="AppTitleTextBlock" Text="MPDCtrl" FontWeight="SemiBold" Margin="6,0,0,0" VerticalAlignment="Center" Opacity="0.9"/>
                         </StackPanel>
                         <!-- Progress ring -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="12,0,12,0">
 
                             <ProgressRing IsActive="{x:Bind ViewModel.IsWorking, Mode=OneWay}" Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center" />
 
-                            <Button Command="{x:Bind ViewModel.FireDebugWindowShowHideCommand}" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Visibility="{x:Bind ViewModel.IsDebugWindowEnabled, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                <Viewbox Width="12" Height="12" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Button Width="40" Height="36" Command="{x:Bind ViewModel.FireDebugWindowShowHideCommand}" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Visibility="{x:Bind ViewModel.IsDebugWindowEnabled, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Viewbox Width="14" Height="14" Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <Path Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Data="M20,8H17.19C16.74,7.2 16.12,6.5 15.37,6L17,4.41L15.59,3L13.42,5.17C12.96,5.06 12.5,5 12,5C11.5,5 11.05,5.06 10.59,5.17L8.41,3L7,4.41L8.62,6C7.87,6.5 7.26,7.21 6.81,8H4V10H6.09C6.03,10.33 6,10.66 6,11V12H4V14H6V15C6,15.34 6.03,15.67 6.09,16H4V18H6.81C8.47,20.87 12.14,21.84 15,20.18C15.91,19.66 16.67,18.9 17.19,18H20V16H17.91C17.97,15.67 18,15.34 18,15V14H20V12H18V11C18,10.66 17.97,10.33 17.91,10H20V8M16,15A4,4 0 0,1 12,19A4,4 0 0,1 8,15V11A4,4 0 0,1 12,7A4,4 0 0,1 16,11V15M14,10V12H10V10H14M10,14H14V16H10V14Z" Width="NaN" Height="NaN" Margin="0">
                                     </Path>
                                 </Viewbox>
+                            </Button>
+                            <!-- I want to have settings button right here. -->
+                            <Button x:Name="SettingsButton" Click="SettingsButton_Click" Width="40" Height="36" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0">
+                                <AnimatedIcon Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <AnimatedIcon.Source>
+                                        <animatedvisuals:AnimatedSettingsVisualSource />
+                                    </AnimatedIcon.Source>
+                                    <AnimatedIcon.FallbackIconSource>
+                                        <SymbolIconSource Symbol="Setting" />
+                                    </AnimatedIcon.FallbackIconSource>
+                                </AnimatedIcon>
                             </Button>
                         </StackPanel>
                     </Grid>

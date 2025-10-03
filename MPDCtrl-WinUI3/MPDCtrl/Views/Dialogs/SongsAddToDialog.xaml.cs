@@ -17,13 +17,13 @@ using Windows.Foundation.Collections;
 
 namespace MPDCtrl.Views.Dialogs;
 
-public sealed partial class AddToDialog : Page
+public sealed partial class SongsAddToDialog : Page
 {
     public bool CreateNewCheckBoxIsChecked = false;
     public string TextBoxPlaylistNameText = string.Empty;
     public Playlist? PlaylistComboBoxSelectedItem;
 
-    public AddToDialog()
+    public SongsAddToDialog()
     {
         InitializeComponent();
     }

@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI;
 using CommunityToolkit.WinUI.Animations;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -6575,6 +6576,33 @@ public partial class MainViewModel : ObservableObject
         {
             await _mpc.MpdAdd(selectedList);
         }
+    }
+
+    [RelayCommand]
+    public void FilesCopyFilePath(object obj)
+    {
+        if (obj is null)
+        {
+            Debug.WriteLine("obj is null @FilesCopyFilePath");
+            return;
+        }
+
+        if (obj is not NodeFile file)
+        {
+            Debug.WriteLine("obj is not NodeFile @FilesCopyFilePath");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(file.FilePath))
+        {
+            return;
+        }
+
+        DataPackage dataPackage = new();
+        string originalString = file.FilePath;
+        string newString = originalString.Replace('/', System.IO.Path.DirectorySeparatorChar);
+        dataPackage.SetText(newString);
+        Clipboard.SetContent(dataPackage);
     }
 
     [RelayCommand]

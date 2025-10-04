@@ -151,10 +151,10 @@
 
                 </Grid>
 
-                <ListView Grid.Row="1" x:Name="FilesListview" Margin="8,24,0,0" ItemsSource="{x:Bind ViewModel.MusicEntriesFiltered, Mode=OneWay}" SelectionMode="Extended" IsMultiSelectCheckBoxEnabled="False" RightTapped="ListView_RightTapped"  BorderThickness="0" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView Grid.Row="1" x:Name="FilesListview" Margin="8,24,0,0" ItemsSource="{x:Bind ViewModel.MusicEntriesFiltered, Mode=OneWay}" SelectionMode="Extended"  IsMultiSelectCheckBoxEnabled="False" RightTapped="ListView_RightTapped"  BorderThickness="0" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListView.ContextFlyout>
                         <MenuFlyout>
-                            <MenuFlyoutItem x:Uid="ListViewItemContextMenu_Play" Command="{x:Bind ViewModel.FilesSelectedItemsPlayCommand}" CommandParameter="{x:Bind FilesListview.SelectedItems}">
+                            <MenuFlyoutItem x:Uid="ListViewItemContextMenu_Play" Command="{x:Bind ViewModel.FilesSelectedItemsPlayCommand}" CommandParameter="{x:Bind FilesListview.SelectedItems, Mode=OneWay}">
                                 <MenuFlyoutItem.Icon>
                                     <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm8.856-3.845A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189Z"/>
                                 </MenuFlyoutItem.Icon>
@@ -162,14 +162,20 @@
                                     <KeyboardAccelerator Key="Enter" />
                                 </MenuFlyoutItem.KeyboardAccelerators>
                             </MenuFlyoutItem>
-                            <MenuFlyoutItem x:Uid="ListviewItemContextMenu_AddToPlaylist" Command="{x:Bind ViewModel.FilesAddSelectedItemsToPlaylistCommand}" CommandParameter="{x:Bind FilesListview.SelectedItems}">
+                            <MenuFlyoutItem x:Uid="ListviewItemContextMenu_AddToPlaylist" Command="{x:Bind ViewModel.FilesAddSelectedItemsToPlaylistCommand}" CommandParameter="{x:Bind FilesListview.SelectedItems, Mode=OneWay}">
                                 <MenuFlyoutItem.Icon>
                                     <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm0 5a.75.75 0 0 0-.743.648l-.007.102v3.5h-3.5a.75.75 0 0 0-.102 1.493l.102.007h3.5v3.5a.75.75 0 0 0 1.493.102l.007-.102v-3.5h3.5a.75.75 0 0 0 .102-1.493l-.102-.007h-3.5v-3.5A.75.75 0 0 0 12 7Z"/>
                                 </MenuFlyoutItem.Icon>
                             </MenuFlyoutItem>
-                            <MenuFlyoutItem x:Uid="ListviewItemContextMenu_AddToQueue" Command="{x:Bind ViewModel.FilesAddSelectedItemsToQueueCommand}" CommandParameter="{x:Bind FilesListview.SelectedItems}">
+                            <MenuFlyoutItem x:Uid="ListviewItemContextMenu_AddToQueue" Command="{x:Bind ViewModel.FilesAddSelectedItemsToQueueCommand}" CommandParameter="{x:Bind FilesListview.SelectedItems, Mode=OneWay}">
                                 <MenuFlyoutItem.Icon>
                                     <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Zm0 5a.75.75 0 0 0-.743.648l-.007.102v3.5h-3.5a.75.75 0 0 0-.102 1.493l.102.007h3.5v3.5a.75.75 0 0 0 1.493.102l.007-.102v-3.5h3.5a.75.75 0 0 0 .102-1.493l-.102-.007h-3.5v-3.5A.75.75 0 0 0 12 7Z"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem x:Uid="ListviewItemContextMenu_CopyFilePath" Command="{x:Bind ViewModel.FilesCopyFilePathCommand}" CommandParameter="{x:Bind FilesListview.SelectedItem, Mode=OneWay}">
+                                <MenuFlyoutItem.Icon>
+                                    <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M4.00029 4.08525L4 10.5C4 11.8255 5.03154 12.91 6.33562 12.9947L6.5 13L10.9144 13.0007C10.7083 13.5829 10.1528 14 9.5 14H6C4.34315 14 3 12.6569 3 11V5.5C3 4.84678 3.41754 4.29109 4.00029 4.08525ZM11.5 2C12.3284 2 13 2.67157 13 3.5V10.5C13 11.3284 12.3284 12 11.5 12H6.5C5.67157 12 5 11.3284 5 10.5V3.5C5 2.67157 5.67157 2 6.5 2H11.5ZM11.5 3H6.5C6.22386 3 6 3.22386 6 3.5V10.5C6 10.7761 6.22386 11 6.5 11H11.5C11.7761 11 12 10.7761 12 10.5V3.5C12 3.22386 11.7761 3 11.5 3Z"/>
                                 </MenuFlyoutItem.Icon>
                             </MenuFlyoutItem>
                         </MenuFlyout>

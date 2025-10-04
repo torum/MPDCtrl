@@ -491,4 +491,7 @@ SOFTWARE.</value>
   <data name="Settings_MPD_Connection_Status_IsConnecting" xml:space="preserve">
     <value>接続中</value>
   </data>
+  <data name="ListviewItemContextMenu_CopyFilePath.Text" xml:space="preserve">
+    <value>ファイルのパスをコピー</value>
+  </data>
 </root>

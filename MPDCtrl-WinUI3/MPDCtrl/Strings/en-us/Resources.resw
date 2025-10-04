@@ -490,4 +490,7 @@ SOFTWARE.</value>
   <data name="Settings_MPD_Connection_Status_IsConnecting" xml:space="preserve">
     <value>Connecting</value>
   </data>
+  <data name="ListviewItemContextMenu_CopyFilePath.Text" xml:space="preserve">
+    <value>Copy File Path</value>
+  </data>
 </root>

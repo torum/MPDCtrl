@@ -85,6 +85,23 @@ public sealed partial class ShellPage : Page
         }
     }
 
+    private void Page_Unloaded(object sender, RoutedEventArgs e)
+    {
+        ViewModel.AlbumSelectedNavigateToDetailsPage -= this.OnAlbumSelectedNavigateToDetailsPage;
+        ViewModel.GoBackButtonVisibilityChanged -= this.OnGoBackButtonVisibilityChanged;
+        ViewModel.DebugCommandOutput -= (sender, arg) => { this.OnDebugCommandOutput(arg); };
+        ViewModel.DebugIdleOutput -= (sender, arg) => { this.OnDebugIdleOutput(arg); };
+        ViewModel.DebugCommandClear -= this.OnDebugCommandClear;
+        ViewModel.DebugIdleClear -= this.OnDebugIdleClear;
+
+        this.ActualThemeChanged -= this.This_ActualThemeChanged;
+
+        if (App.MainWnd is not null)
+        {
+            App.MainWnd.Activated -= MainWindow_Activated;
+        }
+    }
+
     private void NavigationView_Loaded(object sender, RoutedEventArgs e)
     {
         /*

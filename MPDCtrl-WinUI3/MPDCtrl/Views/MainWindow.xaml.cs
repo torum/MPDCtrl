@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using MPDCtrl.Helpers;
 using MPDCtrl.Models;
@@ -23,14 +24,15 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using Windows.Storage;
-using Windows.System;
-using WinRT;
-using WinRT.Interop;
 using Windows.Media;
 using Windows.Media.Control;
 using Windows.Media.Core;
 using Windows.Media.Playback;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using Windows.System;
+using WinRT;
+using WinRT.Interop;
 
 namespace MPDCtrl.Views;
 
@@ -42,18 +44,17 @@ public sealed partial class MainWindow : Window
     private Microsoft.UI.Dispatching.DispatcherQueue? _currentDispatcherQueue;// = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
     public Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue => _currentDispatcherQueue;
 
-    // WinUI3 workaround.
+    // Stupid WinUI3 workaround.
     private readonly MediaPlayer? _mediaPlayer;
     private readonly SystemMediaTransportControls? _smtc;
-    private readonly bool _isMediaTransportControlEnable = false;
+    private readonly bool _isMediaTransportControlEnable = true;
 
     private readonly WindowMessageHook? _hook;
     private readonly bool _isGlobalHotKeyEnable = false;
 
     // Window position and size
-    // TODO: Change this lator.1920x1080
-    private int _winRestoreWidth = 1024;//1024;
-    private int _winRestoreHeight = 768;//768;
+    private int _winRestoreWidth = 1024;
+    private int _winRestoreHeight = 768;
     private int _winRestoreTop = 100;
     private int _winRestoreLeft = 100;
 
@@ -111,41 +112,84 @@ public sealed partial class MainWindow : Window
             };
         }
 
-        _isMediaTransportControlEnable = true;
-
         if (_isMediaTransportControlEnable)
         {
-            // Stupid WinAppSDK and WinUI3 needs workaround for media key control. 
+            // Stupid WinRT, WinAppSDK and WinUI3 need a whole lot of workaround including media key control. 
             //_smtc = SystemMediaTransportControls.GetForCurrentView(); //<- this is only works in UWP.
             // So, get the SystemMediaTransportControls from the MediaPlayer instance for workaround.
-            // This is just so stupid.
+            // This is kinda stupid.
 
             _mediaPlayer = new MediaPlayer();
             //_mediaPlayer.CommandManager.IsEnabled = false; <- not good if false.
             _smtc = _mediaPlayer.SystemMediaTransportControls;
 
-            if (_smtc is not null)
-            {
-                _smtc.IsPlayEnabled = true;
-                _smtc.IsPauseEnabled = true;
-                _smtc.IsNextEnabled = true;
-                _smtc.IsPreviousEnabled = true;
-                _smtc.IsStopEnabled = true;
+            OnUpdateSongInfoForSystemMediaTransportControls(new SongInfoForSystemMediaTransportControls());
 
-                _smtc.PlaybackStatus = MediaPlaybackStatus.Paused;
+            //
+            _smtc.ButtonPressed += Smtc_ButtonPressed;
 
-                //
-                _smtc.ButtonPressed += Smtc_ButtonPressed;
-
-                //
-                var updater = _smtc.DisplayUpdater;
-                updater.Type = MediaPlaybackType.Music;
-                updater.MusicProperties.Title = "a title";
-                updater.Update();
-            }
+            _vm.UpdateSongInfoForSystemMediaTransportControls += (sender, arg) => { this.OnUpdateSongInfoForSystemMediaTransportControls(arg); };
 
         }
+    }
 
+    private void OnUpdateSongInfoForSystemMediaTransportControls(SongInfoForSystemMediaTransportControls SongInfoForSMTC)
+    {
+        //Debug.WriteLine("OnUpdateSongInfoForSystemMediaTransportControls");
+
+        if (SongInfoForSMTC is null)
+        {
+            return;
+        }
+
+        if (_smtc is null)
+        {
+            return;
+        }
+
+        CurrentDispatcherQueue?.EnqueueAsync(() =>
+        {
+            _smtc.IsPlayEnabled = SongInfoForSMTC.IsPlayEnabled;
+            _smtc.IsPauseEnabled = SongInfoForSMTC.IsPauseEnabled;
+            _smtc.IsNextEnabled = SongInfoForSMTC.IsNextEnabled;
+            _smtc.IsPreviousEnabled = SongInfoForSMTC.IsPreviousEnabled;
+            _smtc.IsStopEnabled = SongInfoForSMTC.IsStopEnabled;
+
+            _smtc.PlaybackStatus = SongInfoForSMTC.PlaybackStatus;
+
+            //
+            var updater = _smtc.DisplayUpdater;
+            
+            updater.Type = MediaPlaybackType.Music;
+
+            updater.MusicProperties.AlbumArtist = SongInfoForSMTC.AlbumArtist;
+            updater.MusicProperties.Artist = SongInfoForSMTC.Artist;
+            updater.MusicProperties.Title = SongInfoForSMTC.Title;
+            updater.MusicProperties.AlbumTitle = SongInfoForSMTC.AlbumTitle;
+
+            if (SongInfoForSMTC.IsThumbnailIncluded)
+            {
+                // TODO: Stupid WinUI3/WinRT..
+                // updater.Thumbnail won't ...
+                updater.Thumbnail = SongInfoForSMTC.Thumbnail;
+                /*
+                if (!string.IsNullOrEmpty(SongInfoForSMTC.FilePath))
+                {
+                    updater.Thumbnail = RandomAccessStreamReference.CreateFromUri(new Uri(SongInfoForSMTC.FilePath));
+                }
+                else
+                {
+                    updater.Thumbnail = SongInfoForSMTC.Thumbnail;
+                }
+                */
+            }
+            else
+            {
+                updater.Thumbnail = null;
+            }
+
+            updater.Update();
+        });
     }
 
     private void LoadSettings()
@@ -1191,7 +1235,7 @@ public sealed partial class MainWindow : Window
 
     private async void Smtc_ButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
     {
-        Debug.WriteLine("Smtc_ButtonPressed");
+        Debug.WriteLine("ButtonPressed via SystemMediaTransportControls");
 
         if (_smtc is null) return;
 
@@ -1207,23 +1251,28 @@ public sealed partial class MainWindow : Window
             switch (args.Button)
             {
                 case SystemMediaTransportControlsButton.Play:
-                    Task.Run(_vm.Play);
+                    //Task.Run(_vm.Play);
+                    _ = _vm.Play();
                     _smtc.PlaybackStatus = MediaPlaybackStatus.Playing;
                     break;
                 case SystemMediaTransportControlsButton.Pause:
-                    Task.Run(_vm.Pause);
+                    //Task.Run(_vm.Pause);
+                    _ = _vm.Pause();
                     _smtc.PlaybackStatus = MediaPlaybackStatus.Paused;
                     break;
                 case SystemMediaTransportControlsButton.Next:
-                    Task.Run(_vm.PlayNext);
+                    //Task.Run(_vm.PlayNext);
+                    _ = _vm.PlayNext();
                     _smtc.PlaybackStatus = MediaPlaybackStatus.Playing;
                     break;
                 case SystemMediaTransportControlsButton.Previous:
-                    Task.Run(_vm.PlayPrev);
+                    //Task.Run(_vm.PlayPrev);
+                    _ = _vm.PlayPrev();
                     _smtc.PlaybackStatus = MediaPlaybackStatus.Playing;
                     break;
                 case SystemMediaTransportControlsButton.Stop:
-                    Task.Run(_vm.Stop);
+                    //Task.Run(_vm.Stop);
+                    _ = _vm.Stop();
                     _smtc.PlaybackStatus = MediaPlaybackStatus.Stopped;
                     break;
             }

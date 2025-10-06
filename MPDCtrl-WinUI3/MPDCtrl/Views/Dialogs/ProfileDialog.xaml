@@ -58,7 +58,7 @@
                 </StackPanel>
 
                 <StackPanel Spacing="3" HorizontalAlignment="Left">
-                    <CheckBox x:Name="IsDefaultCheckBox" Content="IsDefault" HorizontalAlignment="Left" />
+                    <CheckBox x:Name="IsDefaultCheckBox" x:Uid="ConnectionSettings_IsDefault" HorizontalAlignment="Left" />
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>

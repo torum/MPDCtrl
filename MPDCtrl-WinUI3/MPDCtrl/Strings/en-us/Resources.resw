@@ -493,4 +493,13 @@ SOFTWARE.</value>
   <data name="ListviewItemContextMenu_CopyFilePath.Text" xml:space="preserve">
     <value>Copy File Path</value>
   </data>
+  <data name="Dialog_EditProfile" xml:space="preserve">
+    <value>Edit Profile</value>
+  </data>
+  <data name="Dialog_AddProfile" xml:space="preserve">
+    <value>Add Profile</value>
+  </data>
+  <data name="ConnectionSettings_IsDefault.Content" xml:space="preserve">
+    <value>Default</value>
+  </data>
 </root>

@@ -304,10 +304,10 @@
     <value>プレイリストを選択</value>
   </data>
   <data name="Dialog_Ok" xml:space="preserve">
-    <value>OK (&amp;O)</value>
+    <value>OK</value>
   </data>
   <data name="Dialog_Cancel" xml:space="preserve">
-    <value>キャンセル (Esc)</value>
+    <value>キャンセル</value>
   </data>
   <data name="ListviewItemContextMenu_AddToPlaylist.Text" xml:space="preserve">
     <value>プレイリストに追加</value>
@@ -493,5 +493,14 @@ SOFTWARE.</value>
   </data>
   <data name="ListviewItemContextMenu_CopyFilePath.Text" xml:space="preserve">
     <value>ファイルのパスをコピー</value>
+  </data>
+  <data name="Dialog_EditProfile" xml:space="preserve">
+    <value>プロファイルの編集</value>
+  </data>
+  <data name="Dialog_AddProfile" xml:space="preserve">
+    <value>プロファイルの追加</value>
+  </data>
+  <data name="ConnectionSettings_IsDefault.Content" xml:space="preserve">
+    <value>既定</value>
   </data>
 </root>

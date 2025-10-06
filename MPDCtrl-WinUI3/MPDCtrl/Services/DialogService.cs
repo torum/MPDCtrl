@@ -44,7 +44,6 @@ public class DialogService : IDialogService
             return null;
         }
 
-        Debug.WriteLine("ShowInitDialog");
         var dialog = new ContentDialog
         {
             XamlRoot = App.MainWnd.Content.XamlRoot,
@@ -197,12 +196,12 @@ public class DialogService : IDialogService
         var dialog = new ContentDialog
         {
             XamlRoot = App.MainWnd?.Content.XamlRoot,
-            Title = "ADD",
+            Title = _resourceLoader.GetString("Dialog_AddProfile"),
             IsPrimaryButtonEnabled = true,
-            PrimaryButtonText = "Dialog_Ok",
+            PrimaryButtonText = _resourceLoader.GetString("Dialog_Ok"),
             DefaultButton = ContentDialogButton.Primary,
             IsSecondaryButtonEnabled = false,
-            CloseButtonText = "Dialog_CancelClose",
+            CloseButtonText = _resourceLoader.GetString("Dialog_Cancel"),
             Content = new Views.Dialogs.ProfileDialog()
             {
                 //DataContext = new DialogViewModel()
@@ -240,12 +239,12 @@ public class DialogService : IDialogService
         var dialog = new ContentDialog
         {
             XamlRoot = App.MainWnd?.Content.XamlRoot,
-            Title = "EDIT",
+            Title = _resourceLoader.GetString("Dialog_EditProfile"),
             IsPrimaryButtonEnabled = true,
-            PrimaryButtonText = "Dialog_Ok",
+            PrimaryButtonText = _resourceLoader.GetString("Dialog_Ok"),
             DefaultButton = ContentDialogButton.Primary,
             IsSecondaryButtonEnabled = false,
-            CloseButtonText = "Dialog_CancelClose",
+            CloseButtonText = _resourceLoader.GetString("Dialog_Cancel"),
             Content = new Views.Dialogs.ProfileDialog()
             {
                 //DataContext = new DialogViewModel()

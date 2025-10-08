@@ -13,15 +13,19 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
+using static MPDCtrl.Services.MpcService;
 
 namespace MPDCtrl.Services;
 
 public class MpcBinaryService : IMpcBinaryService
 {
+    private CancellationTokenSource? _cts;
+
     private static TcpClient _binaryConnection = new();
     private StreamReader? _binaryReader;
     private StreamWriter? _binaryWriter;
@@ -41,6 +45,10 @@ public class MpcBinaryService : IMpcBinaryService
 
     public async Task<bool> MpdBinaryConnectionStart(string host, int port, string password)
     {
+        _cts?.Dispose();
+
+        _cts = new CancellationTokenSource();
+
         ConnectionResult r = await MpdBinaryConnect(host, port);
 
         if (r.IsSuccess)
@@ -151,6 +159,17 @@ public class MpcBinaryService : IMpcBinaryService
     private async Task<CommandResult> MpdBinarySendCommand(string cmd)
     {
         CommandResult ret = new();
+
+        if (_cts is null)
+        {
+            return ret;
+        }
+
+        if (_cts.Token.IsCancellationRequested)
+        {
+            Debug.WriteLine("IsCancellationRequested returning @MpdBinarySendCommand");
+            return ret;
+        }
 
         if (_binaryConnection.Client is null)
         {
@@ -332,6 +351,17 @@ public class MpcBinaryService : IMpcBinaryService
     {
         CommandBinaryResult ret = new();
 
+        if (_cts is null)
+        {
+            return ret;
+        }
+
+        if (_cts.Token.IsCancellationRequested)
+        {
+            Debug.WriteLine("IsCancellationRequested returning @MpdBinarySendBinaryCommand");
+            return ret;
+        }
+
         if (_binaryConnection.Client is null)
         {
             Debug.WriteLine("@MpdBinarySendBinaryCommand: " + "TcpClient.Client is null");
@@ -422,7 +452,7 @@ public class MpcBinaryService : IMpcBinaryService
 
                 using (MemoryStream ms = new())
                 {
-                    while ((readSize = await _binaryReader.BaseStream.ReadAsync(buffer)) > 0)
+                    while ((readSize = await _binaryReader.BaseStream.ReadAsync(buffer, _cts.Token)) > 0)
                     {
                         ms.Write(buffer, 0, readSize);
 
@@ -612,6 +642,14 @@ public class MpcBinaryService : IMpcBinaryService
 
             Debug.WriteLine("InvalidOperationException@MpdBinarySendBinaryCommand: " + cmd.Trim() + " ReadAsync ---- " + e.Message);
 
+            ret.IsSuccess = false;
+            ret.ErrorMessage = e.Message;
+
+            return ret;
+        }
+        catch (System.OperationCanceledException e)
+        {
+            Debug.WriteLine("ReadLineAsync canceled due to ConnectionStatus.Disconnecting, now exiting. @MpdBinarySendBinaryCommand" + e.Message);
             ret.IsSuccess = false;
             ret.ErrorMessage = e.Message;
 
@@ -844,6 +882,27 @@ public class MpcBinaryService : IMpcBinaryService
 
     public async Task<CommandImageResult> MpdQueryAlbumArt(string uri, bool isUsingReadpicture)
     {
+        if (_cts is null)
+        {
+            CommandImageResult f = new()
+            {
+                ErrorMessage = "(_cts is null)",
+                IsSuccess = false
+            };
+            return f;
+        }
+
+        if (_cts.Token.IsCancellationRequested)
+        {
+            Debug.WriteLine("IsCancellationRequested returning @MpdQueryAlbumArt (Binary)");
+            CommandImageResult f = new()
+            {
+                ErrorMessage = "(IsCancellationRequested)",
+                IsSuccess = false
+            };
+            return f;
+        }
+
         if (string.IsNullOrEmpty(uri))
         {
             CommandImageResult f = new()
@@ -1067,12 +1126,22 @@ public class MpcBinaryService : IMpcBinaryService
         return (new System.Version(a)).CompareTo(new System.Version(b));
     }
 
-    public void MpdBinaryConnectionDisconnect()
+    public void MpdBinaryConnectionDisconnect(bool isReconnect)
     {
         try
         {
+            //
+            _cts?.Cancel();
+
             //_binaryConnection.Client?.Shutdown(SocketShutdown.Both);
             _binaryConnection.Close();
+
+            _cts?.Dispose();
+
+            if (isReconnect)
+            {
+                _cts = new CancellationTokenSource();
+            }
         }
         catch { }
     }

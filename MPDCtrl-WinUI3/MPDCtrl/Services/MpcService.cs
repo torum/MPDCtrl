@@ -356,7 +356,7 @@ public partial class MpcService : IMpcService
 
         if (_idleConnection.Client is null)
         {
-            Debug.WriteLine("@MpdIdleSendCommand: " + "TcpClient.Client is null");
+            Debug.WriteLine("@MpdIdleSendCommand: TcpClient.Client is null");
 
             ret.IsSuccess = false;
             ret.ErrorMessage = "TcpClient.Client is null";
@@ -721,7 +721,7 @@ public partial class MpcService : IMpcService
 
         if (_idleConnection.Client is null)
         {
-            Debug.WriteLine("@MpdIdle: " + "TcpClient.Client is null");
+            Debug.WriteLine("@MpdIdle: TcpClient.Client is null");
 
             DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdle", "TcpClient.Client is null", "", Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
 
@@ -1250,6 +1250,15 @@ public partial class MpcService : IMpcService
 
         if (await _semaphoreCommand.WaitAsync(TimeSpan.FromSeconds(3)))
         {
+            if (MpdStop)
+            {
+                Debug.WriteLine("@MpdCommandSendCommand: MpdStop");
+                ret.IsWaitFailed = true;
+                ret.ErrorMessage = "WaitAsync failed due to MpdStop. @MpdCommandSendCommand";
+                _semaphoreCommand.Release();
+                return ret;
+            }
+
             try
             {
                 ret = await MpdCommandSendCommandProtected(cmd, false);
@@ -1278,7 +1287,7 @@ public partial class MpcService : IMpcService
 
         if (_commandConnection.Client is null)
         {
-            Debug.WriteLine("@MpdSendCommand: " + "TcpClient.Client is null");
+            Debug.WriteLine("@MpdSendCommand: TcpClient.Client is null");
 
             ret.IsSuccess = false;
             ret.ErrorMessage = "TcpClient.Client is null";
@@ -1995,6 +2004,11 @@ public partial class MpcService : IMpcService
             result.ResultText = cm.ResultText;
             result.SearchResult = await ParseSearchResult(cm.ResultText);
         }
+        else
+        {
+            result.IsSuccess = false;
+            result.ErrorMessage = cm.ErrorMessage;
+        }
 
         MpcProgress?.Invoke(this, "");
 
@@ -2025,6 +2039,11 @@ public partial class MpcService : IMpcService
 
             MpcProgress?.Invoke(this, "[Background] Playlist info is updated.");
         }
+        else
+        {
+            result.IsSuccess = false;
+            result.ErrorMessage = cm.ErrorMessage;
+        }
 
         return result;
     }
@@ -2043,6 +2062,26 @@ public partial class MpcService : IMpcService
         {
             try
             {
+                if (_cts is null)
+                {
+                    res.IsSuccess = false;
+                    return res;
+                }
+                
+                if (MpdStop)
+                {
+                    Debug.WriteLine("MpdStop @MpdQueryAlbumArtForAlbumView");
+                    res.IsSuccess = false;
+                    return res;
+                }
+
+                if (_cts.Token.IsCancellationRequested)
+                {
+                    Debug.WriteLine("IsCancellationRequested returning @MpdQueryAlbumArt (Command)");
+                    res.IsSuccess = false;
+                    return res;
+                }
+
                 res = await _binaryDownloader.MpdQueryAlbumArt(uri, isUsingReadpicture);
 
                 if (res.IsSuccess)
@@ -2135,6 +2174,26 @@ public partial class MpcService : IMpcService
         {
             try
             {
+                if (_cts is null)
+                {
+                    res.IsSuccess = false;
+                    return res;
+                }
+
+                if (MpdStop)
+                {
+                    Debug.WriteLine("MpdStop @MpdQueryAlbumArtForAlbumView");
+                    res.IsSuccess = false;
+                    return res;
+                }
+
+                if (_cts.Token.IsCancellationRequested)
+                {
+                    Debug.WriteLine("IsCancellationRequested returning @MpdQueryAlbumArtForAlbumView (Command)");
+                    res.IsSuccess = false;
+                    return res;
+                }
+
                 res = await _binaryDownloader.MpdQueryAlbumArt(uri, isUsingReadpicture);
 
                 if (res.IsSuccess)
@@ -4292,7 +4351,7 @@ public partial class MpcService : IMpcService
             ConnectionState = ConnectionStatus.DisconnectedByUser;
         }
 
-        _binaryDownloader.MpdBinaryConnectionDisconnect();
+        _binaryDownloader.MpdBinaryConnectionDisconnect(isReconnect);
 
         ConnectionState = ConnectionStatus.DisconnectedByUser;
         IsBusy?.Invoke(this, false);

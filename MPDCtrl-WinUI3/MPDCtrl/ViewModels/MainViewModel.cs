@@ -2859,7 +2859,7 @@ public partial class MainViewModel : ObservableObject
             }
             else
             {
-                Debug.WriteLine("Queue.Count == 0. @UpdateStatus()");
+                //Debug.WriteLine("Queue.Count == 0. @UpdateStatus()");
 
                 // TODO:
                 AlbumCover = null;
@@ -3550,7 +3550,7 @@ public partial class MainViewModel : ObservableObject
 
     private void SetSystemMediaTransportControls(SongInfoEx songInfo)
     {
-        Debug.WriteLine("SetSystemMediaTransportControls");
+        //Debug.WriteLine("SetSystemMediaTransportControls");
 
         var songInfoForSMTC = new SongInfoForSystemMediaTransportControls
         {

@@ -189,7 +189,7 @@ public sealed partial class AlbumsPage : Page
 
         scrollViewer.SizeChanged += (sender, eventArgs) =>
         {
-            Debug.WriteLine("scrollViewer.SizeChanged");
+            //Debug.WriteLine("scrollViewer.SizeChanged");
             UpdateVisibleItems(this.AlbumListView, scrollViewer);
         };
 

@@ -226,7 +226,7 @@
                     <controls:SettingsExpander x:Uid="Settings_License">
 
                         <controls:SettingsExpander.Items>
-                            <controls:SettingsCard Header="The MIT License" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="Copyright (c) 2018~ torum">
+                            <controls:SettingsCard Header="The MIT License" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="Copyright (c) 2018- torum">
                                 <TextBlock x:Uid="Settings_LicenseText" TextWrapping="Wrap" Margin="0,12,0,12"></TextBlock>
                             </controls:SettingsCard>
                         </controls:SettingsExpander.Items>

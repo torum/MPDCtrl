@@ -7,7 +7,7 @@ public interface IMpcBinaryService
 {
     //AlbumImage AlbumCover { get; }
 
-    void MpdBinaryConnectionDisconnect();
+    void MpdBinaryConnectionDisconnect(bool isReconnect);
     Task<bool> MpdBinaryConnectionStart(string host, int port, string password);
     Task<CommandImageResult> MpdQueryAlbumArt(string uri, bool isUsingReadpicture);
 }

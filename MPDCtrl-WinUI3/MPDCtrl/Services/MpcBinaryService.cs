@@ -46,7 +46,6 @@ public class MpcBinaryService : IMpcBinaryService
     public async Task<bool> MpdBinaryConnectionStart(string host, int port, string password)
     {
         _cts?.Dispose();
-
         _cts = new CancellationTokenSource();
 
         ConnectionResult r = await MpdBinaryConnect(host, port);
@@ -236,7 +235,7 @@ public class MpcBinaryService : IMpcBinaryService
 
             while (true)
             {
-                string? line = await _binaryReader.ReadLineAsync();
+                string? line = await _binaryReader.ReadLineAsync(_cts.Token);
 
                 if (line is not null)
                 {
@@ -1036,7 +1035,7 @@ public class MpcBinaryService : IMpcBinaryService
                         }
                         else
                         {
-                            Debug.WriteLine("not IsSuccess @MpdQueryAlbumArt: " + result.ErrorMessage);
+                            Debug.WriteLine("Not IsSuccess MpdReQueryAlbumArt @MpdQueryAlbumArt: " + result.ErrorMessage);
                             /*
                             Dispatcher.UIThread.Post(() =>
                             {

@@ -69,19 +69,22 @@ public sealed partial class ShellPage : Page
         //ViewModel.StartMPC();
     }
 
-    private void Page_Loaded(object sender, RoutedEventArgs e)
+    private async void Page_Loaded(object sender, RoutedEventArgs e)
     {
         // Set focus so that space shortcut works.
         this.PlaybackPlay.Focus(FocusState.Programmatic);
 
-        // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage)
-        // is loaded, initialized, set, drawn, navigated. So start the connection.
-        _ = ViewModel.StartMPC();
-
-        // 
         if (App.MainWnd is not null)
         {
             App.MainWnd.Activated += MainWindow_Activated;
+
+            // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage)
+            // is loaded, initialized, set, drawn, navigated. So start the connection.
+            await ViewModel.StartMPC();
+        }
+        else
+        {
+            Debug.WriteLine("App.MainWnd is null. Init order is wrong.");
         }
     }
 

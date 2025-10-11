@@ -2517,12 +2517,12 @@ public partial class MainViewModel : ObservableObject
 
             CurrentProfile = pro;
 
-            _ = Task.Run(() => Start(_host, _port));
+            await Task.Run(() => Start(_host, _port));
 
             return;
         }
 
-        _ = Task.Run(() => Start(_host, _port));
+        await Task.Run(() => Start(_host, _port));
     }
 
     public void CleanUp()
@@ -2641,7 +2641,7 @@ public partial class MainViewModel : ObservableObject
         }
 
         // Start MPD connection.
-        _ = Task.Run(() => _mpc.MpdIdleConnect(HostIpAddress.ToString(), port));
+        await Task.Run(() => _mpc.MpdIdleConnect(HostIpAddress.ToString(), port));
     }
 
     private async Task LoadInitialData()
@@ -4306,6 +4306,11 @@ public partial class MainViewModel : ObservableObject
 
             foreach (var item in AlbumExItems)
             {
+                if (_mpc.MpdStop)
+                {
+                    break;
+                }
+
                 if (item is not AlbumEx album)
                 {
                     Debug.WriteLine("GetAlbumPictures: item is not AlbumEx, skipping...." + item.ToString());
@@ -4427,6 +4432,11 @@ public partial class MainViewModel : ObservableObject
 
                     foreach (var albumsong in sresult)
                     {
+                        if (_mpc.MpdStop)
+                        {
+                            break;
+                        }
+
                         if (albumsong is null)
                         {
                             continue;
@@ -4862,18 +4872,14 @@ public partial class MainViewModel : ObservableObject
 
     #region == MPD events == 
 
-    private void OnMpdIdleConnected(MpcService sender)
+    private async void OnMpdIdleConnected(MpcService sender)
     {
-        Debug.WriteLine("OK MPD " + _mpc.MpdVerText + " @OnMpdConnected");
-
         // ATTN: this won't be called if we etablishe the connection before MainWnd is initialized.
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue( () =>
         {
+            Debug.WriteLine("OK MPD " + _mpc.MpdVerText + " @OnMpdConnected");
+
             MpdVersion = _mpc.MpdVerText;
-
-            ////MpdStatusMessage = MpdVersion;// + ": " + MPDCtrlX.Properties.Resources.MPD_StatusConnected;
-
-            //MpdStatusButton = _pathMpdOkButton;
 
             IsConnected = true;
             IsConnecting = false;
@@ -4891,7 +4897,7 @@ public partial class MainViewModel : ObservableObject
         });
 
         // 
-        _ = Task.Run(LoadInitialData);
+        await Task.Run(LoadInitialData);
     }
 
     private void OnMpdPlayerStatusChanged(MpcService sender)
@@ -7025,7 +7031,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void ReConnectWithSelectedProfile()
+    public async Task ReConnectWithSelectedProfile()
     {
         if (IsBusy) return;
         if (IsConnecting) return;
@@ -7099,7 +7105,7 @@ public partial class MainViewModel : ObservableObject
         //IsAlbumArtVisible = false;
         AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
 
-        _ = Task.Run(() => Start(_host, _port));
+        await Task.Run(() => Start(_host, _port));
         /*
         ConnectionResult r = await _mpc.MpdIdleConnect(_host, _port);
 

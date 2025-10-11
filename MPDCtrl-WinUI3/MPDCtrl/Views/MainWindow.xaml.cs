@@ -66,6 +66,7 @@ public sealed partial class MainWindow : Window
         // This DispatcherQueue should be alive as long as MainWindow is alive. Make sure to clear when the window is closed.
         _currentDispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 
+        // This is where the MainViewModel is first initilized.
         _vm = App.GetService<MainViewModel>();
 
         if (this.AppWindow.Presenter is OverlappedPresenter presenter)

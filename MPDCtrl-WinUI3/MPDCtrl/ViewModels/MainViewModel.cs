@@ -2536,7 +2536,10 @@ public partial class MainViewModel : ObservableObject
                 _mpc.MpdDisconnect(false);
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Exception @CleanUp() {ex}");
+        }
     }
 
     public void SetError(string error)

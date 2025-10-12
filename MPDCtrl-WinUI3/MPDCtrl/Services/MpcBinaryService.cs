@@ -352,6 +352,7 @@ public class MpcBinaryService : IMpcBinaryService
 
         if (_cts is null)
         {
+            ret.IsSuccess = false;
             return ret;
         }
 
@@ -453,6 +454,12 @@ public class MpcBinaryService : IMpcBinaryService
                 {
                     while ((readSize = await _binaryReader.BaseStream.ReadAsync(buffer, _cts.Token)) > 0)
                     {
+                        if (_cts.Token.IsCancellationRequested)
+                        {
+                            Debug.WriteLine("IsCancellationRequested in while loop @MpdBinarySendBinaryCommand");
+                            return ret;
+                        }
+
                         ms.Write(buffer, 0, readSize);
 
                         if (readSize < bufferSize)
@@ -678,11 +685,25 @@ public class MpcBinaryService : IMpcBinaryService
         }
     }
 
-    private static CommandBinaryResult ParseAlbumImageData(byte[] data, AlbumImage albumCover)
+    private CommandBinaryResult ParseAlbumImageData(byte[] data, AlbumImage albumCover)
     {
         CommandBinaryResult r = new();
 
         //if (MpdStop) return r;
+
+        if (_cts is null)
+        {
+            r.IsSuccess = false;
+            albumCover.IsDownloading = false;
+            return r;
+        }
+
+        if (_cts.Token.IsCancellationRequested)
+        {
+            Debug.WriteLine("IsCancellationRequested returning @ParseAlbumImageData");
+            albumCover.IsDownloading = false;
+            return r;
+        }
 
         if (data.Length > 20000000) //2000000000
         {
@@ -1127,19 +1148,20 @@ public class MpcBinaryService : IMpcBinaryService
 
     public void MpdBinaryConnectionDisconnect(bool isReconnect)
     {
+        //
+        _cts?.Cancel();
+
         try
         {
-            //
-            _cts?.Cancel();
-
-            //_binaryConnection.Client?.Shutdown(SocketShutdown.Both);
+            _binaryConnection.Client?.Shutdown(SocketShutdown.Both);
             _binaryConnection.Close();
 
-            _cts?.Dispose();
+            // not good here.
+            //_cts?.Dispose();
 
             if (isReconnect)
             {
-                _cts = new CancellationTokenSource();
+                //_cts = new CancellationTokenSource();
             }
         }
         catch { }

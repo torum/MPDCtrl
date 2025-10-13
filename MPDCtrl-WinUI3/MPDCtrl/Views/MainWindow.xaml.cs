@@ -79,6 +79,9 @@ public sealed partial class MainWindow : Window
 
         this.ExtendsContentIntoTitleBar = true;
 
+        this.Closed += Window_Closed;
+        this.SizeChanged += Window_SizeChanged;
+
         LoadSettings();
 
         // It's important to set content as early as here in order to set theme.

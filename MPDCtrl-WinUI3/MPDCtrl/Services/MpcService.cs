@@ -4363,7 +4363,9 @@ public partial class MpcService : IMpcService
     {
         // This needs to be first.
         ConnectionState = ConnectionStatus.Disconnecting;
-        //
+
+        MpdStop = true;
+
         _cts?.Cancel();
 
         try
@@ -4375,7 +4377,10 @@ public partial class MpcService : IMpcService
             _commandConnection.Client?.Shutdown(SocketShutdown.Both);
             _commandConnection.Close();
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Exception @MpdDisconnect on _commandConnection.Close() {ex}");
+        }
         finally
         {
             IsBusy?.Invoke(this, false);
@@ -4391,7 +4396,10 @@ public partial class MpcService : IMpcService
             _idleConnection.Client?.Shutdown(SocketShutdown.Both);
             _idleConnection.Close();
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Exception @MpdDisconnect on _idleConnection.Close() {ex}");
+        }
         finally
         {
             IsBusy?.Invoke(this, false);
@@ -4403,12 +4411,9 @@ public partial class MpcService : IMpcService
         ConnectionState = ConnectionStatus.DisconnectedByUser;
         IsBusy?.Invoke(this, false);
 
-        // uhh...not here.
-        //_cts?.Dispose();
-
-        if (isReconnect)
+        if (!isReconnect)
         {
-            //_cts = new CancellationTokenSource();
+            _cts?.Dispose();
         }
     }
 }

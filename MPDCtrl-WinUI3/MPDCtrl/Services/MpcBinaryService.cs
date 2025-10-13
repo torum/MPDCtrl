@@ -1156,14 +1156,14 @@ public class MpcBinaryService : IMpcBinaryService
             _binaryConnection.Client?.Shutdown(SocketShutdown.Both);
             _binaryConnection.Close();
 
-            // not good here.
-            //_cts?.Dispose();
-
-            if (isReconnect)
+            if (!isReconnect)
             {
-                //_cts = new CancellationTokenSource();
+                _cts?.Dispose();
             }
         }
-        catch { }
+        catch(Exception ex)
+        {
+            Debug.WriteLine($"Exception @MpdBinaryConnectionDisconnect {ex}");
+        }
     }
 }

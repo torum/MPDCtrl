@@ -8,9 +8,9 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="171e024f-2367-40ba-9e51-8d1b5f64335d"
-    Publisher="CN=torum"
-    Version="1.0.0.0" />
+    Name="60132torumyax.MPDCtrl"
+    Publisher="CN=F3079A96-760D-4F53-9E00-374C09B6D4B1"
+    Version="4.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="171e024f-2367-40ba-9e51-8d1b5f64335d" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

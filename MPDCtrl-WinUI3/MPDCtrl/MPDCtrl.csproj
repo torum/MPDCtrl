@@ -17,12 +17,11 @@
 
 	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 
-
 	  <ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
 	  <DebugType>embedded</DebugType>
 
 	  <VersionPrefix>4.0.0.0</VersionPrefix>
-	  <VersionSuffix>RC1</VersionSuffix>
+
 	  <FileVersion>4.0.0.0</FileVersion>
 	  
   </PropertyGroup>
@@ -34,7 +33,6 @@
 		<DebugType>embedded</DebugType>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-
 
 		<SelfContained>true</SelfContained>
 		<NeutralLanguage>en</NeutralLanguage>

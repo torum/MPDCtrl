@@ -48,6 +48,7 @@ using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using WinRT.Interop;
+using System.Drawing;
 
 namespace MPDCtrl.ViewModels;
 
@@ -2343,7 +2344,64 @@ public partial class MainViewModel : ObservableObject
 
 #pragma warning disable CA1822 
     public string AlbumCacheFolderPath => App.AppDataCacheFolder;
+
+    public string AlbumCacheFolderPathTruncated => MinimizeNameByCharCount(App.AppDataCacheFolder, 45);
 #pragma warning restore CA1822
+
+    public static string MinimizeNameByCharCount(string fileName, int maxLength)
+    {
+        // If the path already fits within the maximum length, return it.
+        if (fileName.Length <= maxLength)
+        {
+            return fileName;
+        }
+
+        string fileAndExtension = Path.GetFileName(fileName);
+
+        string? drive = Path.GetPathRoot(fileName);
+        if (drive is null)
+        {
+            return fileName;
+        }
+
+        string? directoryPath = Path.GetDirectoryName(fileName);
+        directoryPath ??= string.Empty;
+
+        // If no directory path exists, or if it's just the drive, return only the filename
+        // if the drive + filename is too long.
+        if (string.IsNullOrEmpty(directoryPath) || directoryPath.Equals(drive, StringComparison.OrdinalIgnoreCase))
+        {
+            return (drive + fileAndExtension).Length > maxLength ? fileAndExtension : drive + fileAndExtension;
+        }
+
+        // Remove the drive letter from the directory path for iteration.
+        string normalizedDirectory = directoryPath.StartsWith(drive, StringComparison.OrdinalIgnoreCase)
+            ? directoryPath[drive.Length..]
+            : directoryPath;
+
+        string[] directories = normalizedDirectory.Split(Path.DirectorySeparatorChar);
+        int currentDirIndex = 0;
+
+        while (currentDirIndex < directories.Length)
+        {
+            // Reconstruct the path with an ellipsis.
+            string remainingPath = string.Join(Path.DirectorySeparatorChar.ToString(), directories, currentDirIndex, directories.Length - currentDirIndex);
+            string composedName = $"{drive}...{Path.DirectorySeparatorChar}{remainingPath}{Path.DirectorySeparatorChar}{fileAndExtension}";
+
+            // Check if the composed name is within the maximum length.
+            if (composedName.Length <= maxLength)
+            {
+                return composedName;
+            }
+
+            // If not, remove the next directory from the beginning.
+            currentDirIndex++;
+        }
+
+        // If after removing all directories, it still doesn't fit, return just the filename.
+        return fileAndExtension.Length <= maxLength ? fileAndExtension : string.Concat(fileAndExtension.AsSpan(0, maxLength - 3), "...");
+    }
+
 
     private string _albumCacheFolderSizeFormatted = string.Empty;
 

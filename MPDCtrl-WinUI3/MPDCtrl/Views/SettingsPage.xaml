@@ -191,13 +191,13 @@
                             <controls:SettingsCard Header="" Description="" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical">
                                 <Grid Margin="0,12,0,12">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Stretch">
-                                        <HyperlinkButton NavigateUri="{x:Bind ViewModel.AlbumCacheFolderPath, Mode=OneTime}" Content="{x:Bind ViewModel.AlbumCacheFolderPath, Mode=OneWay}" Click="HyperlinkButton_AlbumCacheFolderPath_Click" Margin="0,0,24,0"></HyperlinkButton>
+                                    <StackPanel Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
+                                        <HyperlinkButton NavigateUri="{x:Bind ViewModel.AlbumCacheFolderPath, Mode=OneTime}" Content="{x:Bind ViewModel.AlbumCacheFolderPathTruncated, Mode=OneWay}" Click="HyperlinkButton_AlbumCacheFolderPath_Click" Margin="0,0,24,0"></HyperlinkButton>
                                     </StackPanel>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" MinWidth="130">
                                         <TextBlock Text="{x:Bind ViewModel.AlbumCacheFolderSizeFormatted, Mode=OneWay}" VerticalAlignment="Center" MinWidth="84"></TextBlock>
                                         <Button Content="Clear" Command="{x:Bind ViewModel.ClearAlbumCacheFolderCommand}" VerticalAlignment="Center" HorizontalAlignment="Right"></Button>
                                     </StackPanel>

@@ -2,11 +2,9 @@
 
 <img width="48" height="48" src="https://github.com/torum/MPDCtrl/blob/master/MPDCtrl-WinUI3/MPDCtrl/Assets/MPDCtrl.png?raw=true">
 
-MPDCtrl is a Windows desktop client app for [MPD (Music player daemon)](http://www.musicpd.org/). 
+MPDCtrl is a Windows desktop client app for [MPD (Music player daemon)](http://www.musicpd.org/). For other platforms like Linux, please check out [MPDCtrlX](https://github.com/torum/MPDCtrlX) which is a [Avalonia UI](https://avaloniaui.net/) based cross-platform desktop GUI client app ported from MPDCtrl.
 
-For other platforms, please check out [MPDCtrlX](https://github.com/torum/MPDCtrlX) which is a [Avalonia UI](https://avaloniaui.net/) based cross-platform desktop GUI client app ported from the WPF-based MPDCtrl.
-
-Also, MPDCtrl v4 is comming! The GUI is entirely rewritten with the latest WinUI3. (See the [release page](https://github.com/torum/MPDCtrl/releases) for the downloads)
+Now, MPDCtrl v4 is here! The GUI is entirely rewritten with the latest WinUI3. (See the [release page](https://github.com/torum/MPDCtrl/releases) for the downloads)
 
 ![MPDCtrl4](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v4/MPDCtrl4.png?raw=true) 
 

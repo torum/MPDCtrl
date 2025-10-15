@@ -4,54 +4,63 @@
     <TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>MPDCtrl</RootNamespace>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x86;x64;ARM64</Platforms>
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
     <PublishProfile>win-$(Platform).pubxml</PublishProfile>
     <UseWinUI>true</UseWinUI>
-    <EnableMsixTooling>true</EnableMsixTooling>
-    <Nullable>enable</Nullable>
-	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+
+	  <Nullable>enable</Nullable>
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	  
+	  <ApplicationManifest>app.manifest</ApplicationManifest>
+	  <Company>torum</Company>
+	  <Description>MPD client</Description>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	  <PackageIcon>MPDCtrl.ico</PackageIcon>
+
+	  <EnableMsixTooling>true</EnableMsixTooling>
+
+
+	  <IncludeSymbols>True</IncludeSymbols>
+	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+
 	  <ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
-	  <DebugType>embedded</DebugType>
 
 	  <VersionPrefix>4.0.0.0</VersionPrefix>
 	  <FileVersion>4.0.0.0</FileVersion>
 
 	  <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-	  <NeutralLanguage>en</NeutralLanguage>
 
-  </PropertyGroup>
-
-  <!-- Publish Properties -->
-  <PropertyGroup>
 	  <SelfContained>true</SelfContained>
 	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-	  <DebugType>embedded</DebugType>
-	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+	  <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+	  <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
+	  <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+	  <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+	  <GenerateTestArtifacts>True</GenerateTestArtifacts>
+	  <AppxBundle>Auto</AppxBundle>
+	  <AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
+	  <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+	  <StartupObject>MPDCtrl.Program</StartupObject>
+	  <AssemblyName>MPDCtrl</AssemblyName>
+
+	  <!--  
+	   AOT related.
+	  	  <PublishTrimmed>True</PublishTrimmed>
+	  <PublishAot>True</PublishAot>
+	  -->
+
+	  <!--
+	   Comment these two out when publish packaged app. Uncomment when debug Unpackaged.
+	   
+	  <PublishSingleFile>false</PublishSingleFile>
+	  <WindowsPackageType>None</WindowsPackageType>
+-->
+
+
   </PropertyGroup>
 
-	<PropertyGroup>
-		<PublishTrimmed>True</PublishTrimmed>
-		<PublishAot>True</PublishAot>
-		<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-		<AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
-		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-		<AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
-		<GenerateTestArtifacts>True</GenerateTestArtifacts>
-		<AppxBundle>Auto</AppxBundle>
-		<AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
-		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
-		
-		<!--
-		<PublishSingleFile>true</PublishSingleFile>
-		
-		<WindowsPackageType>None</WindowsPackageType>
-		<PlatformTarget>x64</PlatformTarget>
-		<WindowsPackageType>None</WindowsPackageType>
-		-->
-	</PropertyGroup>
   <ItemGroup>
     <None Remove="Assets\BadgeLogo.scale-100.png" />
     <None Remove="Assets\BadgeLogo.scale-125.png" />
@@ -122,9 +131,10 @@
     Tools extension to be activated for this project even if the Windows App SDK Nuget
     package has not yet been restored.
   -->
-  <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
-    <ProjectCapability Include="Msix" />
-  </ItemGroup>
+	<ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+		<ProjectCapability Include="Msix" />
+	</ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="CommunityToolkit.WinUI.Animations" Version="8.2.250402" />
@@ -137,11 +147,10 @@
     <PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.2.250402" />
     <PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.2.250402" />
     <PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.2.250402" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6584" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250916003" />
-    <PackageReference Include="System.Private.Uri" Version="4.3.2" />
-    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.9" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251003001" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.10" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="Assets\MPDCtrl.ico">
@@ -155,6 +164,12 @@
     <Content Update="Assets\SvgIcons\ic_fluent_error_circle_16_color.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Assets\MPDCtrl.ico">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Dialogs\InitDialog.xaml">
@@ -208,45 +223,53 @@
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
     Explorer "Package and Publish" context menu entry to be enabled for this project even if
     the Windows App SDK Nuget package has not yet been restored.
-  -->
-  <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
-    <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
-  </PropertyGroup>
+-->
+	<PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+		<HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+		<Optimize>False</Optimize>
+		<IsPublishable>True</IsPublishable>
+		<DebugType>full</DebugType>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<Optimize>False</Optimize>
+		<IsPublishable>True</IsPublishable>
+		<DebugType>full</DebugType>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+		<Optimize>False</Optimize>
+		<IsPublishable>True</IsPublishable>
+		<DebugType>full</DebugType>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+		<Optimize>False</Optimize>
+		<IsPublishable>True</IsPublishable>
+		<DebugType>full</DebugType>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<Optimize>False</Optimize>
+		<IsPublishable>True</IsPublishable>
+		<DebugType>full</DebugType>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+		<Optimize>False</Optimize>
+		<IsPublishable>True</IsPublishable>
+		<DebugType>full</DebugType>
+	</PropertyGroup>
+	<ItemGroup>
+	  <PRIResource Update="Properties\ja-Jp\Resources.resw">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		  <Generator>PublicResXFileCodeGenerator</Generator>
+	  </PRIResource>
+	</ItemGroup>
+	<ItemGroup>
+	  <PRIResource Update="Properties\en-US\Resources.resw">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		  <Generator>PublicResXFileCodeGenerator</Generator>
+	  </PRIResource>
+	</ItemGroup>
 
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <Optimize>False</Optimize>
-    <IsPublishable>True</IsPublishable>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Optimize>False</Optimize>
-    <IsPublishable>True</IsPublishable>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <Optimize>False</Optimize>
-    <IsPublishable>True</IsPublishable>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <Optimize>False</Optimize>
-    <IsPublishable>True</IsPublishable>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Optimize>False</Optimize>
-    <IsPublishable>True</IsPublishable>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <Optimize>False</Optimize>
-    <IsPublishable>True</IsPublishable>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Update="Microsoft.Windows.AI.MachineLearning.Projection">
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
 </Project>

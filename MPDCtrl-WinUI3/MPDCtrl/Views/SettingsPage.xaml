@@ -254,8 +254,8 @@
                                     <HyperlinkButton NavigateUri="https://www.nuget.org/packages/microsoft.extensions.dependencyinjection/">Microsoft.Extensions.DependencyInjection</HyperlinkButton>
                                     <HyperlinkButton NavigateUri="https://www.nuget.org/packages/Microsoft.Extensions.Hosting">Microsoft.Extensions.Hosting</HyperlinkButton>
                                     <HyperlinkButton NavigateUri="https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/">System.Security.Cryptography.ProtectedData</HyperlinkButton>
-                                    <HyperlinkButton NavigateUri="https://github.com/microsoft/WindowsAppSDK">WindowsAppSDK</HyperlinkButton>
-                                    <HyperlinkButton NavigateUri="https://github.com/microsoft/microsoft-ui-xaml">WinUI3</HyperlinkButton>
+                                    <HyperlinkButton NavigateUri="https://github.com/microsoft/WindowsAppSDK">Windows App SDK</HyperlinkButton>
+                                    <HyperlinkButton NavigateUri="https://github.com/microsoft/microsoft-ui-xaml">WinUI3 (microsoft-ui-xaml)</HyperlinkButton>
                                 </StackPanel>
                             </controls:SettingsCard>
                         </controls:SettingsExpander.Items>

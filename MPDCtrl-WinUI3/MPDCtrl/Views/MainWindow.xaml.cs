@@ -151,7 +151,7 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        CurrentDispatcherQueue?.EnqueueAsync(() =>
+        this.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
             _smtc.IsPlayEnabled = SongInfoForSMTC.IsPlayEnabled;
             _smtc.IsPauseEnabled = SongInfoForSMTC.IsPauseEnabled;
@@ -173,13 +173,22 @@ public sealed partial class MainWindow : Window
 
             if (SongInfoForSMTC.IsThumbnailIncluded)
             {
-                // TODO: Stupid WinUI3/WinRT..
-                // updater.Thumbnail won't ...
+                //Debug.WriteLine("(SongInfoForSMTC.IsThumbnailIncluded)");
+
+                // TODO: Stupid WinUI3/WinRT.. updater.Thumbnail won't ...
                 updater.Thumbnail = SongInfoForSMTC.Thumbnail;
+
                 /*
                 if (!string.IsNullOrEmpty(SongInfoForSMTC.FilePath))
                 {
-                    updater.Thumbnail = RandomAccessStreamReference.CreateFromUri(new Uri(SongInfoForSMTC.FilePath));
+                    Debug.WriteLine($"RandomAccessStreamReference.CreateFromUri() {SongInfoForSMTC.FilePath}");
+
+                    // Noop.
+                    //updater.Thumbnail = RandomAccessStreamReference.CreateFromUri(new Uri(SongInfoForSMTC.FilePath));
+
+                    // Noop. Stupid WinUI3...
+                    //StorageFile storageFile = await StorageFile.GetFileFromPathAsync(SongInfoForSMTC.FilePath);
+                    //await updater.CopyFromFileAsync(MediaPlaybackType.Music, storageFile);
                 }
                 else
                 {
@@ -191,7 +200,7 @@ public sealed partial class MainWindow : Window
             {
                 updater.Thumbnail = null;
             }
-
+            
             updater.Update();
         });
     }

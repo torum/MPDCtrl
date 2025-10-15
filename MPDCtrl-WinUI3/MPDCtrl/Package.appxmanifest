@@ -14,7 +14,7 @@
 
   <Properties>
     <DisplayName>MPDCtrl</DisplayName>
-    <PublisherDisplayName>torum</PublisherDisplayName>
+    <PublisherDisplayName>toru_m</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -23,7 +23,6 @@
   </Dependencies>
 
   <Resources>
-    <Resource Language="x-generate"/>
 	  <Resource Language="en-US"/>
 	  <Resource Language="ja-JP"/>
   </Resources>

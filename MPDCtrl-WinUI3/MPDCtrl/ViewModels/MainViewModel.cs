@@ -934,13 +934,6 @@ public partial class MainViewModel : ObservableObject
             _selectedNodeMenu = value;
             OnPropertyChanged(nameof(SelectedNodeMenu));
 
-            // Testing
-            var onUIThread = App.MainWnd?.CurrentDispatcherQueue?.HasThreadAccess;
-            if ((onUIThread is not null) && (onUIThread == false))
-            {
-                Debug.WriteLine("SelectedNodeMenu set HasNoThreadAccess");
-            }
-
             if (value is null)
             {
                 App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
@@ -3326,7 +3319,7 @@ public partial class MainViewModel : ObservableObject
                     // This is not good, all the selections will be cleared and position will be reset, but ...
                     //Queue = new ObservableCollection<SongInfoEx>(Queue.OrderBy(n => n.Index));
 
-                    //Debug.WriteLine("Queue sort.");
+                    Debug.WriteLine("Queue sort.");
                     Queue.Sort((a, b) => { return a.Index.CompareTo(b.Index); });
 
                     UpdateProgress?.Invoke(this, "[UI] Checking current song after Queue update.");
@@ -3691,17 +3684,21 @@ public partial class MainViewModel : ObservableObject
                 }
         }
 
-        songInfoForSMTC.IsThumbnailIncluded = true;
-
-        //if (bitmap is not null)
-        if (string.IsNullOrEmpty(filePath))
+        //
+        if (bitmap is null) //if (string.IsNullOrEmpty(filePath))
         {
             Debug.WriteLine("(bitmap is null");
             songInfoForSMTC.Thumbnail = null;
         }
         else
         {
-            songInfoForSMTC.FilePath = filePath;
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                songInfoForSMTC.FilePath = filePath;
+            }
+
+            songInfoForSMTC.IsThumbnailIncluded = true;
+
             songInfoForSMTC.Thumbnail = bitmap;//RandomAccessStreamReference.CreateFromUri(new Uri(filePath)); // bitmap;//await BitmapImageToRandomAccessStreamReference(bitmap);
         }
 
@@ -3740,10 +3737,9 @@ public partial class MainViewModel : ObservableObject
             return null;
         }
 
-        using var memoryStream = new MemoryStream(byteArray);
+        using MemoryStream memoryStream = new(byteArray);
+        memoryStream.Position = 0;
         IRandomAccessStream randomAccessStream = memoryStream.AsRandomAccessStream();
-        randomAccessStream.Seek(0);
-
         return RandomAccessStreamReference.CreateFromStream(randomAccessStream);
     }
 

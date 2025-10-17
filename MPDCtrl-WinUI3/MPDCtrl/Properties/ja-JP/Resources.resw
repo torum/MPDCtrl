@@ -268,7 +268,7 @@
     <value>再生</value>
   </data>
   <data name="PageMenu_Find.ToolTipService.ToolTip" xml:space="preserve">
-    <value>検索</value>
+    <value>検索 (Ctrl+F)</value>
   </data>
   <data name="PageMenu_Clear.Text" xml:space="preserve">
     <value>クリア</value>
@@ -502,5 +502,32 @@ SOFTWARE.</value>
   </data>
   <data name="ConnectionSettings_IsDefault.Content" xml:space="preserve">
     <value>既定</value>
+  </data>
+  <data name="PageMenu_More.ToolTipService.ToolTip" xml:space="preserve">
+    <value>その他</value>
+  </data>
+  <data name="PlaybackControl_Prev.ToolTipService.ToolTip" xml:space="preserve">
+    <value>前の曲 (Ctrl+Left)</value>
+  </data>
+  <data name="PlaybackControl_Play.ToolTipService.ToolTip" xml:space="preserve">
+    <value>再生・一時停止 (Ctrl+P, *Space)</value>
+  </data>
+  <data name="PlaybackControl_Next.ToolTipService.ToolTip" xml:space="preserve">
+    <value>次の曲 (Ctrl+Right)</value>
+  </data>
+  <data name="PlaybackControl_Repeat.ToolTipService.ToolTip" xml:space="preserve">
+    <value>リピート</value>
+  </data>
+  <data name="PlaybackControl_Single.ToolTipService.ToolTip" xml:space="preserve">
+    <value>シングル</value>
+  </data>
+  <data name="PlaybackControl_Shuffle.ToolTipService.ToolTip" xml:space="preserve">
+    <value>シャッフル</value>
+  </data>
+  <data name="PlaybackControl_Consume.ToolTipService.ToolTip" xml:space="preserve">
+    <value>コンシューム</value>
+  </data>
+  <data name="PageMenu_Filter.ToolTipService.ToolTip" xml:space="preserve">
+    <value>絞り込み (Ctrl+F)</value>
   </data>
 </root>

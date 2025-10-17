@@ -231,13 +231,13 @@
                         <ColumnDefinition Width="*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Row="0" Grid.Column="0" x:Name="PlaybackPrev" ToolTipService.ToolTip="Ctrl+Left" AccessKey="B" Command="{x:Bind ViewModel.PlayPrevCommand}" Width="30" Height="30" CornerRadius="3" Background="Transparent" BorderThickness="0" Margin="18,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="0">
+                    <Button Grid.Row="0" Grid.Column="0" x:Name="PlaybackPrev" x:Uid="PlaybackControl_Prev" AccessKey="B" Command="{x:Bind ViewModel.PlayPrevCommand}" Width="30" Height="30" CornerRadius="3" Background="Transparent" BorderThickness="0" Margin="18,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="0">
                         <Button.KeyboardAccelerators>
                             <KeyboardAccelerator Key="Left" Modifiers="Control"/>
                         </Button.KeyboardAccelerators>
                         <Path RenderTransformOrigin="0,0" Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Width="18" Height="18" Data="M3 20.25a.75.75 0 0 0 1.5 0V3.75a.75.75 0 1 0-1.5 0v16.5ZM18.23 20.475c1.158.83 2.77.002 2.77-1.422V4.83c0-1.384-1.53-2.22-2.695-1.473l-10.47 6.716a1.75 1.75 0 0 0-.074 2.895l10.47 7.507Zm1.27-1.422a.25.25 0 0 1-.396.203l-10.47-7.507a.25.25 0 0 1 .011-.413l10.47-6.717a.25.25 0 0 1 .385.21v14.224Z"/>
                     </Button>
-                    <Button Grid.Row="0" Grid.Column="1" x:Name="PlaybackPlay" ToolTipService.ToolTip="Ctrl+P, (*Space)" AccessKey="P" Command="{x:Bind ViewModel.PlayCommand}" Width="54" Height="54" CornerRadius="27" Background="Transparent" BorderThickness="0" Margin="18,0,18,0" VerticalAlignment="Center" Padding="0">
+                    <Button Grid.Row="0" Grid.Column="1" x:Name="PlaybackPlay" x:Uid="PlaybackControl_Play" AccessKey="P" Command="{x:Bind ViewModel.PlayCommand}" Width="54" Height="54" CornerRadius="27" Background="Transparent" BorderThickness="0" Margin="18,0,18,0" VerticalAlignment="Center" Padding="0">
                         <Path RenderTransformOrigin="0,0" Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Width="48" Height="48" Data="{x:Bind ViewModel.PlayButton, Mode=OneWay}"/>
                         <Button.KeyboardAccelerators>
                             <KeyboardAccelerator Key="P" Modifiers="Control"/>
@@ -246,7 +246,7 @@
                             -->
                         </Button.KeyboardAccelerators>
                     </Button>
-                    <Button Grid.Row="0" Grid.Column="2" x:Name="PlaybackNext" ToolTipService.ToolTip="Ctrl+Right" AccessKey="N" Command="{x:Bind ViewModel.PlayNextCommand}" Width="30" Height="30" CornerRadius="3" Background="Transparent" BorderThickness="0" Margin="0,0,18,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0">
+                    <Button Grid.Row="0" Grid.Column="2" x:Name="PlaybackNext" x:Uid="PlaybackControl_Next" AccessKey="N" Command="{x:Bind ViewModel.PlayNextCommand}" Width="30" Height="30" CornerRadius="3" Background="Transparent" BorderThickness="0" Margin="0,0,18,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0">
                         <Button.KeyboardAccelerators>
                             <KeyboardAccelerator Key="Right" Modifiers="Control"/>
                         </Button.KeyboardAccelerators>
@@ -259,22 +259,22 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         
                         <controls:WrapPanel Orientation="Horizontal" x:Name="PlaybackOptions" HorizontalSpacing="10" VerticalSpacing="6" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,48,0" Padding="12,0,0,4">
-                            <ToggleButton Width="26" Height="26" IsChecked="{x:Bind ViewModel.Repeat, Mode=TwoWay}" AccessKey="R" Padding="0">
+                            <ToggleButton Width="26" Height="26" IsChecked="{x:Bind ViewModel.Repeat, Mode=TwoWay}" x:Uid="PlaybackControl_Repeat" AccessKey="R" Padding="0">
                                 <Viewbox Width="14" Height="14" Margin="-1,-1,0,0">
                                     <PathIcon Width="NaN" Height="NaN" Data="m14.61 2.47-.077-.067a.748.748 0 0 0-.983.067l-.068.078a.755.755 0 0 0 .068.987l1.971 1.977H8.5l-.233.004C4.785 5.639 2 8.51 2 12.036c0 1.69.64 3.23 1.692 4.39l.072.069a.751.751 0 0 0 1.08-1.033l-.2-.231A5.009 5.009 0 0 1 3.5 12.035c0-2.771 2.239-5.018 5-5.018h6.881l-1.832 1.84-.067.078a.755.755 0 0 0 .068.987.748.748 0 0 0 1.06 0l3.182-3.193.067-.078a.755.755 0 0 0-.067-.987L14.61 2.47Zm5.62 5.101a.751.751 0 0 0-1.05 1.066 5.01 5.01 0 0 1 1.32 3.398c0 2.772-2.239 5.019-5 5.019H8.558l1.905-1.911.074-.086a.755.755 0 0 0-.007-.902l-.067-.077-.084-.073a.748.748 0 0 0-.9.006l-.076.067-3.182 3.194-.073.085a.755.755 0 0 0 .006.902l.067.077 3.182 3.194.084.072c.293.22.71.195.976-.073a.755.755 0 0 0 .068-.987l-.068-.077-1.899-1.906H15.5l.233-.004C19.215 18.432 22 15.56 22 12.035a6.513 6.513 0 0 0-1.697-4.395l-.073-.069Z"/>
                                 </Viewbox>
                             </ToggleButton>
-                            <ToggleButton Width="26" Height="26" IsChecked="{x:Bind ViewModel.Single, Mode=TwoWay}" AccessKey="E" Padding="0">
+                            <ToggleButton Width="26" Height="26" IsChecked="{x:Bind ViewModel.Single, Mode=TwoWay}" ToolTipService.ToolTip="Single" AccessKey="E" Padding="0">
                                 <Viewbox Width="14" Height="14" Margin="-1,-1,0,0">
                                     <PathIcon Width="NaN" Height="NaN" Data="M19,19H5V5H19M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M12,17H14V7H10V9H12"/>
                                 </Viewbox>
                             </ToggleButton>
-                            <ToggleButton Width="26" Height="26" IsChecked="{x:Bind ViewModel.Random, Mode=TwoWay}" AccessKey="M" Padding="0">
+                            <ToggleButton Width="26" Height="26" IsChecked="{x:Bind ViewModel.Random, Mode=TwoWay}" ToolTipService.ToolTip="Shuffle" AccessKey="M" Padding="0">
                                 <Viewbox Width="14" Height="14" Margin="-1,-3,0,0">
                                     <PathIcon Width="NaN" Height="NaN" Data="M19.2803 4.71967C18.9874 4.42678 18.5126 4.42678 18.2197 4.71967C17.9268 5.01256 17.9268 5.48744 18.2197 5.78033L19.4393 6.99999H19.25C15.332 6.99999 12.8269 9.30232 10.5579 11.3877L10.4925 11.4477C8.15388 13.5968 6.04432 15.5 2.75 15.5C2.33579 15.5 2 15.8358 2 16.25C2 16.6642 2.33579 17 2.75 17C6.66803 17 9.1731 14.6977 11.4421 12.6123L11.4421 12.6123L11.5075 12.5522C13.8461 10.4032 15.9557 8.49999 19.25 8.49999H19.4393L18.2197 9.71966C17.9268 10.0126 17.9268 10.4874 18.2197 10.7803C18.5126 11.0732 18.9874 11.0732 19.2803 10.7803L21.7803 8.28032C21.921 8.13967 22 7.9489 22 7.74999C22 7.55108 21.921 7.36031 21.7803 7.21966L19.2803 4.71967ZM2.75 6.99983C5.99799 6.99983 8.27497 8.58203 10.2514 10.3112C10.1492 10.4048 10.0482 10.4978 9.94821 10.5897L9.81591 10.7113C9.58463 10.9239 9.35843 11.1309 9.13588 11.3316C7.28326 9.73131 5.39993 8.49983 2.75 8.49983C2.33579 8.49983 2 8.16405 2 7.74983C2 7.33562 2.33579 6.99983 2.75 6.99983ZM19.25 16.9998C16.0021 16.9998 13.7251 15.4177 11.7487 13.6885C11.8507 13.5951 11.9515 13.5023 12.0513 13.4105L12.0518 13.4101L12.1841 13.2885C12.4154 13.0759 12.6416 12.8688 12.8642 12.6681C14.7168 14.2684 16.6001 15.4998 19.25 15.4998H19.4393L18.2197 14.2802C17.9268 13.9873 17.9268 13.5124 18.2197 13.2195C18.5126 12.9266 18.9874 12.9266 19.2803 13.2195L21.7803 15.7195C21.921 15.8602 22 16.0509 22 16.2498C22 16.4487 21.921 16.6395 21.7803 16.7802L19.2803 19.2802C18.9874 19.5731 18.5126 19.5731 18.2197 19.2802C17.9268 18.9873 17.9268 18.5124 18.2197 18.2195L19.4393 16.9998H19.25Z"/>
                                 </Viewbox>
                             </ToggleButton>
-                            <ToggleButton Width="26" Height="26" IsChecked="{x:Bind ViewModel.Consume, Mode=TwoWay}" AccessKey="O" Padding="0">
+                            <ToggleButton Width="26" Height="26" IsChecked="{x:Bind ViewModel.Consume, Mode=TwoWay}" ToolTipService.ToolTip="Consume" AccessKey="O" Padding="0">
                                 <Viewbox Width="14" Height="14" Margin="-1,-1,0,0">
                                     <PathIcon Width="NaN" Height="NaN" Data="M3 5.5C3.55228 5.5 4 5.05228 4 4.5C4 3.94772 3.55228 3.5 3 3.5C2.44772 3.5 2 3.94772 2 4.5C2 5.05228 2.44772 5.5 3 5.5ZM6 4.5C6 4.22386 6.22386 4 6.5 4H17.5C17.7761 4 18 4.22386 18 4.5C18 4.77614 17.7761 5 17.5 5H6.5C6.22386 5 6 4.77614 6 4.5ZM6 9.5C6 9.22386 6.22386 9 6.5 9H17.5C17.7761 9 18 9.22386 18 9.5C18 9.77614 17.7761 10 17.5 10H6.5C6.22386 10 6 9.77614 6 9.5ZM10.0224 15C10.0534 14.6566 10.1159 14.3223 10.207 14H6.5C6.22386 14 6 14.2239 6 14.5C6 14.7761 6.22386 15 6.5 15H10.0224ZM4 14.5C4 15.0523 3.55228 15.5 3 15.5C2.44772 15.5 2 15.0523 2 14.5C2 13.9477 2.44772 13.5 3 13.5C3.55228 13.5 4 13.9477 4 14.5ZM3 10.5C3.55228 10.5 4 10.0523 4 9.5C4 8.94772 3.55228 8.5 3 8.5C2.44772 8.5 2 8.94772 2 9.5C2 10.0523 2.44772 10.5 3 10.5ZM20 15.5C20 17.9853 17.9853 20 15.5 20C13.0147 20 11 17.9853 11 15.5C11 13.0147 13.0147 11 15.5 11C17.9853 11 20 13.0147 20 15.5ZM16.2071 15.5L17.3536 14.3536C17.5488 14.1583 17.5488 13.8417 17.3536 13.6464C17.1583 13.4512 16.8417 13.4512 16.6464 13.6464L15.5 14.7929L14.3536 13.6464C14.1583 13.4512 13.8417 13.4512 13.6464 13.6464C13.4512 13.8417 13.4512 14.1583 13.6464 14.3536L14.7929 15.5L13.6464 16.6464C13.4512 16.8417 13.4512 17.1583 13.6464 17.3536C13.8417 17.5488 14.1583 17.5488 14.3536 17.3536L15.5 16.2071L16.6464 17.3536C16.8417 17.5488 17.1583 17.5488 17.3536 17.3536C17.5488 17.1583 17.5488 16.8417 17.3536 16.6464L16.2071 15.5Z"/>
                                 </Viewbox>

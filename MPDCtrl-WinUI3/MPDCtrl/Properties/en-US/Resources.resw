@@ -268,7 +268,7 @@
     <value>Play</value>
   </data>
   <data name="PageMenu_Find.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Find</value>
+    <value>Find (Ctrl+F)</value>
   </data>
   <data name="PageMenu_Clear.Text" xml:space="preserve">
     <value>Clear</value>
@@ -501,5 +501,32 @@ SOFTWARE.</value>
   </data>
   <data name="ConnectionSettings_IsDefault.Content" xml:space="preserve">
     <value>Default</value>
+  </data>
+  <data name="PageMenu_More.ToolTipService.ToolTip" xml:space="preserve">
+    <value>More</value>
+  </data>
+  <data name="PlaybackControl_Prev.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Previous (Ctrl+Left)</value>
+  </data>
+  <data name="PlaybackControl_Play.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Play/Pause (Ctrl+P, *Space)</value>
+  </data>
+  <data name="PlaybackControl_Next.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Next (Ctrl+Right)</value>
+  </data>
+  <data name="PlaybackControl_Repeat.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Repeat</value>
+  </data>
+  <data name="PlaybackControl_Single.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Single</value>
+  </data>
+  <data name="PlaybackControl_Shuffle.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Shuffle</value>
+  </data>
+  <data name="PlaybackControl_Consume.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Consume</value>
+  </data>
+  <data name="PageMenu_Filter.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Filter (Ctrl+F)</value>
   </data>
 </root>

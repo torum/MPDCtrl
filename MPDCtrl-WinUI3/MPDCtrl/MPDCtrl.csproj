@@ -259,16 +259,11 @@
 		<DebugType>full</DebugType>
 	</PropertyGroup>
 	<ItemGroup>
-	  <PRIResource Update="Properties\ja-Jp\Resources.resw">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		  <Generator>PublicResXFileCodeGenerator</Generator>
-	  </PRIResource>
+	  <PRIResource Remove="Properties\Resources.ja-JP.resw" />
 	</ItemGroup>
 	<ItemGroup>
-	  <PRIResource Update="Properties\en-US\Resources.resw">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		  <Generator>PublicResXFileCodeGenerator</Generator>
-	  </PRIResource>
+	  <Folder Include="Properties\en-US\" />
+	  <Folder Include="Properties\ja-JP\" />
 	</ItemGroup>
 
 

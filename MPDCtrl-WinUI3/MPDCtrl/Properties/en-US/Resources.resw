@@ -433,7 +433,7 @@
     <value>Options</value>
   </data>
   <data name="Settings_Opts_AutoScrollToNowPlaying.Content" xml:space="preserve">
-    <value>Auto scroll to current song</value>
+    <value>Auto scroll to current song in Queue list</value>
   </data>
   <data name="Settings_ProjectPage.Header" xml:space="preserve">
     <value>Project info</value>
@@ -528,5 +528,8 @@ SOFTWARE.</value>
   </data>
   <data name="PageMenu_Filter.ToolTipService.ToolTip" xml:space="preserve">
     <value>Filter (Ctrl+F)</value>
+  </data>
+  <data name="Settings_MPD_Opts_UseReadPictureExplanation.Text" xml:space="preserve">
+    <value>"albumart" command reads an album cover from a separate file(cover.png, cover.jpg, or cover.webp) in the same directory as the music file whereas "readpicture" reads from music file's metadata such as ID3 tags. </value>
   </data>
 </root>

@@ -433,7 +433,7 @@
     <value>オプション</value>
   </data>
   <data name="Settings_Opts_AutoScrollToNowPlaying.Content" xml:space="preserve">
-    <value>現在の曲へ自動でジャンプする</value>
+    <value>再生キューで、現在の曲へ自動でジャンプする</value>
   </data>
   <data name="Settings_ProjectPage.Header" xml:space="preserve">
     <value>プロジェクト情報</value>
@@ -529,5 +529,8 @@ SOFTWARE.</value>
   </data>
   <data name="PageMenu_Filter.ToolTipService.ToolTip" xml:space="preserve">
     <value>絞り込み (Ctrl+F)</value>
+  </data>
+  <data name="Settings_MPD_Opts_UseReadPictureExplanation.Text" xml:space="preserve">
+    <value>"albumart"コマンドは音楽ファイルと同じディレクトリにある画像ファイル（cover.png, cover.jpg, cover.webp のいずれか）を読み込み、"readpicture" コマンドは音楽ファイルのメタデータ（ID3タグなど）から読み込みます。</value>
   </data>
 </root>

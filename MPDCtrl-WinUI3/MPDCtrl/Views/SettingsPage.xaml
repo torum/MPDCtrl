@@ -159,7 +159,10 @@
                             </controls:SettingsCard>
 
                             <controls:SettingsCard Header="" Description="" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
-                                <CheckBox x:Uid="Settings_MPD_Opts_UseReadPicture" IsChecked="{x:Bind ViewModel.IsDownloadAlbumArtEmbeddedUsingReadPicture, Mode=TwoWay}" Margin="0,12,0,12"/>
+                                <StackPanel>
+                                    <CheckBox x:Uid="Settings_MPD_Opts_UseReadPicture" IsChecked="{x:Bind ViewModel.IsDownloadAlbumArtEmbeddedUsingReadPicture, Mode=TwoWay}" Margin="0,12,0,12"/>
+                                    <TextBlock x:Uid="Settings_MPD_Opts_UseReadPictureExplanation" TextWrapping="WrapWholeWords" Margin="28,0,12,12"></TextBlock>
+                                </StackPanel>
                             </controls:SettingsCard>
                             
                         </controls:SettingsExpander.Items>
@@ -213,9 +216,11 @@
                             <controls:SettingsCard Header="Project Page" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="@Github">
                                 <HyperlinkButton NavigateUri="https://github.com/torum/MPDCtrl/">https://github.com/torum/MPDCtrl/</HyperlinkButton>
                             </controls:SettingsCard>
+                            <!--
                             <controls:SettingsCard Header="App Page" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="@Github">
                                 <HyperlinkButton NavigateUri="https://torum.github.io/MPDCtrl/">https://torum.github.io/MPDCtrl/</HyperlinkButton>
                             </controls:SettingsCard>
+                            -->
                             <controls:SettingsCard Header="Microsoft App Store Page" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="@Microsoft">
                                 <HyperlinkButton NavigateUri="https://apps.microsoft.com/detail/9nv2bbj82brx">https://apps.microsoft.com/detail/9nv2bbj82brx</HyperlinkButton>
                             </controls:SettingsCard>

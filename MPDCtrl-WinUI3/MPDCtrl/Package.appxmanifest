@@ -10,7 +10,7 @@
   <Identity
     Name="60132torumyax.MPDCtrl"
     Publisher="CN=F3079A96-760D-4F53-9E00-374C09B6D4B1"
-    Version="4.0.0.0" />
+    Version="4.0.1.0" />
 
   <Properties>
     <DisplayName>MPDCtrl</DisplayName>

@@ -207,13 +207,6 @@ public sealed partial class MainWindow : Window
 
     private void LoadSettings()
     {
-        /*
-                var filePath = App.AppConfigFilePath;
-                if (RuntimeHelper.IsMSIX)
-                {
-                    filePath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.AppName + ".config");
-                }
-        */
         if (Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController.IsSupported())
         {
             _vm.IsAcrylicSupported = true;
@@ -376,16 +369,32 @@ public sealed partial class MainWindow : Window
             opts = xdoc.Root.Element("Opts");
             if (opts != null)
             {
-                /*
-                xvalue = opts.Attribute("IsDebugSaveLog");
+                var xvalue = opts.Attribute("isUpdateOnStartup");
                 if (xvalue != null)
                 {
                     if (!string.IsNullOrEmpty(xvalue.Value))
                     {
-                        //MainViewModel.IsDebugSaveLog = xvalue.Value == "True";
+                        _vm.IsUpdateOnStartup = xvalue.Value == "True";
                     }
                 }
-                */
+
+                xvalue = opts.Attribute("isDownloadAlbumArtEmbeddedUsingReadPicture");
+                if (xvalue != null)
+                {
+                    if (!string.IsNullOrEmpty(xvalue.Value))
+                    {
+                        _vm.IsDownloadAlbumArtEmbeddedUsingReadPicture = xvalue.Value == "True";
+                    }
+                }
+
+                xvalue = opts.Attribute("isAutoScrollToNowPlaying");
+                if (xvalue != null)
+                {
+                    if (!string.IsNullOrEmpty(xvalue.Value))
+                    {
+                        _vm.IsAutoScrollToNowPlaying = xvalue.Value == "True";
+                    }
+                }
             }
 
             #region == Profiles  ==
@@ -947,9 +956,17 @@ public sealed partial class MainWindow : Window
         // Options
         var xOpts = doc.CreateElement(string.Empty, "Opts", string.Empty);
 
-        //attrs = doc.CreateAttribute("isDebugSaveLog");
-        //attrs.Value = MainViewModel.IsDebugSaveLog.ToString();
-        //xOpts.SetAttributeNode(attrs);
+        attrs = doc.CreateAttribute("isUpdateOnStartup");
+        attrs.Value = _vm.IsUpdateOnStartup.ToString();
+        xOpts.SetAttributeNode(attrs);
+
+        attrs = doc.CreateAttribute("isDownloadAlbumArtEmbeddedUsingReadPicture");
+        attrs.Value = _vm.IsDownloadAlbumArtEmbeddedUsingReadPicture.ToString();
+        xOpts.SetAttributeNode(attrs);
+
+        attrs = doc.CreateAttribute("isAutoScrollToNowPlaying");
+        attrs.Value = _vm.IsAutoScrollToNowPlaying.ToString();
+        xOpts.SetAttributeNode(attrs);
 
         root.AppendChild(xOpts);
 

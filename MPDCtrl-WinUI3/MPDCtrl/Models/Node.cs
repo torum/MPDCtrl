@@ -1,5 +1,4 @@
 
-
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -11,7 +10,7 @@ namespace MPDCtrl.Models;
 /// <summary>
 /// Base class for Treeview Node and Listview Item.
 /// </summary>
-abstract public class Node(string name) : ObservableObject
+public abstract class Node(string name) : ObservableObject
 {
     private string _name = name;
     public string Name

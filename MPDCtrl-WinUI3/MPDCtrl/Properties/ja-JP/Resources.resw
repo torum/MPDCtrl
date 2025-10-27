@@ -533,4 +533,10 @@ SOFTWARE.</value>
   <data name="Settings_MPD_Opts_UseReadPictureExplanation.Text" xml:space="preserve">
     <value>"albumart"コマンドは音楽ファイルと同じディレクトリにある画像ファイル（cover.png, cover.jpg, cover.webp のいずれか）を読み込み、"readpicture" コマンドは音楽ファイルのメタデータ（ID3タグなど）から読み込みます。</value>
   </data>
+  <data name="Settings_ThirdParty.Header" xml:space="preserve">
+    <value>サードパーティー製のライブラリ</value>
+  </data>
+  <data name="Settings_ThirdParty.Description" xml:space="preserve">
+    <value>C#/.NET</value>
+  </data>
 </root>

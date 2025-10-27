@@ -47,7 +47,7 @@
                 <!-- Play and AddTo buttons -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
                     <!-- Play -->
-                    <Button Margin="0,0,8,0" Height="36" Command="{x:Bind ViewModel.SongsPlayAllCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.PlaylistSongs, Mode=OneWay}">
+                    <Button Margin="0,0,8,0" Height="36" Command="{x:Bind ViewModel.ClearQueueAndLoadPlaylistCommand, Mode=OneWay}">
                         <StackPanel Orientation="Horizontal">
                             <Viewbox Width="14" Height="14">
                                 <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M5.74514 3.06445C5.41183 2.87696 5 3.11781 5 3.50023V12.5005C5 12.8829 5.41182 13.1238 5.74512 12.9363L13.7454 8.43631C14.0852 8.24517 14.0852 7.75589 13.7454 7.56474L5.74514 3.06445ZM4 3.50023C4 2.35298 5.2355 1.63041 6.23541 2.19288L14.2357 6.69317C15.2551 7.26664 15.2551 8.73446 14.2356 9.3079L6.23537 13.8079C5.23546 14.3703 4 13.6477 4 12.5005V3.50023Z"/>
@@ -56,7 +56,7 @@
                         </StackPanel>
                     </Button>
                     <!-- Add to queue-->
-                    <Button Margin="8,0,8,0" Height="36" Command="{x:Bind ViewModel.SongsAddToQueueCommand}" CommandParameter="{x:Bind ViewModel.PlaylistSongs, Mode=OneWay}">
+                    <Button Margin="8,0,8,0" Height="36" Command="{x:Bind ViewModel.LoadPlaylistCommand}">
                         <StackPanel Orientation="Horizontal">
                             <Viewbox Width="14" Height="14">
                                 <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z"/>

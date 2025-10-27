@@ -227,6 +227,17 @@
                         </controls:SettingsExpander.Items>
                     </controls:SettingsExpander>
 
+                    <!-- PrivacyPolicy -->
+                    <controls:SettingsExpander x:Uid="Settings_PrivacyPolicy">
+
+                        <controls:SettingsExpander.Items>
+                            <controls:SettingsCard Header="" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="">
+                                <TextBlock  x:Uid="Settings_PrivacyPolicyText" TextWrapping="Wrap" Margin="0,12,0,12"></TextBlock>
+                            </controls:SettingsCard>
+                        </controls:SettingsExpander.Items>
+
+                    </controls:SettingsExpander>
+
                     <!-- License -->
                     <controls:SettingsExpander x:Uid="Settings_License">
 
@@ -238,19 +249,8 @@
 
                     </controls:SettingsExpander>
                     
-                    <!-- PrivacyPolicy -->
-                    <controls:SettingsExpander x:Uid="Settings_PrivacyPolicy">
-
-                        <controls:SettingsExpander.Items>
-                            <controls:SettingsCard Header="" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="">
-                                <TextBlock  x:Uid="Settings_PrivacyPolicyText" TextWrapping="Wrap" Margin="0,12,0,12"></TextBlock>
-                            </controls:SettingsCard>
-                        </controls:SettingsExpander.Items>
-                        
-                    </controls:SettingsExpander>
-
                     <!-- Third party -->
-                    <controls:SettingsExpander Header="Third-Party Dependency &amp; Libraries" Description="Built with C#/.NET">
+                    <controls:SettingsExpander x:Uid="Settings_ThirdParty">
 
                         <controls:SettingsExpander.Items>
                             <controls:SettingsCard Header="Microsoft" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="The MIT License">

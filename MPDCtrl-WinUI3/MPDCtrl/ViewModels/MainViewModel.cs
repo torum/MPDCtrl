@@ -717,7 +717,7 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
 
-            _ = Task.Run(SetRpeat, _cts.Token);
+            Task.Run(SetRpeat, _cts.Token);
         }
     }
 
@@ -740,7 +740,7 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
 
-            _ = Task.Run(SetRandom, _cts.Token);
+            Task.Run(SetRandom, _cts.Token);
         }
     }
 
@@ -762,7 +762,7 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
 
-            _ = Task.Run(SetConsume, _cts.Token);
+            Task.Run(SetConsume, _cts.Token);
         }
     }
 
@@ -780,7 +780,7 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
 
-            _ = Task.Run(SetSingle, _cts.Token);
+            Task.Run(SetSingle, _cts.Token);
         }
     }
 
@@ -1394,7 +1394,7 @@ public partial class MainViewModel : ObservableObject
             ////_ = Task.Run(() => GetAlbumPictures(SelectedArtistAlbums));
             //GetAlbumPictures(SelectedArtistAlbums);
 
-            _ = Task.Run(() =>
+            Task.Run(() =>
             {
                 GetArtistSongs(_selectedAlbumArtist);
                 GetAlbumPictures(SelectedArtistAlbums);
@@ -1487,7 +1487,7 @@ public partial class MainViewModel : ObservableObject
             */
             //_ = Task.Run(async () => { await GetAlbumSongs(_selectedAlbum); });
 
-            _ = Task.Run(() => 
+            Task.Run(() => 
             {
                 GetAlbumSongs(_selectedAlbum);
                 App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
@@ -1561,7 +1561,7 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
 
-            _ = Task.Run(() => GetAlbumPictures(VisibleItemsAlbumsEx), _cts.Token);
+            Task.Run(() => GetAlbumPictures(VisibleItemsAlbumsEx), _cts.Token);
             //GetAlbumPictures(VisibleItemsAlbumsEx); 
         }
     }
@@ -6878,7 +6878,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public async Task ClearQueueAndLoadPlaylist(string playlistName)
+    public async Task ClearQueueAndLoadPlaylist()
     {
         if (IsBusy) return;
         if (IsWorking) return;
@@ -7330,4 +7330,5 @@ public partial class MainViewModel : ObservableObject
     }
 
     #endregion
+
 }

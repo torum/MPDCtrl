@@ -532,4 +532,10 @@ SOFTWARE.</value>
   <data name="Settings_MPD_Opts_UseReadPictureExplanation.Text" xml:space="preserve">
     <value>"albumart" command reads an album cover from a separate file(cover.png, cover.jpg, or cover.webp) in the same directory as the music file whereas "readpicture" reads from music file's metadata such as ID3 tags. </value>
   </data>
+  <data name="Settings_ThirdParty.Header" xml:space="preserve">
+    <value>Third-Party Dependency &amp; Libraries</value>
+  </data>
+  <data name="Settings_ThirdParty.Description" xml:space="preserve">
+    <value>Built with C#/.NET</value>
+  </data>
 </root>

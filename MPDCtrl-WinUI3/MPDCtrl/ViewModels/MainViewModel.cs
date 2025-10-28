@@ -4047,18 +4047,15 @@ public partial class MainViewModel : ObservableObject
             MusicDirectories.Clear();
 
         filestNode.IsAcquired = true;
+        
+        IsWorking = true;
 
         await Task.Run(async () =>
         {
             //await Task.Delay(10);
             await Task.Yield();
 
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-            {
-                IsWorking = true;
-            });
-
-            CommandResult result = await _mpc.MpdQueryListAll().ConfigureAwait(false);
+            CommandResult result = await _mpc.MpdQueryListAll();
             if (result.IsSuccess)
             {
                 App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
@@ -4093,7 +4090,8 @@ public partial class MainViewModel : ObservableObject
         if (playlistNode is null)
             return;
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () => {
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () => 
+        {
             IsWorking = true;
             await Task.Yield();
 
@@ -4797,11 +4795,13 @@ public partial class MainViewModel : ObservableObject
             return result;
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+#pragma warning disable CS8602
+        await App.MainWnd?.CurrentDispatcherQueue?.EnqueueAsync(() =>
         {
             IsWorking = true;
             //UpdateProgress?.Invoke(this, "");
         });
+#pragma warning restore CS8602
 
         string queryShiki = "==";
         var res = await _mpc.MpdSearch("Album", queryShiki, name); // No name.Trim() because of "=="
@@ -4832,11 +4832,13 @@ public partial class MainViewModel : ObservableObject
             return result;
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+#pragma warning disable CS8602
+        await App.MainWnd?.CurrentDispatcherQueue?.EnqueueAsync(() =>
         {
             IsWorking = true;
             //UpdateProgress?.Invoke(this, "");
         });
+#pragma warning restore CS8602
 
         string queryShiki = "==";
         var res = await _mpc.MpdSearch("AlbumArtist", queryShiki, name); // AlbumArtist looks for VALUE in AlbumArtist and falls back to Artist tags if AlbumArtist does not exist. 
@@ -4956,7 +4958,8 @@ public partial class MainViewModel : ObservableObject
     private async void OnMpdIdleConnected(MpcService sender)
     {
         // ATTN: this won't be called if we etablishe the connection before MainWnd is initialized.
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue( () =>
+#pragma warning disable CS8602
+        await App.MainWnd?.CurrentDispatcherQueue?.EnqueueAsync(() =>
         {
             Debug.WriteLine("OK MPD " + _mpc.MpdVerText + " @OnMpdConnected");
 
@@ -4976,6 +4979,7 @@ public partial class MainViewModel : ObservableObject
                 Profiles.Add(CurrentProfile);
             }
         });
+#pragma warning restore CS8602
 
         // 
         await Task.Run(LoadInitialData, _cts.Token);

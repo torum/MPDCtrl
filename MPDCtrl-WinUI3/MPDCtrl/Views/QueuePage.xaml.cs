@@ -62,7 +62,7 @@ public sealed partial class QueuePage : Page
 
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
-            lb.ScrollIntoView(obj, ScrollIntoViewAlignment.Leading);
+            lb.ScrollIntoView(obj, ScrollIntoViewAlignment.Default);//Leading
 
             if (obj is not SongInfoEx song)
             {

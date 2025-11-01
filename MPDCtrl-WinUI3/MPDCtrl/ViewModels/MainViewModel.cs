@@ -4190,7 +4190,7 @@ public partial class MainViewModel : ObservableObject
                         album.IsSongsAcquired = true;
 
                         //SelectedAlbum = album;
-                        IsWorking = true;
+                        IsWorking = false;
                         await Task.Yield();
 
                     }
@@ -4233,12 +4233,14 @@ public partial class MainViewModel : ObservableObject
                             album.IsSongsAcquired = true;
 
                             //SelectedAlbum = album;
-                            IsWorking = true;
+                            IsWorking = false;
                             await Task.Yield();
                         }
                         else
                         {
                             Debug.WriteLine("GetAlbumSongs: SearchArtistSongs returned false, returning.");
+                            IsWorking = false;
+                            await Task.Yield();
                             return;
                         }
 
@@ -4795,13 +4797,8 @@ public partial class MainViewModel : ObservableObject
             return result;
         }
 
-#pragma warning disable CS8602
-        await App.MainWnd?.CurrentDispatcherQueue?.EnqueueAsync(() =>
-        {
-            IsWorking = true;
-            //UpdateProgress?.Invoke(this, "");
-        });
-#pragma warning restore CS8602
+        IsWorking = true;
+        //UpdateProgress?.Invoke(this, "");
 
         string queryShiki = "==";
         var res = await _mpc.MpdSearch("Album", queryShiki, name); // No name.Trim() because of "=="
@@ -4811,11 +4808,8 @@ public partial class MainViewModel : ObservableObject
             Debug.WriteLine("SearchAlbumSongs failed: " + res.ErrorMessage);
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-        {
-            IsWorking = false;
-            UpdateProgress?.Invoke(this, "");
-        });
+        IsWorking = false;
+        UpdateProgress?.Invoke(this, "");
 
         return res;
     }
@@ -4832,13 +4826,8 @@ public partial class MainViewModel : ObservableObject
             return result;
         }
 
-#pragma warning disable CS8602
-        await App.MainWnd?.CurrentDispatcherQueue?.EnqueueAsync(() =>
-        {
-            IsWorking = true;
-            //UpdateProgress?.Invoke(this, "");
-        });
-#pragma warning restore CS8602
+        IsWorking = true;
+        //UpdateProgress?.Invoke(this, "");
 
         string queryShiki = "==";
         var res = await _mpc.MpdSearch("AlbumArtist", queryShiki, name); // AlbumArtist looks for VALUE in AlbumArtist and falls back to Artist tags if AlbumArtist does not exist. 
@@ -4852,11 +4841,8 @@ public partial class MainViewModel : ObservableObject
             //Debug.WriteLine(res.ResultText);
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-        {
-            IsWorking = false;
-            UpdateProgress?.Invoke(this, "");
-        });
+        IsWorking = false;
+        UpdateProgress?.Invoke(this, "");
 
         return res;
     }
@@ -4958,8 +4944,7 @@ public partial class MainViewModel : ObservableObject
     private async void OnMpdIdleConnected(MpcService sender)
     {
         // ATTN: this won't be called if we etablishe the connection before MainWnd is initialized.
-#pragma warning disable CS8602
-        await App.MainWnd?.CurrentDispatcherQueue?.EnqueueAsync(() =>
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
             Debug.WriteLine("OK MPD " + _mpc.MpdVerText + " @OnMpdConnected");
 
@@ -4979,7 +4964,6 @@ public partial class MainViewModel : ObservableObject
                 Profiles.Add(CurrentProfile);
             }
         });
-#pragma warning restore CS8602
 
         // 
         await Task.Run(LoadInitialData, _cts.Token);

@@ -655,7 +655,7 @@ public class MpcBinaryService : IMpcBinaryService
         }
         catch (System.OperationCanceledException e)
         {
-            Debug.WriteLine("ReadLineAsync canceled due to ConnectionStatus.Disconnecting, now exiting. @MpdBinarySendBinaryCommand" + e.Message);
+            Debug.WriteLine("ReadLineAsync canceled due to ConnectionStatus. Disconnecting, now exiting. @MpdBinarySendBinaryCommand" + e.Message);
             ret.IsSuccess = false;
             ret.ErrorMessage = e.Message;
 

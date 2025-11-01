@@ -925,11 +925,11 @@ public partial class MpcService : IMpcService
             if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser) || (ConnectionState == ConnectionStatus.Connecting))
             {
                 // no problem
-                Debug.WriteLine("ReadLineAsync canceled due to ConnectionStatus.Disconnecting, now exiting.");
+                Debug.WriteLine("ReadLineAsync canceled due to ConnectionStatus. Disconnecting, now exiting. @MpdIdle()");
             }
             else
             {
-                Debug.WriteLine("[OperationCanceledException@MpdIdle] ({0}):\n{1}", "ReadLineAsync: " + ConnectionState.ToString(), e.Message);
+                Debug.WriteLine("[OperationCanceledException@MpdIdle] ({0}):\n{1}", "ReadLineAsync @MpdIdle(): " + ConnectionState.ToString(), e.Message);
             }
         }
         catch (System.InvalidOperationException e)

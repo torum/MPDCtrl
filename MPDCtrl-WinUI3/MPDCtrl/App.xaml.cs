@@ -79,9 +79,10 @@ public partial class App : Application
             Debug.WriteLine("IsMSIX");
             var envDataFolder = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
             AppDataFolder = System.IO.Path.Combine(System.IO.Path.Combine(envDataFolder, _appDeveloper), _appName);
-            AppConfigFilePath = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.AppName + ".config");
+            AppConfigFilePath = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, _appName + ".config");
+            //AppConfigFilePath = System.IO.Path.Combine(AppDataFolder, _appName + ".config"); // should have been this...
             var envAppLocalCahceFolder = Windows.Storage.ApplicationData.Current.LocalCacheFolder.Path;
-            AppDataCacheFolder = System.IO.Path.Combine(System.IO.Path.Combine((System.IO.Path.Combine(envAppLocalCahceFolder, _appDeveloper)), AppName), "AlbumCoverCache");
+            AppDataCacheFolder = System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.Combine(envAppLocalCahceFolder, _appDeveloper), _appName), "AlbumCoverCache");
         }
         else
         {

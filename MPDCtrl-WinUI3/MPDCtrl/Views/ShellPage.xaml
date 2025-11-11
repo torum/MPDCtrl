@@ -43,7 +43,7 @@
         <!-- NaviView -->
         <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BorderBrush="{ThemeResource SmokeFillColorDefaultBrush}" BorderThickness="0,0,0,0">
 
-            <NavigationView x:Name="NaviView" AccessKey="H" MenuItemsSource="{x:Bind ViewModel.MainMenuItems, Mode=OneWay}" IsTitleBarAutoPaddingEnabled="True" IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="False" IsSettingsVisible="False" PaneDisplayMode="Left" ExpandedModeThresholdWidth="1008" CompactModeThresholdWidth="640" OpenPaneLength ="320" IsPaneOpen="{x:Bind ViewModel.IsNavigationViewMenuOpen, Mode=TwoWay}" Loaded="NavigationView_Loaded" ItemInvoked="NavigationView_ItemInvoked" SelectionChanged="NaviView_SelectionChanged">
+            <NavigationView x:Name="NaviView" AccessKey="H" MenuItemsSource="{x:Bind ViewModel.MainMenuItems, Mode=OneWay}" IsTitleBarAutoPaddingEnabled="True" IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="False" IsSettingsVisible="False" PaneDisplayMode="Left" ExpandedModeThresholdWidth="1008" CompactModeThresholdWidth="640" OpenPaneLength ="280" IsPaneOpen="{x:Bind ViewModel.IsNavigationViewMenuOpen, Mode=TwoWay}" Loaded="NavigationView_Loaded" ItemInvoked="NavigationView_ItemInvoked" SelectionChanged="NaviView_SelectionChanged">
                 <NavigationView.PaneHeader>
                     <!-- App title and icon -->
                     <Grid VerticalAlignment="Center">
@@ -327,6 +327,7 @@
                         <Setter Target="NaviView.PaneDisplayMode" Value="CompactLeft" />
                         <Setter Target="NaviView.IsPaneOpen" Value="False" />
                         <Setter Target="PlaybackOptions.Visibility" Value="Visible" />
+                        <Setter Target="NaviView.OpenPaneLength" Value="280" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -339,6 +340,7 @@
                         <Setter Target="NaviView.IsPaneOpen" Value="False" />
                         <Setter Target="PlaybackOptions.Visibility" Value="Collapsed" />
                         <Setter Target="AlbumCoverAndSongTitle.Visibility" Value="Visible" />
+                        <Setter Target="NaviView.OpenPaneLength" Value="230" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -351,6 +353,7 @@
                         <Setter Target="NaviView.IsPaneOpen" Value="False" />
                         <Setter Target="AlbumCoverAndSongTitle.Visibility" Value="Collapsed" />
                         <Setter Target="PlaybackOptions.Visibility" Value="Collapsed" />
+                        <Setter Target="NaviView.OpenPaneLength" Value="230" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

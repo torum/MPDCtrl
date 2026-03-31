@@ -11,7 +11,7 @@ namespace MPDCtrl.Models;
 
 public partial class Album : ObservableObject
 {
-    public string Name { get; set; } = "";
+    public string Name { get; set; } = string.Empty;
 
     public bool IsSongsAcquired { get; set; } = false;
 
@@ -33,7 +33,7 @@ public partial class Album : ObservableObject
 
 public partial class AlbumEx :Album
 {
-    public string AlbumArtist { get; set; } = "";
+    public string AlbumArtist { get; set; } = string.Empty;
 
     public string? AlbumImagePath { get; set; } = null;
 
@@ -60,7 +60,7 @@ public partial class AlbumEx :Album
 
 public class AlbumArtist
 {
-    public string Name { get; set; } = "";
+    public string Name { get; set; } = string.Empty;
 
     public ObservableCollection<AlbumEx> Albums { get; private set; } = [];
 }

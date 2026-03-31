@@ -24,7 +24,7 @@ public partial class Playlist : ObservableObject
         }
     }
 
-    private string _lastModified = "";
+    private string _lastModified = string.Empty;
     public string LastModified
     {
         get
@@ -37,6 +37,9 @@ public partial class Playlist : ObservableObject
                 return;
 
             _lastModified = value;
+
+            OnPropertyChanged(nameof(LastModified));
+            OnPropertyChanged(nameof(LastModifiedFormated));
         }
     }
 

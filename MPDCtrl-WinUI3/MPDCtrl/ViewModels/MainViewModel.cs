@@ -51,6 +51,8 @@ using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using WinRT.Interop;
 
+#pragma warning disable IDE0028
+
 namespace MPDCtrl.ViewModels;
 
 public partial class MainViewModel : ObservableObject
@@ -324,9 +326,14 @@ public partial class MainViewModel : ObservableObject
             byte[] sBytes = Encoding.Unicode.GetBytes(s);
             using (System.Security.Cryptography.Aes encryptor = System.Security.Cryptography.Aes.Create())
             {
-                Rfc2898DeriveBytes pdb = new(encryptionKey, entropy, 10000, HashAlgorithmName.SHA1);
-                encryptor.Key = pdb.GetBytes(32);
-                encryptor.IV = pdb.GetBytes(16);
+                // Obsolete and deprecated in .NET 10.
+                //Rfc2898DeriveBytes pdb = new(encryptionKey, entropy, 10000, HashAlgorithmName.SHA1);
+                //encryptor.Key = pdb.GetBytes(32);
+                //encryptor.IV = pdb.GetBytes(16);
+                // New since .NET 10.
+                encryptor.Key = Rfc2898DeriveBytes.Pbkdf2(encryptionKey, entropy, 10000, HashAlgorithmName.SHA1, 32);
+                encryptor.IV = Rfc2898DeriveBytes.Pbkdf2(encryptionKey, entropy, 10000, HashAlgorithmName.SHA1, 16);
+
                 using MemoryStream ms = new();
                 using (CryptoStream cs = new(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
                 {
@@ -369,9 +376,14 @@ public partial class MainViewModel : ObservableObject
             byte[] sBytes = Convert.FromBase64String(s);
             using (System.Security.Cryptography.Aes encryptor = System.Security.Cryptography.Aes.Create())
             {
-                Rfc2898DeriveBytes pdb = new(encryptionKey, entropy, 10000, HashAlgorithmName.SHA1);
-                encryptor.Key = pdb.GetBytes(32);
-                encryptor.IV = pdb.GetBytes(16);
+                // Obsolete and deprecated in .NET 10.
+                //Rfc2898DeriveBytes pdb = new(encryptionKey, entropy, 10000, HashAlgorithmName.SHA1);
+                //encryptor.Key = pdb.GetBytes(32);
+                //encryptor.IV = pdb.GetBytes(16);
+                // New since .NET 10.
+                encryptor.Key = Rfc2898DeriveBytes.Pbkdf2(encryptionKey, entropy, 10000, HashAlgorithmName.SHA1, 32);
+                encryptor.IV = Rfc2898DeriveBytes.Pbkdf2(encryptionKey, entropy, 10000, HashAlgorithmName.SHA1, 16);
+
                 using MemoryStream ms = new();
                 using (CryptoStream cs = new(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
                 {
@@ -2800,10 +2812,7 @@ public partial class MainViewModel : ObservableObject
                     CurrentSong.IsPlaying = false;
 
                     //
-                    if (_mpc.MpdCurrentSong is not null)
-                    {
-                        _mpc.MpdCurrentSong.IsPlaying = false;
-                    }
+                    _mpc.MpdCurrentSong?.IsPlaying = false;
                     AlbumCover = null;
                     AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
                 }
@@ -2811,10 +2820,7 @@ public partial class MainViewModel : ObservableObject
             else
             {
                 // just in case
-                if (_mpc.MpdCurrentSong is not null)
-                {
-                    _mpc.MpdCurrentSong.IsPlaying = false;
-                }
+                _mpc.MpdCurrentSong?.IsPlaying = false;
 
                 isCurrentSongWasNull = true;
             }
@@ -3041,10 +3047,7 @@ public partial class MainViewModel : ObservableObject
                     CurrentSong.IsPlaying = false;
 
                     //
-                    if (_mpc.MpdCurrentSong is not null)
-                    {
-                        _mpc.MpdCurrentSong.IsPlaying = false;
-                    }
+                    _mpc.MpdCurrentSong?.IsPlaying = false;
 
                 }
 
@@ -7146,8 +7149,7 @@ public partial class MainViewModel : ObservableObject
 
         //SelectedPlaylistSong = null;
 
-        if (_mainMenuItems.FilesDirectory is not null)
-            _mainMenuItems.FilesDirectory.IsAcquired = false;
+        _mainMenuItems.FilesDirectory?.IsAcquired = false;
 
         MusicEntries.Clear();
 
@@ -7318,5 +7320,29 @@ public partial class MainViewModel : ObservableObject
     }
 
     #endregion
+
+
+    [RelayCommand]
+    public void AlbumSelectedPlay(AlbumEx album)
+    {
+        /*
+        if (album is null)
+        {
+            Debug.WriteLine("album is null @AlbumSelectedPlay");
+            return;
+        }
+        var uriList = new List<string>();
+        foreach (var song in album.Songs)
+        {
+            uriList.Add(song.File);
+        }
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        {
+            Queue.Clear();
+            CurrentSong = null;
+            await _mpc.MpdMultiplePlay(uriList, Convert.ToInt32(_volume));
+        });
+        */
+    }
 
 }

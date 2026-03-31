@@ -87,7 +87,7 @@ public sealed partial class QueuePage : Page
             return;
         }
 
-        // UI element that was right-clicked
+        // UI element that was double-clicked
         FrameworkElement element = (FrameworkElement)e.OriginalSource;
 
         var container = FindParent<ListViewItem>(element);

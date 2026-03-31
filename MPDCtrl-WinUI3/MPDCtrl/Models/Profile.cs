@@ -12,7 +12,7 @@ namespace MPDCtrl.Models;
 /// </summary>
 public partial class Profile : ObservableObject
 {
-    private string _host = "";
+    private string _host = string.Empty;
     public string Host
     {
         get { return _host; }
@@ -56,7 +56,7 @@ public partial class Profile : ObservableObject
         }
     }
 
-    private string _password = "";
+    private string _password = string.Empty;
     public string Password
     {
         get { return _password; }
@@ -70,7 +70,7 @@ public partial class Profile : ObservableObject
         }
     }
 
-    private string _name = "";
+    private string _name = string.Empty;
     public string Name
     {
         get { return _name; }
@@ -80,6 +80,7 @@ public partial class Profile : ObservableObject
                 return;
 
             _name = value;
+
             OnPropertyChanged(nameof(Name));
         }
     }

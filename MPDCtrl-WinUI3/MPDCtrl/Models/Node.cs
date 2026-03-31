@@ -145,7 +145,7 @@ public partial class NodeTree : Node
 
     protected NodeTree(string name) : base(name)
     {
-        //BindingOperations.EnableCollectionSynchronization(_children, new object());
+
     }
 
 }

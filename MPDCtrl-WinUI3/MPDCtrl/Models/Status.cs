@@ -10,24 +10,13 @@ public class Status
     };
 
     private MpdPlayState _ps;
-    private int _volume = 20;
-    private bool _volumeIsSet = false;
-    private bool _volumeIsReturned;
-    private bool _repeat;
-    private bool _random;
-    private bool _consume;
-    private bool _single;
-    private string _songID = "";
-    private double _songTime = 0;
-    private double _songElapsed = 0;
-    private string _error = "";
-
     public MpdPlayState MpdState
     {
         get { return _ps; }
         set { _ps = value; }
     }
 
+    private int _volume = 20;
     public int MpdVolume
     {
         get { return _volume; }
@@ -37,6 +26,7 @@ public class Status
         }
     }
 
+    private bool _volumeIsReturned;
     public bool MpdVolumeIsReturned
     {
         get { return _volumeIsReturned; }
@@ -46,6 +36,7 @@ public class Status
         }
     }
 
+    private bool _volumeIsSet = false;
     public bool MpdVolumeIsSet
     {
         get { return _volumeIsSet; }
@@ -55,6 +46,7 @@ public class Status
         }
     }
 
+    private bool _repeat;
     public bool MpdRepeat
     {
         get { return _repeat; }
@@ -64,6 +56,7 @@ public class Status
         }
     }
 
+    private bool _random;
     public bool MpdRandom
     {
         get { return _random; }
@@ -72,6 +65,8 @@ public class Status
             _random = value;
         }
     }
+
+    private bool _consume;
     public bool MpdConsume
     {
         get { return _consume; }
@@ -81,6 +76,7 @@ public class Status
         }
     }
 
+    private bool _single;
     public bool MpdSingle
     {
         get { return _single; }
@@ -90,6 +86,7 @@ public class Status
         }
     }
 
+    private string _songID = string.Empty;
     public string MpdSongID
     {
         get { return _songID; }
@@ -99,6 +96,7 @@ public class Status
         }
     }
 
+    private double _songTime = 0;
     public double MpdSongTime
     {
         get { return _songTime; }
@@ -108,6 +106,7 @@ public class Status
         }
     }
 
+    private double _songElapsed = 0;
     public double MpdSongElapsed
     {
         get { return _songElapsed; }
@@ -116,6 +115,8 @@ public class Status
             _songElapsed = value;
         }
     }
+
+    private string _error = string.Empty;
     public string MpdError
     {
         get { return _error; }

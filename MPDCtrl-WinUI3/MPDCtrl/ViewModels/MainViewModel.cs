@@ -4139,12 +4139,14 @@ public partial class MainViewModel : ObservableObject
             IsWorking = true;
             await Task.Yield();
 
+            var ci = CultureInfo.CurrentCulture;
+            var comp = StringComparer.Create(ci, true);
 
             UpdateProgress?.Invoke(this, "[UI] Updating the AlbumArtists...");
-            Artists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists);// COPY. //.OrderBy(x => x.Name, comp)
+            Artists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists.OrderBy(x => x.Name, comp));// COPY. // Sort 
 
             UpdateProgress?.Invoke(this, "[UI] Updating the Albums...");
-            Albums = new ObservableCollection<AlbumEx>(_mpc.Albums); // COPY. // Sort .OrderBy(x => x.Name, comp)
+            Albums = new ObservableCollection<AlbumEx>(_mpc.Albums.OrderBy(x => x.AlbumArtist, comp)); // COPY. // Sort 
 
             UpdateProgress?.Invoke(this, "");
 
@@ -6255,7 +6257,6 @@ public partial class MainViewModel : ObservableObject
             case "album":
                 Albums = new ObservableCollection<AlbumEx>(Albums.OrderBy(x => x.Name, comp));
                 break;
-
             case "reverse":
                 Albums = new ObservableCollection<AlbumEx>(Albums.Reverse<AlbumEx>());
                 break;

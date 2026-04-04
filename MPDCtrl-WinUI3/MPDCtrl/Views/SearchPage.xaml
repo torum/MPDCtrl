@@ -137,7 +137,11 @@
 
                 <!--Search query input textbox -->
                 <StackPanel Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
-                    <TextBox x:Name="SearchTextBox" MinWidth="100" Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="6,0,0,0" HorizontalAlignment="Stretch"></TextBox>
+                    <TextBox x:Name="SearchTextBox" MinWidth="100" Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="6,0,0,0" HorizontalAlignment="Stretch">
+                        <TextBox.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="Enter" Invoked="SearchTextBox_EnterInvoked" />
+                        </TextBox.KeyboardAccelerators>
+                    </TextBox>
                 </StackPanel>
 
                 <!-- Search button -->

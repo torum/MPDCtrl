@@ -117,4 +117,9 @@ public sealed partial class SearchPage : Page
     {
         this.SearchTextBox.Focus(FocusState.Programmatic);
     }
+
+    private void SearchTextBox_EnterInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        ViewModel.SearchExecCommand.Execute(null);
+    }
 }

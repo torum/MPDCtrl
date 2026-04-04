@@ -4162,6 +4162,8 @@ public partial class MainViewModel : ObservableObject
 
             if (!album.IsSongsAcquired)
             {
+                //Debug.WriteLine($"GetAlbumSongs: Getting songs for album {album.Name} by artist {album.AlbumArtist}...");
+
                 if (!string.IsNullOrEmpty(album.AlbumArtist.Trim()))
                 {
                     //Debug.WriteLine($"GetAlbumSongs: Album artist is not empty, searching by album artist. ({album.AlbumArtist})");
@@ -4194,7 +4196,6 @@ public partial class MainViewModel : ObservableObject
 
                         //SelectedAlbum = album;
                         IsWorking = false;
-                        await Task.Yield();
 
                     }
                     else
@@ -4210,6 +4211,8 @@ public partial class MainViewModel : ObservableObject
                     */
                     OnPropertyChanged(nameof(SelectedAlbumSongs));
                     OnPropertyChanged(nameof(AlbumPageSubTitleSelectedAlbumSongsCount));
+
+                    await Task.Yield();
                 }
                 else
                 {
@@ -4237,7 +4240,6 @@ public partial class MainViewModel : ObservableObject
 
                             //SelectedAlbum = album;
                             IsWorking = false;
-                            await Task.Yield();
                         }
                         else
                         {
@@ -4253,11 +4255,15 @@ public partial class MainViewModel : ObservableObject
                         */
                         OnPropertyChanged(nameof(SelectedAlbumSongs));
                         OnPropertyChanged(nameof(AlbumPageSubTitleSelectedAlbumSongsCount));
+
+                        await Task.Yield();
                     }
                     else
                     {
-                        Debug.WriteLine("GetAlbumSongs: No album name, no artist name.");
+                        Debug.WriteLine("GetAlbumSongs: No album name, no artist name. TODO: This should not happen.");
                         // This should not happen.
+
+                        // TODO: clear songs?
                     }
                 }
             }
@@ -4265,6 +4271,10 @@ public partial class MainViewModel : ObservableObject
             {
                 //SelectedAlbum = album;
                 await Task.Delay(50);
+                //Debug.WriteLine($"GetAlbumSongs: Songs for album {album.Name} by artist {album.AlbumArtist} is already acquired, just updating the UI.");
+
+                OnPropertyChanged(nameof(SelectedAlbumSongs));
+                OnPropertyChanged(nameof(AlbumPageSubTitleSelectedAlbumSongsCount));
             }
 
             IsWorking = false;
@@ -6875,8 +6885,13 @@ public partial class MainViewModel : ObservableObject
         if (IsWorking) return;
         if (SelectedNodeMenu is null)
             return;
-        if (SelectedNodeMenu is not NodeMenuPlaylistItem)
+        if (SelectedNodeMenu is not NodeMenuPlaylistItem list)
             return;
+
+        if (list.PlaylistSongs.Count == 0)
+        {
+            return;
+        }
 
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
@@ -6898,8 +6913,13 @@ public partial class MainViewModel : ObservableObject
         if (IsWorking) return;
         if (SelectedNodeMenu is null)
             return;
-        if (SelectedNodeMenu is not NodeMenuPlaylistItem)
+        if (SelectedNodeMenu is not NodeMenuPlaylistItem list)
             return;
+
+        if (list.PlaylistSongs.Count == 0)
+        {
+            return;
+        }
 
         await _mpc.MpdLoadPlaylist(SelectedNodeMenu.Name);
     }

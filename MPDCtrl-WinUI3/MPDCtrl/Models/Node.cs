@@ -121,7 +121,6 @@ public partial class NodeTree : Node
             if (_parent == value)
                 return;
 
-
             _parent = value;
 
             OnPropertyChanged(nameof(Parent));
@@ -137,6 +136,9 @@ public partial class NodeTree : Node
         }
         set
         {
+            if (_children == value)
+                return;
+
             _children = value;
 
             OnPropertyChanged(nameof(Children));

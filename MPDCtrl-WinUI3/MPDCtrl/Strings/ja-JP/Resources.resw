@@ -539,4 +539,7 @@ SOFTWARE.</value>
   <data name="Settings_ThirdParty.Description" xml:space="preserve">
     <value>C#/.NET</value>
   </data>
+  <data name="Setting.ToolTipService.ToolTip" xml:space="preserve">
+    <value>設定</value>
+  </data>
 </root>

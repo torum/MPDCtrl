@@ -68,7 +68,7 @@
                                 </Viewbox>
                             </Button>
                             <!-- I want to have a settings button right here. -->
-                            <Button x:Name="SettingsButton" Click="SettingsButton_Click" Width="40" Height="36" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0">
+                            <Button x:Name="SettingsButton" x:Uid="Setting" Click="SettingsButton_Click" Width="40" Height="36" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0">
                                 <AnimatedIcon Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <AnimatedIcon.Source>
                                         <animatedvisuals:AnimatedSettingsVisualSource />

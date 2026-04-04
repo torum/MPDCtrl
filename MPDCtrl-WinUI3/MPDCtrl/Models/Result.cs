@@ -7,7 +7,7 @@ public class Result
 {
     public bool IsWaitFailed = false;
     public bool IsSuccess = false;
-    public string ErrorMessage = "";
+    public string ErrorMessage = string.Empty;
 }
 
 public class ConnectionResult: Result
@@ -17,7 +17,7 @@ public class ConnectionResult: Result
 
 public class CommandResult : Result
 {
-    public string ResultText = "";
+    public string ResultText = string.Empty;
 }
 
 public class CommandBinaryResult : Result
@@ -26,7 +26,7 @@ public class CommandBinaryResult : Result
     public bool IsTimeOut = false;
     public int WholeSize;
     public int ChunkSize;
-    public string Type = "";
+    public string Type = string.Empty;
     public byte[]? BinaryData;
 }
 

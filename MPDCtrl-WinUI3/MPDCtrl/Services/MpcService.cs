@@ -3909,6 +3909,15 @@ public partial class MpcService : IMpcService
                     {
                         if (!string.IsNullOrEmpty(arts.Name))
                         {
+                            if (arts.Name.StartsWith("The ", StringComparison.OrdinalIgnoreCase))
+                            {
+                                arts.NameSort = arts.Name.Replace("The ", "");
+                            }
+                            else
+                            {
+                                arts.NameSort = arts.Name;
+                            }
+
                             AlbumArtists.Add(arts);
                         }
                     }
@@ -3948,6 +3957,15 @@ public partial class MpcService : IMpcService
                     {
                         if (!string.IsNullOrEmpty(arts.Name))
                         {
+                            if (arts.Name.StartsWith("The ", StringComparison.OrdinalIgnoreCase))
+                            {
+                                arts.NameSort = arts.Name.Replace("The ", "");
+                            }
+                            else
+                            {
+                                arts.NameSort = arts.Name;
+                            }
+
                             AlbumArtists.Add(arts);
                         }
                     }

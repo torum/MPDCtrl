@@ -489,10 +489,7 @@ public sealed partial class MainWindow : Window
                     if (_vm.CurrentProfile is null)
                     {
                         _vm.CurrentProfile = _vm.Profiles.FirstOrDefault();
-                        if (_vm.CurrentProfile is not null)
-                        {
-                            _vm.CurrentProfile.IsDefault = true;
-                        }
+                        _vm.CurrentProfile?.IsDefault = true;
                     }
                     
                     if (_vm.CurrentProfile is not null)

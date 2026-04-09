@@ -8,7 +8,6 @@ using System.ComponentModel;
 
 namespace MPDCtrl.Models;
 
-
 public partial class Album : ObservableObject
 {
     public string Name { get; set; } = string.Empty;
@@ -58,9 +57,10 @@ public partial class AlbumEx :Album
     public MainViewModel? ParentViewModel { get; set; }
 }
 
-public class AlbumArtist
+public partial class AlbumArtist : ObservableObject
 {
     public string Name { get; set; } = string.Empty;
+    public string NameSort { get; set; } = string.Empty;
 
     public ObservableCollection<AlbumEx> Albums { get; private set; } = [];
 }

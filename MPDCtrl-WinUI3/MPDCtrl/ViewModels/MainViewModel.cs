@@ -4147,7 +4147,8 @@ public partial class MainViewModel : ObservableObject
             Artists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists.OrderBy(x => x.NameSort, comp));// COPY. // Sort 
 
             UpdateProgress?.Invoke(this, "[UI] Updating the Albums...");
-            Albums = new ObservableCollection<AlbumEx>(_mpc.Albums.OrderBy(x => x.AlbumArtist, comp)); // COPY. // Sort 
+            //Albums = new ObservableCollection<AlbumEx>(_mpc.Albums.OrderBy(x => x.AlbumArtist, comp)); // COPY. // Sort 
+            Albums = new ObservableCollection<AlbumEx>(_mpc.Albums.OrderBy(x => x.AlbumArtistSort, comp)); // COPY. // Sort 
 
             UpdateProgress?.Invoke(this, "");
 
@@ -6253,7 +6254,8 @@ public partial class MainViewModel : ObservableObject
         switch (key)
         {
             case "artist":
-                Albums = new ObservableCollection<AlbumEx>(Albums.OrderBy(x => x.AlbumArtist, comp));
+                //Albums = new ObservableCollection<AlbumEx>(Albums.OrderBy(x => x.AlbumArtist, comp));
+                Albums = new ObservableCollection<AlbumEx>(Albums.OrderBy(x => x.AlbumArtistSort, comp));
                 break;
             case "album":
                 Albums = new ObservableCollection<AlbumEx>(Albums.OrderBy(x => x.Name, comp));

@@ -1403,32 +1403,12 @@ public partial class MainViewModel : ObservableObject
 
             OnPropertyChanged(nameof(ArtistPageSubTitleArtistAlbumCount));
 
-            if (SelectedArtistAlbums is null)
+            _ = Task.Run(async () =>
             {
-                return;
-            }
-
-            if (IsAlbumSortWithoutThePrefix)
-            {
-                // Sort
-                var ci = CultureInfo.CurrentCulture;
-                var comp = StringComparer.Create(ci, true);
-                SelectedArtistAlbums = new ObservableCollection<AlbumEx>(SelectedArtistAlbums.OrderBy(x => x.NameSort, comp)); // COPY. // Sort without prefix like "The" or "A".
-            }
-
-            Task.Run(() =>
-            {
-                /*
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
-                {
-                    await Task.Yield();
-                    await Task.Delay(40);
-                    IsWorking = false;
-                });
-                */
                 GetArtistSongs(_selectedAlbumArtist);
                 GetAlbumPictures(SelectedArtistAlbums);
             }, _cts.Token);
+
         }
     }
 
@@ -1452,6 +1432,14 @@ public partial class MainViewModel : ObservableObject
                 foreach (var album in _selectedArtistAlbums)
                 {
                     album.ParentViewModel = this;
+                }
+                
+                // Sort
+                if (IsAlbumSortWithoutThePrefix)
+                {
+                    var ci = CultureInfo.CurrentCulture;
+                    var comp = StringComparer.Create(ci, true);
+                    _selectedArtistAlbums = new ObservableCollection<AlbumEx>(_selectedArtistAlbums.OrderBy(x => x.NameSort, comp)); // COPY. // Sort without prefix like "The" or "A".
                 }
             }
 
@@ -3370,7 +3358,7 @@ public partial class MainViewModel : ObservableObject
                     // This is not good, all the selections will be cleared and position will be reset, but ...
                     //Queue = new ObservableCollection<SongInfoEx>(Queue.OrderBy(n => n.Index));
 
-                    Debug.WriteLine("Queue sort.");
+                    Debug.WriteLine("Queue sort. @UpdateCurrentQueue");
                     Queue.Sort((a, b) => { return a.Index.CompareTo(b.Index); });
 
                     UpdateProgress?.Invoke(this, "[UI] Checking current song after Queue update.");
@@ -4366,12 +4354,11 @@ public partial class MainViewModel : ObservableObject
             await Task.Yield(); // Needed this.
             //UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
 
-            var r = await SearchArtistSongs(artist.Name);
+            var r = await SearchArtistSongs(artist.Name);//.ConfigureAwait(ConfigureAwaitOptions.None);
 
             IsWorking = true;
             await Task.Yield();
             //UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
-
 
             if (!r.IsSuccess)
             {
@@ -4499,7 +4486,7 @@ public partial class MainViewModel : ObservableObject
 
                 if (string.IsNullOrEmpty(album.Name.Trim()))
                 {
-                    Debug.WriteLine($"GetAlbumPictures: album.Name is null or empty, skipping. {album.AlbumArtist}");
+                    //Debug.WriteLine($"GetAlbumPictures: album.Name is null or empty, skipping. {album.AlbumArtist}");
                     continue;
                 }
 
@@ -4912,7 +4899,7 @@ public partial class MainViewModel : ObservableObject
             return result;
         }
 
-        IsWorking = true;
+        //IsWorking = true;
         //UpdateProgress?.Invoke(this, "");
 
         string queryShiki = "==";
@@ -4927,7 +4914,7 @@ public partial class MainViewModel : ObservableObject
             //Debug.WriteLine(res.ResultText);
         }
 
-        IsWorking = false;
+        //IsWorking = false;
         UpdateProgress?.Invoke(this, "");
 
         return res;
@@ -7206,6 +7193,44 @@ public partial class MainViewModel : ObservableObject
             Debug.WriteLine("SelectedNodeMenu is NOT NodeMenuPlaylistItem nmpli @PlaylistRemoveSelectedItem");
             return;
         }
+    }
+
+    // Remove duplicated songs in a playlist. 
+    [RelayCommand]
+    public void PlaylistRemoveDuplicates(string playlist)
+    {
+        if (string.IsNullOrEmpty(_selectedPlaylistName))
+        {
+            return;
+        }
+
+        if (_selectedPlaylistName != playlist)
+        {
+            return;
+        }
+
+        if (PlaylistSongs.Count <= 1)
+        {
+            return;
+        }
+
+        //var duplicates = PlaylistSongs.GroupBy(x => x.File).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
+        var uniqueSongs = PlaylistSongs.GroupBy(s => s.File).Select(g => g.First()).ToList();
+
+        if (PlaylistSongs.Count == uniqueSongs.Count)
+        {
+            return;
+        }
+
+        List<string> uris = [];
+        foreach (var song in uniqueSongs)
+        {
+            //Debug.WriteLine($"Unique song: {song.Title} - {song.File}");
+            uris.Add(song.File);
+        }
+
+        _mpc.MpdPlaylistClear(_selectedPlaylistName);
+        _mpc.MpdPlaylistAdd(_selectedPlaylistName, uris);
     }
 
     [RelayCommand]

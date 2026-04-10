@@ -548,4 +548,7 @@ SOFTWARE.</value>
   <data name="Settings_Opts_AlbumSortWithoutTheAndAPrefix.Content" xml:space="preserve">
     <value>アルバム名をソートするとき先頭の「The」と「A」を無視する。（再起動で反映）</value>
   </data>
+  <data name="PageMenu_RemoveDuplicateSongsFromPlaylist.Text" xml:space="preserve">
+    <value>重複した曲を削除</value>
+  </data>
 </root>

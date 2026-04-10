@@ -547,4 +547,7 @@ SOFTWARE.</value>
   <data name="Settings_Opts_AlbumSortWithoutTheAndAPrefix.Content" xml:space="preserve">
     <value>Sort album without "The" and "A" prefix. (Require relaunch to take effect)</value>
   </data>
+  <data name="PageMenu_RemoveDuplicateSongsFromPlaylist.Text" xml:space="preserve">
+    <value>Remove duplicate songs</value>
+  </data>
 </root>

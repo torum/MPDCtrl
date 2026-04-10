@@ -542,4 +542,10 @@ SOFTWARE.</value>
   <data name="Setting.ToolTipService.ToolTip" xml:space="preserve">
     <value>設定</value>
   </data>
+  <data name="Settings_Opts_ArtistSortWithoutThePrefix.Content" xml:space="preserve">
+    <value>アーティスト名をソートするとき先頭の「The」を無視する。（再起動で反映）</value>
+  </data>
+  <data name="Settings_Opts_AlbumSortWithoutTheAndAPrefix.Content" xml:space="preserve">
+    <value>アルバム名をソートするとき先頭の「The」と「A」を無視する。（再起動で反映）</value>
+  </data>
 </root>

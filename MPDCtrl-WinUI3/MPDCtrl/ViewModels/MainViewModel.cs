@@ -1400,14 +1400,32 @@ public partial class MainViewModel : ObservableObject
             OnPropertyChanged(nameof(SelectedAlbumArtist));
 
             SelectedArtistAlbums = _selectedAlbumArtist?.Albums;
+
             OnPropertyChanged(nameof(ArtistPageSubTitleArtistAlbumCount));
 
-            //_ = Task.Run(() => GetArtistSongs(_selectedAlbumArtist));
-            ////_ = Task.Run(() => GetAlbumPictures(SelectedArtistAlbums));
-            //GetAlbumPictures(SelectedArtistAlbums);
+            if (SelectedArtistAlbums is null)
+            {
+                return;
+            }
+
+            if (IsAlbumSortWithoutThePrefix)
+            {
+                // Sort
+                var ci = CultureInfo.CurrentCulture;
+                var comp = StringComparer.Create(ci, true);
+                SelectedArtistAlbums = new ObservableCollection<AlbumEx>(SelectedArtistAlbums.OrderBy(x => x.NameSort, comp)); // COPY. // Sort without prefix like "The" or "A".
+            }
 
             Task.Run(() =>
             {
+                /*
+                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+                {
+                    await Task.Yield();
+                    await Task.Delay(40);
+                    IsWorking = false;
+                });
+                */
                 GetArtistSongs(_selectedAlbumArtist);
                 GetAlbumPictures(SelectedArtistAlbums);
             }, _cts.Token);
@@ -2270,6 +2288,36 @@ public partial class MainViewModel : ObservableObject
             _isAutoScrollToNowPlaying = value;
 
             OnPropertyChanged(nameof(IsAutoScrollToNowPlaying));
+        }
+    }
+
+    private bool _isArtistSortWithoutThePrefix = false;
+    public bool IsArtistSortWithoutThePrefix
+    {
+        get { return _isArtistSortWithoutThePrefix; }
+        set
+        {
+            if (_isArtistSortWithoutThePrefix == value)
+                return;
+
+            _isArtistSortWithoutThePrefix = value;
+
+            OnPropertyChanged(nameof(IsArtistSortWithoutThePrefix));
+        }
+    }
+
+    private bool _isAlbumSortWithoutThePrefix = true;
+    public bool IsAlbumSortWithoutThePrefix
+    {
+        get { return _isAlbumSortWithoutThePrefix; }
+        set
+        {
+            if (_isAlbumSortWithoutThePrefix == value)
+                return;
+
+            _isAlbumSortWithoutThePrefix = value;
+
+            OnPropertyChanged(nameof(IsAlbumSortWithoutThePrefix));
         }
     }
 
@@ -4144,11 +4192,29 @@ public partial class MainViewModel : ObservableObject
 
             UpdateProgress?.Invoke(this, "[UI] Updating the AlbumArtists...");
             //Artists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists.OrderBy(x => x.Name, comp));// COPY. // Sort 
-            Artists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists.OrderBy(x => x.NameSort, comp));// COPY. // Sort 
+
+            // Sort with AlbumArtist for Artist view.
+            if (IsArtistSortWithoutThePrefix)
+            {
+                Artists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists.OrderBy(x => x.NameSort, comp));// COPY. // Sort without prefix like "The"".
+            }
+            else
+            {
+                Artists = new ObservableCollection<AlbumArtist>(_mpc.AlbumArtists.OrderBy(x => x.Name, comp));// COPY. // Sort 
+            }
 
             UpdateProgress?.Invoke(this, "[UI] Updating the Albums...");
             //Albums = new ObservableCollection<AlbumEx>(_mpc.Albums.OrderBy(x => x.AlbumArtist, comp)); // COPY. // Sort 
-            Albums = new ObservableCollection<AlbumEx>(_mpc.Albums.OrderBy(x => x.AlbumArtistSort, comp)); // COPY. // Sort 
+
+            // Sort with AlbumArtist for Album view.(TODO: Save preference. AlbumArtist/Album name)
+            if (IsArtistSortWithoutThePrefix)
+            {
+                Albums = new ObservableCollection<AlbumEx>(_mpc.Albums.OrderBy(x => x.AlbumArtistSort, comp)); // COPY. // Sort without prefix like "The".
+            }
+            else
+            {
+                Albums = new ObservableCollection<AlbumEx>(_mpc.Albums.OrderBy(x => x.AlbumArtist, comp)); // COPY. // Sort 
+            }
 
             UpdateProgress?.Invoke(this, "");
 
@@ -4297,11 +4363,13 @@ public partial class MainViewModel : ObservableObject
             }
 
             IsWorking = true;
+            await Task.Yield(); // Needed this.
             //UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
 
             var r = await SearchArtistSongs(artist.Name);
 
             IsWorking = true;
+            await Task.Yield();
             //UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
 
 
@@ -4359,6 +4427,7 @@ public partial class MainViewModel : ObservableObject
             }
 
             IsWorking = false;
+            await Task.Yield();
         });
     }
 
@@ -6254,11 +6323,24 @@ public partial class MainViewModel : ObservableObject
         switch (key)
         {
             case "artist":
-                //Albums = new ObservableCollection<AlbumEx>(Albums.OrderBy(x => x.AlbumArtist, comp));
-                Albums = new ObservableCollection<AlbumEx>(Albums.OrderBy(x => x.AlbumArtistSort, comp));
+                if (IsArtistSortWithoutThePrefix)
+                {
+                    Albums = new ObservableCollection<AlbumEx>(Albums.OrderBy(x => x.AlbumArtistSort, comp)); // COPY. // Sort without prefix like "The".
+                }
+                else
+                {
+                    Albums = new ObservableCollection<AlbumEx>(Albums.OrderBy(x => x.AlbumArtist, comp)); // COPY. // Sort
+                }
                 break;
             case "album":
-                Albums = new ObservableCollection<AlbumEx>(Albums.OrderBy(x => x.Name, comp));
+                if (IsAlbumSortWithoutThePrefix)
+                {
+                    Albums = new ObservableCollection<AlbumEx>(Albums.OrderBy(x => x.NameSort, comp)); // COPY. // Sort without prefix like "The" or "A".
+                }
+                else
+                {
+                    Albums = new ObservableCollection<AlbumEx>(Albums.OrderBy(x => x.Name, comp)); // COPY. // Sort
+                }
                 break;
             case "reverse":
                 Albums = new ObservableCollection<AlbumEx>(Albums.Reverse<AlbumEx>());

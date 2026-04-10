@@ -175,10 +175,20 @@
                             x:Uid="Settings_Options"
                             IsEnabled="True"
                             IsExpanded="False">
+                        
                         <controls:SettingsExpander.Items>
                             <controls:SettingsCard Header="" Description="" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
                                 <CheckBox x:Uid="Settings_Opts_AutoScrollToNowPlaying" IsChecked="{x:Bind ViewModel.IsAutoScrollToNowPlaying, Mode=TwoWay}" Margin="0,12,0,12"/>
                             </controls:SettingsCard>
+
+                            <controls:SettingsCard Header="" Description="" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
+                                <CheckBox x:Uid="Settings_Opts_ArtistSortWithoutThePrefix" IsChecked="{x:Bind ViewModel.IsArtistSortWithoutThePrefix, Mode=TwoWay}" Margin="0,12,0,12"/>
+                            </controls:SettingsCard>
+                            
+                            <controls:SettingsCard Header="" Description="" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
+                                <CheckBox x:Uid="Settings_Opts_AlbumSortWithoutTheAndAPrefix" IsChecked="{x:Bind ViewModel.IsAlbumSortWithoutThePrefix, Mode=TwoWay}" Margin="0,12,0,12"/>
+                            </controls:SettingsCard>
+                            
 
                         </controls:SettingsExpander.Items>
                     </controls:SettingsExpander>

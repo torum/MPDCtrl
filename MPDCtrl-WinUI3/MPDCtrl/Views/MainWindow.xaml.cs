@@ -395,6 +395,24 @@ public sealed partial class MainWindow : Window
                         _vm.IsAutoScrollToNowPlaying = xvalue.Value == "True";
                     }
                 }
+
+                xvalue = opts.Attribute("isArtistSortWithoutThePrefix");
+                if (xvalue != null)
+                {
+                    if (!string.IsNullOrEmpty(xvalue.Value))
+                    {
+                        _vm.IsArtistSortWithoutThePrefix = xvalue.Value == "True";
+                    }
+                }
+
+                xvalue = opts.Attribute("isAlbumSortWithoutThePrefix");
+                if (xvalue != null)
+                {
+                    if (!string.IsNullOrEmpty(xvalue.Value))
+                    {
+                        _vm.IsAlbumSortWithoutThePrefix = xvalue.Value == "True";
+                    }
+                }
             }
 
             #region == Profiles  ==
@@ -963,6 +981,14 @@ public sealed partial class MainWindow : Window
 
         attrs = doc.CreateAttribute("isAutoScrollToNowPlaying");
         attrs.Value = _vm.IsAutoScrollToNowPlaying.ToString();
+        xOpts.SetAttributeNode(attrs);
+
+        attrs = doc.CreateAttribute("isArtistSortWithoutThePrefix");
+        attrs.Value = _vm.IsArtistSortWithoutThePrefix.ToString();
+        xOpts.SetAttributeNode(attrs);
+
+        attrs = doc.CreateAttribute("isAlbumSortWithoutThePrefix");
+        attrs.Value = _vm.IsAlbumSortWithoutThePrefix.ToString();
         xOpts.SetAttributeNode(attrs);
 
         root.AppendChild(xOpts);

@@ -541,4 +541,10 @@ SOFTWARE.</value>
   <data name="Setting.ToolTipService.ToolTip" xml:space="preserve">
     <value>Setting</value>
   </data>
+  <data name="Settings_Opts_ArtistSortWithoutThePrefix.Content" xml:space="preserve">
+    <value>Sort artists without "The" prefix. (Require relaunch to take effect)</value>
+  </data>
+  <data name="Settings_Opts_AlbumSortWithoutTheAndAPrefix.Content" xml:space="preserve">
+    <value>Sort album without "The" and "A" prefix. (Require relaunch to take effect)</value>
+  </data>
 </root>

@@ -3881,14 +3881,15 @@ public partial class MpcService : IMpcService
         return Task.FromResult(true);
     }
 
-    private static string RemoveThePrefix(string? value)
+    private static string RemoveThePrefix(string? value, string prefix)
     {
-        if (string.IsNullOrEmpty(value))
+        if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(prefix))
         {
             return string.Empty;
         }
 
-        string prefix = "The ";
+        //string prefix = "The ";
+        prefix += " ";
 
         if (value.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
         {
@@ -3928,7 +3929,7 @@ public partial class MpcService : IMpcService
                     {
                         if (!string.IsNullOrEmpty(arts.Name))
                         {
-                            arts.NameSort = RemoveThePrefix(arts.Name);
+                            arts.NameSort = RemoveThePrefix(arts.Name, "The");
 
                             AlbumArtists.Add(arts);
                         }
@@ -3948,9 +3949,22 @@ public partial class MpcService : IMpcService
                     {
                         Name = value.Replace("Album: ", ""),
                         AlbumArtist = arts?.Name ?? "",
-                        AlbumArtistSort = RemoveThePrefix(arts?.Name)
+                        AlbumArtistSort = RemoveThePrefix(arts?.Name, "The")
                     };
                     //Debug.WriteLine(albx.AlbumArtistSort);
+
+                    if (albx.Name.StartsWith("The ", StringComparison.OrdinalIgnoreCase))
+                    {
+                        albx.NameSort = RemoveThePrefix(albx.Name, "The");
+                    }
+                    else if (albx.Name.StartsWith("A ", StringComparison.OrdinalIgnoreCase))
+                    {
+                        albx.NameSort = RemoveThePrefix(albx.Name, "A");
+                    }
+                    else
+                    {
+                        albx.NameSort = albx.Name;
+                    }
 
                     arts?.Albums.Add(albx);
 
@@ -3970,7 +3984,7 @@ public partial class MpcService : IMpcService
                     {
                         if (!string.IsNullOrEmpty(arts.Name))
                         {
-                            arts.NameSort = RemoveThePrefix(arts.Name);
+                            arts.NameSort = RemoveThePrefix(arts.Name, "The");
 
                             AlbumArtists.Add(arts);
                         }

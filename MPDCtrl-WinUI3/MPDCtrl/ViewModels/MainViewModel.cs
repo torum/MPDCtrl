@@ -6451,8 +6451,9 @@ public partial class MainViewModel : ObservableObject
 
         var item = Artists.FirstOrDefault(i => i.Name == asdf);
         if (item is null) return;
-        GoToArtistPage();
+
         SelectedAlbumArtist = item;
+        GoToArtistPage(); // Needs to be after setting SelectedAlbumArtist because GoToArtistPage() will set selected item in NavigationView menu which will trigger loading albums of the artist.
     }
 
     private void GoToArtistPage()
@@ -6545,8 +6546,10 @@ public partial class MainViewModel : ObservableObject
 
         var item = Artists.FirstOrDefault(i => i.Name == asdf);
         if (item is null) return;
-        GoToArtistPage();
+
         SelectedAlbumArtist = item;
+        GoToArtistPage(); // Needs to be after setting SelectedAlbumArtist because GoToArtistPage() will set selected item in NavigationView menu which will trigger loading albums of the artist.
+
     }
 
     [RelayCommand]
@@ -6565,8 +6568,9 @@ public partial class MainViewModel : ObservableObject
 
         var item = Artists.FirstOrDefault(i => i.Name == asdf);
         if (item is null) return;
-        GoToArtistPage();
+
         SelectedAlbumArtist = item;
+        GoToArtistPage(); // Needs to be after setting SelectedAlbumArtist because GoToArtistPage() will set selected item in NavigationView menu which will trigger loading albums of the artist.
     }
 
     [RelayCommand]
@@ -7451,29 +7455,5 @@ public partial class MainViewModel : ObservableObject
     }
 
     #endregion
-
-
-    [RelayCommand]
-    public void AlbumSelectedPlay(AlbumEx album)
-    {
-        /*
-        if (album is null)
-        {
-            Debug.WriteLine("album is null @AlbumSelectedPlay");
-            return;
-        }
-        var uriList = new List<string>();
-        foreach (var song in album.Songs)
-        {
-            uriList.Add(song.File);
-        }
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
-        {
-            Queue.Clear();
-            CurrentSong = null;
-            await _mpc.MpdMultiplePlay(uriList, Convert.ToInt32(_volume));
-        });
-        */
-    }
 
 }

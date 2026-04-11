@@ -1,0 +1,35 @@
+
+(A) Create package bundle file for Microsoft store.
+-------
+dotnet build MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=x64 /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=true
+
+dotnet build MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=x86 /p:Platform=x86 /p:RuntimeIdentifier=win-x86 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=true
+
+dotnet build MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=ARM64 /p:Platform=ARM64 /p:RuntimeIdentifier=win-arm64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=true
+-------
+
+Put msix files into "AppPackages\msix" folder.
+
+-------
+cd "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\"
+
+./makeappx.exe bundle /d "C:\Users\torum\Source\Repos\MPDCtrl\MPDCtrl-WinUI3\MPDCtrl\AppPackages\msix" /p "C:\Users\torum\Source\Repos\MPDCtrl\MPDCtrl-WinUI3\MPDCtrl\AppPackages\Output\MPDCtrl_0.0.0.0_x86_x64_arm64_bundle.msixbundle"
+-------
+
+Put msixbundle and the .appxsym or .msixsym files (optional but recommended for debugging) into the Output folder. 
+Select those files and zip it (don't zip the folder).
+Rename and change file extension to MPDCtrl_0.0.0.0_x86_x64_arm64_bundle.msixupload
+
+=======
+
+(B) Unpackaged single self-contained exe file.
+----
+dotnet publish -c Release -r win-x64 -p:PublishAot=false -p:PublishSingleFile=true -p:WindowsPackageType=None -p:AppxPackage=false -p:EnableMsixTooling=true --self-contained true
+----
+
+(C) Unpackaged Aot compiled.
+----
+dotnet publish -c Release -r win-x64 -p:PublishAot=true -p:WindowsPackageType=None -p:AppxPackage=false -p:EnableMsixTooling=false --self-contained true
+Or simply
+dotnet publish -c Release -r win-x64 -p:PublishAot=true --self-contained true
+----

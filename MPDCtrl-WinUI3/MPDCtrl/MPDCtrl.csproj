@@ -8,13 +8,13 @@
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
     <PublishProfile>win-$(Platform).pubxml</PublishProfile>
     <UseWinUI>true</UseWinUI>
-
+	  <WinUISDKReferences>False</WinUISDKReferences>
 	  <Nullable>enable</Nullable>
 	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	  
 	  <ApplicationManifest>app.manifest</ApplicationManifest>
 	  <Company>torum</Company>
-	  <Description>MPD client</Description>
+	  <Description>MPD Client</Description>
 	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	  <PackageIcon>MPDCtrl.ico</PackageIcon>
 
@@ -26,8 +26,8 @@
 
 	  <ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
 
-	  <VersionPrefix>4.0.1.0</VersionPrefix>
-	  <FileVersion>4.0.1.0</FileVersion>
+	  <VersionPrefix>4.0.3.0</VersionPrefix>
+	  <FileVersion>4.0.3.0</FileVersion>
 
 	  <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 
@@ -47,17 +47,38 @@
 
 	  <!--  
 	   AOT related.
-	  	  <PublishTrimmed>True</PublishTrimmed>
 	  <PublishAot>True</PublishAot>
+	  <PublishTrimmed>True</PublishTrimmed>
+	  <TrimMode>partial</TrimMode>
+	  <WindowsPackageType>None</WindowsPackageType>
+	  <SelfContained>True</SelfContained>
+	  <WindowsAppSDKSelfContained>True</WindowsAppSDKSelfContained>
+	  <EnableMsixTooling>True</EnableMsixTooling>
+	  <PublishSingleFile>True</PublishSingleFile>
 	  -->
+	  <IsAotCompatible>true</IsAotCompatible>
+	  <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+	  <TrimmerSingleWarn>false</TrimmerSingleWarn>
+	  <TrimMode>partial</TrimMode>
 
 	  <!--
 	   Comment these two out when publish packaged app. Uncomment when debug Unpackaged.
 	   
 	  <PublishSingleFile>false</PublishSingleFile>
 	  <WindowsPackageType>None</WindowsPackageType>
--->
-
+	  -->
+	  <!--
+		"Unpackaged"
+	  <EnableMsixTooling>False</EnableMsixTooling>
+	  <WindowsPackageType>None</WindowsPackageType>
+	  <SelfContained>true</SelfContained>
+	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+	  -->
+	  <!--
+		"Packaged"
+	  <EnableMsixTooling>True</EnableMsixTooling>
+	  <WindowsPackageType>MSIX</WindowsPackageType>
+	  -->
 
   </PropertyGroup>
 
@@ -176,52 +197,55 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\Dialogs\InitDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Dialogs\ProfileDialog.xaml">
-      <SubType>Designer</SubType>
-    </Page>
+	  <Page Update="Views\Dialogs\InitDialog.xaml">
+		  <SubType>Designer</SubType>
+		  <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Views\Dialogs\ProfileDialog.xaml">
+		  <SubType>Designer</SubType>
+		  <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Views\Dialogs\PlaylistRenameToDialog.xaml">
+		  <SubType>Designer</SubType>
+		  <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Views\AlbumDetailPage.xaml">
+		  <SubType>Designer</SubType>
+		  <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Views\PlaylistItemPage.xaml">
+		  <SubType>Designer</SubType>
+		  <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Views\SearchPage.xaml">
+		  <SubType>Designer</SubType>
+		  <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Views\FilesPage.xaml">
+		  <SubType>Designer</SubType>
+		  <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Views\ArtistsPage.xaml">
+		  <SubType>Designer</SubType>
+		  <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Views\AlbumsPage.xaml">
+		  <SubType>Designer</SubType>
+		  <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Views\SettingsPage.xaml">
+		  <SubType>Designer</SubType>
+		  <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Views\QueuePage.xaml">
+		  <SubType>Designer</SubType>
+		  <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Views\Dialogs\SongsAddToDialog.xaml">
+		  <SubType>Designer</SubType>
+		  <Generator>MSBuild:Compile</Generator>
+	  </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\Dialogs\PlaylistRenameToDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\AlbumDetailPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\PlaylistItemPage.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\SearchPage.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\FilesPage.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\ArtistsPage.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\AlbumsPage.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\SettingsPage.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\QueuePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\Dialogs\SongsAddToDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
 
   <!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
@@ -264,15 +288,39 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Folder Include="Properties\en-US\" />
-	  <Folder Include="Properties\ja-JP\" />
+		<Compile Remove="AppPackages\**" />
+		<Compile Remove="BundleArtifacts\**" />
+		<Compile Remove="Properties\en-US\**" />
+		<Compile Remove="Properties\ja-JP\**" />
+		<EmbeddedResource Remove="AppPackages\**" />
+		<EmbeddedResource Remove="BundleArtifacts\**" />
+		<EmbeddedResource Remove="Properties\en-US\**" />
+		<EmbeddedResource Remove="Properties\ja-JP\**" />
+		<None Remove="AppPackages\**" />
+		<None Remove="BundleArtifacts\**" />
+		<None Remove="Properties\en-US\**" />
+		<None Remove="Properties\ja-JP\**" />
+		<Page Remove="AppPackages\**" />
+		<Page Remove="BundleArtifacts\**" />
+		<Page Remove="Properties\en-US\**" />
+		<Page Remove="Properties\ja-JP\**" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PRIResource Update="Properties\en-US\Resources.resw">
-	    <Generator>ResXFileCodeGenerator</Generator>
-	  </PRIResource>
+	  <PRIResource Remove="Properties\en-US\**" />
 	</ItemGroup>
 
-
+	<ItemGroup>
+	  <PRIResource Remove="Properties\ja-JP\**" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Remove="AppPackages\**" />
+		<Compile Remove="BundleArtifacts\**" />
+		<EmbeddedResource Remove="AppPackages\**" />
+		<EmbeddedResource Remove="BundleArtifacts\**" />
+		<None Remove="AppPackages\**" />
+		<None Remove="BundleArtifacts\**" />
+		<Page Remove="AppPackages\**" />
+		<Page Remove="BundleArtifacts\**" />
+	</ItemGroup>
 </Project>

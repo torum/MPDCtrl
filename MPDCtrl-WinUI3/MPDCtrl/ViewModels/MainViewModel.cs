@@ -1403,12 +1403,15 @@ public partial class MainViewModel : ObservableObject
 
             OnPropertyChanged(nameof(ArtistPageSubTitleArtistAlbumCount));
 
-            _ = Task.Run(async () =>
+            Task.Run(async () =>
             {
+                await Task.Yield();
+                await Task.Delay(100); // Avoid blocking UI thread.
                 GetArtistSongs(_selectedAlbumArtist);
+                await Task.Yield();
+                await Task.Delay(100);
                 GetAlbumPictures(SelectedArtistAlbums);
             }, _cts.Token);
-
         }
     }
 
@@ -4352,13 +4355,10 @@ public partial class MainViewModel : ObservableObject
 
             IsWorking = true;
             await Task.Yield(); // Needed this.
+            await Task.Delay(20);
             //UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
 
-            var r = await SearchArtistSongs(artist.Name);//.ConfigureAwait(ConfigureAwaitOptions.None);
-
-            IsWorking = true;
-            await Task.Yield();
-            //UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
+            var r = await SearchArtistSongs(artist.Name);
 
             if (!r.IsSuccess)
             {
@@ -4370,7 +4370,6 @@ public partial class MainViewModel : ObservableObject
                 Debug.WriteLine("GetArtistSongs: SelectedAlbumArtist is null, returning.");
                 return;
             }
-
 
             if (r.SearchResult is null)
             {
@@ -4411,6 +4410,7 @@ public partial class MainViewModel : ObservableObject
                 }
 
                 slbm.IsSongsAcquired = true;
+                await Task.Yield();
             }
 
             IsWorking = false;
@@ -6452,28 +6452,15 @@ public partial class MainViewModel : ObservableObject
         var item = Artists.FirstOrDefault(i => i.Name == asdf);
         if (item is null) return;
 
-        SelectedAlbumArtist = item;
-        GoToArtistPage(); // Needs to be after setting SelectedAlbumArtist because GoToArtistPage() will set selected item in NavigationView menu which will trigger loading albums of the artist.
+        GoToArtistPage(item);
     }
 
-    private void GoToArtistPage()
+    private void GoToArtistPage(AlbumArtist albumArtist)
     {
         IsNavigationViewMenuOpen = true;
+
+        SelectedAlbumArtist = albumArtist;// Needs to be after setting SelectedAlbumArtist because GoToArtistPage() will set selected item in NavigationView menu which will trigger loading albums of the artist.
         _mainMenuItems.ArtistsDirectory.Selected = true;
-        //GoToSelectedPage?.Invoke(this, _mainMenuItems.ArtistsDirectory);
-        /*
-        foreach (var hoge in MainMenuItems)
-        {
-            if (hoge is not NodeMenuLibrary) continue;
-            foreach (var fuga in hoge.Children)
-            {
-                if (fuga is not NodeMenuArtist) continue;
-                IsNavigationViewMenuOpen = true;
-                fuga.Selected = true;
-                break;
-            }
-        }
-        */
     }
 
     [RelayCommand]
@@ -6547,9 +6534,7 @@ public partial class MainViewModel : ObservableObject
         var item = Artists.FirstOrDefault(i => i.Name == asdf);
         if (item is null) return;
 
-        SelectedAlbumArtist = item;
-        GoToArtistPage(); // Needs to be after setting SelectedAlbumArtist because GoToArtistPage() will set selected item in NavigationView menu which will trigger loading albums of the artist.
-
+        GoToArtistPage(item);
     }
 
     [RelayCommand]
@@ -6569,8 +6554,7 @@ public partial class MainViewModel : ObservableObject
         var item = Artists.FirstOrDefault(i => i.Name == asdf);
         if (item is null) return;
 
-        SelectedAlbumArtist = item;
-        GoToArtistPage(); // Needs to be after setting SelectedAlbumArtist because GoToArtistPage() will set selected item in NavigationView menu which will trigger loading albums of the artist.
+        GoToArtistPage(item);
     }
 
     [RelayCommand]
@@ -7304,7 +7288,6 @@ public partial class MainViewModel : ObservableObject
         SelectedAlbumArtist = null;
         //SelectedAlbumSongs = [];
         SelectedArtistAlbums = null;
-        SelectedAlbumArtist = null;
 
         // TODO: more?
 

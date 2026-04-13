@@ -2282,7 +2282,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private bool _isArtistSortWithoutThePrefix = false;
+    private bool _isArtistSortWithoutThePrefix = true;
     public bool IsArtistSortWithoutThePrefix
     {
         get { return _isArtistSortWithoutThePrefix; }

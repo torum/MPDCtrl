@@ -550,4 +550,10 @@ SOFTWARE.</value>
   <data name="PageMenu_RemoveDuplicateSongsFromPlaylist.Text" xml:space="preserve">
     <value>Remove duplicate songs</value>
   </data>
+  <data name="Settings_Options.Description" xml:space="preserve">
+    <value>Other preferences</value>
+  </data>
+  <data name="Settings_LocalStorage_ClearCache.Content" xml:space="preserve">
+    <value>Clear</value>
+  </data>
 </root>

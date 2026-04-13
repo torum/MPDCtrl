@@ -212,7 +212,7 @@
                                     </StackPanel>
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" MinWidth="130">
                                         <TextBlock Text="{x:Bind ViewModel.AlbumCacheFolderSizeFormatted, Mode=OneWay}" VerticalAlignment="Center" MinWidth="84"></TextBlock>
-                                        <Button Content="Clear" Command="{x:Bind ViewModel.ClearAlbumCacheFolderCommand}" VerticalAlignment="Center" HorizontalAlignment="Right"></Button>
+                                        <Button x:Uid="Settings_LocalStorage_ClearCache" Command="{x:Bind ViewModel.ClearAlbumCacheFolderCommand}" VerticalAlignment="Center" HorizontalAlignment="Right"></Button>
                                     </StackPanel>
                                 </Grid>
                             </controls:SettingsCard>

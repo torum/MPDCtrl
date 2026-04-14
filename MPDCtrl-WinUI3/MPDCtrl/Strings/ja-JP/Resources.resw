@@ -557,4 +557,7 @@ SOFTWARE.</value>
   <data name="Settings_LocalStorage_ClearCache.Content" xml:space="preserve">
     <value>クリア</value>
   </data>
+  <data name="Settings_LocalStorage_ClearCache.ToolTipService.ToolTip" xml:space="preserve">
+    <value>キャッシュファイルをクリア</value>
+  </data>
 </root>

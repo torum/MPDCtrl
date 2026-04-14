@@ -1399,19 +1399,27 @@ public partial class MainViewModel : ObservableObject
 
             OnPropertyChanged(nameof(SelectedAlbumArtist));
 
+            if (_selectedAlbumArtist is null)
+            {
+                SelectedArtistAlbums = null;
+                return;
+            }
+
             SelectedArtistAlbums = _selectedAlbumArtist?.Albums;
 
             OnPropertyChanged(nameof(ArtistPageSubTitleArtistAlbumCount));
 
-            Task.Run(async () =>
-            {
+            //Task.Run(async () =>
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+             {
                 await Task.Yield();
                 await Task.Delay(100); // Avoid blocking UI thread.
                 GetArtistSongs(_selectedAlbumArtist);
                 await Task.Yield();
                 await Task.Delay(100);
                 GetAlbumPictures(SelectedArtistAlbums);
-            }, _cts.Token);
+            });
+            //}, _cts.Token);
         }
     }
 

@@ -556,4 +556,7 @@ SOFTWARE.</value>
   <data name="Settings_LocalStorage_ClearCache.Content" xml:space="preserve">
     <value>Clear</value>
   </data>
+  <data name="Settings_LocalStorage_ClearCache.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Clear cache files</value>
+  </data>
 </root>

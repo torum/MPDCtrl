@@ -40,6 +40,7 @@
                 <!-- etc buttons-->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                     <!-- Filter box -->
+                    <!--
                     <StackPanel Orientation="Horizontal" Height="36">
                         <TextBox Name="FilesFilterQueryTextBox" MinWidth="120" Width="180" Text="{x:Bind ViewModel.FilterMusicEntriesQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Visibility="{x:Bind TglButtonFilesItemsFilter.IsChecked, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" VerticalAlignment="Bottom" Margin="0,0,6,0"></TextBox>
                         <ToggleButton Name="TglButtonFilesItemsFilter" x:Uid="PageMenu_Filter" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0" Height="36" Click="TglButtonFilesItemsFilter_Click">
@@ -53,6 +54,7 @@
                             </ToggleButton.KeyboardAccelerators>
                         </ToggleButton>
                     </StackPanel>
+                    -->
                 </StackPanel>
             </Grid>
 
@@ -114,14 +116,13 @@
                 <!-- Page controls -->
                 <Grid Grid.Row="0" Margin="12,12,0,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
                     <!-- Play and AddTo buttons -->
-                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <controls:WrapPanel Orientation="Horizontal" VerticalSpacing="12" HorizontalSpacing="18">
                         <!-- Play -->
-                        <Button Margin="0,0,8,0" Height="36" Command="{x:Bind ViewModel.SelectedDirectoryPlayAllCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.MusicEntriesFiltered, Mode=OneWay}">
+                        <Button Margin="0" Height="36" Command="{x:Bind ViewModel.SelectedDirectoryPlayAllCommand, Mode=OneWay}" CommandParameter="{x:Bind ViewModel.MusicEntriesFiltered, Mode=OneWay}">
                             <StackPanel Orientation="Horizontal">
                                 <Viewbox Width="14" Height="14">
                                     <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M5.74514 3.06445C5.41183 2.87696 5 3.11781 5 3.50023V12.5005C5 12.8829 5.41182 13.1238 5.74512 12.9363L13.7454 8.43631C14.0852 8.24517 14.0852 7.75589 13.7454 7.56474L5.74514 3.06445ZM4 3.50023C4 2.35298 5.2355 1.63041 6.23541 2.19288L14.2357 6.69317C15.2551 7.26664 15.2551 8.73446 14.2356 9.3079L6.23537 13.8079C5.23546 14.3703 4 13.6477 4 12.5005V3.50023Z"/>
@@ -130,7 +131,7 @@
                             </StackPanel>
                         </Button>
                         <!-- Add to queue-->
-                        <Button Margin="8,0,8,0" Height="36" Command="{x:Bind ViewModel.SelectedDirectoryAddToQueueCommand}" CommandParameter="{x:Bind ViewModel.MusicEntriesFiltered, Mode=OneWay}" >
+                        <Button Margin="0" Height="36" Command="{x:Bind ViewModel.SelectedDirectoryAddToQueueCommand}" CommandParameter="{x:Bind ViewModel.MusicEntriesFiltered, Mode=OneWay}" >
                             <StackPanel Orientation="Horizontal">
                                 <Viewbox Width="14" Height="14">
                                     <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z"/>
@@ -139,7 +140,7 @@
                             </StackPanel>
                         </Button>
                         <!-- Add to playlist -->
-                        <Button Margin="8,0,8,0" Height="36" Command="{x:Bind ViewModel.SelectedDirectoryAddToPlaylistCommand}" CommandParameter="{x:Bind ViewModel.MusicEntriesFiltered, Mode=OneWay}">
+                        <Button Margin="0" Height="36" Command="{x:Bind ViewModel.SelectedDirectoryAddToPlaylistCommand}" CommandParameter="{x:Bind ViewModel.MusicEntriesFiltered, Mode=OneWay}">
                             <StackPanel Orientation="Horizontal">
                                 <Viewbox Width="14" Height="14">
                                     <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M8 2C8.27614 2 8.5 2.22386 8.5 2.5V7.5H13.5C13.7761 7.5 14 7.72386 14 8C14 8.27614 13.7761 8.5 13.5 8.5H8.5V13.5C8.5 13.7761 8.27614 14 8 14C7.72386 14 7.5 13.7761 7.5 13.5V8.5H2.5C2.22386 8.5 2 8.27614 2 8C2 7.72386 2.22386 7.5 2.5 7.5H7.5V2.5C7.5 2.22386 7.72386 2 8 2Z"/>
@@ -147,7 +148,22 @@
                                 <TextBlock x:Uid="PageMenu_AddToPlaylist" Margin="8,0,6,0" FontSize="{StaticResource FontSizePageMenuControlText}" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-                    </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0" Height="36" HorizontalAlignment="Right">
+                            <!-- Filter box -->
+                            <TextBox Name="FilesFilterQueryTextBox" MinWidth="120" Width="180" Text="{x:Bind ViewModel.FilterMusicEntriesQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Visibility="{x:Bind TglButtonFilesItemsFilter.IsChecked, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" VerticalAlignment="Bottom" Margin="0,0,6,0"></TextBox>
+                            <ToggleButton Name="TglButtonFilesItemsFilter" x:Uid="PageMenu_Filter" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0" Height="36" Click="TglButtonFilesItemsFilter_Click">
+                                <Viewbox Width="14" Height="14" Margin="-2,-2,0,0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <PathIcon Width="NaN" Height="NaN"
+								Data="M7.5 13H12.5C12.7761 13 13 13.2239 13 13.5C13 13.7455 12.8231 13.9496 12.5899 13.9919L12.5 14H7.5C7.22386 14 7 13.7761 7 13.5C7 13.2545 7.17688 13.0504 7.41012 13.0081L7.5 13H12.5H7.5ZM5.5 9H14.5C14.7761 9 15 9.22386 15 9.5C15 9.74546 14.8231 9.94961 14.5899 9.99194L14.5 10H5.5C5.22386 10 5 9.77614 5 9.5C5 9.25454 5.17688 9.05039 5.41012 9.00806L5.5 9H14.5H5.5ZM3.5 5H16.5C16.7761 5 17 5.22386 17 5.5C17 5.74546 16.8231 5.94961 16.5899 5.99194L16.5 6H3.5C3.22386 6 3 5.77614 3 5.5C3 5.25454 3.17688 5.05039 3.41012 5.00806L3.5 5H16.5H3.5Z">
+                                    </PathIcon>
+                                </Viewbox>
+                                <ToggleButton.KeyboardAccelerators>
+                                    <KeyboardAccelerator Key="F" Modifiers="Control"/>
+                                </ToggleButton.KeyboardAccelerators>
+                            </ToggleButton>
+                        </StackPanel>
+                    </controls:WrapPanel>
 
                 </Grid>
 

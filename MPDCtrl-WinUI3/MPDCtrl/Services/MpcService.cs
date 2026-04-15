@@ -3961,6 +3961,10 @@ public partial class MpcService : IMpcService
                     {
                         albx.NameSort = RemoveThePrefix(albx.Name, "A");
                     }
+                    else if (albx.Name.StartsWith("An ", StringComparison.OrdinalIgnoreCase))
+                    {
+                        albx.NameSort = RemoveThePrefix(albx.Name, "An");
+                    }
                     else
                     {
                         albx.NameSort = albx.Name;

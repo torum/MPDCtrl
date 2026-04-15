@@ -960,11 +960,15 @@ public partial class MainViewModel : ObservableObject
 
             if (value is NodeMenuQueue)
             {
-                //
+                // Don't remove.
+            }
+            else if (value is NodeMenuLibrary)
+            {
+                // Don't remove.
             }
             else if (value is NodeMenuSearch)
             {
-                //
+                // Don't remove.
             }
             else if (value is NodeMenuArtist)
             {
@@ -978,7 +982,7 @@ public partial class MainViewModel : ObservableObject
             }
             else if (value is NodeMenuAlbum)
             {
-                //
+                // Don't remove.
             }
             else if (value is NodeMenuFiles nml)
             {
@@ -989,7 +993,7 @@ public partial class MainViewModel : ObservableObject
             }
             else if (value is NodeMenuPlaylists)
             {
-                // Do nothing
+                // Do nothing. Don't remove.
             }
             else if (value is NodeMenuPlaylistItem nmpli)
             {
@@ -4414,6 +4418,10 @@ public partial class MainViewModel : ObservableObject
                         song.ParentViewModel = this;
 
                         slbm.Songs?.Add(song);
+                        if (!string.IsNullOrEmpty(song.Date))
+                        {
+                            slbm.ReleaseYear = song.Date;
+                        }
                     }
                 }
 
@@ -7085,6 +7093,9 @@ public partial class MainViewModel : ObservableObject
         {
             return;
         }
+
+        // Move the selection to the parent directory to avoid selecting a non existing playlist after deletion.
+        _mainMenuItems.PlaylistsDirectory.Selected = true;
 
         var ret = await _mpc.MpdRemovePlaylist(_selectedPlaylistName);
 

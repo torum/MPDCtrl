@@ -193,6 +193,8 @@
                                                 <TextBlock Text="{x:Bind Name, Mode=OneWay}" FontSize="24" FontWeight="SemiBold" TextWrapping="WrapWholeWords" Opacity="0.9" Visibility="{x:Bind Name, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=False}"/>
                                                 <TextBlock x:Uid="Text_UnknownAlbum" FontSize="24" TextWrapping="WrapWholeWords" Opacity="0.6" Visibility="{x:Bind Name, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=True}" />
                                             </StackPanel>
+                                            <TextBlock Text="{x:Bind ReleaseYear, Mode=OneWay}" Margin="0,2,0,0" FontSize="14" FontWeight="Normal" TextWrapping="WrapWholeWords" Opacity="0.6" Visibility="{x:Bind ReleaseYear, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=False}"/>
+
                                         </StackPanel>
 
                                         <!-- Page controls -->

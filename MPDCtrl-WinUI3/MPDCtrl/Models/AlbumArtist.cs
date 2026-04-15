@@ -14,6 +14,21 @@ public partial class Album : ObservableObject
 
     public string NameSort { get; set; } = string.Empty;
 
+    private string _releaseYear = string.Empty;
+    public string ReleaseYear
+    {
+        get => _releaseYear;
+        set
+        {
+            if (_releaseYear == value)
+            {
+                return;
+            }
+            _releaseYear = value;
+            OnPropertyChanged(nameof(ReleaseYear));
+        }
+    }
+
     public bool IsSongsAcquired { get; set; } = false;
 
     public ObservableCollection<SongInfo> _songs = [];

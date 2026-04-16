@@ -4418,7 +4418,8 @@ public partial class MainViewModel : ObservableObject
                         song.ParentViewModel = this;
 
                         slbm.Songs?.Add(song);
-                        if (!string.IsNullOrEmpty(song.Date))
+
+                        if ((!string.IsNullOrEmpty(song.Date)) && (!string.IsNullOrEmpty(song.Album)))
                         {
                             slbm.ReleaseYear = song.Date;
                         }

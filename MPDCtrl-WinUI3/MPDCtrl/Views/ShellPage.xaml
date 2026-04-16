@@ -237,7 +237,7 @@
                         <ColumnDefinition Width="*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Row="0" Grid.Column="0" x:Name="PlaybackPrev" x:Uid="PlaybackControl_Prev" AccessKey="B" Command="{x:Bind ViewModel.PlayPrevCommand}" Width="30" Height="30" CornerRadius="3" Background="Transparent" BorderThickness="0" Margin="18,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="0">
+                    <Button Grid.Row="0" Grid.Column="0" x:Name="PlaybackPrev" x:Uid="PlaybackControl_Prev" AccessKey="B" Command="{x:Bind ViewModel.PlayPrevCommand}" Width="40" Height="40" CornerRadius="3" Background="Transparent" BorderThickness="0" Margin="18,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="0">
                         <Button.KeyboardAccelerators>
                             <KeyboardAccelerator Key="Left" Modifiers="Control"/>
                         </Button.KeyboardAccelerators>
@@ -252,7 +252,7 @@
                             -->
                         </Button.KeyboardAccelerators>
                     </Button>
-                    <Button Grid.Row="0" Grid.Column="2" x:Name="PlaybackNext" x:Uid="PlaybackControl_Next" AccessKey="N" Command="{x:Bind ViewModel.PlayNextCommand}" Width="30" Height="30" CornerRadius="3" Background="Transparent" BorderThickness="0" Margin="0,0,18,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0">
+                    <Button Grid.Row="0" Grid.Column="2" x:Name="PlaybackNext" x:Uid="PlaybackControl_Next" AccessKey="N" Command="{x:Bind ViewModel.PlayNextCommand}" Width="40" Height="40" CornerRadius="3" Background="Transparent" BorderThickness="0" Margin="0,0,18,0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0">
                         <Button.KeyboardAccelerators>
                             <KeyboardAccelerator Key="Right" Modifiers="Control"/>
                         </Button.KeyboardAccelerators>

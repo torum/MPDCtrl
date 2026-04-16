@@ -25,6 +25,8 @@ namespace MPDCtrl.Views;
 
 public sealed partial class ShellPage : Page
 {
+    private long _token;
+
     public MainViewModel ViewModel
     {
         get;
@@ -86,6 +88,9 @@ public sealed partial class ShellPage : Page
         {
             Debug.WriteLine("App.MainWnd is null. Init order is wrong.");
         }
+
+        _token = AlbumCoverImage.RegisterPropertyChangedCallback(Microsoft.UI.Xaml.Controls.Image.SourceProperty, OnSourceChanged);
+
     }
 
     private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -103,6 +108,9 @@ public sealed partial class ShellPage : Page
         {
             App.MainWnd.Activated -= MainWindow_Activated;
         }
+
+        AlbumCoverImage.UnregisterPropertyChangedCallback(Microsoft.UI.Xaml.Controls.Image.SourceProperty, _token);
+
     }
 
     private void NavigationView_Loaded(object sender, RoutedEventArgs e)
@@ -666,5 +674,10 @@ public sealed partial class ShellPage : Page
 
             await ViewModel.GetCacheFolderSize();
         }
+    }
+
+    private void OnSourceChanged(DependencyObject sender, DependencyProperty dp)
+    {
+        FadeInStoryboard.Begin();
     }
 }

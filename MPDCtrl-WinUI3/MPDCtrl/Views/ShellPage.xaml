@@ -188,7 +188,13 @@
 
                     </Border>
                     <Border x:Name="AlbumCover" CornerRadius="2" Width="70" Height="70" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8,4,0,8">
-                        <Image Source="{x:Bind ViewModel.AlbumArtBitmapSource, Mode=OneWay}" Stretch="UniformToFill"></Image>
+                        <Image x:Name="AlbumCoverImage" Source="{x:Bind ViewModel.AlbumArtBitmapSource, Mode=OneWay}" Stretch="UniformToFill" Opacity="1">
+                            <Image.Resources>
+                                <Storyboard x:Name="FadeInStoryboard">
+                                    <DoubleAnimation Storyboard.TargetName="AlbumCoverImage" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.5"/>
+                                </Storyboard>
+                            </Image.Resources>
+                        </Image>
                     </Border>
                     <Border x:Name="AlbumCoverBorder" CornerRadius="2" Width="70" Height="70" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8,4,0,8" BorderBrush="Gray" BorderThickness="1" Opacity="0.1">
 

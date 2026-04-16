@@ -99,16 +99,11 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Grid Grid.Row="0" Margin="24,24,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="200" />
-                    </Grid.ColumnDefinitions>
-
+                <StackPanel Margin="24,16,0,0">
                     <TextBlock Grid.Column="0" Text="{x:Bind ViewModel.SelectedAlbumArtist.Name, Mode=OneWay}" FontSize="{StaticResource FontSizePageTitle}" FontWeight="SemiBold" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Grid.Column="1" FontSize="{StaticResource FontSizePageSubTitle}" Text="{x:Bind ViewModel.ArtistPageSubTitleArtistAlbumCount, Mode=OneWay}" VerticalAlignment="Bottom" Padding="48,0,0,4" Opacity="0.7"/>
-              
-                </Grid>
+                    <TextBlock Grid.Column="1" FontSize="{StaticResource FontSizePageSubTitle}" Text="{x:Bind ViewModel.ArtistPageSubTitleArtistAlbumCount, Mode=OneWay}" VerticalAlignment="Bottom" Padding="0,4,0,4" Opacity="0.7"/>
+
+                </StackPanel>
 
                 <!-- Page controls -->
                 <Grid Grid.Row="1" Margin="24,12,0,0">

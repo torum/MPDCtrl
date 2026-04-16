@@ -19,7 +19,7 @@
 
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
             <converters:StringVisibilityConverter x:Key="StringVisibilityConverter" />
-
+            <helpers:BoolToFontWeightConverter x:Key="BoolToFontWeightConverter"/>
 
             <helpers:ElementThemeEnumToBooleanConverter x:Key="ElementThemeEnumToBooleanConverter" />
             <helpers:SystemBackdropEnumToBooleanConverter x:Key="SystemBackdropEnumToBooleanConverter" />

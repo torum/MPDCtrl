@@ -313,114 +313,14 @@
                                         </Path.RenderTransform>
                                     </Path>
                                 </Border>
-                                <TextBlock Grid.Column="3" x:Name="TextBlock_Title" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Title, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0">
-                                    <!-- This won't work properly. Somehow FontWeight becomes very thin regardless of the value. Probably a bug in XamlBehaviors or WinUI3.
-                                        <interactivity:Interaction.Behaviors>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Title}" PropertyName="FontWeight" 
-                                                                                    Value="{x:Bind IsPlaying, Converter={StaticResource BooleanToFontWeightConverter}, Mode=OneWay}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Title}" PropertyName="FontWeight" 
-                                                                                    Value="{x:Bind IsPlaying, Converter={StaticResource BooleanToFontWeightConverter}, Mode=OneWay}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                        </interactivity:Interaction.Behaviors>
-                                    -->
-                                    <!-- This won't work properly. When Queue page is invisible (ex other page is shown) this does not update the color and leave old color. 
-                                        <interactivity:Interaction.Behaviors>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Title}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Title}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                        </interactivity:Interaction.Behaviors>
-                                    -->
-                                </TextBlock>
-                                <TextBlock Grid.Column="4" x:Name="TextBlock_Time" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind TimeFormated, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="6,0,4,0">
-                                    <!-- 
-                                        <interactivity:Interaction.Behaviors>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Time}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Time}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                        </interactivity:Interaction.Behaviors>
-                                    -->
-                                </TextBlock>
-                                <TextBlock Grid.Column="5" x:Name="TextBlock_Artist" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Artist, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0">
-                                    <!--    
-                                        <interactivity:Interaction.Behaviors>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Artist}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Artist}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                        </interactivity:Interaction.Behaviors>
-                                    -->
-                                </TextBlock>
-                                <TextBlock Grid.Column="6" x:Name="TextBlock_Album" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Album, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0">
-                                    <!--
-                                        <interactivity:Interaction.Behaviors>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Album}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Album}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                        </interactivity:Interaction.Behaviors>
-                                    -->
-                                </TextBlock>
-                                <TextBlock Grid.Column="7" x:Name="TextBlock_Disc" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Disc, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="6,0,4,0">
-                                    <!--
-                                        <interactivity:Interaction.Behaviors>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Disc}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Disc}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                        </interactivity:Interaction.Behaviors>
-                                    -->
-                                </TextBlock>
-                                <TextBlock Grid.Column="8" x:Name="TextBlock_Track" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Track, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="6,0,4,0">
-                                    <!-- 
-                                        <interactivity:Interaction.Behaviors>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Track}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Track}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                        </interactivity:Interaction.Behaviors>
-                                    -->
-                                </TextBlock>
-                                <TextBlock Grid.Column="9" x:Name="TextBlock_Genre" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Genre, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0">
-                                    <!-- 
-                                        <interactivity:Interaction.Behaviors>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Genre}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_Genre}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                        </interactivity:Interaction.Behaviors>
-                                    -->
-                                </TextBlock>
-                                <TextBlock Grid.Column="10" x:Name="TextBlock_LastModifiedFormated" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind LastModifiedFormated, Mode=OneWay}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0">
-                                    <!--  
-                                        <interactivity:Interaction.Behaviors>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource True}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_LastModifiedFormated}" PropertyName="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                            <interactivity:DataTriggerBehavior Binding="{x:Bind IsPlaying, Mode=OneWay}" Value="{StaticResource False}">
-                                                <interactivity:ChangePropertyAction TargetObject="{Binding ElementName=TextBlock_LastModifiedFormated}" PropertyName="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}"/>
-                                            </interactivity:DataTriggerBehavior>
-                                        </interactivity:Interaction.Behaviors>
-                                    -->
-                                </TextBlock>
+                                <TextBlock Grid.Column="3" x:Name="TextBlock_Title" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Title, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"></TextBlock>
+                                <TextBlock Grid.Column="4" x:Name="TextBlock_Time" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind TimeFormated, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="6,0,4,0"></TextBlock>
+                                <TextBlock Grid.Column="5" x:Name="TextBlock_Artist" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Artist, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"></TextBlock>
+                                <TextBlock Grid.Column="6" x:Name="TextBlock_Album" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Album, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"></TextBlock>
+                                <TextBlock Grid.Column="7" x:Name="TextBlock_Disc" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Disc, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="6,0,4,0"></TextBlock>
+                                <TextBlock Grid.Column="8" x:Name="TextBlock_Track" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Track, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="6,0,4,0"></TextBlock>
+                                <TextBlock Grid.Column="9" x:Name="TextBlock_Genre" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Genre, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"></TextBlock>
+                                <TextBlock Grid.Column="10" x:Name="TextBlock_LastModifiedFormated" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind LastModifiedFormated, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"></TextBlock>
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>

@@ -4262,6 +4262,11 @@ public partial class MainViewModel : ObservableObject
 
                                     //Debug.WriteLine($"{song.Album}=={album.Name}?...{song.Title}");
                                     album.Songs.Add(song);
+
+                                    if ((!string.IsNullOrEmpty(song.Date)) && (!string.IsNullOrEmpty(song.Album)))
+                                    {
+                                        album.ReleaseYear = song.Date;
+                                    }
                                 }
                             }
                         }
@@ -4308,6 +4313,11 @@ public partial class MainViewModel : ObservableObject
                                 song.ParentViewModel = this;
 
                                 album.Songs.Add(song);
+
+                                if ((!string.IsNullOrEmpty(song.Date)) && (!string.IsNullOrEmpty(song.Album)))
+                                {
+                                    album.ReleaseYear = song.Date;
+                                }
                             }
                             album.IsSongsAcquired = true;
 

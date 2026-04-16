@@ -4421,7 +4421,8 @@ public partial class MpcService : IMpcService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Exception @MpdDisconnect on _commandConnection.Close() {ex}");
+            _ = ex;
+            //Debug.WriteLine($"Exception @MpdDisconnect on _commandConnection.Close() {ex}");
         }
         finally
         {
@@ -4440,7 +4441,8 @@ public partial class MpcService : IMpcService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Exception @MpdDisconnect on _idleConnection.Close() {ex}");
+            _ = ex;
+            //Debug.WriteLine($"Exception @MpdDisconnect on _idleConnection.Close() {ex}");
         }
         finally
         {

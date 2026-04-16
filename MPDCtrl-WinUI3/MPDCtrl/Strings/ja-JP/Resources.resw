@@ -560,4 +560,7 @@ SOFTWARE.</value>
   <data name="Settings_LocalStorage_ClearCache.ToolTipService.ToolTip" xml:space="preserve">
     <value>キャッシュファイルをクリア</value>
   </data>
+  <data name="PageMenu_Search.ToolTipService.ToolTip" xml:space="preserve">
+    <value>検索 (Enter)</value>
+  </data>
 </root>

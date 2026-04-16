@@ -12,7 +12,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-    NavigationCacheMode="Required">
+    NavigationCacheMode="Required"
+    PreviewKeyDown="Page_PreviewKeyDown">
 
     <Grid x:Name="ContentGrid">
         <Grid.RowDefinitions>
@@ -30,21 +31,35 @@
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0" x:Uid="PageTitle_Artists" FontSize="{StaticResource FontSizePageTitle}" FontWeight="SemiBold"/>
                 <TextBlock Grid.Column="1" FontSize="{StaticResource FontSizePageSubTitle}" Text="{x:Bind ViewModel.ArtistPageSubTitleArtistCount, Mode=OneWay}" VerticalAlignment="Bottom" Padding="48,0,0,4" Opacity="0.7"/>
-                
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <!-- Find -->
+                    <ToggleButton x:Name="TglButtonArtistFilter" x:Uid="PageMenu_Find" AccessKey="F" Height="36" Width="38" Margin="4,0,4,0" IsChecked="{x:Bind ViewModel.IsArtistFindVisible, Mode=TwoWay}" Click="TglButtonArtistFilter_Click">
+                        <ToggleButton.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="F" Modifiers="Control"/>
+                        </ToggleButton.KeyboardAccelerators>
+                        <Viewbox Width="14" Height="14">
+                            <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M10.0195 10.7266C9.06578 11.5217 7.83875 12 6.5 12C3.46243 12 1 9.53757 1 6.5C1 3.46243 3.46243 1 6.5 1C9.53757 1 12 3.46243 12 6.5C12 7.83875 11.5217 9.06578 10.7266 10.0195L13.8535 13.1464C14.0488 13.3417 14.0488 13.6583 13.8535 13.8536C13.6583 14.0488 13.3417 14.0488 13.1464 13.8536L10.0195 10.7266ZM11 6.5C11 4.01472 8.98528 2 6.5 2C4.01472 2 2 4.01472 2 6.5C2 8.98528 4.01472 11 6.5 11C8.98528 11 11 8.98528 11 6.5Z"/>
+                        </Viewbox>
+                    </ToggleButton>
+
+                </StackPanel>
             </Grid>
         </Grid>
-        
+
         <Grid Grid.Row="1" x:Name="BodyGrid" Margin="24,0,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="6*"/>
             </Grid.ColumnDefinitions>
 
+            <!-- Artists listview -->
             <Grid Grid.Column="0">
                 <ListView x:Name="ArtistsListView" Padding="0,0,0,0" Margin="0,24,0,0" ItemsSource="{x:Bind ViewModel.Artists, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAlbumArtist, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="ArtistsListView_SelectionChanged" SelectionMode="Single" Background="Transparent">
                     <ListView.ItemTemplate>
@@ -55,11 +70,6 @@
                                     <ColumnDefinition MinWidth="128"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
                                 <PersonPicture DisplayName="{x:Bind Name, Mode=OneTime}" Width="36" Height="36" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                <!--
-                                <Canvas Background="Transparent" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Ellipse Fill="Gray" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Canvas>
-                                -->
                                 <Border Name="bdrArtistName" Grid.Row="0" Grid.Column="1">
                                     <TextBlock Text="{x:Bind Name, Mode=OneTime}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="0,0,0,0" Opacity="0.9"/>
                                 </Border>
@@ -71,9 +81,6 @@
                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                             <Setter Property="VerticalAlignment" Value="Center" />
                             <Setter Property="Height" Value="48" />
-                            <!-- Not possible in winui3?
-                        <Setter Property="IsSelected" Value="{x:Bind IsSelected, Mode=TwoWay}" />
-                        -->
                         </Style>
                     </ListView.ItemContainerStyle>
                 </ListView>
@@ -339,7 +346,44 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
+
             </Grid>
+
+            <Popup Grid.Row="1" PlacementTarget="{x:Bind BodyGrid}" DesiredPlacement="Top" HorizontalOffset="0" VerticalOffset="280" IsLightDismissEnabled="True" IsOpen="{x:Bind ViewModel.IsArtistFindVisible, Mode=TwoWay}">
+                <Border Width="280" Height="280" KeyboardAcceleratorPlacementMode="Hidden" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" CornerRadius="6" Padding="6" BorderBrush="{ThemeResource LayerFillColorDefaultBrush}" BorderThickness="1">
+                    <Border.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Escape" Invoked="Popup_Escape_Invoked" />
+                    </Border.KeyboardAccelerators>
+                    <StackPanel>
+                        <TextBox x:Name="FilterArtistQueryTextBox" Text="{x:Bind ViewModel.FilterArtistQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="0,0,0,0"></TextBox>
+                        <ListView Name="FilterArtistListBox" ItemsSource="{x:Bind ViewModel.ArtistsForFilter, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedFilterAlbumArtist,Mode=TwoWay}" IsDoubleTapEnabled="True" DoubleTapped="FilterArtistListBox_DoubleTapped" SelectionMode="Single" MaxHeight="240" BorderThickness="0" Padding="0,3,0,0">
+
+                            <ListView.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Command="{x:Bind ViewModel.ArtistFilterSelectCommand}" CommandParameter="{x:Bind FilterArtistListBox.SelectedItem, Mode=OneWay}">
+                                        <MenuFlyoutItem.Icon>
+                                            <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm8.856-3.845A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189Z"/>
+                                        </MenuFlyoutItem.Icon>
+                                        <MenuFlyoutItem.KeyboardAccelerators>
+                                            <KeyboardAccelerator Key="Enter" />
+                                        </MenuFlyoutItem.KeyboardAccelerators>
+                                    </MenuFlyoutItem>
+
+                                </MenuFlyout>
+                            </ListView.ContextFlyout>
+
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="mod:AlbumArtist">
+                                    <StackPanel>
+                                        <TextBlock x:Name="filterListBoxTitle" Text="{x:Bind Path=Name, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
+                </Border>
+            </Popup>
+
         </Grid>
 
         <VisualStateManager.VisualStateGroups>

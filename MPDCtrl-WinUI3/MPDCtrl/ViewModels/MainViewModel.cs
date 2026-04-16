@@ -1462,6 +1462,95 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    // For Artist filter.
+    private ObservableCollection<AlbumArtist> _artistsForFilter = [];
+    public ObservableCollection<AlbumArtist> ArtistsForFilter
+    {
+        get
+        {
+            return _artistsForFilter;
+        }
+        set
+        {
+            if (_artistsForFilter == value)
+                return;
+
+            _artistsForFilter = value;
+            OnPropertyChanged(nameof(ArtistsForFilter));
+        }
+    }
+
+    private string _filterArtistQuery = "";
+    public string FilterArtistQuery
+    {
+        get
+        {
+            return _filterArtistQuery;
+        }
+        set
+        {
+            if (_filterArtistQuery == value)
+                return;
+
+            _filterArtistQuery = value;
+            OnPropertyChanged(nameof(FilterArtistQuery));
+
+            if (_filterArtistQuery == "")
+            {
+                return;
+            }
+
+            var filtered = Artists.Where(artist => FilterArtists(artist));
+
+            ArtistsForFilter = new ObservableCollection<AlbumArtist>(filtered);
+
+        }
+    }
+
+    private bool FilterArtists(AlbumArtist artist)
+    {
+        return artist.Name.Contains(FilterArtistQuery, StringComparison.CurrentCultureIgnoreCase);// InvariantCultureIgnoreCase
+    }
+
+    private bool _isArtistFindVisible;
+    public bool IsArtistFindVisible
+    {
+        get
+        {
+            return _isArtistFindVisible;
+        }
+        set
+        {
+            if (_isArtistFindVisible == value)
+                return;
+
+            _isArtistFindVisible = value;
+
+            ArtistsForFilter.Clear();
+
+            FilterArtistQuery = "";
+
+            OnPropertyChanged(nameof(IsArtistFindVisible));
+        }
+    }
+
+    private AlbumArtist? _selectedFilterAlbumArtist;
+    public AlbumArtist? SelectedFilterAlbumArtist
+    {
+        get
+        {
+            return _selectedFilterAlbumArtist;
+        }
+        set
+        {
+            if (_selectedFilterAlbumArtist == value)
+                return;
+
+            _selectedFilterAlbumArtist = value;
+            OnPropertyChanged(nameof(SelectedFilterAlbumArtist));
+        }
+    }
+
     #endregion
 
     #region == Albums ==
@@ -6488,6 +6577,22 @@ public partial class MainViewModel : ObservableObject
 
         SelectedAlbumArtist = albumArtist;// Needs to be after setting SelectedAlbumArtist because GoToArtistPage() will set selected item in NavigationView menu which will trigger loading albums of the artist.
         _mainMenuItems.ArtistsDirectory.Selected = true;
+    }
+
+
+    [RelayCommand]
+    public void ArtistFilterSelect(object obj)
+    {
+        if (Artists.Count <= 1)
+            return;
+
+        if (obj is null) return;
+
+        if (obj is AlbumArtist artist)
+        {
+            //ScrollIntoViewAndSelect?.Invoke(this, artist);
+            SelectedAlbumArtist = artist;
+        }
     }
 
     [RelayCommand]

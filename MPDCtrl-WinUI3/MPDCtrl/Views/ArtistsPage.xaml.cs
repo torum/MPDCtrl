@@ -133,4 +133,72 @@ public sealed partial class ArtistsPage : Page
             return null;
         }
     }
+
+    private void TglButtonArtistFilter_Click(object sender, RoutedEventArgs e)
+    {
+        if (this.TglButtonArtistFilter is ToggleButton tb)
+        {
+            if (tb.IsChecked == true)
+            {
+                this.FilterArtistQueryTextBox.Focus(FocusState.Programmatic);
+            }
+            else
+            {
+                this.TglButtonArtistFilter.Focus(FocusState.Programmatic);
+            }
+        }
+    }
+
+    private void Page_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        Windows.System.VirtualKey downKey = e.OriginalKey;
+
+        if (downKey == Windows.System.VirtualKey.Escape)
+        {
+            if (this.TglButtonArtistFilter is ToggleButton tb)
+            {
+                tb.IsChecked = false;
+            }
+        }
+    }
+
+    private void Popup_Escape_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (this.TglButtonArtistFilter is ToggleButton tb)
+        {
+            tb.IsChecked = false;
+        }
+    }
+
+    private void FilterArtistListBox_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        if (sender is not ListView)
+        {
+            return;
+        }
+
+        FrameworkElement element = (FrameworkElement)e.OriginalSource;
+
+        var container = FindParent<ListViewItem>(element);
+
+        if (container is null)
+        {
+            return;
+        }
+
+        if (container.Content is not AlbumArtist artist)
+        {
+            return;
+        }
+
+        if (this.ArtistsListView is ListView lb)
+        {
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                lb.ScrollIntoView(artist, ScrollIntoViewAlignment.Default);
+
+                lb.SelectedItem = artist;
+            });
+        }
+    }
 }

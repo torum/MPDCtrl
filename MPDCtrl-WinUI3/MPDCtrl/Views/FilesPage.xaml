@@ -12,7 +12,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-    NavigationCacheMode="Required">
+    NavigationCacheMode="Required"
+    PreviewKeyDown="Page_PreviewKeyDown">
 
     <Grid x:Name="ContentGrid">
         <Grid.RowDefinitions>
@@ -151,7 +152,7 @@
 
                         <StackPanel Orientation="Horizontal" Margin="0" Height="36" HorizontalAlignment="Right">
                             <!-- Filter box -->
-                            <TextBox Name="FilesFilterQueryTextBox" MinWidth="120" Width="180" Text="{x:Bind ViewModel.FilterMusicEntriesQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Visibility="{x:Bind TglButtonFilesItemsFilter.IsChecked, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" VerticalAlignment="Bottom" Margin="0,0,6,0"></TextBox>
+                            <TextBox Name="FilesFilterQueryTextBox" MinWidth="120" Width="280" Text="{x:Bind ViewModel.FilterMusicEntriesQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Visibility="{x:Bind TglButtonFilesItemsFilter.IsChecked, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" VerticalAlignment="Bottom" Margin="0,0,6,0"></TextBox>
                             <ToggleButton Name="TglButtonFilesItemsFilter" x:Uid="PageMenu_Filter" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0" Height="36" Click="TglButtonFilesItemsFilter_Click">
                                 <Viewbox Width="14" Height="14" Margin="-2,-2,0,0" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <PathIcon Width="NaN" Height="NaN"

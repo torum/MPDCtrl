@@ -559,4 +559,7 @@ SOFTWARE.</value>
   <data name="Settings_LocalStorage_ClearCache.ToolTipService.ToolTip" xml:space="preserve">
     <value>Clear cache files</value>
   </data>
+  <data name="PageMenu_Search.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Search (Enter)</value>
+  </data>
 </root>

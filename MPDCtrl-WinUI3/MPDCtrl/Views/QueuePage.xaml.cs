@@ -115,6 +115,27 @@ public sealed partial class QueuePage : Page
         await ViewModel.QueueSelectedPlay(song);
     }
 
+    private void Page_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        Windows.System.VirtualKey downKey = e.OriginalKey;
+
+        if (downKey == Windows.System.VirtualKey.Escape)
+        {
+            if (this.TglButtonQueueFilter is ToggleButton tb)
+            {
+                tb.IsChecked = false;
+            }
+        }
+    }
+
+    private void Popup_Escape_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (this.TglButtonQueueFilter is ToggleButton tb)
+        {
+            tb.IsChecked = false;
+        }
+    }
+
     private async void QueueListview_KeyUp(object sender, KeyRoutedEventArgs e)
     {
         if (sender is not ListView listView)
@@ -276,4 +297,5 @@ public sealed partial class QueuePage : Page
             }
         }
     }
+
 }

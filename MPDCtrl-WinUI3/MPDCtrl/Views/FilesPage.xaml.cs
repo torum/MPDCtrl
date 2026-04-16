@@ -108,4 +108,17 @@ public sealed partial class FilesPage : Page
             FilesFilterQueryTextBox.Focus(FocusState.Programmatic);
         }
     }
+
+    private void Page_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        Windows.System.VirtualKey downKey = e.OriginalKey;
+
+        if (downKey == Windows.System.VirtualKey.Escape)
+        {
+            if (this.TglButtonFilesItemsFilter is ToggleButton tb)
+            {
+                tb.IsChecked = false;
+            }
+        }
+    }
 }

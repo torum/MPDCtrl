@@ -179,8 +179,8 @@
                                         <StackPanel>
                                             <TextBlock x:Name="filterListBoxTitle" Text="{x:Bind Path=Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" />
 
-                                            <TextBlock Text="{x:Bind Path=AlbumArtist, Mode=OneWay}" Opacity="0.6" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" Visibility="{x:Bind AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=Flase}" />
-                                            <TextBlock x:Uid="Text_UnknownArtist" Opacity="0.6" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" Visibility="{x:Bind AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=True}"/>
+                                            <TextBlock Text="{x:Bind Path=Artist, Mode=OneWay}" Opacity="0.6" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" Visibility="{x:Bind Artist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=Flase}" />
+                                            <TextBlock x:Uid="Text_UnknownArtist" Opacity="0.6" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" Visibility="{x:Bind Artist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=True}"/>
 
                                         </StackPanel>
                                     </DataTemplate>

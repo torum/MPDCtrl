@@ -1,18 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI;
-using CommunityToolkit.WinUI.Animations;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Windows.ApplicationModel.Resources;
 using MPDCtrl.Helpers;
 using MPDCtrl.Models;
@@ -20,11 +12,9 @@ using MPDCtrl.Services;
 using MPDCtrl.Services.Contracts;
 using MPDCtrl.Views;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -38,18 +28,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
-using System.Windows.Input;
-using System.Xml;
-using System.Xml.Linq;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics.Imaging;
-using Windows.Media.Core;
-using Windows.Storage;
-using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
-using WinRT.Interop;
 
 #pragma warning disable IDE0028
 
@@ -59,39 +41,31 @@ public partial class MainViewModel : ObservableObject
 {
     #region == Flags ==
 
-    private bool _isBusy;
     public bool IsBusy
     {
-        get
-        {
-            return _isBusy;
-        }
+        get;
         set
         {
-            if (_isBusy == value)
+            if (field == value)
             {
                 return;
             }
 
-            _isBusy = value;
-            OnPropertyChanged(nameof(IsBusy));
+            field = value;
+            OnPropertyChanged();
         }
     }
 
-    private bool _isWorking;
     public bool IsWorking
     {
-        get
-        {
-            return _isWorking;
-        }
+        get;
         set
         {
-            if (_isWorking == value)
+            if (field == value)
                 return;
 
-            _isWorking = value;
-            OnPropertyChanged(nameof(IsWorking));
+            field = value;
+            OnPropertyChanged();
         }
     }
 
@@ -99,77 +73,55 @@ public partial class MainViewModel : ObservableObject
 
     #region == Profile ==
 
-    private readonly ObservableCollection<Profile> _profiles = [];
-    public ObservableCollection<Profile> Profiles
-    {
-        get { return _profiles; }
-    }
+    public ObservableCollection<Profile> Profiles { get; } = [];
 
-    private Profile? _currentProfile;
-    public Profile? CurrentProfile
-    {
-        get { return _currentProfile; }
-        set
+    public Profile? CurrentProfile { get; set
         {
-            if (_currentProfile == value)
+            if (field == value)
                 return;
 
-            _currentProfile = value;
-            OnPropertyChanged(nameof(CurrentProfile));
+            field = value;
+            OnPropertyChanged();
 
             /*
             SelectedProfile = _currentProfile;
             */
 
-            if (_currentProfile is not null)
+            if (field is not null)
             {
-                _volume = _currentProfile.Volume;
+                _volume = field.Volume;
                 OnPropertyChanged(nameof(Volume));
 
-                Host = _currentProfile.Host;
-                Port = _currentProfile.Port.ToString();
-                _password = _currentProfile.Password;
+                Host = field.Host;
+                Port = field.Port.ToString();
+                _password = field.Password;
                 OnPropertyChanged(nameof(Password));
             }
             else
             {
                 Debug.WriteLine("(_currentProfile is not null)");
             }
-        }
-    }
+        } }
 
-    private Profile? _selectedProfile;
-    public Profile? SelectedProfile
-    {
-        get
+    public Profile? SelectedProfile { get; set
         {
-            return _selectedProfile;
-        }
-        set
-        {
-            if (_selectedProfile == value)
+            if (field == value)
                 return;
 
-            _selectedProfile = value;
+            field = value;
 
-            OnPropertyChanged(nameof(SelectedProfile));
-        }
-    }
+            OnPropertyChanged();
+        } }
 
-    private bool _setIsDefault = true;
-    public bool SetIsDefault
-    {
-        get { return _setIsDefault; }
-        set
+    public bool SetIsDefault { get; set
         {
-            if (_setIsDefault == value)
+            if (field == value)
                 return;
 
-            _setIsDefault = value;
+            field = value;
 
-            OnPropertyChanged(nameof(SetIsDefault));
-        }
-    }
+            OnPropertyChanged();
+        } } = true;
 
     /*
     private bool _isRememberAsProfile = true;
@@ -193,7 +145,7 @@ public partial class MainViewModel : ObservableObject
     private string _host = "";
     public string Host
     {
-        get { return _host; }
+        get => _host;
         set
         {
             //ClearError(nameof(Host));
@@ -211,10 +163,9 @@ public partial class MainViewModel : ObservableObject
             }
             else
             {
-                IPAddress ipAddress;
                 try
                 {
-                    ipAddress = IPAddress.Parse(value);
+                    var ipAddress = IPAddress.Parse(value);
                     if (ipAddress is not null)
                     {
                         _host = value;
@@ -227,29 +178,20 @@ public partial class MainViewModel : ObservableObject
                 }
             }
 
-            OnPropertyChanged(nameof(Host));
+            OnPropertyChanged();
         }
     }
 
-    private IPAddress? _hostIpAddress;
-    public IPAddress? HostIpAddress
-    {
-        get { return _hostIpAddress; }
-        set
+    public IPAddress? HostIpAddress { get; set
         {
-            if (_hostIpAddress == value)
-                return;
-
-            _hostIpAddress = value;
-
-            OnPropertyChanged(nameof(HostIpAddress));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } }
 
     private int _port = 6600;
     public string Port
     {
-        get { return _port.ToString(); }
+        get => _port.ToString();
         set
         {
             //ClearError(nameof(Port));
@@ -276,24 +218,21 @@ public partial class MainViewModel : ObservableObject
                 }
             }
 
-            OnPropertyChanged(nameof(Port));
+            OnPropertyChanged();
         }
     }
 
     private string _password = "";
     public string Password
     {
-        get
-        {
-            return DummyPassword(_password);
-        }
+        get => DummyPassword(_password);
         set
         {
             // Don't. if (_password == value) ...
 
             _password = value;
 
-            OnPropertyChanged(nameof(Password));
+            OnPropertyChanged();
         }
     }
 
@@ -412,20 +351,13 @@ public partial class MainViewModel : ObservableObject
 
     #region == CurrentSong ==
 
-    private SongInfoEx? _currentSong;
-    public SongInfoEx? CurrentSong
-    {
-        get
+    public SongInfoEx? CurrentSong { get; set
         {
-            return _currentSong;
-        }
-        set
-        {
-            if (_currentSong == value)
+            if (field == value)
                 return;
 
-            _currentSong = value;
-            OnPropertyChanged(nameof(CurrentSong));
+            field = value;
+            OnPropertyChanged();
             OnPropertyChanged(nameof(CurrentSongTitle));
             OnPropertyChanged(nameof(CurrentSongArtist));
             OnPropertyChanged(nameof(CurrentSongAlbum));
@@ -434,43 +366,19 @@ public partial class MainViewModel : ObservableObject
 
             //CurrentSongChanged?.Invoke(this, CurrentSongStringForWindowTitle);
 
-            if (value is null)
-            {
-                //_elapsedTimer.Stop();
-                IsCurrentSongNotNull = false;
-            }
-            else
-            {
-                IsCurrentSongNotNull = true;
-            }
-        }
-    }
+            //_elapsedTimer.Stop();
+            IsCurrentSongNotNull = value is not null;
+        } }
 
-    public string CurrentSongTitle
-    {
-        get
-        {
-            if (_currentSong is not null)
-            {
-                return _currentSong.Title;
-            }
-            else
-            {
-                return string.Empty;
-            }
-        }
-    }
+    public string CurrentSongTitle => CurrentSong is not null ? CurrentSong.Title : string.Empty;
 
     public string CurrentSongArtist
     {
         get
         {
-            if (_currentSong is not null)
+            if (CurrentSong is not null)
             {
-                if (!string.IsNullOrEmpty(_currentSong.Artist))
-                    return _currentSong.Artist.Trim();
-                else
-                    return "";
+                return !string.IsNullOrEmpty(CurrentSong.Artist) ? CurrentSong.Artist.Trim() : "";
             }
             else
             {
@@ -483,12 +391,9 @@ public partial class MainViewModel : ObservableObject
     {
         get
         {
-            if (_currentSong is not null)
+            if (CurrentSong is not null)
             {
-                if (!string.IsNullOrEmpty(_currentSong.Album))
-                    return _currentSong.Album.Trim();
-                else
-                    return "";
+                return !string.IsNullOrEmpty(CurrentSong.Album) ? CurrentSong.Album.Trim() : "";
             }
             else
             {
@@ -501,12 +406,9 @@ public partial class MainViewModel : ObservableObject
     {
         get
         {
-            if (_currentSong is not null)
+            if (CurrentSong is not null)
             {
-                if (!string.IsNullOrEmpty(_currentSong.Artist))
-                    return true;
-                else
-                    return false;
+                return !string.IsNullOrEmpty(CurrentSong.Artist);
             }
             else
             {
@@ -519,12 +421,9 @@ public partial class MainViewModel : ObservableObject
     {
         get
         {
-            if (_currentSong is not null)
+            if (CurrentSong is not null)
             {
-                if (!string.IsNullOrEmpty(_currentSong.Album))
-                    return true;
-                else
-                    return false;
+                return !string.IsNullOrEmpty(CurrentSong.Album);
             }
             else
             {
@@ -533,52 +432,44 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private bool _isCurrentSongNotNull;
-    public bool IsCurrentSongNotNull
-    {
-        get
+    public bool IsCurrentSongNotNull { get; set
         {
-            return _isCurrentSongNotNull;
-        }
-        set
-        {
-            if (_isCurrentSongNotNull == value)
+            if (field == value)
                 return;
 
-            _isCurrentSongNotNull = value;
-            OnPropertyChanged(nameof(IsCurrentSongNotNull));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } }
 
     public string CurrentSongStringForWindowTitle
     {
         get
         {
-            if (_currentSong is not null)
+            if (CurrentSong is not null)
             {
-                string s = string.Empty;
+                var s = string.Empty;
 
-                if (!string.IsNullOrEmpty(_currentSong.Title))
+                if (!string.IsNullOrEmpty(CurrentSong.Title))
                 {
-                    s = _currentSong.Title.Trim();
+                    s = CurrentSong.Title.Trim();
                 }
 
-                if (!string.IsNullOrEmpty(_currentSong.Artist))
+                if (!string.IsNullOrEmpty(CurrentSong.Artist))
                 {
                     if (!string.IsNullOrEmpty(s))
                     {
                         s += " by ";
                     }
-                    s += $"{_currentSong.Artist.Trim()}";
+                    s += $"{CurrentSong.Artist.Trim()}";
                 }
 
-                if (!string.IsNullOrEmpty(_currentSong.Album))
+                if (!string.IsNullOrEmpty(CurrentSong.Album))
                 {
                     if (!string.IsNullOrEmpty(s))
                     {
                         s += " from ";
                     }
-                    s += $"{_currentSong.Album.Trim()}";
+                    s += $"{CurrentSong.Album.Trim()}";
                 }
 
                 return s;
@@ -594,73 +485,48 @@ public partial class MainViewModel : ObservableObject
 
     #region == AlbumArt ==
 
-    private AlbumImage? _albumCover;
-    public AlbumImage? AlbumCover
-    {
-        get
+    public AlbumImage? AlbumCover { get; set
         {
-            return _albumCover;
-        }
-        set
-        {
-            if (_albumCover == value)
+            if (field == value)
                 return;
 
-            _albumCover = value;
+            field = value;
 
-            OnPropertyChanged(nameof(AlbumCover));
-        }
-    }
+            OnPropertyChanged();
+        } }
 
     private readonly ImageSource? _albumArtBitmapSourceDefault = null;
-    private ImageSource? _albumArtBitmapSource;
-    public ImageSource? AlbumArtBitmapSource
-    {
-        get
+
+    public ImageSource? AlbumArtBitmapSource { get; set
         {
-            return _albumArtBitmapSource;
-        }
-        set
-        {
-            if (_albumArtBitmapSource == value)
+            if (field == value)
                 return;
 
-            _albumArtBitmapSource = value;
-            OnPropertyChanged(nameof(AlbumArtBitmapSource));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } }
 
     #endregion
 
     #region == Playback ==
 
-    private static readonly string _pathPlayButton = "M10.856 8.155A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189ZM12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2ZM3.5 12a8.5 8.5 0 1 1 17 0 8.5 8.5 0 0 1-17 0Z";//"M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm8.856-3.845A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189Z";//"M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
-    private static readonly string _pathPauseButton = "M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2Zm-1.5 6.25v7.5a.75.75 0 0 1-1.5 0v-7.5a.75.75 0 0 1 1.5 0Zm4.5 0v7.5a.75.75 0 0 1-1.5 0v-7.5a.75.75 0 0 1 1.5 0Z";
+    private static readonly string PathPlayButton = "M10.856 8.155A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189ZM12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2ZM3.5 12a8.5 8.5 0 1 1 17 0 8.5 8.5 0 0 1-17 0Z";//"M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm8.856-3.845A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189Z";//"M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
+    private static readonly string PathPauseButton = "M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2Zm-1.5 6.25v7.5a.75.75 0 0 1-1.5 0v-7.5a.75.75 0 0 1 1.5 0Zm4.5 0v7.5a.75.75 0 0 1-1.5 0v-7.5a.75.75 0 0 1 1.5 0Z";
+
     //private static string _pathStopButton = "M10,16.5V7.5L16,12M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
-    private string _playButton = _pathPlayButton;
-    public string PlayButton
-    {
-        get
+    public string PlayButton { get; set
         {
-            return _playButton;
-        }
-        set
-        {
-            if (_playButton == value)
+            if (field == value)
                 return;
 
-            _playButton = value;
-            OnPropertyChanged(nameof(PlayButton));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = PathPlayButton;
 
     private double _volume = 20;
     public double Volume
     {
-        get
-        {
-            return _volume;
-        }
+        get => _volume;
         set
         {
             if (_volume == value)
@@ -668,7 +534,7 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
             _volume = value;
-            OnPropertyChanged(nameof(Volume));
+            OnPropertyChanged();
 
             if (_mpc is null)
             {
@@ -714,11 +580,11 @@ public partial class MainViewModel : ObservableObject
     private bool _repeat;
     public bool Repeat
     {
-        get { return _repeat; }
+        get => _repeat;
         set
         {
             _repeat = value;
-            OnPropertyChanged(nameof(Repeat));
+            OnPropertyChanged();
 
             if (_mpc is null)
             {
@@ -736,11 +602,11 @@ public partial class MainViewModel : ObservableObject
     private bool _random;
     public bool Random
     {
-        get { return _random; }
+        get => _random;
         set
         {
             _random = value;
-            OnPropertyChanged(nameof(Random));
+            OnPropertyChanged();
 
             if (_mpc is null)
             {
@@ -759,11 +625,11 @@ public partial class MainViewModel : ObservableObject
     private bool _consume;
     public bool Consume
     {
-        get { return _consume; }
+        get => _consume;
         set
         {
             _consume = value;
-            OnPropertyChanged(nameof(Consume));
+            OnPropertyChanged();
 
             if (_mpc is null)
             {
@@ -781,11 +647,11 @@ public partial class MainViewModel : ObservableObject
     private bool _single;
     public bool Single
     {
-        get { return _single; }
+        get => _single;
         set
         {
             _single = value;
-            OnPropertyChanged(nameof(Single));
+            OnPropertyChanged();
 
             if (_mpc is null || _mpc.MpdStatus.MpdSingle == value)
             {
@@ -796,23 +662,15 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private int _time = 0;
-    public int Time
-    {
-        get
+    public int Time { get; set
         {
-            return _time;
-        }
-        set
-        {
-            if (_time == value)
+            if (field == value)
                 return;
 
-            _time = value;
-            OnPropertyChanged(nameof(Time));
+            field = value;
+            OnPropertyChanged();
             OnPropertyChanged(nameof(TimeFormatted));
-        }
-    }
+        } } = 0;
 
     public string TimeFormatted
     {
@@ -826,7 +684,7 @@ public partial class MainViewModel : ObservableObject
             s = sec % 60;
             hour = min / 60;
             min %= 60;
-            return string.Format("{0}:{1:00}:{2:00}", hour, min, s);
+            return $"{hour}:{min:00}:{s:00}";
         }
     }
 
@@ -834,19 +692,16 @@ public partial class MainViewModel : ObservableObject
     private int _elapsed = 0;
     public int Elapsed
     {
-        get
-        {
-            return _elapsed;
-        }
+        get => _elapsed;
         set
         {
-            if ((value < _time) && _elapsed != value)
+            if ((value < Time) && _elapsed != value)
             {
                 _elapsed = value;
 
                 App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
                 {
-                    OnPropertyChanged(nameof(Elapsed));
+                    OnPropertyChanged();
                     OnPropertyChanged(nameof(ElapsedFormatted));
                 });
 
@@ -885,14 +740,14 @@ public partial class MainViewModel : ObservableObject
             hour = min / 60;
             min %= 60;
 
-            return string.Format("{0}:{1:00}:{2:00}", hour, min, s);
+            return $"{hour}:{min:00}:{s:00}";
         }
     }
 
     private System.Timers.Timer? _elapsedDelayTimer = null;
     private void DoChangeElapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
-        if (_mpc is not null && (_elapsed < _time) && SetSeekCommand.CanExecute(null))
+        if ( (_elapsed < Time) && SetSeekCommand.CanExecute(null))
         {
             //SetSeekCommand.Execute(null);
             _ = Task.Run(SetSeek, _cts.Token);
@@ -902,7 +757,7 @@ public partial class MainViewModel : ObservableObject
     private readonly System.Timers.Timer _elapsedTimer = new(1000); // when using _elapsedTimeMultiplier(other than 1), change this accordingly.
     private void ElapsedTimer(object? sender, System.Timers.ElapsedEventArgs e)
     {
-        if ((_elapsed < _time) && (_mpc.MpdStatus.MpdState == Status.MpdPlayState.Play))
+        if ((_elapsed < Time) && (_mpc.MpdStatus.MpdState == Status.MpdPlayState.Play))
         {
             _elapsed += 1;
 
@@ -926,25 +781,21 @@ public partial class MainViewModel : ObservableObject
     private readonly MenuTreeBuilder _mainMenuItems = new("");
     public ObservableCollection<NodeTree> MainMenuItems
     {
-        get { return _mainMenuItems.Children; }
+        get => _mainMenuItems.Children;
         set
         {
             _mainMenuItems.Children = value;
-            OnPropertyChanged(nameof(MainMenuItems));
+            OnPropertyChanged();
         }
     }
 
-    private NodeTree? _selectedNodeMenu = new NodeMenu("root");
-    public NodeTree? SelectedNodeMenu
-    {
-        get { return _selectedNodeMenu; }
-        set
+    public NodeTree? SelectedNodeMenu { get; set
         {
-            if (_selectedNodeMenu == value)
+            if (field == value)
                 return;
 
-            _selectedNodeMenu = value;
-            OnPropertyChanged(nameof(SelectedNodeMenu));
+            field = value;
+            OnPropertyChanged();
 
             if (value is null)
             {
@@ -1015,238 +866,146 @@ public partial class MainViewModel : ObservableObject
                     throw new NotImplementedException();
             }
 
-        }
-    }
+        } } = new NodeMenu("root");
 
     #endregion
 
     #region == Playlists ==  
 
-    private ObservableCollection<Playlist> _playlists = [];
-    public ObservableCollection<Playlist> Playlists
-    {
-        get
+    public ObservableCollection<Playlist> Playlists { get; set
         {
-            return _playlists;
-        }
-        set
-        {
-            if (_playlists == value)
+            if (field == value)
                 return;
 
-            _playlists = value;
-            OnPropertyChanged(nameof(Playlists));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = [];
 
     #endregion
 
-    #region == Queue ==  
+    #region == Queue ==
 
-    private ObservableCollection<SongInfoEx> _queue = [];
     public ObservableCollection<SongInfoEx> Queue
     {
-        get
-        {
-            if (_mpc is not null)
-            {
-                return _queue;
-                //return _mpc.CurrentQueue;
-            }
-            else
-            {
-                return _queue;
-            }
-        }
+        get;
         set
         {
-            if (_queue == value)
+            if (field == value)
                 return;
 
-            _queue = value;
-            OnPropertyChanged(nameof(Queue));
+            field = value;
+            OnPropertyChanged();
             OnPropertyChanged(nameof(QueuePageSubTitleSongCount));
         }
-    }
+    } = [];
 
-    private SongInfoEx? _selectedQueueSong;
-    public SongInfoEx? SelectedQueueSong
-    {
-        get
+    public SongInfoEx? SelectedQueueSong { get; set
         {
-            return _selectedQueueSong;
-        }
-        set
-        {
-            if (_selectedQueueSong == value)
+            if (field == value)
                 return;
 
-            _selectedQueueSong = value;
-            OnPropertyChanged(nameof(SelectedQueueSong));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } }
 
-    private bool _isQueueFindVisible;
-    public bool IsQueueFindVisible
-    {
-        get
+    public bool IsQueueFindVisible { get; set
         {
-            return _isQueueFindVisible;
-        }
-        set
-        {
-            if (_isQueueFindVisible == value)
+            if (field == value)
                 return;
 
-            _isQueueFindVisible = value;
+            field = value;
 
             QueueForFilter.Clear();
 
             FilterQueueQuery = "";
 
-            OnPropertyChanged(nameof(IsQueueFindVisible));
-        }
-    }
+            OnPropertyChanged();
+        } }
 
     private bool FilterSongInfoEx(SongInfoEx song)
     {
         return song.Title.Contains(FilterQueueQuery, StringComparison.CurrentCultureIgnoreCase);// InvariantCultureIgnoreCase
     }
 
-    private ObservableCollection<SongInfoEx> _queueForFilter = [];
-    public ObservableCollection<SongInfoEx> QueueForFilter
-    {
-        get
+    public ObservableCollection<SongInfoEx> QueueForFilter { get; set
         {
-            return _queueForFilter;
-        }
-        set
-        {
-            if (_queueForFilter == value)
+            if (field == value)
                 return;
 
-            _queueForFilter = value;
-            OnPropertyChanged(nameof(QueueForFilter));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = [];
 
-    private SearchTags _selectedQueueFilterTags = SearchTags.Title;
-    public SearchTags SelectedQueueFilterTags
-    {
-        get
+    public SearchTags SelectedQueueFilterTags { get; set
         {
-            return _selectedQueueFilterTags;
-        }
-        set
-        {
-            if (_selectedQueueFilterTags == value)
+            if (field == value)
                 return;
 
-            _selectedQueueFilterTags = value;
-            OnPropertyChanged(nameof(SelectedQueueFilterTags));
+            field = value;
+            OnPropertyChanged();
+        } } = SearchTags.Title;
 
-            if (_filterQueueQuery == "")
-                return;
-        }
-    }
-
-    private string _filterQueueQuery = "";
-    public string FilterQueueQuery
-    {
-        get
+    public string FilterQueueQuery { get; set
         {
-            return _filterQueueQuery;
-        }
-        set
-        {
-            if (_filterQueueQuery == value)
+            if (field == value)
                 return;
 
-            _filterQueueQuery = value;
-            OnPropertyChanged(nameof(FilterQueueQuery));
+            field = value;
+            OnPropertyChanged();
 
-            if (_filterQueueQuery == "")
+            if (field == "")
             {
                 return;
             }
 
-            var filtered = Queue.Where(song => FilterSongInfoEx(song));
+            var filtered = Queue.Where(FilterSongInfoEx);
             QueueForFilter = new ObservableCollection<SongInfoEx>(filtered);
-        }
-    }
+        } } = "";
 
-    private SongInfoEx? _selectedQueueFilterSong;
-    public SongInfoEx? SelectedQueueFilterSong
-    {
-        get
+    public SongInfoEx? SelectedQueueFilterSong { get; set
         {
-            return _selectedQueueFilterSong;
-        }
-        set
-        {
-            if (_selectedQueueFilterSong == value)
+            if (field == value)
                 return;
 
-            _selectedQueueFilterSong = value;
-            OnPropertyChanged(nameof(SelectedQueueFilterSong));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } }
 
-    private string _queuePageSubTitleSongCount = "";
-    public string QueuePageSubTitleSongCount
-    {
-        get
+    public string QueuePageSubTitleSongCount { get
         {
-            string str = _resourceLoader.GetString("QueuePage_SubTitle_SongCount");
+            var str = _resourceLoader.GetString("QueuePage_SubTitle_SongCount");
 
-            _queuePageSubTitleSongCount = string.Format(str, Queue.Count);
-            return _queuePageSubTitleSongCount;
-        }
-    }
+            field = string.Format(str, Queue.Count);
+            return field;
+        } } = "";
 
     #endregion
 
     #region == Search ==
 
-    private ObservableCollection<SongInfo>? _searchResult = [];
-    public ObservableCollection<SongInfo>? SearchResult
-    {
-        get
+    public ObservableCollection<SongInfo>? SearchResult { get; set
         {
-            return _searchResult;
-        }
-        set
-        {
-            if (_searchResult == value)
+            if (field == value)
                 return;
 
-            _searchResult = value;
-            OnPropertyChanged(nameof(SearchResult));
+            field = value;
+            OnPropertyChanged();
             OnPropertyChanged(nameof(SearchPageSubTitleResultCount));
             OnPropertyChanged(nameof(IsSearchControlEnabled));
-        }
-    }
+        } } = [];
 
-    private bool _isSearchControlEnabled;
-    public bool IsSearchControlEnabled
-    {
-        get
+    public bool IsSearchControlEnabled { get; set
         {
-            return _isSearchControlEnabled;
-        }
-        set
-        {
-            if (_isSearchControlEnabled == value)
+            if (field == value)
                 return;
 
-            _isSearchControlEnabled = value;
-            OnPropertyChanged(nameof(IsSearchControlEnabled));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } }
 
     // Search Tags, re-init in construtor in order to translate with resource string.
-    private ObservableCollection<Models.SearchOption> _searchTagList =
-    [
+
+    public ObservableCollection<Models.SearchOption> SearchTagList { get; private set; } = [
         new Models.SearchOption(SearchTags.Title, "Title"),
         new Models.SearchOption(SearchTags.Artist, "Artist"),
         new Models.SearchOption(SearchTags.Album, "Album"),
@@ -1254,350 +1013,235 @@ public partial class MainViewModel : ObservableObject
         new Models.SearchOption(SearchTags.Any, "Any")
     ];
 
-    public ObservableCollection<Models.SearchOption> SearchTagList
-    {
-        get
+    public Models.SearchOption SelectedSearchTag { get; set
         {
-            return _searchTagList;
-        }
-    }
-
-    private Models.SearchOption _selectedSearchTag = new(SearchTags.Title, "Title");
-    public Models.SearchOption SelectedSearchTag
-    {
-        get
-        {
-            return _selectedSearchTag;
-        }
-        set
-        {
-            if (_selectedSearchTag == value)
+            if (field == value)
                 return;
 
-            _selectedSearchTag = value;
-            OnPropertyChanged(nameof(SelectedSearchTag));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = new(SearchTags.Title, "Title");
 
     // Search Shiki (contain/==), re-init in construtor in order to translate with resource string.
-    private ObservableCollection<Models.SearchWith> _searchShikiList =
-    [
+
+    public ObservableCollection<Models.SearchWith> SearchShikiList { get; private set; } = [
         new Models.SearchWith(SearchShiki.Contains, "Contains"),
         new Models.SearchWith(SearchShiki.Equals, "Equals")
     ];
 
-    public ObservableCollection<Models.SearchWith> SearchShikiList
-    {
-        get
+    public Models.SearchWith SelectedSearchShiki { get; set
         {
-            return _searchShikiList;
-        }
-    }
-
-    private Models.SearchWith _selectedSearchShiki = new(SearchShiki.Contains, "Contains");
-    public Models.SearchWith SelectedSearchShiki
-    {
-        get
-        {
-            return _selectedSearchShiki;
-        }
-        set
-        {
-            if (_selectedSearchShiki == value)
+            if (field == value)
                 return;
 
-            _selectedSearchShiki = value;
-            OnPropertyChanged(nameof(SelectedSearchShiki));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = new(SearchShiki.Contains, "Contains");
 
     // 
-    private string _searchQuery = "";
-    public string SearchQuery
-    {
-        get
+    public string SearchQuery { get; set
         {
-            return _searchQuery;
-        }
-        set
-        {
-            if (_searchQuery == value)
+            if (field == value)
                 return;
 
-            _searchQuery = value;
-            OnPropertyChanged(nameof(SearchQuery));
+            field = value;
+            OnPropertyChanged();
             //SearchExecCommand.NotifyCanExecuteChanged();
-        }
-    }
+        } } = "";
 
-    private string _searchPageSubTitleResultCount = "";
-    public string SearchPageSubTitleResultCount
-    {
-        get
+    public string SearchPageSubTitleResultCount { get
         {
             string str = _resourceLoader.GetString("SearchPage_SubTitle_ResultCount");
-            _searchPageSubTitleResultCount = string.Format(str, SearchResult?.Count);
-            return _searchPageSubTitleResultCount;
-        }
-    }
+            field = string.Format(str, SearchResult?.Count);
+            return field;
+        } } = "";
 
     #endregion
 
     #region == Artists ==
 
-    private ObservableCollection<AlbumArtist> _artists = [];
-    public ObservableCollection<AlbumArtist> Artists
-    {
-        get { return _artists; }
-        set
+    public ObservableCollection<AlbumArtist> Artists { get; set
         {
-            if (_artists == value)
+            if (field == value)
                 return;
 
-            _artists = value;
-            OnPropertyChanged(nameof(Artists));
+            field = value;
+            OnPropertyChanged();
             OnPropertyChanged(nameof(ArtistPageSubTitleArtistCount));
             OnPropertyChanged(nameof(ArtistPageSubTitleArtistAlbumCount));
-        }
-    }
+        } } = [];
 
-    private string _artistPageSubTitleArtistCount = "";
-    public string ArtistPageSubTitleArtistCount
-    {
-        get
+    public string ArtistPageSubTitleArtistCount { get
         {
-            string str = _resourceLoader.GetString("ArtistPage_SubTitle_ArtistCount");
-            _artistPageSubTitleArtistCount = string.Format(str, Artists.Count);
-            return _artistPageSubTitleArtistCount;
-        }
-    }
+            var str = _resourceLoader.GetString("ArtistPage_SubTitle_ArtistCount");
+            field = string.Format(str, Artists.Count);
+            return field;
+        } } = "";
 
-    private string _artistPageSubTitleArtistAlbumCount = "";
-    public string ArtistPageSubTitleArtistAlbumCount
-    {
-        get
+    public string ArtistPageSubTitleArtistAlbumCount { get
         {
-            if (_selectedAlbumArtist is null)
+            if (SelectedAlbumArtist is null)
             {
                 return string.Empty;
             }
 
-            string str = _resourceLoader.GetString("ArtistPage_SubTitle_ArtistAlbumCount");
-            _artistPageSubTitleArtistAlbumCount = string.Format(str, _selectedAlbumArtist.Albums.Count);
-            return _artistPageSubTitleArtistAlbumCount;
-        }
-    }
+            var str = _resourceLoader.GetString("ArtistPage_SubTitle_ArtistAlbumCount");
+            field = string.Format(str, SelectedAlbumArtist.Albums.Count);
+            return field;
+        } } = "";
 
-    private AlbumArtist? _selectedAlbumArtist;
-    public AlbumArtist? SelectedAlbumArtist
-    {
-        get { return _selectedAlbumArtist; }
-        set
+    public AlbumArtist? SelectedAlbumArtist { get; set
         {
-            if (_selectedAlbumArtist == value)
+            if (field == value)
             {
                 return;
             }
 
-            _selectedAlbumArtist = value;
+            field = value;
 
-            OnPropertyChanged(nameof(SelectedAlbumArtist));
+            OnPropertyChanged();
 
-            if (_selectedAlbumArtist is null)
+            if (field is null)
             {
                 SelectedArtistAlbums = null;
                 return;
             }
 
-            SelectedArtistAlbums = _selectedAlbumArtist?.Albums;
+            SelectedArtistAlbums = field?.Albums;
 
             OnPropertyChanged(nameof(ArtistPageSubTitleArtistAlbumCount));
 
             //Task.Run(async () =>
             App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
              {
-                await Task.Yield();
-                await Task.Delay(100); // Avoid blocking UI thread.
-                GetArtistSongs(_selectedAlbumArtist);
-                await Task.Yield();
-                await Task.Delay(100);
-                GetAlbumPictures(SelectedArtistAlbums);
-            });
+                 await Task.Yield();
+                 await Task.Delay(100); // Avoid blocking UI thread.
+                 GetArtistSongs(field);
+                 await Task.Yield();
+                 await Task.Delay(100);
+                 GetAlbumPictures(SelectedArtistAlbums);
+             });
             //}, _cts.Token);
-        }
-    }
+        } }
 
-    private ObservableCollection<AlbumEx>? _selectedArtistAlbums = [];
-    public ObservableCollection<AlbumEx>? SelectedArtistAlbums
-    {
-        get
+    public ObservableCollection<AlbumEx>? SelectedArtistAlbums { get; set
         {
-            return _selectedArtistAlbums;
-        }
-        set
-        {
-            if (_selectedArtistAlbums == value)
+            if (field == value)
                 return;
 
-            _selectedArtistAlbums = value;
+            field = value;
 
-            if (_selectedArtistAlbums is not null)
+            if (field is not null)
             {
                 // Workaround for WinUI3's limitation or lack of features. 
-                foreach (var album in _selectedArtistAlbums)
+                foreach (var album in field)
                 {
                     album.ParentViewModel = this;
                 }
-                
+
                 // Sort
                 if (IsAlbumSortWithoutThePrefix)
                 {
                     var ci = CultureInfo.CurrentCulture;
                     var comp = StringComparer.Create(ci, true);
-                    _selectedArtistAlbums = new ObservableCollection<AlbumEx>(_selectedArtistAlbums.OrderBy(x => x.NameSort, comp)); // COPY. // Sort without prefix like "The" or "A".
+                    field = new ObservableCollection<AlbumEx>(field.OrderBy(x => x.NameSort, comp)); // COPY. // Sort without prefix like "The" or "A".
                 }
             }
 
-            OnPropertyChanged(nameof(SelectedArtistAlbums));
-        }
-    }
+            OnPropertyChanged();
+        } } = [];
 
     // For Artist filter.
-    private ObservableCollection<AlbumArtist> _artistsForFilter = [];
-    public ObservableCollection<AlbumArtist> ArtistsForFilter
-    {
-        get
+    public ObservableCollection<AlbumArtist> ArtistsForFilter { get; set
         {
-            return _artistsForFilter;
-        }
-        set
-        {
-            if (_artistsForFilter == value)
+            if (field == value)
                 return;
 
-            _artistsForFilter = value;
-            OnPropertyChanged(nameof(ArtistsForFilter));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = [];
 
-    private string _filterArtistQuery = "";
-    public string FilterArtistQuery
-    {
-        get
+    public string FilterArtistQuery { get; set
         {
-            return _filterArtistQuery;
-        }
-        set
-        {
-            if (_filterArtistQuery == value)
+            if (field == value)
                 return;
 
-            _filterArtistQuery = value;
-            OnPropertyChanged(nameof(FilterArtistQuery));
+            field = value;
+            OnPropertyChanged();
 
-            if (_filterArtistQuery == "")
+            if (field == "")
             {
                 return;
             }
 
-            var filtered = Artists.Where(artist => FilterArtists(artist));
+            var filtered = Artists.Where(FilterArtists);
 
             ArtistsForFilter = new ObservableCollection<AlbumArtist>(filtered);
 
-        }
-    }
+        } } = "";
 
     private bool FilterArtists(AlbumArtist artist)
     {
         return artist.Name.Contains(FilterArtistQuery, StringComparison.CurrentCultureIgnoreCase);// InvariantCultureIgnoreCase
     }
 
-    private bool _isArtistFindVisible;
-    public bool IsArtistFindVisible
-    {
-        get
+    public bool IsArtistFindVisible { get; set
         {
-            return _isArtistFindVisible;
-        }
-        set
-        {
-            if (_isArtistFindVisible == value)
+            if (field == value)
                 return;
 
-            _isArtistFindVisible = value;
+            field = value;
 
             ArtistsForFilter.Clear();
 
             FilterArtistQuery = "";
 
-            OnPropertyChanged(nameof(IsArtistFindVisible));
-        }
-    }
+            OnPropertyChanged();
+        } }
 
-    private AlbumArtist? _selectedFilterAlbumArtist;
-    public AlbumArtist? SelectedFilterAlbumArtist
-    {
-        get
+    public AlbumArtist? SelectedFilterAlbumArtist { get; set
         {
-            return _selectedFilterAlbumArtist;
-        }
-        set
-        {
-            if (_selectedFilterAlbumArtist == value)
+            if (field == value)
                 return;
 
-            _selectedFilterAlbumArtist = value;
-            OnPropertyChanged(nameof(SelectedFilterAlbumArtist));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } }
 
     #endregion
 
     #region == Albums ==
 
-    private ObservableCollection<AlbumEx> _albums = [];
-    public ObservableCollection<AlbumEx> Albums
-    {
-        get { return _albums; }
-        set
+    public ObservableCollection<AlbumEx> Albums { get; set
         {
-            if (_albums == value)
+            if (field == value)
                 return;
 
-            _albums = value;
-            OnPropertyChanged(nameof(Albums));
+            field = value;
+            OnPropertyChanged();
             OnPropertyChanged(nameof(AlbumPageSubTitleAlbumCount));
-        }
-    }
+        } } = [];
 
-    private string _albumPageSubTitleAlbumCount = "";
-    public string AlbumPageSubTitleAlbumCount
-    {
-        get
+    public string AlbumPageSubTitleAlbumCount { get
         {
-            string str = _resourceLoader.GetString("AlbumPage_SubTitle_AlbumCount");
-            _albumPageSubTitleAlbumCount = string.Format(str, Albums.Count);
-            return _albumPageSubTitleAlbumCount;
-        }
-    }
+            var str = _resourceLoader.GetString("AlbumPage_SubTitle_AlbumCount");
+            field = string.Format(str, Albums.Count);
+            return field;
+        } } = "";
 
-    private AlbumEx? _selectedAlbum = new();
-    public AlbumEx? SelectedAlbum
-    {
-        get { return _selectedAlbum; }
-        set
+    public AlbumEx? SelectedAlbum { get; set
         {
-            if (_selectedAlbum == value)
+            if (field == value)
             {
                 return;
             }
 
-            _selectedAlbum = value;
-            OnPropertyChanged(nameof(SelectedAlbum));
+            field = value;
+            OnPropertyChanged();
             //OnPropertyChanged(nameof(SelectedAlbumSongs));
             //OnPropertyChanged(nameof(AlbumPageSubTitleSelectedAlbumSongsCount));
 
-            if (_selectedAlbum is null)
+            if (field is null)
             {
                 //SelectedAlbumSongs = [];
                 return;
@@ -1609,41 +1253,18 @@ public partial class MainViewModel : ObservableObject
             */
             //_ = Task.Run(async () => { await GetAlbumSongs(_selectedAlbum); });
 
-            Task.Run(() => 
+            Task.Run(() =>
             {
-                GetAlbumSongs(_selectedAlbum);
+                GetAlbumSongs(field);
                 App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
                 {
                     AlbumSelectedNavigateToDetailsPage?.Invoke(this, EventArgs.Empty);
                 });
             }, _cts.Token);
-        }
-    }
+        } } = new();
 
     private readonly ObservableCollection<SongInfo>? _selectedAlbumSongs = [];
-    public ObservableCollection<SongInfo>? SelectedAlbumSongs
-    {
-        get
-        {
-            if (_selectedAlbum is not null)
-            {
-                return _selectedAlbum.Songs;
-            }
-
-            return _selectedAlbumSongs;
-        }
-        /*
-        set
-        {
-            if (_selectedAlbumSongs == value)
-                return;
-
-            _selectedAlbumSongs = value;
-            OnPropertyChanged(nameof(SelectedAlbumSongs));
-            OnPropertyChanged(nameof(AlbumPageSubTitleSelectedAlbumSongsCount));
-        }
-        */
-    }
+    public ObservableCollection<SongInfo>? SelectedAlbumSongs => SelectedAlbum is not null ? SelectedAlbum.Songs : _selectedAlbumSongs;
 
     public string AlbumPageSubTitleSelectedAlbumSongsCount
     {
@@ -1654,10 +1275,10 @@ public partial class MainViewModel : ObservableObject
                 return string.Empty;
             }
 
-            string str = _resourceLoader.GetString("AlbumPage_SubTitle_SelectedAlbumSongsCount");
-            if (_selectedAlbum is not null)
+            var str = _resourceLoader.GetString("AlbumPage_SubTitle_SelectedAlbumSongsCount");
+            if (SelectedAlbum is not null)
             {
-                return string.Format(str, _selectedAlbum.Songs.Count); ;
+                return string.Format(str, SelectedAlbum.Songs.Count); ;
             }
             else
             {
@@ -1666,116 +1287,78 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private ObservableCollection<AlbumEx>? _visibleItemsAlbumsEx = [];
-    public ObservableCollection<AlbumEx>? VisibleItemsAlbumsEx
-    {
-        get => _visibleItemsAlbumsEx;
-        set
+    public ObservableCollection<AlbumEx>? VisibleItemsAlbumsEx { get; set
         {
-            if (_visibleItemsAlbumsEx == value)
+            if (field == value)
                 return;
 
-            _visibleItemsAlbumsEx = value;
+            field = value;
             //OnPropertyChanged(nameof(VisibleItemsAlbumsEx));
 
-            if (_visibleItemsAlbumsEx is null)
+            if (field is null)
             {
                 return;
             }
 
             Task.Run(() => GetAlbumPictures(VisibleItemsAlbumsEx), _cts.Token);
             //GetAlbumPictures(VisibleItemsAlbumsEx); 
-        }
-    }
+        } } = [];
 
     // For Album filter.
-    private ObservableCollection<AlbumEx> _albumsForFilter = [];
-    public ObservableCollection<AlbumEx> AlbumsForFilter
-    {
-        get
+    public ObservableCollection<AlbumEx> AlbumsForFilter { get; set
         {
-            return _albumsForFilter;
-        }
-        set
-        {
-            if (_albumsForFilter == value)
+            if (field == value)
                 return;
 
-            _albumsForFilter = value;
-            OnPropertyChanged(nameof(AlbumsForFilter));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = [];
 
-    private string _filterAlbumQuery = "";
-    public string FilterAlbumQuery
-    {
-        get
+    public string FilterAlbumQuery { get; set
         {
-            return _filterAlbumQuery;
-        }
-        set
-        {
-            if (_filterAlbumQuery == value)
+            if (field == value)
                 return;
 
-            _filterAlbumQuery = value;
-            OnPropertyChanged(nameof(FilterAlbumQuery));
+            field = value;
+            OnPropertyChanged();
 
-            if (_filterAlbumQuery == "")
+            if (field == "")
             {
                 return;
             }
 
-            var filtered = Albums.Where(album => FilterAlbums(album));
+            var filtered = Albums.Where(FilterAlbums);
 
             AlbumsForFilter = new ObservableCollection<AlbumEx>(filtered);
-        }
-    }
+        } } = "";
 
     private bool FilterAlbums(AlbumEx album)
     {
         return album.Name.Contains(FilterAlbumQuery, StringComparison.CurrentCultureIgnoreCase);// InvariantCultureIgnoreCase
     }
 
-    private bool _isAlbumFindVisible;
-    public bool IsAlbumFindVisible
-    {
-        get
+    public bool IsAlbumFindVisible { get; set
         {
-            return _isAlbumFindVisible;
-        }
-        set
-        {
-            if (_isAlbumFindVisible == value)
+            if (field == value)
                 return;
 
-            _isAlbumFindVisible = value;
+            field = value;
 
             AlbumsForFilter.Clear();
 
             FilterAlbumQuery = "";
 
-            OnPropertyChanged(nameof(IsAlbumFindVisible));
-        }
-    }
+            OnPropertyChanged();
+        } }
 
-    private AlbumEx? _selectedFilterAlbum;
-    public AlbumEx? SelectedFilterAlbum
-    {
-        get
+    public AlbumEx? SelectedFilterAlbum { get; set
         {
-            return _selectedFilterAlbum;
-        }
-        set
-        {
-            if (_selectedFilterAlbum == value)
+            if (field == value)
                 return;
 
-            _selectedFilterAlbum = value;
-            OnPropertyChanged(nameof(SelectedFilterAlbum));
-        }
-    }
-
+            field = value;
+            OnPropertyChanged();
+        } }
 
     #endregion
 
@@ -1784,25 +1367,25 @@ public partial class MainViewModel : ObservableObject
     private readonly DirectoryTreeBuilder _musicDirectories = new("");
     public ObservableCollection<NodeTree> MusicDirectories
     {
-        get { return _musicDirectories.Children; }
+        get => _musicDirectories.Children;
         set
         {
             _musicDirectories.Children = value;
-            OnPropertyChanged(nameof(MusicDirectories));
+            OnPropertyChanged();
         }
     }
 
     private NodeDirectory _selectedNodeDirectory = new(".", new Uri(@"file:///./"));
     public NodeDirectory SelectedNodeDirectory
     {
-        get { return _selectedNodeDirectory; }
+        get => _selectedNodeDirectory;
         set
         {
             if (_selectedNodeDirectory == value)
                 return;
 
             _selectedNodeDirectory = value;
-            OnPropertyChanged(nameof(SelectedNodeDirectory));
+            OnPropertyChanged();
 
             if (_selectedNodeDirectory is null)
                 return;
@@ -1816,12 +1399,12 @@ public partial class MainViewModel : ObservableObject
             {
                 if (FilterMusicEntriesQuery != "")
                 {
-                    var filtered = _musicEntries.Where(song => song.Name.Contains(FilterMusicEntriesQuery, StringComparison.InvariantCultureIgnoreCase));
+                    var filtered = MusicEntries.Where(song => song.Name.Contains(FilterMusicEntriesQuery, StringComparison.InvariantCultureIgnoreCase));
                     _musicEntriesFiltered = new ObservableCollection<NodeFile>(filtered);
                 }
                 else
                 {
-                    _musicEntriesFiltered = new ObservableCollection<NodeFile>(_musicEntries);
+                    _musicEntriesFiltered = new ObservableCollection<NodeFile>(MusicEntries);
                 }
             }
             else
@@ -1833,38 +1416,27 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private ObservableCollection<NodeFile> _musicEntries = [];
-    public ObservableCollection<NodeFile> MusicEntries
-    {
-        get
+    public ObservableCollection<NodeFile> MusicEntries { get; set
         {
-            return _musicEntries;
-        }
-        set
-        {
-            if (value == _musicEntries)
+            if (value == field)
                 return;
 
-            _musicEntries = value;
-            OnPropertyChanged(nameof(MusicEntries));
+            field = value;
+            OnPropertyChanged();
             OnPropertyChanged(nameof(FilesPageSubTitleFileCount));
-        }
-    }
+        } } = [];
 
     private ObservableCollection<NodeFile> _musicEntriesFiltered = [];
     public ObservableCollection<NodeFile> MusicEntriesFiltered
     {
-        get
-        {
-            return _musicEntriesFiltered;
-        }
+        get => _musicEntriesFiltered;
         set
         {
             if (_musicEntriesFiltered == value)
                 return;
 
             _musicEntriesFiltered = value;
-            OnPropertyChanged(nameof(MusicEntriesFiltered));
+            OnPropertyChanged();
         }
     }
 
@@ -1872,7 +1444,7 @@ public partial class MainViewModel : ObservableObject
     {
         _musicEntriesFiltered.Clear();
 
-        foreach (var entry in _musicEntries)
+        foreach (var entry in MusicEntries)
         {
             string path = entry.FileUri.LocalPath; //person.FileUri.AbsoluteUri;
             if (string.IsNullOrEmpty(path))
@@ -1900,20 +1472,13 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private string _filterMusicEntriesQuery = "";
-    public string FilterMusicEntriesQuery
-    {
-        get
+    public string FilterMusicEntriesQuery { get; set
         {
-            return _filterMusicEntriesQuery;
-        }
-        set
-        {
-            if (_filterMusicEntriesQuery == value)
+            if (field == value)
                 return;
 
-            _filterMusicEntriesQuery = value;
-            OnPropertyChanged(nameof(FilterMusicEntriesQuery));
+            field = value;
+            OnPropertyChanged();
 
             if (_selectedNodeDirectory is null)
                 return;
@@ -1922,12 +1487,12 @@ public partial class MainViewModel : ObservableObject
             {
                 if (FilterMusicEntriesQuery != "")
                 {
-                    var filtered = _musicEntries.Where(song => song.Name.Contains(FilterMusicEntriesQuery, StringComparison.InvariantCultureIgnoreCase));
+                    var filtered = MusicEntries.Where(song => song.Name.Contains(FilterMusicEntriesQuery, StringComparison.InvariantCultureIgnoreCase));
                     MusicEntriesFiltered = new ObservableCollection<NodeFile>(filtered);
                 }
                 else
                 {
-                    MusicEntriesFiltered = new ObservableCollection<NodeFile>(_musicEntries);
+                    MusicEntriesFiltered = new ObservableCollection<NodeFile>(MusicEntries);
                 }
             }
             else
@@ -1935,269 +1500,154 @@ public partial class MainViewModel : ObservableObject
                 FilterFiles();
                 OnPropertyChanged(nameof(MusicEntriesFiltered));
             }
-        }
-    }
+        } } = "";
 
-    private string _filesPageSubTitleFileCount = "";
-    public string FilesPageSubTitleFileCount
-    {
-        get
+    public string FilesPageSubTitleFileCount { get
         {
-            string str = _resourceLoader.GetString("FilesPage_SubTitle_FileCount");
-            _filesPageSubTitleFileCount = string.Format(str, MusicEntries.Count);
-            return _filesPageSubTitleFileCount;
-        }
-    }
+            var str = _resourceLoader.GetString("FilesPage_SubTitle_FileCount");
+            field = string.Format(str, MusicEntries.Count);
+            return field;
+        } } = "";
 
     #endregion
 
     #region == PlaylistItems ==
 
-    private ObservableCollection<SongInfo> _playlistSongs = [];
-    public ObservableCollection<SongInfo> PlaylistSongs
+    public ObservableCollection<SongInfo> PlaylistSongs { get; set
     {
-        get
-        {
-            return _playlistSongs;
-        }
-        set
-        {
-            if (_playlistSongs != value)
-            {
-                _playlistSongs = value;
-                OnPropertyChanged(nameof(PlaylistSongs));
-                OnPropertyChanged(nameof(PlaylistPageSubTitleSongCount));
-            }
-        }
-    }
+        if (field == value) return;
+        field = value;
+        OnPropertyChanged();
+        OnPropertyChanged(nameof(PlaylistPageSubTitleSongCount));
+    } } = [];
 
-    private string _playlistPageSubTitleSongCount = "";
-    public string PlaylistPageSubTitleSongCount
-    {
-        get
+    public string PlaylistPageSubTitleSongCount { get
         {
-            string str = _resourceLoader.GetString("PlaylistPage_SubTitle_SongCount");
-            _playlistPageSubTitleSongCount = string.Format(str, PlaylistSongs.Count);
-            return _playlistPageSubTitleSongCount;
+            var str = _resourceLoader.GetString("PlaylistPage_SubTitle_SongCount");
+            field = string.Format(str, PlaylistSongs.Count);
+            return field;
         }
-    }
 
+        private set;
+    } = "";
 
-    private string _selectedPlaylistName = "";
-    public string SelectedPlaylistName
-    {
-        get
+    public string SelectedPlaylistName { get; set
         {
-            return _selectedPlaylistName;
-        }
-        set
-        {
-            if (_selectedPlaylistName == value)
+            if (field == value)
                 return;
 
-            _selectedPlaylistName = value;
-            OnPropertyChanged(nameof(SelectedPlaylistName));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = "";
 
-    private string _renamedSelectPendingPlaylistName = "";
-    public string RenamedSelectPendingPlaylistName
-    {
-        get
+    public string RenamedSelectPendingPlaylistName { get; set
         {
-            return _renamedSelectPendingPlaylistName;
-        }
-        set
-        {
-            if (_renamedSelectPendingPlaylistName == value)
+            if (field == value)
                 return;
 
-            _renamedSelectPendingPlaylistName = value;
-            OnPropertyChanged(nameof(RenamedSelectPendingPlaylistName));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = "";
 
     #endregion
 
     #region == Status Messages == 
 
-    private string _statusBarMessage = "";
-    public string StatusBarMessage
-    {
-        get
+    public string StatusBarMessage { get; set
         {
-            return _statusBarMessage;
-        }
-        set
-        {
-            _statusBarMessage = value;
-            OnPropertyChanged(nameof(StatusBarMessage));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = "";
 
-    private string _connectionStatusMessage = "";
-    public string ConnectionStatusMessage
-    {
-        get
+    public string ConnectionStatusMessage { get; set
         {
-            return _connectionStatusMessage;
-        }
-        set
-        {
-            _connectionStatusMessage = value;
-            OnPropertyChanged(nameof(ConnectionStatusMessage));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = "";
 
-    private string _infoBarInfoTitle = "";
-    public string InfoBarInfoTitle
-    {
-        get
+    public string InfoBarInfoTitle { get; set
         {
-            return _infoBarInfoTitle;
-        }
-        set
-        {
-            _infoBarInfoTitle = value;
-            OnPropertyChanged(nameof(InfoBarInfoTitle));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = "";
 
-    private string _infoBarInfoMessage = "";
-    public string InfoBarInfoMessage
-    {
-        get
+    public string InfoBarInfoMessage { get; set
         {
-            return _infoBarInfoMessage;
-        }
-        set
-        {
-            _infoBarInfoMessage = value;
-            OnPropertyChanged(nameof(InfoBarInfoMessage));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = "";
 
-    private bool _isShowInfoWindow;
-    public bool IsShowInfoWindow
-
-    {
-        get { return _isShowInfoWindow; }
-        set
+    public bool IsShowInfoWindow { get; set
         {
-            if (_isShowInfoWindow == value)
+            if (field == value)
                 return;
 
-            _isShowInfoWindow = value;
+            field = value;
 
-            if (!_isShowInfoWindow)
+            if (!field)
             {
                 InfoBarInfoTitle = string.Empty;
                 InfoBarInfoMessage = string.Empty;
             }
 
-            OnPropertyChanged(nameof(IsShowInfoWindow));
-        }
-    }
+            OnPropertyChanged();
+        } }
 
-    private string _infoBarAckTitle = "";
-    public string InfoBarAckTitle
-    {
-        get
+    public string InfoBarAckTitle { get; set
         {
-            return _infoBarAckTitle;
-        }
-        set
-        {
-            _infoBarAckTitle = value;
-            OnPropertyChanged(nameof(InfoBarAckTitle));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = "";
 
-    private string _infoBarAckMessage = "";
-    public string InfoBarAckMessage
-    {
-        get
+    public string InfoBarAckMessage { get; set
         {
-            return _infoBarAckMessage;
-        }
-        set
-        {
-            _infoBarAckMessage = value;
-            OnPropertyChanged(nameof(InfoBarAckMessage));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = "";
 
-    private bool _isShowAckWindow;
-    public bool IsShowAckWindow
-
-    {
-        get { return _isShowAckWindow; }
-        set
+    public bool IsShowAckWindow { get; set
         {
-            if (_isShowAckWindow == value)
+            if (field == value)
                 return;
 
-            _isShowAckWindow = value;
+            field = value;
 
-            if (!_isShowAckWindow)
+            if (!field)
             {
                 InfoBarAckTitle = string.Empty;
                 InfoBarAckMessage = string.Empty;
             }
 
-            OnPropertyChanged(nameof(IsShowAckWindow));
-        }
-    }
+            OnPropertyChanged();
+        } }
 
-    private string _infoBarErrTitle = "";
-    public string InfoBarErrTitle
-    {
-        get
+    public string InfoBarErrTitle { get; set
         {
-            return _infoBarErrTitle;
-        }
-        set
-        {
-            _infoBarErrTitle = value;
-            OnPropertyChanged(nameof(InfoBarErrTitle));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = "";
 
-    private string _infoBarErrMessage = "";
-    public string InfoBarErrMessage
-    {
-        get
+    public string InfoBarErrMessage { get; set
         {
-            return _infoBarErrMessage;
-        }
-        set
-        {
-            _infoBarErrMessage = value;
-            OnPropertyChanged(nameof(InfoBarErrMessage));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = "";
 
-    private bool _isShowErrWindow;
-    public bool IsShowErrWindow
-
-    {
-        get { return _isShowErrWindow; }
-        set
+    public bool IsShowErrWindow { get; set
         {
-            if (_isShowErrWindow == value)
+            if (field == value)
                 return;
 
-            _isShowErrWindow = value;
+            field = value;
 
-            if (!_isShowErrWindow)
+            if (!field)
             {
                 InfoBarErrTitle = string.Empty;
                 InfoBarErrMessage = string.Empty;
             }
 
-            OnPropertyChanged(nameof(IsShowErrWindow));
-        }
-    }
+            OnPropertyChanged();
+        } }
 
     private string _mpdVersion = "";
     public string MpdVersion
@@ -2216,7 +1666,7 @@ public partial class MainViewModel : ObservableObject
                 return;
 
             _mpdVersion = value;
-            OnPropertyChanged(nameof(MpdVersion));
+            OnPropertyChanged();
         }
     }
 
@@ -2231,39 +1681,18 @@ public partial class MainViewModel : ObservableObject
 
                 if (!string.IsNullOrEmpty(_mpdVersion))
                 {
-                    if (CurrentProfile is not null)
-                    {
-                        return $"{connected} ({CurrentProfile.Name} with MPD Protocol v{_mpdVersion})";
-                    }
-                    else
-                    {
-                        return $"{connected} (MPD Protocol v{_mpdVersion})";
-                    }
+                    return CurrentProfile is not null ? $"{connected} ({CurrentProfile.Name} with MPD Protocol v{_mpdVersion})" : $"{connected} (MPD Protocol v{_mpdVersion})";
                 }
                 else
                 {
-                    if (CurrentProfile is not null)
-                    {
-                        return $"{connected} ({CurrentProfile.Name})";
-                    }
-                    else
-                    {
-                        return $"{connected}";
-                    }
+                    return CurrentProfile is not null ? $"{connected} ({CurrentProfile.Name})" : $"{connected}";
                 }
             }
             else if (IsConnecting)
             {
                 var connecting = _resourceLoader.GetString("Settings_MPD_Connection_Status_IsConnecting");
 
-                if (CurrentProfile is not null)
-                {
-                    return $"{connecting} ({CurrentProfile.Name})...";
-                }
-                else
-                {
-                    return $"{connecting}...";
-                }
+                return CurrentProfile is not null ? $"{connecting} ({CurrentProfile.Name})..." : $"{connecting}...";
             }
             else
             {
@@ -2273,7 +1702,6 @@ public partial class MainViewModel : ObservableObject
                 {
                     return $"{notConnected}";
                 }
-
 
                 return $"{notConnected}";
             }
@@ -2311,244 +1739,166 @@ public partial class MainViewModel : ObservableObject
 
     #region == Status flags ==
 
-    private bool _isConnected;
-    public bool IsConnected
-    {
-        get => _isConnected;
-        set
+    public bool IsConnected { get; set
         {
-            if (_isConnected == value)
+            if (field == value)
                 return;
 
-            _isConnected = value;
-            OnPropertyChanged(nameof(IsConnected));
+            field = value;
+            OnPropertyChanged();
             OnPropertyChanged(nameof(ShortStatusWithMpdVersion));
             OnPropertyChanged(nameof(IsNotConnecting));
 
-            IsConnecting = !_isConnected;
+            IsConnecting = !field;
 
-            if (!_isConnected)
+            if (!field)
             {
                 IsNotConnectingNorConnected = true;
             }
-            if (_isConnected)
+            if (field)
             {
                 IsConnectButtonEnabled = true;
             }
-        }
-    }
+        } }
 
-    private bool _isConnecting;
-    public bool IsConnecting
-    {
-        get
+    public bool IsConnecting { get; set
         {
-            return _isConnecting;
-        }
-        set
-        {
-            if (_isConnecting == value)
+            if (field == value)
                 return;
 
-            _isConnecting = value;
-            OnPropertyChanged(nameof(IsConnecting));
+            field = value;
+            OnPropertyChanged();
             OnPropertyChanged(nameof(IsNotConnecting));
             OnPropertyChanged(nameof(ShortStatusWithMpdVersion));
 
-            if (_isConnecting)
+            if (field)
             {
                 IsConnectButtonEnabled = false;
             }
-        }
-    }
+        } }
 
-    private bool _isNotConnectingNorConnected = true;
-    public bool IsNotConnectingNorConnected
-    {
-        get
+    public bool IsNotConnectingNorConnected { get; set
         {
-            return _isNotConnectingNorConnected;
-        }
-        set
-        {
-            if (_isNotConnectingNorConnected == value)
+            if (field == value)
                 return;
 
-            _isNotConnectingNorConnected = value;
-            OnPropertyChanged(nameof(IsNotConnectingNorConnected));
+            field = value;
+            OnPropertyChanged();
             OnPropertyChanged(nameof(ShortStatusWithMpdVersion));
 
-            if (_isNotConnectingNorConnected)
+            if (field)
             {
                 IsConnectButtonEnabled = true;
             }
-        }
-    }
+        } } = true;
 
-    private bool _isConnectButtonEnabled = true;
-    public bool IsConnectButtonEnabled
-    {
-        get { return _isConnectButtonEnabled; }
-        set
+    public bool IsConnectButtonEnabled { get; set
         {
-            if (_isConnectButtonEnabled == value)
+            if (field == value)
                 return;
 
-            _isConnectButtonEnabled = value;
+            field = value;
 
-            OnPropertyChanged(nameof(IsConnectButtonEnabled));
-        }
-    }
+            OnPropertyChanged();
+        } } = true;
 
-    public bool IsNotConnecting
-    {
-        get
-        {
-            return !_isConnecting;
-        }
-    }
+    public bool IsNotConnecting => !IsConnecting;
 
     #endregion
 
     #region == Options ==
 
-    private bool _isUpdateOnStartup = true;
-    public bool IsUpdateOnStartup
-    {
-        get { return _isUpdateOnStartup; }
-        set
+    public bool IsUpdateOnStartup { get; set
         {
-            if (_isUpdateOnStartup == value)
+            if (field == value)
                 return;
 
-            _isUpdateOnStartup = value;
+            field = value;
 
-            OnPropertyChanged(nameof(IsUpdateOnStartup));
-        }
-    }
+            OnPropertyChanged();
+        } } = true;
 
-    private bool _isDownloadAlbumArt = true;
-    public bool IsDownloadAlbumArt
-    {
-        get { return _isDownloadAlbumArt; }
-        set
+    public bool IsDownloadAlbumArt { get; set
         {
-            if (_isDownloadAlbumArt == value)
+            if (field == value)
                 return;
 
-            _isDownloadAlbumArt = value;
+            field = value;
 
-            OnPropertyChanged(nameof(IsDownloadAlbumArt));
-        }
-    }
+            OnPropertyChanged();
+        } } = true;
 
-    private bool _isDownloadAlbumArtEmbeddedUsingReadPicture = true;
-    public bool IsDownloadAlbumArtEmbeddedUsingReadPicture
-    {
-        get { return _isDownloadAlbumArtEmbeddedUsingReadPicture; }
-        set
+    public bool IsDownloadAlbumArtEmbeddedUsingReadPicture { get; set
         {
-            if (_isDownloadAlbumArtEmbeddedUsingReadPicture == value)
+            if (field == value)
                 return;
 
-            _isDownloadAlbumArtEmbeddedUsingReadPicture = value;
+            field = value;
 
-            OnPropertyChanged(nameof(IsDownloadAlbumArtEmbeddedUsingReadPicture));
-        }
-    }
+            OnPropertyChanged();
+        } } = true;
 
-    private bool _isAutoScrollToNowPlaying = true;
-    public bool IsAutoScrollToNowPlaying
-    {
-        get { return _isAutoScrollToNowPlaying; }
-        set
+    public bool IsAutoScrollToNowPlaying { get; set
         {
-            if (_isAutoScrollToNowPlaying == value)
+            if (field == value)
                 return;
 
-            _isAutoScrollToNowPlaying = value;
+            field = value;
 
-            OnPropertyChanged(nameof(IsAutoScrollToNowPlaying));
-        }
-    }
+            OnPropertyChanged();
+        } } = true;
 
-    private bool _isArtistSortWithoutThePrefix = true;
-    public bool IsArtistSortWithoutThePrefix
-    {
-        get { return _isArtistSortWithoutThePrefix; }
-        set
+    public bool IsArtistSortWithoutThePrefix { get; set
         {
-            if (_isArtistSortWithoutThePrefix == value)
+            if (field == value)
                 return;
 
-            _isArtistSortWithoutThePrefix = value;
+            field = value;
 
-            OnPropertyChanged(nameof(IsArtistSortWithoutThePrefix));
-        }
-    }
+            OnPropertyChanged();
+        } } = true;
 
-    private bool _isAlbumSortWithoutThePrefix = true;
-    public bool IsAlbumSortWithoutThePrefix
-    {
-        get { return _isAlbumSortWithoutThePrefix; }
-        set
+    public bool IsAlbumSortWithoutThePrefix { get; set
         {
-            if (_isAlbumSortWithoutThePrefix == value)
+            if (field == value)
                 return;
 
-            _isAlbumSortWithoutThePrefix = value;
+            field = value;
 
-            OnPropertyChanged(nameof(IsAlbumSortWithoutThePrefix));
-        }
-    }
+            OnPropertyChanged();
+        } } = true;
 
-    private bool _isSaveLog;
-    public bool IsSaveLog
-    {
-        get { return _isSaveLog; }
-        set
+    public bool IsSaveLog { get; set
         {
-            if (_isSaveLog == value)
+            if (field == value)
                 return;
 
-            _isSaveLog = value;
+            field = value;
 
-            OnPropertyChanged(nameof(IsSaveLog));
-        }
-    }
+            OnPropertyChanged();
+        } }
 
     //
-    private bool _isDebugWindowEnabled;
-    public bool IsDebugWindowEnabled
-
-    {
-        get { return _isDebugWindowEnabled; }
-        set
+    public bool IsDebugWindowEnabled { get; set
         {
-            if (_isDebugWindowEnabled == value)
+            if (field == value)
                 return;
 
-            _isDebugWindowEnabled = value;
+            field = value;
 
-            OnPropertyChanged(nameof(IsDebugWindowEnabled));
-        }
-    }
+            OnPropertyChanged();
+        } }
 
-    private bool _isShowDebugWindow;
-    public bool IsShowDebugWindow
-
-    {
-        get { return _isShowDebugWindow; }
-        set
+    public bool IsShowDebugWindow { get; set
         {
-            if (_isShowDebugWindow == value)
+            if (field == value)
                 return;
 
-            _isShowDebugWindow = value;
+            field = value;
 
-            OnPropertyChanged(nameof(IsShowDebugWindow));
+            OnPropertyChanged();
 
-            if (_isShowDebugWindow)
+            if (field)
             {
                 /*
                 //Application.Current.Dispatcher.Invoke(() =>
@@ -2570,9 +1920,7 @@ public partial class MainViewModel : ObservableObject
                 });
                 */
             }
-        }
-
-    }
+        } }
     #endregion
 
     #region == Settings ==
@@ -2591,15 +1939,15 @@ public partial class MainViewModel : ObservableObject
             return fileName;
         }
 
-        string fileAndExtension = Path.GetFileName(fileName);
+        var fileAndExtension = Path.GetFileName(fileName);
 
-        string? drive = Path.GetPathRoot(fileName);
+        var drive = Path.GetPathRoot(fileName);
         if (drive is null)
         {
             return fileName;
         }
 
-        string? directoryPath = Path.GetDirectoryName(fileName);
+        var directoryPath = Path.GetDirectoryName(fileName);
         directoryPath ??= string.Empty;
 
         // If no directory path exists, or if it's just the drive, return only the filename
@@ -2610,18 +1958,18 @@ public partial class MainViewModel : ObservableObject
         }
 
         // Remove the drive letter from the directory path for iteration.
-        string normalizedDirectory = directoryPath.StartsWith(drive, StringComparison.OrdinalIgnoreCase)
+        var normalizedDirectory = directoryPath.StartsWith(drive, StringComparison.OrdinalIgnoreCase)
             ? directoryPath[drive.Length..]
             : directoryPath;
 
-        string[] directories = normalizedDirectory.Split(Path.DirectorySeparatorChar);
-        int currentDirIndex = 0;
+        var directories = normalizedDirectory.Split(Path.DirectorySeparatorChar);
+        var currentDirIndex = 0;
 
         while (currentDirIndex < directories.Length)
         {
             // Reconstruct the path with an ellipsis.
-            string remainingPath = string.Join(Path.DirectorySeparatorChar.ToString(), directories, currentDirIndex, directories.Length - currentDirIndex);
-            string composedName = $"{drive}...{Path.DirectorySeparatorChar}{remainingPath}{Path.DirectorySeparatorChar}{fileAndExtension}";
+            var remainingPath = string.Join(Path.DirectorySeparatorChar.ToString(), directories, currentDirIndex, directories.Length - currentDirIndex);
+            var composedName = $"{drive}...{Path.DirectorySeparatorChar}{remainingPath}{Path.DirectorySeparatorChar}{fileAndExtension}";
 
             // Check if the composed name is within the maximum length.
             if (composedName.Length <= maxLength)
@@ -2637,37 +1985,26 @@ public partial class MainViewModel : ObservableObject
         return fileAndExtension.Length <= maxLength ? fileAndExtension : string.Concat(fileAndExtension.AsSpan(0, maxLength - 3), "...");
     }
 
-
-    private string _albumCacheFolderSizeFormatted = string.Empty;
-
-    public string AlbumCacheFolderSizeFormatted
-    {
-        get => _albumCacheFolderSizeFormatted;
-        set
+    public string AlbumCacheFolderSizeFormatted { get; set
         {
-            if (_albumCacheFolderSizeFormatted == value)
+            if (field == value)
                 return;
 
-            _albumCacheFolderSizeFormatted = value;
-            OnPropertyChanged(nameof(AlbumCacheFolderSizeFormatted));
-        }
-    }
+            field = value;
+            OnPropertyChanged();
+        } } = string.Empty;
 
     #endregion
 
     #region == Layout ==
 
-    private bool _isNavigationViewMenuOpen = true;
-    public bool IsNavigationViewMenuOpen
-    {
-        get { return _isNavigationViewMenuOpen; }
-        set
+    public bool IsNavigationViewMenuOpen { get; set
         {
-            if (_isNavigationViewMenuOpen == value)
+            if (field == value)
                 return;
 
-            _isNavigationViewMenuOpen = value;
-            OnPropertyChanged(nameof(IsNavigationViewMenuOpen));
+            field = value;
+            OnPropertyChanged();
 
             /* What's this for?
             foreach (var hoge in MainMenuItems)
@@ -2683,65 +2020,35 @@ public partial class MainViewModel : ObservableObject
                 }
             }
             */
-        }
-    }
+        } } = true;
 
-    private bool _isGoBackButtonVisible = false;
-    public bool IsGoBackButtonVisible
-    {
-        get { return _isGoBackButtonVisible; }
-        set
+    public bool IsGoBackButtonVisible { get; set
         {
-            if (_isGoBackButtonVisible == value)
+            if (field == value)
                 return;
 
-            _isGoBackButtonVisible = value;
-            OnPropertyChanged(nameof(IsGoBackButtonVisible));
+            field = value;
+            OnPropertyChanged();
 
             // Update RegionsForCustomTitleBar.
             GoBackButtonVisibilityChanged?.Invoke(this, EventArgs.Empty);
-        }
-    }
+        } } = false;
 
 
     #endregion
 
     #region == Theme ==
 
-    private ElementTheme _theme = ElementTheme.Default;
-    public ElementTheme Theme
-    {
-        get => _theme;
-        set => SetProperty(ref _theme, value);
-    }
-
-    private SystemBackdropOption _material = SystemBackdropOption.Mica;
-    public SystemBackdropOption Material
-    {
-        get => _material;
-        set => SetProperty(ref _material, value);
-    }
-
-    private bool _isAcrylicSupported = false;
-    public bool IsAcrylicSupported
-    {
-        get => _isAcrylicSupported;
-        set => SetProperty(ref _isAcrylicSupported, value);
-    }
-
-    private bool _isBackdropEnabled = false;
-    public bool IsBackdropEnabled
-    {
-        get => _isBackdropEnabled;
-        set => SetProperty(ref _isBackdropEnabled, value);
-    }
-
-    private bool _isMicaSupported = false;
-    public bool IsMicaSupported
-    {
-        get => _isMicaSupported;
-        set => SetProperty(ref _isMicaSupported, value);
-    }
+    [ObservableProperty]
+    public partial ElementTheme Theme { get; set; } = ElementTheme.Default;
+    [ObservableProperty]
+    public partial SystemBackdropOption Material { get; set; } = SystemBackdropOption.Mica;
+    [ObservableProperty]
+    public partial bool IsAcrylicSupported { get; set; } = false;
+    [ObservableProperty]
+    public partial bool IsBackdropEnabled { get; set; } = false;
+    [ObservableProperty]
+    public partial bool IsMicaSupported { get; set; } = false;
 
     #endregion
 
@@ -2864,24 +2171,24 @@ public partial class MainViewModel : ObservableObject
     {
         #region == Subscribe to events ==
 
-        _mpc.MpdIdleConnected += new MpcService.IsMpdIdleConnectedEvent(OnMpdIdleConnected);
-        _mpc.MpdPlayerStatusChanged += new MpcService.MpdPlayerStatusChangedEvent(OnMpdPlayerStatusChanged);
-        _mpc.MpdCurrentQueueChanged += new MpcService.MpdCurrentQueueChangedEvent(OnMpdCurrentQueueChanged);
-        _mpc.MpdPlaylistsChanged += new MpcService.MpdPlaylistsChangedEvent(OnMpdPlaylistsChanged);
+        _mpc.MpdIdleConnected += OnMpdIdleConnected;
+        _mpc.MpdPlayerStatusChanged += OnMpdPlayerStatusChanged;
+        _mpc.MpdCurrentQueueChanged += OnMpdCurrentQueueChanged;
+        _mpc.MpdPlaylistsChanged += OnMpdPlaylistsChanged;
 
-        _mpc.DebugCommandOutput += new MpcService.DebugCommandOutputEvent(OnDebugCommandOutput);
-        _mpc.DebugIdleOutput += new MpcService.DebugIdleOutputEvent(OnDebugIdleOutput);
+        _mpc.DebugCommandOutput += OnDebugCommandOutput;
+        _mpc.DebugIdleOutput += OnDebugIdleOutput;
 
-        _mpc.ConnectionStatusChanged += new MpcService.ConnectionStatusChangedEvent(OnConnectionStatusChanged);
-        _mpc.ConnectionError += new MpcService.ConnectionErrorEvent(OnConnectionError);
+        _mpc.ConnectionStatusChanged += OnConnectionStatusChanged;
+        _mpc.ConnectionError += OnConnectionError;
 
-        _mpc.MpdAckError += new MpcService.MpdAckErrorEvent(OnMpdAckError);
-        _mpc.MpdFatalError += new MpcService.MpdFatalErrorEvent(OnMpdFatalError);
+        _mpc.MpdAckError += OnMpdAckError;
+        _mpc.MpdFatalError += OnMpdFatalError;
 
-        _mpc.MpdAlbumArtChanged += new MpcService.MpdAlbumArtChangedEvent(OnAlbumArtChanged);
+        _mpc.MpdAlbumArtChanged += OnAlbumArtChanged;
 
-        _mpc.MpcProgress += new MpcService.MpcProgressEvent(OnMpcProgress);
-        _mpc.IsBusy += new MpcService.IsBusyEvent(OnMpcIsBusy);
+        _mpc.MpcProgress += OnMpcProgress;
+        _mpc.IsBusy += OnMpcIsBusy;
 
         this.UpdateProgress += (sender, arg) => { this.OnUpdateProgress(arg); };
 
@@ -2889,12 +2196,12 @@ public partial class MainViewModel : ObservableObject
 
         #region == Init Song's time elapsed timer. ==  
 
-        _elapsedTimer.Elapsed += new System.Timers.ElapsedEventHandler(ElapsedTimer);
+        _elapsedTimer.Elapsed += ElapsedTimer;
 
         #endregion
 
         // needs to be here for _resourceLoader.
-        _searchTagList =
+        SearchTagList =
             [
                 new Models.SearchOption(SearchTags.Title, _resourceLoader.GetString("SearchTag_Title")),
                 new Models.SearchOption(SearchTags.Artist, _resourceLoader.GetString("SearchTag_Artist")),
@@ -2904,7 +2211,7 @@ public partial class MainViewModel : ObservableObject
             ];
 
         // needs to be here for _resourceLoader.
-        _searchShikiList =
+        SearchShikiList =
             [
                 new Models.SearchWith(SearchShiki.Contains, _resourceLoader.GetString("Search_Shiki_Contains")),
                 new Models.SearchWith(SearchShiki.Equals, _resourceLoader.GetString("Search_Shiki_Equals"))
@@ -2962,7 +2269,7 @@ public partial class MainViewModel : ObservableObject
 
         if (result.IsSuccess)
         {
-            bool r = await _mpc.MpdCommandConnectionStart(_mpc.MpdHost, _mpc.MpdPort, _mpc.MpdPassword);
+            var r = await _mpc.MpdCommandConnectionStart(_mpc.MpdHost, _mpc.MpdPort, _mpc.MpdPassword);
 
             if (r)
             {
@@ -3034,8 +2341,8 @@ public partial class MainViewModel : ObservableObject
         {
             UpdateProgress?.Invoke(this, "[UI] Status updating...");
 
-            bool isSongChanged = false;
-            bool isCurrentSongWasNull = false;
+            var isSongChanged = false;
+            var isCurrentSongWasNull = false;
 
             if (CurrentSong is not null)
             {
@@ -3179,26 +2486,13 @@ public partial class MainViewModel : ObservableObject
             try
             {
                 //Play button
-                switch (_mpc.MpdStatus.MpdState)
+                PlayButton = _mpc.MpdStatus.MpdState switch
                 {
-                    case Status.MpdPlayState.Play:
-                        {
-                            PlayButton = _pathPauseButton;
-                            break;
-                        }
-                    case Status.MpdPlayState.Pause:
-                        {
-                            PlayButton = _pathPlayButton;
-                            break;
-                        }
-                    case Status.MpdPlayState.Stop:
-                        {
-                            PlayButton = _pathPlayButton;
-                            break;
-                        }
-
-                        //_pathStopButton
-                }
+                    Status.MpdPlayState.Play => PathPauseButton,
+                    Status.MpdPlayState.Pause => PathPlayButton,
+                    Status.MpdPlayState.Stop => PathPlayButton,
+                    _ => PlayButton
+                };
 
                 if (_mpc.MpdStatus.MpdVolumeIsReturned)
                 {
@@ -3269,8 +2563,8 @@ public partial class MainViewModel : ObservableObject
     {
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue( () =>
         {
-            bool isSongChanged = false;
-            bool isCurrentSongWasNull = false;
+            var isSongChanged = false;
+            var isCurrentSongWasNull = false;
 
             if (CurrentSong != null)
             {
@@ -4085,7 +3379,7 @@ public partial class MainViewModel : ObservableObject
                     }
                 }
 
-                if (_isNavigationViewMenuOpen)
+                if (IsNavigationViewMenuOpen)
                 {
                     playlistDir.Expanded = true;
                 }
@@ -4132,7 +3426,7 @@ public partial class MainViewModel : ObservableObject
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
         {
             RenamedSelectPendingPlaylistName = string.Empty;
-            _playlistPageSubTitleSongCount = "";
+            PlaylistPageSubTitleSongCount = "";
             OnPropertyChanged(nameof(PlaylistPageSubTitleSongCount));
 
             foreach (var hoge in MainMenuItems)
@@ -4142,19 +3436,18 @@ public partial class MainViewModel : ObservableObject
                 {
                     if (fuga is not NodeMenuPlaylistItem) continue;
 
-                    if (string.Equals(playlist, fuga.Name, StringComparison.CurrentCulture))
-                    {
-                        await Task.Yield();
-                        await Task.Delay(1000); // needed this for WinUI3.
+                    if (!string.Equals(playlist, fuga.Name, StringComparison.CurrentCulture)) continue;
 
-                        Debug.WriteLine($"{playlist} is now selected....");
-                        IsNavigationViewMenuOpen = true;
-                        fuga.Selected = true;
-                        SelectedNodeMenu = fuga;
-                        SelectedPlaylistName = fuga.Name;
+                    await Task.Yield();
+                    await Task.Delay(1000); // needed this for WinUI3.
+
+                    Debug.WriteLine($"{playlist} is now selected....");
+                    IsNavigationViewMenuOpen = true;
+                    fuga.Selected = true;
+                    SelectedNodeMenu = fuga;
+                    SelectedPlaylistName = fuga.Name;
  
-                        break;
-                    }
+                    break;
                 }
             }
         });
@@ -4451,22 +3744,20 @@ public partial class MainViewModel : ObservableObject
 
                         foreach (var song in r.SearchResult)
                         {
-                            if ((song.AlbumArtist.Equals(album.AlbumArtist, StringComparison.CurrentCulture)) || (song.Artist.Equals(album.AlbumArtist, StringComparison.CurrentCulture)))
+                            if ((!song.AlbumArtist.Equals(album.AlbumArtist, StringComparison.CurrentCulture)) &&
+                                (!song.Artist.Equals(album.AlbumArtist, StringComparison.CurrentCulture))) continue;
+                            //if (song.Album.Trim() == album.Name.Trim())
+                            if (!song.Album.Equals(album.Name, StringComparison.CurrentCulture)) continue;
+
+                            // WInUI3's walkaround.
+                            song.ParentViewModel = this;
+
+                            //Debug.WriteLine($"{song.Album}=={album.Name}?...{song.Title}");
+                            album.Songs.Add(song);
+
+                            if ((!string.IsNullOrEmpty(song.Date)) && (!string.IsNullOrEmpty(song.Album)))
                             {
-                                //if (song.Album.Trim() == album.Name.Trim())
-                                if (song.Album.Equals(album.Name, StringComparison.CurrentCulture))
-                                {
-                                    // WInUI3's walkaround.
-                                    song.ParentViewModel = this;
-
-                                    //Debug.WriteLine($"{song.Album}=={album.Name}?...{song.Title}");
-                                    album.Songs.Add(song);
-
-                                    if ((!string.IsNullOrEmpty(song.Date)) && (!string.IsNullOrEmpty(song.Album)))
-                                    {
-                                        album.ReleaseYear = song.Date;
-                                    }
-                                }
+                                album.ReleaseYear = song.Date;
                             }
                         }
                         album.IsSongsAcquired = true;
@@ -4621,17 +3912,16 @@ public partial class MainViewModel : ObservableObject
 
                 foreach (var song in r.SearchResult)
                 {
-                    if (song.Album.Equals(slbm.Name, StringComparison.CurrentCulture))
+                    if (!song.Album.Equals(slbm.Name, StringComparison.CurrentCulture)) continue;
+
+                    // WInUI3's walkaround.
+                    song.ParentViewModel = this;
+
+                    slbm.Songs?.Add(song);
+
+                    if ((!string.IsNullOrEmpty(song.Date)) && (!string.IsNullOrEmpty(song.Album)))
                     {
-                        // WInUI3's walkaround.
-                        song.ParentViewModel = this;
-
-                        slbm.Songs?.Add(song);
-
-                        if ((!string.IsNullOrEmpty(song.Date)) && (!string.IsNullOrEmpty(song.Album)))
-                        {
-                            slbm.ReleaseYear = song.Date;
-                        }
+                        slbm.ReleaseYear = song.Date;
                     }
                 }
 
@@ -4717,26 +4007,12 @@ public partial class MainViewModel : ObservableObject
                 }
 
                 var strArtist = album.AlbumArtist.Trim(); // album.AlbumArtist already fallback to Artist if none.
-                if (string.IsNullOrEmpty(strArtist))
-                {
-                    strArtist = "Unknown Artist";
-                }
-                else
-                {
-                    strArtist = SanitizeFilename(strArtist);
-                }
+                strArtist = string.IsNullOrEmpty(strArtist) ? "Unknown Artist" : SanitizeFilename(strArtist);
 
                 var strAlbum = album.Name.Trim();
-                if (string.IsNullOrEmpty(strAlbum))
-                {
-                    strAlbum = "Unknown Album";
-                }
-                else
-                {
-                    strAlbum = SanitizeFilename(strAlbum);
-                }
+                strAlbum = string.IsNullOrEmpty(strAlbum) ? "Unknown Album" : SanitizeFilename(strAlbum);
 
-                string filePath = System.IO.Path.Combine(App.AppDataCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".bmp";
+                var filePath = System.IO.Path.Combine(App.AppDataCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".bmp";
 
                 if (File.Exists(filePath))
                 {
@@ -5909,7 +5185,7 @@ public partial class MainViewModel : ObservableObject
         {
             return;
         }
-        if (_selectedQueueSong is null)
+        if (SelectedQueueSong is null)
         {
             return;
         }
@@ -7248,15 +6524,15 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public async Task RenamePlaylist(string playlist)
     {
-        if (string.IsNullOrEmpty(_selectedPlaylistName))
+        if (string.IsNullOrEmpty(SelectedPlaylistName))
         {
             Debug.WriteLine("(string.IsNullOrEmpty(_selectedPlaylistName))");
             return;
         }
 
-        if (!_selectedPlaylistName.Equals(playlist, StringComparison.CurrentCulture))
+        if (!SelectedPlaylistName.Equals(playlist, StringComparison.CurrentCulture))
         {
-            Debug.WriteLine($"({_selectedPlaylistName} != {playlist})");
+            Debug.WriteLine($"({SelectedPlaylistName} != {playlist})");
             return;
         }
 
@@ -7293,7 +6569,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var ret = await _mpc.MpdRenamePlaylist(_selectedPlaylistName, result.PlaylistName);
+        var ret = await _mpc.MpdRenamePlaylist(SelectedPlaylistName, result.PlaylistName);
 
         if (ret.IsSuccess)
         {
@@ -7328,12 +6604,12 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public async Task RemovePlaylist(string playlist)
     {
-        if (string.IsNullOrEmpty(_selectedPlaylistName))
+        if (string.IsNullOrEmpty(SelectedPlaylistName))
         {
             return;
         }
 
-        if (_selectedPlaylistName != playlist)
+        if (SelectedPlaylistName != playlist)
         {
             return;
         }
@@ -7341,7 +6617,7 @@ public partial class MainViewModel : ObservableObject
         // Move the selection to the parent directory to avoid selecting a non existing playlist after deletion.
         _mainMenuItems.PlaylistsDirectory.Selected = true;
 
-        var ret = await _mpc.MpdRemovePlaylist(_selectedPlaylistName);
+        var ret = await _mpc.MpdRemovePlaylist(SelectedPlaylistName);
 
         if (ret.IsSuccess)
         {
@@ -7350,7 +6626,7 @@ public partial class MainViewModel : ObservableObject
             // Clear listview 
             PlaylistSongs.Clear();
 
-            _playlistPageSubTitleSongCount = string.Empty;
+            PlaylistPageSubTitleSongCount = string.Empty;
             OnPropertyChanged(nameof(PlaylistPageSubTitleSongCount));
         }
     }
@@ -7358,12 +6634,12 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public async Task ClearPlaylist(string playlist)
     {
-        if (string.IsNullOrEmpty(_selectedPlaylistName))
+        if (string.IsNullOrEmpty(SelectedPlaylistName))
         {
             return;
         }
 
-        if (_selectedPlaylistName != playlist)
+        if (SelectedPlaylistName != playlist)
         {
             return;
         }
@@ -7385,7 +6661,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        if (string.IsNullOrEmpty(_selectedPlaylistName))
+        if (string.IsNullOrEmpty(SelectedPlaylistName))
         {
             Debug.WriteLine("string.IsNullOrEmpty(_selectedPlaylistName) @PlaylistRemoveSelectedItem");
             return;
@@ -7413,7 +6689,7 @@ public partial class MainViewModel : ObservableObject
 
         if (SelectedNodeMenu is NodeMenuPlaylistItem nmpli)
         {
-            if (_selectedPlaylistName != nmpli.Name)
+            if (SelectedPlaylistName != nmpli.Name)
             {
                 Debug.WriteLine("_selectedPlaylistName != nmpli.Name @PlaylistRemoveSelectedItem");
                 return;
@@ -7426,7 +6702,7 @@ public partial class MainViewModel : ObservableObject
             }
             else
             {
-                await _mpc.MpdPlaylistDelete(_selectedPlaylistName, selectedList[0]);
+                await _mpc.MpdPlaylistDelete(SelectedPlaylistName, selectedList[0]);
                 /*
                 if (obj is SongInfo song)
                 {
@@ -7450,12 +6726,12 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public void PlaylistRemoveDuplicates(string playlist)
     {
-        if (string.IsNullOrEmpty(_selectedPlaylistName))
+        if (string.IsNullOrEmpty(SelectedPlaylistName))
         {
             return;
         }
 
-        if (_selectedPlaylistName != playlist)
+        if (SelectedPlaylistName != playlist)
         {
             return;
         }
@@ -7480,8 +6756,8 @@ public partial class MainViewModel : ObservableObject
             uris.Add(song.File);
         }
 
-        _mpc.MpdPlaylistClear(_selectedPlaylistName);
-        _mpc.MpdPlaylistAdd(_selectedPlaylistName, uris);
+        _mpc.MpdPlaylistClear(SelectedPlaylistName);
+        _mpc.MpdPlaylistAdd(SelectedPlaylistName, uris);
     }
 
     [RelayCommand]

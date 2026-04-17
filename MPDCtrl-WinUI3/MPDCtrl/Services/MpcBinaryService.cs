@@ -1,24 +1,15 @@
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Imaging;
 using MPDCtrl.Models;
 using MPDCtrl.Services.Contracts;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using Windows.Graphics.Imaging;
-using Windows.Storage.Streams;
-using static MPDCtrl.Services.MpcService;
 
 namespace MPDCtrl.Services;
 

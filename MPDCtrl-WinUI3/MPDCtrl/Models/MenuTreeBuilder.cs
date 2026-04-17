@@ -1,8 +1,4 @@
-using System;
 using System.Collections.ObjectModel;
-using System.Runtime.Versioning;
-using Microsoft.Windows.ApplicationModel.Resources;
-using MPDCtrl.Models;
 
 namespace MPDCtrl.Models;
 
@@ -89,68 +85,19 @@ public partial class NodeMenuPlaylistItem : NodeMenu
 
 public partial class MenuTreeBuilder : NodeTree
 {
-    private readonly NodeMenuPlaylists _playlistsDirectory;
-    public NodeMenuPlaylists PlaylistsDirectory
-    {
-        get
-        {
-            return _playlistsDirectory;
-        }
-    }
+    public NodeMenuPlaylists PlaylistsDirectory { get; }
 
-    private readonly NodeMenuSearch _searchDirectory;
-    public NodeMenuSearch SearchDirectory
-    {
-        get
-        {
-            return _searchDirectory;
-        }
-    }
+    public NodeMenuSearch SearchDirectory { get; }
 
-    private readonly NodeMenuAlbum _albumsDirectory;
-    public NodeMenuAlbum AlbumsDirectory
-    {
-        get
-        {
-            return _albumsDirectory;
-        }
-    }
+    public NodeMenuAlbum AlbumsDirectory { get; }
 
-    private readonly NodeMenuArtist _artistsDirectory;
-    public NodeMenuArtist ArtistsDirectory
-    {
-        get
-        {
-            return _artistsDirectory;
-        }
-    }
+    public NodeMenuArtist ArtistsDirectory { get; }
 
-    private readonly NodeMenuLibrary _libraryDirectory;
-    public NodeMenuLibrary LibraryDirectory
-    {
-        get
-        {
-            return _libraryDirectory;
-        }
-    }
+    public NodeMenuLibrary LibraryDirectory { get; }
 
-    private readonly NodeMenuFiles _filesDirectory;
-    public NodeMenuFiles FilesDirectory
-    {
-        get
-        {
-            return _filesDirectory;
-        }
-    }
+    public NodeMenuFiles FilesDirectory { get; }
 
-    private readonly NodeMenuQueue _queueDirectory;
-    public NodeMenuQueue QueueDirectory
-    {
-        get
-        {
-            return _queueDirectory;
-        }
-    }
+    public NodeMenuQueue QueueDirectory { get; }
 
     public MenuTreeBuilder(string name) : base(name)
     {
@@ -169,7 +116,7 @@ public partial class MenuTreeBuilder : NodeTree
             Parent = this
         };
         Children.Add(queue);
-        _queueDirectory = queue;
+        QueueDirectory = queue;
 
 
         str = resourceLoader.GetString("MenuTreeItem_Library");
@@ -182,7 +129,7 @@ public partial class MenuTreeBuilder : NodeTree
             Parent = this
         };
         Children.Add(library);
-        _libraryDirectory = library;
+        LibraryDirectory = library;
 
 
         str = resourceLoader.GetString("MenuTreeItem_Albums");
@@ -195,7 +142,7 @@ public partial class MenuTreeBuilder : NodeTree
             Parent = this
         };
         library.Children.Add(albums);
-        _albumsDirectory = albums;
+        AlbumsDirectory = albums;
 
 
         str = resourceLoader.GetString("MenuTreeItem_Artists");
@@ -208,7 +155,7 @@ public partial class MenuTreeBuilder : NodeTree
             Parent = this
         };
         library.Children.Add(artists);
-        _artistsDirectory = artists;
+        ArtistsDirectory = artists;
 
 
         str = resourceLoader.GetString("MenuTreeItem_Files");
@@ -221,7 +168,7 @@ public partial class MenuTreeBuilder : NodeTree
             Parent = this
         };
         library.Children.Add(files);
-        _filesDirectory = files;
+        FilesDirectory = files;
 
 
         str = resourceLoader.GetString("MenuTreeItem_Search");
@@ -234,7 +181,7 @@ public partial class MenuTreeBuilder : NodeTree
             Parent = this
         };
         library.Children.Add(search);
-        _searchDirectory = search;
+        SearchDirectory = search;
 
 
         str = resourceLoader.GetString("MenuTreeItem_Playlists");
@@ -247,6 +194,6 @@ public partial class MenuTreeBuilder : NodeTree
             Parent = this
         };
         Children.Add(playlists);
-        _playlistsDirectory = playlists;
+        PlaylistsDirectory = playlists;
     }
 }

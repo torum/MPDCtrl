@@ -41,8 +41,7 @@ public sealed partial class MainWindow : Window
     private readonly MainViewModel _vm;
 
     // DispatcherQueue
-    private Microsoft.UI.Dispatching.DispatcherQueue? _currentDispatcherQueue;// = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
-    public Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue => _currentDispatcherQueue;
+    public Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue { get; private set; }
 
     // Stupid WinUI3 workaround.
     private readonly MediaPlayer? _mediaPlayer;
@@ -64,7 +63,7 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         // This DispatcherQueue should be alive as long as MainWindow is alive. Make sure to clear when the window is closed.
-        _currentDispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+        CurrentDispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 
         // This is where the MainViewModel is first initilized.
         _vm = App.GetService<MainViewModel>();
@@ -752,7 +751,7 @@ public sealed partial class MainWindow : Window
         _vm.CleanUp();
 
         // For some stupid reason, we needed this, otherwise we get COM error.
-        _currentDispatcherQueue = null;
+        CurrentDispatcherQueue = null;
 
         SaveSettings();
     }

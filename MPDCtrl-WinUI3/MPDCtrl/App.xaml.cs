@@ -1,32 +1,17 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Shapes;
 using MPDCtrl.Helpers;
 using MPDCtrl.Services;
 using MPDCtrl.Services.Contracts;
 using MPDCtrl.ViewModels;
 using MPDCtrl.Views;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.ApplicationSettings;
 using WinRT.Interop;
 
 namespace MPDCtrl;
@@ -34,21 +19,20 @@ namespace MPDCtrl;
 public partial class App : Application
 {
     // AppDataFolder
-    private static readonly string _appName = "MPDCtrl4";//_resourceLoader.GetString("AppName");
-    private static readonly string _appDeveloper = "torum";
-    private static readonly string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+    private static readonly string AppDeveloper = "torum";
+    private static readonly string EnvDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
-    public static readonly string AppName = _appName;
-    public static string AppDataFolder { get; private set; } = System.IO.Path.Combine(System.IO.Path.Combine(_envDataFolder, _appDeveloper), _appName);//_envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
-    public static string AppConfigFilePath { get; private set; } = System.IO.Path.Combine(AppDataFolder, _appName + ".config");
+    public static readonly string AppName =  "MPDCtrl4";//_resourceLoader.GetString("AppName");
+    public static string AppDataFolder { get; private set; } = System.IO.Path.Combine(System.IO.Path.Combine(EnvDataFolder, AppDeveloper), AppName);//_envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
+    public static string AppConfigFilePath { get; private set; } = System.IO.Path.Combine(AppDataFolder, AppName + ".config");
 
     // Temp album cover cache folder.
-    private static readonly string _envAppLocalFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData); // Use Local instead of temp path. //System.IO.Path.GetTempPath();
-    private static readonly string _envAppLocalAppFolder = System.IO.Path.Combine((System.IO.Path.Combine(_envAppLocalFolder, _appDeveloper)), AppName);
-    public static string AppDataCacheFolder { get; private set; } = System.IO.Path.Combine(_envAppLocalAppFolder, "AlbumCoverCache");
+    private static readonly string EnvAppLocalFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData); // Use Local instead of temp path. //System.IO.Path.GetTempPath();
+    private static readonly string EnvAppLocalAppFolder = System.IO.Path.Combine((System.IO.Path.Combine(EnvAppLocalFolder, AppDeveloper)), AppName);
+    public static string AppDataCacheFolder { get; private set; } = System.IO.Path.Combine(EnvAppLocalAppFolder, "AlbumCoverCache");
 
     // ErrorLog
-    private static readonly string _logFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl4_errors.txt";
+    private static readonly string LogFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl4_errors.txt";
 
     // MainWindow
     public static MainWindow? MainWnd
@@ -78,11 +62,11 @@ public partial class App : Application
         {
             Debug.WriteLine("IsMSIX");
             var envDataFolder = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
-            AppDataFolder = System.IO.Path.Combine(System.IO.Path.Combine(envDataFolder, _appDeveloper), _appName);
-            AppConfigFilePath = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, _appName + ".config");
+            AppDataFolder = System.IO.Path.Combine(System.IO.Path.Combine(envDataFolder, AppDeveloper), AppName);
+            AppConfigFilePath = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, AppName + ".config");
             //AppConfigFilePath = System.IO.Path.Combine(AppDataFolder, _appName + ".config"); // should have been this...
             var envAppLocalCahceFolder = Windows.Storage.ApplicationData.Current.LocalCacheFolder.Path;
-            AppDataCacheFolder = System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.Combine(envAppLocalCahceFolder, _appDeveloper), _appName), "AlbumCoverCache");
+            AppDataCacheFolder = System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.Combine(envAppLocalCahceFolder, AppDeveloper), AppName), "AlbumCoverCache");
         }
         else
         {
@@ -184,15 +168,14 @@ public partial class App : Application
 
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         {
-            if (MainWnd is not null)
-            {
-                MainWnd.Activate();
+            if (MainWnd is null) return;
 
-                //MainWindow?.BringToFront();
-                IntPtr hWnd = WindowNative.GetWindowHandle(MainWnd);
-                NativeMethods.ShowWindow(hWnd, NativeMethods.SW_RESTORE); // Ensure it's not minimized
-                NativeMethods.SetForegroundWindow(hWnd); // Attempt to set it as the foreground window
-            }
+            MainWnd.Activate();
+
+            //MainWindow?.BringToFront();
+            IntPtr hWnd = WindowNative.GetWindowHandle(MainWnd);
+            NativeMethods.ShowWindow(hWnd, NativeMethods.SW_RESTORE); // Ensure it's not minimized
+            NativeMethods.SetForegroundWindow(hWnd); // Attempt to set it as the foreground window
         });
     }
 
@@ -287,7 +270,7 @@ public partial class App : Application
 
     public static void SaveErrorLog()
     {
-        if (string.IsNullOrEmpty(_logFilePath))
+        if (string.IsNullOrEmpty(LogFilePath))
         {
             return;
         }
@@ -301,7 +284,7 @@ public partial class App : Application
             var s = Errortxt.ToString();
             if (!string.IsNullOrEmpty(s))
             {
-                File.WriteAllText(_logFilePath, s);
+                File.WriteAllText(LogFilePath, s);
             }
         }
     }

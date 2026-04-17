@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
-using System;
 using MPDCtrl.Models;
+using System;
 
 namespace MPDCtrl.Helpers;
 

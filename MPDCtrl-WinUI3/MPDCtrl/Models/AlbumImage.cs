@@ -1,7 +1,4 @@
 
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Imaging;
-using System;
 
 namespace MPDCtrl.Models;
 

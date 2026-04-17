@@ -9,134 +9,41 @@ public class Status
         Play, Pause, Stop
     };
 
-    private MpdPlayState _ps;
-    public MpdPlayState MpdState
-    {
-        get { return _ps; }
-        set { _ps = value; }
-    }
+    public MpdPlayState MpdState { get; set; }
 
-    private int _volume = 20;
-    public int MpdVolume
-    {
-        get { return _volume; }
-        set
-        {
-            _volume = value;
-        }
-    }
+    public int MpdVolume { get; set; } = 20;
 
-    private bool _volumeIsReturned;
-    public bool MpdVolumeIsReturned
-    {
-        get { return _volumeIsReturned; }
-        set
-        {
-            _volumeIsReturned = value;
-        }
-    }
+    public bool MpdVolumeIsReturned { get; set; }
 
-    private bool _volumeIsSet = false;
-    public bool MpdVolumeIsSet
-    {
-        get { return _volumeIsSet; }
-        set
-        {
-            _volumeIsSet = value;
-        }
-    }
+    public bool MpdVolumeIsSet { get; set; } = false;
 
-    private bool _repeat;
-    public bool MpdRepeat
-    {
-        get { return _repeat; }
-        set
-        {
-            _repeat = value;
-        }
-    }
+    public bool MpdRepeat { get; set; }
 
-    private bool _random;
-    public bool MpdRandom
-    {
-        get { return _random; }
-        set
-        {
-            _random = value;
-        }
-    }
+    public bool MpdRandom { get; set; }
 
-    private bool _consume;
-    public bool MpdConsume
-    {
-        get { return _consume; }
-        set
-        {
-            _consume = value;
-        }
-    }
+    public bool MpdConsume { get; set; }
 
-    private bool _single;
-    public bool MpdSingle
-    {
-        get { return _single; }
-        set
-        {
-            _single = value;
-        }
-    }
+    public bool MpdSingle { get; set; }
 
-    private string _songID = string.Empty;
-    public string MpdSongID
-    {
-        get { return _songID; }
-        set
-        {
-            _songID = value;
-        }
-    }
+    public string MpdSongID { get; set; } = string.Empty;
 
-    private double _songTime = 0;
-    public double MpdSongTime
-    {
-        get { return _songTime; }
-        set
-        {
-            _songTime = value;
-        }
-    }
+    public double MpdSongTime { get; set; } = 0;
 
-    private double _songElapsed = 0;
-    public double MpdSongElapsed
-    {
-        get { return _songElapsed; }
-        set
-        {
-            _songElapsed = value;
-        }
-    }
+    public double MpdSongElapsed { get; set; } = 0;
 
-    private string _error = string.Empty;
-    public string MpdError
-    {
-        get { return _error; }
-        set
-        {
-            _error = value;
-        }
-    }
+    public string MpdError { get; set; } = string.Empty;
 
     public void Reset()
     {
-        _volume = 20;
-        _volumeIsSet = false;
-        _volumeIsReturned = false;
-        _repeat = false;
-        _random = false;
-        _consume = false;
-        _songID = "";
-        _songTime = 0;
-        _songElapsed = 0;
-        _error = "";
+        MpdVolume = 20;
+        MpdVolumeIsSet = false;
+        MpdVolumeIsReturned = false;
+        MpdRepeat = false;
+        MpdRandom = false;
+        MpdConsume = false;
+        MpdSongID = "";
+        MpdSongTime = 0;
+        MpdSongElapsed = 0;
+        MpdError = "";
     }
 }

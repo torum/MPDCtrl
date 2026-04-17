@@ -1,11 +1,9 @@
 
 using MPDCtrl.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace MPDCtrl.Models;
 

@@ -1,9 +1,5 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
-using MPDCtrl.ViewModels;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows;
 
 namespace MPDCtrl.Models;
 
@@ -12,19 +8,18 @@ namespace MPDCtrl.Models;
 /// </summary>
 public partial class Profile : ObservableObject
 {
-    private string _host = string.Empty;
     public string Host
     {
-        get { return _host; }
+        get;
         set
         {
-            if (_host == value)
+            if (field == value)
                 return;
 
-            _host = value;
-            OnPropertyChanged(nameof(Host));
+            field = value;
+            OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     /*
     private IPAddress _hostIpAddress;
@@ -42,76 +37,65 @@ public partial class Profile : ObservableObject
     }
     */
 
-    private int _port = 6600;
     public int Port
     {
-        get { return _port; }
+        get;
         set
         {
-            if (_port == value)
+            if (field == value)
                 return;
 
-            _port = value;
-            OnPropertyChanged(nameof(Port));
+            field = value;
+            OnPropertyChanged();
         }
-    }
+    } = 6600;
 
-    private string _password = string.Empty;
     public string Password
     {
-        get { return _password; }
+        get;
         set
         {
-            if (_password == value)
+            if (field == value)
                 return;
 
-            _password = value;
-            OnPropertyChanged(nameof(Password));
+            field = value;
+            OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
-    private string _name = string.Empty;
     public string Name
     {
-        get { return _name; }
+        get;
         set
         {
-            if (_name == value)
+            if (field == value)
                 return;
 
-            _name = value;
-
-            OnPropertyChanged(nameof(Name));
+            field = value;
+            OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
-    private bool _isDefault;
     public bool IsDefault
     {
-        get { return _isDefault; }
+        get;
         set
         {
-            if (_isDefault == value)
+            if (field == value)
                 return;
 
-            _isDefault = value;
-
-            OnPropertyChanged(nameof(IsDefault));
+            field = value;
+            OnPropertyChanged();
         }
     }
 
-    private double _volume = 50;
     public double Volume
     {
-        get { return _volume; }
+        get;
         set
         {
-            if (_volume == value)
-                return;
-
-            _volume = value;
-
-            OnPropertyChanged(nameof(Volume));
+            field = value;
+            OnPropertyChanged();
         }
-    }
+    } = 50;
 }

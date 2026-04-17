@@ -1,9 +1,6 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows;
-using System.Xml.Linq;
 
 namespace MPDCtrl.Models;
 
@@ -12,41 +9,33 @@ namespace MPDCtrl.Models;
 /// </summary>
 public abstract class Node(string name) : ObservableObject
 {
-    private string _name = name;
     public string Name
     {
-        get
-        {
-            return _name;
-        }
+        get;
         set
         {
-            if (_name == value)
+            if (field == value)
                 return;
 
-            _name = value;
+            field = value;
 
-            OnPropertyChanged(nameof(Name));
+            OnPropertyChanged();
         }
-    }
+    } = name;
 
-    private string _pathData = "M20,18H4V8H20M20,6H12L10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6Z";
     public string PathIcon
     {
-        get
-        {
-            return _pathData;
-        }
+        get;
         protected set
         {
-            if (_pathData == value)
+            if (field == value)
                 return;
 
-            _pathData = value;
+            field = value;
 
-            OnPropertyChanged(nameof(PathIcon));
+            OnPropertyChanged();
         }
-    }
+    } = "M20,18H4V8H20M20,6H12L10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6Z";
 }
 
 /// <summary>
@@ -54,96 +43,76 @@ public abstract class Node(string name) : ObservableObject
 /// </summary>
 public partial class NodeTree : Node
 {
-    private bool _selected;
     public bool Selected
     {
-        get
-        {
-            return _selected;
-        }
+        get;
         set
         {
-            if (_selected == value)
+            if (field == value)
                 return;
 
-            _selected = value;
+            field = value;
 
-            OnPropertyChanged(nameof(Selected));
+            OnPropertyChanged();
         }
     }
 
-    private bool _expanded;
     public bool Expanded
     {
-        get
-        {
-            return _expanded;
-        }
+        get;
         set
         {
-            if (_expanded == value)
+            if (field == value)
                 return;
 
-            _expanded = value;
+            field = value;
 
-            OnPropertyChanged(nameof(Expanded));
+            OnPropertyChanged();
         }
     }
 
-    private string _tag = string.Empty;
     public string Tag
     {
-        get
-        {
-            return _tag;
-        }
+        get;
         set
         {
-            if (_tag == value)
+            if (field == value)
                 return;
 
-            _tag = value;
+            field = value;
 
-            OnPropertyChanged(nameof(Tag));
+            OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
-    private NodeTree? _parent;
     public NodeTree? Parent
     {
-        get
-        {
-            return _parent;
-        }
+        get;
 
         set
         {
-            if (_parent == value)
+            if (field == value)
                 return;
 
-            _parent = value;
+            field = value;
 
-            OnPropertyChanged(nameof(Parent));
+            OnPropertyChanged();
         }
     }
 
-    private ObservableCollection<NodeTree> _children = [];
     public ObservableCollection<NodeTree> Children
     {
-        get
-        {
-            return _children;
-        }
+        get;
         set
         {
-            if (_children == value)
+            if (field == value)
                 return;
 
-            _children = value;
+            field = value;
 
-            OnPropertyChanged(nameof(Children));
+            OnPropertyChanged();
         }
-    }
+    } = [];
 
     protected NodeTree(string name) : base(name)
     {

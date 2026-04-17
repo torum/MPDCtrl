@@ -173,28 +173,7 @@ public sealed partial class MainWindow : Window
 
             if (SongInfoForSMTC.IsThumbnailIncluded)
             {
-                //Debug.WriteLine("(SongInfoForSMTC.IsThumbnailIncluded)");
-
-                // TODO: Stupid WinUI3/WinRT.. updater.Thumbnail won't ...
                 updater.Thumbnail = SongInfoForSMTC.Thumbnail;
-
-                /*
-                if (!string.IsNullOrEmpty(SongInfoForSMTC.FilePath))
-                {
-                    Debug.WriteLine($"RandomAccessStreamReference.CreateFromUri() {SongInfoForSMTC.FilePath}");
-
-                    // Noop.
-                    //updater.Thumbnail = RandomAccessStreamReference.CreateFromUri(new Uri(SongInfoForSMTC.FilePath));
-
-                    // Noop. Stupid WinUI3...
-                    //StorageFile storageFile = await StorageFile.GetFileFromPathAsync(SongInfoForSMTC.FilePath);
-                    //await updater.CopyFromFileAsync(MediaPlaybackType.Music, storageFile);
-                }
-                else
-                {
-                    updater.Thumbnail = SongInfoForSMTC.Thumbnail;
-                }
-                */
             }
             else
             {

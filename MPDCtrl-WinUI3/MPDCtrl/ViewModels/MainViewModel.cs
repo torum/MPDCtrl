@@ -3110,10 +3110,10 @@ public partial class MainViewModel : ObservableObject
                                                 //IsAlbumArtVisible = true;
                                                 CurrentSong.IsAlbumCoverNeedsUpdate = false;
 
-                                                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                                                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
                                                 {
                                                     var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                                    SetSystemMediaTransportControlsWithThumbnail(CurrentSong, filePath, ToRandomAccessStreamReference(res.AlbumCover.BinaryData));
+                                                    SetSystemMediaTransportControlsWithThumbnail(CurrentSong, filePath, await ToRandomAccessStreamReference(res.AlbumCover.BinaryData));
                                                 });
                                             }
                                             else
@@ -3603,10 +3603,10 @@ public partial class MainViewModel : ObservableObject
                                     AlbumArtBitmapSource = await BitmapSourceFromByteArray(res.AlbumCover.BinaryData);
                                     CurrentSong.IsAlbumCoverNeedsUpdate = false;
 
-                                    App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                                    App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async() =>
                                     {
                                         var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                        SetSystemMediaTransportControlsWithThumbnail(CurrentSong, filePath, ToRandomAccessStreamReference(res.AlbumCover.BinaryData));
+                                        SetSystemMediaTransportControlsWithThumbnail(CurrentSong, filePath, await ToRandomAccessStreamReference(res.AlbumCover.BinaryData));
                                     });
                                 }
                             }
@@ -3721,10 +3721,10 @@ public partial class MainViewModel : ObservableObject
                                                     AlbumArtBitmapSource = await BitmapSourceFromByteArray(res.AlbumCover.BinaryData);
                                                     CurrentSong.IsAlbumCoverNeedsUpdate = false;
 
-                                                    App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                                                    App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
                                                     {
                                                         var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                                        SetSystemMediaTransportControlsWithThumbnail(CurrentSong, filePath, ToRandomAccessStreamReference(res.AlbumCover.BinaryData));
+                                                        SetSystemMediaTransportControlsWithThumbnail(CurrentSong, filePath, await ToRandomAccessStreamReference(res.AlbumCover.BinaryData));
                                                     });
                                                 }
                                             }
@@ -3799,10 +3799,10 @@ public partial class MainViewModel : ObservableObject
                                         AlbumArtBitmapSource = await BitmapSourceFromByteArray(res.AlbumCover.BinaryData);
                                         CurrentSong.IsAlbumCoverNeedsUpdate = false;
 
-                                        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                                        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
                                         {
                                             var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                            SetSystemMediaTransportControlsWithThumbnail(CurrentSong, filePath, ToRandomAccessStreamReference(res.AlbumCover.BinaryData));
+                                            SetSystemMediaTransportControlsWithThumbnail(CurrentSong, filePath, await ToRandomAccessStreamReference(res.AlbumCover.BinaryData));
                                         });
                                     }
                                 }
@@ -3967,7 +3967,7 @@ public partial class MainViewModel : ObservableObject
         return RandomAccessStreamReference.CreateFromStream(stream);
     }
 
-    public static RandomAccessStreamReference? ToRandomAccessStreamReference(byte[]? byteArray)
+    public static async Task<RandomAccessStreamReference?> ToRandomAccessStreamReference(byte[]? byteArray)
     {
         if (byteArray is null)
         {
@@ -3975,10 +3975,25 @@ public partial class MainViewModel : ObservableObject
             return null;
         }
 
+        // 1. Create an in-memory random access stream
+        InMemoryRandomAccessStream randomAccessStream = new InMemoryRandomAccessStream();
+
+        // 2. Write the byte array into the stream
+        // Ensure you use AsBuffer() from System.Runtime.InteropServices.WindowsRuntime
+        await randomAccessStream.WriteAsync(byteArray.AsBuffer());
+
+        // 3. Reset the stream position to the beginning before creating the reference
+        randomAccessStream.Seek(0);
+
+        // 4. Create and return the RandomAccessStreamReference
+        return RandomAccessStreamReference.CreateFromStream(randomAccessStream);
+
+        /*
         using MemoryStream memoryStream = new(byteArray);
         memoryStream.Position = 0;
         IRandomAccessStream randomAccessStream = memoryStream.AsRandomAccessStream();
         return RandomAccessStreamReference.CreateFromStream(randomAccessStream);
+        */
     }
 
     private void UpdatePlaylists()

@@ -146,6 +146,54 @@
                         </Button.Flyout>
                     </Button>
                 </StackPanel>
+
+                <Popup Grid.Row="1" PlacementTarget="{x:Bind TglButtonQueueFilter}" DesiredPlacement="LeftEdgeAlignedTop" HorizontalOffset="-6" VerticalOffset="-6" IsLightDismissEnabled="True" IsOpen="{x:Bind ViewModel.IsQueueFindVisible, Mode=TwoWay}">
+
+                    <!--  Background="{ThemeResource LayerFillColorDefaultBrush}" SmokeFillColorDefaultBrush LayerFillColorAltBrush SolidBackgroundFillColorBaseBrush -->
+                    <Border Width="280" Height="280" Translation="0, 0, 12" KeyboardAcceleratorPlacementMode="Hidden" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" CornerRadius="6" Padding="6" BorderBrush="{ThemeResource SmokeFillColorDefaultBrush}" BorderThickness="1">
+                        <Border.Shadow>
+                            <ThemeShadow />
+                        </Border.Shadow>
+                        <Border.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="Escape" Invoked="Popup_Escape_Invoked" />
+                        </Border.KeyboardAccelerators>
+                        <StackPanel>
+                            <TextBox x:Name="FilterQueueQueryTextBox" Text="{x:Bind ViewModel.FilterQueueQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="0,0,0,0"></TextBox>
+                            <ListView Name="FilterQueueListBox" ItemsSource="{x:Bind ViewModel.QueueForFilter, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedQueueFilterSong,Mode=TwoWay}" IsDoubleTapEnabled="True" DoubleTapped="FilterQueueListBox_DoubleTapped" SelectionMode="Single" MaxHeight="240" BorderThickness="0" Padding="0,3,0,0">
+
+                                <ListView.ContextFlyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem Command="{x:Bind ViewModel.QueueFilterSelectCommand}" CommandParameter="{x:Bind FilterQueueListBox.SelectedItem, Mode=OneWay}">
+                                            <MenuFlyoutItem.Icon>
+                                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm8.856-3.845A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189Z"/>
+                                            </MenuFlyoutItem.Icon>
+                                            <MenuFlyoutItem.KeyboardAccelerators>
+                                                <KeyboardAccelerator Key="Enter" />
+                                            </MenuFlyoutItem.KeyboardAccelerators>
+                                        </MenuFlyoutItem>
+                                    </MenuFlyout>
+                                </ListView.ContextFlyout>
+
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="mod:SongInfoEx">
+                                        <StackPanel>
+                                            <TextBlock x:Name="filterListBoxTitle" Text="{x:Bind Path=Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" />
+                                            <!--
+									<TextBlock x:Name="filterListBoxArtist" Text="{Binding Path=Artist, Mode=OneWay}" TextWrapping="Wrap" Margin="0" Padding="3 0 3 0"/>
+									<TextBlock x:Name="fitterListBoxAlbum" Text="{Binding Path=Album, Mode=OneWay}" TextWrapping="Wrap" FontStyle="Italic" Margin="0" Padding="3 0 3 0"/>
+
+									<StackPanel Orientation="Horizontal">
+										<TextBlock x:Name="fitterListBoxGenre" Text="{Binding Path=Genre, Mode=OneWay}" TextWrapping="Wrap" FontStyle="Italic" Margin="0" Padding="3 0 3 0"/>
+									</StackPanel>
+									<TextBlock x:Name="fitterListBoxNewsTimeStamp" Text="{Binding Path=LastModifiedFormated, Mode=OneWay}" Margin="0" Padding="3 0 3 0" HorizontalAlignment="Right"/>
+									-->
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackPanel>
+                    </Border>
+                </Popup>
             </Grid>
             
         </Grid>
@@ -336,49 +384,6 @@
                 </ListView>
             </Grid>
 
-            <Popup Grid.Row="1" PlacementTarget="{x:Bind BodyGrid}" DesiredPlacement="Top" HorizontalOffset="0" VerticalOffset="280" IsLightDismissEnabled="True" IsOpen="{x:Bind ViewModel.IsQueueFindVisible, Mode=TwoWay}">
-                <Border Width="280" Height="280" KeyboardAcceleratorPlacementMode="Hidden" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" CornerRadius="6" Padding="6" BorderBrush="{ThemeResource LayerFillColorDefaultBrush}" BorderThickness="1">
-                    <Border.KeyboardAccelerators>
-                        <KeyboardAccelerator Key="Escape" Invoked="Popup_Escape_Invoked" />
-                    </Border.KeyboardAccelerators>
-                    <StackPanel>
-                        <TextBox x:Name="FilterQueueQueryTextBox" Text="{x:Bind ViewModel.FilterQueueQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="0,0,0,0"></TextBox>
-                        <ListView Name="FilterQueueListBox" ItemsSource="{x:Bind ViewModel.QueueForFilter, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedQueueFilterSong,Mode=TwoWay}" IsDoubleTapEnabled="True" DoubleTapped="FilterQueueListBox_DoubleTapped" SelectionMode="Single" MaxHeight="240" BorderThickness="0" Padding="0,3,0,0">
-
-                            <ListView.ContextFlyout>
-                                <MenuFlyout>
-                                    <MenuFlyoutItem Command="{x:Bind ViewModel.QueueFilterSelectCommand}" CommandParameter="{x:Bind FilterQueueListBox.SelectedItem, Mode=OneWay}">
-                                        <MenuFlyoutItem.Icon>
-                                            <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm8.856-3.845A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189Z"/>
-                                        </MenuFlyoutItem.Icon>
-                                        <MenuFlyoutItem.KeyboardAccelerators>
-                                            <KeyboardAccelerator Key="Enter" />
-                                        </MenuFlyoutItem.KeyboardAccelerators>
-                                    </MenuFlyoutItem>
-
-                                </MenuFlyout>
-                            </ListView.ContextFlyout>
-
-                            <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="mod:SongInfoEx">
-                                    <StackPanel>
-                                        <TextBlock x:Name="filterListBoxTitle" Text="{x:Bind Path=Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" />
-                                        <!--
-									<TextBlock x:Name="filterListBoxArtist" Text="{Binding Path=Artist, Mode=OneWay}" TextWrapping="Wrap" Margin="0" Padding="3 0 3 0"/>
-									<TextBlock x:Name="fitterListBoxAlbum" Text="{Binding Path=Album, Mode=OneWay}" TextWrapping="Wrap" FontStyle="Italic" Margin="0" Padding="3 0 3 0"/>
-
-									<StackPanel Orientation="Horizontal">
-										<TextBlock x:Name="fitterListBoxGenre" Text="{Binding Path=Genre, Mode=OneWay}" TextWrapping="Wrap" FontStyle="Italic" Margin="0" Padding="3 0 3 0"/>
-									</StackPanel>
-									<TextBlock x:Name="fitterListBoxNewsTimeStamp" Text="{Binding Path=LastModifiedFormated, Mode=OneWay}" Margin="0" Padding="3 0 3 0" HorizontalAlignment="Right"/>
-									-->
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                    </StackPanel>
-                </Border>
-            </Popup>
             
         </Grid>
         

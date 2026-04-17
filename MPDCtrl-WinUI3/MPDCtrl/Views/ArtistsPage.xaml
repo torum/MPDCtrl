@@ -73,14 +73,13 @@
                                                 <KeyboardAccelerator Key="Enter" />
                                             </MenuFlyoutItem.KeyboardAccelerators>
                                         </MenuFlyoutItem>
-
                                     </MenuFlyout>
                                 </ListView.ContextFlyout>
 
                                 <ListView.ItemTemplate>
                                     <DataTemplate x:DataType="mod:AlbumArtist">
                                         <StackPanel>
-                                            <TextBlock x:Name="filterListBoxTitle" Text="{x:Bind Path=Name, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" />
+                                            <TextBlock Text="{x:Bind Path=Name, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" />
                                         </StackPanel>
                                     </DataTemplate>
                                 </ListView.ItemTemplate>

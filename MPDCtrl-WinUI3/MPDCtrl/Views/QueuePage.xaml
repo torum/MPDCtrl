@@ -178,18 +178,19 @@
                                     <DataTemplate x:DataType="mod:SongInfoEx">
                                         <StackPanel>
                                             <TextBlock x:Name="filterListBoxTitle" Text="{x:Bind Path=Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" />
-                                            <!--
-									<TextBlock x:Name="filterListBoxArtist" Text="{Binding Path=Artist, Mode=OneWay}" TextWrapping="Wrap" Margin="0" Padding="3 0 3 0"/>
-									<TextBlock x:Name="fitterListBoxAlbum" Text="{Binding Path=Album, Mode=OneWay}" TextWrapping="Wrap" FontStyle="Italic" Margin="0" Padding="3 0 3 0"/>
 
-									<StackPanel Orientation="Horizontal">
-										<TextBlock x:Name="fitterListBoxGenre" Text="{Binding Path=Genre, Mode=OneWay}" TextWrapping="Wrap" FontStyle="Italic" Margin="0" Padding="3 0 3 0"/>
-									</StackPanel>
-									<TextBlock x:Name="fitterListBoxNewsTimeStamp" Text="{Binding Path=LastModifiedFormated, Mode=OneWay}" Margin="0" Padding="3 0 3 0" HorizontalAlignment="Right"/>
-									-->
+                                            <TextBlock Text="{x:Bind Path=AlbumArtist, Mode=OneWay}" Opacity="0.6" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" Visibility="{x:Bind AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=Flase}" />
+                                            <TextBlock x:Uid="Text_UnknownArtist" Opacity="0.6" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" Visibility="{x:Bind AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=True}"/>
+
                                         </StackPanel>
                                     </DataTemplate>
                                 </ListView.ItemTemplate>
+                                <ListView.ItemContainerStyle>
+                                    <Style BasedOn="{StaticResource DefaultListViewItemStyle}" TargetType="ListViewItem">
+                                        <Setter Property="Padding" Value="12,6,6,6" />
+                                        <Setter Property="Margin" Value="0" />
+                                    </Style>
+                                </ListView.ItemContainerStyle>
                             </ListView>
                         </StackPanel>
                     </Border>

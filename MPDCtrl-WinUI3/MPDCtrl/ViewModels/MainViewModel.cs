@@ -1688,6 +1688,95 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    // For Album filter.
+    private ObservableCollection<AlbumEx> _albumsForFilter = [];
+    public ObservableCollection<AlbumEx> AlbumsForFilter
+    {
+        get
+        {
+            return _albumsForFilter;
+        }
+        set
+        {
+            if (_albumsForFilter == value)
+                return;
+
+            _albumsForFilter = value;
+            OnPropertyChanged(nameof(AlbumsForFilter));
+        }
+    }
+
+    private string _filterAlbumQuery = "";
+    public string FilterAlbumQuery
+    {
+        get
+        {
+            return _filterAlbumQuery;
+        }
+        set
+        {
+            if (_filterAlbumQuery == value)
+                return;
+
+            _filterAlbumQuery = value;
+            OnPropertyChanged(nameof(FilterAlbumQuery));
+
+            if (_filterAlbumQuery == "")
+            {
+                return;
+            }
+
+            var filtered = Albums.Where(album => FilterAlbums(album));
+
+            AlbumsForFilter = new ObservableCollection<AlbumEx>(filtered);
+        }
+    }
+
+    private bool FilterAlbums(AlbumEx album)
+    {
+        return album.Name.Contains(FilterAlbumQuery, StringComparison.CurrentCultureIgnoreCase);// InvariantCultureIgnoreCase
+    }
+
+    private bool _isAlbumFindVisible;
+    public bool IsAlbumFindVisible
+    {
+        get
+        {
+            return _isAlbumFindVisible;
+        }
+        set
+        {
+            if (_isAlbumFindVisible == value)
+                return;
+
+            _isAlbumFindVisible = value;
+
+            AlbumsForFilter.Clear();
+
+            FilterAlbumQuery = "";
+
+            OnPropertyChanged(nameof(IsAlbumFindVisible));
+        }
+    }
+
+    private AlbumEx? _selectedFilterAlbum;
+    public AlbumEx? SelectedFilterAlbum
+    {
+        get
+        {
+            return _selectedFilterAlbum;
+        }
+        set
+        {
+            if (_selectedFilterAlbum == value)
+                return;
+
+            _selectedFilterAlbum = value;
+            OnPropertyChanged(nameof(SelectedFilterAlbum));
+        }
+    }
+
+
     #endregion
 
     #region == Files ==
@@ -2761,6 +2850,12 @@ public partial class MainViewModel : ObservableObject
     public async Task GetCacheFolderSize()
     {
         AlbumCacheFolderSizeFormatted = ToFileSizeString(await GetFolderSize(App.AppDataCacheFolder).ConfigureAwait(true));
+    }
+
+    public void GetAlbumPicture(AlbumEx album)
+    {
+        var list = new ObservableCollection<AlbumEx> { album };
+        GetAlbumPictures(list);
     }
 
     #region == Private Methods ==
@@ -6454,6 +6549,24 @@ public partial class MainViewModel : ObservableObject
         // Albums sort resets ObservableCollection which is not recognized by ListViewBehavior and does not UpdateVisibleItems,
         // so forcibly fire scroll event in AlbumsPage's code behind.
         AlbumsCollectionHasBeenReset?.Invoke(this, EventArgs.Empty);
+    }
+
+
+    [RelayCommand]
+    public void AlbumFilterSelect(object obj)
+    {
+        if (Albums.Count <= 1)
+            return;
+
+        if (obj is null) return;
+
+        if (obj is AlbumEx album)
+        {
+            SelectedAlbum = album;
+
+            var list = new ObservableCollection<AlbumEx> { album };
+            GetAlbumPictures(list);
+        }
     }
 
     [RelayCommand]

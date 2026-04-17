@@ -49,7 +49,7 @@ public sealed partial class AlbumsPage : Page
     {
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
         {
-            if (this.AlbumListView is not ListView lb)
+            if (this.AlbumsListView is not ListView lb)
             {
                 return;
             }
@@ -92,7 +92,7 @@ public sealed partial class AlbumsPage : Page
         // Need this to load image.
         // Albums sort resets ObservableCollection which is not recognized by ListViewBehavior and does not UpdateVisibleItems,
         // so forcibly fire scroll event.
-        if (this.AlbumListView is ListView lb)
+        if (this.AlbumsListView is ListView lb)
         {
             App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
             {
@@ -166,17 +166,17 @@ public sealed partial class AlbumsPage : Page
     private void AlbumListView_Loaded(object sender, RoutedEventArgs e)
     {
         // Already subscribed, returning.
-        if (this.AlbumListView.Tag != null)
+        if (this.AlbumsListView.Tag != null)
         {
             //Debug.WriteLine("(ListView.Tag != null) @ListViewBehaviors");
             return;
         }
 
-        this.AlbumListView.Tag = "LoadedEvent_ListViewBehaviors";
+        this.AlbumsListView.Tag = "LoadedEvent_ListViewBehaviors";
 
         //Debug.WriteLine("listView.Loaded and subscribing. @OnPropertyChanged");
 
-        var scrollViewer = FindScrollViewer(this.AlbumListView);
+        var scrollViewer = FindScrollViewer(this.AlbumsListView);
         if (scrollViewer is null)
         {
             return;
@@ -184,16 +184,16 @@ public sealed partial class AlbumsPage : Page
 
         scrollViewer.ViewChanged += (sender, eventArgs) =>
         {
-            UpdateVisibleItems(this.AlbumListView, scrollViewer);
+            UpdateVisibleItems(this.AlbumsListView, scrollViewer);
         };
 
         scrollViewer.SizeChanged += (sender, eventArgs) =>
         {
             //Debug.WriteLine("scrollViewer.SizeChanged");
-            UpdateVisibleItems(this.AlbumListView, scrollViewer);
+            UpdateVisibleItems(this.AlbumsListView, scrollViewer);
         };
 
-        UpdateVisibleItems(this.AlbumListView, scrollViewer);
+        UpdateVisibleItems(this.AlbumsListView, scrollViewer);
     }
 
     private void UpdateVisibleItems(ListView listView, ScrollViewer scrollViewer)//, ObservableCollection<object> visibleItems
@@ -245,5 +245,93 @@ public sealed partial class AlbumsPage : Page
         //listView.SetValue(VisibleItemsProperty, visibleItems);
 
         ViewModel.VisibleItemsAlbumsEx = visibleItems;
+    }
+
+    private static T? FindParent<T>(DependencyObject child) where T : DependencyObject
+    {
+        DependencyObject parent = VisualTreeHelper.GetParent(child);
+        while (parent != null && parent is not T)
+        {
+            parent = VisualTreeHelper.GetParent(parent);
+        }
+
+        if (parent is not null)
+        {
+            return parent as T;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private void TglButtonAlbumFilter_Click(object sender, RoutedEventArgs e)
+    {
+        if (this.TglButtonAlbumFilter is ToggleButton tb)
+        {
+            if (tb.IsChecked == true)
+            {
+                this.FilterAlbumQueryTextBox.Focus(FocusState.Programmatic);
+            }
+            else
+            {
+                this.TglButtonAlbumFilter.Focus(FocusState.Programmatic);
+            }
+        }
+    }
+
+    private void Page_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        Windows.System.VirtualKey downKey = e.OriginalKey;
+
+        if (downKey == Windows.System.VirtualKey.Escape)
+        {
+            if (this.TglButtonAlbumFilter is ToggleButton tb)
+            {
+                tb.IsChecked = false;
+            }
+        }
+    }
+
+    private void Popup_Escape_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (this.TglButtonAlbumFilter is ToggleButton tb)
+        {
+            tb.IsChecked = false;
+        }
+    }
+
+    private void FilterAlbumListBox_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        if (sender is not ListView)
+        {
+            return;
+        }
+
+        FrameworkElement element = (FrameworkElement)e.OriginalSource;
+
+        var container = FindParent<ListViewItem>(element);
+
+        if (container is null)
+        {
+            return;
+        }
+
+        if (container.Content is not AlbumEx album)
+        {
+            return;
+        }
+
+        if (this.AlbumsListView is ListView lb)
+        {
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                lb.ScrollIntoView(album, ScrollIntoViewAlignment.Default);
+
+                lb.SelectedItem = album;
+
+                ViewModel.GetAlbumPicture(album);
+            });
+        }
     }
 }

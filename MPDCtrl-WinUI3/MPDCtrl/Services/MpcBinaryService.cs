@@ -73,6 +73,7 @@ public class MpcBinaryService : IMpcBinaryService
         {
             await _binaryConnection.ConnectAsync(_host, _port);
 
+            //TODO: always false
             if (_binaryConnection.Client is null)
             {
                 Debug.WriteLine("_binaryConnection.Client is null. " + host + " " + port.ToString());
@@ -161,6 +162,7 @@ public class MpcBinaryService : IMpcBinaryService
             return ret;
         }
 
+        // TODO: always false
         if (_binaryConnection.Client is null)
         {
             return ret;
@@ -185,15 +187,9 @@ public class MpcBinaryService : IMpcBinaryService
         {
             //IsBusy?.Invoke(this, true);
 
-            string cmdDummy = cmd;
-            if (cmd.StartsWith("password "))
-                cmdDummy = "password ****";
-
-            cmdDummy = cmdDummy.Trim().Replace("\n", "\n" + ">>>>");
-
             await _binaryWriter.WriteAsync(cmd.Trim() + "\n");
         }
-        catch (System.IO.IOException e)
+        catch (IOException e)
         {
             // IOException : Unable to write data to the transport connection
             ret.IsSuccess = false;
@@ -300,7 +296,7 @@ public class MpcBinaryService : IMpcBinaryService
             }
 
         }
-        catch (System.InvalidOperationException e)
+        catch (InvalidOperationException e)
         {
             // The stream is currently in use by a previous operation on the stream.
 
@@ -312,7 +308,7 @@ public class MpcBinaryService : IMpcBinaryService
             //IsBusy?.Invoke(this, false);
             return ret;
         }
-        catch (System.IO.IOException e)
+        catch (IOException e)
         {
             // IOException : Unable to write data to the transport connection
 
@@ -353,6 +349,7 @@ public class MpcBinaryService : IMpcBinaryService
             return ret;
         }
 
+        // TODO: always false
         if (_binaryConnection.Client is null)
         {
             Debug.WriteLine("@MpdBinarySendBinaryCommand: " + "TcpClient.Client is null");
@@ -386,15 +383,9 @@ public class MpcBinaryService : IMpcBinaryService
         // WriteAsync
         try
         {
-            string cmdDummy = cmd;
-            if (cmd.StartsWith("password "))
-                cmdDummy = "password ****";
-
-            cmdDummy = cmdDummy.Trim().Replace("\n", "\n" + ">>>>");
-
             await _binaryWriter.WriteAsync(cmd.Trim() + "\n");
         }
-        catch (System.IO.IOException e)
+        catch (IOException e)
         {
             // IOException : Unable to write data to the transport connection
             
@@ -432,9 +423,9 @@ public class MpcBinaryService : IMpcBinaryService
             bool isNullReturn = false;
             bool isBinaryFound = false;
 
-            bool isWaitForOK = true;
+            bool isWaitForOk = true;
 
-            while (isWaitForOK)
+            while (isWaitForOk)
             {
                 int readSize = 0;
                 int bufferSize = 5000;
@@ -466,7 +457,7 @@ public class MpcBinaryService : IMpcBinaryService
                 {
                     isNullReturn = true;
 
-                    isWaitForOK = false;
+                    isWaitForOk = false;
                 }
                 else
                 {
@@ -493,7 +484,7 @@ public class MpcBinaryService : IMpcBinaryService
                                 ackText = line;
                                 isAck = true;
 
-                                isWaitForOK = false;
+                                isWaitForOk = false;
 
                                 break;
                             }
@@ -566,7 +557,7 @@ public class MpcBinaryService : IMpcBinaryService
                                 if (!string.IsNullOrEmpty(line))
                                     stringBuilder.Append(line + "\n");
 
-                                isWaitForOK = false;
+                                isWaitForOk = false;
                                 break;
                             }
                             else
@@ -578,7 +569,7 @@ public class MpcBinaryService : IMpcBinaryService
                         {
                             isNullReturn = true;
 
-                            isWaitForOK = false;
+                            isWaitForOk = false;
                             break;
                         }
                     }
@@ -633,7 +624,7 @@ public class MpcBinaryService : IMpcBinaryService
                 }
             }
         }
-        catch (System.InvalidOperationException e)
+        catch (InvalidOperationException e)
         {
             // The stream is currently in use by a previous operation on the stream.
 
@@ -644,7 +635,7 @@ public class MpcBinaryService : IMpcBinaryService
 
             return ret;
         }
-        catch (System.OperationCanceledException e)
+        catch (OperationCanceledException e)
         {
             Debug.WriteLine("ReadLineAsync canceled due to ConnectionStatus. Disconnecting, now exiting. @MpdBinarySendBinaryCommand" + e.Message);
             ret.IsSuccess = false;
@@ -652,7 +643,7 @@ public class MpcBinaryService : IMpcBinaryService
 
             return ret;
         }
-        catch (System.IO.IOException e)
+        catch (IOException e)
         {
             // IOException : Unable to write data to the transport connection
 

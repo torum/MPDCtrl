@@ -132,7 +132,6 @@ public partial class MpcService : IMpcService
     public delegate void MpdAckErrorEvent(MpcService sender, string data, string origin);
     public event MpdAckErrorEvent? MpdAckError;
 
-    //
     public delegate void MpdFatalErrorEvent(MpcService sender, string data, string origin);
     public event MpdFatalErrorEvent? MpdFatalError;
 
@@ -153,8 +152,8 @@ public partial class MpcService : IMpcService
 
     #endregion
 
-    private static readonly System.Threading.SemaphoreSlim _semaphoreCommand = new(1, 1);
-    private static readonly System.Threading.SemaphoreSlim _semaphoreBinary = new(1, 1);
+    private static readonly System.Threading.SemaphoreSlim SemaphoreCommand = new(1, 1);
+    private static readonly System.Threading.SemaphoreSlim SemaphoreBinary = new(1, 1);
 
     private readonly IMpcBinaryService _binaryDownloader;
 
@@ -211,7 +210,7 @@ public partial class MpcService : IMpcService
 
             await _idleConnection.ConnectAsync(MpdHost, MpdPort);
 
-            // TODO:
+            // TODO: always false
             if (_idleConnection.Client is null)
             {
                 Debug.WriteLine("_idleConnection.Client is null. " + host + " " + port.ToString());
@@ -349,6 +348,7 @@ public partial class MpcService : IMpcService
     {
         CommandResult ret = new();
 
+        //TODO: aways false
         if (_idleConnection.Client is null)
         {
             Debug.WriteLine("@MpdIdleSendCommand: TcpClient.Client is null");
@@ -356,7 +356,8 @@ public partial class MpcService : IMpcService
             ret.IsSuccess = false;
             ret.ErrorMessage = "TcpClient.Client is null";
 
-            DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdleSendCommand", "TcpClient.Client is null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+            DebugIdleOutput?.Invoke(this,
+                $"################ Error: @MpdIdleSendCommand, Reason: TcpClient.Client is null, Data: {cmd.Trim()}, {Environment.NewLine} Exception:  {Environment.NewLine + Environment.NewLine}");
 
             return ret;
         }
@@ -368,7 +369,8 @@ public partial class MpcService : IMpcService
             ret.IsSuccess = false;
             ret.ErrorMessage = "_idleWriter or _idleReader is null";
 
-            DebugIdleOutput?.Invoke(this, string.Format("################ Error :@{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdleSendCommand", "_idleWriter or _idleReader is null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+            DebugIdleOutput?.Invoke(this,
+                $"################ Error :@MpdIdleSendCommand, Reason: _idleWriter or _idleReader is null, Data: {cmd.Trim()}, {Environment.NewLine} Exception:  {Environment.NewLine + Environment.NewLine}");
 
             return ret;
         }
@@ -380,7 +382,8 @@ public partial class MpcService : IMpcService
             ret.IsSuccess = false;
             ret.ErrorMessage = "NOT IsMpdIdleConnected";
 
-            DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdleSendCommand", "!CommandConnection.Client.Connected", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+            DebugIdleOutput?.Invoke(this,
+                $"################ Error: @MpdIdleSendCommand, Reason: !CommandConnection.Client.Connected, Data: {cmd.Trim()}, {Environment.NewLine} Exception:  {Environment.NewLine + Environment.NewLine}");
 
             return ret;
         }
@@ -423,7 +426,8 @@ public partial class MpcService : IMpcService
             }
             else
             {
-                DebugIdleOutput?.Invoke(this, string.Format("################ Error@{0}, Reason:{1}, Data:{2}, {3} Exception: {4} {5}", "WriteAsync@MpdIdleSendCommand", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+                DebugIdleOutput?.Invoke(this,
+                    $"################ Error@WriteAsync@MpdIdleSendCommand, Reason:IOException, Data:{cmd.Trim()}, {Environment.NewLine} Exception: {e.Message} {Environment.NewLine + Environment.NewLine}");
 
                 ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
@@ -445,7 +449,8 @@ public partial class MpcService : IMpcService
             }
             else
             {
-                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "WriteAsync@MpdIdleSendCommand", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+                DebugIdleOutput?.Invoke(this,
+                    $"################ Error: @WriteAsync@MpdIdleSendCommand, Reason: Exception, Data: {cmd.Trim()}, {Environment.NewLine} Exception: {e.Message} {Environment.NewLine + Environment.NewLine}");
 
                 ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
@@ -459,14 +464,14 @@ public partial class MpcService : IMpcService
         {
             StringBuilder stringBuilder = new();
 
-            bool isAck = false;
-            bool isErr = false;
-            string ackText = "";
-            string errText = "";
+            var isAck = false;
+            var isErr = false;
+            var ackText = "";
+            var errText = "";
 
             while (true)
             {
-                string? line = await _idleReader.ReadLineAsync();
+                var line = await _idleReader.ReadLineAsync();
 
                 if (line is not null)
                 {
@@ -526,7 +531,8 @@ public partial class MpcService : IMpcService
                 {
                     Debug.WriteLine("@MpdIdleSendCommand ReadLineAsync line is not null");
 
-                    DebugIdleOutput?.Invoke(this, string.Format("################ Error @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdleSendCommand", "ReadLineAsync received null data", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+                    DebugIdleOutput?.Invoke(this,
+                        $"################ Error @ReadLineAsync@MpdIdleSendCommand, Reason: ReadLineAsync received null data, Data: {cmd.Trim()}, {Environment.NewLine} Exception:  {Environment.NewLine + Environment.NewLine}");
 
                     ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
@@ -570,7 +576,8 @@ public partial class MpcService : IMpcService
 
             Debug.WriteLine("InvalidOperationException@MpdIdleSendCommand: " + cmd.Trim() + " ReadLineAsync ---- " + e.Message);
 
-            DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdleSendCommand", "InvalidOperationException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+            DebugIdleOutput?.Invoke(this,
+                $"################ Error: @ReadLineAsync@MpdIdleSendCommand, Reason: InvalidOperationException, Data: {cmd.Trim()}, {Environment.NewLine} Exception: {e.Message} {Environment.NewLine + Environment.NewLine}");
 
             //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
@@ -593,7 +600,8 @@ public partial class MpcService : IMpcService
             ret.IsSuccess = false;
             ret.ErrorMessage = e.Message;
 
-            DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdleSendCommand", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+            DebugIdleOutput?.Invoke(this,
+                $"################ Error: @ReadLineAsync@MpdIdleSendCommand, Reason: Exception, Data: {cmd.Trim()}, {Environment.NewLine} Exception: {e.Message} {Environment.NewLine + Environment.NewLine}");
 
             return ret;
         }
@@ -714,11 +722,13 @@ public partial class MpcService : IMpcService
             return;
         }
 
+        //TODO:always false
         if (_idleConnection.Client is null)
         {
             Debug.WriteLine("@MpdIdle: TcpClient.Client is null");
 
-            DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdle", "TcpClient.Client is null", "", Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+            DebugIdleOutput?.Invoke(this,
+                $"################ Error: @MpdIdle, Reason: TcpClient.Client is null, Data: , {Environment.NewLine} Exception:  {Environment.NewLine + Environment.NewLine}");
 
             return;
         }
@@ -727,7 +737,8 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("@MpdIdle: " + "_idleWriter or _idleReader is null");
 
-            DebugIdleOutput?.Invoke(this, string.Format("################ Error :@{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdle", "_idleWriter or _idleReader is null", "", Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+            DebugIdleOutput?.Invoke(this,
+                $"################ Error :@MpdIdle, Reason: _idleWriter or _idleReader is null, Data: , {Environment.NewLine} Exception:  {Environment.NewLine + Environment.NewLine}");
 
             return;
         }
@@ -736,7 +747,8 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("@MpdIdle: " + "!_idleConnection.Client.Connected");
 
-            DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdIdle", "!_idleConnection.Client.Connected", "", Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+            DebugIdleOutput?.Invoke(this,
+                $"################ Error: @MpdIdle, Reason: !_idleConnection.Client.Connected, Data: , {Environment.NewLine} Exception:  {Environment.NewLine + Environment.NewLine}");
 
             return;
         }
@@ -755,7 +767,8 @@ public partial class MpcService : IMpcService
 
             Debug.WriteLine("[IOException@MpdIdle] ({0} ):\n{1}", "WriteAsync", e.Message);
 
-            DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "WriteAsync@MpdIdle", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+            DebugIdleOutput?.Invoke(this,
+                $"################ Error: @WriteAsync@MpdIdle, Reason: IOException, Data: {cmd.Trim()}, {Environment.NewLine} Exception: {e.Message} {Environment.NewLine + Environment.NewLine}");
 
             ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
@@ -767,7 +780,8 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("[Exception@MpdIdle] ({0} ):\n{1}", "WriteAsync", e.Message);
 
-            DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "WriteAsync@MpdIdle", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+            DebugIdleOutput?.Invoke(this,
+                $"################ Error: @WriteAsync@MpdIdle, Reason: Exception, Data: {cmd.Trim()}, {Environment.NewLine} Exception: {e.Message} {Environment.NewLine + Environment.NewLine}");
 
             ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
@@ -780,10 +794,10 @@ public partial class MpcService : IMpcService
         {
             StringBuilder stringBuilder = new();
 
-            bool isAck = false;
-            bool isErr = false;
-            string ackText = "";
-            string errText = "";
+            var isAck = false;
+            var isErr = false;
+            var ackText = "";
+            var errText = "";
 
             while (true)
             {
@@ -793,7 +807,7 @@ public partial class MpcService : IMpcService
                     break;
                 }
 
-                string? line = await _idleReader.ReadLineAsync(_cts.Token);
+                var line = await _idleReader.ReadLineAsync(_cts.Token);
 
                 if (line is not null)
                 {
@@ -850,7 +864,8 @@ public partial class MpcService : IMpcService
                     {
                         Debug.WriteLine("TCP Idle Connection: ReadLineAsync @MpdIdle received null data.");
 
-                        DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdle", "ReadLineAsync@MpdIdle received null data", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+                        DebugIdleOutput?.Invoke(this,
+                            $"################ Error: @ReadLineAsync@MpdIdle, Reason: ReadLineAsync@MpdIdle received null data, Data: {cmd.Trim()}, {Environment.NewLine} Exception: {""} {Environment.NewLine + Environment.NewLine}");
 
                         ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
@@ -905,7 +920,8 @@ public partial class MpcService : IMpcService
             {
                 Debug.WriteLine("[IOException@MpdIdle] ({0}):\n{1}", "ReadLineAsync: " + ConnectionState.ToString(), e.Message);
 
-                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdle", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+                DebugIdleOutput?.Invoke(this,
+                    $"################ Error: @ReadLineAsync@MpdIdle, Reason: IOException, Data: {cmd.Trim()}, {Environment.NewLine} Exception: {e.Message} {Environment.NewLine + Environment.NewLine}");
 
                 ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
@@ -928,7 +944,8 @@ public partial class MpcService : IMpcService
         {
             // The stream is currently in use by a previous operation on the stream.
 
-            DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdle", "InvalidOperationException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+            DebugIdleOutput?.Invoke(this,
+                $"################ Error: @ReadLineAsync@MpdIdle, Reason: InvalidOperationException, Data: {cmd.Trim()}, {Environment.NewLine} Exception: {e.Message} {Environment.NewLine + Environment.NewLine}");
 
             ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
@@ -947,7 +964,8 @@ public partial class MpcService : IMpcService
             {
                 Debug.WriteLine("[Exception@MpdIdle] ({0} ):\n{1}", "ReadLineAsync", e.Message);
 
-                DebugIdleOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdIdle", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+                DebugIdleOutput?.Invoke(this,
+                    $"################ Error: @ReadLineAsync@MpdIdle, Reason: Exception, Data: {cmd.Trim()}, {Environment.NewLine} Exception: {e.Message} {Environment.NewLine + Environment.NewLine}");
 
                 ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
@@ -985,7 +1003,7 @@ public partial class MpcService : IMpcService
         }
         */
 
-        List<string> SubSystems = result.Split('\n').ToList();
+        List<string> subSystems = result.Split('\n').ToList();
 
         try
         {
@@ -993,7 +1011,7 @@ public partial class MpcService : IMpcService
             bool isCurrentQueue = false;
             bool isStoredPlaylist = false;
 
-            foreach (string line in SubSystems)
+            foreach (string line in subSystems)
             {
                 //if (line.ToLower() == "changed: playlist")
                 if (string.Equals(line, "changed: playlist", StringComparison.OrdinalIgnoreCase))
@@ -1105,7 +1123,6 @@ public partial class MpcService : IMpcService
         MpdHost = host;
         MpdPort = port;
 
-
         DebugCommandOutput?.Invoke(this, "TCP Command Connection: Connecting." + "\n" + "\n");
 
         ConnectionState = ConnectionStatus.Connecting;
@@ -1114,7 +1131,7 @@ public partial class MpcService : IMpcService
         {
             await _commandConnection.ConnectAsync(MpdHost, MpdPort);
 
-            // TODO:
+            // TODO: always false
             if (_commandConnection.Client is null)
             {
                 Debug.WriteLine("_commandConnection.Client is null. " + host + " " + port.ToString());
@@ -1251,14 +1268,14 @@ public partial class MpcService : IMpcService
 
         try
         {
-            if (await _semaphoreCommand.WaitAsync(TimeSpan.FromSeconds(3), _cts.Token))
+            if (await SemaphoreCommand.WaitAsync(TimeSpan.FromSeconds(3), _cts.Token))
             {
                 if (MpdStop)
                 {
                     Debug.WriteLine("@MpdCommandSendCommand: MpdStop");
                     ret.IsWaitFailed = true;
                     ret.ErrorMessage = "WaitAsync failed due to MpdStop. @MpdCommandSendCommand";
-                    _semaphoreCommand.Release();
+                    SemaphoreCommand.Release();
                     return ret;
                 }
 
@@ -1268,7 +1285,7 @@ public partial class MpcService : IMpcService
                 }
                 finally
                 {
-                    _semaphoreCommand.Release();
+                    SemaphoreCommand.Release();
                 }
             }
             else
@@ -1309,6 +1326,7 @@ public partial class MpcService : IMpcService
             return ret;
         }
 
+        //TODO: always false
         if (_commandConnection.Client is null)
         {
             Debug.WriteLine("@MpdSendCommand: TcpClient.Client is null");
@@ -1316,7 +1334,8 @@ public partial class MpcService : IMpcService
             ret.IsSuccess = false;
             ret.ErrorMessage = "TcpClient.Client is null";
 
-            DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdSendCommand", "TcpClient.Client is null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+            DebugCommandOutput?.Invoke(this,
+                $"################ Error: @MpdSendCommand, Reason: TcpClient.Client is null, Data: {cmd.Trim()}, {Environment.NewLine} Exception:  {Environment.NewLine + Environment.NewLine}");
 
             return ret;
         }
@@ -1328,7 +1347,8 @@ public partial class MpcService : IMpcService
             ret.IsSuccess = false;
             ret.ErrorMessage = "_commandWriter or _commandReader is null";
 
-            DebugCommandOutput?.Invoke(this, string.Format("################ Error :@{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdSendCommand", "_commandWriter or _commandReader is null", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+            DebugCommandOutput?.Invoke(this,
+                $"################ Error :@MpdSendCommand, Reason: _commandWriter or _commandReader is null, Data: {cmd.Trim()}, {Environment.NewLine} Exception:  {Environment.NewLine + Environment.NewLine}");
 
             return ret;
         }
@@ -1340,7 +1360,8 @@ public partial class MpcService : IMpcService
             ret.IsSuccess = false;
             ret.ErrorMessage = "NOT IsMpdCommandConnected";
 
-            DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdSendCommand", "!CommandConnection.Client.Connected", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+            DebugCommandOutput?.Invoke(this,
+                $"################ Error: @MpdSendCommand, Reason: !CommandConnection.Client.Connected, Data: {cmd.Trim()}, {Environment.NewLine} Exception:  {Environment.NewLine + Environment.NewLine}");
 
             return ret;
         }
@@ -1352,7 +1373,8 @@ public partial class MpcService : IMpcService
             ret.IsSuccess = false;
             ret.ErrorMessage = "RetryCount > 5, returning.";
 
-            DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "MpdSendCommand", "RetryCount > 5", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+            DebugCommandOutput?.Invoke(this,
+                $"################ Error: @MpdSendCommand, Reason: RetryCount > 5, Data: {cmd.Trim()}, {Environment.NewLine} Exception:  {Environment.NewLine + Environment.NewLine}");
 
             return ret;
         }
@@ -1431,9 +1453,9 @@ public partial class MpcService : IMpcService
             string cmdDummy = cmd;
             if (cmd.StartsWith("password "))
                 cmdDummy = "password ****";
+
             _ = Task.Run(() => DebugCommandOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n"));
 
-            cmdDummy = cmdDummy.Trim().Replace("\n", "\n" + ">>>>");
             await _commandWriter.WriteAsync(cmd.Trim() + "\n");
         }
         catch (System.IO.IOException e)
@@ -1453,7 +1475,8 @@ public partial class MpcService : IMpcService
             else
             {
                 ConnectionState = ConnectionStatus.ConnectFailTimeout;
-                DebugCommandOutput?.Invoke(this, string.Format("################ Error@{0}, Reason:{1}, Data:{2}, {3} Exception: {4} {5}", "WriteAsync@MpdSendCommand", "IOException", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+                DebugCommandOutput?.Invoke(this,
+                    $"################ Error@WriteAsync@MpdSendCommand, Reason:{nameof(IOException)}, Data:{cmd.Trim()}, {Environment.NewLine} Exception: {e.Message} {Environment.NewLine + Environment.NewLine}");
 
                 // タイムアウトしていたらここで「も」エラーになる模様。
 
@@ -1481,7 +1504,7 @@ public partial class MpcService : IMpcService
                         //if (d.IsSuccess)
                         //{
                         DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. @IOExceptionOfWriteAsync" + Environment.NewLine + Environment.NewLine));
-                        Debug.WriteLine(string.Format("Reconnecting Success.  @IOExceptionOfWriteAsync"));
+                        Debug.WriteLine("Reconnecting Success.  @IOExceptionOfWriteAsync");
 
                         ConnectionState = ConnectionStatus.Connected;
                         ret = await MpdCommandSendCommandProtected(cmd, isAutoIdling, reTryCount++);
@@ -1524,7 +1547,8 @@ public partial class MpcService : IMpcService
             }
             else
             {
-                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "WriteAsync@MpdSendCommand", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+                DebugCommandOutput?.Invoke(this,
+                    $"################ Error: @WriteAsync@MpdSendCommand, Reason: Exception, Data: {cmd.Trim()}, {Environment.NewLine} Exception: {e.Message} {Environment.NewLine + Environment.NewLine}");
 
                 // TODO:
                 //ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
@@ -1550,16 +1574,16 @@ public partial class MpcService : IMpcService
 
             StringBuilder stringBuilder = new();
 
-            bool isDoubleOk = false;
-            bool isAck = false;
-            string ackText = "";
-            bool isNullReturn = false;
-            bool isErr = false;
-            string errText = "";
+            var isDoubleOk = false;
+            var isAck = false;
+            var ackText = "";
+            var isNullReturn = false;
+            var isErr = false;
+            var errText = "";
 
             while (true)
             {
-                string? line = await _commandReader.ReadLineAsync(_cts.Token);
+                var line = await _commandReader.ReadLineAsync(_cts.Token);
                 
                 if (_cts.Token.IsCancellationRequested)
                 {
@@ -1651,7 +1675,8 @@ public partial class MpcService : IMpcService
                 Debug.WriteLine("@MpdSendCommand ReadLineAsync isNullReturn");
 
 
-                DebugCommandOutput?.Invoke(this, string.Format("################ Error @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "ReadLineAsync received null data", cmd.Trim(), Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+                DebugCommandOutput?.Invoke(this,
+                    $"################ Error @ReadLineAsync@MpdSendCommand, Reason: ReadLineAsync received null data, Data: {cmd.Trim()}, {Environment.NewLine} Exception: {Environment.NewLine + Environment.NewLine}");
 
                 ret.ResultText = stringBuilder.ToString();
                 ret.ErrorMessage = "ReadLineAsync@MpdSendCommand received null data";
@@ -1688,8 +1713,8 @@ public partial class MpcService : IMpcService
                         //d = await MpdCommandSendCommand("idle player", isAutoIdling, reTryCount);
                         //if (d.IsSuccess)
                         //{
-                        DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. @isNullReturn" + Environment.NewLine + Environment.NewLine));
-                        Debug.WriteLine(string.Format("Reconnecting Success. @isNullReturn, RetryCount=" + reTryCount.ToString() + Environment.NewLine));
+                        DebugCommandOutput?.Invoke(this, "Reconnecting Success. @isNullReturn" + Environment.NewLine + Environment.NewLine);
+                        Debug.WriteLine("Reconnecting Success. @isNullReturn, RetryCount=" + reTryCount.ToString() + Environment.NewLine);
 
                         ConnectionState = ConnectionStatus.Connected;
 
@@ -1707,7 +1732,7 @@ public partial class MpcService : IMpcService
                 else
                 {
                     // 
-                    DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Failed. " + Environment.NewLine + Environment.NewLine));
+                    DebugCommandOutput?.Invoke(this, "Reconnecting Failed. " + Environment.NewLine + Environment.NewLine);
 
                     ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
@@ -1764,7 +1789,8 @@ public partial class MpcService : IMpcService
 
             Debug.WriteLine("InvalidOperationException@MpdSendCommand: " + cmd.Trim() + " ReadLineAsync ---- " + e.Message);
 
-            DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "InvalidOperationException (Most likely the connection is overloaded)", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+            DebugCommandOutput?.Invoke(this,
+                $"################ Error: @ReadLineAsync@MpdSendCommand, Reason: InvalidOperationException (Most likely the connection is overloaded), Data: {cmd.Trim()}, {Environment.NewLine} Exception: {e.Message} {Environment.NewLine + Environment.NewLine}");
 
             ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
 
@@ -1800,14 +1826,15 @@ public partial class MpcService : IMpcService
             {
                 ConnectionState = ConnectionStatus.ConnectFailTimeout;
 
-                DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}Reason: {1}Data: {2}{3}Exception: {4} {5}", "ReadLineAsync@MpdSendCommand" + Environment.NewLine, "IOException" + Environment.NewLine, cmd.Trim() + Environment.NewLine, Environment.NewLine, e.Message, Environment.NewLine));
+                DebugCommandOutput?.Invoke(this,
+                    $"################ Error: @{"ReadLineAsync@MpdSendCommand" + Environment.NewLine}Reason: {"IOException" + Environment.NewLine}Data: {cmd.Trim() + Environment.NewLine}{Environment.NewLine}Exception: {e.Message} {Environment.NewLine}");
 
                 // タイムアウトしていたらここで「も」エラーになる模様。
 
                 IsMpdCommandConnected = false;
 
                 DebugCommandOutput?.Invoke(this, string.Format("Connection Timeout. Reconnecting... " + Environment.NewLine + Environment.NewLine));
-                Debug.WriteLine(string.Format("Connection Timeout. Reconnecting...  @IOExceptionOfReadLineAsync"));
+                Debug.WriteLine("Connection Timeout. Reconnecting...  @IOExceptionOfReadLineAsync");
 
                 try
                 {
@@ -1829,7 +1856,7 @@ public partial class MpcService : IMpcService
                         //if (d.IsSuccess)
                         //{
                         DebugCommandOutput?.Invoke(this, string.Format("Reconnecting Success. @IOExceptionOfReadLineAsync" + Environment.NewLine + Environment.NewLine));
-                        Debug.WriteLine(string.Format("Reconnecting Success. @IOExceptionOfReadLineAsync"));
+                        Debug.WriteLine("Reconnecting Success. @IOExceptionOfReadLineAsync");
 
                         ConnectionState = ConnectionStatus.Connected;
 
@@ -1867,7 +1894,8 @@ public partial class MpcService : IMpcService
             ret.IsSuccess = false;
             ret.ErrorMessage = e.Message;
 
-            DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ReadLineAsync@MpdSendCommand", "Exception", cmd.Trim(), Environment.NewLine, e.Message, Environment.NewLine + Environment.NewLine));
+            DebugCommandOutput?.Invoke(this,
+                $"################ Error: @ReadLineAsync@MpdSendCommand, Reason: Exception, Data: {cmd.Trim()}, {Environment.NewLine} Exception: {e.Message} {Environment.NewLine + Environment.NewLine}");
 
             IsBusy?.Invoke(this, false);
 
@@ -2096,7 +2124,7 @@ public partial class MpcService : IMpcService
 
         try
         {
-            if (await _semaphoreBinary.WaitAsync(TimeSpan.FromSeconds(3), _cts.Token))
+            if (await SemaphoreBinary.WaitAsync(TimeSpan.FromSeconds(3), _cts.Token))
             {
                 try
                 {
@@ -2150,7 +2178,7 @@ public partial class MpcService : IMpcService
                 }
                 finally
                 {
-                    _semaphoreBinary.Release();
+                    SemaphoreBinary.Release();
                 }
             }
             else
@@ -2179,7 +2207,7 @@ public partial class MpcService : IMpcService
                         DebugCommandOutput?.Invoke(this, "MpdQueryAlbumArt@Timeout. Reconnecting success.");
                         Debug.WriteLine("MpdQueryAlbumArt@Timeout. Reconnecting success.");
                         // retry for the timeout.
-                        //_semaphoreBinary.Release();
+                        //SemaphoreBinary.Release();
                         return await MpdQueryAlbumArt(uri, isUsingReadpicture);
                     }
                     else
@@ -2221,7 +2249,7 @@ public partial class MpcService : IMpcService
 
         try
         {
-            if (await _semaphoreBinary.WaitAsync(TimeSpan.FromSeconds(2), _cts.Token))
+            if (await SemaphoreBinary.WaitAsync(TimeSpan.FromSeconds(2), _cts.Token))
             {
                 try
                 {
@@ -2269,7 +2297,7 @@ public partial class MpcService : IMpcService
                                     Debug.WriteLine("MpdQueryAlbumArt@Timeout. Reconnecting success.");
                                     DebugCommandOutput?.Invoke(this, "MpdQueryAlbumArt@Timeout. Reconnecting success.");
                                     // retry for the timeout.
-                                    //_semaphoreBinary.Release();
+                                    //SemaphoreBinary.Release();
                                     return await MpdQueryAlbumArtForAlbumView(uri, isUsingReadpicture);
                                 }
                                 else
@@ -2287,7 +2315,7 @@ public partial class MpcService : IMpcService
                 }
                 finally
                 {
-                    _semaphoreBinary.Release();
+                    SemaphoreBinary.Release();
                 }
             }
             else
@@ -2676,9 +2704,9 @@ public partial class MpcService : IMpcService
         return await MpdCommandSendCommand(cmd);
     }
 
-    public async Task<CommandResult> MpdMoveId(Dictionary<string, string> IdToNewPosPair)
+    public async Task<CommandResult> MpdMoveId(Dictionary<string, string> idToNewPosPair)
     {
-        if (IdToNewPosPair is null)
+        if (idToNewPosPair is null)
         {
             CommandResult f = new()
             {
@@ -2686,7 +2714,7 @@ public partial class MpcService : IMpcService
             };
             return f;
         }
-        if (IdToNewPosPair.Count < 1)
+        if (idToNewPosPair.Count < 1)
         {
             CommandResult f = new()
             {
@@ -2696,7 +2724,7 @@ public partial class MpcService : IMpcService
         }
 
         string cmd = "command_list_begin" + "\n";
-        foreach (KeyValuePair<string, string> pair in IdToNewPosPair)
+        foreach (KeyValuePair<string, string> pair in idToNewPosPair)
         {
             cmd = cmd + "moveid " + pair.Key + " " + pair.Value + "\n";
         }
@@ -2979,7 +3007,8 @@ public partial class MpcService : IMpcService
         if (result.Trim() == "OK")
         {
             DebugCommandOutput?.Invoke(this, "################(Error) " + "An empty result (OK) returened for a status command." + Environment.NewLine + Environment.NewLine);
-            DebugCommandOutput?.Invoke(this, string.Format("################ Error: @{0}, Reason: {1}, Data: {2}, {3} Exception: {4} {5}", "ParseStatus", "An empty result (OK) returened for a status command.", "", Environment.NewLine, "", Environment.NewLine + Environment.NewLine));
+            DebugCommandOutput?.Invoke(this,
+                $"################ Error: @ParseStatus, Reason: An empty result (OK) returened for a status command., Data: , {Environment.NewLine} Exception:  {Environment.NewLine + Environment.NewLine}");
 
             Debug.WriteLine("@ParseStatus: An empty result (OK)  returened for a status command.");
 
@@ -2991,7 +3020,7 @@ public partial class MpcService : IMpcService
         if (resultLines.Count == 0) return Task.FromResult(false);
 
         var comparer = StringComparer.OrdinalIgnoreCase;
-        Dictionary<string, string> MpdStatusValues = new(comparer);
+        Dictionary<string, string> mpdStatusValues = new(comparer);
 
         try
         {
@@ -3008,24 +3037,24 @@ public partial class MpcService : IMpcService
 
             foreach (string line in resultLines)
             {
-                string[] StatusValuePair = line.Split(':');
-                if (StatusValuePair.Length > 1)
+                string[] statusValuePair = line.Split(':');
+                if (statusValuePair.Length > 1)
                 {
-                    if (MpdStatusValues.ContainsKey(StatusValuePair[0].Trim()))
+                    if (mpdStatusValues.ContainsKey(statusValuePair[0].Trim()))
                     {
                         // new
 
-                        MpdStatusValues[StatusValuePair[0].Trim()] = line.Replace(StatusValuePair[0].Trim() + ": ", "");
+                        mpdStatusValues[statusValuePair[0].Trim()] = line.Replace(statusValuePair[0].Trim() + ": ", "");
                     }
                     else
                     {
-                        MpdStatusValues.Add(StatusValuePair[0].Trim(), line.Replace(StatusValuePair[0].Trim() + ": ", ""));
+                        mpdStatusValues.Add(statusValuePair[0].Trim(), line.Replace(statusValuePair[0].Trim() + ": ", ""));
                     }
                 }
             }
 
             // Play state
-            if (MpdStatusValues.TryGetValue("state", out var valueState))
+            if (mpdStatusValues.TryGetValue("state", out var valueState))
             {
                 switch (valueState)
                 {
@@ -3051,7 +3080,7 @@ public partial class MpcService : IMpcService
             }
 
             // Volume
-            if (MpdStatusValues.TryGetValue("volume", out var valueVolume))
+            if (mpdStatusValues.TryGetValue("volume", out var valueVolume))
             {
                 if (!string.IsNullOrEmpty(valueVolume))
                 {
@@ -3072,17 +3101,17 @@ public partial class MpcService : IMpcService
 
                 // songID
                 MpdStatus.MpdSongID = "";
-            if (MpdStatusValues.TryGetValue("songid", out string? value))
+            if (mpdStatusValues.TryGetValue("songid", out string? value))
             {
                 MpdStatus.MpdSongID = value;
             }
 
             // Repeat opt bool.
-            if (MpdStatusValues.ContainsKey("repeat"))
+            if (mpdStatusValues.ContainsKey("repeat"))
             {
                 try
                 {
-                    if (MpdStatusValues["repeat"] == "1")
+                    if (mpdStatusValues["repeat"] == "1")
                     {
                         MpdStatus.MpdRepeat = true;
                     }
@@ -3099,11 +3128,11 @@ public partial class MpcService : IMpcService
             }
 
             // Random opt bool.
-            if (MpdStatusValues.ContainsKey("random"))
+            if (mpdStatusValues.ContainsKey("random"))
             {
                 try
                 {
-                    if (Int32.Parse(MpdStatusValues["random"]) > 0)
+                    if (Int32.Parse(mpdStatusValues["random"]) > 0)
                     {
                         MpdStatus.MpdRandom = true;
                     }
@@ -3120,11 +3149,11 @@ public partial class MpcService : IMpcService
             }
 
             // Consume opt bool.
-            if (MpdStatusValues.ContainsKey("consume"))
+            if (mpdStatusValues.ContainsKey("consume"))
             {
                 try
                 {
-                    if (Int32.Parse(MpdStatusValues["consume"]) > 0)
+                    if (Int32.Parse(mpdStatusValues["consume"]) > 0)
                     {
                         MpdStatus.MpdConsume = true;
                     }
@@ -3141,11 +3170,11 @@ public partial class MpcService : IMpcService
             }
 
             // Single opt bool.
-            if (MpdStatusValues.ContainsKey("single"))
+            if (mpdStatusValues.ContainsKey("single"))
             {
                 try
                 {
-                    if (Int32.Parse(MpdStatusValues["single"]) > 0)
+                    if (Int32.Parse(mpdStatusValues["single"]) > 0)
                     {
                         MpdStatus.MpdSingle = true;
                     }
@@ -3162,14 +3191,14 @@ public partial class MpcService : IMpcService
             }
 
             // Song time. deprecated. 
-            if (MpdStatusValues.ContainsKey("time"))
+            if (mpdStatusValues.ContainsKey("time"))
             {
                 try
                 {
-                    if (MpdStatusValues["time"].Split(':').Length > 1)
+                    if (mpdStatusValues["time"].Split(':').Length > 1)
                     {
-                        MpdStatus.MpdSongTime = Double.Parse(MpdStatusValues["time"].Split(':')[1].Trim());
-                        MpdStatus.MpdSongElapsed = Double.Parse(MpdStatusValues["time"].Split(':')[0].Trim());
+                        MpdStatus.MpdSongTime = Double.Parse(mpdStatusValues["time"].Split(':')[1].Trim());
+                        MpdStatus.MpdSongElapsed = Double.Parse(mpdStatusValues["time"].Split(':')[0].Trim());
                     }
                 }
                 catch (FormatException e)
@@ -3179,7 +3208,7 @@ public partial class MpcService : IMpcService
             }
 
             // Song time elapsed.
-            if (MpdStatusValues.TryGetValue("elapsed", out string? value1))
+            if (mpdStatusValues.TryGetValue("elapsed", out string? value1))
             {
                 try
                 {
@@ -3189,7 +3218,7 @@ public partial class MpcService : IMpcService
             }
 
             // Song duration.
-            if (MpdStatusValues.TryGetValue("duration", out string? value2))
+            if (mpdStatusValues.TryGetValue("duration", out string? value2))
             {
                 try
                 {
@@ -3199,9 +3228,9 @@ public partial class MpcService : IMpcService
             }
 
             // Error
-            if (MpdStatusValues.ContainsKey("error"))
+            if (mpdStatusValues.ContainsKey("error"))
             {
-                MpdStatus.MpdError = MpdStatusValues["error"];
+                MpdStatus.MpdError = mpdStatusValues["error"];
             }
             else
             {
@@ -3261,31 +3290,31 @@ public partial class MpcService : IMpcService
         try
         {
             var comparer = StringComparer.OrdinalIgnoreCase;
-            Dictionary<string, string> SongValues = new(comparer);
+            Dictionary<string, string> songValues = new(comparer);
 
             foreach (string value in resultLines)
             {
-                string[] StatusValuePair = value.Trim().Split(':');
-                if (StatusValuePair.Length > 1)
+                string[] statusValuePair = value.Trim().Split(':');
+                if (statusValuePair.Length > 1)
                 {
-                    if (SongValues.ContainsKey(StatusValuePair[0].Trim()))
+                    if (songValues.ContainsKey(statusValuePair[0].Trim()))
                     {
                         // Shouldn't be happening here except "Genre"
-                        if (StatusValuePair[0].Trim() == "Genre")
+                        if (statusValuePair[0].Trim() == "Genre")
                         {
-                            SongValues["Genre"] = SongValues["Genre"] + "/" + value.Replace(StatusValuePair[0].Trim() + ": ", "");
+                            songValues["Genre"] = songValues["Genre"] + "/" + value.Replace(statusValuePair[0].Trim() + ": ", "");
                         }
                     }
                     else
                     {
-                        SongValues.TryAdd(StatusValuePair[0].Trim(), value.Replace(StatusValuePair[0].Trim() + ": ", ""));
+                        songValues.TryAdd(statusValuePair[0].Trim(), value.Replace(statusValuePair[0].Trim() + ": ", ""));
                     }
                 }
             }
 
-            if ((SongValues.Count > 0) && SongValues.ContainsKey("Id"))
+            if ((songValues.Count > 0) && songValues.ContainsKey("Id"))
             {
-                SongInfoEx? sng = FillSongInfoEx(SongValues, -1);
+                SongInfoEx? sng = FillSongInfoEx(songValues, -1);
 
                 if (sng is not null)
                 {
@@ -3293,7 +3322,7 @@ public partial class MpcService : IMpcService
                         MpdCurrentSong = sng;
                 }
 
-                SongValues.Clear();
+                songValues.Clear();
             }
         }
         catch (Exception ex)
@@ -3421,7 +3450,7 @@ public partial class MpcService : IMpcService
             */
 
             var comparer = StringComparer.OrdinalIgnoreCase;
-            Dictionary<string, string> SongValues = new(comparer);
+            Dictionary<string, string> songValues = new(comparer);
 
             int i = 0;
 
@@ -3430,15 +3459,15 @@ public partial class MpcService : IMpcService
 
             foreach (string value in resultLines)
             {
-                string[] StatusValuePair = value.Trim().Split(':');
-                if (StatusValuePair.Length > 1)
+                string[] statusValuePair = value.Trim().Split(':');
+                if (statusValuePair.Length > 1)
                 {
                     //if (SongValues.ContainsKey(StatusValuePair[0].Trim()))
-                    if (StatusValuePair[0].Trim().Equals("file"))
+                    if (statusValuePair[0].Trim().Equals("file"))
                     {
-                        if (SongValues.ContainsKey("Id"))
+                        if (songValues.ContainsKey("Id"))
                         {
-                            SongInfoEx? sng = FillSongInfoEx(SongValues, i);
+                            SongInfoEx? sng = FillSongInfoEx(songValues, i);
 
                             if (sng is not null)
                             {
@@ -3447,30 +3476,30 @@ public partial class MpcService : IMpcService
 
                                 i++;
 
-                                MpcProgress?.Invoke(this, string.Format("[Background] Parsing queue item... ({0})", i));
+                                MpcProgress?.Invoke(this, $"[Background] Parsing queue item... ({i})");
 
-                                SongValues.Clear();
+                                songValues.Clear();
                             }
                         }
 
-                        SongValues.Clear();
-                        SongValues.Add(StatusValuePair[0].Trim(), value.Replace(StatusValuePair[0].Trim() + ": ", ""));
+                        songValues.Clear();
+                        songValues.Add(statusValuePair[0].Trim(), value.Replace(statusValuePair[0].Trim() + ": ", ""));
                     }
                     else
                     //if (!SongValues.ContainsKey(StatusValuePair[0].Trim()))
                     {
-                        SongValues.TryAdd(StatusValuePair[0].Trim(), value.Replace(StatusValuePair[0].Trim() + ": ", ""));
+                        songValues.TryAdd(statusValuePair[0].Trim(), value.Replace(statusValuePair[0].Trim() + ": ", ""));
                     }
                 }
             }
 
-            if ((SongValues.Count > 0) && SongValues.ContainsKey("Id"))
+            if ((songValues.Count > 0) && songValues.ContainsKey("Id"))
             {
-                SongInfoEx? sng = FillSongInfoEx(SongValues, i);
+                SongInfoEx? sng = FillSongInfoEx(songValues, i);
 
                 if (sng is not null)
                 {
-                    SongValues.Clear();
+                    songValues.Clear();
                     /*
                     if (Application.Current is null) { return Task.FromResult(false); }
                     Application.Current.Dispatcher.Invoke(() =>
@@ -3481,7 +3510,7 @@ public partial class MpcService : IMpcService
                     //CurrentQueue.Add(sng);
                     tmpQueue.Add(sng);
 
-                    MpcProgress?.Invoke(this, string.Format("[Background] Parsing queue item... ({0})", i + 1));
+                    MpcProgress?.Invoke(this, $"[Background] Parsing queue item... ({i + 1})");
                 }
             }
 
@@ -3518,42 +3547,42 @@ public partial class MpcService : IMpcService
         return Task.FromResult(true);
     }
 
-    private SongInfoEx? FillSongInfoEx(Dictionary<string, string> SongValues, int i)
+    private SongInfoEx? FillSongInfoEx(Dictionary<string, string> songValues, int i)
     {
         try
         {
-            if (SongValues.ContainsKey("Id"))
+            if (songValues.ContainsKey("Id"))
             {
                 SongInfoEx sng = new();
 
-                if (SongValues.ContainsKey("Id"))
+                if (songValues.ContainsKey("Id"))
                 {
-                    sng.Id = SongValues["Id"];
+                    sng.Id = songValues["Id"];
                 }
 
-                if (SongValues.ContainsKey("Title"))
+                if (songValues.ContainsKey("Title"))
                 {
-                    sng.Title = SongValues["Title"];
+                    sng.Title = songValues["Title"];
                 }
                 else
                 {
                     sng.Title = "";
-                    if (SongValues.ContainsKey("file"))
+                    if (songValues.ContainsKey("file"))
                     {
-                        sng.Title = Path.GetFileName(SongValues["file"]);
+                        sng.Title = Path.GetFileName(songValues["file"]);
                     }
                 }
 
-                if (SongValues.ContainsKey("Artist"))
+                if (songValues.ContainsKey("Artist"))
                 {
-                    sng.Artist = SongValues["Artist"];
+                    sng.Artist = songValues["Artist"];
                 }
                 else
                 {
-                    if (SongValues.ContainsKey("AlbumArtist"))
+                    if (songValues.ContainsKey("AlbumArtist"))
                     {
                         // TODO: Should I?
-                        sng.Artist = SongValues["AlbumArtist"];
+                        sng.Artist = songValues["AlbumArtist"];
                     }
                     else
                     {
@@ -3561,65 +3590,65 @@ public partial class MpcService : IMpcService
                     }
                 }
 
-                if (SongValues.ContainsKey("Last-Modified"))
+                if (songValues.ContainsKey("Last-Modified"))
                 {
-                    sng.LastModified = SongValues["Last-Modified"];
+                    sng.LastModified = songValues["Last-Modified"];
                 }
 
-                if (SongValues.ContainsKey("AlbumArtist"))
+                if (songValues.ContainsKey("AlbumArtist"))
                 {
-                    sng.AlbumArtist = SongValues["AlbumArtist"];
+                    sng.AlbumArtist = songValues["AlbumArtist"];
                 }
 
-                if (SongValues.ContainsKey("Album"))
+                if (songValues.ContainsKey("Album"))
                 {
-                    sng.Album = SongValues["Album"];
+                    sng.Album = songValues["Album"];
                 }
 
-                if (SongValues.ContainsKey("Track"))
+                if (songValues.ContainsKey("Track"))
                 {
-                    sng.Track = SongValues["Track"];
+                    sng.Track = songValues["Track"];
                 }
 
-                if (SongValues.ContainsKey("Disc"))
+                if (songValues.ContainsKey("Disc"))
                 {
-                    sng.Disc = SongValues["Disc"];
+                    sng.Disc = songValues["Disc"];
                 }
 
-                if (SongValues.ContainsKey("Date"))
+                if (songValues.ContainsKey("Date"))
                 {
-                    sng.Date = SongValues["Date"];
+                    sng.Date = songValues["Date"];
                 }
 
-                if (SongValues.ContainsKey("Genre"))
+                if (songValues.ContainsKey("Genre"))
                 {
-                    sng.Genre = SongValues["Genre"];
+                    sng.Genre = songValues["Genre"];
                 }
 
-                if (SongValues.ContainsKey("Composer"))
+                if (songValues.ContainsKey("Composer"))
                 {
-                    sng.Composer = SongValues["Composer"];
+                    sng.Composer = songValues["Composer"];
                 }
 
-                if (SongValues.ContainsKey("Time"))
+                if (songValues.ContainsKey("Time"))
                 {
-                    sng.Time = SongValues["Time"];
+                    sng.Time = songValues["Time"];
                 }
 
-                if (SongValues.ContainsKey("duration"))
+                if (songValues.ContainsKey("duration"))
                 {
-                    sng.Time = SongValues["duration"];
-                    sng.Duration = SongValues["duration"];
+                    sng.Time = songValues["duration"];
+                    sng.Duration = songValues["duration"];
                 }
 
-                if (SongValues.ContainsKey("Pos"))
+                if (songValues.ContainsKey("Pos"))
                 {
-                    sng.Pos = SongValues["Pos"];
+                    sng.Pos = songValues["Pos"];
                 }
 
-                if (SongValues.ContainsKey("file"))
+                if (songValues.ContainsKey("file"))
                 {
-                    sng.File = SongValues["file"];
+                    sng.File = songValues["file"];
                 }
 
                 // for sorting.
@@ -3656,7 +3685,7 @@ public partial class MpcService : IMpcService
         }
         catch (Exception e)
         {
-            Debug.WriteLine("Error@FillSongInfoEx: " + e.ToString());
+            Debug.WriteLine("Error@FillSongInfoEx: " + e);
 
             //Application.Current?.Dispatcher.Invoke(() =>
             App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
@@ -3766,7 +3795,7 @@ public partial class MpcService : IMpcService
         }
         catch (Exception e)
         {
-            Debug.WriteLine("Error@ParsePlaylists: " + e.ToString());
+            Debug.WriteLine("Error@ParsePlaylists: " + e);
 
             //Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParsePlaylists", e.Message); });
             App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() => { App.AppendErrorLog("Exception@MPC@ParsePlaylists", e.Message); });
@@ -3823,7 +3852,7 @@ public partial class MpcService : IMpcService
                     */
                     LocalDirectories.Add(value.Replace("directory: ", ""));
 
-                    MpcProgress?.Invoke(this, string.Format("[Background] Parsing files and directories ({0})...", i));
+                    MpcProgress?.Invoke(this, $"[Background] Parsing files and directories ({i})...");
                 }
                 else if (value.StartsWith("file:"))
                 {
@@ -3841,7 +3870,7 @@ public partial class MpcService : IMpcService
 
                     i++;
 
-                    MpcProgress?.Invoke(this, string.Format("[Background] Parsing files and directories ({0})...", i));
+                    MpcProgress?.Invoke(this, $"[Background] Parsing files and directories ({i})...");
                 }
                 else if ((value.StartsWith("OK")))
                 {
@@ -3857,7 +3886,7 @@ public partial class MpcService : IMpcService
         }
         catch (Exception e)
         {
-            Debug.WriteLine("Error@ParseListAll: " + e.ToString());
+            Debug.WriteLine("Error@ParseListAll: " + e);
 
             //Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParseListAll", e.Message); });
             App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>{ App.AppendErrorLog("Exception@MPC@ParseListAll", e.Message); });
@@ -3933,7 +3962,7 @@ public partial class MpcService : IMpcService
                     };
                     //AlbumArtists.Add(arts);
 
-                    MpcProgress?.Invoke(this, string.Format("[Background] Parsing AlbumArtists ({0})...", i));
+                    MpcProgress?.Invoke(this, $"[Background] Parsing AlbumArtists ({i})...");
                 }
                 else if (value.StartsWith("Album:"))
                 {
@@ -3972,7 +4001,7 @@ public partial class MpcService : IMpcService
 
                     i++;
 
-                    MpcProgress?.Invoke(this, string.Format("[Background] Parsing albumartists and albums ({0})...", i));
+                    MpcProgress?.Invoke(this, $"[Background] Parsing albumartists and albums ({i})...");
                 }
                 else if ((value.StartsWith("OK")))
                 {
@@ -3996,7 +4025,7 @@ public partial class MpcService : IMpcService
         }
         catch (Exception e)
         {
-            Debug.WriteLine("Error@ParseListAlbumGroupAlbumArtist: " + e.ToString());
+            Debug.WriteLine("Error@ParseListAlbumGroupAlbumArtist: " + e);
 
             //Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParseListAlbumGroupAlbumArtist", e.Message); });
             App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>{ App.AppendErrorLog("Exception@MPC@ParseListAlbumGroupAlbumArtist", e.Message); });
@@ -4066,7 +4095,7 @@ public partial class MpcService : IMpcService
             IsBusy?.Invoke(this, true);
 
             var comparer = StringComparer.OrdinalIgnoreCase;
-            Dictionary<string, string> SongValues = new(comparer);
+            Dictionary<string, string> songValues = new(comparer);
             //Dictionary<string, string> SongValues = new();
 
             int i = 0;
@@ -4074,18 +4103,18 @@ public partial class MpcService : IMpcService
             foreach (string line in resultLines)
             {
                 //Debug.WriteLine(line);
-                string[] ValuePair = line.Split(':');
-                if (ValuePair.Length > 1)
+                string[] valuePair = line.Split(':');
+                if (valuePair.Length > 1)
                 {
-                    if (ValuePair[0].Trim().Equals("file"))
+                    if (valuePair[0].Trim().Equals("file"))
                     {
                         // save old one and clear songvalues.
-                        if (SongValues.ContainsKey("file"))// && SongValues.ContainsKey("duration")
+                        if (songValues.ContainsKey("file"))// && SongValues.ContainsKey("duration")
                         {
                             //Debug.WriteLine(SongValues["file"]);
-                            SongInfo? sng = FillSongInfo(SongValues, i);
+                            SongInfo? sng = FillSongInfo(songValues, i);
 
-                            SongValues.Clear();
+                            songValues.Clear();
 
                             if (sng is not null)
                             {
@@ -4094,35 +4123,35 @@ public partial class MpcService : IMpcService
                                 res.Add(sng);
                             }
 
-                            MpcProgress?.Invoke(this, string.Format("[Background] Parsing search result item... ({0})", i));
+                            MpcProgress?.Invoke(this, $"[Background] Parsing search result item... ({i})");
 
                         }
 
 
-                        SongValues.Clear();
-                        SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
+                        songValues.Clear();
+                        songValues.Add(valuePair[0].Trim(), line.Replace(valuePair[0].Trim() + ": ", ""));
                     }
                     else
                     {
-                        SongValues.TryAdd(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
+                        songValues.TryAdd(valuePair[0].Trim(), line.Replace(valuePair[0].Trim() + ": ", ""));
 
                     }
                 }
             }
 
             // last one
-            if ((SongValues.Count > 0) && SongValues.ContainsKey("file"))
+            if ((songValues.Count > 0) && songValues.ContainsKey("file"))
             {
-                SongInfo? sng = FillSongInfo(SongValues, i);
+                SongInfo? sng = FillSongInfo(songValues, i);
 
-                SongValues.Clear();
+                songValues.Clear();
 
                 if (sng is not null)
                 {
                     res.Add(sng);
                 }
 
-                MpcProgress?.Invoke(this, string.Format("[Background] Parsing search result item... ({0})", i + 1));
+                MpcProgress?.Invoke(this, $"[Background] Parsing search result item... ({i + 1})");
             }
 
         }
@@ -4192,25 +4221,25 @@ public partial class MpcService : IMpcService
         try
         {
             var comparer = StringComparer.OrdinalIgnoreCase;
-            Dictionary<string, string> SongValues = new(comparer);
+            Dictionary<string, string> songValues = new(comparer);
 
             int i = 0;
 
             foreach (string line in resultLines)
             {
-                string[] ValuePair = line.Split(':');
-                if (ValuePair.Length > 1)
+                string[] valuePair = line.Split(':');
+                if (valuePair.Length > 1)
                 {
-                    if (ValuePair[0].Trim().Equals("file"))
+                    if (valuePair[0].Trim().Equals("file"))
                     {
                         // Contains means new one.
 
                         // save old one and clear songvalues.
-                        if (SongValues.ContainsKey("file")) // && SongValues.ContainsKey("duration")
+                        if (songValues.ContainsKey("file")) // && SongValues.ContainsKey("duration")
                         {
-                            SongInfo? sng = FillSongInfo(SongValues, i);
+                            SongInfo? sng = FillSongInfo(songValues, i);
                             
-                            SongValues.Clear();
+                            songValues.Clear();
 
                             if (sng is not null)
                             {
@@ -4219,17 +4248,17 @@ public partial class MpcService : IMpcService
                                 i++;
                             }
 
-                            MpcProgress?.Invoke(this, string.Format("[Background] Parsing playlist item... ({0})", i));
+                            MpcProgress?.Invoke(this, $"[Background] Parsing playlist item... ({i})");
                         }
 
                         // start over
-                        SongValues.Clear();
-                        SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
+                        songValues.Clear();
+                        songValues.Add(valuePair[0].Trim(), line.Replace(valuePair[0].Trim() + ": ", ""));
                     }
                     else
                     {
                         //SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].TrimStart() + ": ", ""));
-                        SongValues.TryAdd(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
+                        songValues.TryAdd(valuePair[0].Trim(), line.Replace(valuePair[0].Trim() + ": ", ""));
                     }
                     /*
                     if (!SongValues.ContainsKey(ValuePair[0].Trim()))
@@ -4249,18 +4278,18 @@ public partial class MpcService : IMpcService
             }
 
             // last one
-            if ((SongValues.Count > 0) && SongValues.ContainsKey("file"))
+            if ((songValues.Count > 0) && songValues.ContainsKey("file"))
             {
-                SongInfo? sng = FillSongInfo(SongValues, i);
+                SongInfo? sng = FillSongInfo(songValues, i);
 
-                SongValues.Clear();
+                songValues.Clear();
 
                 if (sng is not null)
                 {
                     songList.Add(sng);
                 }
 
-                MpcProgress?.Invoke(this, string.Format("[Background] Parsing playlist item... ({0})", i + 1));
+                MpcProgress?.Invoke(this, $"[Background] Parsing playlist item... ({i + 1})");
             }
 
         }
@@ -4276,13 +4305,13 @@ public partial class MpcService : IMpcService
         return songList;
     }
 
-    private static SongInfo? FillSongInfo(Dictionary<string, string> SongValues, int i)
+    private static SongInfo? FillSongInfo(Dictionary<string, string> songValues, int i)
     {
-        if (SongValues.ContainsKey("file"))
+        if (songValues.ContainsKey("file"))
         {
             SongInfo sng = new()
             {
-                File = SongValues["file"]
+                File = songValues["file"]
             };
 
             if (string.IsNullOrEmpty(sng.File.Trim()))
@@ -4291,22 +4320,22 @@ public partial class MpcService : IMpcService
                 return null;
             }
 
-            if (SongValues.ContainsKey("Title"))
+            if (songValues.ContainsKey("Title"))
             {
-                sng.Title = SongValues["Title"];
+                sng.Title = songValues["Title"];
             }
             else
             {
                 sng.Title = "";
-                if (SongValues.ContainsKey("file"))
+                if (songValues.ContainsKey("file"))
                 {
-                    sng.Title = Path.GetFileName(SongValues["file"]);
+                    sng.Title = Path.GetFileName(songValues["file"]);
                 }
             }
 
-            if (SongValues.ContainsKey("Artist"))
+            if (songValues.ContainsKey("Artist"))
             {
-                sng.Artist = SongValues["Artist"];
+                sng.Artist = songValues["Artist"];
             }
             /*
             else
@@ -4323,55 +4352,55 @@ public partial class MpcService : IMpcService
             }
             */
 
-            if (SongValues.ContainsKey("Last-Modified"))
+            if (songValues.ContainsKey("Last-Modified"))
             {
-                sng.LastModified = SongValues["Last-Modified"];
+                sng.LastModified = songValues["Last-Modified"];
             }
 
-            if (SongValues.ContainsKey("AlbumArtist"))
+            if (songValues.ContainsKey("AlbumArtist"))
             {
-                sng.AlbumArtist = SongValues["AlbumArtist"];
+                sng.AlbumArtist = songValues["AlbumArtist"];
             }
 
-            if (SongValues.ContainsKey("Album"))
+            if (songValues.ContainsKey("Album"))
             {
-                sng.Album = SongValues["Album"];
+                sng.Album = songValues["Album"];
             }
 
-            if (SongValues.ContainsKey("Track"))
+            if (songValues.ContainsKey("Track"))
             {
-                sng.Track = SongValues["Track"];
+                sng.Track = songValues["Track"];
             }
 
-            if (SongValues.ContainsKey("Disc"))
+            if (songValues.ContainsKey("Disc"))
             {
-                sng.Disc = SongValues["Disc"];
+                sng.Disc = songValues["Disc"];
             }
 
-            if (SongValues.ContainsKey("Date"))
+            if (songValues.ContainsKey("Date"))
             {
-                sng.Date = SongValues["Date"];
+                sng.Date = songValues["Date"];
             }
 
-            if (SongValues.ContainsKey("Genre"))
+            if (songValues.ContainsKey("Genre"))
             {
-                sng.Genre = SongValues["Genre"];
+                sng.Genre = songValues["Genre"];
             }
 
-            if (SongValues.ContainsKey("Composer"))
+            if (songValues.ContainsKey("Composer"))
             {
-                sng.Composer = SongValues["Composer"];
+                sng.Composer = songValues["Composer"];
             }
 
-            if (SongValues.ContainsKey("Time"))
+            if (songValues.ContainsKey("Time"))
             {
-                sng.Time = SongValues["Time"];
+                sng.Time = songValues["Time"];
             }
 
-            if (SongValues.ContainsKey("duration"))
+            if (songValues.ContainsKey("duration"))
             {
-                sng.Time = SongValues["duration"];
-                sng.Duration = SongValues["duration"];
+                sng.Time = songValues["duration"];
+                sng.Duration = songValues["duration"];
             }
             /*
             if (SongValues.ContainsKey("file"))

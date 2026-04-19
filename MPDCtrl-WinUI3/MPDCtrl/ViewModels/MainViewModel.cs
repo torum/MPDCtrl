@@ -1996,6 +1996,34 @@ public partial class MainViewModel : ObservableObject
 
     #endregion
 
+    #region == Audio Outputs ==
+
+    public ObservableCollection<AudioOutput> AudioOutputs
+    {
+        get;
+        set
+        {
+            if (field == value)
+                return;
+            field = value;
+            OnPropertyChanged();
+        }
+    } = [];
+
+    public AudioOutput? SelectedAudioOutput
+    {
+        get;
+        set
+        {
+            if (field == value)
+                return;
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
+    #endregion
+
     #region == Layout ==
 
     public bool IsNavigationViewMenuOpen { get; set
@@ -2100,7 +2128,7 @@ public partial class MainViewModel : ObservableObject
 #endif
     }
 
-    public async Task StartMPC()
+    public async Task StartMpc()
     {
         if ((CurrentProfile is null) || (Profiles.Count < 1))
         {
@@ -2175,7 +2203,7 @@ public partial class MainViewModel : ObservableObject
         _mpc.MpdPlayerStatusChanged += OnMpdPlayerStatusChanged;
         _mpc.MpdCurrentQueueChanged += OnMpdCurrentQueueChanged;
         _mpc.MpdPlaylistsChanged += OnMpdPlaylistsChanged;
-
+        _mpc.MpdOutputChanged += OnMpdOutputChanged;
         _mpc.DebugCommandOutput += OnDebugCommandOutput;
         _mpc.DebugIdleOutput += OnDebugIdleOutput;
 
@@ -2234,9 +2262,9 @@ public partial class MainViewModel : ObservableObject
                 ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
                 //StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
 
-                InfoBarAckTitle = "Error";
-                InfoBarAckMessage = "Could not retrive IP Address from the hostname.";
-                IsShowAckWindow = true;
+                InfoBarErrTitle = "Error";
+                InfoBarErrMessage = "Could not retrive IP Address from the hostname.";
+                IsShowErrWindow = true;
 
                 return;
             }
@@ -2247,9 +2275,9 @@ public partial class MainViewModel : ObservableObject
             ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
             //StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
 
-            InfoBarAckTitle = "Error";
-            InfoBarAckMessage = "Could not retrive IP Address from the hostname.";
-            IsShowAckWindow = true;
+            InfoBarErrTitle = "Error";
+            InfoBarErrMessage = "Could not retrive IP Address from the hostname.";
+            IsShowErrWindow = true;
 
             return;
         }
@@ -2299,6 +2327,10 @@ public partial class MainViewModel : ObservableObject
                     await Task.Delay(50);
                     await _mpc.MpdIdleQueryCurrentQueue();
                     UpdateCurrentQueue();
+
+                    await Task.Delay(50);
+                    await _mpc.MpdIdleQueryOutputs();
+                    UpdateAudioOutputs();
 
                     await Task.Delay(300);
                     await _mpc.MpdQueryListAlbumArtists();
@@ -2402,7 +2434,7 @@ public partial class MainViewModel : ObservableObject
 
                                 var res = await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
 
-                                if (res != null)
+                                if ((res != null) && (CurrentSong is not null))
                                 {
                                     if (res.IsSuccess && (res.AlbumCover?.SongFilePath != null) && (CurrentSong.File != null))
                                     {
@@ -3144,7 +3176,7 @@ public partial class MainViewModel : ObservableObject
     {
         //Debug.WriteLine("SetSystemMediaTransportControls");
 
-        var songInfoForSMTC = new SongInfoForSystemMediaTransportControls
+        var songInfoForSmtc = new SongInfoForSystemMediaTransportControls
         {
             Artist = songInfo.Artist,
             AlbumArtist = songInfo.AlbumArtist,
@@ -3158,33 +3190,33 @@ public partial class MainViewModel : ObservableObject
         {
             case Status.MpdPlayState.Play:
                 {
-                    songInfoForSMTC.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Playing;
+                    songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Playing;
                     break;
                 }
             case Status.MpdPlayState.Pause:
                 {
-                    songInfoForSMTC.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Paused;
+                    songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Paused;
                     break;
                 }
             case Status.MpdPlayState.Stop:
                 {
-                    songInfoForSMTC.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Stopped;
+                    songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Stopped;
                     break;
                 }
                 default: {
-                    songInfoForSMTC.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Paused;
+                    songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Paused;
                     break;
                 }
         }
 
-        UpdateSongInfoForSystemMediaTransportControls?.Invoke(this, songInfoForSMTC);
+        UpdateSongInfoForSystemMediaTransportControls?.Invoke(this, songInfoForSmtc);
     }
 
     private void SetSystemMediaTransportControlsWithThumbnail(SongInfoEx songInfo, string? filePath, RandomAccessStreamReference? bitmap)
     {
         //Debug.WriteLine("SetSystemMediaTransportControlsWithThumbnail");
 
-        var songInfoForSMTC = new SongInfoForSystemMediaTransportControls
+        var songInfoForSmtc = new SongInfoForSystemMediaTransportControls
         {
             Artist = songInfo.Artist,
             AlbumArtist = songInfo.AlbumArtist,
@@ -3196,22 +3228,22 @@ public partial class MainViewModel : ObservableObject
         {
             case Status.MpdPlayState.Play:
                 {
-                    songInfoForSMTC.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Playing;
+                    songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Playing;
                     break;
                 }
             case Status.MpdPlayState.Pause:
                 {
-                    songInfoForSMTC.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Paused;
+                    songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Paused;
                     break;
                 }
             case Status.MpdPlayState.Stop:
                 {
-                    songInfoForSMTC.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Stopped;
+                    songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Stopped;
                     break;
                 }
             default:
                 {
-                    songInfoForSMTC.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Paused;
+                    songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Paused;
                     break;
                 }
         }
@@ -3220,21 +3252,21 @@ public partial class MainViewModel : ObservableObject
         if (bitmap is null) //if (string.IsNullOrEmpty(filePath))
         {
             Debug.WriteLine("(bitmap is null");
-            songInfoForSMTC.Thumbnail = null;
+            songInfoForSmtc.Thumbnail = null;
         }
         else
         {
             if (!string.IsNullOrEmpty(filePath))
             {
-                songInfoForSMTC.FilePath = filePath;
+                songInfoForSmtc.FilePath = filePath;
             }
 
-            songInfoForSMTC.IsThumbnailIncluded = true;
+            songInfoForSmtc.IsThumbnailIncluded = true;
 
-            songInfoForSMTC.Thumbnail = bitmap;//RandomAccessStreamReference.CreateFromUri(new Uri(filePath)); // bitmap;//await BitmapImageToRandomAccessStreamReference(bitmap);
+            songInfoForSmtc.Thumbnail = bitmap;//RandomAccessStreamReference.CreateFromUri(new Uri(filePath)); // bitmap;//await BitmapImageToRandomAccessStreamReference(bitmap);
         }
 
-        UpdateSongInfoForSystemMediaTransportControls?.Invoke(this, songInfoForSMTC);
+        UpdateSongInfoForSystemMediaTransportControls?.Invoke(this, songInfoForSmtc);
     }
 
     public static async Task<RandomAccessStreamReference> BitmapImageToRandomAccessStreamReference(BitmapImage bitmapImage)
@@ -3288,6 +3320,17 @@ public partial class MainViewModel : ObservableObject
         IRandomAccessStream randomAccessStream = memoryStream.AsRandomAccessStream();
         return RandomAccessStreamReference.CreateFromStream(randomAccessStream);
         */
+    }
+
+    private void UpdateAudioOutputs()
+    {
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        {
+            UpdateProgress?.Invoke(this, "[UI] Updating the audio outputs...");
+            AudioOutputs = new ObservableCollection<AudioOutput>(_mpc.AudioOutputs);
+
+            UpdateProgress?.Invoke(this, "");
+        });
     }
 
     private void UpdatePlaylists()
@@ -3934,11 +3977,11 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    private void GetAlbumPictures(IEnumerable<object>? AlbumExItems)
+    private void GetAlbumPictures(IEnumerable<object>? albumExItems)
     {
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
         {
-            if (AlbumExItems is null)
+            if (albumExItems is null)
             {
                 Debug.WriteLine("GetAlbumPictures: (AlbumExItems is null)");
                 return;
@@ -3962,7 +4005,7 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
 
-            foreach (var item in AlbumExItems)
+            foreach (var item in albumExItems)
             {
                 if (_mpc.MpdStop)
                 {
@@ -3977,7 +4020,7 @@ public partial class MainViewModel : ObservableObject
 
                 if (item is not AlbumEx album)
                 {
-                    Debug.WriteLine("GetAlbumPictures: item is not AlbumEx, skipping...." + item.ToString());
+                    Debug.WriteLine("GetAlbumPictures: item is not AlbumEx, skipping...." + item);
                     continue;
                 }
 
@@ -4530,8 +4573,8 @@ public partial class MainViewModel : ObservableObject
             IsNotConnectingNorConnected = false;
 
             // Just in case.
-            IsShowAckWindow = false;
-            IsShowErrWindow = false;
+            //IsShowAckWindow = false;
+            //IsShowErrWindow = false;
 
             // Add newly created Profile in the InitDialog to Profiles because connection was successfully established.
             if ((Profiles.Count <= 0) && (CurrentProfile is not null))
@@ -4583,6 +4626,12 @@ public partial class MainViewModel : ObservableObject
         //
     }
 
+    private void OnMpdOutputChanged(MpcService sender)
+    {
+        //Debug.WriteLine("OnMpdOutputChanged");
+        UpdateAudioOutputs();
+    }
+
     private void OnDebugCommandOutput(MpcService sender, string data)
     {
         if (IsDebugWindowEnabled && IsShowDebugWindow)
@@ -4628,9 +4677,9 @@ public partial class MainViewModel : ObservableObject
             ConnectionStatusMessage = _resourceLoader.GetString("ConnectionStatus_ConnectionError") + ": " + msg;
             StatusBarMessage = ConnectionStatusMessage;
 
-            InfoBarAckTitle = _resourceLoader.GetString("ConnectionStatus_ConnectionError");
-            InfoBarAckMessage = msg;
-            IsShowAckWindow = true;
+            InfoBarErrTitle = _resourceLoader.GetString("ConnectionStatus_ConnectionError");
+            InfoBarErrMessage = msg;
+            IsShowErrWindow = true;
         });
     }
 
@@ -4885,7 +4934,7 @@ public partial class MainViewModel : ObservableObject
         s = s.Replace("ACK ", string.Empty);
         s = s.Replace("{} ", string.Empty);
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
         {
             if (origin.Equals("Command", StringComparison.OrdinalIgnoreCase))
             {
@@ -4903,6 +4952,8 @@ public partial class MainViewModel : ObservableObject
             InfoBarErrMessage = s;
 
             IsShowErrWindow = true;
+
+            await _mpc.MpdClearError();
         });
     }
 
@@ -6827,6 +6878,8 @@ public partial class MainViewModel : ObservableObject
         SelectedAlbumArtist = null;
         //SelectedAlbumSongs = [];
         SelectedArtistAlbums = null;
+        IsShowAckWindow = false;
+        IsShowErrWindow = false;
 
         // TODO: more?
 
@@ -6974,6 +7027,30 @@ public partial class MainViewModel : ObservableObject
 
         // Update folder size.
         await GetCacheFolderSize();
+    }
+
+    [RelayCommand]
+    public async Task AudioOutputToggleEnable(object obj)
+    {
+        if (obj is null)
+        {
+            Debug.WriteLine("obj is null @AudioOutputToggleEnable");
+            return;
+        }
+
+        if (obj is not AudioOutput item)
+        {
+            Debug.WriteLine("obj is not AudioOutput @AudioOutputToggleEnable");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(item.Id))
+            return;
+        if (AudioOutputs.Count == 0)
+            return;
+
+        //Debug.WriteLine($"Toggling audio output with id: {item.Id}");
+        await _mpc.MpdToggleOutput(item.Id);
     }
 
     #endregion

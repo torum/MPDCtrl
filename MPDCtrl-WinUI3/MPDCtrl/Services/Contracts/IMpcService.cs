@@ -16,6 +16,7 @@ public interface IMpcService
     ObservableCollection<SongFile> LocalFiles { get; }
     ObservableCollection<AlbumArtist> AlbumArtists { get; }
     ObservableCollection<AlbumEx> Albums { get; }
+    ObservableCollection<AudioOutput> AudioOutputs { get; }
     SongInfoEx? MpdCurrentSong { get; }
     string MpdHost { get; }
     string MpdPassword { get; }
@@ -39,6 +40,7 @@ public interface IMpcService
     event MpcService.IsMpdIdleConnectedEvent MpdIdleConnected;
     event MpcService.MpdPlayerStatusChangedEvent MpdPlayerStatusChanged;
     event MpcService.MpdPlaylistsChangedEvent MpdPlaylistsChanged;
+    event MpcService.MpdOutputChangedEvent MpdOutputChanged;
 
     Task<CommandResult> MpdAdd(List<string> uris);
     Task<CommandResult> MpdAdd(string uri);
@@ -60,6 +62,7 @@ public interface IMpcService
     Task<CommandResult> MpdIdleQueryPlaylists();
     Task<CommandResult> MpdIdleQueryStatus();
     Task<CommandResult> MpdIdleQueryProtocol();
+    Task<CommandResult> MpdIdleQueryOutputs();
     Task<CommandResult> MpdIdleSendPassword(string password = "");
     void MpdIdleStart();
     Task<CommandResult> MpdLoadPlaylist(string playlistName);
@@ -95,4 +98,6 @@ public interface IMpcService
     Task<CommandResult> MpdSetRepeat(bool on);
     Task<CommandResult> MpdSetSingle(bool on);
     Task<CommandResult> MpdSetVolume(int v);
+    Task<CommandResult> MpdToggleOutput(string id);
+    Task<CommandResult> MpdClearError();
 }

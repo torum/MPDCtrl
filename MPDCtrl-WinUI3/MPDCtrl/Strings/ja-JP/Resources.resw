@@ -424,7 +424,7 @@
     <value>コネクション設定とオプション</value>
   </data>
   <data name="Settings_MPD_Opts_UpdateDatabaseOnStartup.Content" xml:space="preserve">
-    <value>起動時にMPDサーバーの楽曲データベースを最新の状態に更新する (更新されるまで、しばらくかかる場合があります)</value>
+    <value>起動時にMPDサーバーの楽曲データベースを最新の状態に更新する（要control か admin権限）。 (更新されるまで、しばらくかかる場合があります)</value>
   </data>
   <data name="Settings_MPD_Opts_UseReadPicture.Content" xml:space="preserve">
     <value>"albumart"の代わりに"readpicture" コマンドを使用する。 (MPD プロトコルのバージョンが0.22.0以上の時のみ)</value>
@@ -562,5 +562,11 @@ SOFTWARE.</value>
   </data>
   <data name="PageMenu_Search.ToolTipService.ToolTip" xml:space="preserve">
     <value>検索 (Enter)</value>
+  </data>
+  <data name="Settings_MPD_Opts_AudioOutputs.Header" xml:space="preserve">
+    <value>オーディオの出力先</value>
+  </data>
+  <data name="Settings_MPD_Opts_ToggleEnableAudioOutput.Text" xml:space="preserve">
+    <value>有効・無効を切り替える（要admin権限）</value>
   </data>
 </root>

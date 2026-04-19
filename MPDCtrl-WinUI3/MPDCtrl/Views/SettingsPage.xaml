@@ -164,7 +164,27 @@
                                     <TextBlock x:Uid="Settings_MPD_Opts_UseReadPictureExplanation" TextWrapping="WrapWholeWords" Margin="28,0,12,12"></TextBlock>
                                 </StackPanel>
                             </controls:SettingsCard>
-                            
+
+                            <controls:SettingsCard x:Uid="Settings_MPD_Opts_AudioOutputs" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
+                                <ListBox x:Name="AudioOutputsListBox" Margin="0,12,0,12" ItemsSource="{x:Bind ViewModel.AudioOutputs, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAudioOutput, Mode=TwoWay}" HorizontalAlignment="Stretch" MaxHeight="100">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate x:DataType="mod:AudioOutput">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                                                <Viewbox Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,2,0,0">
+                                                    <PathIcon Width="NaN" Height="NaN" Data="{Binding PathIconData, Mode=OneWay}"></PathIcon>
+                                                </Viewbox>
+                                                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Name, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                    <ListBox.ContextFlyout>
+                                        <MenuFlyout>
+                                            <MenuFlyoutItem x:Uid="Settings_MPD_Opts_ToggleEnableAudioOutput" Command="{x:Bind ViewModel.AudioOutputToggleEnableCommand}" CommandParameter="{x:Bind AudioOutputsListBox.SelectedItem, Mode=OneWay}"></MenuFlyoutItem>
+                                        </MenuFlyout>
+                                    </ListBox.ContextFlyout>
+                                </ListBox>
+                            </controls:SettingsCard>
+
                         </controls:SettingsExpander.Items>
 
                     </controls:SettingsExpander>

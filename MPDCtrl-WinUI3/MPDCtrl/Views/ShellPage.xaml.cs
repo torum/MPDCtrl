@@ -82,7 +82,7 @@ public sealed partial class ShellPage : Page
 
             // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage)
             // is loaded, initialized, set, drawn, navigated. So start the connection.
-            await ViewModel.StartMPC();
+            await ViewModel.StartMpc();
         }
         else
         {

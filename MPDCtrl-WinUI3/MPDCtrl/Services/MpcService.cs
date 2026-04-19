@@ -52,6 +52,8 @@ public partial class MpcService : IMpcService
 
     public ObservableCollection<AlbumEx> Albums { get; private set; } = [];
 
+    public ObservableCollection<AudioOutput> AudioOutputs { get; private set; } = [];
+
     //private ObservableCollection<SongInfo> SearchResult { get; set; } = [];
 
     //private AlbumImage AlbumCover { get; set; } = new();
@@ -143,6 +145,9 @@ public partial class MpcService : IMpcService
 
     public delegate void MpdPlaylistsChangedEvent(MpcService sender);
     public event MpdPlaylistsChangedEvent? MpdPlaylistsChanged;
+
+    public delegate void MpdOutputChangedEvent(MpcService sender);
+    public event MpdOutputChangedEvent? MpdOutputChanged;
 
     public delegate void MpdAlbumArtChangedEvent(MpcService sender);
     public event MpdAlbumArtChangedEvent? MpdAlbumArtChanged;
@@ -703,6 +708,22 @@ public partial class MpcService : IMpcService
         return result;
     }
 
+    public async Task<CommandResult> MpdIdleQueryOutputs()
+    {
+        MpcProgress?.Invoke(this, "[Background] Querying output...");
+
+        CommandResult result = await MpdIdleSendCommand("outputs");
+        if (result.IsSuccess)
+        {
+            MpcProgress?.Invoke(this, "[Background] Parsing outputs...");
+            result.IsSuccess = await ParseOutputs(result.ResultText);
+
+            MpcProgress?.Invoke(this, "[Background] outputs updated.");
+        }
+
+        return result;
+    }
+
     public void MpdIdleStart()
     {
         MpdIdle();
@@ -753,7 +774,7 @@ public partial class MpcService : IMpcService
             return;
         }
 
-        string cmd = "idle player mixer options playlist stored_playlist\n";
+        string cmd = "idle player mixer options playlist stored_playlist output\n";
 
         DebugIdleOutput?.Invoke(this, ">>>>" + cmd.Trim() + "\n" + "\n");
 
@@ -884,12 +905,12 @@ public partial class MpcService : IMpcService
 
             if (isAck)
             {
-                MpdAckError?.Invoke(this, ackText + " (@idle)", "Command");
+                _ = Task.Run(() => MpdAckError?.Invoke(this, ackText, "Idle"));
             }
 
             if (isErr)
             {
-                MpdFatalError?.Invoke(this, errText, "Idle");
+                _ = Task.Run(() => MpdFatalError?.Invoke(this, errText, "Idle"));
                 //ret.IsSuccess = false;
 
                 //return ret;
@@ -1010,6 +1031,7 @@ public partial class MpcService : IMpcService
             bool isPlayer = false;
             bool isCurrentQueue = false;
             bool isStoredPlaylist = false;
+            var isOutput = false;
 
             foreach (string line in subSystems)
             {
@@ -1036,6 +1058,11 @@ public partial class MpcService : IMpcService
                 {
                     // mixer: the volume has been changed
                     isPlayer = true;
+                }
+                if (line.ToLower() == "changed: output")
+                {
+                    // output: Audio output has been added, removed or modified(e.g.renamed, enabled or disabled)
+                    isOutput = true;
                 }
                 //if (line.ToLower() == "changed: stored_playlist")
                 if (string.Equals(line, "changed: stored_playlist", StringComparison.OrdinalIgnoreCase))
@@ -1069,6 +1096,15 @@ public partial class MpcService : IMpcService
                 if (idleResult.IsSuccess)
                 {
                     MpdPlaylistsChanged?.Invoke(this);
+                }
+            }
+
+            if (isOutput)
+            {
+                var idleResult = await MpdIdleQueryOutputs();
+                if (idleResult.IsSuccess)
+                {
+                    MpdOutputChanged?.Invoke(this);
                 }
             }
 
@@ -2982,6 +3018,33 @@ public partial class MpcService : IMpcService
         return result;
     }
 
+    public async Task<CommandResult> MpdToggleOutput(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            CommandResult f = new()
+            {
+                IsSuccess = false
+            };
+            return f;
+        }
+
+        string cmd = "toggleoutput " + id;
+
+        CommandResult result = await MpdCommandSendCommand(cmd);
+
+        return result;
+    }
+
+    public async Task<CommandResult> MpdClearError()
+    {
+        string cmd = "clearerror";
+
+        CommandResult result = await MpdCommandSendCommand(cmd);
+
+        return result;
+    }
+
     #endregion
 
     #region == Response parser methods ==
@@ -2997,6 +3060,100 @@ public partial class MpcService : IMpcService
 
         return Task.FromResult(true); 
     
+    }
+
+    private Task<bool> ParseOutputs(string result)
+    {
+        if (MpdStop) { return Task.FromResult(false); }
+        if (string.IsNullOrEmpty(result)) return Task.FromResult(false);
+
+        List<string> resultLines = result.Split('\n').ToList();
+        if (resultLines.Count == 0) return Task.FromResult(false);
+
+        //Debug.WriteLine(result);
+        /*
+            outputid: 0
+            outputname: 1 - EX-LD4K321V
+            plugin: winmm
+            outputenabled: 1
+            outputid: 1
+            outputname: Speakers
+            plugin: winmm
+            outputenabled: 1
+            OK
+        */
+        try
+        {
+            //IsBusy?.Invoke(this, true);
+
+            AudioOutputs.Clear();
+
+            int i = 0;
+
+            AudioOutput? output = null;
+
+            foreach (string value in resultLines)
+            {
+                if (value.StartsWith("outputid:"))
+                {
+                    if (output is not null)
+                    {
+                        if (!string.IsNullOrEmpty(output.Id))
+                        {
+                            AudioOutputs.Add(output);
+                        }
+                    }
+
+                    output = new AudioOutput
+                    {
+                        Id = value.Replace("outputid: ", "")
+                    };
+
+                    i++;
+                    MpcProgress?.Invoke(this, $"[Background] Parsing AudioOutpus ({i})...");
+                }
+                else if (value.StartsWith("outputname:"))
+                {
+                    output?.Name = value.Replace("outputname: ", "").Trim();
+                }
+                else if (value.StartsWith("outputenabled:"))
+                {
+                    output?.Enabled = value.Replace("outputenabled: ", "").Trim();
+                }
+                else if (value.StartsWith("OK"))
+                {
+                    if (output is not null)
+                    {
+                        if (!string.IsNullOrEmpty(output.Id))
+                        {
+                            AudioOutputs.Add(output);
+                        }
+                    }
+                }
+                else
+                {
+                    //Debug.WriteLine(value);
+                }
+            }
+
+            MpcProgress?.Invoke(this, "[Background] Parsing outputs is done.");
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine("Error@ParseOutputs: " + e);
+            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            {
+                App.AppendErrorLog("Exception@MPC@ParseOutputs", e.Message);
+            });
+            //IsBusy?.Invoke(this, false);
+            return Task.FromResult(false); ;
+        }
+        finally
+        {
+            IsBusy?.Invoke(this, false);
+        }
+
+        return Task.FromResult(true);
     }
 
     private Task<bool> ParseStatus(string result)

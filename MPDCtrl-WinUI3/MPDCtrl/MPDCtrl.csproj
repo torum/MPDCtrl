@@ -26,8 +26,8 @@
 
 	  <ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
 
-	  <VersionPrefix>4.0.5.0</VersionPrefix>
-	  <FileVersion>4.0.5.0</FileVersion>
+	  <VersionPrefix>4.0.6.0</VersionPrefix>
+	  <FileVersion>4.0.6.0</FileVersion>
 
 	  <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 

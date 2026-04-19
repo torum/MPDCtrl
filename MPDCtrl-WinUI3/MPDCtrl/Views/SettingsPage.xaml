@@ -171,7 +171,7 @@
                                         <DataTemplate x:DataType="mod:AudioOutput">
                                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
                                                 <Viewbox Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,2,0,0">
-                                                    <PathIcon Width="NaN" Height="NaN" Data="{Binding PathIconData, Mode=OneWay}"></PathIcon>
+                                                    <PathIcon Width="NaN" Height="NaN" Data="{x:Bind PathIconData, Mode=OneWay}"></PathIcon>
                                                 </Viewbox>
                                                 <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Name, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
                                             </StackPanel>

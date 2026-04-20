@@ -112,7 +112,11 @@ public sealed partial class QueuePage : Page
             return;
         }
 
-        await ViewModel.QueueSelectedPlay(song);
+        if (ViewModel.PlayCanExecute())
+        {
+            await ViewModel.QueueSelectedPlay(song);
+        }
+
     }
 
     private void Page_PreviewKeyDown(object sender, KeyRoutedEventArgs e)

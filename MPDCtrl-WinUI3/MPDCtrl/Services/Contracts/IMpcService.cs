@@ -17,6 +17,7 @@ public interface IMpcService
     ObservableCollection<AlbumArtist> AlbumArtists { get; }
     ObservableCollection<AlbumEx> Albums { get; }
     ObservableCollection<AudioOutput> AudioOutputs { get; }
+    List<string> Commands { get; }
     SongInfoEx? MpdCurrentSong { get; }
     string MpdHost { get; }
     string MpdPassword { get; }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
@@ -47,6 +48,7 @@ public sealed partial class ShellPage : Page
         ViewModel.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
         ViewModel.DebugCommandClear += this.OnDebugCommandClear;
         ViewModel.DebugIdleClear += this.OnDebugIdleClear;
+        ViewModel.UserCanExecuteChanged += OnUserCanExecuteChanged;
 
         this.ActualThemeChanged += this.This_ActualThemeChanged;
 
@@ -146,6 +148,16 @@ public sealed partial class ShellPage : Page
     {
         // Update interactive regions if the size of the window changes.
         SetRegionsForCustomTitleBar();
+    }
+    private void OnUserCanExecuteChanged(object? sender, EventArgs e)
+    {
+        VolumeSlider.IsEnabled = ViewModel.SetVolumeCanExecute();
+        SeekSlider.IsEnabled = ViewModel.SetSeekCanExecute();
+
+        RepeatButton.IsEnabled = ViewModel.SetRpeatCanExecute();
+        SingleButton.IsEnabled = ViewModel.SetSingleCanExecute();
+        RandomButton.IsEnabled = ViewModel.SetRandomCanExecute();
+        ConsumeButton.IsEnabled = ViewModel.SetConsumeCanExecute();
     }
 
     private void SetRegionsForCustomTitleBar()

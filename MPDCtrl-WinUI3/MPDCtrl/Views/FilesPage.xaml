@@ -84,7 +84,7 @@
 
             <!-- WinUI3 bug: Horizontal scrollbar not visible.
                             https://github.com/microsoft/microsoft-ui-xaml/issues/8825 -->
-            <TreeView Grid.Column="0" Margin="0,24,0,0" BorderThickness="0" ItemsSource="{x:Bind ViewModel.MusicDirectories, Mode=OneWay}" SelectionMode="Single" SelectedItem="{x:Bind ViewModel.SelectedNodeDirectory, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Auto"  ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <TreeView Grid.Column="0" Margin="0,24,0,0" BorderThickness="0" ItemsSource="{x:Bind ViewModel.MusicDirectories, Mode=OneWay}" SelectionMode="Single" SelectedItem="{x:Bind ViewModel.SelectedNodeDirectory, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" DoubleTapped="TreeView_DoubleTapped">
                 <TreeView.ItemTemplate>
                     <DataTemplate x:DataType="mod:NodeTree">
                         <TreeViewItem ItemsSource="{x:Bind Path=Children}" IsExpanded="{x:Bind Path=Expanded, Mode=TwoWay}">

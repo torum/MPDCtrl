@@ -9,6 +9,7 @@ using MPDCtrl.Models;
 using MPDCtrl.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -120,5 +121,16 @@ public sealed partial class FilesPage : Page
                 tb.IsChecked = false;
             }
         }
+    }
+
+    private void TreeView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        //Debug.WriteLine($"TreeView_DoubleTapped sender is {sender} e.Source is {e.OriginalSource}");
+        FrameworkElement element = (FrameworkElement)e.OriginalSource;
+
+        var container = FindParent<TreeViewItem>(element);
+        if (container is null) return;
+
+        container.IsExpanded = !container.IsExpanded;
     }
 }

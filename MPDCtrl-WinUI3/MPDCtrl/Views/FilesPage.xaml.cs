@@ -125,7 +125,7 @@ public sealed partial class FilesPage : Page
 
     private void TreeView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
-        //Debug.WriteLine($"TreeView_DoubleTapped sender is {sender} e.Source is {e.OriginalSource}");
+        Debug.WriteLine($"TreeView_DoubleTapped sender is {sender} e.Source is {e.OriginalSource}");
         FrameworkElement element = (FrameworkElement)e.OriginalSource;
 
         var container = FindParent<TreeViewItem>(element);

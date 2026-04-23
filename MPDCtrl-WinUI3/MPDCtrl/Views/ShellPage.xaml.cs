@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using MPDCtrl.Models;
+using MPDCtrl.Services.Contracts;
 using MPDCtrl.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,8 @@ public sealed partial class ShellPage : Page
     {
         get;
     }
+    
+    private readonly IDispatcherService _dispatcherService;
 
     private Type? _currentPage;
 
@@ -39,6 +42,7 @@ public sealed partial class ShellPage : Page
     {
         ViewModel = App.GetService<MainViewModel>();
         //DataContext = ViewModel;
+        _dispatcherService = App.GetService<IDispatcherService>();
 
         InitializeComponent();
 
@@ -49,7 +53,6 @@ public sealed partial class ShellPage : Page
         ViewModel.DebugCommandClear += this.OnDebugCommandClear;
         ViewModel.DebugIdleClear += this.OnDebugIdleClear;
         ViewModel.UserCanExecuteChanged += OnUserCanExecuteChanged;
-
         this.ActualThemeChanged += this.This_ActualThemeChanged;
 
         // Not good because this create instance in addition to navigation view.
@@ -103,7 +106,7 @@ public sealed partial class ShellPage : Page
         ViewModel.DebugIdleOutput -= (sender, arg) => { this.OnDebugIdleOutput(arg); };
         ViewModel.DebugCommandClear -= this.OnDebugCommandClear;
         ViewModel.DebugIdleClear -= this.OnDebugIdleClear;
-
+        ViewModel.UserCanExecuteChanged -= OnUserCanExecuteChanged;
         this.ActualThemeChanged -= this.This_ActualThemeChanged;
 
         if (App.MainWnd is not null)
@@ -264,7 +267,7 @@ public sealed partial class ShellPage : Page
 
         _sbCommandOutput.Append(arg);
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        _dispatcherService.TryEnqueue(() =>
         {
             //DebugCommandTextBox.Text += arg;
             DebugCommandTextBox.Text = _sbCommandOutput.ToString();
@@ -286,7 +289,7 @@ public sealed partial class ShellPage : Page
 
         _sbIdleOutput.Append(arg);
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        _dispatcherService.TryEnqueue(() =>
         {
             //DebugIdleTextBox.Text += arg;
             DebugIdleTextBox.Text = _sbIdleOutput.ToString();
@@ -317,7 +320,7 @@ public sealed partial class ShellPage : Page
             return;
         }
 
-        App.MainWnd.SetCapitionButtonColor();
+        _ = App.MainWnd.SetCapitionButtonColor();
     }
 
     private void MainWindow_Activated(object sender, Microsoft.UI.Xaml.WindowActivatedEventArgs args)
@@ -339,7 +342,7 @@ public sealed partial class ShellPage : Page
             {
                 _currentPage = typeof(SettingsPage);
 
-                await ViewModel.GetCacheFolderSize();
+                await ViewModel.GetCacheFolderSizeAsync();
             }
             return;
         }
@@ -684,7 +687,7 @@ public sealed partial class ShellPage : Page
 
             NaviView.SelectedItem = null;
 
-            await ViewModel.GetCacheFolderSize();
+            await ViewModel.GetCacheFolderSizeAsync();
         }
     }
 

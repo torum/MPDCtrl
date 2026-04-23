@@ -12,6 +12,8 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using MPDCtrl.Helpers;
 using MPDCtrl.Models;
+using MPDCtrl.Services;
+using MPDCtrl.Services.Contracts;
 using MPDCtrl.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -41,7 +43,7 @@ public sealed partial class MainWindow : Window
     private readonly MainViewModel _vm;
 
     // DispatcherQueue
-    public Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue { get; private set; }
+    //public Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue { get; private set; }
 
     // Stupid WinUI3 workaround.
     private readonly MediaPlayer? _mediaPlayer;
@@ -60,10 +62,14 @@ public sealed partial class MainWindow : Window
     //private readonly UISettings settings;
     private ElementTheme theme = ElementTheme.Default;
 
-    public MainWindow()
+
+    private readonly IDispatcherService _dispatcherService;
+
+    public MainWindow(IDispatcherService dispatcherService)
     {
+        _dispatcherService = dispatcherService;
         // This DispatcherQueue should be alive as long as MainWindow is alive. Make sure to clear when the window is closed.
-        CurrentDispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+        //CurrentDispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 
         // This is where the MainViewModel is first initilized.
         _vm = App.GetService<MainViewModel>();
@@ -93,7 +99,7 @@ public sealed partial class MainWindow : Window
             root.RequestedTheme = theme;
 
             //TitleBarHelper.UpdateTitleBar(theme, this);
-            SetCapitionButtonColor();
+            _ = SetCapitionButtonColor();
 
             root.CallMeWhenMainWindowIsReady(this);
         }
@@ -150,7 +156,7 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        this.CurrentDispatcherQueue?.TryEnqueue(() =>
+        _dispatcherService.TryEnqueue(() =>
         {
             _smtc.IsPlayEnabled = SongInfoForSMTC.IsPlayEnabled;
             _smtc.IsPauseEnabled = SongInfoForSMTC.IsPauseEnabled;
@@ -673,16 +679,16 @@ public sealed partial class MainWindow : Window
                 root.RequestedTheme = theme;
 
                 //TitleBarHelper.UpdateTitleBar(theme, this);
-                SetCapitionButtonColor();
+                _ = SetCapitionButtonColor();
             }
 
             this.SystemBackdrop = null;
         }
     }
 
-    public void SetCapitionButtonColor()
+    public async Task SetCapitionButtonColor()
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        await _dispatcherService.EnqueueAsync(() =>
         {
             if (this.Content is null)
             {
@@ -751,7 +757,7 @@ public sealed partial class MainWindow : Window
         _vm.CleanUp();
 
         // For some stupid reason, we needed this, otherwise we get COM error.
-        CurrentDispatcherQueue = null;
+        //CurrentDispatcherQueue = null;
 
         SaveSettings();
     }
@@ -1270,14 +1276,11 @@ public sealed partial class MainWindow : Window
 
         if (_smtc is null) return;
 
-        if (CurrentDispatcherQueue is null)
-        {
-            return;
-        }
+        //if (CurrentDispatcherQueue is null) return;
 
         // Media key events are dispatched on a background thread.
         // Use the DispatcherQueue to execute code on the UI thread.
-        await CurrentDispatcherQueue.EnqueueAsync(() =>
+        await _dispatcherService.EnqueueAsync(() =>
         {
             switch (args.Button)
             {

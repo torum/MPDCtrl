@@ -108,7 +108,7 @@ public sealed partial class AlbumDetailPage : Page
         if (ViewModel.SelectedAlbum is not null)
         {
             // When go back to AlbumsPage, scroll into view.
-            ViewModel.GoBackFromAlbumDetailsPage(ViewModel.SelectedAlbum);
+            _ = ViewModel.GoBackFromAlbumDetailsPage(ViewModel.SelectedAlbum);
         }
 
         // Needed this to invoke the same album in AlbumListView

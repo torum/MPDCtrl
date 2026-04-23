@@ -33,12 +33,15 @@ public partial class App : Application
 
     // ErrorLog
     private static readonly string LogFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl4_errors.txt";
+    private static readonly StringBuilder Errortxt = new();
 
     // MainWindow
     public static MainWindow? MainWnd
     {
         get; private set;
     }
+
+    public Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue { get; private set; }
 
     public IHost Host
     {
@@ -58,6 +61,8 @@ public partial class App : Application
 
     public App()
     {
+        CurrentDispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+
         if (RuntimeHelper.IsMSIX)
         {
             Debug.WriteLine("IsMSIX");
@@ -99,6 +104,7 @@ public partial class App : Application
             services.AddSingleton<IMpcService, MpcService>();
             services.AddSingleton<IMpcBinaryService, MpcBinaryService>();
             services.AddSingleton<IDialogService, DialogService>();
+            services.AddSingleton<IDispatcherService>(new DispatcherService(CurrentDispatcherQueue));
 
             // Views and ViewModels
             services.AddSingleton<MainViewModel>();
@@ -123,6 +129,7 @@ public partial class App : Application
         Microsoft.UI.Xaml.Application.Current.UnhandledException += App_UnhandledException;
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        this.UnhandledException += App_UnhandledException;
     }
 
     protected async override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
@@ -166,7 +173,7 @@ public partial class App : Application
             return;
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        CurrentDispatcherQueue?.TryEnqueue(() =>
         {
             if (MainWnd is null) return;
 
@@ -205,7 +212,7 @@ public partial class App : Application
         // TODO: Log and handle exceptions as appropriate.
         // https://docs.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.application.unhandledexception.
 
-        // This does not fire...because of winui3 bugs. should be fixed in v1.2.2 WinAppSDK
+        // This does not fire...because of winui3 bugs.
         // see https://github.com/microsoft/microsoft-ui-xaml/issues/5221
 
         // This kills app... 
@@ -257,8 +264,6 @@ public partial class App : Application
             SaveErrorLog();
         }
     }
-
-    private static readonly StringBuilder Errortxt = new();
 
     public static void AppendErrorLog(string kindTxt, string errorTxt)
     {

@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using MPDCtrl.Models;
+using MPDCtrl.Services.Contracts;
 using MPDCtrl.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -24,16 +25,19 @@ public sealed partial class ArtistsPage : Page
         get;
     }
 
+    private readonly IDispatcherService _dispatcherService;
+
     public ArtistsPage()
     {
         ViewModel = App.GetService<MainViewModel>();
+        _dispatcherService = App.GetService<IDispatcherService>();
 
         InitializeComponent();
     }
 
     private void ArtistsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        _dispatcherService.TryEnqueue(() =>
         {
             if (sender is not ListView listview)
             {
@@ -193,7 +197,7 @@ public sealed partial class ArtistsPage : Page
 
         if (this.ArtistsListView is ListView lb)
         {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            _dispatcherService.TryEnqueue(() =>
             {
                 lb.ScrollIntoView(artist, ScrollIntoViewAlignment.Default);
 

@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using MPDCtrl.Helpers;
 using MPDCtrl.Models;
+using MPDCtrl.Services.Contracts;
 using MPDCtrl.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -27,10 +28,13 @@ public sealed partial class QueuePage : Page
     {
         get;
     }
+    
+    private readonly IDispatcherService _dispatcherService;
 
     public QueuePage()
     {
         ViewModel = App.GetService<MainViewModel>();
+        _dispatcherService = App.GetService<IDispatcherService>();
 
         InitializeComponent();
 
@@ -44,7 +48,7 @@ public sealed partial class QueuePage : Page
 
         if (this.QueueListview is ListView lb)
         {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            _dispatcherService.TryEnqueue(() =>
             {
                 lb.ScrollIntoView(obj, ScrollIntoViewAlignment.Default);
             });
@@ -60,7 +64,7 @@ public sealed partial class QueuePage : Page
             return;
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        _dispatcherService.TryEnqueue(() =>
         {
             lb.ScrollIntoView(obj, ScrollIntoViewAlignment.Default);//Leading
 
@@ -277,7 +281,7 @@ public sealed partial class QueuePage : Page
 
         if (this.QueueListview is ListView lb)
         {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            _dispatcherService.TryEnqueue(() =>
             {
                 lb.ScrollIntoView(song, ScrollIntoViewAlignment.Default);
 

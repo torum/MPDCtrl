@@ -159,10 +159,12 @@ public partial class MpcService : IMpcService
     private static readonly System.Threading.SemaphoreSlim SemaphoreBinary = new(1, 1);
 
     private readonly IMpcBinaryService _binaryDownloader;
+    private readonly IDispatcherService _dispatcherService;
 
-    public MpcService(IMpcBinaryService binaryDownloader)
+    public MpcService(IMpcBinaryService binaryDownloader, IDispatcherService dispatcherService)
     {
         _binaryDownloader = binaryDownloader;
+        _dispatcherService = dispatcherService;
     }
 
     #region == Idle Connection ==
@@ -351,6 +353,18 @@ public partial class MpcService : IMpcService
     {
         CommandResult ret = new();
 
+        if (MpdStop)
+        {
+            Debug.WriteLine("@MpdIdleSendCommand: MpdStop1");
+            return ret;
+        }
+
+        if (_cts is null)
+        {
+            Debug.WriteLine("@MpdIdleSendCommand: _cts is null)");
+            return ret;
+        }
+
         //TODO: aways false
         if (_idleConnection.Client is null)
         {
@@ -474,7 +488,10 @@ public partial class MpcService : IMpcService
 
             while (true)
             {
-                var line = await _idleReader.ReadLineAsync();
+                var line = await _idleReader.ReadLineAsync(_cts.Token);
+
+                //if (_cts.Token.IsCancellationRequested)
+                _cts.Token.ThrowIfCancellationRequested();
 
                 if (line is not null)
                 {
@@ -952,7 +969,7 @@ public partial class MpcService : IMpcService
             if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser) || (ConnectionState == ConnectionStatus.Connecting))
             {
                 // no problem
-                Debug.WriteLine("ReadLineAsync canceled due to ConnectionStatus. Disconnecting, now exiting. @MpdIdle()");
+                Debug.WriteLine("ReadLineAsync canceled due to OperationCanceledException. Disconnecting, now exiting. @MpdIdle()");
             }
             else
             {
@@ -1331,11 +1348,13 @@ public partial class MpcService : IMpcService
         }
         catch (Exception e)
         {
-            // probably System.OperationCanceledException or System.ObjectDisposedException
+            // Probably System.OperationCanceledException or System.ObjectDisposedException
+            // System.ObjectDisposedException: The CancellationTokenSource has been disposed.
 
-            Debug.WriteLine("Exception. @MpdCommandSendCommand: " + e.Message);
+            Debug.WriteLine($"Exception. @MpdCommandSendCommand: {e}");
             ret.IsWaitFailed = true;
             ret.ErrorMessage = "Exception. @MpdCommandSendCommand" + e.Message;
+
         }
 
         return ret;
@@ -2169,6 +2188,13 @@ public partial class MpcService : IMpcService
                         return res;
                     }
 
+                    if (_cts is null)
+                    {
+                        Debug.WriteLine("_cts is null returning @MpdQueryAlbumArt (Command)");
+                        res.IsSuccess = false;
+                        return res;
+                    }
+
                     if (_cts.Token.IsCancellationRequested)
                     {
                         Debug.WriteLine("IsCancellationRequested returning @MpdQueryAlbumArt (Command)");
@@ -2253,13 +2279,13 @@ public partial class MpcService : IMpcService
         }
         catch (Exception e)
         {
-            // probably System.OperationCanceledException or System.ObjectDisposedException
+            // Probably System.OperationCanceledException or System.ObjectDisposedException
+            // The CancellationTokenSource has been disposed.
 
-            Debug.WriteLine("Exception. @MpdQueryAlbumArt: " + e.Message);
+            Debug.WriteLine($"Exception. @MpdQueryAlbumArt: {e}");
 
             res.ErrorMessage = "Exception. @MpdQueryAlbumArt" + e.Message;
         }
-
 
         return res;
     }
@@ -2354,7 +2380,7 @@ public partial class MpcService : IMpcService
             }
             else
             {
-                //Debug.WriteLine("WaitAsync failed. @MpdQueryAlbumArtForAlbumView");
+                Debug.WriteLine("WaitAsync failed. @MpdQueryAlbumArtForAlbumView");
                 res.IsWaitFailed = true;
                 res.ErrorMessage = "WaitAsync failed. @MpdQueryAlbumArtForAlbumView";
             }
@@ -2364,7 +2390,7 @@ public partial class MpcService : IMpcService
         {
             // probably System.OperationCanceledException or System.ObjectDisposedException
 
-            Debug.WriteLine("Exception. @MpdQueryAlbumArtForAlbumView: " + e.Message);
+            Debug.WriteLine($"Exception. @MpdQueryAlbumArtForAlbumView: {e}");
 
             res.ErrorMessage = "Exception. @MpdQueryAlbumArtForAlbumView" + e.Message;
         }
@@ -3171,7 +3197,7 @@ public partial class MpcService : IMpcService
         catch (Exception e)
         {
             Debug.WriteLine("Error@ParseOutputs: " + e);
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            _dispatcherService.TryEnqueue(() =>
             {
                 App.AppendErrorLog("Exception@MPC@ParseOutputs", e.Message);
             });
@@ -3432,7 +3458,7 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("Exception@ParseStatus:" + ex.Message);
 
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            _dispatcherService.TryEnqueue(() =>
             {
                 App.AppendErrorLog("Exception@MPC@ParseStatus", ex.Message);
             });
@@ -3516,7 +3542,7 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("Error@ParseCurrentSong: " + ex.Message);
 
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            _dispatcherService.TryEnqueue(() =>
             {
                 App.AppendErrorLog("Exception@MPC@ParseCurrentSong", ex.Message);
             });
@@ -3531,9 +3557,9 @@ public partial class MpcService : IMpcService
         return Task.FromResult(true);
     }
 
-    private Task<bool> ParsePlaylistInfo(string result)
+    private async Task<bool> ParsePlaylistInfo(string result)
     {
-        if (MpdStop) return Task.FromResult(false);
+        if (MpdStop) return false;
 
         bool isEmptyResult = false;
 
@@ -3555,13 +3581,12 @@ public partial class MpcService : IMpcService
 
         if (isEmptyResult)
         {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-            //Application.Current.Dispatcher.Invoke(() =>
+            await _dispatcherService.EnqueueAsync(() =>
             {
                 CurrentQueue.Clear();
             });
 
-            return Task.FromResult(true);
+            return true;
         }
 
         // aka Queue
@@ -3642,7 +3667,7 @@ public partial class MpcService : IMpcService
             int i = 0;
 
             if (resultLines is null)
-                return Task.FromResult(true);
+                return true;
 
             foreach (string value in resultLines)
             {
@@ -3703,9 +3728,8 @@ public partial class MpcService : IMpcService
 
             // test
             MpcProgress?.Invoke(this, "[Background] Updating internal queue list...");
-            
-            //Application.Current.Dispatcher.Invoke((Action)(() =>
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+
+            await _dispatcherService.EnqueueAsync(async () =>
             {
                 //CurrentQueue.Clear();
                 //_queue = tmpQueue;
@@ -3718,20 +3742,19 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("Exception@ParsePlaylistInfo: " + ex.Message);
 
-            //Application.Current?.Dispatcher.Invoke(() =>
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            await _dispatcherService.EnqueueAsync(async () =>
             {
                 App.AppendErrorLog("Exception@MPC@ParsePlaylistInfo", ex.Message);
             });
 
-            return Task.FromResult(false);
+            return false;
         }
         finally
         {
             IsBusy?.Invoke(this, false);
         }
 
-        return Task.FromResult(true);
+        return true;
     }
 
     private SongInfoEx? FillSongInfoEx(Dictionary<string, string> songValues, int i)
@@ -3874,8 +3897,7 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("Error@FillSongInfoEx: " + e);
 
-            //Application.Current?.Dispatcher.Invoke(() =>
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            _dispatcherService.TryEnqueue(() =>
             {
                 App.AppendErrorLog("Exception@MPC@FillSongInfoEx", e.Message);
                 });
@@ -3884,7 +3906,7 @@ public partial class MpcService : IMpcService
         }
     }
 
-    private Task<bool> ParsePlaylists(string result)
+    private async Task<bool> ParsePlaylists(string result)
     {
         bool isEmptyResult = false;
 
@@ -3899,12 +3921,12 @@ public partial class MpcService : IMpcService
         if (isEmptyResult)
         {
             //Application.Current.Dispatcher.Invoke(() =>
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            await _dispatcherService.EnqueueAsync(async () =>
             {
                 Playlists.Clear();
             });
 
-            return Task.FromResult(true);
+            return true;
         }
 
         try
@@ -3938,8 +3960,7 @@ public partial class MpcService : IMpcService
                 }
             }
 
-            //Application.Current.Dispatcher.Invoke((Action)(() =>
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            await _dispatcherService.EnqueueAsync(async () =>
             {
                 this.Playlists = new ObservableCollection<Playlist>(tmpPlaylists);
             });
@@ -3984,18 +4005,17 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("Error@ParsePlaylists: " + e);
 
-            //Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParsePlaylists", e.Message); });
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() => { App.AppendErrorLog("Exception@MPC@ParsePlaylists", e.Message); });
+            _dispatcherService.TryEnqueue(() => { App.AppendErrorLog("Exception@MPC@ParsePlaylists", e.Message); });
 
             IsBusy?.Invoke(this, false);
-            return Task.FromResult(false);
+            return false;
         }
         finally
         {
             IsBusy?.Invoke(this, false);
         }
 
-        return Task.FromResult(true);
+        return true;
     }
 
     private Task<bool> ParseListAll(string result)
@@ -4075,8 +4095,7 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("Error@ParseListAll: " + e);
 
-            //Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParseListAll", e.Message); });
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>{ App.AppendErrorLog("Exception@MPC@ParseListAll", e.Message); });
+            _dispatcherService.TryEnqueue(() =>{ App.AppendErrorLog("Exception@MPC@ParseListAll", e.Message); });
 
             IsBusy?.Invoke(this, false);
             return Task.FromResult(false); ;
@@ -4214,8 +4233,7 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("Error@ParseListAlbumGroupAlbumArtist: " + e);
 
-            //Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParseListAlbumGroupAlbumArtist", e.Message); });
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>{ App.AppendErrorLog("Exception@MPC@ParseListAlbumGroupAlbumArtist", e.Message); });
+            _dispatcherService.TryEnqueue(() =>{ App.AppendErrorLog("Exception@MPC@ParseListAlbumGroupAlbumArtist", e.Message); });
 
             IsBusy?.Invoke(this, false);
             return Task.FromResult(false); ;
@@ -4346,8 +4364,7 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("Error@ParseSearchResult: " + ex.Message);
 
-            //Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParseSearchResult", ex.Message); });
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() => { App.AppendErrorLog("Exception@MPC@ParseSearchResult", ex.Message); });
+            _dispatcherService.TryEnqueue(() => { App.AppendErrorLog("Exception@MPC@ParseSearchResult", ex.Message); });
 
             IsBusy?.Invoke(this, false);
             return Task.FromResult(res);
@@ -4484,8 +4501,7 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("Error@ParsePlaylistSongsResult: " + ex.Message);
 
-            //Application.Current?.Dispatcher.Invoke(() => { (Application.Current as App)?.AppendErrorLog("Exception@MPC@ParsePlaylistSongsResult", ex.Message); });
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() => { App.AppendErrorLog("Exception@MPC@ParsePlaylistSongsResult", ex.Message); });
+            _dispatcherService.TryEnqueue(() => { App.AppendErrorLog("Exception@MPC@ParsePlaylistSongsResult", ex.Message); });
             return songList;
         }
 

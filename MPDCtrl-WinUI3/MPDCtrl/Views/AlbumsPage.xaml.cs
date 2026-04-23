@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
 using MPDCtrl.Models;
+using MPDCtrl.Services.Contracts;
 using MPDCtrl.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -35,9 +36,12 @@ public sealed partial class AlbumsPage : Page
     private readonly Compositor _compositor = Microsoft.UI.Xaml.Media.CompositionTarget.GetCompositorForCurrentThread();
     private SpringVector3NaturalMotionAnimation? _springAnimation;
 
+    private readonly IDispatcherService _dispatcherService;
+
     public AlbumsPage()
     {
         ViewModel = App.GetService<MainViewModel>();
+        _dispatcherService = App.GetService<IDispatcherService>();
 
         InitializeComponent();
 
@@ -47,7 +51,7 @@ public sealed partial class AlbumsPage : Page
 
     public void OnAlbumScrollIntoView(object? sender, AlbumEx album)
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        _dispatcherService.TryEnqueue(async () =>
         {
             if (this.AlbumsListView is not ListView lb)
             {
@@ -94,7 +98,7 @@ public sealed partial class AlbumsPage : Page
         // so forcibly fire scroll event.
         if (this.AlbumsListView is ListView lb)
         {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+            _dispatcherService.TryEnqueue(async () =>
             {
                 var scrollViewer = FindScrollViewer(lb);
                 if (scrollViewer is null)
@@ -324,13 +328,13 @@ public sealed partial class AlbumsPage : Page
 
         if (this.AlbumsListView is ListView lb)
         {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            _dispatcherService.TryEnqueue(() =>
             {
                 lb.ScrollIntoView(album, ScrollIntoViewAlignment.Default);
 
                 lb.SelectedItem = album;
 
-                ViewModel.GetAlbumPicture(album);
+                _ = ViewModel.GetAlbumPictureAsync(album);
             });
         }
     }

@@ -52,7 +52,7 @@ public partial class MainViewModel : ObservableObject
             }
 
             field = value;
-            OnPropertyChanged();
+            _dispatcherService.TryEnqueue(() => { OnPropertyChanged(); });
         }
     }
 
@@ -65,7 +65,7 @@ public partial class MainViewModel : ObservableObject
                 return;
 
             field = value;
-            OnPropertyChanged();
+            _dispatcherService.TryEnqueue(() => { OnPropertyChanged(); });
         }
     }
 
@@ -570,11 +570,21 @@ public partial class MainViewModel : ObservableObject
     private System.Timers.Timer? _volumeDelayTimer = null;
     private async void DoChangeVolume(object? sender, System.Timers.ElapsedEventArgs e)
     {
-        if (_mpc is null)
+        try
         {
-            return;
+            if (_mpc is null)
+            {
+                return;
+            }
+            await _mpc.MpdSetVolume(Convert.ToInt32(_volume));
+
         }
-        await _mpc.MpdSetVolume(Convert.ToInt32(_volume));
+        catch (Exception ex)
+        {
+            _ = e;
+            Debug.WriteLine($"Exception @DoChangeVolume: {ex}");
+        }
+
     }
 
     private bool _repeat;
@@ -595,7 +605,8 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
 
-            Task.Run(SetRpeat, _cts.Token);
+            //Task.Run(SetRpeat, _cts.Token);
+            _ = SetRpeat();
         }
     }
 
@@ -618,7 +629,8 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
 
-            Task.Run(SetRandom, _cts.Token);
+            //Task.Run(SetRandom, _cts.Token);
+            _ = SetRandom();
         }
     }
 
@@ -640,7 +652,8 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
 
-            Task.Run(SetConsume, _cts.Token);
+            //Task.Run(SetConsume, _cts.Token);
+            _ = SetConsume();
         }
     }
 
@@ -658,7 +671,8 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
 
-            Task.Run(SetSingle, _cts.Token);
+            //_ = Task.Run(SetSingle, _cts.Token);
+            _ = SetSingle();
         }
     }
 
@@ -699,7 +713,7 @@ public partial class MainViewModel : ObservableObject
             {
                 _elapsed = value;
 
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                _dispatcherService.TryEnqueue(() =>
                 {
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(ElapsedFormatted));
@@ -750,7 +764,8 @@ public partial class MainViewModel : ObservableObject
         if ( (_elapsed < Time) && SetSeekCommand.CanExecute(null))
         {
             //SetSeekCommand.Execute(null);
-            _ = Task.Run(SetSeek, _cts.Token);
+            //_ = Task.Run(SetSeek, _cts.Token);
+            _ = SetSeek();
         }
     }
 
@@ -759,14 +774,22 @@ public partial class MainViewModel : ObservableObject
     {
         if ((_elapsed < Time) && (_mpc.MpdStatus.MpdState == Status.MpdPlayState.Play))
         {
-            _elapsed += 1;
-
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-            {
-                OnPropertyChanged(nameof(Elapsed));
-                OnPropertyChanged(nameof(ElapsedFormatted));
-            });
             //Debug.WriteLine($"ElapsedTimer: {_elapsed}/{_time}");
+
+            _dispatcherService.TryEnqueue(() =>
+            {
+                _elapsed += 1;
+
+                if (App.MainWnd is not null)
+                {
+                    OnPropertyChanged(nameof(Elapsed));
+                    OnPropertyChanged(nameof(ElapsedFormatted));
+                }
+                else
+                {
+                    Debug.WriteLine("MainWnd is null. @ElapsedTimer (App.MainWnd is not null)");
+                }
+            });
         }
         else
         {
@@ -799,7 +822,7 @@ public partial class MainViewModel : ObservableObject
 
             if (value is null)
             {
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                _dispatcherService.TryEnqueue(() =>
                 {
                     SelectedPlaylistName = string.Empty;
                     RenamedSelectPendingPlaylistName = string.Empty;
@@ -823,7 +846,7 @@ public partial class MainViewModel : ObservableObject
             }
             else if (value is NodeMenuArtist)
             {
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                _dispatcherService.TryEnqueue(() =>
                 {
                     if ((Artists.Count > 0) && (SelectedAlbumArtist is null))
                     {
@@ -839,7 +862,7 @@ public partial class MainViewModel : ObservableObject
             {
                 if (!nml.IsAcquired || (MusicDirectories.Count <= 1) && (MusicEntries.Count == 0))
                 {
-                    _ = GetFiles(nml);
+                    _ = GetFilesAsync(nml);
                 }
             }
             else if (value is NodeMenuPlaylists)
@@ -848,14 +871,14 @@ public partial class MainViewModel : ObservableObject
             }
             else if (value is NodeMenuPlaylistItem nmpli)
             {
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                _dispatcherService.TryEnqueue(() =>
                 {
                     PlaylistSongs = nmpli.PlaylistSongs;
                     SelectedPlaylistName = nmpli.Name;
 
                     if ((nmpli.PlaylistSongs.Count == 0) || nmpli.IsUpdateRequied)
                     {
-                        GetPlaylistSongs(nmpli);
+                        _ = GetPlaylistSongsAsync(nmpli);
                     }
                 });
 
@@ -1112,14 +1135,14 @@ public partial class MainViewModel : ObservableObject
             OnPropertyChanged(nameof(ArtistPageSubTitleArtistAlbumCount));
 
             //Task.Run(async () =>
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+            _dispatcherService.TryEnqueue(async () =>
              {
                  await Task.Yield();
                  await Task.Delay(100); // Avoid blocking UI thread.
-                 GetArtistSongs(field);
+                 _ = GetArtistSongsAsync(field);
                  await Task.Yield();
                  await Task.Delay(100);
-                 GetAlbumPictures(SelectedArtistAlbums);
+                 _ = GetAlbumPicturesAsync(SelectedArtistAlbums);
              });
             //}, _cts.Token);
         } }
@@ -1247,20 +1270,24 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
 
-            /*
-             *  do this at GetAlbumSongs(_selectedAlbum);
-            SelectedAlbumSongs = _selectedAlbum.Songs;
-            */
-            //_ = Task.Run(async () => { await GetAlbumSongs(_selectedAlbum); });
-
-            Task.Run(() =>
+            _ = Task.Run(async () =>
             {
-                GetAlbumSongs(field);
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                await GetAlbumSongsAsync(field);
+                _dispatcherService.TryEnqueue(() =>
                 {
                     AlbumSelectedNavigateToDetailsPage?.Invoke(this, EventArgs.Empty);
                 });
             }, _cts.Token);
+
+            // Or
+            /*
+            _ = GetAlbumSongs(field);
+            _dispatcherService.TryEnqueue(() =>
+            {
+                AlbumSelectedNavigateToDetailsPage?.Invoke(this, EventArgs.Empty);
+            });
+            */
+
         } } = new();
 
     private readonly ObservableCollection<SongInfo>? _selectedAlbumSongs = [];
@@ -1300,7 +1327,7 @@ public partial class MainViewModel : ObservableObject
                 return;
             }
 
-            Task.Run(() => GetAlbumPictures(VisibleItemsAlbumsEx), _cts.Token);
+            Task.Run(() => GetAlbumPicturesAsync(VisibleItemsAlbumsEx), _cts.Token);
             //GetAlbumPictures(VisibleItemsAlbumsEx); 
         } } = [];
 
@@ -2109,11 +2136,13 @@ public partial class MainViewModel : ObservableObject
 
     private readonly IMpcService _mpc;
     private readonly IDialogService _dialogs;
+    private readonly IDispatcherService _dispatcherService;
 
-    public MainViewModel(IMpcService mpcService, IDialogService dialogService)
+    public MainViewModel(IMpcService mpcService, IDialogService dialogService, IDispatcherService dispatcherService)
     {
         _mpc = mpcService;
         _dialogs = dialogService;
+        _dispatcherService = dispatcherService;
 
         InitializeAndSubscribe();
 
@@ -2144,19 +2173,33 @@ public partial class MainViewModel : ObservableObject
 
             CurrentProfile = pro;
 
-            await Task.Run(() => Start(_host, _port), _cts.Token);
+            await Task.Run(async () => await StartAsync(_host, _port), _cts.Token);
 
             return;
         }
 
-        await Task.Run(() => Start(_host, _port), _cts.Token);
+        await Task.Run(async () => await StartAsync(_host, _port), _cts.Token);
     }
 
     public void CleanUp()
     {
         try
         {
-            _cts?.Cancel();
+            // Unsubscribe events to avoid callbacks after shutdown
+            _mpc.MpdIdleConnected -= OnMpdIdleConnected;
+            _mpc.MpdPlayerStatusChanged -= OnMpdPlayerStatusChanged;
+            _mpc.MpdCurrentQueueChanged -= OnMpdCurrentQueueChanged;
+            _mpc.MpdPlaylistsChanged -= OnMpdPlaylistsChanged;
+            _mpc.MpdOutputChanged -= OnMpdOutputChanged;
+            _mpc.DebugCommandOutput -= OnDebugCommandOutput;
+            _mpc.DebugIdleOutput -= OnDebugIdleOutput;
+            _mpc.ConnectionStatusChanged -= OnConnectionStatusChanged;
+            _mpc.ConnectionError -= OnConnectionError;
+            _mpc.MpdAckError -= OnMpdAckError;
+            _mpc.MpdFatalError -= OnMpdFatalError;
+            _mpc.MpdAlbumArtChanged -= OnAlbumArtChanged;
+            _mpc.MpcProgress -= OnMpcProgress;
+            _mpc.IsBusy -= OnMpcIsBusy;
 
             if (IsConnected)
             {
@@ -2164,6 +2207,8 @@ public partial class MainViewModel : ObservableObject
 
                 _mpc.MpdDisconnect(false);
             }
+
+            _cts?.Cancel();
 
             _cts?.Dispose();
         }
@@ -2180,15 +2225,15 @@ public partial class MainViewModel : ObservableObject
         IsShowErrWindow = true;
     }
 
-    public async Task GetCacheFolderSize()
+    public async Task GetCacheFolderSizeAsync()
     {
-        AlbumCacheFolderSizeFormatted = ToFileSizeString(await GetFolderSize(App.AppDataCacheFolder).ConfigureAwait(true));
+        AlbumCacheFolderSizeFormatted = ToFileSizeString(await GetFolderSizeAsync(App.AppDataCacheFolder).ConfigureAwait(true));
     }
 
-    public void GetAlbumPicture(AlbumEx album)
+    public async Task GetAlbumPictureAsync(AlbumEx album)
     {
         var list = new ObservableCollection<AlbumEx> { album };
-        GetAlbumPictures(list);
+        await GetAlbumPicturesAsync(list);
     }
 
     #region == Private Methods ==
@@ -2204,15 +2249,11 @@ public partial class MainViewModel : ObservableObject
         _mpc.MpdOutputChanged += OnMpdOutputChanged;
         _mpc.DebugCommandOutput += OnDebugCommandOutput;
         _mpc.DebugIdleOutput += OnDebugIdleOutput;
-
         _mpc.ConnectionStatusChanged += OnConnectionStatusChanged;
         _mpc.ConnectionError += OnConnectionError;
-
         _mpc.MpdAckError += OnMpdAckError;
         _mpc.MpdFatalError += OnMpdFatalError;
-
         _mpc.MpdAlbumArtChanged += OnAlbumArtChanged;
-
         _mpc.MpcProgress += OnMpcProgress;
         _mpc.IsBusy += OnMpcIsBusy;
 
@@ -2244,7 +2285,7 @@ public partial class MainViewModel : ObservableObject
             ];
     }
 
-    private async Task Start(string host, int port)
+    private async Task StartAsync(string host, int port)
     {
         HostIpAddress = null;
         try
@@ -2280,11 +2321,11 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        // Start MPD connection.
+        // Start MPD connection. (without await MpdIdleConnect.   ?)
         await Task.Run(() => _mpc.MpdIdleConnect(HostIpAddress.ToString(), port), _cts.Token);
     }
 
-    private async Task LoadInitialData()
+    private async Task LoadInitialDataAsync()
     {
         IsBusy = true;
 
@@ -2315,30 +2356,30 @@ public partial class MainViewModel : ObservableObject
                 if (result.IsSuccess)
                 {
                     await Task.Delay(5);
-                    UpdateStatus();
+                    _ = UpdateStatusAsync();
 
                     await Task.Delay(50);
                     await _mpc.MpdIdleQueryCurrentSong();
-                    UpdateCurrentSong();
+                    _ = UpdateCurrentSongAsync();
 
                     await Task.Delay(50);
-                    UpdateCommandStatus();
+                    _ = UpdateCommandStatusAsync();
 
                     await Task.Delay(50);
                     await _mpc.MpdIdleQueryPlaylists();
-                    UpdatePlaylists();
+                    _ = UpdatePlaylistsAsync();
 
                     await Task.Delay(50);
                     await _mpc.MpdIdleQueryCurrentQueue();
-                    UpdateCurrentQueue();
+                    _ = UpdateCurrentQueueAsync();
 
                     await Task.Delay(50);
                     await _mpc.MpdIdleQueryOutputs();
-                    UpdateAudioOutputs();
+                    _ = UpdateAudioOutputsAsync();
 
                     await Task.Delay(300);
                     await _mpc.MpdQueryListAlbumArtists();
-                    UpdateAlbumsAndArtists();
+                    _ = UpdateAlbumsAndArtistsAsync();
 
                     await Task.Delay(20);
 
@@ -2357,7 +2398,7 @@ public partial class MainViewModel : ObservableObject
         {
             if (CompareVersionString(_mpc.MpdVerText, "0.20.0") == -1)
             {
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                _dispatcherService.TryEnqueue(() =>
                 {
                     InfoBarErrTitle = MpdVersion;
 
@@ -2369,11 +2410,11 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private void UpdateStatus()
+    private async Task UpdateStatusAsync()
     {
-        UpdateButtonStatus();
+        await UpdateButtonStatusAsync();
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             UpdateProgress?.Invoke(this, "[UI] Status updating...");
 
@@ -2423,7 +2464,7 @@ public partial class MainViewModel : ObservableObject
                             ScrollIntoView?.Invoke(this, CurrentSong);
                         }
 
-                        SetSystemMediaTransportControls(CurrentSong);
+                        _ = SetSystemMediaTransportControlsAsync(CurrentSong);
 
                         //IsAlbumArtVisible = false;
                         AlbumCover = null;
@@ -2449,15 +2490,14 @@ public partial class MainViewModel : ObservableObject
                                                 //var bin = res.AlbumCover.BinaryData;
 
                                                 AlbumCover = res.AlbumCover;
-                                                AlbumArtBitmapSource = await BitmapSourceFromByteArray(res.AlbumCover.BinaryData);
+                                                AlbumArtBitmapSource = await BitmapSourceFromByteArrayAsync(res.AlbumCover.BinaryData);
                                                 //IsAlbumArtVisible = true;
                                                 CurrentSong.IsAlbumCoverNeedsUpdate = false;
 
-                                                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
-                                                {
-                                                    var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                                    SetSystemMediaTransportControlsWithThumbnail(CurrentSong, filePath, await ToRandomAccessStreamReference(res.AlbumCover.BinaryData));
-                                                });
+
+                                                var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
+                                                _ = SetSystemMediaTransportControlsWithThumbnailAsync(CurrentSong, filePath, await ToRandomAccessStreamReferenceAsync(res.AlbumCover.BinaryData));
+
                                             }
                                             else
                                             {
@@ -2515,9 +2555,9 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    private void UpdateButtonStatus()
+    private async Task UpdateButtonStatusAsync()
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        await _dispatcherService.EnqueueAsync(() =>
         {
             try
             {
@@ -2595,9 +2635,9 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    private void UpdateCurrentSong()
+    private async Task UpdateCurrentSongAsync()
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue( () =>
+        await _dispatcherService.EnqueueAsync( () =>
         {
             var isSongChanged = false;
             var isCurrentSongWasNull = false;
@@ -2631,7 +2671,7 @@ public partial class MainViewModel : ObservableObject
             // Update SMTC
             if (CurrentSong is not null)
             {
-                SetSystemMediaTransportControls(CurrentSong);
+                _ = SetSystemMediaTransportControlsAsync(CurrentSong);
             }
 
             if (_mpc.MpdCurrentSong != null)
@@ -2683,9 +2723,14 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    private void UpdateCurrentQueue()
+    private async Task UpdateCurrentQueueAsync()
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        if (_cts is null)
+            return;
+        if (_cts.IsCancellationRequested)
+            return;
+
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             IsQueueFindVisible = false;
 
@@ -2930,14 +2975,12 @@ public partial class MainViewModel : ObservableObject
                                 {
                                     AlbumCover = res.AlbumCover;
                                     //AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
-                                    AlbumArtBitmapSource = await BitmapSourceFromByteArray(res.AlbumCover.BinaryData);
+                                    AlbumArtBitmapSource = await BitmapSourceFromByteArrayAsync(res.AlbumCover.BinaryData);
                                     CurrentSong.IsAlbumCoverNeedsUpdate = false;
 
-                                    App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async() =>
-                                    {
-                                        var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                        SetSystemMediaTransportControlsWithThumbnail(CurrentSong, filePath, await ToRandomAccessStreamReference(res.AlbumCover.BinaryData));
-                                    });
+                                    var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
+                                    _ = SetSystemMediaTransportControlsWithThumbnailAsync(CurrentSong, filePath, await ToRandomAccessStreamReferenceAsync(res.AlbumCover.BinaryData));
+
                                 }
                             }
                         }
@@ -2959,12 +3002,10 @@ public partial class MainViewModel : ObservableObject
                 }
                 catch (Exception e)
                 {
-                    Debug.WriteLine("Exception@UpdateCurrentQueue: " + e.Message);
-
                     UpdateProgress?.Invoke(this, "Exception@UpdateCurrentQueue: " + e.Message);
 
-                    IsWorking = false;
                     App.AppendErrorLog("Exception@UpdateCurrentQueue", e.Message);
+                    Debug.WriteLine($"Exception@UpdateCurrentQueue: {e}");
 
                     return;
                 }
@@ -3048,14 +3089,11 @@ public partial class MainViewModel : ObservableObject
                                                 {
                                                     AlbumCover = res.AlbumCover;
                                                     //AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
-                                                    AlbumArtBitmapSource = await BitmapSourceFromByteArray(res.AlbumCover.BinaryData);
+                                                    AlbumArtBitmapSource = await BitmapSourceFromByteArrayAsync(res.AlbumCover.BinaryData);
                                                     CurrentSong.IsAlbumCoverNeedsUpdate = false;
 
-                                                    App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
-                                                    {
-                                                        var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                                        SetSystemMediaTransportControlsWithThumbnail(CurrentSong, filePath, await ToRandomAccessStreamReference(res.AlbumCover.BinaryData));
-                                                    });
+                                                    var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
+                                                    _ = SetSystemMediaTransportControlsWithThumbnailAsync(CurrentSong, filePath, await ToRandomAccessStreamReferenceAsync(res.AlbumCover.BinaryData));
                                                 }
                                             }
                                         }
@@ -3126,14 +3164,11 @@ public partial class MainViewModel : ObservableObject
                                     {
                                         AlbumCover = res.AlbumCover;
                                         //AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
-                                        AlbumArtBitmapSource = await BitmapSourceFromByteArray(res.AlbumCover.BinaryData);
+                                        AlbumArtBitmapSource = await BitmapSourceFromByteArrayAsync(res.AlbumCover.BinaryData);
                                         CurrentSong.IsAlbumCoverNeedsUpdate = false;
 
-                                        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
-                                        {
-                                            var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                            SetSystemMediaTransportControlsWithThumbnail(CurrentSong, filePath, await ToRandomAccessStreamReference(res.AlbumCover.BinaryData));
-                                        });
+                                        var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
+                                        _ = SetSystemMediaTransportControlsWithThumbnailAsync(CurrentSong, filePath, await ToRandomAccessStreamReferenceAsync(res.AlbumCover.BinaryData));
                                     }
                                 }
                             }
@@ -3153,13 +3188,10 @@ public partial class MainViewModel : ObservableObject
                 }
                 catch (Exception e)
                 {
-                    Debug.WriteLine("Exception@UpdateCurrentQueue: " + e.Message);
-
                     StatusBarMessage = "Exception@UpdateCurrentQueue: " + e.Message;
 
-                    IsWorking = false;
-
                     App.AppendErrorLog("Exception@UpdateCurrentQueue", e.Message);
+                    Debug.WriteLine($"Exception@UpdateCurrentQueue: {e}");
 
                     return;
                 }
@@ -3176,10 +3208,8 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    private void SetSystemMediaTransportControls(SongInfoEx songInfo)
+    private async Task SetSystemMediaTransportControlsAsync(SongInfoEx songInfo)
     {
-        //Debug.WriteLine("SetSystemMediaTransportControls");
-
         var songInfoForSmtc = new SongInfoForSystemMediaTransportControls
         {
             Artist = songInfo.Artist,
@@ -3207,16 +3237,20 @@ public partial class MainViewModel : ObservableObject
                     songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Stopped;
                     break;
                 }
-                default: {
+            default:
+                {
                     songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Paused;
                     break;
                 }
         }
 
-        UpdateSongInfoForSystemMediaTransportControls?.Invoke(this, songInfoForSmtc);
+        await _dispatcherService.EnqueueAsync(() =>
+        {
+            UpdateSongInfoForSystemMediaTransportControls?.Invoke(this, songInfoForSmtc);
+        });
     }
 
-    private void SetSystemMediaTransportControlsWithThumbnail(SongInfoEx songInfo, string? filePath, RandomAccessStreamReference? bitmap)
+    private async Task SetSystemMediaTransportControlsWithThumbnailAsync(SongInfoEx songInfo, string? filePath, RandomAccessStreamReference? bitmap)
     {
         //Debug.WriteLine("SetSystemMediaTransportControlsWithThumbnail");
 
@@ -3252,28 +3286,31 @@ public partial class MainViewModel : ObservableObject
                 }
         }
 
-        //
-        if (bitmap is null) //if (string.IsNullOrEmpty(filePath))
+        await _dispatcherService.EnqueueAsync(() =>
         {
-            Debug.WriteLine("(bitmap is null");
-            songInfoForSmtc.Thumbnail = null;
-        }
-        else
-        {
-            if (!string.IsNullOrEmpty(filePath))
+            if (bitmap is null) //if (string.IsNullOrEmpty(filePath))
             {
-                songInfoForSmtc.FilePath = filePath;
+                Debug.WriteLine("(bitmap is null");
+                songInfoForSmtc.Thumbnail = null;
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(filePath))
+                {
+                    songInfoForSmtc.FilePath = filePath;
+                }
+
+                songInfoForSmtc.IsThumbnailIncluded = true;
+
+                songInfoForSmtc.Thumbnail = bitmap;//RandomAccessStreamReference.CreateFromUri(new Uri(filePath)); // bitmap;//await BitmapImageToRandomAccessStreamReference(bitmap);
             }
 
-            songInfoForSmtc.IsThumbnailIncluded = true;
+            UpdateSongInfoForSystemMediaTransportControls?.Invoke(this, songInfoForSmtc);
+        });
 
-            songInfoForSmtc.Thumbnail = bitmap;//RandomAccessStreamReference.CreateFromUri(new Uri(filePath)); // bitmap;//await BitmapImageToRandomAccessStreamReference(bitmap);
-        }
-
-        UpdateSongInfoForSystemMediaTransportControls?.Invoke(this, songInfoForSmtc);
     }
 
-    public static async Task<RandomAccessStreamReference> BitmapImageToRandomAccessStreamReference(BitmapImage bitmapImage)
+    public static async Task<RandomAccessStreamReference> BitmapImageToRandomAccessStreamReferenceAsync(BitmapImage bitmapImage)
     {
         // Create a new WriteableBitmap with the current image data.
         var writeableBitmap = new WriteableBitmap(bitmapImage.PixelWidth, bitmapImage.PixelHeight);
@@ -3297,7 +3334,7 @@ public partial class MainViewModel : ObservableObject
         return RandomAccessStreamReference.CreateFromStream(stream);
     }
 
-    public static async Task<RandomAccessStreamReference?> ToRandomAccessStreamReference(byte[]? byteArray)
+    public static async Task<RandomAccessStreamReference?> ToRandomAccessStreamReferenceAsync(byte[]? byteArray)
     {
         if (byteArray is null)
         {
@@ -3326,9 +3363,9 @@ public partial class MainViewModel : ObservableObject
         */
     }
 
-    private void UpdateAudioOutputs()
+    private async Task UpdateAudioOutputsAsync()
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        await _dispatcherService.EnqueueAsync(() =>
         {
             UpdateProgress?.Invoke(this, "[UI] Updating the audio outputs...");
             AudioOutputs = new ObservableCollection<AudioOutput>(_mpc.AudioOutputs);
@@ -3337,9 +3374,9 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    private void UpdateCommandStatus()
+    private async Task UpdateCommandStatusAsync()
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        await _dispatcherService.EnqueueAsync(() =>
         {
             PlayCommand.NotifyCanExecuteChanged();
             PlayNextCommand.NotifyCanExecuteChanged();
@@ -3380,11 +3417,12 @@ public partial class MainViewModel : ObservableObject
             UserCanExecuteChanged?.Invoke(this, EventArgs.Empty);
         });
     }
-    private void UpdatePlaylists()
+
+    private async Task UpdatePlaylistsAsync()
     {
         //await Task.Delay(10);
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             UpdateProgress?.Invoke(this, "[UI] Playlists loading...");
 
@@ -3459,7 +3497,7 @@ public partial class MainViewModel : ObservableObject
                 {
                     if (nmpli.IsUpdateRequied && nmpli.Selected)
                     {
-                        GetPlaylistSongs(nmpli);
+                        await GetPlaylistSongsAsync(nmpli);
 
                         if (isListChanged)
                         {
@@ -3483,15 +3521,15 @@ public partial class MainViewModel : ObservableObject
 
             if (!string.IsNullOrEmpty(RenamedSelectPendingPlaylistName))
             {
-                GoToRenamedPlaylistPage(RenamedSelectPendingPlaylistName);
+                await GoToRenamedPlaylistPageAsync(RenamedSelectPendingPlaylistName);
                 RenamedSelectPendingPlaylistName = string.Empty;
             }
         });
     }
 
-    private void GoToPlaylistPage(NodeMenuPlaylistItem playlist)
+    private async Task GoToPlaylistPageAsync(NodeMenuPlaylistItem playlist)
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        await _dispatcherService.EnqueueAsync(() =>
         {
             foreach (var hoge in MainMenuItems)
             {
@@ -3511,9 +3549,9 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    private void GoToRenamedPlaylistPage(string playlist)
+    private async Task GoToRenamedPlaylistPageAsync(string playlist)
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             RenamedSelectPendingPlaylistName = string.Empty;
             PlaylistPageSubTitleSongCount = "";
@@ -3543,15 +3581,15 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    private Task UpdateLibraryMusicAsync()
+    private async Task UpdateLibraryMusicAsync()
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
 
             //IsBusy = true;
             IsWorking = true;
-            await Task.Yield();
+            await Task.Yield(); 
 
             var tmpMusicEntries = new ObservableCollection<NodeFile>();
 
@@ -3606,13 +3644,13 @@ public partial class MainViewModel : ObservableObject
             await Task.Yield();
         });
 
-        return Task.CompletedTask;
+        return;
     }
 
-    private Task UpdateLibraryDirectoriesAsync()
+    private async Task UpdateLibraryDirectoriesAsync()
     {
         // Directories
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             UpdateProgress?.Invoke(this, "[UI] Library directories loading...");
             IsWorking = true;
@@ -3661,10 +3699,10 @@ public partial class MainViewModel : ObservableObject
             }
         });
 
-        return Task.CompletedTask;
+        return;
     }
 
-    private async Task GetFiles(NodeMenuFiles filestNode)
+    private async Task GetFilesAsync(NodeMenuFiles filestNode)
     {
         // TODO: fix this
 
@@ -3694,7 +3732,7 @@ public partial class MainViewModel : ObservableObject
             CommandResult result = await _mpc.MpdQueryListAll();
             if (result.IsSuccess)
             {
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                await _dispatcherService.EnqueueAsync(() =>
                 {
                     filestNode.IsAcquired = true;
                 });
@@ -3707,26 +3745,26 @@ public partial class MainViewModel : ObservableObject
             }
             else
             {
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                await _dispatcherService.EnqueueAsync(() =>
                 {
                     filestNode.IsAcquired = false;
                 });
                 Debug.WriteLine("fail to get MpdQueryListAll: " + result.ErrorMessage);
             }
 
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            await _dispatcherService.EnqueueAsync(() =>
             {
                 IsWorking = false;
             });
         }, _cts.Token);
     }
 
-    private void GetPlaylistSongs(NodeMenuPlaylistItem playlistNode)
+    private async Task GetPlaylistSongsAsync(NodeMenuPlaylistItem playlistNode)
     {
         if (playlistNode is null)
             return;
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () => 
+        await _dispatcherService.EnqueueAsync(async () => 
         {
             IsWorking = true;
             await Task.Yield();
@@ -3765,9 +3803,9 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    private void UpdateAlbumsAndArtists()
+    private async Task UpdateAlbumsAndArtistsAsync()
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             IsWorking = true;
             await Task.Yield();
@@ -3808,9 +3846,9 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    private void GetAlbumSongs(AlbumEx album)
+    private async Task GetAlbumSongsAsync(AlbumEx album)
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             IsWorking = true;
             await Task.Yield();
@@ -3822,7 +3860,7 @@ public partial class MainViewModel : ObservableObject
                 if (!string.IsNullOrEmpty(album.AlbumArtist.Trim()))
                 {
                     //Debug.WriteLine($"GetAlbumSongs: Album artist is not empty, searching by album artist. ({album.AlbumArtist})");
-                    var r = await SearchArtistSongs(album.AlbumArtist);//.ConfigureAwait(ConfigureAwaitOptions.None);// no trim() here.
+                    var r = await SearchArtistSongsAsync(album.AlbumArtist);//.ConfigureAwait(ConfigureAwaitOptions.None);// no trim() here.
 
                     if (r.IsSuccess)
                     {
@@ -3878,7 +3916,7 @@ public partial class MainViewModel : ObservableObject
 
                     if (!string.IsNullOrEmpty(album.Name.Trim()))
                     {
-                        var r = await SearchAlbumSongs(album.Name); // no trim() here.
+                        var r = await SearchAlbumSongsAsync(album.Name); // no trim() here.
                         if (r.IsSuccess)
                         {
                             if (r.SearchResult is null)
@@ -3945,9 +3983,9 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    private void GetArtistSongs(AlbumArtist? artist)
+    private async Task GetArtistSongsAsync(AlbumArtist? artist)
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             if (artist is null)
             {
@@ -3960,7 +3998,7 @@ public partial class MainViewModel : ObservableObject
             await Task.Delay(20);
             //UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
 
-            var r = await SearchArtistSongs(artist.Name);
+            var r = await SearchArtistSongsAsync(artist.Name);
 
             if (!r.IsSuccess)
             {
@@ -4024,9 +4062,9 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    private void GetAlbumPictures(IEnumerable<object>? albumExItems)
+    private async Task GetAlbumPicturesAsync(IEnumerable<object>? albumExItems)
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             if (albumExItems is null)
             {
@@ -4142,7 +4180,7 @@ public partial class MainViewModel : ObservableObject
                         continue; // Skip if temp file exists, it means the album art has found to have no image.
                     }
 
-                    var ret = await SearchAlbumSongs(album.Name);
+                    var ret = await SearchAlbumSongsAsync(album.Name);
                     if (!ret.IsSuccess)
                     {
                         Debug.WriteLine("GetAlbumPictures: SearchAlbumSongs failed: " + ret.ErrorMessage);
@@ -4215,7 +4253,7 @@ public partial class MainViewModel : ObservableObject
                             //Dispatcher.UIThread.Post(() =>
                             //{
                             //album.AlbumImage = r.AlbumCover.AlbumImageSource;
-                            album.AlbumImage = await BitmapSourceFromByteArray(r.AlbumCover.BinaryData);
+                            album.AlbumImage = await BitmapSourceFromByteArrayAsync(r.AlbumCover.BinaryData);
                             //
                             //});
 
@@ -4289,7 +4327,7 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    private static async Task<BitmapImage?> BitmapSourceFromByteArray(byte[]? buffer)
+    private static async Task<BitmapImage?> BitmapSourceFromByteArrayAsync(byte[]? buffer)
     {
         if (buffer == null)
         {
@@ -4450,7 +4488,7 @@ public partial class MainViewModel : ObservableObject
         return sanitizedName;
     }
 
-    private async Task<CommandSearchResult> SearchAlbumSongs(string name)
+    private async Task<CommandSearchResult> SearchAlbumSongsAsync(string name)
     {
         if (name is null)
         {
@@ -4479,7 +4517,7 @@ public partial class MainViewModel : ObservableObject
         return res;
     }
 
-    private async Task<CommandSearchResult> SearchArtistSongs(string name)
+    private async Task<CommandSearchResult> SearchArtistSongsAsync(string name)
     {
         if (name is null)
         {
@@ -4517,7 +4555,7 @@ public partial class MainViewModel : ObservableObject
         return (new System.Version(a)).CompareTo(new System.Version(b));
     }
 
-    private static async Task<long> GetFolderSize(string path)
+    private static async Task<long> GetFolderSizeAsync(string path)
     {
         long totalSize = 0;
 
@@ -4537,7 +4575,7 @@ public partial class MainViewModel : ObservableObject
         // Recursively add the size of files in subdirectories
         foreach (DirectoryInfo subDirectory in directoryInfo.GetDirectories())
         {
-            totalSize += await GetFolderSize(subDirectory.FullName);
+            totalSize += await GetFolderSizeAsync(subDirectory.FullName);
         }
 
         //long totalSize = dInfo.EnumerateFiles().Sum(file => file.Length);
@@ -4604,34 +4642,42 @@ public partial class MainViewModel : ObservableObject
 
     #endregion
 
-    #region == MPD events == 
+    #region == MPD events callback == 
 
     private async void OnMpdIdleConnected(MpcService sender)
     {
-        // ATTN: this won't be called if we etablishe the connection before MainWnd is initialized.
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        try
         {
-            Debug.WriteLine("OK MPD " + _mpc.MpdVerText + " @OnMpdConnected");
-
-            MpdVersion = _mpc.MpdVerText;
-
-            IsConnected = true;
-            IsConnecting = false;
-            IsNotConnectingNorConnected = false;
-
-            // Just in case.
-            //IsShowAckWindow = false;
-            //IsShowErrWindow = false;
-
-            // Add newly created Profile in the InitDialog to Profiles because connection was successfully established.
-            if ((Profiles.Count <= 0) && (CurrentProfile is not null))
+            // ATTN: this won't be called if we etablishe the connection before MainWnd is initialized.
+            await _dispatcherService.EnqueueAsync(() =>
             {
-                Profiles.Add(CurrentProfile);
-            }
-        });
+                Debug.WriteLine("OK MPD " + _mpc.MpdVerText + " @OnMpdConnected");
 
-        // 
-        await Task.Run(LoadInitialData, _cts.Token);
+                MpdVersion = _mpc.MpdVerText;
+
+                IsConnected = true;
+                IsConnecting = false;
+                IsNotConnectingNorConnected = false;
+
+                // Just in case.
+                //IsShowAckWindow = false;
+                //IsShowErrWindow = false;
+
+                // Add newly created Profile in the InitDialog to Profiles because connection was successfully established.
+                if ((Profiles.Count <= 0) && (CurrentProfile is not null))
+                {
+                    Profiles.Add(CurrentProfile);
+                }
+            });
+
+            // 
+            await Task.Run(LoadInitialDataAsync, _cts.Token);
+        }
+        catch (Exception e)
+        {
+            _ = e;
+            Debug.WriteLine($"Exception @OnMpdIdleConnected: {e}");
+        }
     }
 
     private void OnMpdPlayerStatusChanged(MpcService sender)
@@ -4655,17 +4701,17 @@ public partial class MainViewModel : ObservableObject
         }
 
         */
-        UpdateStatus();
+        _ = UpdateStatusAsync();
     }
 
     private void OnMpdCurrentQueueChanged(MpcService sender)
     {
-        UpdateCurrentQueue();
+        _ = UpdateCurrentQueueAsync();
     }
 
     private void OnMpdPlaylistsChanged(MpcService sender)
     {
-        UpdatePlaylists();
+        _ = UpdatePlaylistsAsync();
     }
 
     private void OnAlbumArtChanged(MpcService sender)
@@ -4676,7 +4722,7 @@ public partial class MainViewModel : ObservableObject
     private void OnMpdOutputChanged(MpcService sender)
     {
         //Debug.WriteLine("OnMpdOutputChanged");
-        UpdateAudioOutputs();
+        _ = UpdateAudioOutputsAsync();
     }
 
     private void OnDebugCommandOutput(MpcService sender, string data)
@@ -4706,334 +4752,383 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private void OnConnectionError(MpcService sender, string msg)
+    private async void OnConnectionError(MpcService sender, string msg)
     {
         if (string.IsNullOrEmpty(msg))
             return;
 
-        /*
-         *  ?
-        IsConnected = false;
-        IsConnecting = false;
-
-        StatusButton = _pathErrorInfoButton;
-        */
-
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        try
         {
-            ConnectionStatusMessage = _resourceLoader.GetString("ConnectionStatus_ConnectionError") + ": " + msg;
-            StatusBarMessage = ConnectionStatusMessage;
+            await _dispatcherService.EnqueueAsync(() =>
+            {
+                ConnectionStatusMessage = _resourceLoader.GetString("ConnectionStatus_ConnectionError") + ": " + msg;
+                StatusBarMessage = ConnectionStatusMessage;
 
-            InfoBarErrTitle = _resourceLoader.GetString("ConnectionStatus_ConnectionError");
-            InfoBarErrMessage = msg;
-            IsShowErrWindow = true;
-        });
+                InfoBarErrTitle = _resourceLoader.GetString("ConnectionStatus_ConnectionError");
+                InfoBarErrMessage = msg;
+                IsShowErrWindow = true;
+            });
+        }
+        catch(Exception e)
+        {
+            _ = e;
+            Debug.WriteLine($"Exception @OnConnectionError: {e}");
+        }
     }
 
-    private void OnConnectionStatusChanged(MpcService sender, MpcService.ConnectionStatus status)
+    private async void OnConnectionStatusChanged(MpcService sender, MpcService.ConnectionStatus status)
     {
-        if (status == MpcService.ConnectionStatus.NeverConnected)
+        try
         {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            if (status == MpcService.ConnectionStatus.NeverConnected)
             {
-                IsConnected = false;
-                IsConnecting = false;
-                IsNotConnectingNorConnected = true;
+                await _dispatcherService.EnqueueAsync(() =>
+                {
+                    IsConnected = false;
+                    IsConnecting = false;
+                    IsNotConnectingNorConnected = true;
+
+                    /*
+                    IsConnectionSettingShow = true;
+                    StatusButton = _pathDisconnectedButton;
+                    */
+
+                });
+
+                //ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_NeverConnected;
+                Debug.WriteLine("ConnectionStatus_NeverConnected");
+            }
+            else if (status == MpcService.ConnectionStatus.Connected)
+            {
+                await _dispatcherService.EnqueueAsync(() =>
+                {
+                    IsConnected = true;
+                    IsConnecting = false;
+                    IsNotConnectingNorConnected = false;
+                });
+
+                /*
+                IsConnectionSettingShow = false;
+                StatusButton = _pathConnectedButton;
+                */
+
+                //ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_Connected;
+                //Debug.WriteLine("ConnectionStatus_Connected");
+            }
+            else if (status == MpcService.ConnectionStatus.Connecting)
+            {
+                await _dispatcherService.EnqueueAsync(() =>
+                {
+                    IsConnected = false;
+                    IsConnecting = true;
+                    IsNotConnectingNorConnected = false;
+                });
+                /*
+                //IsConnectionSettingShow = true;
+                StatusButton = _pathConnectingButton;
+                */
+
+                //ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_Connecting;
+
+                //StatusBarMessage = ConnectionStatusMessage;
+                //Debug.WriteLine("ConnectionStatus_Connecting");
+            }
+            else if (status == MpcService.ConnectionStatus.ConnectFailTimeout)
+            {
+                await _dispatcherService.EnqueueAsync(() =>
+                {
+                    IsConnected = false;
+                    IsConnecting = false;
+                    IsNotConnectingNorConnected = true;
+                });
+                /*
+                IsConnectionSettingShow = true;
+
+                Debug.WriteLine("ConnectionStatus_ConnectFail_Timeout");
+                ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_ConnectFail_Timeout;
+                StatusButton = _pathErrorInfoButton;
+
+                StatusBarMessage = ConnectionStatusMessage;
+                */
+
+                Debug.WriteLine("ConnectionStatus_ConnectFail_Timeout");
+            }
+            else if (status == MpcService.ConnectionStatus.SeeConnectionErrorEvent)
+            {
+                await _dispatcherService.EnqueueAsync(() =>
+                {
+                    IsConnected = false;
+                    IsConnecting = false;
+                    IsNotConnectingNorConnected = true;
+                });
+                /*
+                IsConnectionSettingShow = true;
+                StatusButton = _pathErrorInfoButton;
+                */
+
+                _elapsedTimer.Stop();
+                Debug.WriteLine("ConnectionStatus_SeeConnectionErrorEvent");
+            }
+            else if (status == MpcService.ConnectionStatus.Disconnected)
+            {
+                await _dispatcherService.EnqueueAsync(() =>
+                {
+                    IsConnected = false;
+                    IsConnecting = false;
+                    IsNotConnectingNorConnected = true;
+                });
 
                 /*
                 IsConnectionSettingShow = true;
-                StatusButton = _pathDisconnectedButton;
+                ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_Disconnected;
+                StatusButton = _pathErrorInfoButton;
+                StatusBarMessage = ConnectionStatusMessage;
                 */
 
-            });
+                Debug.WriteLine("ConnectionStatus_Disconnected");
 
-            //ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_NeverConnected;
-            Debug.WriteLine("ConnectionStatus_NeverConnected");
-        }
-        else if (status == MpcService.ConnectionStatus.Connected)
-        {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+            }
+            else if (status == MpcService.ConnectionStatus.DisconnectedByHost)
             {
-                IsConnected = true;
-                IsConnecting = false;
-                IsNotConnectingNorConnected = false;
-            });
+                await _dispatcherService.EnqueueAsync(() =>
+                {
+                    IsConnected = false;
+                    IsConnecting = false;
+                    IsNotConnectingNorConnected = true;
+                });
 
-            /*
-            IsConnectionSettingShow = false;
-            StatusButton = _pathConnectedButton;
-            */
+                // TODO: not really usued now...
+                /*
+                IsConnectionSettingShow = true;
 
-            //ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_Connected;
-            //Debug.WriteLine("ConnectionStatus_Connected");
-        }
-        else if (status == MpcService.ConnectionStatus.Connecting)
-        {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_DisconnectedByHost;
+                StatusButton = _pathErrorInfoButton;
+
+                StatusBarMessage = ConnectionStatusMessage;
+                */
+                Debug.WriteLine("ConnectionStatus_DisconnectedByHost");
+            }
+            else if (status == MpcService.ConnectionStatus.Disconnecting)
             {
-                IsConnected = false;
-                IsConnecting = true;
-                IsNotConnectingNorConnected = false;
-            });
-            /*
-            //IsConnectionSettingShow = true;
-            StatusButton = _pathConnectingButton;
-            */
+                await _dispatcherService.EnqueueAsync(() =>
+                {
+                    IsConnected = false;
+                    IsConnecting = false;
+                    IsNotConnectingNorConnected = false;
+                });
+                /*
+                //IsConnectionSettingShow = true;
 
-            //ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_Connecting;
+                ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_Disconnecting;
+                StatusButton = _pathConnectingButton;
 
-            //StatusBarMessage = ConnectionStatusMessage;
-            //Debug.WriteLine("ConnectionStatus_Connecting");
-        }
-        else if (status == MpcService.ConnectionStatus.ConnectFailTimeout)
-        {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                StatusBarMessage = ConnectionStatusMessage;
+                */
+                //Debug.WriteLine("ConnectionStatus_Disconnecting");
+            }
+            else if (status == MpcService.ConnectionStatus.DisconnectedByUser)
             {
-                IsConnected = false;
-                IsConnecting = false;
-                IsNotConnectingNorConnected = true;
-            });
-            /*
-            IsConnectionSettingShow = true;
+                await _dispatcherService.EnqueueAsync(() =>
+                {
+                    IsConnected = false;
+                    IsConnecting = false;
+                    IsNotConnectingNorConnected = true;
+                });
+                /*
+                //IsConnectionSettingShow = true;
 
-            Debug.WriteLine("ConnectionStatus_ConnectFail_Timeout");
-            ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_ConnectFail_Timeout;
-            StatusButton = _pathErrorInfoButton;
+                ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_DisconnectedByUser;
+                StatusButton = _pathDisconnectedButton;
 
-            StatusBarMessage = ConnectionStatusMessage;
-            */
-
-            Debug.WriteLine("ConnectionStatus_ConnectFail_Timeout");
-        }
-        else if (status == MpcService.ConnectionStatus.SeeConnectionErrorEvent)
-        {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                StatusBarMessage = ConnectionStatusMessage;
+                */
+                //Debug.WriteLine("ConnectionStatus_DisconnectedByUser");
+            }
+            else if (status == MpcService.ConnectionStatus.SendFailNotConnected)
             {
-                IsConnected = false;
-                IsConnecting = false;
-                IsNotConnectingNorConnected = true;
-            });
-            /*
-            IsConnectionSettingShow = true;
-            StatusButton = _pathErrorInfoButton;
-            */
+                await _dispatcherService.EnqueueAsync(() =>
+                {
+                    IsConnected = false;
+                    IsConnecting = false;
+                    IsNotConnectingNorConnected = true;
+                });
+                /*
+                IsConnectionSettingShow = true;
+                ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_SendFail_NotConnected;
+                StatusButton = _pathErrorInfoButton;
 
-            _elapsedTimer.Stop();
-            Debug.WriteLine("ConnectionStatus_SeeConnectionErrorEvent");
-        }
-        else if (status == MpcService.ConnectionStatus.Disconnected)
-        {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                StatusBarMessage = ConnectionStatusMessage;
+                */
+
+                Debug.WriteLine("ConnectionStatus_SendFail_NotConnected");
+            }
+            else if (status == MpcService.ConnectionStatus.SendFailTimeout)
             {
-                IsConnected = false;
-                IsConnecting = false;
-                IsNotConnectingNorConnected = true;
-            });
+                await _dispatcherService.EnqueueAsync(() =>
+                {
+                    IsConnected = false;
+                    IsConnecting = false;
+                    IsNotConnectingNorConnected = true;
+                });
+                /*
+                IsConnectionSettingShow = true;
 
-            /*
-            IsConnectionSettingShow = true;
-            ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_Disconnected;
-            StatusButton = _pathErrorInfoButton;
-            StatusBarMessage = ConnectionStatusMessage;
-            */
+                ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_SendFail_Timeout;
+                StatusButton = _pathErrorInfoButton;
 
-            Debug.WriteLine("ConnectionStatus_Disconnected");
-
+                StatusBarMessage = ConnectionStatusMessage;
+                */
+                Debug.WriteLine("ConnectionStatus_SendFail_Timeout");
+            }
         }
-        else if (status == MpcService.ConnectionStatus.DisconnectedByHost)
+        catch (Exception e)
         {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-            {
-                IsConnected = false;
-                IsConnecting = false;
-                IsNotConnectingNorConnected = true;
-            });
-
-            // TODO: not really usued now...
-            /*
-            IsConnectionSettingShow = true;
-
-            ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_DisconnectedByHost;
-            StatusButton = _pathErrorInfoButton;
-
-            StatusBarMessage = ConnectionStatusMessage;
-            */
-            Debug.WriteLine("ConnectionStatus_DisconnectedByHost");
-        }
-        else if (status == MpcService.ConnectionStatus.Disconnecting)
-        {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-            {
-                IsConnected = false;
-                IsConnecting = false;
-                IsNotConnectingNorConnected = false;
-            });
-            /*
-            //IsConnectionSettingShow = true;
-
-            ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_Disconnecting;
-            StatusButton = _pathConnectingButton;
-
-            StatusBarMessage = ConnectionStatusMessage;
-            */
-            //Debug.WriteLine("ConnectionStatus_Disconnecting");
-        }
-        else if (status == MpcService.ConnectionStatus.DisconnectedByUser)
-        {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-            {
-                IsConnected = false;
-                IsConnecting = false;
-                IsNotConnectingNorConnected = true;
-            });
-            /*
-            //IsConnectionSettingShow = true;
-
-            ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_DisconnectedByUser;
-            StatusButton = _pathDisconnectedButton;
-
-            StatusBarMessage = ConnectionStatusMessage;
-            */
-            //Debug.WriteLine("ConnectionStatus_DisconnectedByUser");
-        }
-        else if (status == MpcService.ConnectionStatus.SendFailNotConnected)
-        {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-            {
-                IsConnected = false;
-                IsConnecting = false;
-                IsNotConnectingNorConnected = true;
-            });
-            /*
-            IsConnectionSettingShow = true;
-            ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_SendFail_NotConnected;
-            StatusButton = _pathErrorInfoButton;
-
-            StatusBarMessage = ConnectionStatusMessage;
-            */
-
-            Debug.WriteLine("ConnectionStatus_SendFail_NotConnected");
-        }
-        else if (status == MpcService.ConnectionStatus.SendFailTimeout)
-        {
-            App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-            {
-                IsConnected = false;
-                IsConnecting = false;
-                IsNotConnectingNorConnected = true;
-            });
-            /*
-            IsConnectionSettingShow = true;
-
-            ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_SendFail_Timeout;
-            StatusButton = _pathErrorInfoButton;
-
-            StatusBarMessage = ConnectionStatusMessage;
-            */
-            Debug.WriteLine("ConnectionStatus_SendFail_Timeout");
+            _ = e;
+            Debug.WriteLine($"Exception @OnConnectionStatusChanged: {e}");
         }
     }
 
-    private void OnMpdAckError(MpcService sender, string ackMsg, string origin)
+    private async void OnMpdAckError(MpcService sender, string ackMsg, string origin)
     {
         if (string.IsNullOrEmpty(ackMsg))
             return;
 
         Debug.WriteLine($"MpdAckError: {ackMsg}");
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        try
         {
-            string s = ackMsg;
-            string patternStr = @"[\[].+?[\]]";//@"[{\[].+?[}\]]";
-            s = System.Text.RegularExpressions.Regex.Replace(s, patternStr, string.Empty);
-            s = s.Replace("ACK ", string.Empty);
-            s = s.Replace("{} ", string.Empty);
-
-            if (origin.Equals("Command", StringComparison.OrdinalIgnoreCase))
+            await _dispatcherService.EnqueueAsync(async () =>
             {
-                InfoBarAckTitle = MpdVersion + " " + _resourceLoader.GetString("MPD_CommandResponse");
-            }
-            else if (origin.Equals("Idle", StringComparison.OrdinalIgnoreCase))
-            {
-                InfoBarAckTitle = MpdVersion + " " + _resourceLoader.GetString("MPD_IdleResponse");
-            }
-            else
-            {
-                InfoBarAckTitle = MpdVersion;
-            }
+                string s = ackMsg;
+                string patternStr = @"[\[].+?[\]]";//@"[{\[].+?[}\]]";
+                s = System.Text.RegularExpressions.Regex.Replace(s, patternStr, string.Empty);
+                s = s.Replace("ACK ", string.Empty);
+                s = s.Replace("{} ", string.Empty);
 
-            InfoBarAckMessage = s;
+                if (origin.Equals("Command", StringComparison.OrdinalIgnoreCase))
+                {
+                    InfoBarAckTitle = MpdVersion + " " + _resourceLoader.GetString("MPD_CommandResponse");
+                }
+                else if (origin.Equals("Idle", StringComparison.OrdinalIgnoreCase))
+                {
+                    InfoBarAckTitle = MpdVersion + " " + _resourceLoader.GetString("MPD_IdleResponse");
+                }
+                else
+                {
+                    InfoBarAckTitle = MpdVersion;
+                }
 
-            IsShowAckWindow = true;
+                InfoBarAckMessage = s;
 
-            if (_mpc.Commands.Contains("clearerror"))
-            {
-                await _mpc.MpdClearError();
-            }
-        });
+                IsShowAckWindow = true;
+
+                if (_mpc.Commands.Contains("clearerror"))
+                {
+                    await _mpc.MpdClearError();
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            _ = e;
+            Debug.WriteLine($"Exception @OnMpdAckError: {e}");
+        }
     }
 
-    private void OnMpdFatalError(MpcService sender, string errMsg, string origin)
+    private async void OnMpdFatalError(MpcService sender, string errMsg, string origin)
     {
         if (string.IsNullOrEmpty(errMsg))
             return;
 
         Debug.WriteLine($"MpdFatalError: {errMsg}");
 
-        string s = errMsg;
-        string patternStr = @"[\[].+?[\]]";//@"[{\[].+?[}\]]";
-        s = System.Text.RegularExpressions.Regex.Replace(s, patternStr, string.Empty);
-        s = s.Replace("ACK ", string.Empty);
-        s = s.Replace("{} ", string.Empty);
-
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        try
         {
-            if (origin.Equals("Command", StringComparison.OrdinalIgnoreCase))
-            {
-                InfoBarErrTitle = MpdVersion + " " + _resourceLoader.GetString("MPD_CommandResponse");
-            }
-            else if (origin.Equals("Idle", StringComparison.OrdinalIgnoreCase))
-            {
-                InfoBarErrTitle = MpdVersion + " " + _resourceLoader.GetString("MPD_IdleResponse");
-            }
-            else
-            {
-                InfoBarErrTitle = MpdVersion;
-            }
+            string s = errMsg;
+            string patternStr = @"[\[].+?[\]]";//@"[{\[].+?[}\]]";
+            s = System.Text.RegularExpressions.Regex.Replace(s, patternStr, string.Empty);
+            s = s.Replace("ACK ", string.Empty);
+            s = s.Replace("{} ", string.Empty);
 
-            InfoBarErrMessage = s;
-
-            IsShowErrWindow = true;
-
-            if (_mpc.Commands.Contains("clearerror"))
+            await _dispatcherService.EnqueueAsync(async () =>
             {
-                await _mpc.MpdClearError();
-            }
-        });
+                if (origin.Equals("Command", StringComparison.OrdinalIgnoreCase))
+                {
+                    InfoBarErrTitle = MpdVersion + " " + _resourceLoader.GetString("MPD_CommandResponse");
+                }
+                else if (origin.Equals("Idle", StringComparison.OrdinalIgnoreCase))
+                {
+                    InfoBarErrTitle = MpdVersion + " " + _resourceLoader.GetString("MPD_IdleResponse");
+                }
+                else
+                {
+                    InfoBarErrTitle = MpdVersion;
+                }
+
+                InfoBarErrMessage = s;
+
+                IsShowErrWindow = true;
+
+                if (_mpc.Commands.Contains("clearerror"))
+                {
+                    await _mpc.MpdClearError();
+                }
+            });
+
+        }
+        catch (Exception e)
+        {
+            _ = e;
+            Debug.WriteLine($"Exception @OnMpdFatalError: {e}");
+        }
     }
 
-    private void OnMpcProgress(MpcService sender, string msg)
+    private async void OnMpcProgress(MpcService sender, string msg)
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        try
         {
-            StatusBarMessage = msg;
-        });
+            await _dispatcherService.EnqueueAsync(() =>
+            {
+                StatusBarMessage = msg;
+            });
+        }
+        catch (Exception e)
+        {
+            _ = e;
+            Debug.WriteLine($"Exception @OnMpcProgress: {e}");
+        }
     }
 
-    private void OnMpcIsBusy(MpcService sender, bool on)
+    private async void OnMpcIsBusy(MpcService sender, bool on)
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        try
         {
-            IsBusy = on;
-        });
+            await _dispatcherService.EnqueueAsync(() =>
+            {
+                IsBusy = on;
+            });
+        }
+        catch (Exception e)
+        {
+            _ = e;
+            Debug.WriteLine($"Exception @OnMpcIsBusy: {e}");
+        }
     }
 
-    private void OnUpdateProgress(string msg)
+    private async void OnUpdateProgress(string msg)
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        try
         {
-            StatusBarMessage = msg;
-        });
+            await _dispatcherService.EnqueueAsync(() =>
+            {
+                StatusBarMessage = msg;
+            });
+        }
+        catch (Exception e)
+        {
+            _ = e;
+            Debug.WriteLine($"Exception @OnUpdateProgress: {e}");
+        }
     }
 
     #endregion
@@ -5067,7 +5162,7 @@ public partial class MainViewModel : ObservableObject
 
             //TitleBarHelper.UpdateTitleBar(Theme, App.MainWnd);
 
-            App.MainWnd.SetCapitionButtonColor();
+            _ = App.MainWnd?.SetCapitionButtonColor();
         }
     }
 
@@ -5307,7 +5402,7 @@ public partial class MainViewModel : ObservableObject
         {
             if (res.SearchResult is not null)
             {
-                App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+                await _dispatcherService.EnqueueAsync(() =>
                 {
                     // WinUI3's workaround.
                     foreach (var item in res.SearchResult)
@@ -5365,7 +5460,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(SongsPlayCanExecute))]
-    public void SongsListviewPlayThis(object obj)
+    public async Task SongsListviewPlayThis(object obj)
     {
         if (obj is null) return;
 
@@ -5374,7 +5469,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             Queue.Clear();
             CurrentSong = null;
@@ -5714,7 +5809,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(SongsPlayCanExecute))]
-    public void SongsPlayAll(object obj)
+    public async Task SongsPlayAll(object obj)
     {
         if (obj is null) return;
 
@@ -5728,7 +5823,7 @@ public partial class MainViewModel : ObservableObject
             uriList.Add(song.File);
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             Queue.Clear();
             CurrentSong = null; 
@@ -5798,7 +5893,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(SongsPlayCanExecute))]
-    public void SongsSelectedItemsPlay(System.Collections.Generic.IList<object> obj)
+    public async Task SongsSelectedItemsPlay(System.Collections.Generic.IList<object> obj)
     {
         if (obj is null)
         {
@@ -5825,7 +5920,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             Queue.Clear();
             CurrentSong = null;
@@ -6050,7 +6145,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void AlbumFilterSelect(object obj)
+    public async Task AlbumFilterSelect(object obj)
     {
         if (Albums.Count <= 1)
             return;
@@ -6062,12 +6157,12 @@ public partial class MainViewModel : ObservableObject
             SelectedAlbum = album;
 
             var list = new ObservableCollection<AlbumEx> { album };
-            GetAlbumPictures(list);
+            await GetAlbumPicturesAsync(list);
         }
     }
 
     [RelayCommand]
-    public void ListviewGoToAlbumPage(SongInfo song)
+    public async Task ListviewGoToAlbumPage(SongInfo song)
     {
         if (song is null)
         {
@@ -6094,7 +6189,7 @@ public partial class MainViewModel : ObservableObject
             // found it
             if (hoge is not null)
             {
-                GoToAlbumDetailsPage(hoge);
+                await GoToAlbumDetailsPage(hoge);
             }
         }
         else
@@ -6105,7 +6200,7 @@ public partial class MainViewModel : ObservableObject
                 // found it
                 if (item is not null)
                 {
-                    GoToAlbumDetailsPage(item);
+                    await GoToAlbumDetailsPage(item);
                 }
                 break;
             }
@@ -6118,9 +6213,9 @@ public partial class MainViewModel : ObservableObject
         _mainMenuItems.AlbumsDirectory.Selected = true;
     }
 
-    private void GoToAlbumDetailsPage(AlbumEx album)
+    private async Task GoToAlbumDetailsPage(AlbumEx album)
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             // First, go to album page so that "Back" mean back to AlbumPage.
             GoToAlbumPage();
@@ -6139,13 +6234,13 @@ public partial class MainViewModel : ObservableObject
             // Fetch album cover if not.
             // Use a tmp collection to use existing method.
             var tmpCollection = new ObservableCollection<AlbumEx> { album };
-            GetAlbumPictures(tmpCollection);
+            await GetAlbumPicturesAsync(tmpCollection);
         });
     }
 
-    public void GoBackFromAlbumDetailsPage(AlbumEx album)
+    public async Task GoBackFromAlbumDetailsPage(AlbumEx album)
     {
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             //
             await Task.Yield();
@@ -6205,7 +6300,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void CurrentSongToAlbumPage()
+    public async Task CurrentSongToAlbumPage()
     {
         if (CurrentSong is null)
         {
@@ -6232,7 +6327,7 @@ public partial class MainViewModel : ObservableObject
             {
                 //GoToAlbumPage();
                 //SelectedAlbum = hoge;
-                GoToAlbumDetailsPage(hoge);
+                await GoToAlbumDetailsPage(hoge);
             }
         }
         else
@@ -6246,7 +6341,7 @@ public partial class MainViewModel : ObservableObject
                 {
                     //GoToAlbumPage();
                     //SelectedAlbum = item;
-                    GoToAlbumDetailsPage(item);
+                    await GoToAlbumDetailsPage(item);
                 }
                 break;
             }
@@ -6299,7 +6394,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(SongsPlayCanExecute))]
-    public void SelectedAlbumArtistPlayAll(object obj)
+    public async Task SelectedAlbumArtistPlayAll(object obj)
     {
         if (obj is null) return;
         if (SelectedAlbumArtist is null) return;
@@ -6326,7 +6421,7 @@ public partial class MainViewModel : ObservableObject
             }
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             Queue.Clear();
             CurrentSong = null;
@@ -6433,7 +6528,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(SongsPlayCanExecute))]
-    public void SelectedDirectoryPlayAll(object obj)
+    public async Task SelectedDirectoryPlayAll(object obj)
     {
         if (obj is null) return;
 
@@ -6447,7 +6542,7 @@ public partial class MainViewModel : ObservableObject
             uriList.Add(song.OriginalFileUri);
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             Queue.Clear();
             CurrentSong = null;
@@ -6512,7 +6607,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(SongsPlayCanExecute))]
-    public void FilesListviewPlayThis(object obj)
+    public async Task FilesListviewPlayThis(object obj)
     {
         if (obj is null) return;
 
@@ -6521,7 +6616,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             Queue.Clear();
             CurrentSong = null;
@@ -6542,7 +6637,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(SongsPlayCanExecute))]
-    public void FilesSelectedItemsPlay(System.Collections.Generic.IList<object> obj)
+    public async Task FilesSelectedItemsPlay(System.Collections.Generic.IList<object> obj)
     {
         if (obj is null)
         {
@@ -6569,7 +6664,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(async () =>
+        await _dispatcherService.EnqueueAsync(async () =>
         {
             Queue.Clear();
             CurrentSong = null;
@@ -6695,7 +6790,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
+        await _dispatcherService.EnqueueAsync(() =>
         {
             Queue.Clear();
             CurrentSong = null;
@@ -6705,7 +6800,7 @@ public partial class MainViewModel : ObservableObject
 
         await Task.Yield();
         await Task.Delay(200);
-        UpdateCurrentSong();
+        await UpdateCurrentSongAsync();
     }
     public bool ChangePlaylistCanExecute()
     {
@@ -7081,7 +7176,7 @@ public partial class MainViewModel : ObservableObject
         //IsAlbumArtVisible = false;
         AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
 
-        await Task.Run(() => Start(_host, _port), _cts.Token);
+        await Task.Run(() => StartAsync(_host, _port), _cts.Token);
         /*
         ConnectionResult r = await _mpc.MpdIdleConnect(_host, _port);
 
@@ -7221,7 +7316,7 @@ public partial class MainViewModel : ObservableObject
         DeleteAllContents(App.AppDataCacheFolder);
 
         // Update folder size.
-        await GetCacheFolderSize();
+        await GetCacheFolderSizeAsync();
     }
 
     [RelayCommand(CanExecute = nameof(AudioOutputToggleCanExecute))]

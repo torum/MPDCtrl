@@ -16,7 +16,8 @@
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
     mc:Ignorable="d"
     NavigationCacheMode="Required"
-    KeyDown="Page_PreviewKeyDown">
+    KeyDown="Page_PreviewKeyDown"
+    Unloaded="Page_Unloaded">
     <Page.Resources>
         <animations:ImplicitAnimationSet x:Name="ShowTransitions">
             <animations:OffsetAnimation EasingMode="EaseOut" From="0,24,0" To="0" Duration="0:0:0.4" />

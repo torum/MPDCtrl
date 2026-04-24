@@ -18,7 +18,8 @@
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
     mc:Ignorable="d"
     NavigationCacheMode="Required"
-    PreviewKeyDown="Page_PreviewKeyDown">
+    PreviewKeyDown="Page_PreviewKeyDown"
+    Unloaded="Page_Unloaded">
     <Page.Resources>
         <x:Boolean x:Key="True">True</x:Boolean>
         <x:Boolean x:Key="False">False</x:Boolean>

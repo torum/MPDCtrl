@@ -14,7 +14,16 @@
     Loaded="Page_Loaded"
     Unloaded="Page_Unloaded"
     PreviewKeyDown="Page_PreviewKeyDown" PreviewKeyUp="Page_PreviewKeyUp">
-    <Grid>
+    <Grid x:Name="RootGrid">
+        <!--
+        <Grid.Resources>
+            <Storyboard x:Name="FadeInStoryboard">
+                <DoubleAnimation Storyboard.TargetName="RootGrid"
+                                 Storyboard.TargetProperty="Opacity"
+                                 From="0.0" To="1.0" Duration="0:0:0.5" />
+            </Storyboard>
+        </Grid.Resources>
+        -->
         <Grid.RowDefinitions>
             <RowDefinition Height="42"/>
             <RowDefinition Height="*"/>

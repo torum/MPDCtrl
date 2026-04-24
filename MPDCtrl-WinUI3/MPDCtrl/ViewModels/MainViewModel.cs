@@ -2155,7 +2155,7 @@ public partial class MainViewModel : ObservableObject
 #endif
     }
 
-    public async Task StartMpc()
+    public async Task StartMpcAsync()
     {
         if ((CurrentProfile is null) || (Profiles.Count < 1))
         {
@@ -2173,12 +2173,15 @@ public partial class MainViewModel : ObservableObject
 
             CurrentProfile = pro;
 
+            // TODO: let's not await for faster start up.
             await Task.Run(async () => await StartAsync(_host, _port), _cts.Token);
 
             return;
         }
 
+        // TODO: let's not await for faster start up.
         await Task.Run(async () => await StartAsync(_host, _port), _cts.Token);
+        //_ = Task.Run(() => StartAsync(_host, _port), _cts.Token);
     }
 
     public void CleanUp()
@@ -2322,7 +2325,8 @@ public partial class MainViewModel : ObservableObject
         }
 
         // Start MPD connection. (without await MpdIdleConnect.   ?)
-        await Task.Run(() => _mpc.MpdIdleConnect(HostIpAddress.ToString(), port), _cts.Token);
+        await Task.Run(async () => await _mpc.MpdIdleConnect(HostIpAddress.ToString(), port), _cts.Token);
+        //_ = Task.Run(() => _mpc.MpdIdleConnect(HostIpAddress.ToString(), port), _cts.Token);
     }
 
     private async Task LoadInitialDataAsync()

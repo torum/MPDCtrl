@@ -155,6 +155,7 @@ public sealed partial class AlbumsPage : Page
         ele.CenterPoint = new Vector3((float)(ele.ActualWidth / 2.0), (float)(ele.ActualHeight / 2.0), 1f);
         ele.StartAnimation(_springAnimation);
     }
+
     private void Border_PointerExited(object sender, PointerRoutedEventArgs e)
     {
         if (sender is not FrameworkElement ele)
@@ -200,7 +201,7 @@ public sealed partial class AlbumsPage : Page
         UpdateVisibleItems(this.AlbumsListView, scrollViewer);
     }
 
-    private void UpdateVisibleItems(ListView listView, ScrollViewer scrollViewer)//, ObservableCollection<object> visibleItems
+    private void UpdateVisibleItems(ListView listView, ScrollViewer scrollViewer)
     {
         //visibleItems.Clear();
         ObservableCollection<AlbumEx> visibleItems = [];
@@ -337,5 +338,11 @@ public sealed partial class AlbumsPage : Page
                 _ = ViewModel.GetAlbumPictureAsync(album);
             });
         }
+    }
+
+    private void Page_Unloaded(object sender, RoutedEventArgs e)
+    {
+        ViewModel.AlbumsCollectionHasBeenReset -= this.OnAlbumsCollectionHasBeenReset;
+        ViewModel.AlbumScrollIntoView -= this.OnAlbumScrollIntoView;
     }
 }

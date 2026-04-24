@@ -78,24 +78,33 @@ public sealed partial class ShellPage : Page
 
     private async void Page_Loaded(object sender, RoutedEventArgs e)
     {
-        // Set focus so that space shortcut works.
-        this.PlaybackPlay.Focus(FocusState.Programmatic);
-
-        if (App.MainWnd is not null)
+        try
         {
-            App.MainWnd.Activated += MainWindow_Activated;
+            // Set focus so that space shortcut works.
+            this.PlaybackPlay.Focus(FocusState.Programmatic);
 
-            // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage)
-            // is loaded, initialized, set, drawn, navigated. So start the connection.
-            await ViewModel.StartMpc();
+            if (App.MainWnd is not null)
+            {
+                App.MainWnd.Activated += MainWindow_Activated;
+
+                // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage)
+                // is loaded, initialized, set, drawn, navigated. So start the connection.
+
+                await ViewModel.StartMpcAsync();
+            }
+            else
+            {
+                Debug.WriteLine("App.MainWnd is null. Init order is wrong.");
+            }
+
+            _token = AlbumCoverImage.RegisterPropertyChangedCallback(Microsoft.UI.Xaml.Controls.Image.SourceProperty, OnSourceChanged);
+
         }
-        else
+        catch (Exception ex)
         {
-            Debug.WriteLine("App.MainWnd is null. Init order is wrong.");
+            _ = ex;
+            Debug.WriteLine($"Exception @Page_Loaded::ShellPage: {ex}");
         }
-
-        _token = AlbumCoverImage.RegisterPropertyChangedCallback(Microsoft.UI.Xaml.Controls.Image.SourceProperty, OnSourceChanged);
-
     }
 
     private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -331,7 +340,26 @@ public sealed partial class ShellPage : Page
 
         //this.AppTitleTextBlock.Opacity = args.WindowActivationState == WindowActivationState.Deactivated ? 0.3 : 1;
         //this.AppTitleIcon.Opacity = args.WindowActivationState == WindowActivationState.Deactivated ? 0.3 : 1;
-        this.Opacity = args.WindowActivationState == WindowActivationState.Deactivated ? 0.7 : 1;
+
+        //this.Opacity = args.WindowActivationState == WindowActivationState.Deactivated ? 0.7 : 1;
+
+        //
+        var compositor = Microsoft.UI.Xaml.Media.CompositionTarget.GetCompositorForCurrentThread();
+        var visual = Microsoft.UI.Xaml.Hosting.ElementCompositionPreview.GetElementVisual(RootGrid);
+
+        var animation = compositor.CreateScalarKeyFrameAnimation();
+        if (args.WindowActivationState != WindowActivationState.CodeActivated)
+        {
+            animation.InsertKeyFrame(0f, 1f); // Start opacity
+            animation.InsertKeyFrame(1f, 0.5f); // End opacity
+        }
+        else
+        {
+            animation.InsertKeyFrame(0f, 0.5f); // Start opacity
+            animation.InsertKeyFrame(1f, 1f); // End opacity
+        }
+        animation.Duration = TimeSpan.FromMilliseconds(160);
+        visual.StartAnimation("Opacity", animation);
     }
 
     private async void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)

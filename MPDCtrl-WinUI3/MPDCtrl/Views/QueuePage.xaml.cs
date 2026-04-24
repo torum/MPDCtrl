@@ -306,4 +306,9 @@ public sealed partial class QueuePage : Page
         }
     }
 
+    private void Page_Unloaded(object sender, RoutedEventArgs e)
+    {
+        ViewModel.ScrollIntoView -= (sender, arg) => { this.OnScrollIntoView(arg); };
+        ViewModel.ScrollIntoViewAndSelect -= (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
+    }
 }

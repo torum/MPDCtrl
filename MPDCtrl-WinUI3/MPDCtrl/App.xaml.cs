@@ -33,7 +33,13 @@ public partial class App : Application
 
     // ErrorLog
     private static readonly string LogFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl4_errors.txt";
-    private static readonly StringBuilder Errortxt = new();
+    private readonly StringBuilder Errortxt = new();
+
+#if DEBUG
+    public bool IsSaveErrorLog = true;
+#else
+    public bool IsSaveErrorLog = false;
+#endif
 
     // MainWindow
     public static MainWindow? MainWnd
@@ -130,6 +136,7 @@ public partial class App : Application
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         this.UnhandledException += App_UnhandledException;
+
     }
 
     protected async override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
@@ -265,16 +272,26 @@ public partial class App : Application
         }
     }
 
-    public static void AppendErrorLog(string kindTxt, string errorTxt)
+    public void AppendErrorLog(string kindTxt, string errorTxt)
     {
+        if (!IsSaveErrorLog)
+        {
+            return;
+        }
+
         Errortxt.AppendLine(kindTxt + ": " + errorTxt);
         var dt = DateTime.Now;
         Errortxt.AppendLine($"Occured at {dt.ToString("yyyy/MM/dd HH:mm:ss")}");
         Errortxt.AppendLine("");
     }
 
-    public static void SaveErrorLog()
+    public void SaveErrorLog()
     {
+        if (!IsSaveErrorLog)
+        {
+            return;
+        }
+
         if (string.IsNullOrEmpty(LogFilePath))
         {
             return;

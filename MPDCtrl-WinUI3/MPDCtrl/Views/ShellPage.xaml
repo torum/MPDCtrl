@@ -31,6 +31,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="1"/>
             <RowDefinition Height="116"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- App dummy titlebar -->
@@ -136,15 +137,15 @@
                 <ColumnDefinition Width="1*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <TextBox Grid.Column="0" x:Name="DebugCommandTextBox" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" IsReadOnly="False" TextWrapping="NoWrap" VerticalAlignment="Stretch" Margin="6,6,3,6"></TextBox>
+            <RichEditBox Grid.Column="0" x:Name="DebugCommandTextBox" ScrollViewer.VerticalScrollBarVisibility="Auto" IsReadOnly="False" TextWrapping="NoWrap" VerticalAlignment="Stretch" Margin="6,6,3,6"></RichEditBox>
             <Button Grid.Column="0" Margin="16" Command="{x:Bind ViewModel.FireDebugCommandClearCommand}" HorizontalAlignment="Right" VerticalAlignment="Top">
                 <Viewbox Width="12" Height="12" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Path Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Data="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" Width="NaN" Height="NaN" Margin="0">
                     </Path>
                 </Viewbox>
             </Button>
-            
-            <TextBox Grid.Column="1" x:Name="DebugIdleTextBox" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" IsReadOnly="False" TextWrapping="NoWrap" VerticalAlignment="Stretch" Margin="3,6,6,6"></TextBox>
+
+            <RichEditBox Grid.Column="1" x:Name="DebugIdleTextBox" ScrollViewer.VerticalScrollBarVisibility="Auto" IsReadOnly="False" TextWrapping="NoWrap" VerticalAlignment="Stretch" Margin="3,6,6,6"></RichEditBox>
             <Button Grid.Column="1" Margin="16" Command="{x:Bind ViewModel.FireDebugIdleClearCommand}" HorizontalAlignment="Right" VerticalAlignment="Top">
                 <Viewbox Width="12" Height="12" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Path Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Data="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" Width="NaN" Height="NaN" Margin="0">
@@ -308,6 +309,10 @@
             </Grid>
 
         </Grid>
+
+        <Border Grid.Row="6" Height="32" Visibility="Collapsed">
+            <TextBlock x:Name="StatusBarText" Text="" Padding="12,0,0,0"></TextBlock>
+        </Border>
 
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>

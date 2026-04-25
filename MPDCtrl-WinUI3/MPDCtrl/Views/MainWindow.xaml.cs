@@ -62,9 +62,12 @@ public sealed partial class MainWindow : Window
     //private readonly UISettings settings;
     private ElementTheme theme = ElementTheme.Default;
 
-
     private readonly IDispatcherService _dispatcherService;
 
+    // TODO: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    //[DynamicWindowsRuntimeCast(typeof(OverlappedPresenter))]
+    //[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     public MainWindow(IDispatcherService dispatcherService)
     {
         _dispatcherService = dispatcherService;
@@ -832,8 +835,8 @@ public sealed partial class MainWindow : Window
                 }
                 catch (Exception ex) 
                 {
-                    App.AppendErrorLog("AOT Error",$"{ex}");
-                    App.SaveErrorLog();
+                    (App.Current as App)?.AppendErrorLog("AOT Error@SaveSettings", $"{ex}");
+                    (App.Current as App)?.SaveErrorLog();
                 }
 
             }

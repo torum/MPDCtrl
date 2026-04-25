@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
@@ -48,11 +49,12 @@ public sealed partial class ShellPage : Page
 
         ViewModel.AlbumSelectedNavigateToDetailsPage += this.OnAlbumSelectedNavigateToDetailsPage;
         ViewModel.GoBackButtonVisibilityChanged += this.OnGoBackButtonVisibilityChanged;
-        ViewModel.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
-        ViewModel.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
+        //ViewModel.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
+        //ViewModel.DebugIdleOutput += (sender, arg) => { this.OnDebugIdleOutput(arg); };
         ViewModel.DebugCommandClear += this.OnDebugCommandClear;
         ViewModel.DebugIdleClear += this.OnDebugIdleClear;
         ViewModel.UserCanExecuteChanged += OnUserCanExecuteChanged;
+        ViewModel.UpdateProgress += (sender, arg) => { this.OnUpdateProgress(arg); };
         this.ActualThemeChanged += this.This_ActualThemeChanged;
 
         // Not good because this create instance in addition to navigation view.
@@ -76,7 +78,7 @@ public sealed partial class ShellPage : Page
         //ViewModel.StartMPC();
     }
 
-    private async void Page_Loaded(object sender, RoutedEventArgs e)
+    private void Page_Loaded(object sender, RoutedEventArgs e)
     {
         try
         {
@@ -90,7 +92,9 @@ public sealed partial class ShellPage : Page
                 // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage)
                 // is loaded, initialized, set, drawn, navigated. So start the connection.
 
-                await ViewModel.StartMpcAsync();
+                //await ViewModel.StartMpcAsync();
+                // Let's not await, for faster startup. Fire and forget.
+                ViewModel.Start();
             }
             else
             {
@@ -111,17 +115,15 @@ public sealed partial class ShellPage : Page
     {
         ViewModel.AlbumSelectedNavigateToDetailsPage -= this.OnAlbumSelectedNavigateToDetailsPage;
         ViewModel.GoBackButtonVisibilityChanged -= this.OnGoBackButtonVisibilityChanged;
-        ViewModel.DebugCommandOutput -= (sender, arg) => { this.OnDebugCommandOutput(arg); };
-        ViewModel.DebugIdleOutput -= (sender, arg) => { this.OnDebugIdleOutput(arg); };
+        //ViewModel.DebugCommandOutput -= (sender, arg) => { this.OnDebugCommandOutput(arg); };
+        //ViewModel.DebugIdleOutput -= (sender, arg) => { this.OnDebugIdleOutput(arg); };
         ViewModel.DebugCommandClear -= this.OnDebugCommandClear;
         ViewModel.DebugIdleClear -= this.OnDebugIdleClear;
         ViewModel.UserCanExecuteChanged -= OnUserCanExecuteChanged;
+        ViewModel.UpdateProgress -= (sender, arg) => { this.OnUpdateProgress(arg); };
         this.ActualThemeChanged -= this.This_ActualThemeChanged;
 
-        if (App.MainWnd is not null)
-        {
-            App.MainWnd.Activated -= MainWindow_Activated;
-        }
+        App.MainWnd?.Activated -= MainWindow_Activated;
 
         AlbumCoverImage.UnregisterPropertyChangedCallback(Microsoft.UI.Xaml.Controls.Image.SourceProperty, _token);
 
@@ -142,10 +144,7 @@ public sealed partial class ShellPage : Page
         {
             _currentPage = typeof(QueuePage);
             var queuePage = ViewModel.MainMenuItems.FirstOrDefault();
-            if (queuePage != null)
-            {
-                queuePage.Selected = true;
-            }
+            queuePage?.Selected = true;
         }
     }
 
@@ -266,60 +265,58 @@ public sealed partial class ShellPage : Page
         //ViewModel.StartMPC(this.XamlRoot);
     }
 
-    private readonly StringBuilder _sbCommandOutput = new();
+    public void OnUpdateProgress(string arg)
+    {
+        _dispatcherService.TryEnqueue(() =>
+        {
+            this.StatusBarText.Text = arg;
+        });
+    }
+
     public void OnDebugCommandOutput(string arg)
     {
-        // WPF's AppendText() is much faster than data binding.
+        // WPF's AppendText() is virtualized and much faster.
         //DebugCommandTextBox.AppendText(arg);
         //DebugCommandTextBox.CaretIndex = DebugCommandTextBox.Text.Length;
         //DebugCommandTextBox.ScrollToEnd();
 
-        _sbCommandOutput.Append(arg);
-
         _dispatcherService.TryEnqueue(() =>
         {
-            //DebugCommandTextBox.Text += arg;
-            DebugCommandTextBox.Text = _sbCommandOutput.ToString();
-
-            // No CaretIndex, No ScrollToEnd.
-            //DebugCommandTextBox.SelectionStart = DebugCommandTextBox.Text.Length;
-            // Needed to this to acutually scrol to the end.
-            //DebugCommandTextBox.Focus(FocusState.Programmatic);
+            //TextBox,RichEditBox,ichTextBlock in WinUI 3 are not virtualized.
+            //var range = DebugCommandTextBox.Document.GetRange(int.MaxValue, int.MaxValue);
+            //range.Text = arg;
         });
     }
 
-    private readonly StringBuilder _sbIdleOutput = new();
     public void OnDebugIdleOutput(string arg)
     {
-        // WPF's AppendText() is much faster than data binding.
+        // WPF's AppendText() is virtualized and much faster.
         //DebugIdleTextBox.AppendText(arg);
         //DebugIdleTextBox.CaretIndex = DebugIdleTextBox.Text.Length;
         //DebugIdleTextBox.ScrollToEnd();
 
-        _sbIdleOutput.Append(arg);
-
         _dispatcherService.TryEnqueue(() =>
         {
-            //DebugIdleTextBox.Text += arg;
-            DebugIdleTextBox.Text = _sbIdleOutput.ToString();
-
-            // No CaretIndex, No ScrollToEnd.
-            //DebugIdleTextBox.SelectionStart = DebugIdleTextBox.Text.Length;
-            // Needed to this to acutually scrol to the end.
-            //DebugIdleTextBox.Focus(FocusState.Programmatic);
+            //TextBox,RichEditBox,ichTextBlock in WinUI 3 are not virtualized.
+            //var range = DebugIdleTextBox.Document.GetRange(int.MaxValue, int.MaxValue);
+            //range.Text = arg;
         });
     }
 
     public void OnDebugCommandClear(object? sender, System.EventArgs e)
     {
-        _sbCommandOutput.Clear();
-        DebugCommandTextBox.Text = string.Empty;
+        _dispatcherService.TryEnqueue(() =>
+        {
+            
+        });
     }
 
     public void OnDebugIdleClear(object? sender, System.EventArgs e)
     {
-        _sbIdleOutput.Clear();
-        DebugIdleTextBox.Text = string.Empty;
+        _dispatcherService.TryEnqueue(() =>
+        {
+            
+        });
     }
 
     private void This_ActualThemeChanged(FrameworkElement sender, object args)

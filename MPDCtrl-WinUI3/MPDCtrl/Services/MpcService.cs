@@ -99,7 +99,6 @@ public partial class MpcService : IMpcService
     } = ConnectionStatus.NeverConnected;
 
     private CancellationTokenSource? _cts;// = new();
-    //private static readonly CancellationToken token = _cts.Token;
 
     // TODO: Not really used...
     public bool IsMpdCommandConnected { get; set; }
@@ -365,6 +364,8 @@ public partial class MpcService : IMpcService
             return ret;
         }
 
+        MpcProgress?.Invoke(this, $"[Background] MpdIdleSendCommand...");
+
         //TODO: aways false
         if (_idleConnection.Client is null)
         {
@@ -410,7 +411,7 @@ public partial class MpcService : IMpcService
             cmdDummy = "password ****";
 
         //DebugIdleOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n");
-        _ = Task.Run(() => DebugIdleOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n"));
+        DebugIdleOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n");
 
         try
         {
@@ -427,6 +428,8 @@ public partial class MpcService : IMpcService
                 await _idleWriter.WriteAsync(cmd.Trim() + "\n");
             }
             */
+
+            MpcProgress?.Invoke(this, $"[Background] MpdIdleSendCommand::WriteAsync...");
             await _idleWriter.WriteAsync(cmd.Trim() + "\n");
         }
         catch (System.IO.IOException e)
@@ -479,6 +482,8 @@ public partial class MpcService : IMpcService
 
         try
         {
+            MpcProgress?.Invoke(this, $"[Background] MpdIdleSendCommand::ReadLineAsync...");
+
             StringBuilder stringBuilder = new();
 
             var isAck = false;
@@ -495,6 +500,8 @@ public partial class MpcService : IMpcService
 
                 if (line is not null)
                 {
+                    MpcProgress?.Invoke(this, $"[Background] MpdIdleSendCommand::ReadLineAsync...{line}");
+
                     if (line.StartsWith("ACK"))
                     {
                         Debug.WriteLine("ACK line @MpdIdleSendCommand: " + cmd.Trim() + " and " + line);
@@ -542,6 +549,7 @@ public partial class MpcService : IMpcService
                         else
                         {
                             Debug.WriteLine("line == IsNullOrEmpty");
+                            MpcProgress?.Invoke(this, $"[Background] MpdIdleSendCommand::ReadLineAsync...line == IsEmpty");
 
                             break;
                         }
@@ -550,6 +558,7 @@ public partial class MpcService : IMpcService
                 else
                 {
                     Debug.WriteLine("@MpdIdleSendCommand ReadLineAsync line is not null");
+                    MpcProgress?.Invoke(this, $"[Background] MpdIdleSendCommand::ReadLineAsync...line == IsNull");
 
                     DebugIdleOutput?.Invoke(this,
                         $"################ Error @ReadLineAsync@MpdIdleSendCommand, Reason: ReadLineAsync received null data, Data: {cmd.Trim()}, {Environment.NewLine} Exception:  {Environment.NewLine + Environment.NewLine}");
@@ -565,16 +574,20 @@ public partial class MpcService : IMpcService
                 }
             }
 
-            _ = Task.Run(() => DebugIdleOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n"));
+            //_ = Task.Run(() => );
+            DebugIdleOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
 
             if (isAck)
             {
-                _ = Task.Run(() => MpdAckError?.Invoke(this, ackText, "Idle"));
+                //_ = Task.Run(() => );
+                MpdAckError?.Invoke(this, ackText, "Idle");
             }
 
             if (isErr)
             {
-                _ = Task.Run(() => MpdFatalError?.Invoke(this, errText, "Idle"));
+                //_ = Task.Run(() => );
+                MpdFatalError?.Invoke(this, errText, "Idle");
+
                 //ret.IsSuccess = false;
 
                 //return ret;
@@ -616,6 +629,8 @@ public partial class MpcService : IMpcService
         catch (Exception e)
         {
             Debug.WriteLine("Exception@MpdIdleSendCommand: " + cmd.Trim() + " ReadLineAsync ---- " + e.Message);
+
+            MpcProgress?.Invoke(this, $"[Background] Exception @MpdIdleSendCommand::ReadLineAsync...");
 
             ret.IsSuccess = false;
             ret.ErrorMessage = e.Message;
@@ -920,12 +935,14 @@ public partial class MpcService : IMpcService
 
             if (isAck)
             {
-                _ = Task.Run(() => MpdAckError?.Invoke(this, ackText, "Idle"));
+                //_ = Task.Run(() => MpdAckError?.Invoke(this, ackText, "Idle"));
+                MpdAckError?.Invoke(this, ackText, "Idle");
             }
 
             if (isErr)
             {
-                _ = Task.Run(() => MpdFatalError?.Invoke(this, errText, "Idle"));
+                //_ = Task.Run(() => MpdFatalError?.Invoke(this, errText, "Idle"));
+                MpdFatalError?.Invoke(this, errText, "Idle");
                 //ret.IsSuccess = false;
 
                 //return ret;
@@ -1507,7 +1524,7 @@ public partial class MpcService : IMpcService
             if (cmd.StartsWith("password "))
                 cmdDummy = "password ****";
 
-            _ = Task.Run(() => DebugCommandOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n"));
+            DebugCommandOutput?.Invoke(this, ">>>>" + cmdDummy.Trim() + "\n" + "\n");
 
             await _commandWriter.WriteAsync(cmd.Trim() + "\n");
         }
@@ -1800,16 +1817,16 @@ public partial class MpcService : IMpcService
             else
             {
                 //DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
-                _ = Task.Run(() => DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n"));
+                DebugCommandOutput?.Invoke(this, "<<<<" + stringBuilder.ToString().Trim().Replace("\n", "\n" + "<<<<") + "\n" + "\n");
 
                 if (isAck)
                 {
-                    _ = Task.Run(() => MpdAckError?.Invoke(this, ackText, "Command"));
+                    MpdAckError?.Invoke(this, ackText, "Command");
                 }
 
                 if (isErr)
                 {
-                    _ = Task.Run(() => MpdFatalError?.Invoke(this, errText, "Command"));
+                    MpdFatalError?.Invoke(this, errText, "Command");
                 }
 
                 ret.ResultText = stringBuilder.ToString();
@@ -3199,7 +3216,7 @@ public partial class MpcService : IMpcService
             Debug.WriteLine("Error@ParseOutputs: " + e);
             _dispatcherService.TryEnqueue(() =>
             {
-                App.AppendErrorLog("Exception@MPC@ParseOutputs", e.Message);
+                (App.Current as App)?.AppendErrorLog("Exception@MPC@ParseOutputs", e.Message);
             });
             //IsBusy?.Invoke(this, false);
             return Task.FromResult(false); ;
@@ -3460,7 +3477,7 @@ public partial class MpcService : IMpcService
 
             _dispatcherService.TryEnqueue(() =>
             {
-                App.AppendErrorLog("Exception@MPC@ParseStatus", ex.Message);
+                (App.Current as App)?.AppendErrorLog("Exception@MPC@ParseStatus", ex.Message);
             });
 
             IsBusy?.Invoke(this, false);
@@ -3544,7 +3561,7 @@ public partial class MpcService : IMpcService
 
             _dispatcherService.TryEnqueue(() =>
             {
-                App.AppendErrorLog("Exception@MPC@ParseCurrentSong", ex.Message);
+                (App.Current as App)?.AppendErrorLog("Exception@MPC@ParseCurrentSong", ex.Message);
             });
 
             return Task.FromResult(false);
@@ -3742,9 +3759,10 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("Exception@ParsePlaylistInfo: " + ex.Message);
 
-            await _dispatcherService.EnqueueAsync(async () =>
+            _dispatcherService.TryEnqueue(() =>
             {
-                App.AppendErrorLog("Exception@MPC@ParsePlaylistInfo", ex.Message);
+                (App.Current as App)?.AppendErrorLog("Exception@MPC@ParsePlaylistInfo", ex.Message);
+                (App.Current as App)?.SaveErrorLog();
             });
 
             return false;
@@ -3899,7 +3917,7 @@ public partial class MpcService : IMpcService
 
             _dispatcherService.TryEnqueue(() =>
             {
-                App.AppendErrorLog("Exception@MPC@FillSongInfoEx", e.Message);
+                (App.Current as App)?.AppendErrorLog("Exception@MPC@FillSongInfoEx", e.Message);
                 });
 
             return null;
@@ -3951,8 +3969,7 @@ public partial class MpcService : IMpcService
                 }
                 else if (value.StartsWith("Last-Modified: "))
                 {
-                    if (pl is not null)
-                        pl.LastModified = value.Replace("Last-Modified: ", "");
+                    pl?.LastModified = value.Replace("Last-Modified: ", "");
                 }
                 else if (value.StartsWith("OK"))
                 {
@@ -4005,7 +4022,7 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("Error@ParsePlaylists: " + e);
 
-            _dispatcherService.TryEnqueue(() => { App.AppendErrorLog("Exception@MPC@ParsePlaylists", e.Message); });
+            _dispatcherService.TryEnqueue(() => { (App.Current as App)?.AppendErrorLog("Exception@MPC@ParsePlaylists", e.Message); });
 
             IsBusy?.Invoke(this, false);
             return false;
@@ -4095,7 +4112,7 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("Error@ParseListAll: " + e);
 
-            _dispatcherService.TryEnqueue(() =>{ App.AppendErrorLog("Exception@MPC@ParseListAll", e.Message); });
+            _dispatcherService.TryEnqueue(() =>{ (App.Current as App)?.AppendErrorLog("Exception@MPC@ParseListAll", e.Message); });
 
             IsBusy?.Invoke(this, false);
             return Task.FromResult(false); ;
@@ -4233,7 +4250,7 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("Error@ParseListAlbumGroupAlbumArtist: " + e);
 
-            _dispatcherService.TryEnqueue(() =>{ App.AppendErrorLog("Exception@MPC@ParseListAlbumGroupAlbumArtist", e.Message); });
+            _dispatcherService.TryEnqueue(() =>{ (App.Current as App)?.AppendErrorLog("Exception@MPC@ParseListAlbumGroupAlbumArtist", e.Message); });
 
             IsBusy?.Invoke(this, false);
             return Task.FromResult(false); ;
@@ -4364,7 +4381,7 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("Error@ParseSearchResult: " + ex.Message);
 
-            _dispatcherService.TryEnqueue(() => { App.AppendErrorLog("Exception@MPC@ParseSearchResult", ex.Message); });
+            _dispatcherService.TryEnqueue(() => { (App.Current as App)?.AppendErrorLog("Exception@MPC@ParseSearchResult", ex.Message); });
 
             IsBusy?.Invoke(this, false);
             return Task.FromResult(res);
@@ -4501,7 +4518,7 @@ public partial class MpcService : IMpcService
         {
             Debug.WriteLine("Error@ParsePlaylistSongsResult: " + ex.Message);
 
-            _dispatcherService.TryEnqueue(() => { App.AppendErrorLog("Exception@MPC@ParsePlaylistSongsResult", ex.Message); });
+            _dispatcherService.TryEnqueue(() => { (App.Current as App)?.AppendErrorLog("Exception@MPC@ParsePlaylistSongsResult", ex.Message); });
             return songList;
         }
 

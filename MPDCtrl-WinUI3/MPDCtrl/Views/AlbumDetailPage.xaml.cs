@@ -1,3 +1,4 @@
+using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -46,7 +47,7 @@ public sealed partial class AlbumDetailPage : Page
 
     private Frame? _frame;
 
-    private readonly ResourceLoader _resourceLoader = new();
+    //private readonly ResourceLoader _resourceLoader = new();
 
     public AlbumDetailPage()
     {
@@ -55,7 +56,7 @@ public sealed partial class AlbumDetailPage : Page
         InitializeComponent();
 
         var selectedAlbumName = ViewModel.SelectedAlbum?.Name ?? string.Empty;
-        var basePageTitle = _resourceLoader.GetString("MenuTreeItem_Albums");
+        var basePageTitle = "MenuTreeItem_Albums".GetLocalized();
 
         BreadcrumbItems = [
             new() { Name = basePageTitle},

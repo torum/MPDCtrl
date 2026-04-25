@@ -1,3 +1,4 @@
+using CommunityToolkit.WinUI;
 using System.Collections.ObjectModel;
 
 namespace MPDCtrl.Models;
@@ -101,12 +102,9 @@ public partial class MenuTreeBuilder : NodeTree
 
     public MenuTreeBuilder(string name) : base(name)
     {
-        Microsoft.Windows.ApplicationModel.Resources.ResourceLoader resourceLoader = new();
-        //var resourceLoader = new Microsoft.Windows.ApplicationModel.Resources.ResourceLoader(Microsoft.Windows.ApplicationModel.Resources.ResourceLoader.GetDefaultResourceFilePath(),"Resources");
-        //Microsoft.Windows.ApplicationModel.Resources.ResourceLoader resourceLoader = new("MPDCtrl.pri", "Resources");
+        //Microsoft.Windows.ApplicationModel.Resources.ResourceLoader resourceLoader = new();
 
-        string str = resourceLoader.GetString("MenuTreeItem_Queue");
-        NodeMenuQueue queue = new(str)
+        NodeMenuQueue queue = new($"{"MenuTreeItem_Queue".GetLocalized()}")
         {
             Tag = "queue",
             //Selected = true,
@@ -119,8 +117,7 @@ public partial class MenuTreeBuilder : NodeTree
         QueueDirectory = queue;
 
 
-        str = resourceLoader.GetString("MenuTreeItem_Library");
-        NodeMenuLibrary library = new(str)
+        NodeMenuLibrary library = new($"{"MenuTreeItem_Library".GetLocalized()}")
         {
             Tag = "library",
             Selected = false,
@@ -132,8 +129,7 @@ public partial class MenuTreeBuilder : NodeTree
         LibraryDirectory = library;
 
 
-        str = resourceLoader.GetString("MenuTreeItem_Albums");
-        NodeMenuAlbum albums = new(str)
+        NodeMenuAlbum albums = new($"{"MenuTreeItem_Albums".GetLocalized()}")
         {
             Tag = "albums",
             Selected = false,
@@ -145,8 +141,7 @@ public partial class MenuTreeBuilder : NodeTree
         AlbumsDirectory = albums;
 
 
-        str = resourceLoader.GetString("MenuTreeItem_Artists");
-        NodeMenuArtist artists = new(str)
+        NodeMenuArtist artists = new($"{"MenuTreeItem_Artists".GetLocalized()}")
         {
             Tag = "artists",
             Selected = false,
@@ -158,8 +153,7 @@ public partial class MenuTreeBuilder : NodeTree
         ArtistsDirectory = artists;
 
 
-        str = resourceLoader.GetString("MenuTreeItem_Files");
-        NodeMenuFiles files = new(str)
+        NodeMenuFiles files = new($"{"MenuTreeItem_Files".GetLocalized()}")
         {
             Tag = "files",
             Selected = false,
@@ -171,8 +165,7 @@ public partial class MenuTreeBuilder : NodeTree
         FilesDirectory = files;
 
 
-        str = resourceLoader.GetString("MenuTreeItem_Search");
-        NodeMenuSearch search = new(str)
+        NodeMenuSearch search = new($"{"MenuTreeItem_Search".GetLocalized()}")
         {
             Tag = "search",
             Selected = false,
@@ -184,8 +177,7 @@ public partial class MenuTreeBuilder : NodeTree
         SearchDirectory = search;
 
 
-        str = resourceLoader.GetString("MenuTreeItem_Playlists");
-        NodeMenuPlaylists playlists = new(str)
+        NodeMenuPlaylists playlists = new($"{"MenuTreeItem_Playlists".GetLocalized()}")
         {
             Tag = "playlists",
             Selected = false,

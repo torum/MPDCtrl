@@ -60,7 +60,8 @@
 	  <IsAotCompatible>true</IsAotCompatible>
 	  <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
 	  <TrimmerSingleWarn>false</TrimmerSingleWarn>
-	  <TrimMode>partial</TrimMode>
+	  <Optimize>true</Optimize>
+	  <CsWinRTAotWarningLevel>3</CsWinRTAotWarningLevel>
 
 	  <!--
 	   Comment these two out when publish packaged app. Uncomment when debug Unpackaged.
@@ -170,7 +171,7 @@
     <PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.2.251219" />
     <PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.2.251219" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
-	<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" />
+	<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1721" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools.MSIX" Version="1.7.260316102">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -258,32 +259,32 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-		<Optimize>False</Optimize>
+		<Optimize>True</Optimize>
 		<IsPublishable>True</IsPublishable>
 		<DebugType>full</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-		<Optimize>False</Optimize>
+		<Optimize>True</Optimize>
 		<IsPublishable>True</IsPublishable>
 		<DebugType>full</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-		<Optimize>False</Optimize>
+		<Optimize>True</Optimize>
 		<IsPublishable>True</IsPublishable>
 		<DebugType>full</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-		<Optimize>False</Optimize>
+		<Optimize>True</Optimize>
 		<IsPublishable>True</IsPublishable>
 		<DebugType>full</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-		<Optimize>False</Optimize>
+		<Optimize>True</Optimize>
 		<IsPublishable>True</IsPublishable>
 		<DebugType>full</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-		<Optimize>False</Optimize>
+		<Optimize>True</Optimize>
 		<IsPublishable>True</IsPublishable>
 		<DebugType>full</DebugType>
 	</PropertyGroup>

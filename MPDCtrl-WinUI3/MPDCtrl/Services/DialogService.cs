@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using CommunityToolkit.WinUI;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.Windows.ApplicationModel.Resources;
 using MPDCtrl.Models;
 using MPDCtrl.Services.Contracts;
@@ -15,7 +16,7 @@ namespace MPDCtrl.Services;
 
 public class DialogService : IDialogService
 {
-    private readonly ResourceLoader _resourceLoader = new();
+    //private readonly ResourceLoader _resourceLoader = new();
 
     public record AddToDialogResult(string PlaylistName, bool AsNew);
     public record RenameDialogResult(string PlaylistName);
@@ -44,10 +45,10 @@ public class DialogService : IDialogService
             XamlRoot = App.MainWnd.Content.XamlRoot,
             Title = "MPDCtrl",//_resourceLoader.GetString("Dialog_Title_SelectPlaylist")
             IsPrimaryButtonEnabled = true,
-            PrimaryButtonText = _resourceLoader.GetString("Dialog_Connect"),
+            PrimaryButtonText = "Dialog_Connect".GetLocalized(),
             DefaultButton = ContentDialogButton.Primary,
             IsSecondaryButtonEnabled = false,
-            CloseButtonText = _resourceLoader.GetString("Dialog_Cancel"),//
+            CloseButtonText = "Dialog_Cancel".GetLocalized(),//
             Content = new Views.Dialogs.InitDialog(vm)
             {
                 //DataContext = vm
@@ -85,12 +86,12 @@ public class DialogService : IDialogService
         var dialog = new ContentDialog
         {
             XamlRoot = App.MainWnd.Content.XamlRoot,
-            Title = _resourceLoader.GetString("Dialog_Title_SelectPlaylist"),
+            Title = "Dialog_Title_SelectPlaylist".GetLocalized(),
             IsPrimaryButtonEnabled = true,
-            PrimaryButtonText = _resourceLoader.GetString("Dialog_Ok"),
+            PrimaryButtonText = "Dialog_Ok".GetLocalized(),
             DefaultButton = ContentDialogButton.Primary,
             IsSecondaryButtonEnabled = false,
-            CloseButtonText = _resourceLoader.GetString("Dialog_Cancel"),
+            CloseButtonText = "Dialog_Cancel".GetLocalized(),
             Content = new Views.Dialogs.SongsAddToDialog()
             {
                 //DataContext = new DialogViewModel()
@@ -154,12 +155,12 @@ public class DialogService : IDialogService
         var dialog = new ContentDialog
         {
             XamlRoot = App.MainWnd.Content.XamlRoot,
-            Title = _resourceLoader.GetString("Dialog_Title_NewPlaylistName"),
+            Title = "Dialog_Title_NewPlaylistName".GetLocalized(),
             IsPrimaryButtonEnabled = true,
-            PrimaryButtonText = _resourceLoader.GetString("Dialog_Ok"),
+            PrimaryButtonText = "Dialog_Ok".GetLocalized(),
             DefaultButton = ContentDialogButton.Primary,
             IsSecondaryButtonEnabled = false,
-            CloseButtonText = _resourceLoader.GetString("Dialog_Cancel"),
+            CloseButtonText = "Dialog_Cancel".GetLocalized(),
             Content = new Views.Dialogs.PlaylistRenameToDialog()
             {
                 //DataContext = new DialogViewModel()
@@ -191,12 +192,12 @@ public class DialogService : IDialogService
         var dialog = new ContentDialog
         {
             XamlRoot = App.MainWnd?.Content.XamlRoot,
-            Title = _resourceLoader.GetString("Dialog_AddProfile"),
+            Title = "Dialog_AddProfile".GetLocalized(),
             IsPrimaryButtonEnabled = true,
-            PrimaryButtonText = _resourceLoader.GetString("Dialog_Ok"),
+            PrimaryButtonText = "Dialog_Ok".GetLocalized(),
             DefaultButton = ContentDialogButton.Primary,
             IsSecondaryButtonEnabled = false,
-            CloseButtonText = _resourceLoader.GetString("Dialog_Cancel"),
+            CloseButtonText = "Dialog_Cancel".GetLocalized(),
             Content = new Views.Dialogs.ProfileDialog()
             {
                 //DataContext = new DialogViewModel()
@@ -234,12 +235,12 @@ public class DialogService : IDialogService
         var dialog = new ContentDialog
         {
             XamlRoot = App.MainWnd?.Content.XamlRoot,
-            Title = _resourceLoader.GetString("Dialog_EditProfile"),
+            Title = "Dialog_EditProfile".GetLocalized(),
             IsPrimaryButtonEnabled = true,
-            PrimaryButtonText = _resourceLoader.GetString("Dialog_Ok"),
+            PrimaryButtonText = "Dialog_Ok".GetLocalized(),
             DefaultButton = ContentDialogButton.Primary,
             IsSecondaryButtonEnabled = false,
-            CloseButtonText = _resourceLoader.GetString("Dialog_Cancel"),
+            CloseButtonText = "Dialog_Cancel".GetLocalized(),
             Content = new Views.Dialogs.ProfileDialog()
             {
                 //DataContext = new DialogViewModel()

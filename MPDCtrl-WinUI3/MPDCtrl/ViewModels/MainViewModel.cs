@@ -2234,6 +2234,8 @@ public partial class MainViewModel : ObservableObject
             _mpc.MpcProgress -= OnMpcProgress;
             _mpc.IsBusy -= OnMpcIsBusy;
 
+            this.UpdateProgress -= (sender, arg) => { this.OnUpdateProgress(arg); };
+
             if (IsConnected)
             {
                 _mpc.MpdStop = true;
@@ -5253,7 +5255,7 @@ public partial class MainViewModel : ObservableObject
 
             //TitleBarHelper.UpdateTitleBar(Theme, App.MainWnd);
 
-            _ = App.MainWnd?.SetCapitionButtonColor();
+            App.MainWnd?.SetCapitionButtonColor();
         }
     }
 

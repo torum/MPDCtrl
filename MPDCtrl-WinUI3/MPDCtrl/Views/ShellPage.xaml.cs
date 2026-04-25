@@ -101,6 +101,7 @@ public sealed partial class ShellPage : Page
                 Debug.WriteLine("App.MainWnd is null. Init order is wrong.");
             }
 
+            // For animation fade
             _token = AlbumCoverImage.RegisterPropertyChangedCallback(Microsoft.UI.Xaml.Controls.Image.SourceProperty, OnSourceChanged);
 
         }
@@ -126,7 +127,6 @@ public sealed partial class ShellPage : Page
         App.MainWnd?.Activated -= MainWindow_Activated;
 
         AlbumCoverImage.UnregisterPropertyChangedCallback(Microsoft.UI.Xaml.Controls.Image.SourceProperty, _token);
-
     }
 
     private void NavigationView_Loaded(object sender, RoutedEventArgs e)
@@ -326,7 +326,7 @@ public sealed partial class ShellPage : Page
             return;
         }
 
-        _ = App.MainWnd.SetCapitionButtonColor();
+        App.MainWnd.SetCapitionButtonColor();
     }
 
     private void MainWindow_Activated(object sender, Microsoft.UI.Xaml.WindowActivatedEventArgs args)

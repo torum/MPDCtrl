@@ -87,9 +87,6 @@ public sealed partial class MainWindow : Window
 
         this.ExtendsContentIntoTitleBar = true;
 
-        this.Closed += Window_Closed;
-        this.SizeChanged += Window_SizeChanged;
-
         LoadSettings();
 
         // It's important to set content as early as here in order to set theme.
@@ -102,7 +99,7 @@ public sealed partial class MainWindow : Window
             root.RequestedTheme = theme;
 
             //TitleBarHelper.UpdateTitleBar(theme, this);
-            _ = SetCapitionButtonColor();
+            SetCapitionButtonColor();
 
             root.CallMeWhenMainWindowIsReady(this);
         }
@@ -139,9 +136,13 @@ public sealed partial class MainWindow : Window
 
             //
             _smtc.ButtonPressed += Smtc_ButtonPressed;
-
             _vm.UpdateSongInfoForSystemMediaTransportControls += (sender, arg) => { this.OnUpdateSongInfoForSystemMediaTransportControls(arg); };
 
+            this.Closed += (s, e) =>
+            {
+                _smtc.ButtonPressed -= Smtc_ButtonPressed;
+                _vm.UpdateSongInfoForSystemMediaTransportControls -= (sender, arg) => { this.OnUpdateSongInfoForSystemMediaTransportControls(arg); };
+            };
         }
     }
 
@@ -682,16 +683,16 @@ public sealed partial class MainWindow : Window
                 root.RequestedTheme = theme;
 
                 //TitleBarHelper.UpdateTitleBar(theme, this);
-                _ = SetCapitionButtonColor();
+                SetCapitionButtonColor();
             }
 
             this.SystemBackdrop = null;
         }
     }
 
-    public async Task SetCapitionButtonColor()
+    public void SetCapitionButtonColor()
     {
-        await _dispatcherService.EnqueueAsync(() =>
+        _dispatcherService.TryEnqueue(() =>
         {
             if (this.Content is null)
             {
@@ -758,9 +759,6 @@ public sealed partial class MainWindow : Window
     {
         // Disconnect from MPD and close socket connection.
         _vm.CleanUp();
-
-        // For some stupid reason, we needed this, otherwise we get COM error.
-        //CurrentDispatcherQueue = null;
 
         SaveSettings();
     }
@@ -1317,6 +1315,5 @@ public sealed partial class MainWindow : Window
     }
 
     #endregion
-
 }
 

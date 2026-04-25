@@ -8,6 +8,16 @@ dotnet build MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=x86 /p:Pl
 dotnet build MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=ARM64 /p:Platform=ARM64 /p:RuntimeIdentifier=win-arm64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=false -p:WindowsPackageType=MSIX --self-contained true
 -------
 
+(A* with AoT)
+---
+dotnet publish MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=x64 /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=true -p:WindowsPackageType=MSIX --self-contained true
+
+dotnet publish MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=x86 /p:Platform=x86 /p:RuntimeIdentifier=win-x86 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=true -p:WindowsPackageType=MSIX --self-contained true
+
+dotnet publish MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=ARM64 /p:Platform=ARM64 /p:RuntimeIdentifier=ARM64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=true -p:WindowsPackageType=MSIX --self-contained true
+---
+
+
 Put msix files into "AppPackages\msix" folder.
 
 -------

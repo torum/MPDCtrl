@@ -2911,8 +2911,8 @@ public partial class MainViewModel : ObservableObject
                     foreach (var sng in Queue)
                     {
                         UpdateProgress?.Invoke(this, "[UI] Queue list updating...(checking deleted items)");
-
                         IsWorking = true;
+                        await Task.Yield();
 
                         var queitem = _mpc.CurrentQueue.FirstOrDefault(i => i.Id == sng.Id);
                         if (queitem is null)
@@ -2926,8 +2926,8 @@ public partial class MainViewModel : ObservableObject
                     foreach (var hoge in tmpQueue)
                     {
                         UpdateProgress?.Invoke(this, "[UI] Queue list updating...(deletion)");
-
                         IsWorking = true;
+                        await Task.Yield();
 
                         Queue.Remove(hoge);
                     }
@@ -2936,8 +2936,8 @@ public partial class MainViewModel : ObservableObject
                     foreach (var sng in _mpc.CurrentQueue)
                     {
                         UpdateProgress?.Invoke(this, $"[UI] Queue list updating...(checking and adding new items {sng.Id})");
-
                         IsWorking = true;
+                        await Task.Yield();
 
                         var fuga = Queue.FirstOrDefault(i => i.Id == sng.Id);
                         if (fuga is not null)
@@ -2982,6 +2982,8 @@ public partial class MainViewModel : ObservableObject
                     // Sorting.
                     // Sort here because Queue list may have been re-ordered.
                     UpdateProgress?.Invoke(this, "[UI] Queue list sorting...");
+                    await Task.Yield();
+                    await Task.Delay(1);
 
                     // WinUI3/AvaloniaUI doesn't have this. Only for WPF.
                     //var collectionView = CollectionViewSource.GetDefaultView(Queue);
@@ -2996,6 +2998,7 @@ public partial class MainViewModel : ObservableObject
                     Queue.Sort((a, b) => { return a.Index.CompareTo(b.Index); });
 
                     UpdateProgress?.Invoke(this, "[UI] Checking current song after Queue update.");
+                    await Task.Yield();
 
                     // Set Current and NowPlaying.
                     var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
@@ -3052,10 +3055,10 @@ public partial class MainViewModel : ObservableObject
                         AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
                     }
 
-                    //TODO temp
-                    //UpdateProgress?.Invoke(this, "");
+                    UpdateProgress?.Invoke(this, "");
 
                     IsWorking = false;
+                    await Task.Yield();
 
                     #endregion
                 }
@@ -3072,7 +3075,6 @@ public partial class MainViewModel : ObservableObject
                 finally
                 {
                     IsWorking = false;
-                    //TODO temp
                     UpdateProgress?.Invoke(this, "");
                 }
 
@@ -3192,6 +3194,8 @@ public partial class MainViewModel : ObservableObject
                         isNeedToFindCurrentSong = true;
                     }
 
+                    await Task.Yield();
+
                     if (isNeedToFindCurrentSong)
                     {
                         // Set Current and NowPlaying.
@@ -3247,6 +3251,7 @@ public partial class MainViewModel : ObservableObject
                     }
 
                     UpdateProgress?.Invoke(this, "");
+                    await Task.Yield();
                 }
                 catch (Exception ex)
                 {

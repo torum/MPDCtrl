@@ -26,8 +26,8 @@
 
 	  <ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
 
-	  <VersionPrefix>4.0.6.0</VersionPrefix>
-	  <FileVersion>4.0.6.0</FileVersion>
+	  <VersionPrefix>4.0.7.1</VersionPrefix>
+	  <FileVersion>4.0.7.1</FileVersion>
 
 	  <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 
@@ -141,6 +141,7 @@
     <None Remove="Assets\Wide310x150Logo.scale-150.png" />
     <None Remove="Assets\Wide310x150Logo.scale-200.png" />
     <None Remove="Assets\Wide310x150Logo.scale-400.png" />
+    <None Remove="Memo_for_publish_commands.txt" />
     <None Remove="Views\Dialogs\InitDialog.xaml" />
     <None Remove="Views\ShellPage.xaml" />
   </ItemGroup>

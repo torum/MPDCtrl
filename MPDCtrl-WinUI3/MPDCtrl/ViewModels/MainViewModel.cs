@@ -2797,9 +2797,9 @@ public partial class MainViewModel : ObservableObject
             if (Queue.Count > 0)
             {
                 UpdateProgress?.Invoke(this, "[UI] Updating the queue...");
-                await Task.Delay(20);
-
                 IsWorking = true;
+                await Task.Yield();
+                await Task.Delay(1);
 
                 try
                 {
@@ -3081,16 +3081,12 @@ public partial class MainViewModel : ObservableObject
             else
             {
                 UpdateProgress?.Invoke(this, "[UI] Loading the queue...");
-                await Task.Delay(20);
-
                 IsWorking = true;
+                await Task.Yield();
+                await Task.Delay(1);
 
                 try
                 {
-                    IsWorking = true;
-
-                    UpdateProgress?.Invoke(this, "[UI] Loading the queue...");
-
                     Queue = new ObservableCollection<SongInfoEx>(_mpc.CurrentQueue);
 
                     // Workaround for WinUI3's limitation or lack of features.
@@ -3272,7 +3268,7 @@ public partial class MainViewModel : ObservableObject
             }
 
             IsWorking = false;
-
+            await Task.Yield();
             OnPropertyChanged(nameof(QueuePageSubTitleSongCount));
         });
     }
@@ -3493,9 +3489,11 @@ public partial class MainViewModel : ObservableObject
         {
             UpdateProgress?.Invoke(this, "[UI] Playlists loading...");
 
-            bool isListChanged = false;
-            //IsBusy = true;
             IsWorking = true;
+            await Task.Yield();
+            await Task.Delay(1);
+
+            bool isListChanged = false;
 
             if (Playlists.Count == 0)
             {
@@ -3580,9 +3578,9 @@ public partial class MainViewModel : ObservableObject
                 }
             }
 
-            //IsBusy = false;
+            UpdateProgress?.Invoke(this, "");
             IsWorking = false;
-
+            await Task.Yield();
             // apply open/close after this menu is loaded.
             OnPropertyChanged(nameof(IsNavigationViewMenuOpen));
 
@@ -3653,18 +3651,14 @@ public partial class MainViewModel : ObservableObject
         await _dispatcherService.EnqueueAsync(async () =>
         {
             UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
-
-            //IsBusy = true;
             IsWorking = true;
-            await Task.Yield(); 
+            await Task.Yield();
+            await Task.Delay(1);
 
             var tmpMusicEntries = new ObservableCollection<NodeFile>();
 
             foreach (var songfile in _mpc.LocalFiles)
             {
-                //IsBusy = true;
-                //IsWorking = true;
-
                 if (string.IsNullOrEmpty(songfile.File)) continue;
 
                 try
@@ -3696,7 +3690,6 @@ public partial class MainViewModel : ObservableObject
                 }
             }
 
-            //IsBusy = true;
             IsWorking = true;
 
             UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
@@ -3707,7 +3700,6 @@ public partial class MainViewModel : ObservableObject
             OnPropertyChanged(nameof(MusicEntriesFiltered));
 
             UpdateProgress?.Invoke(this, "");
-            //IsBusy = false;
             IsWorking = false;
             await Task.Yield();
         });
@@ -3723,6 +3715,7 @@ public partial class MainViewModel : ObservableObject
             UpdateProgress?.Invoke(this, "[UI] Library directories loading...");
             IsWorking = true;
             await Task.Yield();
+            await Task.Delay(1);
 
             try
             {
@@ -3732,7 +3725,6 @@ public partial class MainViewModel : ObservableObject
                 UpdateProgress?.Invoke(this, "[UI] Library directories loading...");
 
                 IsWorking = true;
-                await Task.Yield();
 
                 MusicDirectories = new ObservableCollection<NodeTree>(tmpMusicDirectories.Children);// COPY
                 if (MusicDirectories.Count > 0)
@@ -3744,16 +3736,14 @@ public partial class MainViewModel : ObservableObject
                     }
                 }
 
-                //IsBusy = false;
                 IsWorking = false;
-                await Task.Yield();
                 UpdateProgress?.Invoke(this, "");
             }
             catch (Exception e)
             {
                 Debug.WriteLine("_musicDirectories.Load: " + e.Message);
 
-                //IsBusy = false;
+                UpdateProgress?.Invoke(this, "");
                 IsWorking = false;
                 await Task.Yield();
                 (App.Current as App)?.AppendErrorLog("Exception@UpdateLibraryDirectories", e.Message);
@@ -3761,10 +3751,9 @@ public partial class MainViewModel : ObservableObject
             }
             finally
             {
-                //IsBusy = false;
+                UpdateProgress?.Invoke(this, "");
                 IsWorking = false;
                 await Task.Yield();
-                UpdateProgress?.Invoke(this, "");
             }
         });
 
@@ -3790,16 +3779,15 @@ public partial class MainViewModel : ObservableObject
             MusicDirectories.Clear();
 
         filestNode.IsAcquired = true;
-        
+
         IsWorking = true;
+        await Task.Yield();
+        await Task.Delay(1);
 
         try
         {
             await Task.Run(async () =>
             {
-                //await Task.Delay(10);
-                await Task.Yield();
-
                 CommandResult result = await _mpc.MpdQueryListAll();
                 if (result.IsSuccess)
                 {
@@ -3823,10 +3811,6 @@ public partial class MainViewModel : ObservableObject
                     Debug.WriteLine("fail to get MpdQueryListAll: " + result.ErrorMessage);
                 }
 
-                await _dispatcherService.EnqueueAsync(() =>
-                {
-                    IsWorking = false;
-                });
             }, _cts.Token);
         }
         catch (Exception ex)
@@ -3838,11 +3822,16 @@ public partial class MainViewModel : ObservableObject
             {
                 (App.Current as App)?.AppendErrorLog("Exception @StartMpcAsync", ex.Message + $"StackTrace: {ex.StackTrace}, Source: {ex.Source}");
                 (App.Current as App)?.SaveErrorLog();
-
-                IsWorking = false;
             });
         }
-
+        finally
+        {
+            await _dispatcherService.EnqueueAsync(async () =>
+            {
+                IsWorking = false;
+                await Task.Yield();
+            });
+        }
     }
 
     private async Task GetPlaylistSongsAsync(NodeMenuPlaylistItem playlistNode)
@@ -3854,6 +3843,7 @@ public partial class MainViewModel : ObservableObject
         {
             IsWorking = true;
             await Task.Yield();
+            await Task.Delay(1);
 
             if (playlistNode.PlaylistSongs.Count > 0)
             {
@@ -3895,6 +3885,7 @@ public partial class MainViewModel : ObservableObject
         {
             IsWorking = true;
             await Task.Yield();
+            await Task.Delay(1);
 
             var ci = CultureInfo.CurrentCulture;
             var comp = StringComparer.Create(ci, true);
@@ -3938,6 +3929,7 @@ public partial class MainViewModel : ObservableObject
         {
             IsWorking = true;
             await Task.Yield();
+            await Task.Delay(1);
 
             if (!album.IsSongsAcquired)
             {
@@ -4081,7 +4073,7 @@ public partial class MainViewModel : ObservableObject
 
             IsWorking = true;
             await Task.Yield(); // Needed this.
-            await Task.Delay(20);
+            await Task.Delay(1);
             //UpdateProgress?.Invoke(this, "[UI] Library songs loading...");
 
             var r = await SearchArtistSongsAsync(artist.Name);
@@ -4169,6 +4161,7 @@ public partial class MainViewModel : ObservableObject
 
             IsWorking = true;
             await Task.Yield();
+            await Task.Delay(1);
 
             if (_cts.Token.IsCancellationRequested)
             {
@@ -4586,7 +4579,7 @@ public partial class MainViewModel : ObservableObject
             return result;
         }
 
-        IsWorking = true;
+        //IsWorking = true;
         //UpdateProgress?.Invoke(this, "");
 
         string queryShiki = "==";
@@ -4597,8 +4590,8 @@ public partial class MainViewModel : ObservableObject
             Debug.WriteLine("SearchAlbumSongs failed: " + res.ErrorMessage);
         }
 
-        IsWorking = false;
-        UpdateProgress?.Invoke(this, "");
+        //IsWorking = false;
+        //UpdateProgress?.Invoke(this, "");
 
         return res;
     }
@@ -4631,7 +4624,7 @@ public partial class MainViewModel : ObservableObject
         }
 
         //IsWorking = false;
-        UpdateProgress?.Invoke(this, "");
+        //UpdateProgress?.Invoke(this, "");
 
         return res;
     }
@@ -7204,6 +7197,8 @@ public partial class MainViewModel : ObservableObject
 
         IsBusy = true;
         IsWorking = true;
+        await Task.Yield();
+        await Task.Delay(1);
 
         // Disconnect if connected.
         if (IsConnected)
@@ -7297,6 +7292,7 @@ public partial class MainViewModel : ObservableObject
         //IsSwitchingProfile = false;
         IsBusy = false;
         IsWorking = false;
+        await Task.Yield();
     }
 
     [RelayCommand]

@@ -14,19 +14,19 @@ dotnet publish MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=x64 /p:
 
 dotnet publish MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=x86 /p:Platform=x86 /p:RuntimeIdentifier=win-x86 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=true -p:WindowsPackageType=MSIX --self-contained true
 
-dotnet publish MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=ARM64 /p:Platform=ARM64 /p:RuntimeIdentifier=ARM64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=true -p:WindowsPackageType=MSIX --self-contained true
+dotnet publish MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=ARM64 /p:Platform=ARM64 /p:RuntimeIdentifier=win-arm64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=true -p:WindowsPackageType=MSIX --self-contained true
 ---
 
-
-Put msix files into "AppPackages\msix" folder.
+Create MSIX and Output folder inside AppPackages folder.
+Put msix files into "AppPackages\MSIX" folder.
 
 -------
 cd "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\"
 
-./makeappx.exe bundle /d "C:\Users\torum\Source\Repos\MPDCtrl\MPDCtrl-WinUI3\MPDCtrl\AppPackages\msix" /p "C:\Users\torum\Source\Repos\MPDCtrl\MPDCtrl-WinUI3\MPDCtrl\AppPackages\Output\MPDCtrl_0.0.0.0_x86_x64_arm64_bundle.msixbundle"
+./makeappx.exe bundle /d "C:\Users\torum\Source\Repos\MPDCtrl\MPDCtrl-WinUI3\MPDCtrl\AppPackages\MSIX" /p "C:\Users\torum\Source\Repos\MPDCtrl\MPDCtrl-WinUI3\MPDCtrl\AppPackages\Output\MPDCtrl_0.0.0.0_x86_x64_arm64_bundle.msixbundle"
 -------
 
-Put msixbundle and the .appxsym or .msixsym files (optional but recommended for debugging) into the Output folder. 
+Put .appxsym or .msixsym files (optional but recommended for debugging) into the Output folder along with the .msixbundle. 
 Select those files and zip it (don't zip the folder).
 Rename and change file extension to MPDCtrl_0.0.0.0_x86_x64_arm64_bundle.msixupload
 

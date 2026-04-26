@@ -348,14 +348,14 @@ public sealed partial class ShellPage : Page
         if (args.WindowActivationState != WindowActivationState.CodeActivated)
         {
             animation.InsertKeyFrame(0f, 1f); // Start opacity
-            animation.InsertKeyFrame(1f, 0.5f); // End opacity
+            animation.InsertKeyFrame(1f, 0.9f); // End opacity
         }
         else
         {
-            animation.InsertKeyFrame(0f, 0.5f); // Start opacity
+            animation.InsertKeyFrame(0f, 0.9f); // Start opacity
             animation.InsertKeyFrame(1f, 1f); // End opacity
         }
-        animation.Duration = TimeSpan.FromMilliseconds(160);
+        animation.Duration = TimeSpan.FromMilliseconds(100);
         visual.StartAnimation("Opacity", animation);
     }
 

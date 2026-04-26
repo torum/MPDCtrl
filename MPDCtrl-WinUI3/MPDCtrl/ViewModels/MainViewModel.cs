@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.VisualBasic;
 using Microsoft.Windows.ApplicationModel.Resources;
 using MPDCtrl.Helpers;
 using MPDCtrl.Models;
@@ -2994,8 +2995,21 @@ public partial class MainViewModel : ObservableObject
                     // This is not good, all the selections will be cleared and position will be reset, but ...
                     //Queue = new ObservableCollection<SongInfoEx>(Queue.OrderBy(n => n.Index));
 
-                    Debug.WriteLine("Queue sort. @UpdateCurrentQueue");
-                    Queue.Sort((a, b) => { return a.Index.CompareTo(b.Index); });
+                    Debug.WriteLine("Queue sort started. @UpdateCurrentQueue");
+                    //Queue.Sort((a, b) => { return a.Index.CompareTo(b.Index); }); // TOO Slow.
+                    var sortableList = new List<SongInfoEx>(Queue);
+                    sortableList.Sort((a, b) => a.Index.CompareTo(b.Index));
+                    for (int i = 0; i < sortableList.Count; i++)
+                    {
+                        var hoge = sortableList[i] as SongInfoEx;
+                        var oldIndex = Queue.IndexOf(hoge);
+                        if (hoge.Index != oldIndex)
+                        {
+                            Debug.WriteLine($"Song index {hoge.Index}, list index {oldIndex}");
+                            Queue.Move(oldIndex, i);
+                        }
+                    }
+                    Debug.WriteLine("Queue sort end. @UpdateCurrentQueue");
 
                     UpdateProgress?.Invoke(this, "[UI] Checking current song after Queue update.");
                     await Task.Yield();
@@ -3024,7 +3038,7 @@ public partial class MainViewModel : ObservableObject
                         // AlbumArt
                         if (IsDownloadAlbumArt && CurrentSong.IsAlbumCoverNeedsUpdate)
                         {
-                            //Debug.WriteLine("MpdQueryAlbumArt @UpdateCurrentQueue (Queue.Count > 0)");
+                            Debug.WriteLine("MpdQueryAlbumArt @UpdateCurrentQueue (Queue.Count > 0)");
                             UpdateProgress?.Invoke(this, "[UI] Queue checking AlbumArt...");
 
                             var res = await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);

@@ -262,32 +262,32 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
 		<Optimize>True</Optimize>
 		<IsPublishable>True</IsPublishable>
-		<DebugType>full</DebugType>
+		<DebugType>portable</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 		<Optimize>True</Optimize>
 		<IsPublishable>True</IsPublishable>
-		<DebugType>full</DebugType>
+		<DebugType>portable</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
 		<Optimize>True</Optimize>
 		<IsPublishable>True</IsPublishable>
-		<DebugType>full</DebugType>
+		<DebugType>portable</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
 		<Optimize>True</Optimize>
 		<IsPublishable>True</IsPublishable>
-		<DebugType>full</DebugType>
+		<DebugType>portable</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<Optimize>True</Optimize>
 		<IsPublishable>True</IsPublishable>
-		<DebugType>full</DebugType>
+		<DebugType>portable</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
 		<Optimize>True</Optimize>
 		<IsPublishable>True</IsPublishable>
-		<DebugType>full</DebugType>
+		<DebugType>portable</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>

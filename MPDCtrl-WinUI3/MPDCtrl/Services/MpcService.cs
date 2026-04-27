@@ -2004,7 +2004,7 @@ public partial class MpcService : IMpcService
         return result;
     }
 
-    public async Task<CommandResult> MpdQueryStatus(bool autoIdling = true)
+    public async Task<CommandResult> MpdQueryStatus()
     {
         CommandResult result = await MpdCommandSendCommand("status");
         if (result.IsSuccess)
@@ -2015,7 +2015,7 @@ public partial class MpcService : IMpcService
         return result;
     }
 
-    public async Task<CommandResult> MpdQueryCurrentSong(bool autoIdling = true)
+    public async Task<CommandResult> MpdQueryCurrentSong()
     {
         CommandResult result = await MpdCommandSendCommand("currentsong");
         if (result.IsSuccess)
@@ -2026,7 +2026,7 @@ public partial class MpcService : IMpcService
         return result;
     }
 
-    public async Task<CommandResult> MpdQueryCurrentQueue(bool autoIdling = true)
+    public async Task<CommandResult> MpdQueryCurrentQueue()
     {
         CommandResult result = await MpdCommandSendCommand("playlistinfo");
         if (result.IsSuccess)
@@ -2037,7 +2037,7 @@ public partial class MpcService : IMpcService
         return result;
     }
 
-    public async Task<CommandResult> MpdQueryPlaylists(bool autoIdling = true)
+    public async Task<CommandResult> MpdQueryPlaylists()
     {
         CommandResult result = await MpdCommandSendCommand("listplaylists");
         if (result.IsSuccess)
@@ -2048,7 +2048,7 @@ public partial class MpcService : IMpcService
         return result;
     }
 
-    public async Task<CommandResult> MpdQueryListAll(bool autoIdling = true)
+    public async Task<CommandResult> MpdQueryListAll()
     {
         MpcProgress?.Invoke(this, "[Background] Querying files and directories...");
 
@@ -2074,7 +2074,7 @@ public partial class MpcService : IMpcService
     [GeneratedRegex(@"[""]+")]
     private static partial Regex EscapeRegex3();
 
-    public async Task<CommandSearchResult> MpdSearch(string queryTag, string queryShiki, string queryValue, bool autoIdling = true)
+    public async Task<CommandSearchResult> MpdSearch(string queryTag, string queryShiki, string queryValue)
     {
         //MpcProgress?.Invoke(this, "[Background] Searching...");
 
@@ -2143,7 +2143,7 @@ public partial class MpcService : IMpcService
         return result;
     }
 
-    public async Task<CommandPlaylistResult> MpdQueryPlaylistSongs(string playlistName, bool autoIdling = true)
+    public async Task<CommandPlaylistResult> MpdQueryPlaylistSongs(string playlistName)
     {
         CommandPlaylistResult result = new();
 
@@ -2431,7 +2431,7 @@ public partial class MpcService : IMpcService
 
     public async Task<CommandResult> MpdSendUpdate()
     {
-        CommandResult result = await MpdCommandSendCommand("update");// TEST: no autoIdling
+        CommandResult result = await MpdCommandSendCommand("update");
 
         return result;
     }

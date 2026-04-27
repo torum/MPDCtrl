@@ -754,6 +754,22 @@ public partial class MpcService : IMpcService
         return result;
     }
 
+    public async Task<CommandResult> MpdIdleQueryListAlbumArtists()
+    {
+        MpcProgress?.Invoke(this, "[Background] Querying artists...");
+
+        CommandResult result = await MpdIdleSendCommand("list album group albumartist");
+        if (result.IsSuccess)
+        {
+            MpcProgress?.Invoke(this, "[Background] Parsing artists...");
+            result.IsSuccess = await ParseListAlbumGroupAlbumArtist(result.ResultText);
+            MpcProgress?.Invoke(this, "[Background] Artists updated.");
+        }
+        MpcProgress?.Invoke(this, "");
+
+        return result;
+    }
+
     public void MpdIdleStart()
     {
         MpdIdle();
@@ -2046,22 +2062,6 @@ public partial class MpcService : IMpcService
         }
 
         MpcProgress?.Invoke(this, "");
-        return result;
-    }
-    
-    public async Task<CommandResult> MpdQueryListAlbumArtists(bool autoIdling = true)
-    {
-        MpcProgress?.Invoke(this, "[Background] Querying artists...");
-
-        CommandResult result = await MpdCommandSendCommand("list album group albumartist");
-        if (result.IsSuccess)
-        {
-            MpcProgress?.Invoke(this, "[Background] Parsing artists...");
-            result.IsSuccess = await ParseListAlbumGroupAlbumArtist(result.ResultText);
-            MpcProgress?.Invoke(this, "[Background] Artists updated.");
-        }
-        MpcProgress?.Invoke(this, "");
-
         return result;
     }
 

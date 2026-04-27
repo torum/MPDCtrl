@@ -64,6 +64,7 @@ public interface IMpcService
     Task<CommandResult> MpdIdleQueryStatus();
     Task<CommandResult> MpdIdleQueryProtocol();
     Task<CommandResult> MpdIdleQueryOutputs();
+    Task<CommandResult> MpdIdleQueryListAlbumArtists();
     Task<CommandResult> MpdIdleSendPassword(string password = "");
     void MpdIdleStart();
     Task<CommandResult> MpdLoadPlaylist(string playlistName);
@@ -83,7 +84,6 @@ public interface IMpcService
     Task<CommandResult> MpdQueryCurrentQueue(bool autoIdling = true);
     Task<CommandResult> MpdQueryCurrentSong(bool autoIdling = true);
     Task<CommandResult> MpdQueryListAll(bool autoIdling = true);
-    Task<CommandResult> MpdQueryListAlbumArtists(bool autoIdling = true);
     Task<CommandResult> MpdQueryPlaylists(bool autoIdling = true);
     Task<CommandPlaylistResult> MpdQueryPlaylistSongs(string playlistName, bool autoIdling = true);
     Task<CommandResult> MpdQueryStatus(bool autoIdling = true);

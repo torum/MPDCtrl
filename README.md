@@ -11,22 +11,22 @@ Download and install via [Microsoft Store](https://apps.microsoft.com/store/deta
   
 ## Screenshots
 
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v4/MPDCtrl-Queue.png?raw=true)  
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v4/MPDCtrl-Queue.png)  
 
 
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v4/MPDCtrl-Search.png?raw=true)  
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v4/MPDCtrl-Search.png)  
 
 
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v4/MPDCtrl-Albums.png?raw=true)  
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v4/MPDCtrl-Albums.png)  
 
 
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v4/MPDCtrl-Artists.png?raw=true)  
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v4/MPDCtrl-Artists.png)  
 
 
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v4/MPDCtrl-Files.png?raw=true)  
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v4/MPDCtrl-Files.png)  
 
 
-![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v4/MPDCtrl-Playlists.png?raw=true)  
+![MPDCtrl](https://github.com/torum/MPDCtrl/blob/master/images/screenshots/v4/MPDCtrl-Playlists.png)  
 
 
 ## Contributing

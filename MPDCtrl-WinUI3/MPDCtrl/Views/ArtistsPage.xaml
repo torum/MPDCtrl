@@ -51,7 +51,7 @@
 
                 </StackPanel>
 
-                <Popup Grid.Row="0" PlacementTarget="{x:Bind TglButtonArtistFilter}" DesiredPlacement="LeftEdgeAlignedTop" HorizontalOffset="-6" VerticalOffset="-6" IsLightDismissEnabled="True" IsOpen="{x:Bind ViewModel.IsArtistFindVisible, Mode=TwoWay}">
+                <Popup Grid.Row="0" PlacementTarget="{x:Bind TglButtonArtistFilter}" DesiredPlacement="LeftEdgeAlignedTop" HorizontalOffset="-6" VerticalOffset="-6" ShouldConstrainToRootBounds="True" IsLightDismissEnabled="True" IsOpen="{x:Bind ViewModel.IsArtistFindVisible, Mode=TwoWay}">
                     <Border Width="280" Height="280" Translation="0, 0, 12" KeyboardAcceleratorPlacementMode="Hidden" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" CornerRadius="6" Padding="6" BorderBrush="{ThemeResource LayerFillColorDefaultBrush}" BorderThickness="1">
                         <Border.Shadow>
                             <ThemeShadow />

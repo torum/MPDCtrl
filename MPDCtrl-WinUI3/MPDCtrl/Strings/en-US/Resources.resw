@@ -184,7 +184,7 @@
     <value>Theme</value>
   </data>
   <data name="QueuePage_SubTitle_SongCount" xml:space="preserve">
-    <value>{0} songs</value>
+    <value>{0} song(s)</value>
   </data>
   <data name="ListviewColumnHeader_Album.Text" xml:space="preserve">
     <value>Album</value>
@@ -211,7 +211,7 @@
     <value>Track</value>
   </data>
   <data name="AlbumPage_SubTitle_AlbumCount" xml:space="preserve">
-    <value>{0} albums</value>
+    <value>{0} album(s)</value>
   </data>
   <data name="PageTitle_Queue.Text" xml:space="preserve">
     <value>Queue</value>
@@ -235,10 +235,10 @@
     <value>Settings</value>
   </data>
   <data name="FilesPage_SubTitle_FileCount" xml:space="preserve">
-    <value>{0} files</value>
+    <value>{0} file(s)</value>
   </data>
   <data name="PlaylistPage_SubTitle_SongCount" xml:space="preserve">
-    <value>{0} songs</value>
+    <value>{0} song(s)</value>
   </data>
   <data name="SearchTag_Any" xml:space="preserve">
     <value>Any</value>
@@ -334,7 +334,7 @@
     <value>Unknown Album</value>
   </data>
   <data name="ArtistPage_SubTitle_ArtistCount" xml:space="preserve">
-    <value>{0} artists</value>
+    <value>{0} artist(s)</value>
   </data>
   <data name="ListviewItemContextMenu_GoToAlbumPage.Text" xml:space="preserve">
     <value>Go to album page</value>
@@ -370,10 +370,10 @@
     <value>Playlist name already exists.</value>
   </data>
   <data name="ArtistPage_SubTitle_ArtistAlbumCount" xml:space="preserve">
-    <value>{0} albums</value>
+    <value>{0} album(s)</value>
   </data>
   <data name="AlbumPage_SubTitle_SelectedAlbumSongsCount" xml:space="preserve">
-    <value>{0} songs</value>
+    <value>{0} song(s)</value>
   </data>
   <data name="ConnectionSettings_Host.Header" xml:space="preserve">
     <value>Host</value>

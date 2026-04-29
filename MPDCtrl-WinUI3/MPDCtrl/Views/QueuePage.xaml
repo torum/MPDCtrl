@@ -148,7 +148,7 @@
                     </Button>
                 </StackPanel>
 
-                <Popup Grid.Row="1" PlacementTarget="{x:Bind TglButtonQueueFilter}" DesiredPlacement="LeftEdgeAlignedTop" HorizontalOffset="-6" VerticalOffset="-6" IsLightDismissEnabled="True" IsOpen="{x:Bind ViewModel.IsQueueFindVisible, Mode=TwoWay}">
+                <Popup Grid.Row="1" PlacementTarget="{x:Bind TglButtonQueueFilter}" DesiredPlacement="LeftEdgeAlignedTop" ShouldConstrainToRootBounds="True" HorizontalOffset="-6" VerticalOffset="-6" IsLightDismissEnabled="True" IsOpen="{x:Bind ViewModel.IsQueueFindVisible, Mode=TwoWay}">
 
                     <!--  Background="{ThemeResource LayerFillColorDefaultBrush}" SmokeFillColorDefaultBrush LayerFillColorAltBrush SolidBackgroundFillColorBaseBrush -->
                     <Border Width="280" Height="280" Translation="0, 0, 12" KeyboardAcceleratorPlacementMode="Hidden" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" CornerRadius="6" Padding="6" BorderBrush="{ThemeResource SmokeFillColorDefaultBrush}" BorderThickness="1">

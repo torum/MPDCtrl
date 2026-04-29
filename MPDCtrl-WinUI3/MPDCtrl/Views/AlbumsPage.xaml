@@ -81,7 +81,7 @@
                     </Button>
                 </StackPanel>
 
-                <Popup Grid.Row="0" PlacementTarget="{x:Bind TglButtonAlbumFilter}" DesiredPlacement="LeftEdgeAlignedTop" HorizontalOffset="-6" VerticalOffset="-6" IsLightDismissEnabled="True" IsOpen="{x:Bind ViewModel.IsAlbumFindVisible, Mode=TwoWay}">
+                <Popup Grid.Row="0" PlacementTarget="{x:Bind TglButtonAlbumFilter}" DesiredPlacement="LeftEdgeAlignedTop" HorizontalOffset="-6" VerticalOffset="-6" ShouldConstrainToRootBounds="True" IsLightDismissEnabled="True" IsOpen="{x:Bind ViewModel.IsAlbumFindVisible, Mode=TwoWay}">
                     <Border Width="280" Height="280" Translation="0, 0, 12" KeyboardAcceleratorPlacementMode="Hidden" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" CornerRadius="6" Padding="6" BorderBrush="{ThemeResource LayerFillColorDefaultBrush}" BorderThickness="1">
                         <Border.Shadow>
                             <ThemeShadow />
@@ -149,7 +149,7 @@
         </Grid>
 
         <Grid Grid.Row="1" x:Name="BodyGrid" Margin="24,0,0,0">
-            <ListView x:Name="AlbumsListView" AccessKey="L" Margin="0,12,0,0" ItemsSource="{x:Bind ViewModel.Albums, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAlbum, Mode=TwoWay}" SelectionMode="Single" SingleSelectionFollowsFocus="False" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            <ListView x:Name="AlbumsListView" AccessKey="L" Margin="0,24,0,0" ItemsSource="{x:Bind ViewModel.Albums, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAlbum, Mode=TwoWay}" SelectionMode="Single" SingleSelectionFollowsFocus="False" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                         IsMultiSelectCheckBoxEnabled="False" Loaded="AlbumListView_Loaded">
                 
                 <!-- AOT problem
@@ -197,7 +197,7 @@
                         <Setter Property="Height" Value="260" />
                         <Setter Property="Width" Value="230" />
                         <Setter Property="Padding" Value="10,16,10,0" />
-                        <Setter Property="Margin" Value="6,0,6,0" />
+                        <Setter Property="Margin" Value="0,0,24,0" />
                     </Style>
                 </ListView.ItemContainerStyle>
             </ListView>

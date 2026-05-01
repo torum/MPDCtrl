@@ -54,6 +54,8 @@
 	  <Optimize>true</Optimize>
 	  <CsWinRTAotWarningLevel>3</CsWinRTAotWarningLevel>
 
+	  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
 	  <!--
 	   Comment these two out when publish packaged app. Uncomment when debug Unpackaged.
 	   

@@ -149,7 +149,7 @@
         </Grid>
 
         <Grid Grid.Row="1" x:Name="BodyGrid" Margin="24,0,0,0">
-            <ListView x:Name="AlbumsListView" AccessKey="L" Margin="0,24,0,0" ItemsSource="{x:Bind ViewModel.Albums, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAlbum, Mode=TwoWay}" SelectionMode="Single" SingleSelectionFollowsFocus="False" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            <ListView x:Name="AlbumsListView" AccessKey="L" Margin="0,24,0,0" Padding="0,0,0,0" Background="Transparent" ItemsSource="{x:Bind ViewModel.Albums, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedAlbum, Mode=TwoWay}" SelectionMode="Single" SingleSelectionFollowsFocus="False" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                         IsMultiSelectCheckBoxEnabled="False" Loaded="AlbumListView_Loaded">
                 
                 <!-- AOT problem

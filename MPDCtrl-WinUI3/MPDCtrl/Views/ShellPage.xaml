@@ -53,7 +53,7 @@
         <!-- NaviView -->
         <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BorderBrush="{ThemeResource SmokeFillColorDefaultBrush}" BorderThickness="0,0,0,0">
 
-            <NavigationView x:Name="NaviView" AccessKey="H" MenuItemsSource="{x:Bind ViewModel.MainMenuItems, Mode=OneWay}" IsTitleBarAutoPaddingEnabled="True" IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="False" IsSettingsVisible="False" PaneDisplayMode="Left" ExpandedModeThresholdWidth="1008" CompactModeThresholdWidth="640" OpenPaneLength ="280" IsPaneOpen="{x:Bind ViewModel.IsNavigationViewMenuOpen, Mode=TwoWay}" Loaded="NavigationView_Loaded" ItemInvoked="NavigationView_ItemInvoked" SelectionChanged="NaviView_SelectionChanged">
+            <NavigationView x:Name="NaviView" AccessKey="H" MenuItemsSource="{x:Bind ViewModel.MainMenuItems, Mode=OneWay}" IsTitleBarAutoPaddingEnabled="True" IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="False" IsSettingsVisible="False" PaneDisplayMode="Left" ExpandedModeThresholdWidth="1008" CompactModeThresholdWidth="640" OpenPaneLength ="280" IsPaneOpen="{x:Bind ViewModel.IsNavigationViewMenuOpen, Mode=TwoWay}" Loaded="NavigationView_Loaded" ItemInvoked="NavigationView_ItemInvoked" SelectionChanged="NaviView_SelectionChanged" PaneClosed="NaviView_PaneClosed" PaneOpened="NaviView_PaneOpened">
                 <NavigationView.PaneHeader>
                     <!-- App title and icon -->
                     <Grid VerticalAlignment="Center">
@@ -69,7 +69,7 @@
                         <!-- Progress ring, Settings, etc -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="12,0,6,0">
 
-                            <ProgressRing IsActive="{x:Bind ViewModel.IsWorking, Mode=OneWay}" Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            <ProgressRing IsActive="{x:Bind ViewModel.IsWorking, Mode=OneWay}" Width="16" Height="16" Margin="0,0,6,0" HorizontalAlignment="Right" VerticalAlignment="Center" />
 
                             <Button Width="40" Height="36" Command="{x:Bind ViewModel.FireDebugWindowShowHideCommand}" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Visibility="{x:Bind ViewModel.IsDebugWindowEnabled, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <Viewbox Width="14" Height="14" Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -105,14 +105,14 @@
                     </DataTemplate>
                 </NavigationView.MenuItemTemplate>
 
-                <Grid Background="{ThemeResource LayerFillColorDefaultBrush}">
+                <Grid Background="{ThemeResource LayerFillColorDefaultBrush}" SizeChanged="AppTitleBar_SizeChanged" Loaded="AppTitleBarGrid_Loaded">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="42"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" SizeChanged="AppTitleBar_SizeChanged">
-                        <Button x:Name="BackButton" x:Uid="GoBackButton" Height="36" Width="40" Margin="6,6,0,0" Click="BackButton_Click" Style="{StaticResource TitleBarBackButtonStyle}" Visibility="{x:Bind ViewModel.IsGoBackButtonVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    <Border Grid.Row="0">
+                        <Button x:Name="BackButton" x:Uid="GoBackButton" Height="36" Width="40" Margin="6,6,0,0" Click="BackButton_Click" Style="{ThemeResource TitleBarBackButtonStyle}" Visibility="{x:Bind ViewModel.IsGoBackButtonVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     </Border>
                     
                     <!-- NavigationView content frame -->

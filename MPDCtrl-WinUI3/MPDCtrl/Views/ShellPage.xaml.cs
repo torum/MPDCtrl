@@ -146,12 +146,12 @@ public sealed partial class ShellPage : Page
             var queuePage = ViewModel.MainMenuItems.FirstOrDefault();
             queuePage?.Selected = true;
         }
+
+        SetRegionsForCustomTitleBar();
     }
 
     private void AppTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        // This does not allways fire. We might need to use diffrent grid and use navigated event.
-        // Update interactive regions (for backbutton) if the size of the window changes.
         SetRegionsForCustomTitleBar();
     }
 
@@ -186,22 +186,6 @@ public sealed partial class ShellPage : Page
         }
 
         double scaleAdjustment = AppTitleBar.XamlRoot.RasterizationScale;
-
-        //
-        /*
-        GeneralTransform transform = this.SearchBox.TransformToVisual(null);
-        Rect bounds = transform.TransformBounds(new Rect(0, 0,
-                                                         this.SearchBox.ActualWidth,
-                                                         this.SearchBox.ActualHeight));
-        Windows.Graphics.RectInt32 SearchBoxRect = GetRect(bounds, scaleAdjustment);
-
-        GeneralTransform transform = this.DummyButton.TransformToVisual(null);
-        Rect bounds = transform.TransformBounds(new Rect(0, 0,
-                                                         this.DummyButton.ActualWidth,
-                                                         this.DummyButton.ActualHeight));
-        Windows.Graphics.RectInt32 DummyButtonRect = GetRect(bounds, scaleAdjustment);
-        */
-        
         
         // Settings button
         GeneralTransform transform1 = this.SettingsButton.TransformToVisual(null);
@@ -209,7 +193,6 @@ public sealed partial class ShellPage : Page
                                                          this.SettingsButton.ActualWidth,
                                                          this.SettingsButton.ActualHeight));
         Windows.Graphics.RectInt32 SettingsButton = GetRect(bounds1, scaleAdjustment);
-
 
         // Back button
         double width = this.BackButton.Width;//ActualWidth won't work in certain cases.
@@ -228,13 +211,10 @@ public sealed partial class ShellPage : Page
                                                     height));
         Windows.Graphics.RectInt32 BackButtonRect = GetRect(bounds, scaleAdjustment);
 
-        //
-        //var rectArray = new Windows.Graphics.RectInt32[] { SearchBoxRect, BackButtonRect };
         var rectArray = new Windows.Graphics.RectInt32[] { BackButtonRect, SettingsButton };
 
-        InputNonClientPointerSource nonClientInputSrc =
-            InputNonClientPointerSource.GetForWindowId(m_AppWindow.Id);
-        nonClientInputSrc.SetRegionRects(NonClientRegionKind.Passthrough, rectArray);
+        InputNonClientPointerSource nonClientInputSrc = InputNonClientPointerSource.GetForWindowId(m_AppWindow.Id);
+        nonClientInputSrc.SetRegionRects(NonClientRegionKind.Passthrough, rectArray); 
     }
 
     private static Windows.Graphics.RectInt32 GetRect(Rect bounds, double scale)
@@ -719,5 +699,20 @@ public sealed partial class ShellPage : Page
     private void OnSourceChanged(DependencyObject sender, DependencyProperty dp)
     {
         FadeInStoryboard.Begin();
+    }
+
+    private void NaviView_PaneClosed(NavigationView sender, object args)
+    {
+        SetRegionsForCustomTitleBar();
+    }
+
+    private void NaviView_PaneOpened(NavigationView sender, object args)
+    {
+        SetRegionsForCustomTitleBar();
+    }
+
+    private void AppTitleBarGrid_Loaded(object sender, RoutedEventArgs e)
+    {
+        SetRegionsForCustomTitleBar();
     }
 }

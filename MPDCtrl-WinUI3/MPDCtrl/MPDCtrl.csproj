@@ -8,31 +8,22 @@
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
     <PublishProfile>win-$(Platform).pubxml</PublishProfile>
     <UseWinUI>true</UseWinUI>
-	  <WinUISDKReferences>False</WinUISDKReferences>
-	  <Nullable>enable</Nullable>
-	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<WinUISDKReferences>False</WinUISDKReferences>
+	<Nullable>enable</Nullable>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	  
 	  <ApplicationManifest>app.manifest</ApplicationManifest>
 	  <Company>torum</Company>
 	  <Description>MPD Client</Description>
-	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	  <PackageIcon>MPDCtrl.ico</PackageIcon>
-
-	  <EnableMsixTooling>true</EnableMsixTooling>
-
-
-	  <IncludeSymbols>True</IncludeSymbols>
-	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-
 	  <ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
 
 	  <VersionPrefix>4.0.8.0</VersionPrefix>
 	  <FileVersion>4.0.8.0</FileVersion>
-
-	  <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-
-	  <SelfContained>true</SelfContained>
-	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+	  
+	  <IncludeSymbols>True</IncludeSymbols>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	  <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
 
 	  <AppxPackageIncludePrivateSymbols>true</AppxPackageIncludePrivateSymbols>
 	  <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
@@ -76,12 +67,20 @@
 	  <SelfContained>true</SelfContained>
 	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 	  -->
+	  <EnableMsixTooling>False</EnableMsixTooling>
+	  <WindowsPackageType>None</WindowsPackageType>
 	  <!--
 		"Packaged"
 	  <EnableMsixTooling>True</EnableMsixTooling>
 	  <WindowsPackageType>MSIX</WindowsPackageType>
 	  -->
 
+	  <!--
+	  <SelfContained>true</SelfContained>
+	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+	  -->
+	  
   </PropertyGroup>
 
   <ItemGroup>
@@ -172,12 +171,12 @@
     <PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.2.251219" />
     <PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.2.251219" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
-	<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1721" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools.MSIX" Version="1.7.260316102">
+	<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools.MSIX" Version="1.7.260425100">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260416003" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.0.1" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.7" />
   </ItemGroup>
   <ItemGroup>

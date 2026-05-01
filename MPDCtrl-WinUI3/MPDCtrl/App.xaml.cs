@@ -29,7 +29,7 @@ public partial class App : Application
     // Temp album cover cache folder.
     private static readonly string EnvAppLocalFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData); // Use Local instead of temp path. //System.IO.Path.GetTempPath();
     private static readonly string EnvAppLocalAppFolder = System.IO.Path.Combine((System.IO.Path.Combine(EnvAppLocalFolder, AppDeveloper)), AppName);
-    public static string AppDataCacheFolder { get; private set; } = System.IO.Path.Combine(EnvAppLocalAppFolder, "AlbumCoverCache");
+    public static string AlbumCoverCacheFolder { get; private set; } = System.IO.Path.Combine(EnvAppLocalAppFolder, "AlbumCoverCache");
 
     // ErrorLog
     private static readonly string LogFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl4_errors.txt";
@@ -41,7 +41,7 @@ public partial class App : Application
     public bool IsSaveErrorLog = false;
 #endif
 
-    // MainWindow
+    // TODO: use dependency injection instead of static properties.
     public static MainWindow? MainWnd
     {
         get; private set;
@@ -77,15 +77,13 @@ public partial class App : Application
             AppConfigFilePath = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, AppName + ".config");
             //AppConfigFilePath = System.IO.Path.Combine(AppDataFolder, _appName + ".config"); // should have been this...
             var envAppLocalCahceFolder = Windows.Storage.ApplicationData.Current.LocalCacheFolder.Path;
-            AppDataCacheFolder = System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.Combine(envAppLocalCahceFolder, AppDeveloper), AppName), "AlbumCoverCache");
+            AlbumCoverCacheFolder = System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.Combine(envAppLocalCahceFolder, AppDeveloper), AppName), "AlbumCoverCache");
         }
         else
         {
             /*
             Debug.WriteLine("Not IsMSIX");
-            AppDataFolder = System.IO.Path.Combine(System.IO.Path.Combine(_envDataFolder, _appDeveloper), _appName);
-            AppConfigFilePath = System.IO.Path.Combine(AppDataFolder, _appName + ".config");
-            AppDataCacheFolder = System.IO.Path.Combine(_envAppLocalAppFolder, "AlbumCoverCache");
+
             */
         }
 

@@ -34,7 +34,7 @@ public sealed partial class SettingsPage : Page
 
     private async void HyperlinkButton_AlbumCacheFolderPath_Click(object sender, RoutedEventArgs e)
     {
-        var dir = App.AppDataCacheFolder;
+        var dir = App.AlbumCoverCacheFolder;
         
         await Windows.System.Launcher.LaunchFolderPathAsync(dir);
 

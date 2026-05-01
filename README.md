@@ -1,6 +1,6 @@
 # MPDCtrl
 
-<img width="48" height="48" src="https://github.com/torum/MPDCtrl/images/MPDCtrl.png">
+<img width="48" height="48" src="https://github.com/torum/MPDCtrl/blob/master/images/MPDCtrl.png">
 
 MPDCtrl is a Windows desktop client app for [MPD (Music player daemon)](http://www.musicpd.org/).  
 

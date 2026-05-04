@@ -1572,6 +1572,18 @@ public partial class MainViewModel : ObservableObject
         private set;
     } = "";
 
+    public SongInfo? SelectedPlaylistSong
+    {
+        get; set
+        {
+            if (field == value)
+                return;
+
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
     public string SelectedPlaylistName { get; set
         {
             if (field == value)
@@ -1589,6 +1601,80 @@ public partial class MainViewModel : ObservableObject
             field = value;
             OnPropertyChanged();
         } } = "";
+
+
+    // Filter Playlist
+    public ObservableCollection<SongInfo> PlaylistSongsForFilter
+    {
+        get;
+        set
+        {
+            if (field == value)
+                return;
+
+            field = value;
+            OnPropertyChanged();
+        }
+    } = [];
+
+    public string FilterPlaylistSongQuery
+    {
+        get;
+        set
+        {
+            if (field == value)
+                return;
+
+            field = value;
+            OnPropertyChanged();
+
+            if (field == "")
+            {
+                return;
+            }
+
+            var filtered = PlaylistSongs.Where(FilterPlaylistSong);
+
+            PlaylistSongsForFilter = new ObservableCollection<SongInfo>(filtered);
+
+        }
+    } = "";
+
+    private bool FilterPlaylistSong(SongInfo song)
+    {
+        return song.Title.Contains(FilterPlaylistSongQuery, StringComparison.CurrentCultureIgnoreCase);// InvariantCultureIgnoreCase
+    }
+
+    public bool IsPlaylistSongFindVisible
+    {
+        get;
+        set
+        {
+            if (field == value)
+                return;
+
+            field = value;
+
+            PlaylistSongsForFilter.Clear();
+
+            FilterPlaylistSongQuery = "";
+
+            OnPropertyChanged();
+        }
+    }
+
+    public SongInfo? SelectedFilterPlaylistSong
+    {
+        get;
+        set
+        {
+            if (field == value)
+                return;
+
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
     #endregion
 
@@ -7243,6 +7329,21 @@ public partial class MainViewModel : ObservableObject
         _mpc.MpdPlaylistClear(SelectedPlaylistName);
         _mpc.MpdPlaylistAdd(SelectedPlaylistName, uris);
     }
+
+    [RelayCommand]
+    public void PlaylistSongFilterSelect(object obj)//
+    {
+        if (obj is null) return;
+        if (obj is not SongInfo song) return;
+        if (PlaylistSongs.Count <= 1) return;
+        if (SelectedFilterPlaylistSong is null) return;
+
+        if (SelectedFilterPlaylistSong.Title != song.Title) return; // TODO: culture compare.
+
+        SelectedPlaylistSong = song; // Should scroll to the selected item because AutoScrollToSelectedItem is true in PlaylistSongFilter ListView. 
+        //ScrollIntoViewAndSelect?.Invoke(this, SelectedFilterPlaylistSong.Index);
+    }
+
     public bool PlaylistRemoveDuplicatesCanExecute()
     {
         if (!_mpc.Commands.Contains("playlistclear")) { return false; }

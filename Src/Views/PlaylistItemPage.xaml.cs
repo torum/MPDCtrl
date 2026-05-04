@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using MPDCtrl.Models;
+using MPDCtrl.Services.Contracts;
 using MPDCtrl.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -27,9 +28,12 @@ public sealed partial class PlaylistItemPage : Page
         get;
     }
 
+    private readonly IDispatcherService _dispatcherService;
+
     public PlaylistItemPage()
     {
         ViewModel = App.GetService<MainViewModel>();
+        _dispatcherService = App.GetService<IDispatcherService>();
 
         InitializeComponent();
     }
@@ -137,6 +141,74 @@ public sealed partial class PlaylistItemPage : Page
         else if (args.DropResult == DataPackageOperation.None)
         {
             System.Diagnostics.Debug.WriteLine("Drag operation was cancelled.");
+        }
+    }
+
+    private void TglButtonPlaylistSongsFilter_Click(object sender, RoutedEventArgs e)
+    {
+        if (this.TglButtonPlaylistSongsFilter is ToggleButton tb)
+        {
+            if (tb.IsChecked == true)
+            {
+                this.FilterPlaylistSongQueryTextBox.Focus(FocusState.Programmatic);
+            }
+            else
+            {
+                this.TglButtonPlaylistSongsFilter.Focus(FocusState.Programmatic);
+            }
+        }
+    }
+
+    private void Page_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        Windows.System.VirtualKey downKey = e.OriginalKey;
+
+        if (downKey == Windows.System.VirtualKey.Escape)
+        {
+            if (this.TglButtonPlaylistSongsFilter is ToggleButton tb)
+            {
+                tb.IsChecked = false;
+            }
+        }
+    }
+
+    private void Popup_Escape_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (this.TglButtonPlaylistSongsFilter is ToggleButton tb)
+        {
+            tb.IsChecked = false;
+        }
+    }
+
+    private void FilterPlaylistSongListBox_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        if (sender is not ListView)
+        {
+            return;
+        }
+
+        FrameworkElement element = (FrameworkElement)e.OriginalSource;
+
+        var container = FindParent<ListViewItem>(element);
+
+        if (container is null)
+        {
+            return;
+        }
+
+        if (container.Content is not SongInfo song)
+        {
+            return;
+        }
+
+        if (this.PlaylistListview is ListView lb)
+        {
+            _dispatcherService.TryEnqueue(() =>
+            {
+                lb.ScrollIntoView(song, ScrollIntoViewAlignment.Default);
+
+                lb.SelectedItem = song;
+            });
         }
     }
 }

@@ -12,6 +12,7 @@ namespace MPDCtrl.Services;
 public class DispatcherService : IDispatcherService
 {
     private readonly Microsoft.UI.Dispatching.DispatcherQueue _queue;
+    public Microsoft.UI.Dispatching.DispatcherQueue DispatcherQueue => _queue;
 
     public DispatcherService(Microsoft.UI.Dispatching.DispatcherQueue queue)
     {

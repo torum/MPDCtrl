@@ -77,6 +77,8 @@ public sealed partial class ShellPage : Page
         // Do this at shell page loaded event after everything is initilized even App.MainWnd in app.xaml.cs.
         // It is too early here to show dialogs.
         //ViewModel.StartMPC();
+
+        //this.PlaybackPlay.Loaded += (s, e) => PlaybackPlay.Focus(FocusState.Programmatic);
     }
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -84,7 +86,7 @@ public sealed partial class ShellPage : Page
         try
         {
             // Set focus so that space shortcut works.
-            this.PlaybackPlay.Focus(FocusState.Programmatic);
+            //await FocusManager.TryFocusAsync(this.PlaybackPlay, FocusState.Programmatic);
 
             if (App.MainWnd is not null)
             {
@@ -111,7 +113,6 @@ public sealed partial class ShellPage : Page
             _ = ex;
             Debug.WriteLine($"Exception @Page_Loaded::ShellPage: {ex}");
         }
-
     }
 
     private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -594,19 +595,6 @@ public sealed partial class ShellPage : Page
     {
         Windows.System.VirtualKey releasedKey = e.OriginalKey;
 
-        /*
-         *  Handled in KeyboardAccelerator_Invoked
-        if (releasedKey == Windows.System.VirtualKey.F1)
-        {
-            // show help dialog.
-
-            e.Handled = true;
-            _ = App.GetService<IDialogService>().ShowKeybindingsDialog();
-
-            return;
-        }
-        */
-
         if (releasedKey != Windows.System.VirtualKey.Space)
         {
             return;
@@ -614,7 +602,8 @@ public sealed partial class ShellPage : Page
 
         XamlRoot currentXamlRoot = this.Content.XamlRoot;
         var focusedElement = FocusManager.GetFocusedElement(currentXamlRoot);
-        if ((focusedElement is TextBox) || (focusedElement is ListView) || (focusedElement is ListViewItem))//
+        if ((focusedElement is TextBox) || (focusedElement is ListView) || (focusedElement is ListViewItem)
+            || (focusedElement is Button) || (focusedElement is RadioButton) || (focusedElement is CheckBox) || (focusedElement is ToggleButton))
         {
             // Do nothing.
             return;
@@ -631,7 +620,7 @@ public sealed partial class ShellPage : Page
         }
 
         // Disable space key down.
-        e.Handled = true;
+        //e.Handled = true;
 
         //
         Task.Run(ViewModel.Play);
@@ -648,7 +637,8 @@ public sealed partial class ShellPage : Page
 
         XamlRoot currentXamlRoot = this.Content.XamlRoot;
         var focusedElement = FocusManager.GetFocusedElement(currentXamlRoot);
-        if ((focusedElement is TextBox) || (focusedElement is ListView) || (focusedElement is ListViewItem))//
+        if ((focusedElement is TextBox) || (focusedElement is ListView) || (focusedElement is ListViewItem)
+            || (focusedElement is Button) || (focusedElement is RadioButton) || (focusedElement is CheckBox) || (focusedElement is ToggleButton))
         {
             // Do nothing.
             return;
@@ -665,7 +655,7 @@ public sealed partial class ShellPage : Page
         }
 
         // Disable space key down.
-        e.Handled = true;
+        //e.Handled = true;
     }
 
     private void VolumeSlider_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
@@ -851,7 +841,15 @@ public sealed partial class ShellPage : Page
                 }
             }
         }
+    }
 
-
+    private void PlaybackPlay_Loaded(object sender, RoutedEventArgs e)
+    {
+        // Delays focus until all current layout/focus cycles are finished
+        _dispatcherService.DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, async () =>
+        {
+            await Task.Delay(500);
+            PlaybackPlay.Focus(FocusState.Programmatic);
+        });
     }
 }

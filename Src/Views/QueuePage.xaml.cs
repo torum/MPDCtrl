@@ -349,4 +349,24 @@ public sealed partial class QueuePage : Page
             System.Diagnostics.Debug.WriteLine("Drag operation was cancelled.");
         }
     }
+
+    private void QueueListview_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
+    {
+        if (e.Items is null)
+        {
+            return;
+        }
+
+        var list = new List<SongInfoEx>();
+
+        foreach (var item in e.Items)
+        {
+            if (item is SongInfoEx song)
+            {
+                //Debug.WriteLine($"Start dragging item with ID {song.Id} at position {song.Index}");
+                list.Add(song);
+            }
+        }
+        e.Data.Properties.Add("QueueListViewDragItems", list);
+    }
 }

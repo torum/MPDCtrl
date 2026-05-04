@@ -19,6 +19,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.System;
 using Windows.UI.ApplicationSettings;
@@ -715,4 +716,74 @@ public sealed partial class ShellPage : Page
     {
         SetRegionsForCustomTitleBar();
     }
+
+    private void NavigationViewItem_DragOver(object sender, DragEventArgs e)
+    {
+        if (sender is not FrameworkElement) return;
+
+        if (sender is NavigationViewItem nvi)
+        {
+            if (nvi.DataContext is NodeMenuPlaylistItem targetPlaylist)
+            {
+                //Debug.WriteLine($"tag: {nvi.Tag}, datacontext: {nvi.DataContext}");
+                e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Move;
+                e.DragUIOverride.Caption = $"{targetPlaylist.Name}";
+                e.DragUIOverride.IsCaptionVisible = true;
+            }
+            else
+            {
+                if (nvi.DataContext is null)
+                {
+                    Debug.WriteLine("NavigationViewItem_DragOver: DataContext is null.");
+                }
+
+                e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.None;
+            }
+        }
+        else
+        {
+            e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.None;
+        }
+
+        e.Handled = true;
+    }
+
+    private async void NavigationViewItem_Drop(object sender, DragEventArgs e)
+    {
+        if (sender is not FrameworkElement) return;
+
+        if (sender is not NavigationViewItem nvi)
+        {
+            e.Handled = true;
+            return;
+        }
+
+        if (nvi.DataContext is null)
+        {
+            Debug.WriteLine("NavigationViewItem_DragOver: DataContext is null.");
+            e.Handled = true;
+            return;
+        }
+
+        if (nvi.DataContext is NodeMenuPlaylistItem targetPlaylist)
+        {
+            if (e.DataView.Properties.ContainsKey("QueueListViewDragItems"))
+            {
+                // Retrieve and cast the custom object
+                var items = e.DataView.Properties["QueueListViewDragItems"] as List<SongInfoEx>;
+
+                if (items is null)
+                {
+                    return;
+                }
+
+                var uris = items.Select(i => i.File).ToList();
+
+                await ViewModel.AddToPlaylist(targetPlaylist.Name, uris);
+            }
+        }
+
+        e.Handled = true;
+    }
+
 }

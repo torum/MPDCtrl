@@ -250,7 +250,7 @@
                           ScrollViewer.VerticalScrollBarVisibility="Visible" animations:Implicit.HideAnimations="{StaticResource HideTransitions}"
                           animations:Implicit.ShowAnimations="{StaticResource ShowTransitions}"
                           IsDoubleTapEnabled="True" IsRightTapEnabled="True" DoubleTapped="QueueListview_DoubleTapped" RightTapped="QueueListview_RightTapped"
-                          DragItemsCompleted="QueueListview_DragItemsCompleted">
+                          DragItemsStarting="QueueListview_DragItemsStarting" DragItemsCompleted="QueueListview_DragItemsCompleted">
                     <ListView.Header>
                         <Grid Height="48" ColumnSpacing="8" Margin="0,0,0,0" Visibility="Collapsed">
                             <interactivity:Interaction.Behaviors>

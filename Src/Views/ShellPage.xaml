@@ -53,7 +53,9 @@
         <!-- NaviView -->
         <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BorderBrush="{ThemeResource SmokeFillColorDefaultBrush}" BorderThickness="0,0,0,0">
 
-            <NavigationView x:Name="NaviView" AccessKey="H" MenuItemsSource="{x:Bind ViewModel.MainMenuItems, Mode=OneWay}" IsTitleBarAutoPaddingEnabled="True" IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="False" IsSettingsVisible="False" PaneDisplayMode="Left" ExpandedModeThresholdWidth="1008" CompactModeThresholdWidth="640" OpenPaneLength ="280" IsPaneOpen="{x:Bind ViewModel.IsNavigationViewMenuOpen, Mode=TwoWay}" Loaded="NavigationView_Loaded" ItemInvoked="NavigationView_ItemInvoked" SelectionChanged="NaviView_SelectionChanged" PaneClosed="NaviView_PaneClosed" PaneOpened="NaviView_PaneOpened">
+            <NavigationView x:Name="NaviView" AccessKey="H" 
+                            MenuItemsSource="{x:Bind ViewModel.MainMenuItems, Mode=OneWay}" 
+                            IsTitleBarAutoPaddingEnabled="True" IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="False" IsSettingsVisible="False" PaneDisplayMode="Left" ExpandedModeThresholdWidth="1008" CompactModeThresholdWidth="640" OpenPaneLength ="280" IsPaneOpen="{x:Bind ViewModel.IsNavigationViewMenuOpen, Mode=TwoWay}" Loaded="NavigationView_Loaded" ItemInvoked="NavigationView_ItemInvoked" SelectionChanged="NaviView_SelectionChanged" PaneClosed="NaviView_PaneClosed" PaneOpened="NaviView_PaneOpened">
                 <NavigationView.PaneHeader>
                     <!-- App title and icon -->
                     <Grid VerticalAlignment="Center">
@@ -94,13 +96,12 @@
                 <!-- Menu Items -->
                 <NavigationView.MenuItemTemplate>
                     <DataTemplate x:DataType="mod:NodeTree">
-                        <NavigationViewItem MenuItemsSource="{x:Bind Children, Mode=OneWay}" IsExpanded="{x:Bind Expanded, Mode=TwoWay}" IsSelected="{x:Bind Selected, Mode=TwoWay}" Tag="{x:Bind Tag, Mode=OneWay}">
+                        <NavigationViewItem DataContext="{x:Bind}" MenuItemsSource="{x:Bind Children, Mode=OneWay}" IsExpanded="{x:Bind Expanded, Mode=TwoWay}" IsSelected="{x:Bind Selected, Mode=TwoWay}" Tag="{x:Bind Tag, Mode=OneWay}"
+                            AllowDrop="True" DragOver="NavigationViewItem_DragOver" Drop="NavigationViewItem_Drop">
                             <NavigationViewItem.Icon>
                                 <PathIcon Width="NaN" Height="NaN" Margin="0" Data="{x:Bind PathIcon, Mode=OneWay}"/>
                             </NavigationViewItem.Icon>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0">
-                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Margin="0,0,0,0"></TextBlock>
-                            </StackPanel>
+                            <TextBlock Text="{x:Bind Name, Mode=OneWay}" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Margin="0,0,0,0"></TextBlock>
                         </NavigationViewItem>
                     </DataTemplate>
                 </NavigationView.MenuItemTemplate>

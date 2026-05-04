@@ -3535,7 +3535,8 @@ public partial class MainViewModel : ObservableObject
                     {
                         NodeMenuPlaylistItem playlistNode = new(hoge.Name)
                         {
-                            IsUpdateRequied = true
+                            IsUpdateRequied = true,
+                            Tag = "playlist"
                         };
                         playlistDir.Children.Add(playlistNode);
                         isListChanged = true;
@@ -7198,9 +7199,7 @@ public partial class MainViewModel : ObservableObject
             Debug.WriteLine("SelectedNodeMenu is NOT NodeMenuPlaylistItem nmpli @PlaylistMovePos");
             return;
         }
-
     }
-
     public bool PlaylistMovePosCanExecute()
     {
         if (!_mpc.Commands.Contains("playlistmove")) { return false; }

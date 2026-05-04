@@ -68,7 +68,7 @@ public interface IMpcService
     Task<CommandResult> MpdIdleSendPassword(string password = "");
     void MpdIdleStart();
     Task<CommandResult> MpdLoadPlaylist(string playlistName);
-    Task<CommandResult> MpdMoveId(Dictionary<string, string> IdToNewPosPair);
+    Task<CommandResult> MpdMoveId(Dictionary<string, string> idToNewPosPair);
     Task<CommandResult> MpdPlaybackNext(int volume);
     Task<CommandResult> MpdPlaybackPause();
     Task<CommandResult> MpdPlaybackPlay(int volume, string songId = "");
@@ -79,6 +79,7 @@ public interface IMpcService
     Task<CommandResult> MpdPlaylistAdd(string playlistName, List<string> uris);
     Task<CommandResult> MpdPlaylistClear(string playlistName);
     Task<CommandResult> MpdPlaylistDelete(string playlistName, int pos);
+    Task<CommandResult> MpdPlaylistMove(string playlistName, Dictionary<string, string> posToNewPosPair);
     Task<CommandImageResult> MpdQueryAlbumArt(string uri, bool isUsingReadpicture);
     Task<CommandImageResult> MpdQueryAlbumArtForAlbumView(string uri, bool isUsingReadpicture);
     Task<CommandResult> MpdQueryCurrentQueue();

@@ -243,12 +243,10 @@
             </Grid>
 
             <Grid Grid.Row="1">
-                <ListView x:Name="QueueListview" Padding="0,0,24,0" 
+                <ListView x:Name="QueueListview" AccessKey="L"
+                          Padding="0,0,24,0" 
                           ItemsSource="{x:Bind Path=ViewModel.Queue, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedQueueSong,Mode=TwoWay}" SelectionMode="Extended" IsMultiSelectCheckBoxEnabled="False" 
-                          CanDragItems="True"
-                          AllowDrop="True"
-                          CanReorderItems="True"
-                          AccessKey="L"
+                          CanDragItems="True" AllowDrop="True" CanReorderItems="True"
                           ScrollViewer.VerticalScrollBarVisibility="Visible" animations:Implicit.HideAnimations="{StaticResource HideTransitions}"
                           animations:Implicit.ShowAnimations="{StaticResource ShowTransitions}"
                           IsDoubleTapEnabled="True" IsRightTapEnabled="True" DoubleTapped="QueueListview_DoubleTapped" RightTapped="QueueListview_RightTapped"

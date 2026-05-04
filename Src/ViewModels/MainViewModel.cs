@@ -7169,6 +7169,44 @@ public partial class MainViewModel : ObservableObject
         return true;
     }
 
+    [RelayCommand(CanExecute = nameof(QueueListviewMoveCanExecute))]
+    public async Task PlaylistMovePos(Dictionary<string, string> posToNewPos)
+    {
+        if (posToNewPos is null) return;
+        if (posToNewPos.Count == 0) return;
+
+        if (SelectedNodeMenu is NodeMenuPlaylistItem nmpli)
+        {
+            if (SelectedPlaylistName != nmpli.Name)
+            {
+                Debug.WriteLine("_selectedPlaylistName != nmpli.Name @PlaylistMovePos");
+                return;
+            }
+
+            if (nmpli.IsUpdateRequied)
+            {
+                Debug.WriteLine("nmpli.IsUpdateRequied @PlaylistMovePos");
+                return;
+            }
+            else
+            {
+                await _mpc.MpdPlaylistMove(SelectedPlaylistName, posToNewPos);
+            }
+        }
+        else
+        {
+            Debug.WriteLine("SelectedNodeMenu is NOT NodeMenuPlaylistItem nmpli @PlaylistMovePos");
+            return;
+        }
+
+    }
+
+    public bool PlaylistMovePosCanExecute()
+    {
+        if (!_mpc.Commands.Contains("playlistmove")) { return false; }
+        return true;
+    }
+
     // Remove duplicated songs in a playlist. 
     [RelayCommand(CanExecute = nameof(PlaylistRemoveDuplicatesCanExecute))]
     public void PlaylistRemoveDuplicates(string playlist)

@@ -3048,6 +3048,36 @@ public partial class MpcService : IMpcService
         return result;
     }
 
+    public async Task<CommandResult> MpdPlaylistMove(string playlistName, Dictionary<string, string> posToNewPosPair)
+    {
+        if (string.IsNullOrEmpty(playlistName))
+        {
+            CommandResult f = new()
+            {
+                IsSuccess = false
+            };
+            return f;
+        }
+
+        playlistName = Regex.Escape(playlistName);
+
+        //playlistmove {NAME} [{FROM} | {START:END}] {TO}
+        string cmd = "playlistmove \"" + playlistName + "\"" + " " + posToNewPosPair.ToList()[0].Key.ToString() + " " + posToNewPosPair.ToList()[0].Value.ToString();
+
+        // MPD does not support multiple move in a command list.
+        /*
+        string cmd = "command_list_begin" + "\n";
+        foreach (var kvp in posToNewPosPair)
+        {
+            cmd = cmd + "playlistmove \"" + playlistName + "\"" + " " + kvp.Key.ToString() + " " + kvp.Value.ToString() + "\n";
+        }
+        cmd = cmd + "command_list_end" + "\n";
+        */
+        CommandResult result = await MpdCommandSendCommand(cmd);
+        Debug.WriteLine(cmd);
+        return result;
+    }
+
     public async Task<CommandResult> MpdPlaylistClear(string playlistName)
     {
         if (string.IsNullOrEmpty(playlistName))

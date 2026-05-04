@@ -9,10 +9,12 @@ using MPDCtrl.Models;
 using MPDCtrl.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -96,6 +98,45 @@ public sealed partial class PlaylistItemPage : Page
         else
         {
             return null;
+        }
+    }
+
+    private async void PlaylistListview_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+    {
+        if (args.DropResult == DataPackageOperation.Move)
+        {
+            Dictionary<string, string> posToNewPos = [];
+
+            var list = PlaylistListview.ItemsSource as ObservableCollection<SongInfo>;
+            if (list is null)
+            {
+                return;
+            }
+
+            // TODO: MPD does not support playlist move multiple items at once.
+            // So, create a dedicated edit window to edit and then apply the changes to MPD.
+
+            // Need to compare the new position with the old position, because when dragging downwards, the moved item will be removed from the old position first, then inserted into the new position.
+            // So, if we only look at the new position, it will be the same as the old position, which is not what we want.
+            int i = 0;
+            foreach (var item in list)
+            {
+                if (item.Index != i)
+                {
+                    Debug.WriteLine($"Item with ID {item.Title} moved from position {item.Index} to {i}");
+                    posToNewPos.Add(item.Index.ToString(), i.ToString());
+                }
+                i++;
+            }
+
+            if (posToNewPos.Count > 0 && ViewModel.PlaylistMovePosCanExecute())
+            {
+                await ViewModel.PlaylistMovePos(posToNewPos);
+            }
+        }
+        else if (args.DropResult == DataPackageOperation.None)
+        {
+            System.Diagnostics.Debug.WriteLine("Drag operation was cancelled.");
         }
     }
 }

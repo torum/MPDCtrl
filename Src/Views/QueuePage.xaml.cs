@@ -348,6 +348,5 @@ public sealed partial class QueuePage : Page
         {
             System.Diagnostics.Debug.WriteLine("Drag operation was cancelled.");
         }
-        
     }
 }

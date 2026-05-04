@@ -115,7 +115,12 @@
         </Grid>
 
         <Grid Grid.Row="1" x:Name="BodyGrid" Margin="24,0,0,0">
-            <ListView x:Name="PlaylistListview" AccessKey="L" ItemsSource="{x:Bind ViewModel.PlaylistSongs, Mode=OneWay}" SelectionMode="Single" RightTapped="PlaylistListview_RightTapped" BorderThickness="0" Margin="0,12,0,0" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Padding="0,0,24,0">
+            <ListView x:Name="PlaylistListview" AccessKey="L" 
+                      BorderThickness="0" Margin="0,12,0,0" Padding="0,0,24,0"
+                      ItemsSource="{x:Bind ViewModel.PlaylistSongs, Mode=OneWay}" SelectionMode="Single" 
+                      CanDragItems="True" AllowDrop="True" CanReorderItems="True" DragItemsCompleted="PlaylistListview_DragItemsCompleted"
+                      RightTapped="PlaylistListview_RightTapped" IsRightTapEnabled="True"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListView.ContextFlyout>
                     <MenuFlyout>
                         <MenuFlyoutItem x:Uid="ListViewItemContextMenu_Play" Command="{x:Bind ViewModel.SongsSelectedItemsPlayCommand}" CommandParameter="{x:Bind PlaylistListview.SelectedItems}">

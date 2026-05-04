@@ -99,7 +99,7 @@
                                 <PathIcon Width="NaN" Height="NaN" Margin="0" Data="{x:Bind PathIcon, Mode=OneWay}"/>
                             </NavigationViewItem.Icon>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0">
-                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" Margin="0,0,0,0"></TextBlock>
+                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Margin="0,0,0,0"></TextBlock>
                             </StackPanel>
                         </NavigationViewItem>
                     </DataTemplate>

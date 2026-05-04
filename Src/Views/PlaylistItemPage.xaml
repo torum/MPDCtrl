@@ -209,14 +209,14 @@
                                 </Button>
                             </StackPanel>
 
-                            <TextBlock Grid.Column="3" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="4" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind TimeFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Artist, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="6" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Album, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="7" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Disc, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="8" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Track, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="9" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Genre, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind LastModifiedFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="3" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="4" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind TimeFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind Artist, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="6" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind Album, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="7" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind Disc, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="8" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind Track, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="9" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind Genre, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="10" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind LastModifiedFormated, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0" VerticalAlignment="Center"/>
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>

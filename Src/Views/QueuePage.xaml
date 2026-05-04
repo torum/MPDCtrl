@@ -243,9 +243,16 @@
             </Grid>
 
             <Grid Grid.Row="1">
-                <ListView x:Name="QueueListview" ItemsSource="{x:Bind Path=ViewModel.Queue, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedQueueSong,Mode=TwoWay}" AccessKey="L"
-                                  ScrollViewer.VerticalScrollBarVisibility="Visible" animations:Implicit.HideAnimations="{StaticResource HideTransitions}"
-                            animations:Implicit.ShowAnimations="{StaticResource ShowTransitions}" SelectionMode="Extended" IsMultiSelectCheckBoxEnabled="False" Padding="0,0,24,0" IsDoubleTapEnabled="True" IsRightTapEnabled="True" DoubleTapped="QueueListview_DoubleTapped" RightTapped="QueueListview_RightTapped">
+                <ListView x:Name="QueueListview" Padding="0,0,24,0" 
+                          ItemsSource="{x:Bind Path=ViewModel.Queue, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedQueueSong,Mode=TwoWay}" SelectionMode="Extended" IsMultiSelectCheckBoxEnabled="False" 
+                          CanDragItems="True"
+                          AllowDrop="True"
+                          CanReorderItems="True"
+                          AccessKey="L"
+                          ScrollViewer.VerticalScrollBarVisibility="Visible" animations:Implicit.HideAnimations="{StaticResource HideTransitions}"
+                          animations:Implicit.ShowAnimations="{StaticResource ShowTransitions}"
+                          IsDoubleTapEnabled="True" IsRightTapEnabled="True" DoubleTapped="QueueListview_DoubleTapped" RightTapped="QueueListview_RightTapped"
+                          DragItemsCompleted="QueueListview_DragItemsCompleted">
                     <ListView.Header>
                         <Grid Height="48" ColumnSpacing="8" Margin="0,0,0,0" Visibility="Collapsed">
                             <interactivity:Interaction.Behaviors>
@@ -367,14 +374,14 @@
                                         </Path.RenderTransform>
                                     </Path>
                                 </Border>
-                                <TextBlock Grid.Column="3" x:Name="TextBlock_Title" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Title, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"></TextBlock>
-                                <TextBlock Grid.Column="4" x:Name="TextBlock_Time" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind TimeFormated, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="6,0,4,0"></TextBlock>
-                                <TextBlock Grid.Column="5" x:Name="TextBlock_Artist" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Artist, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"></TextBlock>
-                                <TextBlock Grid.Column="6" x:Name="TextBlock_Album" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Album, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"></TextBlock>
-                                <TextBlock Grid.Column="7" x:Name="TextBlock_Disc" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Disc, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="6,0,4,0"></TextBlock>
-                                <TextBlock Grid.Column="8" x:Name="TextBlock_Track" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Track, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="6,0,4,0"></TextBlock>
-                                <TextBlock Grid.Column="9" x:Name="TextBlock_Genre" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind Genre, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"></TextBlock>
-                                <TextBlock Grid.Column="10" x:Name="TextBlock_LastModifiedFormated" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind LastModifiedFormated, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"></TextBlock>
+                                <TextBlock Grid.Column="3" x:Name="TextBlock_Title" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind Title, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"></TextBlock>
+                                <TextBlock Grid.Column="4" x:Name="TextBlock_Time" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind TimeFormated, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="6,0,4,0"></TextBlock>
+                                <TextBlock Grid.Column="5" x:Name="TextBlock_Artist" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind Artist, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"></TextBlock>
+                                <TextBlock Grid.Column="6" x:Name="TextBlock_Album" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind Album, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"></TextBlock>
+                                <TextBlock Grid.Column="7" x:Name="TextBlock_Disc" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind Disc, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="6,0,4,0"></TextBlock>
+                                <TextBlock Grid.Column="8" x:Name="TextBlock_Track" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind Track, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="6,0,4,0"></TextBlock>
+                                <TextBlock Grid.Column="9" x:Name="TextBlock_Genre" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind Genre, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"></TextBlock>
+                                <TextBlock Grid.Column="10" x:Name="TextBlock_LastModifiedFormated" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Text="{x:Bind LastModifiedFormated, Mode=OneWay}" FontWeight="{x:Bind IsPlaying, Mode=OneWay, Converter={StaticResource BoolToFontWeightConverter}}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="4,0,4,0"></TextBlock>
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>

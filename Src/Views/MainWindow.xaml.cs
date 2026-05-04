@@ -574,6 +574,11 @@ public sealed partial class MainWindow : Window
                 }
                 else if (winState == OverlappedPresenterState.Restored)
                 {
+                    // TODO:
+                    //var dpi = Windows.Win32.PInvoke.GetDpiForWindow(new Windows.Win32.Foundation.HWND(WinRT.Interop.WindowNative.GetWindowHandle(this)));
+                    //var scalingFactor = (float)dpi / 96;
+                    //AppWindow.Resize(new Windows.Graphics.SizeInt32((int)(400.0f * scalingFactor), (int)(300.0f * scalingFactor)));
+
                     // Sets restore size and position.
                     appWindow.MoveAndResize(new Windows.Graphics.RectInt32(_winRestoreLeft, _winRestoreTop, _winRestoreWidth, _winRestoreHeight));
                 }
@@ -712,7 +717,7 @@ public sealed partial class MainWindow : Window
             }
             else
             {
-                if (App.Current.RequestedTheme == ApplicationTheme.Dark)
+                if (Application.Current.RequestedTheme == ApplicationTheme.Dark)
                 {
                     this.AppWindow.TitleBar.ButtonForegroundColor = Colors.White;
                     this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.White;
@@ -833,8 +838,8 @@ public sealed partial class MainWindow : Window
                 }
                 catch (Exception ex) 
                 {
-                    (App.Current as App)?.AppendErrorLog("AOT Error@SaveSettings", $"{ex}");
-                    (App.Current as App)?.SaveErrorLog();
+                    (Application.Current as App)?.AppendErrorLog("AOT Error@SaveSettings", $"{ex}");
+                    (Application.Current as App)?.SaveErrorLog();
                 }
 
             }

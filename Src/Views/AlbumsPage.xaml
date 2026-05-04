@@ -181,10 +181,10 @@
                                 <Image Stretch="UniformToFill" Source="{x:Bind AlbumImage, Mode=OneWay}" Width="184" Height="184"/>
                             </Border>
                             <StackPanel Grid.Row="1">
-                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="16,6,16,0"/>
+                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" Foreground="{ThemeResource TextFillColorPrimaryBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="16,6,16,0"/>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{x:Bind AlbumArtist, Mode=OneWay}" Opacity="0.6" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="16,0,16,0" Visibility="{x:Bind AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=False}"/>
-                                    <TextBlock x:Uid="Text_UnknownArtist" Visibility="{x:Bind AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=True}" Opacity="0.6" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="16,0,16,0"/>
+                                    <TextBlock Text="{x:Bind AlbumArtist, Mode=OneWay}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Opacity="0.6" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="16,0,16,0" Visibility="{x:Bind AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=False}"/>
+                                    <TextBlock x:Uid="Text_UnknownArtist" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Visibility="{x:Bind AlbumArtist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=True}" Opacity="0.6" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="16,0,16,0"/>
                                 </StackPanel>
                             </StackPanel>
                         </Grid>

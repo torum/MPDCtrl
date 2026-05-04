@@ -2159,6 +2159,8 @@ public partial class MainViewModel : ObservableObject
 #endif
     }
 
+    #region == Public Methods ==
+
     public async void Start()
     {
         if ((CurrentProfile is null) || (Profiles.Count < 1))
@@ -2276,6 +2278,8 @@ public partial class MainViewModel : ObservableObject
         var list = new ObservableCollection<AlbumEx> { album };
         await GetAlbumPicturesAsync(list);
     }
+
+    #endregion
 
     #region == Private Methods ==
 

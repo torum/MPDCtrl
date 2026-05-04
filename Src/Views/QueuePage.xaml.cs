@@ -320,18 +320,23 @@ public sealed partial class QueuePage : Page
         {
             Dictionary<string, string> idToNewPos = [];
 
-            foreach (var item in args.Items)
+            var list = QueueListview.ItemsSource as ObservableCollection<SongInfoEx>;
+            if (list is null)
             {
-                if (item is SongInfoEx draggedItem)
+                return;
+            }
+
+            // Need to compare the new position with the old position, because when dragging downwards, the moved item will be removed from the old position first, then inserted into the new position.
+            // So, if we only look at the new position, it will be the same as the old position, which is not what we want.
+            int i = 0;
+            foreach (var item in list)
+            {
+                if (item.Index != i)
                 {
-                    var i = (QueueListview.ItemsSource as ObservableCollection<SongInfoEx>)?.IndexOf(draggedItem) ?? -1;
-
-                    if (i == -1) continue;
-
-                    System.Diagnostics.Debug.WriteLine($"Successfully moved: {draggedItem.Pos} from to {(QueueListview.ItemsSource as ObservableCollection<SongInfoEx>)?.IndexOf(draggedItem)}");
-
-                    idToNewPos.Add(draggedItem.Id, i.ToString());
+                    Debug.WriteLine($"Item with ID {item.Id} moved from position {item.Index} to {i}");
+                    idToNewPos.Add(item.Id, i.ToString());
                 }
+                i++;
             }
 
             if (idToNewPos.Count > 0 && ViewModel.QueueListviewMoveCanExecute())
@@ -343,5 +348,6 @@ public sealed partial class QueuePage : Page
         {
             System.Diagnostics.Debug.WriteLine("Drag operation was cancelled.");
         }
+        
     }
 }

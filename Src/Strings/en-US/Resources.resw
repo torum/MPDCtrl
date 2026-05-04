@@ -568,4 +568,7 @@ SOFTWARE.</value>
   <data name="Settings_MPD_Opts_ToggleEnableAudioOutput.Text" xml:space="preserve">
     <value>Toggle enable/disable (require admin permission)</value>
   </data>
+  <data name="Dialog_Title_KeyboardShortcuts" xml:space="preserve">
+    <value>Keyboard Shortcuts</value>
+  </data>
 </root>

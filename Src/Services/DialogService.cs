@@ -26,6 +26,38 @@ public class DialogService : IDialogService
        
     }
 
+    public async Task ShowKeybindingsDialog()
+    {
+        if (App.MainWnd is null)
+        {
+            Debug.WriteLine("App.MainWnd is null");
+            return;
+        }
+
+        if (App.MainWnd.Content is not ShellPage)
+        {
+            Debug.WriteLine("App.MainWnd?.Content is not ShellPage");
+            return;
+        }
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = App.MainWnd.Content.XamlRoot,
+            Title = "Dialog_Title_KeyboardShortcuts".GetLocalized(),
+            IsPrimaryButtonEnabled = true,
+            PrimaryButtonText = "Dialog_Ok".GetLocalized(),
+            DefaultButton = ContentDialogButton.Primary,
+            IsSecondaryButtonEnabled = false,
+
+            Content = new Views.Dialogs.KeybindingsDialog()
+            {
+                //DataContext = new DialogViewModel()
+            }
+        };
+
+        await dialog.ShowAsync();
+    }
+
     public async Task<Profile?> ShowInitDialog(ViewModels.MainViewModel vm)
     {
         if (App.MainWnd is null)

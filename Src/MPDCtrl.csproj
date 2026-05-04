@@ -205,6 +205,9 @@
 		  <SubType>Designer</SubType>
 		  <Generator>MSBuild:Compile</Generator>
 	  </Page>
+	  <Page Update="Views\Dialogs\KeybindingsDialog.xaml">
+	    <SubType>Designer</SubType>
+	  </Page>
 	  <Page Update="Views\Dialogs\ProfileDialog.xaml">
 		  <SubType>Designer</SubType>
 		  <Generator>MSBuild:Compile</Generator>

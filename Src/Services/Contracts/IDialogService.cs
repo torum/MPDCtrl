@@ -21,4 +21,6 @@ public interface IDialogService
     Task<Profile?> ShowProfileAddDialog();
 
     Task<Profile?> ShowProfileEditDialog(Profile selectedProfile);
+
+    Task ShowKeybindingsDialog();
 }

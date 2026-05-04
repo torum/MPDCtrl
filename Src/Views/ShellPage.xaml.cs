@@ -111,6 +111,7 @@ public sealed partial class ShellPage : Page
             _ = ex;
             Debug.WriteLine($"Exception @Page_Loaded::ShellPage: {ex}");
         }
+
     }
 
     private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -593,6 +594,19 @@ public sealed partial class ShellPage : Page
     {
         Windows.System.VirtualKey releasedKey = e.OriginalKey;
 
+        /*
+         *  Handled in KeyboardAccelerator_Invoked
+        if (releasedKey == Windows.System.VirtualKey.F1)
+        {
+            // show help dialog.
+
+            e.Handled = true;
+            _ = App.GetService<IDialogService>().ShowKeybindingsDialog();
+
+            return;
+        }
+        */
+
         if (releasedKey != Windows.System.VirtualKey.Space)
         {
             return;
@@ -786,4 +800,58 @@ public sealed partial class ShellPage : Page
         e.Handled = true;
     }
 
+    private async void KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (args.KeyboardAccelerator.Key == Windows.System.VirtualKey.F1)
+        {
+            // set this first.
+            args.Handled = true;
+
+            // show help dialog.
+            await App.GetService<IDialogService>().ShowKeybindingsDialog();
+
+            return;
+        }
+
+
+        if (args.KeyboardAccelerator.Modifiers == Windows.System.VirtualKeyModifiers.Control)
+        {
+            if (args.KeyboardAccelerator.Key == Windows.System.VirtualKey.S)
+            {
+                // set this first.
+                args.Handled = true;
+
+                // TODO: Go to settings page.
+                Debug.WriteLine("Show settings page.");
+                ViewModel.GoToSearchPage();
+
+                return;
+            }
+
+            if (args.KeyboardAccelerator.Key == Windows.System.VirtualKey.Subtract)
+            {
+                // set this first.
+                args.Handled = true;
+
+                // Handle Ctrl + Subtract
+                if (ViewModel.SetVolumeCanExecute())
+                {
+                    ViewModel.VolumeDown();
+                }
+            }
+            else if (args.KeyboardAccelerator.Key == Windows.System.VirtualKey.Add)
+            {
+                // set this first.
+                args.Handled = true;
+
+                // Handle Ctrl + Add
+                if (ViewModel.SetVolumeCanExecute())
+                {
+                    ViewModel.VolumeUp();
+                }
+            }
+        }
+
+
+    }
 }

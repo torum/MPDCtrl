@@ -5444,9 +5444,9 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(SetVolumeCanExecute))]
     public void VolumeDown()
     {
-        if (_volume >= 10)
+        if (_volume >= 5)
         {
-            Volume -= 10;
+            Volume -= 5;    
             //await _mpc.MpdSetVolume(Convert.ToInt32(_volume - 10));
         }
         else
@@ -5469,9 +5469,9 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(SetVolumeCanExecute))]
     public void VolumeUp()
     {
-        if (_volume <= 90)
+        if (_volume <= 95)
         {
-            Volume += 10;
+            Volume += 5;
             //await _mpc.MpdSetVolume(Convert.ToInt32(_volume + 10));
         }
         else
@@ -7506,6 +7506,12 @@ public partial class MainViewModel : ObservableObject
     {
         if (!_mpc.Commands.Contains("toggleoutput")) { return false; }
         return true;
+    }
+
+    public void GoToSearchPage()
+    {
+        IsNavigationViewMenuOpen = true;
+        _mainMenuItems.SearchDirectory.Selected = true;
     }
 
     #endregion

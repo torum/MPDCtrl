@@ -569,4 +569,7 @@ SOFTWARE.</value>
   <data name="Settings_MPD_Opts_ToggleEnableAudioOutput.Text" xml:space="preserve">
     <value>有効・無効を切り替える（要admin権限）</value>
   </data>
+  <data name="Dialog_Title_KeyboardShortcuts" xml:space="preserve">
+    <value>キーボードショートカット</value>
+  </data>
 </root>

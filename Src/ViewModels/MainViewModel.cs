@@ -2189,8 +2189,8 @@ public partial class MainViewModel : ObservableObject
                 Debug.WriteLine($"Exception @StartMpcAsync {ex}");
                 _dispatcherService.TryEnqueue(() =>
                 {
-                    (App.Current as App)?.AppendErrorLog("Exception @StartMpcAsync", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
-                    (App.Current as App)?.SaveErrorLog();
+                    (Application.Current as App)?.AppendErrorLog("Exception @StartMpcAsync", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                    (Application.Current as App)?.SaveErrorLog();
                 });
             }
 
@@ -2209,8 +2209,8 @@ public partial class MainViewModel : ObservableObject
             Debug.WriteLine($"Exception @StartMpcAsync {ex}");
             _dispatcherService.TryEnqueue(() =>
             {
-                (App.Current as App)?.AppendErrorLog("Exception @StartMpcAsync", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
-                (App.Current as App)?.SaveErrorLog();
+                (Application.Current as App)?.AppendErrorLog("Exception @StartMpcAsync", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                (Application.Current as App)?.SaveErrorLog();
             });
         }
     }
@@ -2253,8 +2253,8 @@ public partial class MainViewModel : ObservableObject
             Debug.WriteLine($"Exception @CleanUp() {ex}");
             _dispatcherService.TryEnqueue(() =>
             {
-                (App.Current as App)?.AppendErrorLog("Exception @CleanUp", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
-                (App.Current as App)?.SaveErrorLog();
+                (Application.Current as App)?.AppendErrorLog("Exception @CleanUp", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                (Application.Current as App)?.SaveErrorLog();
             });
         }
     }
@@ -2376,8 +2376,8 @@ public partial class MainViewModel : ObservableObject
             Debug.WriteLine($"Exception @StartAsync {ex}");
             _dispatcherService.TryEnqueue(() =>
             {
-                (App.Current as App)?.AppendErrorLog("Exception @StartAsync", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
-                (App.Current as App)?.SaveErrorLog();
+                (Application.Current as App)?.AppendErrorLog("Exception @StartAsync", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                (Application.Current as App)?.SaveErrorLog();
             });
         }
     }
@@ -2687,8 +2687,8 @@ public partial class MainViewModel : ObservableObject
                 Debug.WriteLine("Error@UpdateButtonStatus");
                 _dispatcherService.TryEnqueue(() =>
                 {
-                    (App.Current as App)?.AppendErrorLog("Exception @UpdateButtonStatus", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
-                    (App.Current as App)?.SaveErrorLog();
+                    (Application.Current as App)?.AppendErrorLog("Exception @UpdateButtonStatus", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                    (Application.Current as App)?.SaveErrorLog();
                 });
             }
         });
@@ -3077,8 +3077,8 @@ public partial class MainViewModel : ObservableObject
                     UpdateProgress?.Invoke(this, "Exception@UpdateCurrentQueue1: " + ex.Message);
                     Debug.WriteLine($"Exception@UpdateCurrentQueue1: {ex}");
 
-                    (App.Current as App)?.AppendErrorLog("Exception @UpdateCurrentQueue", ex.Message + $"StackTrace: {ex.StackTrace}, Source: {ex.Source}");
-                    (App.Current as App)?.SaveErrorLog();
+                    (Application.Current as App)?.AppendErrorLog("Exception @UpdateCurrentQueue", ex.Message + $"StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                    (Application.Current as App)?.SaveErrorLog();
 
                     return;
                 }
@@ -3269,8 +3269,8 @@ public partial class MainViewModel : ObservableObject
 
                     UpdateProgress?.Invoke(this, $"[UI] Exception @UpdateCurrentQueue: {ex.Message}");
 
-                    (App.Current as App)?.AppendErrorLog("Exception @UpdateCurrentQueue", ex.Message + $"StackTrace: {ex.StackTrace}, Source: {ex.Source}");
-                    (App.Current as App)?.SaveErrorLog();
+                    (Application.Current as App)?.AppendErrorLog("Exception @UpdateCurrentQueue", ex.Message + $"StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                    (Application.Current as App)?.SaveErrorLog();
                     Debug.WriteLine($"Exception@UpdateCurrentQueue2: {ex}");
 
                     return;
@@ -3698,8 +3698,8 @@ public partial class MainViewModel : ObservableObject
                     //IsBusy = false;
                     IsWorking = false;
                     await Task.Yield();
-                    (App.Current as App)?.AppendErrorLog("Exception@UpdateLibraryMusic", e.Message);
-                    (App.Current as App)?.SaveErrorLog();
+                    (Application.Current as App)?.AppendErrorLog("Exception@UpdateLibraryMusic", e.Message);
+                    (Application.Current as App)?.SaveErrorLog();
                     //return Task.FromResult(false);
                     return;
                 }
@@ -3761,8 +3761,8 @@ public partial class MainViewModel : ObservableObject
                 UpdateProgress?.Invoke(this, "");
                 IsWorking = false;
                 await Task.Yield();
-                (App.Current as App)?.AppendErrorLog("Exception@UpdateLibraryDirectories", e.Message);
-                (App.Current as App)?.SaveErrorLog();
+                (Application.Current as App)?.AppendErrorLog("Exception@UpdateLibraryDirectories", e.Message);
+                (Application.Current as App)?.SaveErrorLog();
             }
             finally
             {
@@ -3835,8 +3835,8 @@ public partial class MainViewModel : ObservableObject
 
             await _dispatcherService.EnqueueAsync(() =>
             {
-                (App.Current as App)?.AppendErrorLog("Exception @StartMpcAsync", ex.Message + $"StackTrace: {ex.StackTrace}, Source: {ex.Source}");
-                (App.Current as App)?.SaveErrorLog();
+                (Application.Current as App)?.AppendErrorLog("Exception @StartMpcAsync", ex.Message + $"StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                (Application.Current as App)?.SaveErrorLog();
             });
         }
         finally
@@ -4770,8 +4770,8 @@ public partial class MainViewModel : ObservableObject
             Debug.WriteLine($"Exception @OnMpdIdleConnected: {ex}");
             _dispatcherService.TryEnqueue(() =>
             {
-                (App.Current as App)?.AppendErrorLog("Exception @OnMpdIdleConnected", ex.Message + $"StackTrace: {ex.StackTrace}, Source: {ex.Source}");
-                (App.Current as App)?.SaveErrorLog();
+                (Application.Current as App)?.AppendErrorLog("Exception @OnMpdIdleConnected", ex.Message + $"StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                (Application.Current as App)?.SaveErrorLog();
             });
         }
     }
@@ -5695,6 +5695,17 @@ public partial class MainViewModel : ObservableObject
         {
             return;
         }
+
+        await _mpc.MpdMoveId(idToNewPos);
+    }
+
+    [RelayCommand(CanExecute = nameof(QueueListviewMoveCanExecute))]
+    public async Task QueueListviewMovePos(Dictionary<string, string> idToNewPos)
+    {
+        if (idToNewPos is null) return;
+        if (idToNewPos.Count == 0) return;
+
+        if (Queue.Count <= 1) return;
 
         await _mpc.MpdMoveId(idToNewPos);
     }

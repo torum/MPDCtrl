@@ -12,11 +12,13 @@ using MPDCtrl.Services.Contracts;
 using MPDCtrl.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -310,5 +312,36 @@ public sealed partial class QueuePage : Page
     {
         ViewModel.ScrollIntoView -= (sender, arg) => { this.OnScrollIntoView(arg); };
         ViewModel.ScrollIntoViewAndSelect -= (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
+    }
+
+    private async void QueueListview_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+    {
+        if (args.DropResult == DataPackageOperation.Move)
+        {
+            Dictionary<string, string> idToNewPos = [];
+
+            foreach (var item in args.Items)
+            {
+                if (item is SongInfoEx draggedItem)
+                {
+                    var i = (QueueListview.ItemsSource as ObservableCollection<SongInfoEx>)?.IndexOf(draggedItem) ?? -1;
+
+                    if (i == -1) continue;
+
+                    System.Diagnostics.Debug.WriteLine($"Successfully moved: {draggedItem.Pos} from to {(QueueListview.ItemsSource as ObservableCollection<SongInfoEx>)?.IndexOf(draggedItem)}");
+
+                    idToNewPos.Add(draggedItem.Id, i.ToString());
+                }
+            }
+
+            if (idToNewPos.Count > 0 && ViewModel.QueueListviewMoveCanExecute())
+            {
+                await ViewModel.QueueListviewMovePos(idToNewPos);
+            }
+        }
+        else if (args.DropResult == DataPackageOperation.None)
+        {
+            System.Diagnostics.Debug.WriteLine("Drag operation was cancelled.");
+        }
     }
 }

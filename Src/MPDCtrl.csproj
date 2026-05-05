@@ -18,20 +18,26 @@
 	  <PackageIcon>MPDCtrl.ico</PackageIcon>
 	  <ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
 
-	  <VersionPrefix>4.0.8.0</VersionPrefix>
-	  <FileVersion>4.0.8.0</FileVersion>
+	  <VersionPrefix>4.0.9.0</VersionPrefix>
+	  <FileVersion>4.0.9.0</FileVersion>
 	  
 	  <IncludeSymbols>True</IncludeSymbols>
 	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	  <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+	  
+	  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
+	  <!-- MS bug: https://github.com/microsoft/WindowsAppSDK/issues/5817 -->
+	  <AppxBundleAutoResourcePackageQualifiers>Scale|DXFeatureLevel</AppxBundleAutoResourcePackageQualifiers>
+	  <AppxDefaultResourceQualifiers>Language=en-US;ja-JP</AppxDefaultResourceQualifiers>
+	  
 	  <AppxPackageIncludePrivateSymbols>true</AppxPackageIncludePrivateSymbols>
 	  <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
 	  <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
 	  <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
 	  <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
 	  <GenerateTestArtifacts>True</GenerateTestArtifacts>
-	  <AppxBundle>Auto</AppxBundle>
+	  <AppxBundle>Always</AppxBundle>
 	  <AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
 	  <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 	  <StartupObject>MPDCtrl.Program</StartupObject>
@@ -54,7 +60,10 @@
 	  <Optimize>true</Optimize>
 	  <CsWinRTAotWarningLevel>3</CsWinRTAotWarningLevel>
 
-	  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	  <EnableMsixTooling>True</EnableMsixTooling>
+	  <WindowsPackageType>MSIX</WindowsPackageType>
+	  <SelfContained>True</SelfContained>
+	  <WindowsAppSDKSelfContained>True</WindowsAppSDKSelfContained>
 
 	  <!--
 	   Comment these two out when publish packaged app. Uncomment when debug Unpackaged.
@@ -69,8 +78,7 @@
 	  <SelfContained>true</SelfContained>
 	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 	  -->
-	  <EnableMsixTooling>False</EnableMsixTooling>
-	  <WindowsPackageType>None</WindowsPackageType>
+
 	  <!--
 		"Packaged"
 	  <EnableMsixTooling>True</EnableMsixTooling>
@@ -174,7 +182,7 @@
     <PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.2.251219" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
 	<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools.MSIX" Version="1.7.260425100">
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools.MSIX" Version="1.7.260501103">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

@@ -18,8 +18,8 @@
 	  <PackageIcon>MPDCtrl.ico</PackageIcon>
 	  <ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
 
-	  <VersionPrefix>4.0.9.0</VersionPrefix>
-	  <FileVersion>4.0.9.0</FileVersion>
+	  <VersionPrefix>4.0.10.0</VersionPrefix>
+	  <FileVersion>4.0.10.0</FileVersion>
 	  
 	  <IncludeSymbols>True</IncludeSymbols>
 	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -27,9 +27,9 @@
 	  
 	  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-	  <!-- MS bug: https://github.com/microsoft/WindowsAppSDK/issues/5817 -->
+	  <!-- Workaround for MS bug: https://github.com/microsoft/WindowsAppSDK/issues/5817 -->
 	  <AppxBundleAutoResourcePackageQualifiers>Scale|DXFeatureLevel</AppxBundleAutoResourcePackageQualifiers>
-	  <AppxDefaultResourceQualifiers>Language=en-US;ja-JP</AppxDefaultResourceQualifiers>
+	  <AppxFilterOutUnusedLanguagesResourceFileMaps>false</AppxFilterOutUnusedLanguagesResourceFileMaps>
 	  
 	  <AppxPackageIncludePrivateSymbols>true</AppxPackageIncludePrivateSymbols>
 	  <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
@@ -52,19 +52,29 @@
 	  <SelfContained>True</SelfContained>
 	  <WindowsAppSDKSelfContained>True</WindowsAppSDKSelfContained>
 	  <EnableMsixTooling>True</EnableMsixTooling>
-	  <PublishSingleFile>True</PublishSingleFile>
+	  <PublishSingleFile>False</PublishSingleFile>
 	  -->
+
+	  <PublishAot>True</PublishAot>
+	  <PublishTrimmed>True</PublishTrimmed>
+	  
 	  <IsAotCompatible>true</IsAotCompatible>
 	  <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
 	  <TrimmerSingleWarn>false</TrimmerSingleWarn>
 	  <Optimize>true</Optimize>
 	  <CsWinRTAotWarningLevel>3</CsWinRTAotWarningLevel>
 
+
+	  <EnableMsixTooling>True</EnableMsixTooling>
+	  <WindowsPackageType>MSIX</WindowsPackageType>
+	  
+	  <!--
 	  <EnableMsixTooling>True</EnableMsixTooling>
 	  <WindowsPackageType>MSIX</WindowsPackageType>
 	  <SelfContained>True</SelfContained>
 	  <WindowsAppSDKSelfContained>True</WindowsAppSDKSelfContained>
-
+	  -->
+	  
 	  <!--
 	   Comment these two out when publish packaged app. Uncomment when debug Unpackaged.
 	   
@@ -85,11 +95,18 @@
 	  <WindowsPackageType>MSIX</WindowsPackageType>
 	  -->
 
-	  <!--
-	  <SelfContained>true</SelfContained>
-	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+	  <!-- PublishSingleFile
+	  <WindowsPackageType>None</WindowsPackageType>
+	  <SelfContained>True</SelfContained>
+	  <WindowsAppSDKSelfContained>True</WindowsAppSDKSelfContained>
+	  <EnableMsixTooling>True</EnableMsixTooling>
+	  <PublishSingleFile>True</PublishSingleFile>
 	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 	  -->
+
+	  <SelfContained>true</SelfContained>
+	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+
 	  
   </PropertyGroup>
 

@@ -36,7 +36,7 @@ Rename and change file extension to MPDCtrl_0.0.0.0_x86_x64_arm64_bundle.msixupl
 
 (B) Unpackaged single self-contained exe file.
 ----
-dotnet publish -c Release -r win-x64 -p:PublishAot=false -p:PublishSingleFile=true -p:WindowsPackageType=None -p:AppxPackage=false -p:EnableMsixTooling=true --self-contained true
+dotnet publish -c Release -r win-x64 -p:PlatformTarget=x64 -p:Platform=x64 -p:RuntimeIdentifier=win-x64 -p:PublishAot=false -p:PublishSingleFile=true -p:WindowsPackageType=None -p:AppxPackage=false -p:EnableMsixTooling=true -p:WindowsAppSDKSelfContained=true --self-contained true
 ----
 
 (C) Unpackaged Aot compiled.

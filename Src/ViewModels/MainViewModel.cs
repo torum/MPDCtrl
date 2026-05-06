@@ -2859,7 +2859,7 @@ public partial class MainViewModel : ObservableObject
                     }
                     else
                     {
-                        Debug.WriteLine("if (isSongChanged || isCurrentSongWasNull). @UpdateCurrentSong()");
+                        //Debug.WriteLine("if (isSongChanged || isCurrentSongWasNull). @UpdateCurrentSong()");
                     }
                 }
                 else
@@ -6021,17 +6021,18 @@ public partial class MainViewModel : ObservableObject
             uriList.Add(song.File);
         }
 
-        await _dispatcherService.EnqueueAsync(async () =>
+        await _dispatcherService.EnqueueAsync(() =>
         {
             Queue.Clear();
             CurrentSong = null; 
-            await _mpc.MpdMultiplePlay(uriList, Convert.ToInt32(_volume));
         });
 
-        // get album cover.
+        await _mpc.MpdMultiplePlay(uriList, Convert.ToInt32(_volume));
+
+        // TODO: Do we need this now?
         //await Task.Yield();
         //await Task.Delay(200);
-        ///UpdateCurrentSong();
+        //UpdateCurrentSong();
     }
 
     [RelayCommand(CanExecute = nameof(AddToQueueCanExecute))]

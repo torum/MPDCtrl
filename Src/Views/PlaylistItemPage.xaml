@@ -289,6 +289,16 @@
             <VisualStateGroup>
                 <VisualState>
                     <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1440" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="HeaderGrid.Margin" Value="48,0,48,0" />
+                        <Setter Target="BodyGrid.Margin" Value="44,0,0,0" />
+                        <Setter Target="PlaylistListview.Padding" Value="0,0,48,0" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="1008" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>

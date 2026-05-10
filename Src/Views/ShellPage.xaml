@@ -70,7 +70,7 @@
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <!-- App icon and app name -->
-                        <StackPanel Grid.Column="0" Margin="12,0,0,0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <StackPanel x:Name="AppTitle" Grid.Column="0" Margin="12,0,0,0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                             <Image x:Name="AppTitleIcon" Source="/Assets/MPDCtrl.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Width="17" Height="17" Margin="0,0,0,0"/>
                             <TextBlock x:Name="AppTitleTextBlock" Text="MPDCtrl" FontWeight="SemiBold" Margin="6,0,0,0" VerticalAlignment="Center" Opacity="0.9"/>
                         </StackPanel>
@@ -261,7 +261,7 @@
                         </Button.KeyboardAccelerators>
                         <Path RenderTransformOrigin="0,0" Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Width="18" Height="18" Data="M3 20.25a.75.75 0 0 0 1.5 0V3.75a.75.75 0 1 0-1.5 0v16.5ZM18.23 20.475c1.158.83 2.77.002 2.77-1.422V4.83c0-1.384-1.53-2.22-2.695-1.473l-10.47 6.716a1.75 1.75 0 0 0-.074 2.895l10.47 7.507Zm1.27-1.422a.25.25 0 0 1-.396.203l-10.47-7.507a.25.25 0 0 1 .011-.413l10.47-6.717a.25.25 0 0 1 .385.21v14.224Z"/>
                     </Button>
-                    <Button Grid.Row="0" Grid.Column="1" x:Name="PlaybackPlay" x:Uid="PlaybackControl_Play" AccessKey="P" Command="{x:Bind ViewModel.PlayCommand}" Width="54" Height="54" CornerRadius="27" Background="Transparent" BorderThickness="0" Margin="18,0,18,0" VerticalAlignment="Center" Padding="0" Loaded="PlaybackPlay_Loaded">
+                    <Button Grid.Row="0" Grid.Column="1" x:Name="PlaybackPlay" x:Uid="PlaybackControl_Play" AccessKey="P" Command="{x:Bind ViewModel.PlayCommand}" Width="56" Height="56" CornerRadius="28" Background="Transparent" BorderThickness="0" Margin="18,0,18,0" VerticalAlignment="Center" Padding="0" Loaded="PlaybackPlay_Loaded">
                         <Path RenderTransformOrigin="0,0" Stretch="UniformToFill" Fill="{ThemeResource TextFillColorSecondaryBrush}" Width="48" Height="48" Data="{x:Bind ViewModel.PlayButton, Mode=OneWay}"/>
                         <Button.KeyboardAccelerators>
                             <KeyboardAccelerator Key="P" Modifiers="Control"/>
@@ -323,7 +323,7 @@
             <VisualStateGroup>
                 <VisualState>
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="1800" />
+                        <AdaptiveTrigger MinWindowWidth="1440" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="True" />

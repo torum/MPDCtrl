@@ -241,7 +241,7 @@
             <VisualStateGroup>
                 <VisualState>
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="2000" />
+                        <AdaptiveTrigger MinWindowWidth="1440" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="48,0,48,0" />

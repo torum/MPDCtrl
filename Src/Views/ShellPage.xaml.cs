@@ -325,20 +325,20 @@ public sealed partial class ShellPage : Page
 
         //
         var compositor = Microsoft.UI.Xaml.Media.CompositionTarget.GetCompositorForCurrentThread();
-        var visual = Microsoft.UI.Xaml.Hosting.ElementCompositionPreview.GetElementVisual(RootGrid);
+        var visual = Microsoft.UI.Xaml.Hosting.ElementCompositionPreview.GetElementVisual(AppTitle);
 
         var animation = compositor.CreateScalarKeyFrameAnimation();
         if (args.WindowActivationState != WindowActivationState.CodeActivated)
         {
             animation.InsertKeyFrame(0f, 1f); // Start opacity
-            animation.InsertKeyFrame(1f, 0.9f); // End opacity
+            animation.InsertKeyFrame(1f, 0.5f); // End opacity
         }
         else
         {
-            animation.InsertKeyFrame(0f, 0.9f); // Start opacity
+            animation.InsertKeyFrame(0f, 0.5f); // Start opacity
             animation.InsertKeyFrame(1f, 1f); // End opacity
         }
-        animation.Duration = TimeSpan.FromMilliseconds(100);
+        animation.Duration = TimeSpan.FromMilliseconds(1000);
         visual.StartAnimation("Opacity", animation);
     }
 

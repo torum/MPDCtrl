@@ -179,7 +179,10 @@
                             </Border>
                             <Border Grid.Row="0" x:Name="AlbumCover" CornerRadius="6" Width="184" Height="184" VerticalAlignment="Top" Background="{ThemeResource LayerFillColorAltBrush}" PointerEntered="Border_PointerEntered" PointerExited="Border_PointerExited">
                                 <Image Stretch="UniformToFill" Source="{x:Bind AlbumImage, Mode=OneWay}" Width="184" Height="184"/>
-                            </Border>
+                            </Border><!--
+                            <Grid Grid.Row="0">
+                                <ProgressRing IsActive="{x:Bind IsImageLoading, Mode=OneWay}" Width="60" Height="60" Margin="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Grid> -->
                             <StackPanel Grid.Row="1">
                                 <TextBlock Text="{x:Bind Name, Mode=OneWay}" Foreground="{ThemeResource TextFillColorPrimaryBrush}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="16,6,16,0"/>
                                 <StackPanel Orientation="Horizontal">
@@ -205,6 +208,17 @@
 
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1440" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="HeaderGrid.Margin" Value="48,0,48,0" />
+                        <Setter Target="BodyGrid.Margin" Value="44,0,0,0" />
+                        <Setter Target="AlbumListView.Padding" Value="0,0,12,0" />
+                        <Setter Target="AlbumListView.Margin" Value="0,24,0,0" />
+                    </VisualState.Setters>
+                </VisualState>
                 <VisualState>
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="1008" />

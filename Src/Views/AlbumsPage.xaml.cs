@@ -173,19 +173,19 @@ public sealed partial class AlbumsPage : Page
         // Already subscribed, returning.
         if (this.AlbumsListView.Tag != null)
         {
-            //Debug.WriteLine("(ListView.Tag != null) @ListViewBehaviors");
+            //Debug.WriteLine("(ListView.Tag != null) @AlbumListView_Loaded");
             return;
         }
 
-        this.AlbumsListView.Tag = "LoadedEvent_ListViewBehaviors";
-
-        //Debug.WriteLine("listView.Loaded and subscribing. @OnPropertyChanged");
+        //Debug.WriteLine("listView.Loaded and subscribing. @AlbumListView_Loaded");
 
         var scrollViewer = FindScrollViewer(this.AlbumsListView);
         if (scrollViewer is null)
         {
             return;
         }
+
+        this.AlbumsListView.Tag = "LoadedEvent_ListViewBehaviors";
 
         scrollViewer.ViewChanged += (sender, eventArgs) =>
         {

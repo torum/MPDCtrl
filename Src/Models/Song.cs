@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using MPDCtrl.ViewModels;
 using System;
+
 namespace MPDCtrl.Models;
 
 /// <summary>
@@ -21,7 +22,9 @@ public partial class SongInfo : SongFile
     public MainViewModel? ParentViewModel { get; set; }
 
     public string Title { get; set; } = string.Empty;
+
     public string Track { get; set; } = string.Empty;
+
     public int TrackSort
     {
         get
@@ -39,7 +42,9 @@ public partial class SongInfo : SongFile
             return iTrack;
         }
     }
+
     public string Disc { get; set; } = string.Empty;
+
     public int DiscSort
     {
         get
@@ -57,7 +62,9 @@ public partial class SongInfo : SongFile
             return iDisc;
         }
     }
+
     public string Time { get; set; } = string.Empty;
+
     public string TimeFormated
     {
         get
@@ -111,6 +118,7 @@ public partial class SongInfo : SongFile
         }
 
     }
+
     public double TimeSort
     {
         get
@@ -124,28 +132,24 @@ public partial class SongInfo : SongFile
             return dtime;
         }
     }
+
     public string Duration { get; set; } = string.Empty;
+
     public string Artist { get; set; } = string.Empty;
+
     public string Album { get; set; } = string.Empty;
+
     public string AlbumArtist { get; set; } = string.Empty;
+
     public string Composer { get; set; } = string.Empty;
+
     public string Date { get; set; } = string.Empty;
+
     public string Genre { get; set; } = string.Empty;
 
-    public string LastModified
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
-
-            field = value;
-
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(LastModifiedFormated));
-        }
-    } = string.Empty;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(LastModifiedFormated))]
+    public partial string LastModified { get; set; } = string.Empty;
 
     public string LastModifiedFormated
     {
@@ -175,34 +179,12 @@ public partial class SongInfo : SongFile
     }
 
     // for sorting and (playlist pos)
-    public int Index
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IndexPlusOne))]
+    public partial int Index {  get; set; }
 
-            field = value;
-
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(IndexPlusOne));
-        }
-    }
-
-    public bool IsSelected
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
-
-            field = value;
-
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; }
 
     public int IndexPlusOne => Index + 1;
 }
@@ -216,45 +198,12 @@ public partial class SongInfoEx : SongInfo
 
     public string Id { get; set; } = string.Empty;
 
-    public string Pos
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
+    [ObservableProperty]
+    public partial string Pos { get; set; } = string.Empty;
 
-            field = value;
+    [ObservableProperty]
+    public partial bool IsPlaying { get; set; }
 
-            OnPropertyChanged();
-        }
-    } = string.Empty;
-
-    public bool IsPlaying
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
-
-            field = value;
-
-            OnPropertyChanged();
-        }
-    }
-
-    public bool IsAlbumCoverNeedsUpdate
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
-
-            field = value;
-
-            OnPropertyChanged();
-        }
-    } = true;
+    [ObservableProperty]
+    public partial bool IsAlbumCoverNeedsUpdate { get; set; } = true;
 }

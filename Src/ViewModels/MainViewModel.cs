@@ -5,8 +5,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Microsoft.VisualBasic;
-using Microsoft.Windows.ApplicationModel.Resources;
 using MPDCtrl.Helpers;
 using MPDCtrl.Models;
 using MPDCtrl.Services;
@@ -84,10 +82,6 @@ public partial class MainViewModel : ObservableObject
             field = value;
             OnPropertyChanged();
 
-            /*
-            SelectedProfile = _currentProfile;
-            */
-
             if (field is not null)
             {
                 _volume = field.Volume;
@@ -124,24 +118,6 @@ public partial class MainViewModel : ObservableObject
             OnPropertyChanged();
         } } = true;
 
-    /*
-    private bool _isRememberAsProfile = true;
-    public bool IsRememberAsProfile
-    {
-        get
-        {
-            return _isRememberAsProfile;
-        }
-        set
-        {
-            if (_isRememberAsProfile == value)
-                return;
-
-            _isRememberAsProfile = value;
-            OnPropertyChanged(nameof(IsRememberAsProfile));
-        }
-    }
-    */
 
     private string _host = "";
     public string Host
@@ -365,9 +341,6 @@ public partial class MainViewModel : ObservableObject
             OnPropertyChanged(nameof(IsCurrentSongArtistNotNull));
             OnPropertyChanged(nameof(IsCurrentSongAlbumNotNull));
 
-            //CurrentSongChanged?.Invoke(this, CurrentSongStringForWindowTitle);
-
-            //_elapsedTimer.Stop();
             IsCurrentSongNotNull = value is not null;
         } }
 
@@ -486,26 +459,11 @@ public partial class MainViewModel : ObservableObject
 
     #region == AlbumArt ==
 
-    public AlbumImage? AlbumCover { get; set
-        {
-            if (field == value)
-                return;
+    [ObservableProperty]
+    public partial AlbumImage? AlbumCover { get; set; }
 
-            field = value;
-
-            OnPropertyChanged();
-        } }
-
-    private readonly ImageSource? _albumArtBitmapSourceDefault = null;
-
-    public ImageSource? AlbumArtBitmapSource { get; set
-        {
-            if (field == value)
-                return;
-
-            field = value;
-            OnPropertyChanged();
-        } }
+    [ObservableProperty]
+    public partial ImageSource? AlbumArtBitmapSource { get; set; }
 
     #endregion
 
@@ -2577,7 +2535,7 @@ public partial class MainViewModel : ObservableObject
                     //
                     _mpc.MpdCurrentSong?.IsPlaying = false;
                     AlbumCover = null;
-                    AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
+                    AlbumArtBitmapSource = null;
                 }
             }
             else
@@ -2612,7 +2570,7 @@ public partial class MainViewModel : ObservableObject
 
                         //IsAlbumArtVisible = false;
                         AlbumCover = null;
-                        AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
+                        AlbumArtBitmapSource = null;
 
                         // AlbumArt
                         if (!string.IsNullOrEmpty(CurrentSong.File))
@@ -2681,7 +2639,7 @@ public partial class MainViewModel : ObservableObject
                         CurrentSong = null;
                         AlbumCover = null;
 
-                        AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
+                        AlbumArtBitmapSource = null;
                     }
                 }
             }
@@ -2692,7 +2650,7 @@ public partial class MainViewModel : ObservableObject
                 // TODO:
                 AlbumCover = null;
 
-                AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
+                AlbumArtBitmapSource = null;
             }
 
             UpdateProgress?.Invoke(this, "");
@@ -2988,7 +2946,7 @@ public partial class MainViewModel : ObservableObject
 
                         //IsAlbumArtVisible = false;
                         AlbumCover = null;
-                        AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
+                        AlbumArtBitmapSource = null;
 
                         UpdateProgress?.Invoke(this, "");
 
@@ -3153,7 +3111,7 @@ public partial class MainViewModel : ObservableObject
 
                         //IsAlbumArtVisible = false;
                         AlbumCover = null;
-                        AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
+                        AlbumArtBitmapSource = null;
                     }
 
                     UpdateProgress?.Invoke(this, "");
@@ -3346,7 +3304,7 @@ public partial class MainViewModel : ObservableObject
                             CurrentSong = null;
                             AlbumCover = null;
 
-                            AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
+                            AlbumArtBitmapSource = null;
                         }
                     }
 
@@ -3480,7 +3438,7 @@ public partial class MainViewModel : ObservableObject
 
     }
 
-    public static async Task<RandomAccessStreamReference> BitmapImageToRandomAccessStreamReferenceAsync(BitmapImage bitmapImage)
+    private static async Task<RandomAccessStreamReference> BitmapImageToRandomAccessStreamReferenceAsync(BitmapImage bitmapImage)
     {
         // Create a new WriteableBitmap with the current image data.
         var writeableBitmap = new WriteableBitmap(bitmapImage.PixelWidth, bitmapImage.PixelHeight);
@@ -3504,7 +3462,7 @@ public partial class MainViewModel : ObservableObject
         return RandomAccessStreamReference.CreateFromStream(stream);
     }
 
-    public static async Task<RandomAccessStreamReference?> ToRandomAccessStreamReferenceAsync(byte[]? byteArray)
+    private static async Task<RandomAccessStreamReference?> ToRandomAccessStreamReferenceAsync(byte[]? byteArray)
     {
         if (byteArray is null)
         {
@@ -4636,7 +4594,7 @@ public partial class MainViewModel : ObservableObject
         return null;
     }
 
-    public static string SanitizeFilename(string name)
+    private static string SanitizeFilename(string name)
     {
         // 1. Get the list of invalid characters for the current system
         // and add additional common invalid path characters.
@@ -7427,7 +7385,7 @@ public partial class MainViewModel : ObservableObject
         // TODO: more?
 
         //IsAlbumArtVisible = false;
-        AlbumArtBitmapSource = _albumArtBitmapSourceDefault;
+        AlbumArtBitmapSource = null;
 
         try
         {

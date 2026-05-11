@@ -7,35 +7,13 @@ namespace MPDCtrl.Models;
 /// <summary>
 /// Base class for Treeview Node and Listview Item.
 /// </summary>
-public abstract class Node(string name) : ObservableObject
+public abstract partial class Node(string name) : ObservableObject
 {
-    public string Name
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
+    [ObservableProperty]
+    public partial string Name { get; set; } = name;
 
-            field = value;
-
-            OnPropertyChanged();
-        }
-    } = name;
-
-    public string PathIcon
-    {
-        get;
-        protected set
-        {
-            if (field == value)
-                return;
-
-            field = value;
-
-            OnPropertyChanged();
-        }
-    } = "M20,18H4V8H20M20,6H12L10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6Z";
+    [ObservableProperty]
+    public partial string PathIcon { get; set; } = "M20,18H4V8H20M20,6H12L10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6Z";
 }
 
 /// <summary>
@@ -43,62 +21,17 @@ public abstract class Node(string name) : ObservableObject
 /// </summary>
 public partial class NodeTree : Node
 {
-    public bool Selected
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
+    [ObservableProperty]
+    public partial bool Selected { get; set; }
 
-            field = value;
+    [ObservableProperty]
+    public partial bool Expanded { get; set; }
 
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial string Tag { get; set; } = string.Empty;
 
-    public bool Expanded
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
-
-            field = value;
-
-            OnPropertyChanged();
-        }
-    }
-
-    public string Tag
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
-
-            field = value;
-
-            OnPropertyChanged();
-        }
-    } = string.Empty;
-
-    public NodeTree? Parent
-    {
-        get;
-
-        set
-        {
-            if (field == value)
-                return;
-
-            field = value;
-
-            OnPropertyChanged();
-        }
-    }
+    [ObservableProperty]
+    public partial NodeTree? Parent { get; set; }
 
     public ObservableCollection<NodeTree> Children
     {
@@ -116,7 +49,7 @@ public partial class NodeTree : Node
 
     protected NodeTree(string name) : base(name)
     {
-
+        
     }
 
 }

@@ -5,34 +5,12 @@ namespace MPDCtrl.Models;
 
 public partial class Playlist : ObservableObject
 {
-    public string Name
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
+    [ObservableProperty]
+    public partial string Name { get; set; } = string.Empty;
 
-            field = value;
-
-            OnPropertyChanged();
-        }
-    } = string.Empty;
-
-    public string LastModified
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
-
-            field = value;
-
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(LastModifiedFormated));
-        }
-    } = string.Empty;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(LastModifiedFormated))]
+    public partial string LastModified { get; set; } = string.Empty;
 
     public string LastModifiedFormated
     {

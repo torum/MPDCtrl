@@ -12,35 +12,13 @@ public partial class Album : ObservableObject
 
     public string NameSort { get; set; } = string.Empty;
 
-    public string ReleaseYear
-    {
-        get;
-        set
-        {
-            if (field == value)
-            {
-                return;
-            }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = string.Empty;
+    [ObservableProperty]
+    public partial string ReleaseYear { get; set; } = string.Empty;
 
     public bool IsSongsAcquired { get; set; } = false;
 
-    public ObservableCollection<SongInfo> Songs
-    {
-        get;
-        set
-        {
-            if (field == value)
-            {
-                return;
-            }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = [];
+    [ObservableProperty]
+    public partial ObservableCollection<SongInfo> Songs { get; set; } = [];
 }
 
 public partial class AlbumEx :Album
@@ -50,18 +28,8 @@ public partial class AlbumEx :Album
 
     public string? AlbumImagePath { get; set; } = null;
 
-    public ImageSource? AlbumImage { 
-        get; 
-        set
-        {
-            if (field == value)
-            {
-                return;
-            }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = null;
+    [ObservableProperty]
+    public partial ImageSource? AlbumImage { get; set; } = null;
 
     public bool IsImageAcquired { get; set; } = false;
     public bool IsImageLoading { get; set; } = false;

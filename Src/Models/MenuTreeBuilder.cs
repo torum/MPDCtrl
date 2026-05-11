@@ -103,9 +103,9 @@ public partial class MenuTreeBuilder : NodeTree
 
     public MenuTreeBuilder(string name) : base(name)
     {
-        //Microsoft.Windows.ApplicationModel.Resources.ResourceLoader resourceLoader = new();
+        Microsoft.Windows.ApplicationModel.Resources.ResourceLoader resourceLoader = new();
 
-        NodeMenuQueue queue = new($"{"MenuTreeItem_Queue".GetLocalized()}")
+        NodeMenuQueue queue = new(resourceLoader.GetString("MenuTreeItem_Queue"))
         {
             Tag = "queue",
             //Selected = true,
@@ -118,7 +118,7 @@ public partial class MenuTreeBuilder : NodeTree
         QueueDirectory = queue;
 
 
-        NodeMenuLibrary library = new($"{"MenuTreeItem_Library".GetLocalized()}")
+        NodeMenuLibrary library = new(resourceLoader.GetString("MenuTreeItem_Library"))
         {
             Tag = "library",
             Selected = false,
@@ -130,7 +130,7 @@ public partial class MenuTreeBuilder : NodeTree
         LibraryDirectory = library;
 
 
-        NodeMenuAlbum albums = new($"{"MenuTreeItem_Albums".GetLocalized()}")
+        NodeMenuAlbum albums = new(resourceLoader.GetString("MenuTreeItem_Albums"))
         {
             Tag = "albums",
             Selected = false,
@@ -142,7 +142,7 @@ public partial class MenuTreeBuilder : NodeTree
         AlbumsDirectory = albums;
 
 
-        NodeMenuArtist artists = new($"{"MenuTreeItem_Artists".GetLocalized()}")
+        NodeMenuArtist artists = new(resourceLoader.GetString("MenuTreeItem_Artists"))
         {
             Tag = "artists",
             Selected = false,
@@ -154,7 +154,7 @@ public partial class MenuTreeBuilder : NodeTree
         ArtistsDirectory = artists;
 
 
-        NodeMenuFiles files = new($"{"MenuTreeItem_Files".GetLocalized()}")
+        NodeMenuFiles files = new(resourceLoader.GetString("MenuTreeItem_Files"))
         {
             Tag = "files",
             Selected = false,
@@ -166,7 +166,7 @@ public partial class MenuTreeBuilder : NodeTree
         FilesDirectory = files;
 
 
-        NodeMenuSearch search = new($"{"MenuTreeItem_Search".GetLocalized()}")
+        NodeMenuSearch search = new(resourceLoader.GetString("MenuTreeItem_Search"))
         {
             Tag = "search",
             Selected = false,
@@ -178,7 +178,7 @@ public partial class MenuTreeBuilder : NodeTree
         SearchDirectory = search;
 
 
-        NodeMenuPlaylists playlists = new($"{"MenuTreeItem_Playlists".GetLocalized()}")
+        NodeMenuPlaylists playlists = new(resourceLoader.GetString("MenuTreeItem_Playlists"))
         {
             Tag = "playlists",
             Selected = false,

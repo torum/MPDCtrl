@@ -3,99 +3,23 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MPDCtrl.Models;
 
-/// <summary>
-/// Profile class for connection setting.
-/// </summary>
 public partial class Profile : ObservableObject
 {
-    public string Host
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
+    [ObservableProperty]
+    public partial string Host { get; set; } = string.Empty;
 
-            field = value;
-            OnPropertyChanged();
-        }
-    } = string.Empty;
+    [ObservableProperty]
+    public partial int Port { get; set; } = 6600;
 
-    /*
-    private IPAddress _hostIpAddress;
-    public IPAddress HostIpAddress
-    {
-        get { return _hostIpAddress; }
-        set
-        {
-            if (_hostIpAddress == value)
-                return;
+    [ObservableProperty]
+    public partial string Password { get; set; } = string.Empty;
 
-            _hostIpAddress = value;
-            OnPropertyChanged(nameof(HostIpAddress));
-        }
-    }
-    */
+    [ObservableProperty]
+    public partial string Name { get; set; } = string.Empty;
 
-    public int Port
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
+    [ObservableProperty]
+    public partial bool IsDefault { get; set; }
 
-            field = value;
-            OnPropertyChanged();
-        }
-    } = 6600;
-
-    public string Password
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
-
-            field = value;
-            OnPropertyChanged();
-        }
-    } = string.Empty;
-
-    public string Name
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
-
-            field = value;
-            OnPropertyChanged();
-        }
-    } = string.Empty;
-
-    public bool IsDefault
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
-
-            field = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public double Volume
-    {
-        get;
-        set
-        {
-            field = value;
-            OnPropertyChanged();
-        }
-    } = 50;
+    [ObservableProperty]
+    public partial double Volume { get; set; } = 50;
 }

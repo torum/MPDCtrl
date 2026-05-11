@@ -7,46 +7,16 @@ namespace MPDCtrl.Models;
 
 public partial class AudioOutput : ObservableObject
 {
-    public string Name
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
+    [ObservableProperty]
+    public partial string Name { get; set; } = string.Empty;
 
-            field = value;
-            OnPropertyChanged();
-        }
-    } = string.Empty;
+    [ObservableProperty]
+    public partial string Id { get; set; } = string.Empty;
 
-    public string Id
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
-
-            field = value;
-            OnPropertyChanged();
-        }
-    } = string.Empty;
-
-    public string Enabled
-    {
-        get;
-        set
-        {
-            if (field == value)
-                return;
-
-            field = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(IsEnabled));
-            OnPropertyChanged(nameof(PathIconData));
-        }
-    } = string.Empty;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsEnabled))]
+    [NotifyPropertyChangedFor(nameof(PathIconData))]
+    public partial string Enabled { get; set; } = string.Empty;
 
     public bool IsEnabled
     {

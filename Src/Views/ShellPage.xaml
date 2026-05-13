@@ -61,7 +61,7 @@
 
             <NavigationView x:Name="NaviView" AccessKey="H" 
                             MenuItemsSource="{x:Bind ViewModel.MainMenuItems, Mode=OneWay}" 
-                            IsTitleBarAutoPaddingEnabled="True" IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="False" IsSettingsVisible="False" PaneDisplayMode="Left" ExpandedModeThresholdWidth="1008" CompactModeThresholdWidth="640" OpenPaneLength ="280" IsPaneOpen="{x:Bind ViewModel.IsNavigationViewMenuOpen, Mode=TwoWay}" Loaded="NavigationView_Loaded" ItemInvoked="NavigationView_ItemInvoked" SelectionChanged="NaviView_SelectionChanged" PaneClosed="NaviView_PaneClosed" PaneOpened="NaviView_PaneOpened">
+                            IsTitleBarAutoPaddingEnabled="True" IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="True" IsSettingsVisible="False" PaneDisplayMode="Auto" ExpandedModeThresholdWidth="1008" CompactModeThresholdWidth="640" OpenPaneLength ="280" IsPaneOpen="{x:Bind ViewModel.IsNavigationViewMenuOpen, Mode=TwoWay}" Loaded="NavigationView_Loaded" ItemInvoked="NavigationView_ItemInvoked" SelectionChanged="NaviView_SelectionChanged" PaneClosed="NaviView_PaneClosed" PaneOpened="NaviView_PaneOpened">
                 <NavigationView.PaneHeader>
                     <!-- App title and icon -->
                     <Grid VerticalAlignment="Center">
@@ -326,9 +326,11 @@
                         <AdaptiveTrigger MinWindowWidth="1440" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="True" />
                         <Setter Target="NaviView.PaneDisplayMode" Value="Left" />
+                        <!--
+                        <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="True" />
                         <Setter Target="NaviView.IsPaneOpen" Value="True" />
+                        -->
                         <Setter Target="NaviView.OpenPaneLength" Value="320" />
                     </VisualState.Setters>
                 </VisualState>
@@ -337,9 +339,11 @@
                         <AdaptiveTrigger MinWindowWidth="1008" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="True" />
                         <Setter Target="NaviView.PaneDisplayMode" Value="Left" />
+                        <!--
+                        <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="True" />
                         <Setter Target="NaviView.IsPaneOpen" Value="True" />
+                        -->
                         <Setter Target="NaviView.OpenPaneLength" Value="280" />
                     </VisualState.Setters>
                 </VisualState>
@@ -348,9 +352,11 @@
                         <AdaptiveTrigger MinWindowWidth="640" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
+                        <Setter Target="NaviView.PaneDisplayMode" Value="LeftCompact" />
+                        <!--
                         <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="True" />
-                        <Setter Target="NaviView.PaneDisplayMode" Value="CompactLeft" />
                         <Setter Target="NaviView.IsPaneOpen" Value="False" />
+                        -->
                         <Setter Target="PlaybackOptions.Visibility" Value="Visible" />
                         <Setter Target="NaviView.OpenPaneLength" Value="280" />
                     </VisualState.Setters>
@@ -360,11 +366,12 @@
                         <AdaptiveTrigger MinWindowWidth="340" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
+                        <Setter Target="NaviView.PaneDisplayMode" Value="Auto" />
+                        <!--
                         <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="True" />
-                        <Setter Target="NaviView.PaneDisplayMode" Value="CompactLeft" />
                         <Setter Target="NaviView.IsPaneOpen" Value="False" />
+                        -->
                         <Setter Target="PlaybackOptions.Visibility" Value="Collapsed" />
-                        <Setter Target="AlbumCoverAndSongTitle.Visibility" Value="Visible" />
                         <Setter Target="NaviView.OpenPaneLength" Value="230" />
                     </VisualState.Setters>
                 </VisualState>
@@ -373,10 +380,11 @@
                         <AdaptiveTrigger MinWindowWidth="0" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
+                        <Setter Target="NaviView.PaneDisplayMode" Value="Auto" />
+                        <!--
                         <Setter Target="NaviView.IsPaneToggleButtonVisible" Value="True" />
-                        <Setter Target="NaviView.PaneDisplayMode" Value="CompactLeft" />
                         <Setter Target="NaviView.IsPaneOpen" Value="False" />
-                        <Setter Target="AlbumCoverAndSongTitle.Visibility" Value="Collapsed" />
+                        -->
                         <Setter Target="PlaybackOptions.Visibility" Value="Collapsed" />
                         <Setter Target="NaviView.OpenPaneLength" Value="230" />
                     </VisualState.Setters>

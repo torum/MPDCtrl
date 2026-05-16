@@ -41,7 +41,7 @@
         </Grid.RowDefinitions>
 
         <!-- App dummy titlebar -->
-        <Grid Grid.Row="0" Grid.Column="0">
+        <Grid Grid.Row="0" Grid.Column="0" SizeChanged="AppTitleBar_SizeChanged">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="48"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
@@ -58,10 +58,9 @@
 
         <!-- NaviView -->
         <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BorderBrush="{ThemeResource SmokeFillColorDefaultBrush}" BorderThickness="0,0,0,0">
-
             <NavigationView x:Name="NaviView" AccessKey="H" 
                             MenuItemsSource="{x:Bind ViewModel.MainMenuItems, Mode=OneWay}" 
-                            IsTitleBarAutoPaddingEnabled="True" IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="True" IsSettingsVisible="False" PaneDisplayMode="Auto" ExpandedModeThresholdWidth="1008" CompactModeThresholdWidth="640" OpenPaneLength ="280" IsPaneOpen="{x:Bind ViewModel.IsNavigationViewMenuOpen, Mode=TwoWay}" Loaded="NavigationView_Loaded" ItemInvoked="NavigationView_ItemInvoked" SelectionChanged="NaviView_SelectionChanged" PaneClosed="NaviView_PaneClosed" PaneOpened="NaviView_PaneOpened">
+                            IsTitleBarAutoPaddingEnabled="True" IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="True" IsSettingsVisible="False" PaneDisplayMode="Auto" ExpandedModeThresholdWidth="1008" CompactModeThresholdWidth="640" OpenPaneLength ="280" IsPaneOpen="{x:Bind ViewModel.IsNavigationViewMenuOpen, Mode=TwoWay}" Loaded="NavigationView_Loaded" ItemInvoked="NavigationView_ItemInvoked" SelectionChanged="NaviView_SelectionChanged" PaneClosed="NaviView_PaneClosed" PaneOpened="NaviView_PaneOpened" DisplayModeChanged="NaviView_DisplayModeChanged">
                 <NavigationView.PaneHeader>
                     <!-- App title and icon -->
                     <Grid VerticalAlignment="Center">
@@ -112,13 +111,13 @@
                     </DataTemplate>
                 </NavigationView.MenuItemTemplate>
 
-                <Grid Background="{ThemeResource LayerFillColorDefaultBrush}" SizeChanged="AppTitleBar_SizeChanged" Loaded="AppTitleBarGrid_Loaded">
+                <Grid Background="{ThemeResource LayerFillColorDefaultBrush}" SizeChanged="AppTitleBar_SizeChanged">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="42"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0">
+                    <Border Grid.Row="0" x:Name="BackButtonGrid">
                         <Button x:Name="BackButton" x:Uid="GoBackButton" Height="36" Width="40" Margin="6,6,0,0" Click="BackButton_Click" Style="{ThemeResource TitleBarBackButtonStyle}" Visibility="{x:Bind ViewModel.IsGoBackButtonVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     </Border>
                     
@@ -332,6 +331,7 @@
                         <Setter Target="NaviView.IsPaneOpen" Value="True" />
                         -->
                         <Setter Target="NaviView.OpenPaneLength" Value="320" />
+                        <Setter Target="BackButtonGrid.Margin" Value="0,0,0,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -345,6 +345,7 @@
                         <Setter Target="NaviView.IsPaneOpen" Value="True" />
                         -->
                         <Setter Target="NaviView.OpenPaneLength" Value="280" />
+                        <Setter Target="BackButtonGrid.Margin" Value="0,0,0,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -359,6 +360,7 @@
                         -->
                         <Setter Target="PlaybackOptions.Visibility" Value="Visible" />
                         <Setter Target="NaviView.OpenPaneLength" Value="280" />
+                        <Setter Target="BackButtonGrid.Margin" Value="0,0,0,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -373,6 +375,7 @@
                         -->
                         <Setter Target="PlaybackOptions.Visibility" Value="Collapsed" />
                         <Setter Target="NaviView.OpenPaneLength" Value="230" />
+                        <Setter Target="BackButtonGrid.Margin" Value="49,-3,0,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -387,6 +390,7 @@
                         -->
                         <Setter Target="PlaybackOptions.Visibility" Value="Collapsed" />
                         <Setter Target="NaviView.OpenPaneLength" Value="230" />
+                        <Setter Target="BackButtonGrid.Margin" Value="49,-3,0,0" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>

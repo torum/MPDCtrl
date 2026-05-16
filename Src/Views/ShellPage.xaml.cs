@@ -199,13 +199,18 @@ public sealed partial class ShellPage : Page
 
         // Back button
         double width = this.BackButton.Width;//ActualWidth won't work in certain cases.
-        double height = this.BackButton.Height;//ActualHeight won't work in certain cases.
+        double height = this.BackButton.Width;//ActualHeight won't work in certain cases.
 
         if (this.BackButton.Visibility != Visibility.Visible)
         {
             //Debug.WriteLine("BackButton.Visibility != Visibility.Visible");
             width = 0;
             height = 0;
+        }
+        else
+        {
+            // ActualWidth,ActualHeight both are 0 when visibility changed.
+            //Debug.WriteLine($"BackButton.Visibility == Visibility.Visible {this.BackButton.Width},{this.BackButton.Height}");
         }
 
         GeneralTransform transform = this.BackButton.TransformToVisual(null);
@@ -589,6 +594,7 @@ public sealed partial class ShellPage : Page
             //this.BackButton.Visibility = Visibility.Collapsed;
             this.BackButton.IsEnabled = false;
         }
+
     }
 
     private void Page_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
@@ -712,11 +718,6 @@ public sealed partial class ShellPage : Page
     }
 
     private void NaviView_PaneOpened(NavigationView sender, object args)
-    {
-        SetRegionsForCustomTitleBar();
-    }
-
-    private void AppTitleBarGrid_Loaded(object sender, RoutedEventArgs e)
     {
         SetRegionsForCustomTitleBar();
     }
@@ -851,5 +852,10 @@ public sealed partial class ShellPage : Page
             await Task.Delay(500);
             PlaybackPlay.Focus(FocusState.Programmatic);
         });
+    }
+
+    private void NaviView_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
+    {
+        SetRegionsForCustomTitleBar();
     }
 }

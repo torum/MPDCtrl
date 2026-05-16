@@ -28,7 +28,6 @@
 	  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
 	  <!-- Workaround for MS bug: https://github.com/microsoft/WindowsAppSDK/issues/5817 -->
-	  <AppxBundleAutoResourcePackageQualifiers>Scale|DXFeatureLevel</AppxBundleAutoResourcePackageQualifiers>
 	  <AppxFilterOutUnusedLanguagesResourceFileMaps>false</AppxFilterOutUnusedLanguagesResourceFileMaps>
 	  
 	  <AppxPackageIncludePrivateSymbols>true</AppxPackageIncludePrivateSymbols>

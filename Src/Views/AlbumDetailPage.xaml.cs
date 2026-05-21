@@ -22,7 +22,7 @@ using Windows.Foundation.Collections;
 
 namespace MPDCtrl.Views;
 
-public class Breadcrumb
+public sealed class Breadcrumb
 {
     public string? Name
     {

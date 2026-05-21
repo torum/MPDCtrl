@@ -4,7 +4,7 @@ using System;
 
 namespace MPDCtrl.Helpers;
 
-public class AncestorSource
+public sealed class AncestorSource
 {
     public static readonly DependencyProperty AncestorTypeProperty =
         DependencyProperty.RegisterAttached(

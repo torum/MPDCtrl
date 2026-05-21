@@ -10,6 +10,7 @@
         <ResourceDictionary>
             <CornerRadius x:Key="NavigationViewContentGridCornerRadius">0</CornerRadius>
             <Thickness x:Key="NavigationViewContentGridBorderThickness">1,0,0,0</Thickness>
+            <Thickness x:Key="NavigationViewMinimalContentMargin">0,0,0,0</Thickness>
             <Thickness x:Key="NavigationViewBorderThickness">0</Thickness>
             <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent"/>
 

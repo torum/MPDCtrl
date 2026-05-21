@@ -16,7 +16,7 @@ using WinRT.Interop;
 
 namespace MPDCtrl;
 
-public partial class App : Application
+public sealed partial class App : Application
 {
     // AppDataFolder
     private static readonly string AppDeveloper = "torum";

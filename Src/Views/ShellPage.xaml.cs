@@ -198,8 +198,8 @@ public sealed partial class ShellPage : Page
         Windows.Graphics.RectInt32 SettingsButton = GetRect(bounds1, scaleAdjustment);
 
         // Back button
-        double width = this.BackButton.Width;//ActualWidth won't work in certain cases.
-        double height = this.BackButton.Width;//ActualHeight won't work in certain cases.
+        double width = this.BackButton.Width;//ActualWidth won't work in certain cases. e.g. when visivility changed.
+        double height = this.BackButton.Width;//ActualHeight won't work in certain cases. e.g. when visivility changed.
 
         if (this.BackButton.Visibility != Visibility.Visible)
         {

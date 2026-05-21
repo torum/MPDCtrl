@@ -192,7 +192,7 @@ public partial class SongInfo : SongFile
 /// <summary>
 /// Song class with some extra info. Extends SongInfo. (for queue)
 /// </summary>
-public partial class SongInfoEx : SongInfo
+public sealed partial class SongInfoEx : SongInfo
 {
     // Queue specific
 

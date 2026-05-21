@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MPDCtrl.Services;
 
-public class DialogService : IDialogService
+public sealed class DialogService : IDialogService
 {
     //private readonly ResourceLoader _resourceLoader = new();
 

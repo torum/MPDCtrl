@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace MPDCtrl.Models;
 
-public class Status
+public sealed class Status
 {
     public enum MpdPlayState
     {

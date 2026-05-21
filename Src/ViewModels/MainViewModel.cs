@@ -36,7 +36,7 @@ using Windows.Storage.Streams;
 
 namespace MPDCtrl.ViewModels;
 
-public partial class MainViewModel : ObservableObject
+public sealed partial class MainViewModel : ObservableObject
 {
     #region == Flags ==
 
@@ -1795,31 +1795,6 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-#pragma warning disable IDE0079
-#pragma warning disable CA1822
-    public string VersionText
-#pragma warning restore CA1822
-#pragma warning restore IDE0079
-    {
-        get
-        {
-            Version version;
-
-            if (RuntimeHelper.IsMSIX)
-            {
-                var packageVersion = Package.Current.Id.Version;
-
-                version = new(packageVersion.Major, packageVersion.Minor, packageVersion.Build, packageVersion.Revision);
-            }
-            else
-            {
-                version = Assembly.GetExecutingAssembly().GetName().Version!;
-            }
-
-            return $"MPDCtrl {"Version".GetLocalized()} - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
-        }
-    }
-
     #endregion
 
     #region == Status flags ==
@@ -1999,6 +1974,31 @@ public partial class MainViewModel : ObservableObject
     #endregion
 
     #region == Settings ==
+
+#pragma warning disable IDE0079
+#pragma warning disable CA1822
+    public string VersionText
+#pragma warning restore CA1822
+#pragma warning restore IDE0079
+    {
+        get
+        {
+            Version version;
+
+            if (RuntimeHelper.IsMSIX)
+            {
+                var packageVersion = Package.Current.Id.Version;
+
+                version = new(packageVersion.Major, packageVersion.Minor, packageVersion.Build, packageVersion.Revision);
+            }
+            else
+            {
+                version = Assembly.GetExecutingAssembly().GetName().Version!;
+            }
+
+            return $"MPDCtrl {"Version".GetLocalized()} - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+        }
+    }
 
 #pragma warning disable CA1822 
     public string AlbumCacheFolderPath => App.AlbumCoverCacheFolder;
@@ -2205,6 +2205,8 @@ public partial class MainViewModel : ObservableObject
 
     #region == Public Methods ==
 
+    // TODO: Convert these public methods to commands.
+
     public async void Start()
     {
         if ((CurrentProfile is null) || (Profiles.Count < 1))
@@ -2312,6 +2314,7 @@ public partial class MainViewModel : ObservableObject
         IsShowErrWindow = true;
     }
 
+    // TODO: make this a command (or make changes so that we don't have to call this from code behind).
     public async Task GetCacheFolderSizeAsync()
     {
         AlbumCacheFolderSizeFormatted = ToFileSizeString(await GetFolderSizeAsync(App.AlbumCoverCacheFolder).ConfigureAwait(true));

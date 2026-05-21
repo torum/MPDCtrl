@@ -3,7 +3,7 @@ using System;
 
 namespace MPDCtrl.Models;
 
-public partial class Playlist : ObservableObject
+public sealed partial class Playlist : ObservableObject
 {
     [ObservableProperty]
     public partial string Name { get; set; } = string.Empty;

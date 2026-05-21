@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MPDCtrl.Models;
 
-public partial class NodeDirectory : NodeTree
+public sealed partial class NodeDirectory : NodeTree
 {
     public Uri DireUri { get; set; }
 
@@ -18,7 +18,7 @@ public partial class NodeDirectory : NodeTree
     }
 }
 
-public partial class NodeFile : Node
+public sealed partial class NodeFile : Node
 {
     public Uri FileUri { get; set; }
 
@@ -54,7 +54,7 @@ public partial class NodeFile : Node
     }
 }
 
-public partial class DirectoryTreeBuilder(string name) : NodeTree(name)
+public sealed partial class DirectoryTreeBuilder(string name) : NodeTree(name)
 {
     public bool IsCanceled { get; set; }
 

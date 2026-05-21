@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace MPDCtrl.Services;
 
-public class MpcBinaryService : IMpcBinaryService
+public sealed class MpcBinaryService : IMpcBinaryService
 {
     private CancellationTokenSource? _cts;
 

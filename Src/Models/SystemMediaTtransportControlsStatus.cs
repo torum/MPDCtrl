@@ -2,7 +2,7 @@
 
 namespace MPDCtrl.Models;
 
-public class SongInfoForSystemMediaTransportControls
+public sealed class SongInfoForSystemMediaTransportControls
 {
     public string Title { get; set; } = string.Empty;
 

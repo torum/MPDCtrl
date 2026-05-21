@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MPDCtrl.Models;
 
-public partial class AudioOutput : ObservableObject
+public sealed partial class AudioOutput : ObservableObject
 {
     [ObservableProperty]
     public partial string Name { get; set; } = string.Empty;

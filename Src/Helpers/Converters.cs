@@ -4,7 +4,7 @@ using System;
 
 namespace MPDCtrl.Helpers
 {
-    public partial class BoolToFontWeightConverter : IValueConverter
+    public sealed partial class BoolToFontWeightConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {

@@ -5,7 +5,7 @@ using System;
 
 namespace MPDCtrl.Helpers;
 
-public partial class ElementThemeEnumToBooleanConverter : IValueConverter
+public sealed partial class ElementThemeEnumToBooleanConverter : IValueConverter
 {
     public ElementThemeEnumToBooleanConverter()
     {

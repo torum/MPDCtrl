@@ -20,7 +20,7 @@ public class CommandResult : Result
     public string ResultText = string.Empty;
 }
 
-public class CommandBinaryResult : Result
+public sealed class CommandBinaryResult : Result
 {
     public bool IsNoBinaryFound = false;
     public bool IsTimeOut = false;
@@ -30,25 +30,25 @@ public class CommandBinaryResult : Result
     public byte[]? BinaryData;
 }
 
-public class  CommandImageResult : Result
+public sealed class  CommandImageResult : Result
 {
     public bool IsNoBinaryFound = false;
     public bool IsTimeOut = false;
     public AlbumImage AlbumCover = new();
 }
 
-public class CommandPlaylistResult : CommandResult
+public sealed class CommandPlaylistResult : CommandResult
 {
     public ObservableCollection<SongInfo>? PlaylistSongs;
 }
 
-public class CommandSearchResult : CommandResult
+public sealed class CommandSearchResult : CommandResult
 {
     public ObservableCollection<SongInfo>? SearchResult;
 }
 
 // TODO: Not used?
-public class IdleResult : CommandResult
+public sealed class IdleResult : CommandResult
 {
 
 }

@@ -12,7 +12,7 @@ public partial class NodeMenu : NodeTree
     }
 }
 
-public partial class NodeMenuQueue : NodeMenu
+public sealed partial class NodeMenuQueue : NodeMenu
 {
     public NodeMenuQueue(string name) : base(name)
     {
@@ -20,7 +20,7 @@ public partial class NodeMenuQueue : NodeMenu
     }
 }
 
-public partial class NodeMenuSearch : NodeMenu
+public sealed partial class NodeMenuSearch : NodeMenu
 {
     public NodeMenuSearch(string name) : base(name)
     {
@@ -28,7 +28,7 @@ public partial class NodeMenuSearch : NodeMenu
     }
 }
 
-public partial class NodeMenuLibrary : NodeMenu
+public sealed partial class NodeMenuLibrary : NodeMenu
 {
     //public bool IsAcquired { get; set; }
 
@@ -38,7 +38,7 @@ public partial class NodeMenuLibrary : NodeMenu
     }
 }
 
-public partial class NodeMenuFiles : NodeMenu
+public sealed partial class NodeMenuFiles : NodeMenu
 {
     public bool IsAcquired { get; set; }
 
@@ -48,7 +48,7 @@ public partial class NodeMenuFiles : NodeMenu
     }
 }
 
-public partial class NodeMenuAlbum : NodeMenu
+public sealed partial class NodeMenuAlbum : NodeMenu
 {
     public NodeMenuAlbum(string name) : base(name)
     {
@@ -56,7 +56,7 @@ public partial class NodeMenuAlbum : NodeMenu
     }
 }
 
-public partial class NodeMenuArtist : NodeMenu
+public sealed partial class NodeMenuArtist : NodeMenu
 {
     public NodeMenuArtist(string name) : base(name)
     {
@@ -64,7 +64,7 @@ public partial class NodeMenuArtist : NodeMenu
     }
 }
 
-public partial class NodeMenuPlaylists : NodeMenu
+public sealed partial class NodeMenuPlaylists : NodeMenu
 {
     public NodeMenuPlaylists(string name) : base(name)
     {
@@ -72,7 +72,7 @@ public partial class NodeMenuPlaylists : NodeMenu
     }
 }
 
-public partial class NodeMenuPlaylistItem : NodeMenu
+public sealed partial class NodeMenuPlaylistItem : NodeMenu
 {
     public ObservableCollection<SongInfo> PlaylistSongs = [];
 
@@ -85,7 +85,7 @@ public partial class NodeMenuPlaylistItem : NodeMenu
     }
 }
 
-public partial class MenuTreeBuilder : NodeTree
+public sealed partial class MenuTreeBuilder : NodeTree
 {
     public NodeMenuPlaylists PlaylistsDirectory { get; }
 

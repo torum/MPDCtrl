@@ -21,7 +21,7 @@ public partial class Album : ObservableObject
     public partial ObservableCollection<SongInfo> Songs { get; set; } = [];
 }
 
-public partial class AlbumEx :Album
+public sealed partial class AlbumEx :Album
 {
     public string AlbumArtist { get; set; } = string.Empty;
     public string AlbumArtistSort { get; set; } = string.Empty;
@@ -38,7 +38,7 @@ public partial class AlbumEx :Album
     public MainViewModel? ParentViewModel { get; set; }
 }
 
-public partial class AlbumArtist : ObservableObject
+public sealed partial class AlbumArtist : ObservableObject
 {
     public string Name { get; set; } = string.Empty;
     public string NameSort { get; set; } = string.Empty;

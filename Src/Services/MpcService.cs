@@ -21,7 +21,7 @@ namespace MPDCtrl.Services;
 #pragma warning disable CA1862
 #pragma warning disable IDE0290
 #pragma warning restore IDE0079 //
-public partial class MpcService : IMpcService
+public sealed partial class MpcService : IMpcService
 {
     #region == Consts, Properties, etc == 
 

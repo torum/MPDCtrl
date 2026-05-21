@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MPDCtrl.Models;
 
-public partial class Profile : ObservableObject
+public sealed partial class Profile : ObservableObject
 {
     [ObservableProperty]
     public partial string Host { get; set; } = string.Empty;

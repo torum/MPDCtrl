@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace MPDCtrl.Services;
 
-public class DispatcherService : IDispatcherService
+public sealed class DispatcherService : IDispatcherService
 {
     private readonly Microsoft.UI.Dispatching.DispatcherQueue _queue;
     public Microsoft.UI.Dispatching.DispatcherQueue DispatcherQueue => _queue;

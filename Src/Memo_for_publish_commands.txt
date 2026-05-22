@@ -1,11 +1,11 @@
 
 (A) Create package bundle file for Microsoft store.
 -------
-dotnet build MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=x64 /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=false -p:WindowsPackageType=MSIX --self-contained true
+dotnet build MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=x64 /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=false /p:WindowsPackageType=MSIX --self-contained true
 
-dotnet build MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=x86 /p:Platform=x86 /p:RuntimeIdentifier=win-x86 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=false -p:WindowsPackageType=MSIX --self-contained true
+dotnet build MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=x86 /p:Platform=x86 /p:RuntimeIdentifier=win-x86 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=false /p:WindowsPackageType=MSIX --self-contained true
 
-dotnet build MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=ARM64 /p:Platform=ARM64 /p:RuntimeIdentifier=win-arm64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=false -p:WindowsPackageType=MSIX --self-contained true
+dotnet build MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=ARM64 /p:Platform=ARM64 /p:RuntimeIdentifier=win-arm64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=false /p:WindowsPackageType=MSIX --self-contained true
 -------
 
 (A* with AoT)
@@ -36,12 +36,13 @@ Rename and change file extension to MPDCtrl_0.0.0.0_x86_x64_arm64_bundle.msixupl
 
 (B) Unpackaged single self-contained exe file.
 ----
-dotnet publish -c Release -r win-x64 -p:PlatformTarget=x64 -p:Platform=x64 -p:RuntimeIdentifier=win-x64 -p:PublishAot=false -p:PublishSingleFile=true -p:WindowsPackageType=None -p:AppxPackage=false -p:EnableMsixTooling=true -p:WindowsAppSDKSelfContained=true --self-contained true
+dotnet publish -c Release -r win-x64 /p:PlatformTarget=x64 /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:PublishAot=false /p:PublishSingleFile=true /p:WindowsPackageType=None /p:AppxPackage=false /p:EnableMsixTooling=true /p:WindowsAppSDKSelfContained=true /p:GenerateAppxPackageOnBuild=false --self-contained true
+
 ----
 
 (C) Unpackaged Aot compiled.
 ----
-dotnet publish -c Release -r win-x64 -p:PublishAot=true -p:WindowsPackageType=None -p:AppxPackage=false -p:EnableMsixTooling=false --self-contained true
+dotnet publish -c Release -r win-x64 /p:PublishAot=true /p:WindowsPackageType=None /p:AppxPackage=false /p:EnableMsixTooling=false --self-contained true
 Or simply
-dotnet publish -c Release -r win-x64 -p:PublishAot=true --self-contained true
+dotnet publish -c Release -r win-x64 /p:PublishAot=true --self-contained true
 ----

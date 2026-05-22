@@ -15,6 +15,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using WinRT;
 
 namespace MPDCtrl.Views;
 
@@ -31,6 +32,11 @@ public sealed partial class SearchPage : Page
         InitializeComponent();
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
+    [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void SearchListview_RightTapped(object sender, RightTappedRoutedEventArgs e)
     {
         //ListView listView = (ListView)sender;

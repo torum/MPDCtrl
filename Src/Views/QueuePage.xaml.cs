@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using WinRT;
 
 namespace MPDCtrl.Views;
 
@@ -85,6 +86,10 @@ public sealed partial class QueuePage : Page
         });
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private async void QueueListview_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
         //ListView listView = (ListView)sender;
@@ -146,6 +151,11 @@ public sealed partial class QueuePage : Page
         }
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
+    [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private async void QueueListview_KeyUp(object sender, KeyRoutedEventArgs e)
     {
         if (sender is not ListView listView)
@@ -178,6 +188,11 @@ public sealed partial class QueuePage : Page
         await ViewModel.QueueSelectedPlay(song);
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
+    [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void QueueListview_RightTapped(object sender, RightTappedRoutedEventArgs e)
     {
         //ListView listView = (ListView)sender;
@@ -260,6 +275,11 @@ public sealed partial class QueuePage : Page
         }
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
+    [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void FilterQueueListBox_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
         if (sender is not ListView)

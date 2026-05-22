@@ -1,3 +1,4 @@
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -15,6 +16,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using WinRT;
 
 namespace MPDCtrl.Views;
 
@@ -35,6 +37,9 @@ public sealed partial class ArtistsPage : Page
         InitializeComponent();
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
     private void ArtistsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         _dispatcherService.TryEnqueue(() =>
@@ -56,6 +61,10 @@ public sealed partial class ArtistsPage : Page
         });
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void ListView_RightTapped(object sender, RightTappedRoutedEventArgs e)
     {
         //ListView listView = (ListView)sender;
@@ -174,6 +183,10 @@ public sealed partial class ArtistsPage : Page
         }
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void FilterArtistListBox_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
         if (sender is not ListView)

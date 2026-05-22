@@ -15,6 +15,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using WinRT;
 
 namespace MPDCtrl.Views;
 
@@ -32,6 +33,10 @@ public sealed partial class FilesPage : Page
         InitializeComponent();
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void ListView_RightTapped(object sender, RightTappedRoutedEventArgs e)
     {
         //ListView listView = (ListView)sender;
@@ -123,6 +128,9 @@ public sealed partial class FilesPage : Page
         }
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void TreeView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
         Debug.WriteLine($"TreeView_DoubleTapped sender is {sender} e.Source is {e.OriginalSource}");

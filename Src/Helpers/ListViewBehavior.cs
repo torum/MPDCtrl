@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Media;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Windows.Foundation;
+using WinRT;
 
 namespace MPDCtrl.Helpers;
 
@@ -31,6 +32,9 @@ public static class ListViewBehavior
     }
 
     // This is called when the property is set in XAML.
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
     private static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         //Debug.WriteLine("OnPropertyChanged @ListViewBehaviors");
@@ -82,6 +86,9 @@ public static class ListViewBehavior
         };
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
     private static void UpdateVisibleItems(ListView listView, ScrollViewer scrollViewer)//, ObservableCollection<object> visibleItems
     {
         //visibleItems.Clear();
@@ -127,6 +134,9 @@ public static class ListViewBehavior
     }
 
     // Find the ScrollViewer in the visual tree
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ScrollViewer))]
     private static ScrollViewer? FindScrollViewer(DependencyObject obj)
     {
         if (obj is ScrollViewer scrollViewer) return scrollViewer;

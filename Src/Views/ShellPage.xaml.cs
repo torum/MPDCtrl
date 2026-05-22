@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Input;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -24,6 +25,7 @@ using Windows.Foundation;
 using Windows.System;
 using Windows.UI.ApplicationSettings;
 using Windows.UI.Core;
+using WinRT;
 
 namespace MPDCtrl.Views;
 
@@ -597,6 +599,16 @@ public sealed partial class ShellPage : Page
 
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(TextBox))]
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
+    [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
+    [DynamicWindowsRuntimeCast(typeof(Button))]
+    [DynamicWindowsRuntimeCast(typeof(RadioButton))]
+    [DynamicWindowsRuntimeCast(typeof(CheckBox))]
+    [DynamicWindowsRuntimeCast(typeof(ToggleButton))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void Page_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
     {
         Windows.System.VirtualKey releasedKey = e.OriginalKey;
@@ -632,6 +644,16 @@ public sealed partial class ShellPage : Page
         Task.Run(ViewModel.Play);
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(TextBox))]
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
+    [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
+    [DynamicWindowsRuntimeCast(typeof(Button))]
+    [DynamicWindowsRuntimeCast(typeof(RadioButton))]
+    [DynamicWindowsRuntimeCast(typeof(CheckBox))]
+    [DynamicWindowsRuntimeCast(typeof(ToggleButton))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void Page_PreviewKeyUp(object sender, KeyRoutedEventArgs e)
     {
         Windows.System.VirtualKey releasedKey = e.OriginalKey;
@@ -664,6 +686,9 @@ public sealed partial class ShellPage : Page
         //e.Handled = true;
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(UIElement))]
     private void VolumeSlider_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
     {
         var pointerPoint = e.GetCurrentPoint(sender as UIElement);
@@ -677,6 +702,9 @@ public sealed partial class ShellPage : Page
         e.Handled = true;
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(UIElement))]
     private void SeekSlider_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
     {
         var pointerPoint = e.GetCurrentPoint(sender as UIElement);
@@ -722,6 +750,10 @@ public sealed partial class ShellPage : Page
         SetRegionsForCustomTitleBar();
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(NavigationViewItem))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void NavigationViewItem_DragOver(object sender, DragEventArgs e)
     {
         if (sender is not FrameworkElement) return;
@@ -753,6 +785,10 @@ public sealed partial class ShellPage : Page
         e.Handled = true;
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(NavigationViewItem))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private async void NavigationViewItem_Drop(object sender, DragEventArgs e)
     {
         if (sender is not FrameworkElement) return;

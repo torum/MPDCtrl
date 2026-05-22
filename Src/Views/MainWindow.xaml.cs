@@ -66,7 +66,7 @@ public sealed partial class MainWindow : Window
 
     // TODO: Require CsWinRT 2.3.0-prerelease.251115.2
     // https://github.com/dotnet/runtime/issues/121590
-    //[DynamicWindowsRuntimeCast(typeof(OverlappedPresenter))]
+    [DynamicWindowsRuntimeCast(typeof(OverlappedPresenter))]
     //[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     public MainWindow(IDispatcherService dispatcherService)
     {
@@ -86,6 +86,9 @@ public sealed partial class MainWindow : Window
         InitializeComponent();
 
         this.ExtendsContentIntoTitleBar = true;
+
+        this.AppWindow.Title = "MPDCtrl";
+        this.AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets\\MPDCtrl.ico"));
 
         LoadSettings();
 
@@ -193,6 +196,10 @@ public sealed partial class MainWindow : Window
         });
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(OverlappedPresenter))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void LoadSettings()
     {
         if (Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController.IsSupported())
@@ -695,6 +702,9 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     public void SetCapitionButtonColor()
     {
         _dispatcherService.TryEnqueue(() =>
@@ -736,6 +746,9 @@ public sealed partial class MainWindow : Window
         });
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(OverlappedPresenter))]
     private void Window_SizeChanged(object sender, WindowSizeChangedEventArgs args)
     {
         Microsoft.UI.Windowing.AppWindow? appWindow = this.AppWindow;
@@ -768,6 +781,9 @@ public sealed partial class MainWindow : Window
         SaveSettings();
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(OverlappedPresenter))]
     private void SaveSettings()
     {
         XmlDocument doc = new();

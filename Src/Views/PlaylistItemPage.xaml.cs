@@ -18,6 +18,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using WinRT;
 
 namespace MPDCtrl.Views;
 
@@ -38,6 +39,10 @@ public sealed partial class PlaylistItemPage : Page
         InitializeComponent();
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void PlaylistListview_RightTapped(object sender, RightTappedRoutedEventArgs e)
     {
         if (sender is not ListView listView)
@@ -180,6 +185,10 @@ public sealed partial class PlaylistItemPage : Page
         }
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void FilterPlaylistSongListBox_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
         if (sender is not ListView)

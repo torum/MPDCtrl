@@ -1,5 +1,6 @@
 using CommunityToolkit.WinUI;
 using Microsoft.UI.Composition;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -23,6 +24,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Web;
+using WinRT;
 
 namespace MPDCtrl.Views;
 
@@ -120,6 +122,9 @@ public sealed partial class AlbumsPage : Page
     }
 
     // Find the ScrollViewer in the visual tree
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ScrollViewer))]
     private static ScrollViewer? FindScrollViewer(DependencyObject obj)
     {
         if (obj is ScrollViewer scrollViewer) return scrollViewer;
@@ -144,6 +149,9 @@ public sealed partial class AlbumsPage : Page
         _springAnimation.FinalValue = new Vector3(finalValue);
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void Border_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         if (sender is not FrameworkElement ele)
@@ -156,6 +164,9 @@ public sealed partial class AlbumsPage : Page
         ele.StartAnimation(_springAnimation);
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void Border_PointerExited(object sender, PointerRoutedEventArgs e)
     {
         if (sender is not FrameworkElement ele)
@@ -201,6 +212,9 @@ public sealed partial class AlbumsPage : Page
         UpdateVisibleItems(this.AlbumsListView, scrollViewer);
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
     private void UpdateVisibleItems(ListView listView, ScrollViewer scrollViewer)
     {
         //visibleItems.Clear();
@@ -306,6 +320,10 @@ public sealed partial class AlbumsPage : Page
         }
     }
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void FilterAlbumListBox_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
         if (sender is not ListView)

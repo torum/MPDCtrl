@@ -1,6 +1,8 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System;
+using WinRT;
 
 namespace MPDCtrl.Helpers;
 
@@ -19,6 +21,9 @@ public sealed class AncestorSource
     public static void SetAncestorType(FrameworkElement element, Type value) =>
         element.SetValue(AncestorTypeProperty, value);
 
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private static void OnAncestorTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is FrameworkElement targetElement && e.NewValue is Type ancestorType)

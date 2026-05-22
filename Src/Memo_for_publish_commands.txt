@@ -10,11 +10,11 @@ dotnet build MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=ARM64 /p:
 
 (A* with AoT)
 ---
-dotnet publish MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=x64 /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=true -p:WindowsPackageType=MSIX --self-contained true
+dotnet publish MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=x64 /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageIncludePrivateSymbols=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=true /p:WindowsPackageType=MSIX /p:NativeDebugSymbols=true /p:StripSymbols=false /p:MsPdbCmfExeFullpath="C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\bin\Hostx64\x64\mspdbcmf.exe" --self-contained true
 
-dotnet publish MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=x86 /p:Platform=x86 /p:RuntimeIdentifier=win-x86 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=true -p:WindowsPackageType=MSIX --self-contained true
+dotnet publish MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=x86 /p:Platform=x86 /p:RuntimeIdentifier=win-x86 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageIncludePrivateSymbols=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=true /p:WindowsPackageType=MSIX /p:NativeDebugSymbols=true /p:StripSymbols=false /p:MsPdbCmfExeFullpath="C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\bin\Hostx64\x86\mspdbcmf.exe" --self-contained true
 
-dotnet publish MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=ARM64 /p:Platform=ARM64 /p:RuntimeIdentifier=win-arm64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=true -p:WindowsPackageType=MSIX --self-contained true
+dotnet publish MPDCtrl.csproj /p:Configuration=Release /p:PlatformTarget=ARM64 /p:Platform=ARM64 /p:RuntimeIdentifier=win-arm64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageIncludePrivateSymbols=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:WindowsAppSDKSelfContained=true /p:PublishAot=true /p:WindowsPackageType=MSIX /p:NativeDebugSymbols=true /p:StripSymbols=false /p:MsPdbCmfExeFullpath="C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.51.36231\bin\Hostx64\arm64\mspdbcmf.exe" --self-contained true
 ---
 
 Create MSIX and Output folder inside AppPackages folder.

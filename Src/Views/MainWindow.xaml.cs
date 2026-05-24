@@ -1180,37 +1180,38 @@ public sealed partial class MainWindow : Window
         switch (e.WParam.ToInt32())
         {
             case HOTKEY_ID1:
-                Task.Run(_vm.Play);
+                //Task.Run(_vm.PlayCommand.Execute());
+                _vm.PlayCommand.Execute(null);
                 break;
             case HOTKEY_ID2:
-                Task.Run(_vm.PlayNext);
+                _vm.PlayNextCommand.Execute(null);
                 break;
             case HOTKEY_ID3:
-                Task.Run(_vm.PlayPrev);
+                _vm.PlayPrevCommand.Execute(null);
                 break;
             case HOTKEY_ID4:
-                _vm.VolumeUp();
+                _vm.VolumeUpCommand.Execute(null);
                 break;
             case HOTKEY_ID5:
-                _vm.VolumeUp();
+                _vm.VolumeUpCommand.Execute(null);
                 break;
             case HOTKEY_ID6:
-                _vm.VolumeDown();
+                _vm.VolumeDownCommand.Execute(null);
                 break;
             case HOTKEY_ID7:
-                _vm.VolumeDown();
+                _vm.VolumeDownCommand.Execute(null);
                 break;
             case HOTKEY_ID8:
-                Task.Run(_vm.Play);
+                _vm.PlayCommand.Execute(null);
                 break;
             case HOTKEY_ID9:
-                Task.Run(_vm.Play);
+                _vm.PlayCommand.Execute(null);
                 break;
             case HOTKEY_ID10:
-                Task.Run(_vm.PlayNext);
+                _vm.PlayNextCommand.Execute(null);
                 break;
             case HOTKEY_ID11:
-                Task.Run(_vm.PlayPrev);
+                _vm.PlayPrevCommand.Execute(null);
                 break;
             default:
                 break;
@@ -1308,27 +1309,27 @@ public sealed partial class MainWindow : Window
             {
                 case SystemMediaTransportControlsButton.Play:
                     //Task.Run(_vm.Play);
-                    _ = _vm.Play();
+                    _vm.PlayCommand.Execute(null);
                     _smtc.PlaybackStatus = MediaPlaybackStatus.Playing;
                     break;
                 case SystemMediaTransportControlsButton.Pause:
                     //Task.Run(_vm.Pause);
-                    _ = _vm.Pause();
+                    _vm.PauseCommand.Execute(null);
                     _smtc.PlaybackStatus = MediaPlaybackStatus.Paused;
                     break;
                 case SystemMediaTransportControlsButton.Next:
                     //Task.Run(_vm.PlayNext);
-                    _ = _vm.PlayNext();
+                    _vm.PlayNextCommand.Execute(null);
                     _smtc.PlaybackStatus = MediaPlaybackStatus.Playing;
                     break;
                 case SystemMediaTransportControlsButton.Previous:
                     //Task.Run(_vm.PlayPrev);
-                    _ = _vm.PlayPrev();
+                    _vm.PlayPrevCommand.Execute(null);
                     _smtc.PlaybackStatus = MediaPlaybackStatus.Playing;
                     break;
                 case SystemMediaTransportControlsButton.Stop:
                     //Task.Run(_vm.Stop);
-                    _ = _vm.Stop();
+                    _vm.StopCommand.Execute(null);
                     _smtc.PlaybackStatus = MediaPlaybackStatus.Stopped;
                     break;
             }

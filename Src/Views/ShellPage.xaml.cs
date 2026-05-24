@@ -167,13 +167,13 @@ public sealed partial class ShellPage : Page
     }
     private void OnUserCanExecuteChanged(object? sender, EventArgs e)
     {
-        VolumeSlider.IsEnabled = ViewModel.SetVolumeCanExecute();
-        SeekSlider.IsEnabled = ViewModel.SetSeekCanExecute();
+        VolumeSlider.IsEnabled = ViewModel.SetVolumeCommand.CanExecute(null);//.SetVolumeCanExecute();
+        SeekSlider.IsEnabled = ViewModel.SetSeekCommand.CanExecute(null);
 
-        RepeatButton.IsEnabled = ViewModel.SetRpeatCanExecute();
-        SingleButton.IsEnabled = ViewModel.SetSingleCanExecute();
-        RandomButton.IsEnabled = ViewModel.SetRandomCanExecute();
-        ConsumeButton.IsEnabled = ViewModel.SetConsumeCanExecute();
+        RepeatButton.IsEnabled = ViewModel.SetRpeatCommand.CanExecute(null);
+        SingleButton.IsEnabled = ViewModel.SetSingleCommand.CanExecute(null);
+        RandomButton.IsEnabled = ViewModel.SetRandomCommand.CanExecute(null);
+        ConsumeButton.IsEnabled = ViewModel.SetConsumeCommand.CanExecute(null);
     }
 
     private void SetRegionsForCustomTitleBar()
@@ -641,7 +641,7 @@ public sealed partial class ShellPage : Page
         //e.Handled = true;
 
         //
-        Task.Run(ViewModel.Play);
+        Task.Run(() => ViewModel.PlayCommand.Execute(null));
     }
 
     // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
@@ -820,6 +820,7 @@ public sealed partial class ShellPage : Page
 
                 var uris = items.Select(i => i.File).ToList();
 
+                // TODO: directly accessing VM's method.
                 await ViewModel.AddToPlaylist(targetPlaylist.Name, uris);
             }
         }
@@ -850,7 +851,7 @@ public sealed partial class ShellPage : Page
 
                 // TODO: Go to settings page.
                 Debug.WriteLine("Show settings page.");
-                ViewModel.GoToSearchPage();
+                ViewModel.GoToSearchPageCommand.Execute(null);
 
                 return;
             }
@@ -861,9 +862,9 @@ public sealed partial class ShellPage : Page
                 args.Handled = true;
 
                 // Handle Ctrl + Subtract
-                if (ViewModel.SetVolumeCanExecute())
+                if (ViewModel.VolumeDownCommand.CanExecute(null))
                 {
-                    ViewModel.VolumeDown();
+                    ViewModel.VolumeDownCommand.Execute(null);
                 }
             }
             else if (args.KeyboardAccelerator.Key == Windows.System.VirtualKey.Add)
@@ -872,9 +873,9 @@ public sealed partial class ShellPage : Page
                 args.Handled = true;
 
                 // Handle Ctrl + Add
-                if (ViewModel.SetVolumeCanExecute())
+                if (ViewModel.VolumeUpCommand.CanExecute(null))
                 {
-                    ViewModel.VolumeUp();
+                    ViewModel.VolumeUpCommand.Execute(null);
                 }
             }
         }

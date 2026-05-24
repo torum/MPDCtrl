@@ -123,9 +123,9 @@ public sealed partial class QueuePage : Page
             return;
         }
 
-        if (ViewModel.PlayCanExecute())
+        if (ViewModel.QueueSelectedPlayCommand.CanExecute(song))
         {
-            await ViewModel.QueueSelectedPlay(song);
+            await ViewModel.QueueSelectedPlayCommand.ExecuteAsync(song);
         }
 
     }
@@ -185,7 +185,7 @@ public sealed partial class QueuePage : Page
             return;
         }
 
-        await ViewModel.QueueSelectedPlay(song);
+        await ViewModel.QueueSelectedPlayCommand.ExecuteAsync(song);
     }
 
     // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
@@ -359,9 +359,9 @@ public sealed partial class QueuePage : Page
                 i++;
             }
 
-            if (idToNewPos.Count > 0 && ViewModel.QueueListviewMoveCanExecute())
+            if (idToNewPos.Count > 0 && ViewModel.QueueListviewMovePosCommand.CanExecute(idToNewPos))
             {
-                await ViewModel.QueueListviewMovePos(idToNewPos);
+                await ViewModel.QueueListviewMovePosCommand.ExecuteAsync(idToNewPos);
             }
         }
         else if (args.DropResult == DataPackageOperation.None)

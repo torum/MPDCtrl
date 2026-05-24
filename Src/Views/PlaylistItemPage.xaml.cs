@@ -138,9 +138,9 @@ public sealed partial class PlaylistItemPage : Page
                 i++;
             }
 
-            if (posToNewPos.Count > 0 && ViewModel.PlaylistMovePosCanExecute())
+            if (posToNewPos.Count > 0 && ViewModel.PlaylistMovePosCommand.CanExecute(posToNewPos))
             {
-                await ViewModel.PlaylistMovePos(posToNewPos);
+                await ViewModel.PlaylistMovePosCommand.ExecuteAsync(posToNewPos);
             }
         }
         else if (args.DropResult == DataPackageOperation.None)

@@ -11,7 +11,7 @@
 	<WinUISDKReferences>False</WinUISDKReferences>
 	<Nullable>enable</Nullable>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	  
+
 	  <ApplicationManifest>app.manifest</ApplicationManifest>
 	  <Company>torum</Company>
 	  <Description>MPD Client</Description>

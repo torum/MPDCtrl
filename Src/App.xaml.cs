@@ -81,10 +81,21 @@ public sealed partial class App : Application
         }
         else
         {
-            /*
-            Debug.WriteLine("Not IsMSIX");
+            //Debug.WriteLine("Not IsMSIX");
+        }
 
-            */
+        try
+        {
+            if (!System.IO.Directory.Exists(App.AlbumCoverCacheFolder))
+            {
+                System.IO.Directory.CreateDirectory(App.AlbumCoverCacheFolder);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log the exception for debugging
+            AppendErrorLog("Failed to create AlbumCoverCache folder on startup.", ex.ToString());
+            SaveErrorLog();
         }
 
         // Only works in packaged environment.

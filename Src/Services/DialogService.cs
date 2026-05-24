@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.WinUI;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.Windows.ApplicationModel.Resources;
 using MPDCtrl.Models;
 using MPDCtrl.Services.Contracts;
 using MPDCtrl.Views;
@@ -16,14 +15,12 @@ namespace MPDCtrl.Services;
 
 public sealed class DialogService : IDialogService
 {
-    //private readonly ResourceLoader _resourceLoader = new();
-
     public record AddToDialogResult(string PlaylistName, bool AsNew);
     public record RenameDialogResult(string PlaylistName);
 
     public DialogService()
     {
-       
+
     }
 
     public async Task ShowKeybindingsDialog()

@@ -22,7 +22,7 @@ public sealed partial class App : Application
     private static readonly string AppDeveloper = "torum";
     private static readonly string EnvDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
-    public static readonly string AppName =  "MPDCtrl4";//_resourceLoader.GetString("AppName");
+    public static readonly string AppName = "MPDCtrl4";//_resourceLoader.GetString("AppName");
     public static string AppDataFolder { get; private set; } = System.IO.Path.Combine(System.IO.Path.Combine(EnvDataFolder, AppDeveloper), AppName);//_envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
     public static string AppConfigFilePath { get; private set; } = System.IO.Path.Combine(AppDataFolder, AppName + ".config");
 

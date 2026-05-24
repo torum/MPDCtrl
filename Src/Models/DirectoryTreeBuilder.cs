@@ -74,7 +74,7 @@ public sealed partial class DirectoryTreeBuilder(string name) : NodeTree(name)
         };
 
         Children.Add(root);
-        
+
         foreach (var pathDir in dirs)
         {
             // for responsivenesss.
@@ -158,7 +158,7 @@ public sealed partial class DirectoryTreeBuilder(string name) : NodeTree(name)
                             // set parent node
                             parent = hoge;
                         }
-                        
+
                     }
                 }
                 else if (ValuePair.Length == 1)

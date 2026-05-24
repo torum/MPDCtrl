@@ -181,7 +181,7 @@ public partial class SongInfo : SongFile
     // for sorting and (playlist pos)
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IndexPlusOne))]
-    public partial int Index {  get; set; }
+    public partial int Index { get; set; }
 
     [ObservableProperty]
     public partial bool IsSelected { get; set; }

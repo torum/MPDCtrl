@@ -1,40 +1,23 @@
-using CommunityToolkit.WinUI;
 using Microsoft.UI;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Xaml.Navigation;
 using MPDCtrl.Helpers;
 using MPDCtrl.Models;
-using MPDCtrl.Services;
 using MPDCtrl.Services.Contracts;
 using MPDCtrl.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using Windows.Media;
-using Windows.Media.Control;
-using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
-using Windows.Storage.Streams;
-using Windows.System;
 using WinRT;
-using WinRT.Interop;
 
 namespace MPDCtrl.Views;
 
@@ -175,7 +158,7 @@ public sealed partial class MainWindow : Window
 
             //
             var updater = _smtc.DisplayUpdater;
-            
+
             updater.Type = MediaPlaybackType.Music;
 
             updater.MusicProperties.AlbumArtist = SongInfoForSMTC.AlbumArtist;
@@ -191,7 +174,7 @@ public sealed partial class MainWindow : Window
             {
                 updater.Thumbnail = null;
             }
-            
+
             updater.Update();
         });
     }
@@ -504,7 +487,7 @@ public sealed partial class MainWindow : Window
                         _vm.CurrentProfile = _vm.Profiles.FirstOrDefault();
                         _vm.CurrentProfile?.IsDefault = true;
                     }
-                    
+
                     if (_vm.CurrentProfile is not null)
                     {
                         _vm.SelectedProfile = _vm.CurrentProfile;
@@ -852,7 +835,7 @@ public sealed partial class MainWindow : Window
                         winState = OverlappedPresenterState.Restored;
                     }
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     (Application.Current as App)?.AppendErrorLog("AOT Error@SaveSettings", $"{ex}");
                     (Application.Current as App)?.SaveErrorLog();

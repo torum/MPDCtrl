@@ -44,7 +44,7 @@ public static class ListViewBehavior
         {
             return;
         }
-        
+
         //Debug.WriteLine("e.OldValue is null. @ListViewBehaviors");
 
         if (d is not ListView listView)

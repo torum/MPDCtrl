@@ -3,14 +3,14 @@ using System.Collections.ObjectModel;
 
 namespace MPDCtrl.Models;
 
-public class Result
+public abstract class Result
 {
     public bool IsWaitFailed = false;
     public bool IsSuccess = false;
     public string ErrorMessage = string.Empty;
 }
 
-public class ConnectionResult: Result
+public class ConnectionResult : Result
 {
 
 }
@@ -30,7 +30,7 @@ public sealed class CommandBinaryResult : Result
     public byte[]? BinaryData;
 }
 
-public sealed class  CommandImageResult : Result
+public sealed class CommandImageResult : Result
 {
     public bool IsNoBinaryFound = false;
     public bool IsTimeOut = false;

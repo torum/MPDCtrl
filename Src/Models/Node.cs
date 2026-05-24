@@ -49,7 +49,7 @@ public partial class NodeTree : Node
 
     protected NodeTree(string name) : base(name)
     {
-        
+
     }
 
 }

@@ -1,5 +1,3 @@
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.WinUI;
 using System.Collections.ObjectModel;
 
 namespace MPDCtrl.Models;

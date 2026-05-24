@@ -1,13 +1,12 @@
 ﻿using CommunityToolkit.WinUI;
 using MPDCtrl.Services.Contracts;
-using Microsoft.UI.Dispatching;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace MPDCtrl.Services;
+
+#pragma warning disable IDE0290 // Use primary constructor
 
 public sealed class DispatcherService : IDispatcherService
 {
@@ -15,6 +14,7 @@ public sealed class DispatcherService : IDispatcherService
     public Microsoft.UI.Dispatching.DispatcherQueue DispatcherQueue => _queue;
 
     public DispatcherService(Microsoft.UI.Dispatching.DispatcherQueue queue)
+
     {
         _queue = queue;
     }

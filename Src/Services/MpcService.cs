@@ -1670,7 +1670,7 @@ public sealed partial class MpcService : IMpcService
             while (true)
             {
                 var line = await _commandReader.ReadLineAsync(_cts.Token);
-                
+
                 if (_cts.Token.IsCancellationRequested)
                 {
                     Debug.WriteLine("IsCancellationRequested in while loop @MpdCommandSendCommandProtected");
@@ -1993,7 +1993,7 @@ public sealed partial class MpcService : IMpcService
     #endregion
 
     #region == Command Connection's MPD Commands with results other than OK == 
-    
+
     public async Task<CommandResult> MpdCommands()
     {
         CommandResult result = await MpdCommandSendCommand("commands");
@@ -2316,7 +2316,7 @@ public sealed partial class MpcService : IMpcService
             res.IsSuccess = false;
             return res;
         }
-        
+
         if (_cts is null)
         {
             res.IsSuccess = false;
@@ -2401,7 +2401,7 @@ public sealed partial class MpcService : IMpcService
                 res.IsWaitFailed = true;
                 res.ErrorMessage = "WaitAsync failed. @MpdQueryAlbumArtForAlbumView";
             }
-////
+            ////
         }
         catch (Exception e)
         {
@@ -3338,8 +3338,8 @@ public sealed partial class MpcService : IMpcService
 
         Debug.WriteLine(result);
 
-        return Task.FromResult(true); 
-    
+        return Task.FromResult(true);
+
     }
 
     private Task<bool> ParseCommands(string result)
@@ -3558,8 +3558,8 @@ public sealed partial class MpcService : IMpcService
                 MpdStatus.MpdVolumeIsReturned = false;
             }
 
-                // songID
-                MpdStatus.MpdSongID = "";
+            // songID
+            MpdStatus.MpdSongID = "";
             if (mpdStatusValues.TryGetValue("songid", out string? value))
             {
                 MpdStatus.MpdSongID = value;
@@ -4147,7 +4147,7 @@ public sealed partial class MpcService : IMpcService
             _dispatcherService.TryEnqueue(() =>
             {
                 (App.Current as App)?.AppendErrorLog("Exception@MPC@FillSongInfoEx", e.Message);
-                });
+            });
 
             return null;
         }
@@ -4341,7 +4341,7 @@ public sealed partial class MpcService : IMpcService
         {
             Debug.WriteLine("Error@ParseListAll: " + e);
 
-            _dispatcherService.TryEnqueue(() =>{ (App.Current as App)?.AppendErrorLog("Exception@MPC@ParseListAll", e.Message); });
+            _dispatcherService.TryEnqueue(() => { (App.Current as App)?.AppendErrorLog("Exception@MPC@ParseListAll", e.Message); });
 
             IsBusy?.Invoke(this, false);
             return Task.FromResult(false); ;
@@ -4479,7 +4479,7 @@ public sealed partial class MpcService : IMpcService
         {
             Debug.WriteLine("Error@ParseListAlbumGroupAlbumArtist: " + e);
 
-            _dispatcherService.TryEnqueue(() =>{ (App.Current as App)?.AppendErrorLog("Exception@MPC@ParseListAlbumGroupAlbumArtist", e.Message); });
+            _dispatcherService.TryEnqueue(() => { (App.Current as App)?.AppendErrorLog("Exception@MPC@ParseListAlbumGroupAlbumArtist", e.Message); });
 
             IsBusy?.Invoke(this, false);
             return Task.FromResult(false); ;
@@ -4688,7 +4688,7 @@ public sealed partial class MpcService : IMpcService
                         if (songValues.ContainsKey("file")) // && SongValues.ContainsKey("duration")
                         {
                             SongInfo? sng = FillSongInfo(songValues, i);
-                            
+
                             songValues.Clear();
 
                             if (sng is not null)

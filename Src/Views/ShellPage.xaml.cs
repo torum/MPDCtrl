@@ -1,11 +1,8 @@
 ﻿using Microsoft.UI.Input;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
@@ -16,14 +13,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
-using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.System;
-using Windows.UI.ApplicationSettings;
 using Windows.UI.Core;
 using WinRT;
 
@@ -37,7 +29,7 @@ public sealed partial class ShellPage : Page
     {
         get;
     }
-    
+
     private readonly IDispatcherService _dispatcherService;
 
     private Type? _currentPage;
@@ -143,7 +135,7 @@ public sealed partial class ShellPage : Page
         }
         return;
         */
-        
+
         // This right here is better. the initial Selected = .. messed up in the constructor.
         if (this.NavigationFrame.Navigate(typeof(QueuePage), this.NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
         {
@@ -191,7 +183,7 @@ public sealed partial class ShellPage : Page
         }
 
         double scaleAdjustment = AppTitleBar.XamlRoot.RasterizationScale;
-        
+
         // Settings button
         GeneralTransform transform1 = this.SettingsButton.TransformToVisual(null);
         Rect bounds1 = transform1.TransformBounds(new Rect(0, 0,
@@ -224,7 +216,7 @@ public sealed partial class ShellPage : Page
         var rectArray = new Windows.Graphics.RectInt32[] { BackButtonRect, SettingsButton };
 
         InputNonClientPointerSource nonClientInputSrc = InputNonClientPointerSource.GetForWindowId(m_AppWindow.Id);
-        nonClientInputSrc.SetRegionRects(NonClientRegionKind.Passthrough, rectArray); 
+        nonClientInputSrc.SetRegionRects(NonClientRegionKind.Passthrough, rectArray);
     }
 
     private static Windows.Graphics.RectInt32 GetRect(Rect bounds, double scale)
@@ -297,7 +289,7 @@ public sealed partial class ShellPage : Page
     {
         _dispatcherService.TryEnqueue(() =>
         {
-            
+
         });
     }
 
@@ -305,7 +297,7 @@ public sealed partial class ShellPage : Page
     {
         _dispatcherService.TryEnqueue(() =>
         {
-            
+
         });
     }
 

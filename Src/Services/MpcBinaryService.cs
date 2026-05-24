@@ -388,7 +388,7 @@ public sealed class MpcBinaryService : IMpcBinaryService
         catch (IOException e)
         {
             // IOException : Unable to write data to the transport connection
-            
+
             Debug.WriteLine("Exception@MpdBinarySendBinaryCommand: " + cmd.Trim() + " WriteAsync " + e.Message);
 
             ret.IsTimeOut = true; // re-try.
@@ -397,7 +397,7 @@ public sealed class MpcBinaryService : IMpcBinaryService
             ret.ErrorMessage = e.Message;
 
             return ret;
-            
+
         }
         catch (Exception e)
         {
@@ -1143,7 +1143,7 @@ public sealed class MpcBinaryService : IMpcBinaryService
                 _cts?.Dispose();
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Debug.WriteLine($"Exception @MpdBinaryConnectionDisconnect {ex}");
         }

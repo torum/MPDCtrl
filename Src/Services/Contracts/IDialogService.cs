@@ -1,10 +1,4 @@
-﻿using Microsoft.UI.Xaml;
-using MPDCtrl.Models;
-using MPDCtrl.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using MPDCtrl.Models;
 using System.Threading.Tasks;
 using static MPDCtrl.Services.DialogService;
 

@@ -572,4 +572,13 @@ SOFTWARE.</value>
   <data name="Dialog_Title_KeyboardShortcuts" xml:space="preserve">
     <value>キーボードショートカット</value>
   </data>
+  <data name="FilterListView_ScrollToSelectedSong.Text" xml:space="preserve">
+    <value>選択した曲にスクロール</value>
+  </data>
+  <data name="FilterListView_MoveToSelectedAlbum.Text" xml:space="preserve">
+    <value>選択したアルバムへ移動</value>
+  </data>
+  <data name="FilterListView_MoveToSelectedArtist.Text" xml:space="preserve">
+    <value>選択したアーティストへ移動</value>
+  </data>
 </root>

@@ -162,28 +162,21 @@
                         <StackPanel>
                             <TextBox x:Name="FilterQueueQueryTextBox" Text="{x:Bind ViewModel.FilterQueueQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="0,0,0,0"></TextBox>
                             <ListView Name="FilterQueueListBox" ItemsSource="{x:Bind ViewModel.QueueForFilter, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedQueueFilterSong,Mode=TwoWay}" IsDoubleTapEnabled="True" DoubleTapped="FilterQueueListBox_DoubleTapped" SelectionMode="Single" MaxHeight="240" BorderThickness="0" Padding="0,3,0,0">
-
                                 <ListView.ContextFlyout>
                                     <MenuFlyout>
-                                        <MenuFlyoutItem Command="{x:Bind ViewModel.QueueFilterSelectCommand}" CommandParameter="{x:Bind FilterQueueListBox.SelectedItem, Mode=OneWay}">
-                                            <MenuFlyoutItem.Icon>
-                                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm8.856-3.845A1.25 1.25 0 0 0 9 9.248v5.504a1.25 1.25 0 0 0 1.856 1.093l5.757-3.189a.75.75 0 0 0 0-1.312l-5.757-3.189Z"/>
-                                            </MenuFlyoutItem.Icon>
+                                        <MenuFlyoutItem x:Uid="FilterListView_ScrollToSelectedSong" Command="{x:Bind ViewModel.QueueFilterSelectCommand}" CommandParameter="{x:Bind FilterQueueListBox.SelectedItem, Mode=OneWay}">
                                             <MenuFlyoutItem.KeyboardAccelerators>
                                                 <KeyboardAccelerator Key="Enter" />
                                             </MenuFlyoutItem.KeyboardAccelerators>
                                         </MenuFlyoutItem>
                                     </MenuFlyout>
                                 </ListView.ContextFlyout>
-
                                 <ListView.ItemTemplate>
                                     <DataTemplate x:DataType="mod:SongInfoEx">
                                         <StackPanel>
                                             <TextBlock x:Name="filterListBoxTitle" Text="{x:Bind Path=Title, Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" />
-
                                             <TextBlock Text="{x:Bind Path=Artist, Mode=OneWay}" Opacity="0.6" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" Visibility="{x:Bind Artist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=Flase}" />
                                             <TextBlock x:Uid="Text_UnknownArtist" Opacity="0.6" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="0" Padding="3 0 3 0" Visibility="{x:Bind Artist, Mode=OneWay, Converter={StaticResource StringVisibilityConverter}, ConverterParameter=True}"/>
-
                                         </StackPanel>
                                     </DataTemplate>
                                 </ListView.ItemTemplate>

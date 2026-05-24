@@ -571,4 +571,13 @@ SOFTWARE.</value>
   <data name="Dialog_Title_KeyboardShortcuts" xml:space="preserve">
     <value>Keyboard Shortcuts</value>
   </data>
+  <data name="FilterListView_ScrollToSelectedSong.Text" xml:space="preserve">
+    <value>Scroll to selected song</value>
+  </data>
+  <data name="FilterListView_MoveToSelectedAlbum.Text" xml:space="preserve">
+    <value>Move to selected album</value>
+  </data>
+  <data name="FilterListView_MoveToSelectedArtist.Text" xml:space="preserve">
+    <value>Move to selected artist</value>
+  </data>
 </root>

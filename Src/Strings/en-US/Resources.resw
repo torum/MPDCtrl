@@ -580,4 +580,7 @@ SOFTWARE.</value>
   <data name="FilterListView_MoveToSelectedArtist.Text" xml:space="preserve">
     <value>Move to selected artist</value>
   </data>
+  <data name="Settings_Opts_ForceSetVolumeExplicitly.Content" xml:space="preserve">
+    <value>Always remember and set the volume explicitly</value>
+  </data>
 </root>

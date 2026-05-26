@@ -391,6 +391,15 @@ public sealed partial class MainWindow : Window
                         _vm.IsAlbumSortWithoutThePrefix = xvalue.Value == "True";
                     }
                 }
+
+                xvalue = opts.Attribute("isForceSetVolumeExplicitly");
+                if (xvalue != null)
+                {
+                    if (!string.IsNullOrEmpty(xvalue.Value))
+                    {
+                        _vm.IsForceSetVolumeExplicitly = xvalue.Value == "True";
+                    }
+                }
             }
 
             #region == Profiles  ==
@@ -978,6 +987,10 @@ public sealed partial class MainWindow : Window
 
         attrs = doc.CreateAttribute("isAlbumSortWithoutThePrefix");
         attrs.Value = _vm.IsAlbumSortWithoutThePrefix.ToString();
+        xOpts.SetAttributeNode(attrs);
+
+        attrs = doc.CreateAttribute("isForceSetVolumeExplicitly");
+        attrs.Value = _vm.IsForceSetVolumeExplicitly.ToString();
         xOpts.SetAttributeNode(attrs);
 
         root.AppendChild(xOpts);

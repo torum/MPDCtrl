@@ -581,4 +581,7 @@ SOFTWARE.</value>
   <data name="FilterListView_MoveToSelectedArtist.Text" xml:space="preserve">
     <value>選択したアーティストへ移動</value>
   </data>
+  <data name="Settings_Opts_ForceSetVolumeExplicitly.Content" xml:space="preserve">
+    <value>常に音量を記憶して明示的に設定する</value>
+  </data>
 </root>

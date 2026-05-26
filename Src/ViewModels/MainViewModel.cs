@@ -2134,6 +2134,21 @@ public sealed partial class MainViewModel : ObservableObject
         }
     } = true;
 
+    public bool IsForceSetVolumeExplicitly
+    {
+        get; set
+        {
+            if (field == value)
+                return;
+
+            field = value;
+
+            _mpc.MpdForceSetVolume = field;
+
+            OnPropertyChanged();
+        }
+    } = true;
+
     //
     public bool IsDebugWindowEnabled
     {
@@ -2553,6 +2568,8 @@ public sealed partial class MainViewModel : ObservableObject
 
     private void InitializeAndSubscribe()
     {
+        _mpc.MpdForceSetVolume = IsForceSetVolumeExplicitly;
+
         #region == Subscribe to events ==
 
         _mpc.MpdIdleConnected += OnMpdIdleConnected;

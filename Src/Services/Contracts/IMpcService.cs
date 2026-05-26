@@ -24,7 +24,8 @@ public interface IMpcService
     int MpdPort { get; }
     Status MpdStatus { get; }
     bool MpdStop { get; set; }
-    string MpdVerText { get; set; }
+    bool MpdForceSetVolume { get; set; }
+    string MpdVerText { get; }
     ObservableCollection<Playlist> Playlists { get; }
     //ObservableCollection<SongInfo> SearchResult { get; }
 

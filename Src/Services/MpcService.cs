@@ -31,9 +31,11 @@ public sealed partial class MpcService : IMpcService
 
     public string MpdPassword { get; private set; } = "";
 
-    public string MpdVerText { get; set; } = "";
+    public string MpdVerText { get; private set; } = "";
 
     public Status MpdStatus { get; private set; } = new();
+
+    public bool MpdForceSetVolume { get; set; }
 
     public bool MpdStop { get; set; }
 
@@ -2447,7 +2449,7 @@ public sealed partial class MpcService : IMpcService
 
         if ((MpdStatus.MpdState == Status.MpdPlayState.Play) || (MpdStatus.MpdState == Status.MpdPlayState.Pause))
         {
-            if (MpdStatus.MpdVolumeIsSet)
+            if (MpdStatus.MpdVolumeIsSet || !MpdForceSetVolume)
             {
                 CommandResult result = await MpdCommandSendCommand(cmd);
 
@@ -2468,12 +2470,14 @@ public sealed partial class MpcService : IMpcService
         else if (MpdStatus.MpdState == Status.MpdPlayState.Stop)
         {
             CommandResult result = await MpdCommandSendCommand(cmd);
-            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && !MpdStatus.MpdVolumeIsSet)
+
+            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
             {
-                Debug.WriteLine("MpdPlaybackPlay. State is stop. Sending setvol command separately.");
+                Debug.WriteLine($"MpdPlaybackPlay. State is stop. Sending setvol command separately.  {volume}");
                 // MPD's volume is reset to 100% when the state is stop. So set the volume.
                 // Also, if you use "command_list_begin", you receive "all outputs are disabled" ark message and the setvol command is not executed.
                 // So send "setvol" command separately.
+                await Task.Delay(200);
                 await MpdCommandSendCommand($"setvol {volume}");
             }
 
@@ -2498,7 +2502,7 @@ public sealed partial class MpcService : IMpcService
     {
         if ((MpdStatus.MpdState == Status.MpdPlayState.Play) || (MpdStatus.MpdState == Status.MpdPlayState.Pause))
         {
-            if (MpdStatus.MpdVolumeIsSet)
+            if (MpdStatus.MpdVolumeIsSet || !MpdForceSetVolume)
             {
                 CommandResult result = await MpdCommandSendCommand("pause 0");
 
@@ -2519,12 +2523,13 @@ public sealed partial class MpcService : IMpcService
         else if (MpdStatus.MpdState == Status.MpdPlayState.Stop)
         {
             CommandResult result = await MpdCommandSendCommand("pause 0");
-            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && !MpdStatus.MpdVolumeIsSet)
+            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
             {
                 Debug.WriteLine("MpdPlaybackResume. State is stop. Sending setvol command separately.");
                 // MPD's volume is reset to 100% when the state is stop. So set the volume.
                 // Also, if you use "command_list_begin", you receive "all outputs are disabled" ark message and the setvol command is not executed.
                 // So send "setvol" command separately.
+                await Task.Delay(200);
                 await MpdCommandSendCommand($"setvol {volume}");
             }
 
@@ -2549,7 +2554,7 @@ public sealed partial class MpcService : IMpcService
     {
         if ((MpdStatus.MpdState == Status.MpdPlayState.Play) || (MpdStatus.MpdState == Status.MpdPlayState.Pause))
         {
-            if (MpdStatus.MpdVolumeIsSet)
+            if (MpdStatus.MpdVolumeIsSet || !MpdForceSetVolume)
             {
                 CommandResult result = await MpdCommandSendCommand("next");
 
@@ -2570,12 +2575,13 @@ public sealed partial class MpcService : IMpcService
         else if (MpdStatus.MpdState == Status.MpdPlayState.Stop)
         {
             CommandResult result = await MpdCommandSendCommand("next");
-            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && !MpdStatus.MpdVolumeIsSet)
+            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
             {
                 Debug.WriteLine("MpdPlaybackNext. State is stop. Sending setvol command separately.");
                 // MPD's volume is reset to 100% when the state is stop. So set the volume.
                 // Also, if you use "command_list_begin", you receive "all outputs are disabled" ark message and the setvol command is not executed.
                 // So send "setvol" command separately.
+                await Task.Delay(200);
                 await MpdCommandSendCommand($"setvol {volume}");
             }
 
@@ -2593,7 +2599,7 @@ public sealed partial class MpcService : IMpcService
     {
         if ((MpdStatus.MpdState == Status.MpdPlayState.Play) || (MpdStatus.MpdState == Status.MpdPlayState.Pause))
         {
-            if (MpdStatus.MpdVolumeIsSet)
+            if (MpdStatus.MpdVolumeIsSet || !MpdForceSetVolume)
             {
                 CommandResult result = await MpdCommandSendCommand("previous");
 
@@ -2614,12 +2620,13 @@ public sealed partial class MpcService : IMpcService
         else if (MpdStatus.MpdState == Status.MpdPlayState.Stop)
         {
             CommandResult result = await MpdCommandSendCommand("previous");
-            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && !MpdStatus.MpdVolumeIsSet)
+            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
             {
                 Debug.WriteLine("MpdPlaybackPrev. State is stop. Sending setvol command separately.");
                 // MPD's volume is reset to 100% when the state is stop. So set the volume.
                 // Also, if you use "command_list_begin", you receive "all outputs are disabled" ark message and the setvol command is not executed.
                 // So send "setvol" command separately.
+                await Task.Delay(200);
                 await MpdCommandSendCommand($"setvol {volume}");
             }
 
@@ -2915,7 +2922,7 @@ public sealed partial class MpcService : IMpcService
                 cmd = cmd + "add \"" + Regex.Escape(uri) + "\"\n";
             }
             cmd = cmd + "play" + "\n";
-            if (!MpdStatus.MpdVolumeIsSet)
+            if (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume)
             {
                 cmd = cmd + "setvol " + volume.ToString() + "\n";
             }
@@ -2953,7 +2960,7 @@ public sealed partial class MpcService : IMpcService
                     await ParseCurrentSong(result2.ResultText);
                 }
                 */
-                if (string.IsNullOrEmpty(result.ErrorMessage) && !MpdStatus.MpdVolumeIsSet)
+                if (string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
                 {
                     // Needed this...
                     await Task.Delay(200);
@@ -2993,7 +3000,7 @@ public sealed partial class MpcService : IMpcService
             cmd = cmd + "clear" + "\n";
             cmd = cmd + "add \"" + Regex.Escape(uri) + "\"\n";
             cmd = cmd + "play" + "\n";
-            if (!MpdStatus.MpdVolumeIsSet)
+            if (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume)
             {
                 cmd = cmd + "setvol " + volume.ToString() + "\n";
             }
@@ -3027,7 +3034,7 @@ public sealed partial class MpcService : IMpcService
                 //    await ParseCurrentSong(result2.ResultText);
                 //}
 
-                if (string.IsNullOrEmpty(result.ErrorMessage) && !MpdStatus.MpdVolumeIsSet)
+                if (string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
                 {
                     await Task.Delay(200);
 
@@ -3069,7 +3076,7 @@ public sealed partial class MpcService : IMpcService
             cmd = cmd + "clear" + "\n";
             cmd = cmd + "load \"" + playlistName + "\"\n";
             cmd = cmd + "play" + "\n";
-            if (!MpdStatus.MpdVolumeIsSet)
+            if (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume)
             {
                 cmd = cmd + "setvol " + volume.ToString() + "\n";
             }
@@ -3102,7 +3109,7 @@ public sealed partial class MpcService : IMpcService
             //    await ParseCurrentSong(result.ResultText);
             //}
 
-            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && !MpdStatus.MpdVolumeIsSet)
+            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
             {
                 await Task.Delay(200);
 

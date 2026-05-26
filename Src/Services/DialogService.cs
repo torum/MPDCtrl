@@ -18,6 +18,8 @@ public sealed class DialogService : IDialogService
     public record AddToDialogResult(string PlaylistName, bool AsNew);
     public record RenameDialogResult(string PlaylistName);
 
+    private bool _isDialogOpened;
+
     public DialogService()
     {
 
@@ -25,6 +27,11 @@ public sealed class DialogService : IDialogService
 
     public async Task ShowKeybindingsDialog()
     {
+        if (_isDialogOpened)
+        {
+            return;
+        }
+
         if (App.MainWnd is null)
         {
             Debug.WriteLine("App.MainWnd is null");
@@ -52,11 +59,18 @@ public sealed class DialogService : IDialogService
             }
         };
 
+        _isDialogOpened = true;
         await dialog.ShowAsync();
+        _isDialogOpened = false;
     }
 
     public async Task<Profile?> ShowInitDialog(ViewModels.MainViewModel vm)
     {
+        if (_isDialogOpened)
+        {
+            return null;
+        }
+
         if (App.MainWnd is null)
         {
             Debug.WriteLine("App.MainWnd is null");
@@ -89,7 +103,9 @@ public sealed class DialogService : IDialogService
             return null;
         }
 
+        _isDialogOpened = true;
         var result = await dialog.ShowAsync();
+        _isDialogOpened = false;
 
         if (result != ContentDialogResult.Primary)
         {
@@ -102,6 +118,11 @@ public sealed class DialogService : IDialogService
 
     public async Task<AddToDialogResult?> ShowSongsAddToDialog(ViewModels.MainViewModel vm)
     {
+        if (_isDialogOpened)
+        {
+            return null;
+        }
+
         if (App.MainWnd is null)
         {
             return null;
@@ -139,7 +160,9 @@ public sealed class DialogService : IDialogService
         //dialogContent.PlaylistComboBox.ItemsSource = new ObservableCollection<Playlist>(vm.Playlists.OrderBy(x => x.Name, comp));
         dialogContent.SetPlaylists(new ObservableCollection<Playlist>(vm.Playlists.OrderBy(x => x.Name, comp)));
 
+        _isDialogOpened = true;
         var result = await dialog.ShowAsync();
+        _isDialogOpened = false;
 
         if (result == ContentDialogResult.Primary)
         {
@@ -171,6 +194,11 @@ public sealed class DialogService : IDialogService
 
     public async Task<RenameDialogResult?> ShowPlaylistRenameToDialog(ViewModels.MainViewModel vm)
     {
+        if (_isDialogOpened)
+        {
+            return null;
+        }
+
         if (App.MainWnd is null)
         {
             return null;
@@ -201,7 +229,9 @@ public sealed class DialogService : IDialogService
             return null;
         }
 
+        _isDialogOpened = true;
         var result = await dialog.ShowAsync();
+        _isDialogOpened = false;
 
         if (result == ContentDialogResult.Primary)
         {
@@ -218,6 +248,11 @@ public sealed class DialogService : IDialogService
 
     public async Task<Profile?> ShowProfileAddDialog()
     {
+        if (_isDialogOpened)
+        {
+            return null;
+        }
+
         var dialog = new ContentDialog
         {
             XamlRoot = App.MainWnd?.Content.XamlRoot,
@@ -238,7 +273,9 @@ public sealed class DialogService : IDialogService
             return null;
         }
 
+        _isDialogOpened = true;
         var result = await dialog.ShowAsync();
+        _isDialogOpened = false;
 
         if (result != ContentDialogResult.Primary)
         {
@@ -256,6 +293,11 @@ public sealed class DialogService : IDialogService
 
     public async Task<Profile?> ShowProfileEditDialog(Profile selectedProfile)
     {
+        if (_isDialogOpened)
+        {
+            return null;
+        }
+
         if (selectedProfile is null)
         {
             return null;
@@ -283,7 +325,9 @@ public sealed class DialogService : IDialogService
 
         dlg.SetProfile(selectedProfile);
 
+        _isDialogOpened = true;
         var result = await dialog.ShowAsync();
+        _isDialogOpened = false;
 
         if (result != ContentDialogResult.Primary)
         {

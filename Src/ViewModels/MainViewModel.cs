@@ -2147,7 +2147,7 @@ public sealed partial class MainViewModel : ObservableObject
 
             OnPropertyChanged();
         }
-    } = true;
+    } = false;
 
     //
     public bool IsDebugWindowEnabled
@@ -2915,7 +2915,7 @@ public sealed partial class MainViewModel : ObservableObject
 
                 if (_mpc.MpdStatus.MpdVolumeIsReturned)
                 {
-                    // Only update volume when Playing or Paused. (Because of MPD's strange behavior where it returns vlume 100 when stopped)
+                    // Only update volume when Playing or Paused. (Because of MPD's strange behavior where it returns volume 100 when stopped)
                     if (_mpc.MpdStatus.MpdState != Status.MpdPlayState.Stop)
                     {
                         //Debug.WriteLine($"Volume is set to {_mpc.MpdStatus.MpdVolume} @UpdateButtonStatus()");

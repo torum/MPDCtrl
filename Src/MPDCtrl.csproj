@@ -18,8 +18,8 @@
 	  <PackageIcon>MPDCtrl.ico</PackageIcon>
 	  <ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
 
-	  <VersionPrefix>4.1.1.0</VersionPrefix>
-	  <FileVersion>4.1.1.0</FileVersion>
+	  <VersionPrefix>4.1.2.0</VersionPrefix>
+	  <FileVersion>4.1.2.0</FileVersion>
 	  
 	  <IncludeSymbols>True</IncludeSymbols>
 	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>

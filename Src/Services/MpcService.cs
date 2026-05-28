@@ -2473,7 +2473,7 @@ public sealed partial class MpcService : IMpcService
 
             if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
             {
-                Debug.WriteLine($"MpdPlaybackPlay. State is stop. Sending setvol command separately.  {volume}");
+                Debug.WriteLine($"MpdPlaybackPlay. State is stop. Sending setvol command separately. {volume}");
                 // MPD's volume is reset to 100% when the state is stop. So set the volume.
                 // Also, if you use "command_list_begin", you receive "all outputs are disabled" ark message and the setvol command is not executed.
                 // So send "setvol" command separately.
@@ -2525,7 +2525,7 @@ public sealed partial class MpcService : IMpcService
             CommandResult result = await MpdCommandSendCommand("pause 0");
             if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
             {
-                Debug.WriteLine("MpdPlaybackResume. State is stop. Sending setvol command separately.");
+                Debug.WriteLine($"MpdPlaybackResume. State is stop. Sending setvol command separately. {volume}");
                 // MPD's volume is reset to 100% when the state is stop. So set the volume.
                 // Also, if you use "command_list_begin", you receive "all outputs are disabled" ark message and the setvol command is not executed.
                 // So send "setvol" command separately.
@@ -2577,7 +2577,7 @@ public sealed partial class MpcService : IMpcService
             CommandResult result = await MpdCommandSendCommand("next");
             if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
             {
-                Debug.WriteLine("MpdPlaybackNext. State is stop. Sending setvol command separately.");
+                Debug.WriteLine($"MpdPlaybackNext. State is stop. Sending setvol command separately. {volume}");
                 // MPD's volume is reset to 100% when the state is stop. So set the volume.
                 // Also, if you use "command_list_begin", you receive "all outputs are disabled" ark message and the setvol command is not executed.
                 // So send "setvol" command separately.
@@ -2622,7 +2622,7 @@ public sealed partial class MpcService : IMpcService
             CommandResult result = await MpdCommandSendCommand("previous");
             if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
             {
-                Debug.WriteLine("MpdPlaybackPrev. State is stop. Sending setvol command separately.");
+                Debug.WriteLine($"MpdPlaybackPrev. State is stop. Sending setvol command separately. {volume}");
                 // MPD's volume is reset to 100% when the state is stop. So set the volume.
                 // Also, if you use "command_list_begin", you receive "all outputs are disabled" ark message and the setvol command is not executed.
                 // So send "setvol" command separately.
@@ -3113,7 +3113,7 @@ public sealed partial class MpcService : IMpcService
             {
                 await Task.Delay(200);
 
-                Debug.WriteLine("MpdChangePlaylist. State is stop. Sending setvol command separately.");
+                Debug.WriteLine($"MpdChangePlaylist. State is stop. Sending setvol command separately. {volume}");
                 // MPD's volume is reset to 100% when the state is stop. So set the volume.
                 // Also, if you use "command_list_begin", you receive "all outputs are disabled" ark message and the setvol command is not executed.
                 // So send "setvol" command separately.

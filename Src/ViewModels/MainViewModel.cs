@@ -2627,6 +2627,24 @@ public sealed partial class MainViewModel : ObservableObject
             }
             else
             {
+                _dispatcherService.TryEnqueue(() =>
+                {
+                    // TODO::
+                    ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
+                    //StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
+
+                    InfoBarErrTitle = "Error";
+                    InfoBarErrMessage = "Could not retrive IP Address from the hostname.";
+                    IsShowErrWindow = true;
+                });
+
+                return;
+            }
+        }
+        catch (Exception)
+        {
+            _dispatcherService.TryEnqueue(() =>
+            {
                 // TODO::
                 ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
                 //StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
@@ -2634,19 +2652,7 @@ public sealed partial class MainViewModel : ObservableObject
                 InfoBarErrTitle = "Error";
                 InfoBarErrMessage = "Could not retrive IP Address from the hostname.";
                 IsShowErrWindow = true;
-
-                return;
-            }
-        }
-        catch (Exception)
-        {
-            // TODO::
-            ConnectionStatusMessage = "Error: Could not retrive IP Address from the hostname.";
-            //StatusBarMessage = "Error: Could not retrive IP Address from the hostname.";
-
-            InfoBarErrTitle = "Error";
-            InfoBarErrMessage = "Could not retrive IP Address from the hostname.";
-            IsShowErrWindow = true;
+            });
 
             return;
         }

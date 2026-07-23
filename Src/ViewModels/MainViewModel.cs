@@ -137,19 +137,19 @@ public sealed partial class MainViewModel : ObservableObject
         get => _host;
         set
         {
-            //ClearError(nameof(Host));
-            _host = value;
+            if (value is null)
+            {
+                return;
+            }
+
+            _host = value.Trim();
 
             // Validate input.
-            if (value == "")
-            {
-                //SetError(nameof(Host), MPDCtrlX.Properties.Resources.Settings_ErrorHostMustBeSpecified);
-
-            }
-            else if (value == "localhost")
+            if (_host == "localhost")
             {
                 _host = "127.0.0.1";
             }
+            /*
             else
             {
                 try
@@ -166,6 +166,7 @@ public sealed partial class MainViewModel : ObservableObject
                     //SetError(nameof(Host), MPDCtrlX.Properties.Resources.Settings_ErrorHostInvalidAddressFormat);
                 }
             }
+            */
 
             OnPropertyChanged();
         }
@@ -1993,10 +1994,7 @@ public sealed partial class MainViewModel : ObservableObject
             {
                 IsNotConnectingNorConnected = true;
             }
-            if (field)
-            {
-                IsConnectButtonEnabled = true;
-            }
+            IsConnectButtonEnabled = field;
         }
     }
 
@@ -2012,10 +2010,7 @@ public sealed partial class MainViewModel : ObservableObject
             OnPropertyChanged(nameof(IsNotConnecting));
             OnPropertyChanged(nameof(ShortStatusWithMpdVersion));
 
-            if (field)
-            {
-                IsConnectButtonEnabled = false;
-            }
+            IsConnectButtonEnabled = !field;
         }
     }
 
@@ -2030,10 +2025,7 @@ public sealed partial class MainViewModel : ObservableObject
             OnPropertyChanged();
             OnPropertyChanged(nameof(ShortStatusWithMpdVersion));
 
-            if (field)
-            {
-                IsConnectButtonEnabled = true;
-            }
+            IsConnectButtonEnabled = field;
         }
     } = true;
 

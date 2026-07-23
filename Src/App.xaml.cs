@@ -75,7 +75,7 @@ public sealed partial class App : Application
             var envDataFolder = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
             AppDataFolder = System.IO.Path.Combine(System.IO.Path.Combine(envDataFolder, AppDeveloper), AppName);
             AppConfigFilePath = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, AppName + ".config");
-            //AppConfigFilePath = System.IO.Path.Combine(AppDataFolder, _appName + ".config"); // should have been this...
+            //AppConfigFilePath = System.IO.Path.Combine(AppDataFolder, AppName + ".config"); // Ops. should have been this...
             var envAppLocalCahceFolder = Windows.Storage.ApplicationData.Current.LocalCacheFolder.Path;
             AlbumCoverCacheFolder = System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.Combine(envAppLocalCahceFolder, AppDeveloper), AppName), "AlbumCoverCache");
         }

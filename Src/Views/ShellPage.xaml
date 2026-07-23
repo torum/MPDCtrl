@@ -58,7 +58,7 @@
 
         <!-- NaviView -->
         <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BorderBrush="{ThemeResource SmokeFillColorDefaultBrush}" BorderThickness="0,0,0,0">
-            <NavigationView x:Name="NaviView" AccessKey="H" 
+            <NavigationView x:Name="NaviView" AccessKey="H"
                             MenuItemsSource="{x:Bind ViewModel.MainMenuItems, Mode=OneWay}" 
                             IsTitleBarAutoPaddingEnabled="True" IsBackButtonVisible="Collapsed" IsPaneToggleButtonVisible="True" IsSettingsVisible="False" PaneDisplayMode="Auto" ExpandedModeThresholdWidth="1008" CompactModeThresholdWidth="640" OpenPaneLength ="280" IsPaneOpen="{x:Bind ViewModel.IsNavigationViewMenuOpen, Mode=TwoWay}" Loaded="NavigationView_Loaded" ItemInvoked="NavigationView_ItemInvoked" SelectionChanged="NaviView_SelectionChanged" PaneClosed="NaviView_PaneClosed" PaneOpened="NaviView_PaneOpened" DisplayModeChanged="NaviView_DisplayModeChanged">
                 <NavigationView.PaneHeader>

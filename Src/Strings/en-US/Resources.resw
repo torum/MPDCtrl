@@ -506,13 +506,13 @@ SOFTWARE.</value>
     <value>More</value>
   </data>
   <data name="PlaybackControl_Prev.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Previous (Ctrl+Left)</value>
+    <value>Previous (Ctrl+Left/Ctrl+B)</value>
   </data>
   <data name="PlaybackControl_Play.ToolTipService.ToolTip" xml:space="preserve">
     <value>Play/Pause (Ctrl+P, *Space)</value>
   </data>
   <data name="PlaybackControl_Next.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Next (Ctrl+Right)</value>
+    <value>Next (Ctrl+Right/Ctrl+N)</value>
   </data>
   <data name="PlaybackControl_Repeat.ToolTipService.ToolTip" xml:space="preserve">
     <value>Repeat</value>
@@ -582,5 +582,8 @@ SOFTWARE.</value>
   </data>
   <data name="Settings_Opts_ForceSetVolumeExplicitly.Content" xml:space="preserve">
     <value>Always remember and set the volume explicitly</value>
+  </data>
+  <data name="PageMenu_Refresh.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Refresh</value>
   </data>
 </root>

@@ -507,13 +507,13 @@ SOFTWARE.</value>
     <value>その他</value>
   </data>
   <data name="PlaybackControl_Prev.ToolTipService.ToolTip" xml:space="preserve">
-    <value>前の曲 (Ctrl+Left)</value>
+    <value>前の曲 (Ctrl+Left/Ctrl+B)</value>
   </data>
   <data name="PlaybackControl_Play.ToolTipService.ToolTip" xml:space="preserve">
     <value>再生・一時停止 (Ctrl+P, *Space)</value>
   </data>
   <data name="PlaybackControl_Next.ToolTipService.ToolTip" xml:space="preserve">
-    <value>次の曲 (Ctrl+Right)</value>
+    <value>次の曲 (Ctrl+Right/Ctrl+N)</value>
   </data>
   <data name="PlaybackControl_Repeat.ToolTipService.ToolTip" xml:space="preserve">
     <value>リピート</value>
@@ -583,5 +583,8 @@ SOFTWARE.</value>
   </data>
   <data name="Settings_Opts_ForceSetVolumeExplicitly.Content" xml:space="preserve">
     <value>常に音量を記憶して明示的に設定する</value>
+  </data>
+  <data name="PageMenu_Refresh.ToolTipService.ToolTip" xml:space="preserve">
+    <value>最新の状態に更新</value>
   </data>
 </root>

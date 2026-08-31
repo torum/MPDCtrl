@@ -4033,6 +4033,11 @@ public sealed partial class MainViewModel : ObservableObject
                     if (MusicDirectories[0] is NodeDirectory nd)
                     {
                         _selectedNodeDirectory = nd;
+                        //_selectedNodeDirectory.Selected = true;
+                        await Task.Delay(100);
+                        SelectedNodeDirectory?.Expanded = true;
+                        // WinUI3 bug: TreeViewItem IsExpanded binding not working. Really sad to see that this is still not fixed in 2026. 
+                        // https://github.com/microsoft/microsoft-ui-xaml/issues/10140
                         OnPropertyChanged(nameof(SelectedNodeDirectory));
                     }
                 }
@@ -4097,8 +4102,6 @@ public sealed partial class MainViewModel : ObservableObject
                         filestNode.IsAcquired = true;
                     });
 
-                    //await UpdateLibraryMusicAsync().ConfigureAwait(false);
-                    //await UpdateLibraryDirectoriesAsync().ConfigureAwait(false);
                     var dirTask = UpdateLibraryDirectoriesAsync();
                     var fileTask = UpdateLibraryMusicAsync();
                     await Task.WhenAll(dirTask, fileTask);
@@ -7649,6 +7652,49 @@ public sealed partial class MainViewModel : ObservableObject
         dataPackage.SetText(newString);
         Clipboard.SetContent(dataPackage);
     }
+
+    [RelayCommand(CanExecute = nameof(FilesRefreshCanExecute))]
+    private async Task FilesRefresh()
+    {
+        if (IsBusy) return;
+        if (IsWorking) return;
+
+        if (SelectedNodeMenu is null) return;
+
+        await _dispatcherService.EnqueueAsync(async () =>
+        {
+            if (SelectedNodeMenu is NodeMenuFiles fmn)
+            {
+                IsWorking = true;
+
+                fmn.IsAcquired = false;
+                MusicDirectories.Clear();
+                MusicEntries.Clear();
+                await GetFilesAsync(fmn);
+
+                if (MusicDirectories.Count > 0)
+                {
+                    if (MusicDirectories[0] is NodeDirectory nd)
+                    {
+                        SelectedNodeDirectory = nd;
+                        await Task.Delay(100);
+                        SelectedNodeDirectory?.Expanded = true;
+                        // WinUI3 bug: TreeViewItem IsExpanded binding not working. Really sad to see that this is still not fixed in 2026. 
+                        // https://github.com/microsoft/microsoft-ui-xaml/issues/10140
+                    }
+                }
+
+                IsWorking = false;
+            }
+        });
+    }
+
+    private bool FilesRefreshCanExecute()
+    {
+        if (!_mpc.Commands.Contains("listall")) { return false; }
+        return true;
+    }
+
 
     [RelayCommand(CanExecute = nameof(ChangePlaylistCanExecute))]
     private async Task ClearQueueAndLoadPlaylist()

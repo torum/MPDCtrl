@@ -414,7 +414,7 @@
                         <AdaptiveTrigger MinWindowWidth="1008" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="HeaderGrid.Margin" Value="24,0,24,0" />
+                        <Setter Target="HeaderGrid.Margin" Value="48,0,48,0" />
                         <Setter Target="BodyGrid.Margin" Value="20,0,0,0" />
                         <Setter Target="QueueListview.Padding" Value="0,0,24,0" />
                         <Setter Target="QueueListviewDummyHeader.Margin" Value="0,0,24,4" />
@@ -429,7 +429,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="24,0,24,0" />
-                        <Setter Target="BodyGrid.Margin" Value="20,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="0,0,0,0" />
                         <Setter Target="QueueListview.Padding" Value="0,0,24,0" />
                         <Setter Target="QueueListviewDummyHeader.Margin" Value="0,0,24,4" />
                         <Setter Target="DummyHeaderColumn_LastModified.Width" Value="0" />
@@ -443,7 +443,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="16,0,16,0" />
-                        <Setter Target="BodyGrid.Margin" Value="12,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="0,0,0,0" />
                         <Setter Target="QueueListview.Padding" Value="0,0,16,0" />
                         <Setter Target="QueueListviewDummyHeader.Margin" Value="0,0,16,4" />
                         <Setter Target="DummyHeaderColumn_LastModified.Width" Value="0" />
@@ -457,7 +457,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="16,0,16,0" />
-                        <Setter Target="BodyGrid.Margin" Value="12,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="0,0,0,0" />
                         <Setter Target="QueueListview.Padding" Value="0,0,16,0" />
                         <Setter Target="QueueListviewDummyHeader.Margin" Value="0,0,16,4" />
                         <Setter Target="DummyHeaderColumn_LastModified.Width" Value="0" />

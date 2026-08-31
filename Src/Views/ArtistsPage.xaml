@@ -40,7 +40,7 @@
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                     <!-- Find -->
-                    <ToggleButton x:Name="TglButtonArtistFilter" x:Uid="PageMenu_Find" AccessKey="F" Height="36" Width="38" Margin="4,0,2,0" IsChecked="{x:Bind ViewModel.IsArtistFindVisible, Mode=TwoWay}" Click="TglButtonArtistFilter_Click" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                    <ToggleButton x:Name="TglButtonArtistFilter" x:Uid="PageMenu_Find" AccessKey="F" Height="36" Width="38" Margin="4,0,4,0" IsChecked="{x:Bind ViewModel.IsArtistFindVisible, Mode=TwoWay}" Click="TglButtonArtistFilter_Click" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                         <ToggleButton.KeyboardAccelerators>
                             <KeyboardAccelerator Key="F" Modifiers="Control"/>
                         </ToggleButton.KeyboardAccelerators>

@@ -60,7 +60,7 @@
                     <StackPanel Orientation="Horizontal" Height="36">
                         <!-- Filter box -->
                         <TextBox Name="FilesFilterQueryTextBox" MinWidth="120" Width="280" Text="{x:Bind ViewModel.FilterMusicEntriesQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Visibility="{x:Bind TglButtonFilesItemsFilter.IsChecked, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" VerticalAlignment="Bottom" Margin="0,0,6,0"></TextBox>
-                        <ToggleButton Name="TglButtonFilesItemsFilter" x:Uid="PageMenu_Filter" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="4,0,2,0" Height="36" Click="TglButtonFilesItemsFilter_Click">
+                        <ToggleButton Name="TglButtonFilesItemsFilter" x:Uid="PageMenu_Filter" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="2,0,4,0" Height="36" Click="TglButtonFilesItemsFilter_Click">
                             <Viewbox Width="14" Height="14" Margin="-2,-2,0,0" HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <PathIcon Width="NaN" Height="NaN"
 								Data="M7.5 13H12.5C12.7761 13 13 13.2239 13 13.5C13 13.7455 12.8231 13.9496 12.5899 13.9919L12.5 14H7.5C7.22386 14 7 13.7761 7 13.5C7 13.2545 7.17688 13.0504 7.41012 13.0081L7.5 13H12.5H7.5ZM5.5 9H14.5C14.7761 9 15 9.22386 15 9.5C15 9.74546 14.8231 9.94961 14.5899 9.99194L14.5 10H5.5C5.22386 10 5 9.77614 5 9.5C5 9.25454 5.17688 9.05039 5.41012 9.00806L5.5 9H14.5H5.5ZM3.5 5H16.5C16.7761 5 17 5.22386 17 5.5C17 5.74546 16.8231 5.94961 16.5899 5.99194L16.5 6H3.5C3.22386 6 3 5.77614 3 5.5C3 5.25454 3.17688 5.05039 3.41012 5.00806L3.5 5H16.5H3.5Z">
@@ -71,6 +71,16 @@
                             </ToggleButton.KeyboardAccelerators>
                         </ToggleButton>
                     </StackPanel>
+                    
+                    <!--  CommandParameter="{x:Bind ViewModel.MusicEntriesFiltered, Mode=OneWay}" -->
+                    <Button x:Uid="PageMenu_Refresh" Height="36" Width="38" Margin="4,0,4,0" Command="{x:Bind ViewModel.FilesRefreshCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <Viewbox Width="14" Height="14">
+                                <PathIcon Width="NaN" Height="NaN" Margin="0" Data="M7.14645 0.646447C7.34171 0.451184 7.65829 0.451184 7.85355 0.646447L9.35355 2.14645C9.54882 2.34171 9.54882 2.65829 9.35355 2.85355L7.85355 4.35355C7.65829 4.54882 7.34171 4.54882 7.14645 4.35355C6.95118 4.15829 6.95118 3.84171 7.14645 3.64645L7.7885 3.00439C5.12517 3.11522 3 5.30943 3 8C3 9.56799 3.72118 10.9672 4.85185 11.8847C5.06627 12.0587 5.09904 12.3736 4.92503 12.588C4.75103 12.8024 4.43615 12.8352 4.22172 12.6612C2.86712 11.5619 2 9.88205 2 8C2 4.75447 4.57689 2.1108 7.79629 2.00339L7.14645 1.35355C6.95118 1.15829 6.95118 0.841709 7.14645 0.646447ZM11.075 3.41199C11.249 3.19756 11.5639 3.1648 11.7783 3.3388C13.1329 4.43806 14 6.11795 14 8C14 11.2455 11.4231 13.8892 8.20371 13.9966L8.85355 14.6464C9.04882 14.8417 9.04882 15.1583 8.85355 15.3536C8.65829 15.5488 8.34171 15.5488 8.14645 15.3536L6.64645 13.8536C6.55268 13.7598 6.5 13.6326 6.5 13.5C6.5 13.3674 6.55268 13.2402 6.64645 13.1464L8.14645 11.6464C8.34171 11.4512 8.65829 11.4512 8.85355 11.6464C9.04882 11.8417 9.04882 12.1583 8.85355 12.3536L8.2115 12.9956C10.8748 12.8848 13 10.6906 13 8C13 6.43201 12.2788 5.03283 11.1482 4.1153C10.9337 3.94129 10.901 3.62641 11.075 3.41199Z"/>
+                            </Viewbox>
+                        </StackPanel>
+                    </Button>
+
                 </StackPanel>
             </Grid>
 
@@ -87,6 +97,8 @@
             <TreeView Grid.Column="0" Margin="0,24,0,0" BorderThickness="0" ItemsSource="{x:Bind ViewModel.MusicDirectories, Mode=OneWay}" SelectionMode="Single" SelectedItem="{x:Bind ViewModel.SelectedNodeDirectory, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" DoubleTapped="TreeView_DoubleTapped">
                 <TreeView.ItemTemplate>
                     <DataTemplate x:DataType="mod:NodeTree">
+                        <!-- WinUI3 bug: TreeViewItem IsExpanded binding not working. Really sad to see that this is still not fixed in 2026. 
+                        https://github.com/microsoft/microsoft-ui-xaml/issues/10140 -->
                         <TreeViewItem ItemsSource="{x:Bind Path=Children}" IsExpanded="{x:Bind Path=Expanded, Mode=TwoWay}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -107,12 +119,14 @@
                     <!--  BasedOn="{StaticResource MUX_TreeViewItemStyle}" Where is DefaultTreeViewItemStyle?? -->
                     <Style TargetType="TreeViewItem">
                         <Setter Property="MinHeight" Value="{ThemeResource TreeViewItemMinHeight}" />
-                        <Setter Property="IsExpanded" Value="True" />
+                        
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                         <Setter Property="VerticalAlignment" Value="Center" />
                         
                         <Setter Property="Padding" Value="0" />
                         <Setter Property="Margin" Value="0" />
+                        <!--<Setter Property="IsExpanded" Value="True" />
+                        -->
                         <!-- Not possible in winui3?
                         
                         <Setter Property="IsSelected" Value="{x:Bind IsSelected, Mode=TwoWay}" />

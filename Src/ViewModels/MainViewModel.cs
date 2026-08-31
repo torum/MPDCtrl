@@ -5520,54 +5520,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     #region == Commands ==
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
-    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
-    [RelayCommand]
-    private void SwitchTheme(ElementTheme? param)
-    {
-        if (param is null)
-        {
-            return;
-        }
-
-        if (Theme == param)
-        {
-            return;
-        }
-
-        if (App.MainWnd == null)
-        {
-            return;
-        }
-        //var mainWin = App.GetService<MainWindow>();
-
-        Theme = (ElementTheme)param;
-
-        if (App.MainWnd?.Content is FrameworkElement rootElement)
-        {
-            rootElement.RequestedTheme = Theme;
-
-            //TitleBarHelper.UpdateTitleBar(Theme, App.MainWnd);
-
-            App.MainWnd?.SetCapitionButtonColor();
-        }
-    }
-
-    [RelayCommand]
-    private static void SwitchSystemBackdrop(string? backdrop)
-    {
-        if (backdrop == null)
-        {
-            return;
-        }
-
-        if (Enum.TryParse(backdrop, out SystemBackdropOption cacheBackdrop))
-        {
-            //var mainWin = App.GetService<MainWindow>();
-            App.MainWnd?.SwitchBackdrop(cacheBackdrop);
-        }
-    }
+    #region == MPD Playback Commands ==
 
     [RelayCommand(CanExecute = nameof(PlayCanExecute))]
     private async Task Play()
@@ -5773,59 +5726,9 @@ public sealed partial class MainViewModel : ObservableObject
         await _mpc.MpdSetVolume(0);
     }
 
-    [RelayCommand]
-    private async Task SearchExec()
-    {
-        // Allow empty string.
-        //if (string.IsNullOrEmpty(SearchQuery)) return; 
+    #endregion
 
-        string queryShiki = "contains";
-        if (SelectedSearchShiki.Shiki == SearchShiki.Equals)
-        {
-            queryShiki = "==";
-        }
-
-        var res = await _mpc.MpdSearch(SelectedSearchTag.Key.ToString(), queryShiki, SearchQuery);
-        if (res.IsSuccess)
-        {
-            if (res.SearchResult is not null)
-            {
-                await _dispatcherService.EnqueueAsync(() =>
-                {
-                    // WinUI3's workaround.
-                    foreach (var item in res.SearchResult)
-                    {
-                        item.ParentViewModel = this;
-                    }
-
-                    SearchResult = new ObservableCollection<SongInfo>(res.SearchResult); // COPY ON PURPOSE
-
-                    if (SearchResult.Count > 0)
-                    {
-                        IsSearchControlEnabled = true;
-                    }
-                    else
-                    {
-                        IsSearchControlEnabled = false;
-                    }
-                });
-            }
-            else
-            {
-                Debug.WriteLine("Search result is null.");
-                SearchResult?.Clear();
-                IsSearchControlEnabled = false;
-            }
-        }
-        else
-        {
-            Debug.WriteLine("Search failed: " + res.ErrorMessage);
-            SearchResult?.Clear();
-            IsSearchControlEnabled = false;
-        }
-
-        UpdateProgress?.Invoke(this, "");
-    }
+    #region == Queue Commands ==
 
     [RelayCommand(CanExecute = nameof(PlayCanExecute))]
     private async Task QueueSelectedPlay(SongInfoEx? song)
@@ -5845,65 +5748,6 @@ public sealed partial class MainViewModel : ObservableObject
             return;
         }
         await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume), song.Id);
-    }
-
-    [RelayCommand(CanExecute = nameof(SongsPlayCanExecute))]
-    private async Task SongsListviewPlayThis(object obj)
-    {
-        if (obj is null) return;
-
-        if (obj is not SongInfo song)
-        {
-            return;
-        }
-
-        await _dispatcherService.EnqueueAsync(async () =>
-        {
-            Queue.Clear();
-            CurrentSong = null;
-
-            await _mpc.MpdSinglePlay(song.File, Convert.ToInt32(_volume));
-        });
-    }
-    private bool SongsPlayCanExecute()
-    {
-        if (!_mpc.Commands.Contains("clear")) { return false; }
-        if (!_mpc.Commands.Contains("add")) { return false; }
-        if (!_mpc.Commands.Contains("play")) { return false; }
-        if (!_mpc.Commands.Contains("setvol")) { return false; }
-        if (!_mpc.Commands.Contains("currentsong")) { return false; }
-        return true;
-    }
-
-    [RelayCommand(CanExecute = nameof(AddToQueueCanExecute))]
-    private async Task SongsListviewAddThis(object obj)
-    {
-        if (obj is null) return;
-
-        if (obj is SongInfo song)
-        {
-            await _mpc.MpdAdd(song.File);
-        }
-    }
-    private bool AddToQueueCanExecute()
-    {
-        if (!_mpc.Commands.Contains("add")) { return false; }
-        return true;
-    }
-
-    [RelayCommand(CanExecute = nameof(QueueClearWithoutPromptCanExecute))]
-    private async Task QueueClearWithoutPrompt()
-    {
-        if (Queue.Count == 0) { return; }
-
-        await _mpc.MpdPlaybackStop();
-        await _mpc.MpdClear();
-    }
-    private bool QueueClearWithoutPromptCanExecute()
-    {
-        if (!_mpc.Commands.Contains("stop")) { return false; }
-        if (!_mpc.Commands.Contains("clear")) { return false; }
-        return true;
     }
 
     [RelayCommand]
@@ -6328,6 +6172,138 @@ public sealed partial class MainViewModel : ObservableObject
         if (!_mpc.Commands.Contains("deleteid")) { return false; }
         return true;
     }
+
+    #endregion
+
+    #region == Search Commands ==
+
+    [RelayCommand]
+    private async Task SearchExec()
+    {
+        // Allow empty string.
+        //if (string.IsNullOrEmpty(SearchQuery)) return; 
+
+        string queryShiki = "contains";
+        if (SelectedSearchShiki.Shiki == SearchShiki.Equals)
+        {
+            queryShiki = "==";
+        }
+
+        var res = await _mpc.MpdSearch(SelectedSearchTag.Key.ToString(), queryShiki, SearchQuery);
+        if (res.IsSuccess)
+        {
+            if (res.SearchResult is not null)
+            {
+                await _dispatcherService.EnqueueAsync(() =>
+                {
+                    // WinUI3's workaround.
+                    foreach (var item in res.SearchResult)
+                    {
+                        item.ParentViewModel = this;
+                    }
+
+                    SearchResult = new ObservableCollection<SongInfo>(res.SearchResult); // COPY ON PURPOSE
+
+                    if (SearchResult.Count > 0)
+                    {
+                        IsSearchControlEnabled = true;
+                    }
+                    else
+                    {
+                        IsSearchControlEnabled = false;
+                    }
+                });
+            }
+            else
+            {
+                Debug.WriteLine("Search result is null.");
+                SearchResult?.Clear();
+                IsSearchControlEnabled = false;
+            }
+        }
+        else
+        {
+            Debug.WriteLine("Search failed: " + res.ErrorMessage);
+            SearchResult?.Clear();
+            IsSearchControlEnabled = false;
+        }
+
+        UpdateProgress?.Invoke(this, "");
+    }
+
+    [RelayCommand]
+    private void GoToSearchPage()
+    {
+        IsNavigationViewMenuOpen = true;
+        _mainMenuItems.SearchDirectory.Selected = true;
+    }
+
+    #endregion
+
+    #region == Songs ListView Commands ==
+
+    [RelayCommand(CanExecute = nameof(SongsPlayCanExecute))]
+    private async Task SongsListviewPlayThis(object obj)
+    {
+        if (obj is null) return;
+
+        if (obj is not SongInfo song)
+        {
+            return;
+        }
+
+        await _dispatcherService.EnqueueAsync(async () =>
+        {
+            Queue.Clear();
+            CurrentSong = null;
+
+            await _mpc.MpdSinglePlay(song.File, Convert.ToInt32(_volume));
+        });
+    }
+    private bool SongsPlayCanExecute()
+    {
+        if (!_mpc.Commands.Contains("clear")) { return false; }
+        if (!_mpc.Commands.Contains("add")) { return false; }
+        if (!_mpc.Commands.Contains("play")) { return false; }
+        if (!_mpc.Commands.Contains("setvol")) { return false; }
+        if (!_mpc.Commands.Contains("currentsong")) { return false; }
+        return true;
+    }
+
+    [RelayCommand(CanExecute = nameof(AddToQueueCanExecute))]
+    private async Task SongsListviewAddThis(object obj)
+    {
+        if (obj is null) return;
+
+        if (obj is SongInfo song)
+        {
+            await _mpc.MpdAdd(song.File);
+        }
+    }
+    private bool AddToQueueCanExecute()
+    {
+        if (!_mpc.Commands.Contains("add")) { return false; }
+        return true;
+    }
+
+    [RelayCommand(CanExecute = nameof(QueueClearWithoutPromptCanExecute))]
+    private async Task QueueClearWithoutPrompt()
+    {
+        if (Queue.Count == 0) { return; }
+
+        await _mpc.MpdPlaybackStop();
+        await _mpc.MpdClear();
+    }
+    private bool QueueClearWithoutPromptCanExecute()
+    {
+        if (!_mpc.Commands.Contains("stop")) { return false; }
+        if (!_mpc.Commands.Contains("clear")) { return false; }
+        return true;
+    }
+
+    #endregion
+
+    #region == Songs Commands ==
 
     [RelayCommand(CanExecute = nameof(SongsPlayCanExecute))]
     private async Task SongsPlayAll(object obj)
@@ -6790,6 +6766,10 @@ public sealed partial class MainViewModel : ObservableObject
         SearchResult = SongsSortBy(SearchResult, key);
     }
 
+    #endregion
+
+    #region == Albums Commands ==
+
     [RelayCommand]
     private void AlbumsSortBy(object obj)
     {
@@ -6954,54 +6934,6 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ListviewGoToArtistPage(SongInfo song)
-    {
-        if (song is null)
-        {
-            return;
-        }
-
-        var asdf = song.AlbumArtist;
-        if (string.IsNullOrEmpty(asdf.Trim()))
-        {
-            asdf = song.Artist;
-        }
-
-        if (string.IsNullOrEmpty(asdf.Trim()))
-        {
-            return;
-        }
-
-        var item = Artists.FirstOrDefault(i => i.Name == asdf);
-        if (item is null) return;
-
-        GoToArtistPage(item);
-    }
-
-    private void GoToArtistPage(AlbumArtist albumArtist)
-    {
-        IsNavigationViewMenuOpen = true;
-
-        SelectedAlbumArtist = albumArtist;// Needs to be after setting SelectedAlbumArtist because GoToArtistPage() will set selected item in NavigationView menu which will trigger loading albums of the artist.
-        _mainMenuItems.ArtistsDirectory.Selected = true;
-    }
-
-    [RelayCommand]
-    private void ArtistFilterSelect(object obj)
-    {
-        if (Artists.Count <= 1)
-            return;
-
-        if (obj is null) return;
-
-        if (obj is AlbumArtist artist)
-        {
-            //ScrollIntoViewAndSelect?.Invoke(this, artist);
-            SelectedAlbumArtist = artist;
-        }
-    }
-
-    [RelayCommand]
     private async Task CurrentSongToAlbumPage()
     {
         if (CurrentSong is null)
@@ -7048,31 +6980,6 @@ public sealed partial class MainViewModel : ObservableObject
                 break;
             }
         }
-    }
-
-    [RelayCommand]
-    private void CurrentSongToArtistPage()
-    {
-        if (CurrentSong is null)
-        {
-            return;
-        }
-
-        var asdf = CurrentSong.AlbumArtist;
-        if (string.IsNullOrEmpty(asdf.Trim()))
-        {
-            asdf = CurrentSong.Artist;
-        }
-
-        if (string.IsNullOrEmpty(asdf.Trim()))
-        {
-            return;
-        }
-
-        var item = Artists.FirstOrDefault(i => i.Name == asdf);
-        if (item is null) return;
-
-        GoToArtistPage(item);
     }
 
     [RelayCommand]
@@ -7210,24 +7117,86 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
+    #endregion
+
+    #region == Artists Commands ==
+
     [RelayCommand]
-    private void FireDebugCommandClear()
+    private void ListviewGoToArtistPage(SongInfo song)
     {
-        DebugCommandClear?.Invoke(this, EventArgs.Empty);
+        if (song is null)
+        {
+            return;
+        }
+
+        var asdf = song.AlbumArtist;
+        if (string.IsNullOrEmpty(asdf.Trim()))
+        {
+            asdf = song.Artist;
+        }
+
+        if (string.IsNullOrEmpty(asdf.Trim()))
+        {
+            return;
+        }
+
+        var item = Artists.FirstOrDefault(i => i.Name == asdf);
+        if (item is null) return;
+
+        GoToArtistPage(item);
+    }
+
+    private void GoToArtistPage(AlbumArtist albumArtist)
+    {
+        IsNavigationViewMenuOpen = true;
+
+        SelectedAlbumArtist = albumArtist;// Needs to be after setting SelectedAlbumArtist because GoToArtistPage() will set selected item in NavigationView menu which will trigger loading albums of the artist.
+        _mainMenuItems.ArtistsDirectory.Selected = true;
     }
 
     [RelayCommand]
-    private void FireDebugIdleClear()
+    private void ArtistFilterSelect(object obj)
     {
-        DebugIdleClear?.Invoke(this, EventArgs.Empty);
+        if (Artists.Count <= 1)
+            return;
+
+        if (obj is null) return;
+
+        if (obj is AlbumArtist artist)
+        {
+            //ScrollIntoViewAndSelect?.Invoke(this, artist);
+            SelectedAlbumArtist = artist;
+        }
     }
 
     [RelayCommand]
-    private void FireDebugWindowShowHide()
+    private void CurrentSongToArtistPage()
     {
-        //DebugWindowShowHide?.Invoke(this, EventArgs.Empty);
-        IsShowDebugWindow = !IsShowDebugWindow;
+        if (CurrentSong is null)
+        {
+            return;
+        }
+
+        var asdf = CurrentSong.AlbumArtist;
+        if (string.IsNullOrEmpty(asdf.Trim()))
+        {
+            asdf = CurrentSong.Artist;
+        }
+
+        if (string.IsNullOrEmpty(asdf.Trim()))
+        {
+            return;
+        }
+
+        var item = Artists.FirstOrDefault(i => i.Name == asdf);
+        if (item is null) return;
+
+        GoToArtistPage(item);
     }
+
+    #endregion
+
+    #region == Files Commands ==
 
     [RelayCommand(CanExecute = nameof(SongsPlayCanExecute))]
     private async Task SelectedDirectoryPlayAll(object obj)
@@ -7695,6 +7664,9 @@ public sealed partial class MainViewModel : ObservableObject
         return true;
     }
 
+    #endregion
+
+    #region == Playlist Commands ==
 
     [RelayCommand(CanExecute = nameof(ChangePlaylistCanExecute))]
     private async Task ClearQueueAndLoadPlaylist()
@@ -8123,6 +8095,10 @@ public sealed partial class MainViewModel : ObservableObject
         return true;
     }
 
+    #endregion
+
+    #region == Profile Commands ==
+
     [RelayCommand]
     private async Task ReConnectWithSelectedProfile()
     {
@@ -8343,6 +8319,10 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
+    #endregion
+
+    #region == Other Settings Commands ==
+
     [RelayCommand]
     private async Task ClearAlbumCacheFolder()
     {
@@ -8381,12 +8361,79 @@ public sealed partial class MainViewModel : ObservableObject
         return true;
     }
 
+    #endregion
+
+    #region == Other Misc Commands ==
+
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     [RelayCommand]
-    private void GoToSearchPage()
+    private void SwitchTheme(ElementTheme? param)
     {
-        IsNavigationViewMenuOpen = true;
-        _mainMenuItems.SearchDirectory.Selected = true;
+        if (param is null)
+        {
+            return;
+        }
+
+        if (Theme == param)
+        {
+            return;
+        }
+
+        if (App.MainWnd == null)
+        {
+            return;
+        }
+        //var mainWin = App.GetService<MainWindow>();
+
+        Theme = (ElementTheme)param;
+
+        if (App.MainWnd?.Content is FrameworkElement rootElement)
+        {
+            rootElement.RequestedTheme = Theme;
+
+            //TitleBarHelper.UpdateTitleBar(Theme, App.MainWnd);
+
+            App.MainWnd?.SetCapitionButtonColor();
+        }
     }
+
+    [RelayCommand]
+    private static void SwitchSystemBackdrop(string? backdrop)
+    {
+        if (backdrop == null)
+        {
+            return;
+        }
+
+        if (Enum.TryParse(backdrop, out SystemBackdropOption cacheBackdrop))
+        {
+            //var mainWin = App.GetService<MainWindow>();
+            App.MainWnd?.SwitchBackdrop(cacheBackdrop);
+        }
+    }
+
+    [RelayCommand]
+    private void FireDebugCommandClear()
+    {
+        DebugCommandClear?.Invoke(this, EventArgs.Empty);
+    }
+
+    [RelayCommand]
+    private void FireDebugIdleClear()
+    {
+        DebugIdleClear?.Invoke(this, EventArgs.Empty);
+    }
+
+    [RelayCommand]
+    private void FireDebugWindowShowHide()
+    {
+        //DebugWindowShowHide?.Invoke(this, EventArgs.Empty);
+        IsShowDebugWindow = !IsShowDebugWindow;
+    }
+
+    #endregion
 
     #endregion
 

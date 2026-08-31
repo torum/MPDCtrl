@@ -6674,6 +6674,98 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
+    [RelayCommand(CanExecute = nameof(AddToQueueCanExecute))]
+    private async Task SongsAddAfterSelectedItemsToQueue(object obj) //(System.Collections.Generic.IList<object> obj)
+    {
+        if (obj is null)
+        {
+            return;
+        }
+
+        /*
+         * AoT bad
+        if (obj is not IList<object> items)
+        {
+            Debug.WriteLine("obj is not IList<object> @SongsAddSelectedItemsToQueue");
+            return;
+        }
+
+        var collection = items.Cast<SongInfo>();
+
+        List<string> selectedList = [];
+
+        foreach (var item in collection)
+        {
+            selectedList.Add(item.File);
+        }
+        */
+
+        List<string> selectedList = [];
+
+        // 1. Intercept the raw C++ COM wrapper (IInspectable) 
+        if (obj is IInspectable)
+        {
+            // Modern C#/WinRT solution (CS0618 Free & Native AOT Safe)
+            // Direct cast to the managed IEnumerable projection handles the COM mapping safely.
+            if (obj is IEnumerable<object> comCollection)
+            {
+                foreach (var item in comCollection)
+                {
+                    if (item is SongInfo song)
+                    {
+                        selectedList.Add(song.File);
+                    }
+                }
+            }
+            else
+            {
+                Debug.WriteLine("IInspectable wrapper does not implement IEnumerable<object>");
+            }
+        }
+        // 2. Fallback for Standard C# Lists (Non-AOT testing environment)
+        else if (obj is IList items)
+        {
+            foreach (var item in items)
+            {
+                if (item is SongInfo song)
+                {
+                    selectedList.Add(song.File);
+                }
+            }
+        }
+        // 3. THE CATCH-ALL FOR AOT WRAPPERS: Try the base non-generic IEnumerable
+        // This safely intercepts .NET 10 internal types like IListImpl`1
+        else if (obj is IEnumerable fallbackCollection)
+        {
+            foreach (var item in fallbackCollection)
+            {
+                if (item is SongInfo song)
+                {
+                    selectedList.Add(song.File);
+                }
+            }
+        }
+        // 4. Fallback for Single Item Selections
+        else if (obj is SongInfo singleSong)
+        {
+            selectedList.Add(singleSong.File);
+        }
+        else
+        {
+            Debug.WriteLine($"obj is an unhandled type: {obj.GetType().FullName}");
+            return;
+        }
+
+        if (selectedList.Count == 1)
+        {
+            await _mpc.MpdAddAfter(selectedList[0]);
+        }
+        else if (selectedList.Count > 1)
+        {
+            await _mpc.MpdAddAfter(selectedList);
+        }
+    }
+
     private static ObservableCollection<SongInfo> SongsSortBy(ObservableCollection<SongInfo> target, string key)
     {
         ObservableCollection<SongInfo> sorted = [];
@@ -7587,6 +7679,97 @@ public sealed partial class MainViewModel : ObservableObject
         else if (selectedList.Count > 1)
         {
             await _mpc.MpdAdd(selectedList);
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(AddToQueueCanExecute))]
+    private async Task FilesAddAfterSelectedItemsToQueue(object obj) //(System.Collections.Generic.IList<object> obj)
+    {
+        if (obj is null)
+        {
+            return;
+        }
+
+        /*
+        if (obj is not IList<object> items)
+        {
+            Debug.WriteLine("obj is not IList<object> @FilesAddSelectedItemsToQueue");
+            return;
+        }
+
+        var collection = items.Cast<NodeFile>();
+
+        List<string> selectedList = [];
+
+        foreach (var item in collection)
+        {
+            selectedList.Add(item.OriginalFileUri);
+        }
+        */
+
+        List<string> selectedList = [];
+
+        // 1. Intercept the raw C++ COM wrapper (IInspectable) 
+        if (obj is IInspectable)
+        {
+            // Modern C#/WinRT solution (CS0618 Free & Native AOT Safe)
+            // Direct cast to the managed IEnumerable projection handles the COM mapping safely.
+            if (obj is IEnumerable<object> comCollection)
+            {
+                foreach (var item in comCollection)
+                {
+                    if (item is NodeFile song)
+                    {
+                        selectedList.Add(song.OriginalFileUri);
+                    }
+                }
+            }
+            else
+            {
+                Debug.WriteLine("IInspectable wrapper does not implement IEnumerable<object>");
+            }
+        }
+        // 2. Fallback for Standard C# Lists (Non-AOT testing environment)
+        else if (obj is IList items)
+        {
+            foreach (var item in items)
+            {
+                if (item is NodeFile song)
+                {
+                    selectedList.Add(song.OriginalFileUri);
+                }
+            }
+        }
+        // 3. THE CATCH-ALL FOR AOT WRAPPERS: Try the base non-generic IEnumerable
+        // This safely intercepts .NET 10 internal types like IListImpl`1
+        else if (obj is IEnumerable fallbackCollection)
+        {
+            foreach (var item in fallbackCollection)
+            {
+                if (item is NodeFile song)
+                {
+                    selectedList.Add(song.OriginalFileUri);
+                }
+            }
+        }
+        // 4. Fallback for Single Item Selections
+        else if (obj is NodeFile singleSong)
+        {
+            selectedList.Add(singleSong.OriginalFileUri);
+        }
+        else
+        {
+            Debug.WriteLine($"obj is an unhandled type: {obj.GetType().FullName}");
+            return;
+        }
+
+        if (selectedList.Count == 1)
+        {
+            await _mpc.MpdAddAfter(selectedList[0]);
+        }
+        else if (selectedList.Count > 1)
+        {
+            await _mpc.MpdAddAfter(selectedList);
         }
     }
 

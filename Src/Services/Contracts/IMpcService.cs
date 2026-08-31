@@ -45,7 +45,9 @@ public interface IMpcService
     event MpcService.MpdOutputChangedEvent MpdOutputChanged;
 
     Task<CommandResult> MpdAdd(List<string> uris);
+    Task<CommandResult> MpdAddAfter(List<string> uris);
     Task<CommandResult> MpdAdd(string uri);
+    Task<CommandResult> MpdAddAfter(string uri);
     Task<CommandResult> MpdMultiplePlay(List<string> uris, int volume);
     Task<CommandResult> MpdSinglePlay(string uri, int volume);
     Task<CommandResult> MpdChangePlaylist(string playlistName, int volume);

@@ -2810,6 +2810,24 @@ public sealed partial class MpcService : IMpcService
         return result;
     }
 
+    public async Task<CommandResult> MpdAddAfter(string uri)
+    {
+        if (string.IsNullOrEmpty(uri))
+        {
+            CommandResult f = new()
+            {
+                IsSuccess = false
+            };
+            return f;
+        }
+
+        uri = Regex.Escape(uri);
+
+        CommandResult result = await MpdCommandSendCommand("add \"" + uri + "\" +0");
+
+        return result;
+    }
+
     public async Task<CommandResult> MpdAdd(List<string> uris)
     {
         if (uris.Count < 1)
@@ -2826,6 +2844,32 @@ public sealed partial class MpcService : IMpcService
         {
             var urie = Regex.Escape(uri);
             cmd = cmd + "add \"" + urie + "\"\n";
+        }
+        cmd = cmd + "command_list_end" + "\n";
+
+        CommandResult result = await MpdCommandSendCommand(cmd);
+
+        return result;
+    }
+
+    public async Task<CommandResult> MpdAddAfter(List<string> uris)
+    {
+        if (uris.Count < 1)
+        {
+            CommandResult f = new()
+            {
+                IsSuccess = false
+            };
+            return f;
+        }
+
+        string cmd = "command_list_begin" + "\n";
+        var i = 0;
+        foreach (var uri in uris)
+        {
+            var urie = Regex.Escape(uri);
+            cmd = cmd + "add \"" + urie + $"\" +{i}\n";
+            i++;
         }
         cmd = cmd + "command_list_end" + "\n";
 

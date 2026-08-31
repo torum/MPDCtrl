@@ -325,7 +325,7 @@
     <value>再生キューに追加</value>
   </data>
   <data name="ListviewItemContextMenu_AddToQueue.Text" xml:space="preserve">
-    <value>再生キューに追加</value>
+    <value>再生キューに追加（最後に）</value>
   </data>
   <data name="Text_UnknownArtist.Text" xml:space="preserve">
     <value>不明なアーティスト</value>
@@ -586,5 +586,8 @@ SOFTWARE.</value>
   </data>
   <data name="PageMenu_Refresh.ToolTipService.ToolTip" xml:space="preserve">
     <value>最新の状態に更新</value>
+  </data>
+  <data name="ListviewItemContextMenu_AddToQueueAfterCurrent.Text" xml:space="preserve">
+    <value>再生キューに追加（次に）</value>
   </data>
 </root>

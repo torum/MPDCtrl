@@ -325,7 +325,7 @@
     <value>Add to queue</value>
   </data>
   <data name="ListviewItemContextMenu_AddToQueue.Text" xml:space="preserve">
-    <value>Add to queue</value>
+    <value>Add to queue (end)</value>
   </data>
   <data name="Text_UnknownArtist.Text" xml:space="preserve">
     <value>Unknown Artist</value>
@@ -585,5 +585,8 @@ SOFTWARE.</value>
   </data>
   <data name="PageMenu_Refresh.ToolTipService.ToolTip" xml:space="preserve">
     <value>Refresh</value>
+  </data>
+  <data name="ListviewItemContextMenu_AddToQueueAfterCurrent.Text" xml:space="preserve">
+    <value>Add to queue (next)</value>
   </data>
 </root>

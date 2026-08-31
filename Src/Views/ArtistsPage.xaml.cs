@@ -21,6 +21,8 @@ public sealed partial class ArtistsPage : Page
 
     private readonly IDispatcherService _dispatcherService;
 
+    private ListView? _contextMenuListView;
+
     public ArtistsPage()
     {
         ViewModel = App.GetService<MainViewModel>();
@@ -64,6 +66,8 @@ public sealed partial class ArtistsPage : Page
         {
             return;
         }
+
+        _contextMenuListView = listView;
 
         // When multiple items are selected, right click clears that selection. That is not good when trying to do multile items operation with popup menu. So, preserve SelectedItems value.
         FrameworkElement element = (FrameworkElement)e.OriginalSource;
@@ -119,6 +123,47 @@ public sealed partial class ArtistsPage : Page
             }
         }
         */
+    }
+
+    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
+    // https://github.com/dotnet/runtime/issues/121590
+    [DynamicWindowsRuntimeCast(typeof(ListView))]
+    [DynamicWindowsRuntimeCast(typeof(MenuFlyoutItem))]
+    private void ArtistSongsMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        // This is a workaround for the WinUI limitation (nested binding and aot)
+
+        if (_contextMenuListView is not ListView listView)
+        {
+            return;
+        }
+
+        if (sender is not MenuFlyoutItem menuItem ||
+            menuItem.Tag is not string action)
+        {
+            return;
+        }
+
+        var selectedItems = listView.SelectedItems;
+
+        switch (action)
+        {
+            case "Play":
+                ViewModel.SongsSelectedItemsPlayCommand.Execute(selectedItems);
+                break;
+
+            case "AddAfter":
+                ViewModel.SongsAddAfterSelectedItemsToQueueCommand.Execute(selectedItems);
+                break;
+
+            case "AddToQueue":
+                ViewModel.SongsAddSelectedItemsToQueueCommand.Execute(selectedItems);
+                break;
+
+            case "AddToPlaylist":
+                ViewModel.SongsAddSelectedItemsToPlaylistCommand.Execute(selectedItems);
+                break;
+        }
     }
 
     private static T? FindParent<T>(DependencyObject child) where T : DependencyObject

@@ -21,6 +21,7 @@
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
             <converters:StringVisibilityConverter x:Key="StringVisibilityConverter" />
             <helpers:BoolToFontWeightConverter x:Key="BoolToFontWeightConverter"/>
+            <helpers:TimeIntToStringValueConverter x:Key="TimeIntToStringValueConverter"/>
 
             <helpers:ElementThemeEnumToBooleanConverter x:Key="ElementThemeEnumToBooleanConverter" />
             <helpers:SystemBackdropEnumToBooleanConverter x:Key="SystemBackdropEnumToBooleanConverter" />

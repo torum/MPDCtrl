@@ -25,11 +25,6 @@ public sealed partial class MainWindow : Window
 {
     private readonly MainViewModel _vm;
 
-    // DispatcherQueue
-    //public Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue { get; private set; }
-
-    // Stupid WinUI3 workaround.
-    private readonly MediaPlayer? _mediaPlayer;
     private readonly SystemMediaTransportControls? _smtc;
     private readonly bool _isMediaTransportControlEnable = true;
 
@@ -54,8 +49,6 @@ public sealed partial class MainWindow : Window
     public MainWindow(IDispatcherService dispatcherService)
     {
         _dispatcherService = dispatcherService;
-        // This DispatcherQueue should be alive as long as MainWindow is alive. Make sure to clear when the window is closed.
-        //CurrentDispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 
         // This is where the MainViewModel is first initilized.
         _vm = App.GetService<MainViewModel>();
@@ -109,18 +102,17 @@ public sealed partial class MainWindow : Window
 
         if (_isMediaTransportControlEnable)
         {
-            // Stupid WinRT, WinAppSDK and WinUI3 need a whole lot of workaround including media key control. 
-            //_smtc = SystemMediaTransportControls.GetForCurrentView(); //<- this is only works in UWP.
-            // So, get the SystemMediaTransportControls from the MediaPlayer instance for workaround.
-            // This is kinda stupid.
+            // Clean this shit up Microsoft!
+            //_smtc = SystemMediaTransportControls.GetForCurrentView(); //<- this is only works in UWP. 
 
-            _mediaPlayer = new MediaPlayer();
-            //_mediaPlayer.CommandManager.IsEnabled = false; <- not good if false.
-            _smtc = _mediaPlayer.SystemMediaTransportControls;
+            //_mediaPlayer = new MediaPlayer();
+            ////_mediaPlayer.CommandManager.IsEnabled = false; <- not good if false.
+            //_smtc = _mediaPlayer.SystemMediaTransportControls;
+
+            _smtc = Windows.Media.SystemMediaTransportControlsInterop.GetForWindow(WinRT.Interop.WindowNative.GetWindowHandle(this));
 
             OnUpdateSongInfoForSystemMediaTransportControls(new SongInfoForSystemMediaTransportControls());
 
-            //
             _smtc.ButtonPressed += Smtc_ButtonPressed;
             _vm.UpdateSongInfoForSystemMediaTransportControls += (sender, arg) => { this.OnUpdateSongInfoForSystemMediaTransportControls(arg); };
 
@@ -156,7 +148,6 @@ public sealed partial class MainWindow : Window
 
             _smtc.PlaybackStatus = SongInfoForSMTC.PlaybackStatus;
 
-            //
             var updater = _smtc.DisplayUpdater;
 
             updater.Type = MediaPlaybackType.Music;
@@ -166,14 +157,7 @@ public sealed partial class MainWindow : Window
             updater.MusicProperties.Title = SongInfoForSMTC.Title;
             updater.MusicProperties.AlbumTitle = SongInfoForSMTC.AlbumTitle;
 
-            if (SongInfoForSMTC.IsThumbnailIncluded)
-            {
-                updater.Thumbnail = SongInfoForSMTC.Thumbnail;
-            }
-            else
-            {
-                updater.Thumbnail = null;
-            }
+            updater.Thumbnail = SongInfoForSMTC.Thumbnail;
 
             updater.Update();
         });

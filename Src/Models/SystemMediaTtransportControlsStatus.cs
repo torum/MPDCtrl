@@ -24,9 +24,9 @@ public sealed class SongInfoForSystemMediaTransportControls
 
     public bool IsStopEnabled { get; set; } = true;
 
-    public bool IsThumbnailIncluded { get; set; } = false;
+    //public bool IsThumbnailIncluded { get; set; } = false;
 
-    public string FilePath { get; set; } = string.Empty;
+    //public string FilePath { get; set; } = string.Empty;
 
     public Windows.Storage.Streams.RandomAccessStreamReference? Thumbnail { get; set; }
 

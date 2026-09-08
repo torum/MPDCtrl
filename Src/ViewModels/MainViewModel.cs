@@ -2805,8 +2805,6 @@ public sealed partial class MainViewModel : ObservableObject
                             ScrollIntoView?.Invoke(this, CurrentSong);
                         }
 
-                        SetSystemMediaTransportControlsAsync(CurrentSong);
-
                         //IsAlbumArtVisible = false;
                         AlbumCover = null;
                         AlbumArtBitmapSource = null;
@@ -2834,11 +2832,11 @@ public sealed partial class MainViewModel : ObservableObject
                                                 AlbumArtBitmapSource = await BitmapSourceFromByteArrayAsync(res.AlbumCover.BinaryData);
                                                 //IsAlbumArtVisible = true;
                                                 CurrentSong.IsAlbumCoverNeedsUpdate = false;
-
-
                                                 var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                                SetSystemMediaTransportControlsWithThumbnailAsync(CurrentSong, filePath, await ToRandomAccessStreamReferenceAsync(res.AlbumCover.BinaryData));
 
+                                                // TODO:
+                                                //Debug.WriteLine($"SetSystemMediaTransportControls AlbumCover @UpdateStatus() ");
+                                                //SetSystemMediaTransportControls(CurrentSong, await ToRandomAccessStreamReferenceAsync(res.AlbumCover.BinaryData));
                                             }
                                             else
                                             {
@@ -2870,15 +2868,31 @@ public sealed partial class MainViewModel : ObservableObject
                         {
                             Debug.WriteLine(" if (!string.IsNullOrEmpty(CurrentSong.File))");
                         }
+
+                        // Update SystemMediaTransportControls
+                        if (AlbumCover is not null)
+                        {
+                            Debug.WriteLine($"SetSystemMediaTransportControls with AlbumCover @UpdateStatus() ");
+                            SetSystemMediaTransportControls(CurrentSong, await ToRandomAccessStreamReferenceAsync(AlbumCover.BinaryData));
+                        }
+                        else
+                        {
+                            Debug.WriteLine($"SetSystemMediaTransportControls @UpdateStatus() ");
+                            SetSystemMediaTransportControls(CurrentSong, null);
+                        }
                     }
                     else
                     {
-                        //Debug.WriteLine("item is null. @UpdateStatus()");
+                        Debug.WriteLine("Couldn't find the song item in the Queue. @UpdateStatus()");
                         // TODO:
                         CurrentSong = null;
                         AlbumCover = null;
 
                         AlbumArtBitmapSource = null;
+
+                        // TODO:??
+                        //Debug.WriteLine($"");
+                        //SetSystemMediaTransportControls(CurrentSong, null);
                     }
                 }
             }
@@ -2985,86 +2999,34 @@ public sealed partial class MainViewModel : ObservableObject
         {
             UpdateProgress?.Invoke(this, "[UI] Updating current song...");
 
-            var isSongChanged = false;
-            var isCurrentSongWasNull = false;
-
-            if (CurrentSong != null)
+            if (CurrentSong is not null)
             {
                 if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
                 {
-                    isSongChanged = true;
-
                     // Clear IsPlaying icon
                     CurrentSong.IsPlaying = false;
 
-                    //
+                    // ?
                     _mpc.MpdCurrentSong?.IsPlaying = false;
 
-                }
+                    Debug.WriteLine($"CurrentSong.Id != _mpc.MpdStatus.MpdSongID @UpdateCurrentSong()");
 
-                if (CurrentSong.IsAlbumCoverNeedsUpdate)
-                {
-                    isSongChanged = true;
+                    // Clear SMTC
+                    Debug.WriteLine($"SetSystemMediaTransportControls (Clearing) @UpdateCurrentSong() ");
+                    SetSystemMediaTransportControls(null, null);
                 }
             }
             else
             {
-                isCurrentSongWasNull = true;
-
                 CurrentSong = _mpc.MpdCurrentSong;
-            }
 
-            // Update SMTC
-            if (CurrentSong is not null)
-            {
-                SetSystemMediaTransportControlsAsync(CurrentSong);
-            }
-
-            if (_mpc.MpdCurrentSong != null)
-            {
-                if (_mpc.MpdCurrentSong.Id == _mpc.MpdStatus.MpdSongID)
+                if (CurrentSong is null)
                 {
-                    if (isSongChanged || isCurrentSongWasNull)
-                    {
-                        /*
-                         * looks like no need to.
-                        // AlbumArt
-                        if (!string.IsNullOrEmpty(_mpc.MpdCurrentSong.File))
-                        {
-                            if (IsDownloadAlbumArt)
-                            {
-                                var res = await _mpc.MpdQueryAlbumArt(_mpc.MpdCurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
-                                if ((res.AlbumCover.IsSuccess) && (!res.AlbumCover.IsDownloading) && (res.AlbumCover?.SongFilePath != null))
-                                {
-                                    if (res.AlbumCover?.SongFilePath == _mpc.MpdCurrentSong.File)
-                                    {
-                                        AlbumCover = res.AlbumCover;
-                                        //AlbumArtBitmapSource = AlbumCover.AlbumImageSource;
-                                        AlbumArtBitmapSource = await BitmapSourceFromByteArray(AlbumCover.BinaryData);
-                                        if (CurrentSong is not null)
-                                        {
-                                            SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                            CurrentSong.IsAlbumCoverNeedsUpdate = false;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        */
-                    }
-                    else
-                    {
-                        //Debug.WriteLine("if (isSongChanged || isCurrentSongWasNull). @UpdateCurrentSong()");
-                    }
+                    //Debug.WriteLine($"CurrentSong and _mpc.MpdCurrentSong are both null. @UpdateCurrentSong()");
+                    // Update SMTC ??
+                    //Debug.WriteLine($"SetSystemMediaTransportControls @UpdateCurrentSong() ");
+                    //SetSystemMediaTransportControls(CurrentSong, null);
                 }
-                else
-                {
-                    Debug.WriteLine("{_mpc.MpdCurrentSong.Id} != {_mpc.MpdStatus.MpdSongID}. @UpdateCurrentSong()");
-                }
-            }
-            else
-            {
-                Debug.WriteLine("_mpc.MpdCurrentSong is null. @UpdateCurrentSong()");
             }
         });
     }
@@ -3167,7 +3129,7 @@ public sealed partial class MainViewModel : ObservableObject
                     */
                     #endregion
 
-                    #region == better way (only for wpf and avaloniaui) ==
+                    #region == better way ==
 
                     IsWorking = true;
                     await Task.Yield();
@@ -3184,6 +3146,9 @@ public sealed partial class MainViewModel : ObservableObject
                         //IsAlbumArtVisible = false;
                         AlbumCover = null;
                         AlbumArtBitmapSource = null;
+
+                        Debug.WriteLine("SetSystemMediaTransportControls(_mpc.CurrentQueue.Count == 0. Clearing) @UpdateCurrentQueue() ");
+                        SetSystemMediaTransportControls(null, null);
 
                         UpdateProgress?.Invoke(this, "");
 
@@ -3278,7 +3243,7 @@ public sealed partial class MainViewModel : ObservableObject
                     // This is not good, all the selections will be cleared and position will be reset, but ...
                     //Queue = new ObservableCollection<SongInfoEx>(Queue.OrderBy(n => n.Index));
 
-                    Debug.WriteLine("Queue sort started. @UpdateCurrentQueue");
+                    //Debug.WriteLine("Queue sort started. @UpdateCurrentQueue");
                     //Queue.Sort((a, b) => { return a.Index.CompareTo(b.Index); }); // TOO Slow.
                     var sortableList = new List<SongInfoEx>(Queue);
                     sortableList.Sort((a, b) => a.Index.CompareTo(b.Index));
@@ -3292,7 +3257,7 @@ public sealed partial class MainViewModel : ObservableObject
                             Queue.Move(oldIndex, i);
                         }
                     }
-                    Debug.WriteLine("Queue sort end. @UpdateCurrentQueue");
+                    //Debug.WriteLine("Queue sort end. @UpdateCurrentQueue");
 
                     UpdateProgress?.Invoke(this, "[UI] Checking current song after Queue update.");
 
@@ -3318,6 +3283,7 @@ public sealed partial class MainViewModel : ObservableObject
                         CurrentSong.IsAlbumCoverNeedsUpdate = asdf;
 
                         // AlbumArt
+                        AlbumImage? albmcvr = null;
                         if (IsDownloadAlbumArt && CurrentSong.IsAlbumCoverNeedsUpdate)
                         {
                             Debug.WriteLine("MpdQueryAlbumArt @UpdateCurrentQueue (Queue.Count > 0)");
@@ -3336,10 +3302,21 @@ public sealed partial class MainViewModel : ObservableObject
                                     CurrentSong.IsAlbumCoverNeedsUpdate = false;
                                     UpdateProgress?.Invoke(this, "[UI] Received AlbumArt...(Saving..)");
                                     var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                    UpdateProgress?.Invoke(this, "[UI] Received AlbumArt...(SetSystemMediaTransportControlsWithThumbnailAsync..)");
-                                    SetSystemMediaTransportControlsWithThumbnailAsync(CurrentSong, filePath, await ToRandomAccessStreamReferenceAsync(res.AlbumCover.BinaryData));
+                                    UpdateProgress?.Invoke(this, "[UI] Received AlbumArt...(SetSystemMediaTransportControls..)");
+
+                                    albmcvr = res.AlbumCover;
                                 }
                             }
+                        }
+
+                        Debug.WriteLine($"SetSystemMediaTransportControls @UpdateCurrentQueue() (Queue.Count > 0) {CurrentSong.Title} - {CurrentSong.Artist} - {CurrentSong.Album}");
+                        if (albmcvr is not null)
+                        {
+                            SetSystemMediaTransportControls(CurrentSong, await ToRandomAccessStreamReferenceAsync(albmcvr.BinaryData));
+                        }
+                        else
+                        {
+                            SetSystemMediaTransportControls(CurrentSong, null);
                         }
                     }
                     else
@@ -3428,6 +3405,7 @@ public sealed partial class MainViewModel : ObservableObject
                                         }
 
                                         // AlbumArt
+                                        AlbumImage? albmcvr = null;
                                         if (IsDownloadAlbumArt && CurrentSong.IsAlbumCoverNeedsUpdate)
                                         {
                                             //Debug.WriteLine("MpdQueryAlbumArt @UpdateCurrentQueue (Queue.Count == 0)");
@@ -3447,10 +3425,22 @@ public sealed partial class MainViewModel : ObservableObject
                                                     CurrentSong.IsAlbumCoverNeedsUpdate = false;
                                                     UpdateProgress?.Invoke(this, "[UI] Received AlbumArt...(Saving..)");
                                                     var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                                    UpdateProgress?.Invoke(this, "[UI] Received AlbumArt...(SetSystemMediaTransportControlsWithThumbnailAsync..)");
-                                                    SetSystemMediaTransportControlsWithThumbnailAsync(CurrentSong, filePath, await ToRandomAccessStreamReferenceAsync(res.AlbumCover.BinaryData));
+                                                    UpdateProgress?.Invoke(this, "[UI] Received AlbumArt...(SetSystemMediaTransportControls..)");
+
+                                                    albmcvr = res.AlbumCover;
+                                                    //SetSystemMediaTransportControls(CurrentSong, await ToRandomAccessStreamReferenceAsync(res.AlbumCover.BinaryData));
                                                 }
                                             }
+                                        }
+
+                                        Debug.WriteLine($"SetSystemMediaTransportControls (CurrentSong is not null, found in Queue) @UpdateCurrentQueue()  {CurrentSong.Title} - {CurrentSong.Artist} - {CurrentSong.Album}");
+                                        if (albmcvr is not null)
+                                        {
+                                            SetSystemMediaTransportControls(CurrentSong, await ToRandomAccessStreamReferenceAsync(albmcvr.BinaryData));
+                                        }
+                                        else
+                                        {
+                                            SetSystemMediaTransportControls(CurrentSong, null);
                                         }
                                     }
                                     /*
@@ -3510,6 +3500,7 @@ public sealed partial class MainViewModel : ObservableObject
                             }
 
                             // AlbumArt
+                            AlbumImage? albmcvr = null;
                             if (IsDownloadAlbumArt && CurrentSong.IsAlbumCoverNeedsUpdate)
                             {
                                 //Debug.WriteLine("MpdQueryAlbumArt @UpdateCurrentQueue (Queue.Count == 0) (isNeedToFindCurrentSong)");
@@ -3528,20 +3519,36 @@ public sealed partial class MainViewModel : ObservableObject
                                         CurrentSong.IsAlbumCoverNeedsUpdate = false;
                                         UpdateProgress?.Invoke(this, "[UI] Received AlbumArt...(Saving..)");
                                         var filePath = SaveAlbumCoverImage(CurrentSong, res.AlbumCover);
-                                        UpdateProgress?.Invoke(this, "[UI] Received AlbumArt...(SetSystemMediaTransportControlsWithThumbnailAsync..)");
-                                        SetSystemMediaTransportControlsWithThumbnailAsync(CurrentSong, filePath, await ToRandomAccessStreamReferenceAsync(res.AlbumCover.BinaryData));
+                                        UpdateProgress?.Invoke(this, "[UI] Received AlbumArt...(SetSystemMediaTransportControls..)");
+
+                                        //Debug.WriteLine($"SetSystemMediaTransportControls CurrentSong found in the Queue @UpdateCurrentQueue() {CurrentSong.Title} - {CurrentSong.Artist} - {CurrentSong.Album}");
+                                        //SetSystemMediaTransportControls(CurrentSong, await ToRandomAccessStreamReferenceAsync(res.AlbumCover.BinaryData));
+                                        albmcvr = res.AlbumCover;
                                     }
                                 }
+                            }
+
+                            Debug.WriteLine($"SetSystemMediaTransportControls CurrentSong found in the Queue @UpdateCurrentQueue() {CurrentSong.Title} - {CurrentSong.Artist} - {CurrentSong.Album}");
+                            if (albmcvr is not null)
+                            {
+                                SetSystemMediaTransportControls(CurrentSong, await ToRandomAccessStreamReferenceAsync(albmcvr.BinaryData));
+                            }
+                            else
+                            {
+                                SetSystemMediaTransportControls(CurrentSong, null);
                             }
                         }
                         else
                         {
-                            Debug.WriteLine("Looks like starting up with playback status Stop. @UpdateCurrentQueue()");
+                            //Debug.WriteLine("CurrentSong is null. Looks like starting up with playback status Stop. @UpdateCurrentQueue()");
                             // just in case.
                             CurrentSong = null;
                             AlbumCover = null;
 
                             AlbumArtBitmapSource = null;
+
+                            Debug.WriteLine("SetSystemMediaTransportControls(CurrentSong is null, Can't find in Queue. Clearing) @UpdateCurrentQueue() ");
+                            SetSystemMediaTransportControls(null, null);
                         }
                     }
 
@@ -3572,7 +3579,7 @@ public sealed partial class MainViewModel : ObservableObject
             OnPropertyChanged(nameof(QueuePageSubTitleSongCount));
         });
     }
-
+    /*
     private void SetSystemMediaTransportControlsAsync(SongInfoEx songInfo)
     {
         var songInfoForSmtc = new SongInfoForSystemMediaTransportControls
@@ -3614,65 +3621,83 @@ public sealed partial class MainViewModel : ObservableObject
             UpdateSongInfoForSystemMediaTransportControls?.Invoke(this, songInfoForSmtc);
         });
     }
-
-    private void SetSystemMediaTransportControlsWithThumbnailAsync(SongInfoEx songInfo, string? filePath, RandomAccessStreamReference? bitmap)
+    */
+    private void SetSystemMediaTransportControls(SongInfoEx? songInfo, RandomAccessStreamReference? bitmap)
     {
         //Debug.WriteLine("SetSystemMediaTransportControlsWithThumbnail");
 
-        var songInfoForSmtc = new SongInfoForSystemMediaTransportControls
+        if (songInfo is null)
         {
-            Artist = songInfo.Artist,
-            AlbumArtist = songInfo.AlbumArtist,
-            Title = songInfo.Title,
-            AlbumTitle = songInfo.Album
-        };
-
-        switch (_mpc.MpdStatus.MpdState)
-        {
-            case Status.MpdPlayState.Play:
-                {
-                    songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Playing;
-                    break;
-                }
-            case Status.MpdPlayState.Pause:
-                {
-                    songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Paused;
-                    break;
-                }
-            case Status.MpdPlayState.Stop:
-                {
-                    songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Stopped;
-                    break;
-                }
-            default:
-                {
-                    songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Paused;
-                    break;
-                }
-        }
-
-        _dispatcherService.TryEnqueue(() =>
-        {
-            if (bitmap is null) //if (string.IsNullOrEmpty(filePath))
+            var songInfoForSmtc = new SongInfoForSystemMediaTransportControls
             {
-                Debug.WriteLine("(bitmap is null");
+                Artist = string.Empty,
+                AlbumArtist = string.Empty,
+                Title = string.Empty,
+                AlbumTitle = string.Empty
+            };
+
+            _dispatcherService.TryEnqueue(() =>
+            {
                 songInfoForSmtc.Thumbnail = null;
-            }
-            else
+                UpdateSongInfoForSystemMediaTransportControls?.Invoke(this, songInfoForSmtc);
+            });
+        }
+        else
+        {
+            var songInfoForSmtc = new SongInfoForSystemMediaTransportControls
             {
-                if (!string.IsNullOrEmpty(filePath))
+                Artist = songInfo.Artist,
+                AlbumArtist = songInfo.AlbumArtist,
+                Title = songInfo.Title,
+                AlbumTitle = songInfo.Album
+            };
+
+            switch (_mpc.MpdStatus.MpdState)
+            {
+                case Status.MpdPlayState.Play:
+                    {
+                        songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Playing;
+                        break;
+                    }
+                case Status.MpdPlayState.Pause:
+                    {
+                        songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Paused;
+                        break;
+                    }
+                case Status.MpdPlayState.Stop:
+                    {
+                        songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Stopped;
+                        break;
+                    }
+                default:
+                    {
+                        songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Paused;
+                        break;
+                    }
+            }
+
+            _dispatcherService.TryEnqueue(() =>
+            {
+                if (bitmap is null) //if (string.IsNullOrEmpty(filePath))
                 {
-                    songInfoForSmtc.FilePath = filePath;
+                    //Debug.WriteLine("(bitmap is null");
+                    songInfoForSmtc.Thumbnail = null;
+                }
+                else
+                {
+                    //if (!string.IsNullOrEmpty(filePath))
+                    //{
+                    //    songInfoForSmtc.FilePath = filePath;
+                    //}
+
+                    //songInfoForSmtc.IsThumbnailIncluded = true;
+
+                    songInfoForSmtc.Thumbnail = bitmap;//RandomAccessStreamReference.CreateFromUri(new Uri(filePath)); // bitmap;//await BitmapImageToRandomAccessStreamReference(bitmap);
                 }
 
-                songInfoForSmtc.IsThumbnailIncluded = true;
-
-                songInfoForSmtc.Thumbnail = bitmap;//RandomAccessStreamReference.CreateFromUri(new Uri(filePath)); // bitmap;//await BitmapImageToRandomAccessStreamReference(bitmap);
-            }
-
-            UpdateSongInfoForSystemMediaTransportControls?.Invoke(this, songInfoForSmtc);
-        });
-
+                UpdateSongInfoForSystemMediaTransportControls?.Invoke(this, songInfoForSmtc);
+            });
+        }
     }
 
     private static async Task<RandomAccessStreamReference> BitmapImageToRandomAccessStreamReferenceAsync(BitmapImage bitmapImage)
@@ -6327,11 +6352,6 @@ public sealed partial class MainViewModel : ObservableObject
         });
 
         await _mpc.MpdMultiplePlay(uriList, Convert.ToInt32(_volume));
-
-        // TODO: Do we need this now?
-        //await Task.Yield();
-        //await Task.Delay(200);
-        //UpdateCurrentSong();
     }
 
     [RelayCommand(CanExecute = nameof(AddToQueueCanExecute))]
@@ -6679,6 +6699,12 @@ public sealed partial class MainViewModel : ObservableObject
     {
         if (obj is null)
         {
+            return;
+        }
+
+        if (CurrentSong is null)
+        {
+            await SongsAddSelectedItemsToQueue(obj);
             return;
         }
 
@@ -7687,6 +7713,12 @@ public sealed partial class MainViewModel : ObservableObject
     {
         if (obj is null)
         {
+            return;
+        }
+
+        if (CurrentSong is null)
+        {
+            await FilesAddSelectedItemsToQueue(obj);
             return;
         }
 

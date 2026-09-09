@@ -115,11 +115,13 @@ public sealed partial class MainWindow : Window
 
             _smtc.ButtonPressed += Smtc_ButtonPressed;
             _vm.UpdateSongInfoForSystemMediaTransportControls += (sender, arg) => { this.OnUpdateSongInfoForSystemMediaTransportControls(arg); };
+            _vm.UpdateSongInfoForSystemMediaTransportControlsButtonStateOnly += (sender, arg) => { this.OnUpdateSongInfoForSystemMediaTransportControlsButtonStateOnly(arg); };
 
             this.Closed += (s, e) =>
             {
                 _smtc.ButtonPressed -= Smtc_ButtonPressed;
                 _vm.UpdateSongInfoForSystemMediaTransportControls -= (sender, arg) => { this.OnUpdateSongInfoForSystemMediaTransportControls(arg); };
+                _vm.UpdateSongInfoForSystemMediaTransportControlsButtonStateOnly -= (sender, arg) => { this.OnUpdateSongInfoForSystemMediaTransportControlsButtonStateOnly(arg); };
             };
         }
     }
@@ -162,6 +164,19 @@ public sealed partial class MainWindow : Window
             updater.Update();
         });
     }
+
+    private void OnUpdateSongInfoForSystemMediaTransportControlsButtonStateOnly(Windows.Media.MediaPlaybackStatus playbackStatus)
+    {
+        //Debug.WriteLine("OnUpdateSongInfoForSystemMediaTransportControlsButtonStateOnly");
+        if (_smtc is null)
+        {
+            return;
+        }
+        _dispatcherService.TryEnqueue(() =>
+        {
+            _smtc.PlaybackStatus = playbackStatus;
+        });
+    }   
 
     // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
     // https://github.com/dotnet/runtime/issues/121590
@@ -713,11 +728,6 @@ public sealed partial class MainWindow : Window
                     this.AppWindow.TitleBar.ButtonForegroundColor = Colors.Black;
                     this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.Black;
                 }
-            }
-
-            if (App.MainWnd is not null)
-            {
-                //TitleBarHelper.UpdateTitleBar(currentTheme, App.MainWnd);
             }
         });
     }

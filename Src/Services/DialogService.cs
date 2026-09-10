@@ -32,21 +32,17 @@ public sealed class DialogService : IDialogService
             return;
         }
 
-        if (App.MainWnd is null)
-        {
-            Debug.WriteLine("App.MainWnd is null");
-            return;
-        }
+        var main = App.GetService<Views.MainWindow>();
 
-        if (App.MainWnd.Content is not ShellPage)
+        if (main.Content is not ShellPage)
         {
-            Debug.WriteLine("App.MainWnd?.Content is not ShellPage");
+            Debug.WriteLine("MainWindow.Content is not ShellPage");
             return;
         }
 
         var dialog = new ContentDialog
         {
-            XamlRoot = App.MainWnd.Content.XamlRoot,
+            XamlRoot = main.Content.XamlRoot,
             Title = "Dialog_Title_KeyboardShortcuts".GetLocalized(),
             IsPrimaryButtonEnabled = true,
             PrimaryButtonText = "Dialog_Ok".GetLocalized(),
@@ -71,21 +67,17 @@ public sealed class DialogService : IDialogService
             return null;
         }
 
-        if (App.MainWnd is null)
-        {
-            Debug.WriteLine("App.MainWnd is null");
-            return null;
-        }
+        var main = App.GetService<Views.MainWindow>();
 
-        if (App.MainWnd.Content is not ShellPage)
+        if (main.Content is not ShellPage)
         {
-            Debug.WriteLine("App.MainWnd?.Content is not ShellPage");
+            Debug.WriteLine("MainWindow.Content is not ShellPage");
             return null;
         }
 
         var dialog = new ContentDialog
         {
-            XamlRoot = App.MainWnd.Content.XamlRoot,
+            XamlRoot = main.Content.XamlRoot,
             Title = "MPDCtrl",//_resourceLoader.GetString("Dialog_Title_SelectPlaylist")
             IsPrimaryButtonEnabled = true,
             PrimaryButtonText = "Dialog_Connect".GetLocalized(),
@@ -123,19 +115,16 @@ public sealed class DialogService : IDialogService
             return null;
         }
 
-        if (App.MainWnd is null)
-        {
-            return null;
-        }
+        var main = App.GetService<Views.MainWindow>();
 
-        if (App.MainWnd.Content is not ShellPage)
+        if (main.Content is not ShellPage)
         {
             return null;
         }
 
         var dialog = new ContentDialog
         {
-            XamlRoot = App.MainWnd.Content.XamlRoot,
+            XamlRoot = main.Content.XamlRoot,
             Title = "Dialog_Title_SelectPlaylist".GetLocalized(),
             IsPrimaryButtonEnabled = true,
             PrimaryButtonText = "Dialog_Ok".GetLocalized(),
@@ -199,19 +188,16 @@ public sealed class DialogService : IDialogService
             return null;
         }
 
-        if (App.MainWnd is null)
-        {
-            return null;
-        }
+        var main = App.GetService<Views.MainWindow>();
 
-        if (App.MainWnd.Content is not ShellPage)
+        if (main.Content is not ShellPage)
         {
             return null;
         }
 
         var dialog = new ContentDialog
         {
-            XamlRoot = App.MainWnd.Content.XamlRoot,
+            XamlRoot = main.Content.XamlRoot,
             Title = "Dialog_Title_NewPlaylistName".GetLocalized(),
             IsPrimaryButtonEnabled = true,
             PrimaryButtonText = "Dialog_Ok".GetLocalized(),
@@ -253,9 +239,16 @@ public sealed class DialogService : IDialogService
             return null;
         }
 
+        var main = App.GetService<Views.MainWindow>();
+
+        if (main.Content is not ShellPage)
+        {
+            return null;
+        }
+
         var dialog = new ContentDialog
         {
-            XamlRoot = App.MainWnd?.Content.XamlRoot,
+            XamlRoot = main.Content.XamlRoot,
             Title = "Dialog_AddProfile".GetLocalized(),
             IsPrimaryButtonEnabled = true,
             PrimaryButtonText = "Dialog_Ok".GetLocalized(),
@@ -303,9 +296,16 @@ public sealed class DialogService : IDialogService
             return null;
         }
 
+        var main = App.GetService<Views.MainWindow>();
+
+        if (main.Content is not ShellPage)
+        {
+            return null;
+        }
+
         var dialog = new ContentDialog
         {
-            XamlRoot = App.MainWnd?.Content.XamlRoot,
+            XamlRoot = main.Content.XamlRoot,
             Title = "Dialog_EditProfile".GetLocalized(),
             IsPrimaryButtonEnabled = true,
             PrimaryButtonText = "Dialog_Ok".GetLocalized(),
@@ -335,12 +335,6 @@ public sealed class DialogService : IDialogService
         }
 
         return dlg.GetProfile();
-        /*
-        if (ret is not null)
-        {
-            selectedProfile = ret;
-        }
-        */
     }
 
 }

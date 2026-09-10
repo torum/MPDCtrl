@@ -3685,6 +3685,7 @@ public sealed partial class MainViewModel : ObservableObject
             UpdateSongInfoForSystemMediaTransportControlsButtonStateOnly?.Invoke(this, playbackStatus);
         });
     }
+
     private static async Task<RandomAccessStreamReference> BitmapImageToRandomAccessStreamReferenceAsync(BitmapImage bitmapImage)
     {
         // Create a new WriteableBitmap with the current image data.

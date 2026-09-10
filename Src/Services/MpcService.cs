@@ -1005,7 +1005,7 @@ public sealed partial class MpcService : IMpcService
             if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser) || (ConnectionState == ConnectionStatus.Connecting))
             {
                 // no problem
-                Debug.WriteLine("ReadLineAsync canceled due to OperationCanceledException. Disconnecting, now exiting. @MpdIdle()");
+                //Debug.WriteLine("ReadLineAsync canceled due to OperationCanceledException. Disconnecting, now exiting. @MpdIdle()");
             }
             else
             {

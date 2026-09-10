@@ -78,6 +78,8 @@ public sealed partial class MainWindow : Window
             root.RequestedTheme = theme;
 
             //TitleBarHelper.UpdateTitleBar(theme, this);
+
+            //// Let's not set caption button color here, because it will affect normal dim when activate/deactivate. Only set caption button color when theme is changed.
             SetCapitionButtonColor();
 
             root.CallMeWhenMainWindowIsReady(this);
@@ -698,6 +700,9 @@ public sealed partial class MainWindow : Window
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     public void SetCapitionButtonColor()
     {
+        // This is a workaround for the WinAppSDK/WinUI3 bug that caption button color is not updated when theme is changed.
+        // Use AppWindow.TitleBar.PreferredTheme instead of Color. It will affect normal dim when activate/deactivate.
+
         _dispatcherService.TryEnqueue(() =>
         {
             if (this.Content is null)
@@ -706,27 +711,32 @@ public sealed partial class MainWindow : Window
             }
 
             var currentTheme = ((FrameworkElement)Content).ActualTheme;
+            
             if (currentTheme == ElementTheme.Dark)
             {
-                this.AppWindow.TitleBar.ButtonForegroundColor = Colors.White;
-                this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.White;
+                //this.AppWindow.TitleBar.ButtonForegroundColor = Colors.White;
+                //this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.White;
+                this.AppWindow.TitleBar.PreferredTheme = TitleBarTheme.Dark;
             }
             else if (currentTheme == ElementTheme.Light)
             {
-                this.AppWindow.TitleBar.ButtonForegroundColor = Colors.Black;
-                this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.Black;
+                //this.AppWindow.TitleBar.ButtonForegroundColor = Colors.Black;
+                //this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.Black;
+                this.AppWindow.TitleBar.PreferredTheme = TitleBarTheme.Light;
             }
             else
             {
                 if (Application.Current.RequestedTheme == ApplicationTheme.Dark)
                 {
-                    this.AppWindow.TitleBar.ButtonForegroundColor = Colors.White;
-                    this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.White;
+                    //this.AppWindow.TitleBar.ButtonForegroundColor = Colors.White;
+                    //this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.White;
+                    this.AppWindow.TitleBar.PreferredTheme = TitleBarTheme.Dark;
                 }
                 else
                 {
-                    this.AppWindow.TitleBar.ButtonForegroundColor = Colors.Black;
-                    this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.Black;
+                    //this.AppWindow.TitleBar.ButtonForegroundColor = Colors.Black;
+                    //this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.Black;
+                    this.AppWindow.TitleBar.PreferredTheme = TitleBarTheme.Light;
                 }
             }
         });

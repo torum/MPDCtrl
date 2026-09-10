@@ -1143,9 +1143,9 @@ public sealed class MpcBinaryService : IMpcBinaryService
                 _cts?.Dispose();
             }
         }
-        catch (Exception ex)
+        catch// (Exception ex)
         {
-            Debug.WriteLine($"Exception @MpdBinaryConnectionDisconnect {ex}");
+            //Debug.WriteLine($"Exception @MpdBinaryConnectionDisconnect {ex}");
         }
     }
 }

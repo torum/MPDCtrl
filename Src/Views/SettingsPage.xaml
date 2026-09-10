@@ -288,12 +288,12 @@
                         <controls:SettingsExpander.Items>
                             <controls:SettingsCard Header="Microsoft" HorizontalContentAlignment="Stretch" ContentAlignment="Vertical" Description="The MIT License">
                                 <StackPanel Spacing="12" Margin="0,12,0,12">
-                                    <HyperlinkButton NavigateUri="https://github.com/CommunityToolkit/Windows">CommunityToolkit.Mvvm/WinUI</HyperlinkButton>
-                                    <HyperlinkButton NavigateUri="https://www.nuget.org/packages/microsoft.extensions.dependencyinjection/">Microsoft.Extensions.DependencyInjection</HyperlinkButton>
+                                    <HyperlinkButton NavigateUri="https://github.com/CommunityToolkit/Windows">CommunityToolkit (MVVM, WinUI)</HyperlinkButton>
+                                    <HyperlinkButton NavigateUri="https://github.com/microsoft/cswinrt">CsWinRT</HyperlinkButton>
                                     <HyperlinkButton NavigateUri="https://www.nuget.org/packages/Microsoft.Extensions.Hosting">Microsoft.Extensions.Hosting</HyperlinkButton>
                                     <HyperlinkButton NavigateUri="https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/">System.Security.Cryptography.ProtectedData</HyperlinkButton>
                                     <HyperlinkButton NavigateUri="https://github.com/microsoft/WindowsAppSDK">Windows App SDK</HyperlinkButton>
-                                    <HyperlinkButton NavigateUri="https://github.com/microsoft/microsoft-ui-xaml">WinUI3 (microsoft-ui-xaml)</HyperlinkButton>
+                                    <HyperlinkButton NavigateUri="https://github.com/microsoft/microsoft-ui-xaml">WinUI</HyperlinkButton>
                                 </StackPanel>
                             </controls:SettingsCard>
                         </controls:SettingsExpander.Items>

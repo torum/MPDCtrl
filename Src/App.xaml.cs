@@ -41,12 +41,6 @@ public sealed partial class App : Application
     public bool IsSaveErrorLog = false;
 #endif
 
-    // TODO: use dependency injection instead of static properties.
-    public static MainWindow? MainWnd
-    {
-        get; private set;
-    }
-
     public Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue { get; private set; }
 
     public IHost Host
@@ -145,7 +139,6 @@ public sealed partial class App : Application
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         this.UnhandledException += App_UnhandledException;
-
     }
 
     protected async override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
@@ -172,31 +165,25 @@ public sealed partial class App : Application
             Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().Activated += App_Activated;
         }
 
-        //MainWnd = new(); // < No
-        MainWnd = App.GetService<MainWindow>();
+        var main = App.GetService<MainWindow>();
 
         // Too late here. In order to set themes, sets content in MainWindow constructor.
         //MainWnd.Content = App.GetService<ShellPage>();
 
         //MainWnd.Activate(); // Activate won't work..
-        MainWnd.AppWindow.Show();
+        main.AppWindow.Show();
     }
 
     private void App_Activated(object? sender, Microsoft.Windows.AppLifecycle.AppActivationArguments e)
     {
-        if (MainWnd is null)
-        {
-            return;
-        }
-
         CurrentDispatcherQueue?.TryEnqueue(() =>
         {
-            if (MainWnd is null) return;
+            var main = App.GetService<Views.MainWindow>();
 
-            MainWnd.Activate();
+            main.Activate();
 
             //MainWindow?.BringToFront();
-            IntPtr hWnd = WindowNative.GetWindowHandle(MainWnd);
+            IntPtr hWnd = WindowNative.GetWindowHandle(main);
             NativeMethods.ShowWindow(hWnd, NativeMethods.SW_RESTORE); // Ensure it's not minimized
             NativeMethods.SetForegroundWindow(hWnd); // Attempt to set it as the foreground window
         });

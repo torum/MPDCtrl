@@ -82,9 +82,10 @@ public sealed partial class ShellPage : Page
             // Set focus so that space shortcut works.
             //await FocusManager.TryFocusAsync(this.PlaybackPlay, FocusState.Programmatic);
 
-            if (App.MainWnd is not null)
+            var main = App.GetService<Views.MainWindow>();
+            if (main is not null)
             {
-                App.MainWnd.Activated += MainWindow_Activated;
+                main.Activated += MainWindow_Activated;
 
                 // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage)
                 // is loaded, initialized, set, drawn, navigated. So start the connection.
@@ -95,7 +96,7 @@ public sealed partial class ShellPage : Page
             }
             else
             {
-                Debug.WriteLine("App.MainWnd is null. Init order is wrong.");
+                Debug.WriteLine("MainWindow is null. Init order is wrong.");
             }
 
             // For animation fade
@@ -121,7 +122,8 @@ public sealed partial class ShellPage : Page
         ViewModel.UpdateProgress -= (sender, arg) => { this.OnUpdateProgress(arg); };
         this.ActualThemeChanged -= this.This_ActualThemeChanged;
 
-        App.MainWnd?.Activated -= MainWindow_Activated;
+        var main = App.GetService<Views.MainWindow>();
+        main?.Activated -= MainWindow_Activated;
 
         AlbumCoverImage.UnregisterPropertyChangedCallback(Microsoft.UI.Xaml.Controls.Image.SourceProperty, _token);
     }
@@ -170,14 +172,15 @@ public sealed partial class ShellPage : Page
 
     private void SetRegionsForCustomTitleBar()
     {
-        var m_AppWindow = App.MainWnd?.AppWindow;
+        var main = App.GetService<Views.MainWindow>();
+        var m_AppWindow = main?.AppWindow;
 
         if (m_AppWindow is null)
         {
             return;
         }
 
-        if (App.MainWnd?.ExtendsContentIntoTitleBar != true)
+        if (main?.ExtendsContentIntoTitleBar != true)
         {
             return;
         }
@@ -303,12 +306,9 @@ public sealed partial class ShellPage : Page
 
     private void This_ActualThemeChanged(FrameworkElement sender, object args)
     {
-        if (App.MainWnd is null)
-        {
-            return;
-        }
+        var main = App.GetService<Views.MainWindow>();
 
-        App.MainWnd.SetCapitionButtonColor();
+        main?.SetCapitionButtonColor();
     }
 
     private void MainWindow_Activated(object sender, Microsoft.UI.Xaml.WindowActivatedEventArgs args)
@@ -337,7 +337,7 @@ public sealed partial class ShellPage : Page
             animation.InsertKeyFrame(0f, 0.5f); // Start opacity
             animation.InsertKeyFrame(1f, 1f); // End opacity
         }
-        animation.Duration = TimeSpan.FromMilliseconds(1000);
+        animation.Duration = TimeSpan.FromMilliseconds(600);
         visual.StartAnimation("Opacity", animation);
     }
 
@@ -803,9 +803,8 @@ public sealed partial class ShellPage : Page
             if (e.DataView.Properties.ContainsKey("QueueListViewDragItems"))
             {
                 // Retrieve and cast the custom object
-                var items = e.DataView.Properties["QueueListViewDragItems"] as List<SongInfoEx>;
 
-                if (items is null)
+                if (e.DataView.Properties["QueueListViewDragItems"] is not List<SongInfoEx> items)
                 {
                     return;
                 }

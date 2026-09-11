@@ -36,13 +36,13 @@ Rename and change file extension to MPDCtrl_0.0.0.0_x86_x64_arm64_bundle.msixupl
 
 (B) Unpackaged single self-contained exe file.
 ----
-dotnet publish -c Release -r win-x64 /p:PlatformTarget=x64 /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:PublishAot=false /p:PublishSingleFile=true /p:WindowsPackageType=None /p:AppxPackage=false /p:EnableMsixTooling=true /p:WindowsAppSDKSelfContained=true /p:GenerateAppxPackageOnBuild=false --self-contained true
+dotnet publish -c Release -r win-x64 /p:Configuration=Release /p:PlatformTarget=x64 /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:PublishAot=false /p:PublishTrimmed=false /p:PublishSingleFile=true /p:WindowsPackageType=None /p:AppxPackage=false /p:EnableMsixTooling=true /p:WindowsAppSDKSelfContained=true /p:GenerateAppxPackageOnBuild=false --self-contained true
 
 ----
 
 (C) Unpackaged Aot compiled.
 ----
-dotnet publish -c Release -r win-x64 /p:PublishAot=true /p:WindowsPackageType=None /p:AppxPackage=false /p:EnableMsixTooling=false --self-contained true
+dotnet publish -c Release -r win-x64 /p:Configuration=Release /p:PlatformTarget=x64 /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:PublishAot=true /p:WindowsPackageType=None /p:AppxPackage=false /p:EnableMsixTooling=false --self-contained true
 Or simply
-dotnet publish -c Release -r win-x64 /p:PublishAot=true --self-contained true
+dotnet publish -c Release -r win-x64 /p:Configuration=Release /p:PlatformTarget=x64 /p:Platform=x64 /p:RuntimeIdentifier=win-x64 /p:PublishAot=true --self-contained true
 ----

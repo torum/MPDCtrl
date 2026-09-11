@@ -18,8 +18,8 @@
 	  <PackageIcon>MPDCtrl.ico</PackageIcon>
 	  <ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
 
-	  <VersionPrefix>4.1.4.0</VersionPrefix>
-	  <FileVersion>4.1.4.0</FileVersion>
+	  <VersionPrefix>4.1.5.0</VersionPrefix>
+	  <FileVersion>4.1.5.0</FileVersion>
 	  
 	  <IncludeSymbols>True</IncludeSymbols>
 	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -42,72 +42,40 @@
 	  <StartupObject>MPDCtrl.Program</StartupObject>
 	  <AssemblyName>MPDCtrl</AssemblyName>
 
-	  <!--  
-	   AOT related.
-	  <PublishAot>True</PublishAot>
-	  <PublishTrimmed>True</PublishTrimmed>
-	  <TrimMode>partial</TrimMode>
-	  <WindowsPackageType>None</WindowsPackageType>
-	  <SelfContained>True</SelfContained>
-	  <WindowsAppSDKSelfContained>True</WindowsAppSDKSelfContained>
-	  <EnableMsixTooling>True</EnableMsixTooling>
-	  <PublishSingleFile>False</PublishSingleFile>
-	  -->
-
-	  <PublishAot>True</PublishAot>
-	  <PublishTrimmed>True</PublishTrimmed>
-	  <NativeDebugSymbols>true</NativeDebugSymbols>
-	  <StripSymbols>false</StripSymbols>
-	  <DebugType>full</DebugType>
 	  <IsAotCompatible>true</IsAotCompatible>
 	  <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
 	  <TrimmerSingleWarn>false</TrimmerSingleWarn>
 	  <Optimize>true</Optimize>
 	  <CsWinRTAotWarningLevel>3</CsWinRTAotWarningLevel>
 
-
-	  <EnableMsixTooling>True</EnableMsixTooling>
-	  <WindowsPackageType>MSIX</WindowsPackageType>
-	  
-	  <!--
-	  <EnableMsixTooling>True</EnableMsixTooling>
-	  <WindowsPackageType>MSIX</WindowsPackageType>
-	  <SelfContained>True</SelfContained>
-	  <WindowsAppSDKSelfContained>True</WindowsAppSDKSelfContained>
+	  <!-- Comment out this when creating an unpackaged single non-aot self-contained exe file in the command-line.  
+	  <PublishAot>True</PublishAot>
+	  <PublishTrimmed>True</PublishTrimmed>
+	  <NativeDebugSymbols>true</NativeDebugSymbols>
+	  <StripSymbols>false</StripSymbols>
+	  <DebugType>full</DebugType>
 	  -->
 	  
-	  <!--
-	   Comment these two out when publish packaged app. Uncomment when debug Unpackaged.
-	   
-	  <PublishSingleFile>false</PublishSingleFile>
+	  <!-- Needs this when creating an unpackaged single self-contained exe file in the command-line. 
 	  <WindowsPackageType>None</WindowsPackageType>
-	  -->
-	  <!--
-		"Unpackaged"
-	  <EnableMsixTooling>False</EnableMsixTooling>
-	  <WindowsPackageType>None</WindowsPackageType>
-	  <SelfContained>true</SelfContained>
-	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-	  -->
-
-	  <!--
-		"Packaged"
-	  <EnableMsixTooling>True</EnableMsixTooling>
-	  <WindowsPackageType>MSIX</WindowsPackageType>
-	  -->
-
-	  <!-- PublishSingleFile
-	  <WindowsPackageType>None</WindowsPackageType>
-	  <SelfContained>True</SelfContained>
-	  <WindowsAppSDKSelfContained>True</WindowsAppSDKSelfContained>
-	  <EnableMsixTooling>True</EnableMsixTooling>
-	  <PublishSingleFile>True</PublishSingleFile>
+	  <PublishSingleFile>true</PublishSingleFile>
 	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 	  -->
 
+	  <!--
+		"Unpackaged" Needs this when developing as an unpackaged app.
+	  -->
+	  <EnableMsixTooling>False</EnableMsixTooling>
+	  <WindowsPackageType>None</WindowsPackageType>
+
+	  <!--
+		"Packaged" Needs this when developing as an packaged app.
+	  <EnableMsixTooling>True</EnableMsixTooling>
+	  <WindowsPackageType>MSIX</WindowsPackageType>
+	  -->
+
 	  <SelfContained>true</SelfContained>
 	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-
 	  
   </PropertyGroup>
 
@@ -198,7 +166,7 @@
     <PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.3.260402-preview2" />
     <PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.3.260402-preview2" />
     <PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.3.260402-preview2" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
     <PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.3.1" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools.MSIX" Version="1.7.260610101">
       <PrivateAssets>all</PrivateAssets>
@@ -206,7 +174,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.4.0" />
     <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.3.6" />
-    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.11" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.12" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="Assets\MPDCtrl.ico">

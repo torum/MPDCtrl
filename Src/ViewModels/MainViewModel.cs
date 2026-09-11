@@ -3269,7 +3269,7 @@ public sealed partial class MainViewModel : ObservableObject
                     // This is not good, all the selections will be cleared and position will be reset, but ...
                     //Queue = new ObservableCollection<SongInfoEx>(Queue.OrderBy(n => n.Index));
 
-                    //Debug.WriteLine("Queue sort started. @UpdateCurrentQueue");
+                    Debug.WriteLine("Queue sort started. @UpdateCurrentQueue");
                     //Queue.Sort((a, b) => { return a.Index.CompareTo(b.Index); }); // TOO Slow.
                     var sortableList = new List<SongInfoEx>(Queue);
                     sortableList.Sort((a, b) => a.Index.CompareTo(b.Index));
@@ -3283,7 +3283,7 @@ public sealed partial class MainViewModel : ObservableObject
                             Queue.Move(oldIndex, i);
                         }
                     }
-                    //Debug.WriteLine("Queue sort end. @UpdateCurrentQueue");
+                    Debug.WriteLine("Queue sort end. @UpdateCurrentQueue");
 
                     UpdateProgress?.Invoke(this, "[UI] Checking current song after Queue update.");
 

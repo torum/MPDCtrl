@@ -587,6 +587,6 @@ SOFTWARE.</value>
     <value>Refresh</value>
   </data>
   <data name="ListviewItemContextMenu_AddToQueueAfterCurrent.Text" xml:space="preserve">
-    <value>Add to queue (next)</value>
+    <value>PlayNext</value>
   </data>
 </root>

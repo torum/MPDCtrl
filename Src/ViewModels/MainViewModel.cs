@@ -3312,7 +3312,7 @@ public sealed partial class MainViewModel : ObservableObject
                         AlbumImage? albmcvr = null;
                         if (IsDownloadAlbumArt && CurrentSong.IsAlbumCoverNeedsUpdate)
                         {
-                            Debug.WriteLine("MpdQueryAlbumArt @UpdateCurrentQueue (Queue.Count > 0)");
+                            //Debug.WriteLine("MpdQueryAlbumArt @UpdateCurrentQueue (Queue.Count > 0)");
                             UpdateProgress?.Invoke(this, "[UI] Queue checking AlbumArt...");
 
                             var res = await _mpc.MpdQueryAlbumArt(CurrentSong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);

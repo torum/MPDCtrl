@@ -2824,7 +2824,21 @@ public sealed partial class MpcService : IMpcService
 
         uri = Regex.Escape(uri);
 
-        CommandResult result = await MpdCommandSendCommand("add \"" + uri + "\" +0");
+        CommandResult result = await MpdCommandSendCommand("addid \"" + uri + "\" +0");
+
+        // Gets the Id, then set prio with the Id.
+        if (!string.IsNullOrEmpty(result.ResultText))
+        {
+            var Ids = await ParseId(result.ResultText);
+            if (Ids.Count > 0)
+            {
+                var strId = Ids[0];
+                if (!string.IsNullOrEmpty(strId))
+                {
+                    result = await MpdCommandSendCommand($"prioid 255 {strId}");
+                }
+            }
+        }
 
         return result;
     }
@@ -2869,12 +2883,31 @@ public sealed partial class MpcService : IMpcService
         foreach (var uri in uris)
         {
             var urie = Regex.Escape(uri);
-            cmd = cmd + "add \"" + urie + $"\" +{i}\n";
+            cmd = cmd + "addid \"" + urie + $"\" +{i}\n";
             i++;
         }
         cmd = cmd + "command_list_end" + "\n";
 
         CommandResult result = await MpdCommandSendCommand(cmd);
+
+        // Gets the Id, then set prio with the Id.
+        if (!string.IsNullOrEmpty(result.ResultText))
+        {
+            var Ids = await ParseId(result.ResultText);
+            if (Ids.Count > 0)
+            {
+                cmd = "command_list_begin" + "\n";
+                var p = 255;
+                foreach (var strId in Ids)
+                {
+                    cmd = cmd + $"prioid {p} {strId}\n";
+                    p--;
+                    if (p == 0) break;
+                }
+                cmd = cmd + "command_list_end" + "\n";
+                result = await MpdCommandSendCommand(cmd);
+            }
+        }
 
         return result;
     }
@@ -3414,6 +3447,36 @@ public sealed partial class MpcService : IMpcService
         }
 
         return Task.FromResult(true);
+    }
+
+    private Task<List<string>> ParseId(string result)
+    {
+        var idList = new List<string>();
+
+        if (MpdStop) { return Task.FromResult(idList); }
+        if (string.IsNullOrEmpty(result)) return Task.FromResult(idList);
+
+        List<string> resultLines = result.Split('\n').ToList();
+        if (resultLines.Count == 0) return Task.FromResult(idList);
+
+        foreach (string line in resultLines)
+        {
+            //Debug.WriteLine(line);
+            if (string.IsNullOrEmpty(line)) continue;
+
+            string[] parts = line.Split(':', StringSplitOptions.TrimEntries);
+            if (parts.Length < 2) continue;
+
+            string key = parts[0];   // "Id"
+            string value = parts[1]; // "999"
+
+            if (string.Equals(key, "id", StringComparison.OrdinalIgnoreCase))
+            {
+                idList.Add(value);
+            }
+        }
+
+        return Task.FromResult(idList);
     }
 
     private Task<bool> ParseOutputs(string result)

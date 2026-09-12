@@ -491,7 +491,7 @@ SOFTWARE.</value>
     <value>Connecting</value>
   </data>
   <data name="ListviewItemContextMenu_CopyFilePath.Text" xml:space="preserve">
-    <value>Copy File Path</value>
+    <value>Copy file path</value>
   </data>
   <data name="Dialog_EditProfile" xml:space="preserve">
     <value>Edit Profile</value>
@@ -587,6 +587,6 @@ SOFTWARE.</value>
     <value>Refresh</value>
   </data>
   <data name="ListviewItemContextMenu_AddToQueueAfterCurrent.Text" xml:space="preserve">
-    <value>PlayNext</value>
+    <value>Play next</value>
   </data>
 </root>

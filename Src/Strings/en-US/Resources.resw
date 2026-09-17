@@ -325,7 +325,7 @@
     <value>Add to queue</value>
   </data>
   <data name="ListviewItemContextMenu_AddToQueue.Text" xml:space="preserve">
-    <value>Add to queue (end)</value>
+    <value>Add to queue</value>
   </data>
   <data name="Text_UnknownArtist.Text" xml:space="preserve">
     <value>Unknown Artist</value>

@@ -1171,14 +1171,14 @@ public sealed partial class MainViewModel : ObservableObject
 
             //Task.Run(async () =>
             _dispatcherService.TryEnqueue(async () =>
-             {
-                 await Task.Yield();
-                 await Task.Delay(100); // Avoid blocking UI thread.
-                 await GetArtistSongsAsync(field);
-                 await Task.Yield();
-                 await Task.Delay(100);
-                 await GetAlbumPicturesAsync(SelectedArtistAlbums);
-             });
+            {
+                await Task.Yield();
+                await Task.Delay(100); // Avoid blocking UI thread.
+                await GetArtistSongsAsync(field);
+                await Task.Yield();
+                await Task.Delay(100);
+                await GetAlbumPicturesAsync(SelectedArtistAlbums);
+            });
             //}, _cts.Token);
         }
     }
@@ -1373,11 +1373,11 @@ public sealed partial class MainViewModel : ObservableObject
 
             if (SelectedAlbum is not null)
             {
-                return string.Format($"{"AlbumPage_SubTitle_SelectedAlbumSongsCount".GetLocalized()}", SelectedAlbum.Songs.Count); ;
+                return string.Format($"{"AlbumPage_SubTitle_SelectedAlbumSongsCount".GetLocalized()}", SelectedAlbum.Songs.Count);
             }
             else
             {
-                return string.Format($"{"AlbumPage_SubTitle_SelectedAlbumSongsCount".GetLocalized()}", _selectedAlbumSongs.Count); ;
+                return string.Format($"{"AlbumPage_SubTitle_SelectedAlbumSongsCount".GetLocalized()}", _selectedAlbumSongs.Count);
             }
         }
     }
@@ -3284,7 +3284,7 @@ public sealed partial class MainViewModel : ObservableObject
                         }
                     }
                     Debug.WriteLine("Queue sort end. @UpdateCurrentQueue");
-
+                    
                     UpdateProgress?.Invoke(this, "[UI] Checking current song after Queue update.");
 
                     // Set Current and NowPlaying.

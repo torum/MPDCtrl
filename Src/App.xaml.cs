@@ -33,7 +33,7 @@ public sealed partial class App : Application
 
     // ErrorLog
     private static readonly string LogFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl4_errors.txt";
-    private readonly StringBuilder Errortxt = new();
+    private readonly StringBuilder _errortxt = new();
 
 #if DEBUG
     public bool IsSaveErrorLog = true;
@@ -275,10 +275,10 @@ public sealed partial class App : Application
             return;
         }
 
-        Errortxt.AppendLine(kindTxt + ": " + errorTxt);
+        _errortxt.AppendLine(kindTxt + ": " + errorTxt);
         var dt = DateTime.Now;
-        Errortxt.AppendLine($"Occured at {dt.ToString("yyyy/MM/dd HH:mm:ss")}");
-        Errortxt.AppendLine("");
+        _errortxt.AppendLine($"Occured at {dt.ToString("yyyy/MM/dd HH:mm:ss")}");
+        _errortxt.AppendLine("");
     }
 
     public void SaveErrorLog()
@@ -293,13 +293,13 @@ public sealed partial class App : Application
             return;
         }
 
-        if (Errortxt.Length > 0)
+        if (_errortxt.Length > 0)
         {
-            Errortxt.AppendLine("");
+            _errortxt.AppendLine("");
             var dt = DateTime.Now;
-            Errortxt.AppendLine($"Saved at {dt.ToString("yyyy/MM/dd HH:mm:ss")}");
+            _errortxt.AppendLine($"Saved at {dt.ToString("yyyy/MM/dd HH:mm:ss")}");
 
-            var s = Errortxt.ToString();
+            var s = _errortxt.ToString();
             if (!string.IsNullOrEmpty(s))
             {
                 File.WriteAllText(LogFilePath, s);

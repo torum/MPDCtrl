@@ -3563,7 +3563,7 @@ public sealed partial class MpcService : IMpcService
                 (App.Current as App)?.AppendErrorLog("Exception@MPC@ParseOutputs", e.Message);
             });
             //IsBusy?.Invoke(this, false);
-            return Task.FromResult(false); ;
+            return Task.FromResult(false);
         }
         finally
         {
@@ -4469,7 +4469,7 @@ public sealed partial class MpcService : IMpcService
             _dispatcherService.TryEnqueue(() => { (App.Current as App)?.AppendErrorLog("Exception@MPC@ParseListAll", e.Message); });
 
             IsBusy?.Invoke(this, false);
-            return Task.FromResult(false); ;
+            return Task.FromResult(false);
         }
         finally
         {
@@ -4607,7 +4607,7 @@ public sealed partial class MpcService : IMpcService
             _dispatcherService.TryEnqueue(() => { (App.Current as App)?.AppendErrorLog("Exception@MPC@ParseListAlbumGroupAlbumArtist", e.Message); });
 
             IsBusy?.Invoke(this, false);
-            return Task.FromResult(false); ;
+            return Task.FromResult(false);
         }
         finally
         {

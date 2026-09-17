@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using WinRT;
 
@@ -378,5 +379,6 @@ public sealed partial class QueuePage : Page
             }
         }
         e.Data.Properties.Add("QueueListViewDragItems", list);
+        e.Data.RequestedOperation = DataPackageOperation.Move;
     }
 }

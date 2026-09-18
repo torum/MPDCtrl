@@ -27,6 +27,7 @@ public sealed partial class QueuePage : Page
 
     public QueuePage()
     {
+        // No DI. Currently WinUI's Frame.Navigate(Type) does not provide a way for applications to control how a Page instance is created)
         ViewModel = App.GetService<MainViewModel>();
         _dispatcherService = App.GetService<IDispatcherService>();
 

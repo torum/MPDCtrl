@@ -46,12 +46,13 @@ public sealed partial class MainWindow : Window
     // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(OverlappedPresenter))]
     //[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
-    public MainWindow(IDispatcherService dispatcherService)
+    public MainWindow(MainViewModel vm, ShellPage shell, IDispatcherService dispatcherService)
     {
+        _vm = vm;
         _dispatcherService = dispatcherService;
 
         // This is where the MainViewModel is first initilized.
-        _vm = App.GetService<MainViewModel>();
+        //_vm = App.GetService<MainViewModel>();
 
         if (this.AppWindow.Presenter is OverlappedPresenter presenter)
         {
@@ -70,20 +71,16 @@ public sealed partial class MainWindow : Window
 
         // It's important to set content as early as here in order to set theme.
         // But make sure to call LoadSettings() before in order to apply settings value for contents.
-        this.Content = App.GetService<ShellPage>();
+        this.Content = shell;//App.GetService<ShellPage>();
 
         // It is necessary to set theme here after the content is set.
-        if (this.Content is ShellPage root)
-        {
-            root.RequestedTheme = theme;
+        shell.RequestedTheme = theme;
 
-            //TitleBarHelper.UpdateTitleBar(theme, this);
+        //// Let's not set caption button color here, because it will affect normal dim when activate/deactivate. Only set caption button color when theme is changed.
+        SetCapitionButtonColor();
 
-            //// Let's not set caption button color here, because it will affect normal dim when activate/deactivate. Only set caption button color when theme is changed.
-            SetCapitionButtonColor();
-
-            root.CallMeWhenMainWindowIsReady(this);
-        }
+        // After the content is set
+        shell.SetTitleBar(this);
 
         _isGlobalHotKeyEnable = false;
 
@@ -714,28 +711,20 @@ public sealed partial class MainWindow : Window
             
             if (currentTheme == ElementTheme.Dark)
             {
-                //this.AppWindow.TitleBar.ButtonForegroundColor = Colors.White;
-                //this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.White;
                 this.AppWindow.TitleBar.PreferredTheme = TitleBarTheme.Dark;
             }
             else if (currentTheme == ElementTheme.Light)
             {
-                //this.AppWindow.TitleBar.ButtonForegroundColor = Colors.Black;
-                //this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.Black;
                 this.AppWindow.TitleBar.PreferredTheme = TitleBarTheme.Light;
             }
             else
             {
                 if (Application.Current.RequestedTheme == ApplicationTheme.Dark)
                 {
-                    //this.AppWindow.TitleBar.ButtonForegroundColor = Colors.White;
-                    //this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.White;
                     this.AppWindow.TitleBar.PreferredTheme = TitleBarTheme.Dark;
                 }
                 else
                 {
-                    //this.AppWindow.TitleBar.ButtonForegroundColor = Colors.Black;
-                    //this.AppWindow.TitleBar.ButtonInactiveForegroundColor = Colors.Black;
                     this.AppWindow.TitleBar.PreferredTheme = TitleBarTheme.Light;
                 }
             }

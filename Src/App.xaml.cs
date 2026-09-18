@@ -120,15 +120,17 @@ public sealed partial class App : Application
             services.AddSingleton<MainWindow>();
             services.AddSingleton<ShellPage>();
 
-            // Pages
-            services.AddSingleton<SettingsPage>();
-            services.AddSingleton<QueuePage>();
-            services.AddSingleton<AlbumsPage>();
-            services.AddSingleton<AlbumDetailPage>();
-            services.AddSingleton<ArtistsPage>();
-            services.AddSingleton<FilesPage>();
-            services.AddSingleton<SearchPage>();
-            services.AddTransient<PlaylistItemPage>();
+            // Pages (Frame creates page instances)
+            // Currently WinUI's Frame.Navigate(Type) does not provide a way for applications to control how a Page instance is created)
+            // So, no DI.
+            //services.AddSingleton<SettingsPage>();
+            //services.AddSingleton<QueuePage>();
+            //services.AddSingleton<AlbumsPage>();
+            //services.AddSingleton<AlbumDetailPage>();
+            //services.AddSingleton<ArtistsPage>();
+            //services.AddSingleton<FilesPage>();
+            //services.AddSingleton<SearchPage>();
+            //services.AddTransient<PlaylistItemPage>();
 
             // Configuration
             //services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
@@ -166,12 +168,7 @@ public sealed partial class App : Application
         }
 
         var main = App.GetService<MainWindow>();
-
-        // Too late here. In order to set themes, sets content in MainWindow constructor.
-        //MainWnd.Content = App.GetService<ShellPage>();
-
-        //MainWnd.Activate(); // Activate won't work..
-        main.AppWindow.Show();
+        main.AppWindow.Show(true);
     }
 
     private void App_Activated(object? sender, Microsoft.Windows.AppLifecycle.AppActivationArguments e)

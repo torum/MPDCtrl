@@ -34,11 +34,11 @@ public sealed partial class ShellPage : Page
 
     private Type? _currentPage;
 
-    public ShellPage()
+    public ShellPage(MainViewModel vm, IDispatcherService dispatcherService)
     {
-        ViewModel = App.GetService<MainViewModel>();
+        ViewModel = vm;//App.GetService<MainViewModel>();
         //DataContext = ViewModel;
-        _dispatcherService = App.GetService<IDispatcherService>();
+        _dispatcherService = dispatcherService;//App.GetService<IDispatcherService>();
 
         InitializeComponent();
 
@@ -240,7 +240,7 @@ public sealed partial class ShellPage : Page
         }
     }
 
-    public void CallMeWhenMainWindowIsReady(MainWindow wnd)
+    public void SetTitleBar(MainWindow wnd)
     {
         wnd.SetTitleBar(AppTitleBar);
 

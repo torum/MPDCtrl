@@ -1,3 +1,7 @@
+* Edit the app version number in the source.
+* Edit the app version number in the Package.appxmanifest.
+* Edit project source code so that the source can be compiled as packaged app.
+
 
 (A) Create package bundle file for Microsoft store.
 -------

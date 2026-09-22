@@ -40,7 +40,7 @@ public sealed partial class App : Application
     public bool IsSaveErrorLog = false;
 #endif
 
-    public Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue { get; private set; }
+    private Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue { get; }
 
     public IHost Host
     {

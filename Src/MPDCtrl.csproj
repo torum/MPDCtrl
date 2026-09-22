@@ -18,8 +18,8 @@
 		<PackageIcon>MPDCtrl.ico</PackageIcon>
 		<ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
 
-		<VersionPrefix>4.1.5.0</VersionPrefix>
-		<FileVersion>4.1.5.0</FileVersion>
+		<VersionPrefix>4.1.6.0</VersionPrefix>
+		<FileVersion>4.1.6.0</FileVersion>
 
 		<IncludeSymbols>True</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -49,31 +49,31 @@
 		<CsWinRTAotWarningLevel>3</CsWinRTAotWarningLevel>
 
 		<!-- Comment out this when creating an unpackaged single non-aot self-contained exe file in the command-line.  
-	  <PublishAot>True</PublishAot>
-	  <PublishTrimmed>True</PublishTrimmed>
-	  <NativeDebugSymbols>true</NativeDebugSymbols>
-	  <StripSymbols>false</StripSymbols>
-	  <DebugType>full</DebugType>
-	  -->
+		<PublishAot>True</PublishAot>
+		<PublishTrimmed>True</PublishTrimmed>
+		<NativeDebugSymbols>true</NativeDebugSymbols>
+		<StripSymbols>false</StripSymbols>
+		<DebugType>full</DebugType>
+		-->
 
 		<!-- Needs this when creating an unpackaged single self-contained exe file in the command-line. 
-	  <WindowsPackageType>None</WindowsPackageType>
-	  <PublishSingleFile>true</PublishSingleFile>
-	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-	  -->
+		<WindowsPackageType>None</WindowsPackageType>
+		<PublishSingleFile>true</PublishSingleFile>
+		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+		-->
 
-		<!--
-		"Unpackaged" Needs this when developing as an unpackaged app.
-	  -->
+		<!-- "Unpackaged" Needs this when developing as an unpackaged app.
+
+		-->
 		<EnableMsixTooling>False</EnableMsixTooling>
 		<WindowsPackageType>None</WindowsPackageType>
 
-		<!--
-		"Packaged" Needs this when developing as an packaged app.
-	  <EnableMsixTooling>True</EnableMsixTooling>
-	  <WindowsPackageType>MSIX</WindowsPackageType>
-	  -->
+		<!-- "Packaged" Needs this when developing or publishing as an packaged app.
+		<EnableMsixTooling>True</EnableMsixTooling>
+		<WindowsPackageType>MSIX</WindowsPackageType>
+		-->
 
+		<!-- always -->
 		<SelfContained>true</SelfContained>
 		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 

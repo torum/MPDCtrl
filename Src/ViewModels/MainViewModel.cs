@@ -1515,7 +1515,8 @@ public sealed partial class MainViewModel : ObservableObject
 
             if (_selectedNodeDirectory.DireUri.LocalPath == "/")
             {
-                if (FilterMusicEntriesQuery != "")
+                //if (FilterMusicEntriesQuery != "")
+                if (!string.IsNullOrEmpty(FilterMusicEntriesQuery))
                 {
                     var filtered = MusicEntries.Where(song => song.Name.Contains(FilterMusicEntriesQuery, StringComparison.InvariantCultureIgnoreCase));
                     _musicEntriesFiltered = new ObservableCollection<NodeFile>(filtered);
@@ -1574,11 +1575,11 @@ public sealed partial class MainViewModel : ObservableObject
             if (string.IsNullOrEmpty(filename))
                 continue;
 
-            path = path.Replace(("/" + filename), "");
+            path = path.Replace("/" + filename, "");
 
             if (path.StartsWith(_selectedNodeDirectory.DireUri.LocalPath))
             {
-                if (FilterMusicEntriesQuery != "")
+                if (!string.IsNullOrEmpty(FilterMusicEntriesQuery))
                 {
                     if (entry.Name.Contains(FilterMusicEntriesQuery, StringComparison.InvariantCultureIgnoreCase))
                     {
@@ -1600,7 +1601,13 @@ public sealed partial class MainViewModel : ObservableObject
             if (field == value)
                 return;
 
-            field = value;
+            if (value is null)
+            {
+                field = string.Empty;
+                return;
+            }
+
+            field = value.Trim();
             OnPropertyChanged();
 
             if (_selectedNodeDirectory is null)
@@ -1608,7 +1615,7 @@ public sealed partial class MainViewModel : ObservableObject
 
             if ((_selectedNodeDirectory as NodeDirectory).DireUri.LocalPath == "/")
             {
-                if (FilterMusicEntriesQuery != "")
+                if (!string.IsNullOrEmpty(FilterMusicEntriesQuery))
                 {
                     var filtered = MusicEntries.Where(song => song.Name.Contains(FilterMusicEntriesQuery, StringComparison.InvariantCultureIgnoreCase));
                     MusicEntriesFiltered = new ObservableCollection<NodeFile>(filtered);
@@ -1909,7 +1916,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         get
         {
-            if (_mpdVersion != "")
+            if (!string.IsNullOrEmpty(_mpdVersion))
                 return "MPD Protocol v" + _mpdVersion;
             else
                 return _mpdVersion;
@@ -2729,7 +2736,7 @@ public sealed partial class MainViewModel : ObservableObject
         await Task.Delay(300);
 
         // MPD protocol ver check.
-        if (_mpc.MpdVerText != "")
+        if (!string.IsNullOrEmpty(_mpc.MpdVerText))
         {
             if (CompareVersionString(_mpc.MpdVerText, "0.20.0") == -1)
             {

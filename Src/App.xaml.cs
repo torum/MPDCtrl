@@ -19,20 +19,19 @@ namespace MPDCtrl;
 public sealed partial class App : Application
 {
     // AppDataFolder
-    private static readonly string AppDeveloper = "torum";
-    private static readonly string EnvDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-
-    public static readonly string AppName = "MPDCtrl4";//_resourceLoader.GetString("AppName");
-    public static string AppDataFolder { get; private set; } = System.IO.Path.Combine(System.IO.Path.Combine(EnvDataFolder, AppDeveloper), AppName);//_envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
+    public const string AppName = "MPDCtrl4";
+    private const string AppDeveloper = "torum";
+    private static readonly string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+    public static string AppDataFolder { get; private set; } = System.IO.Path.Combine(System.IO.Path.Combine(_envDataFolder, AppDeveloper), AppName);//_envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
     public static string AppConfigFilePath { get; private set; } = System.IO.Path.Combine(AppDataFolder, AppName + ".config");
 
     // Temp album cover cache folder.
-    private static readonly string EnvAppLocalFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData); // Use Local instead of temp path. //System.IO.Path.GetTempPath();
-    private static readonly string EnvAppLocalAppFolder = System.IO.Path.Combine((System.IO.Path.Combine(EnvAppLocalFolder, AppDeveloper)), AppName);
-    public static string AlbumCoverCacheFolder { get; private set; } = System.IO.Path.Combine(EnvAppLocalAppFolder, "AlbumCoverCache");
+    private static readonly string _envAppLocalFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData); // Use Local instead of temp path. //System.IO.Path.GetTempPath();
+    private static readonly string _envAppLocalAppFolder = System.IO.Path.Combine((System.IO.Path.Combine(_envAppLocalFolder, AppDeveloper)), AppName);
+    public static string AlbumCoverCacheFolder { get; private set; } = System.IO.Path.Combine(_envAppLocalAppFolder, "AlbumCoverCache");
 
     // ErrorLog
-    private static readonly string LogFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl4_errors.txt";
+    private static readonly string _logFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl4_errors.txt";
     private readonly StringBuilder _errortxt = new();
 
 #if DEBUG
@@ -285,7 +284,7 @@ public sealed partial class App : Application
             return;
         }
 
-        if (string.IsNullOrEmpty(LogFilePath))
+        if (string.IsNullOrEmpty(_logFilePath))
         {
             return;
         }
@@ -299,7 +298,7 @@ public sealed partial class App : Application
             var s = _errortxt.ToString();
             if (!string.IsNullOrEmpty(s))
             {
-                File.WriteAllText(LogFilePath, s);
+                File.WriteAllText(_logFilePath, s);
             }
         }
     }

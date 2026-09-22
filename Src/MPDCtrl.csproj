@@ -1,151 +1,114 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-    <RootNamespace>MPDCtrl</RootNamespace>
-    <Platforms>x86;x64;ARM64</Platforms>
-    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
-    <PublishProfile>win-$(Platform).pubxml</PublishProfile>
-    <UseWinUI>true</UseWinUI>
-	<WinUISDKReferences>False</WinUISDKReferences>
-	<Nullable>enable</Nullable>
-	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<RootNamespace>MPDCtrl</RootNamespace>
+		<Platforms>x86;x64;ARM64</Platforms>
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+		<PublishProfile>win-$(Platform).pubxml</PublishProfile>
+		<UseWinUI>true</UseWinUI>
+		<WinUISDKReferences>False</WinUISDKReferences>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-	  <ApplicationManifest>app.manifest</ApplicationManifest>
-	  <Company>torum</Company>
-	  <Description>MPD Client</Description>
-	  <PackageIcon>MPDCtrl.ico</PackageIcon>
-	  <ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Company>torum</Company>
+		<Description>MPD Client</Description>
+		<PackageIcon>MPDCtrl.ico</PackageIcon>
+		<ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
 
-	  <VersionPrefix>4.1.5.0</VersionPrefix>
-	  <FileVersion>4.1.5.0</FileVersion>
-	  
-	  <IncludeSymbols>True</IncludeSymbols>
-	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-	  <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
-	  
-	  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<VersionPrefix>4.1.5.0</VersionPrefix>
+		<FileVersion>4.1.5.0</FileVersion>
 
-	  <!-- Workaround for MS bug: https://github.com/microsoft/WindowsAppSDK/issues/5817 -->
-	  <AppxFilterOutUnusedLanguagesResourceFileMaps>false</AppxFilterOutUnusedLanguagesResourceFileMaps>
-	  
-	  <AppxPackageIncludePrivateSymbols>true</AppxPackageIncludePrivateSymbols>
-	  <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-	  <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
-	  <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-	  <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
-	  <GenerateTestArtifacts>True</GenerateTestArtifacts>
-	  <AppxBundle>Always</AppxBundle>
-	  <AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
-	  <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
-	  <StartupObject>MPDCtrl.Program</StartupObject>
-	  <AssemblyName>MPDCtrl</AssemblyName>
+		<IncludeSymbols>True</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
 
-	  <IsAotCompatible>true</IsAotCompatible>
-	  <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
-	  <TrimmerSingleWarn>false</TrimmerSingleWarn>
-	  <Optimize>true</Optimize>
-	  <CsWinRTAotWarningLevel>3</CsWinRTAotWarningLevel>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-	  <!-- Comment out this when creating an unpackaged single non-aot self-contained exe file in the command-line.  
+		<!-- Workaround for MS bug: https://github.com/microsoft/WindowsAppSDK/issues/5817 -->
+		<AppxFilterOutUnusedLanguagesResourceFileMaps>false</AppxFilterOutUnusedLanguagesResourceFileMaps>
+
+		<AppxPackageIncludePrivateSymbols>true</AppxPackageIncludePrivateSymbols>
+		<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+		<AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
+		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+		<AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+		<GenerateTestArtifacts>True</GenerateTestArtifacts>
+		<AppxBundle>Always</AppxBundle>
+		<AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
+		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+		<StartupObject>MPDCtrl.Program</StartupObject>
+		<AssemblyName>MPDCtrl</AssemblyName>
+
+		<IsAotCompatible>true</IsAotCompatible>
+		<SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+		<TrimmerSingleWarn>false</TrimmerSingleWarn>
+		<Optimize>true</Optimize>
+		<CsWinRTAotWarningLevel>3</CsWinRTAotWarningLevel>
+
+		<!-- Comment out this when creating an unpackaged single non-aot self-contained exe file in the command-line.  
 	  <PublishAot>True</PublishAot>
 	  <PublishTrimmed>True</PublishTrimmed>
 	  <NativeDebugSymbols>true</NativeDebugSymbols>
 	  <StripSymbols>false</StripSymbols>
 	  <DebugType>full</DebugType>
 	  -->
-	  
-	  <!-- Needs this when creating an unpackaged single self-contained exe file in the command-line. 
+
+		<!-- Needs this when creating an unpackaged single self-contained exe file in the command-line. 
 	  <WindowsPackageType>None</WindowsPackageType>
 	  <PublishSingleFile>true</PublishSingleFile>
 	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 	  -->
 
-	  <!--
+		<!--
 		"Unpackaged" Needs this when developing as an unpackaged app.
 	  -->
-	  <EnableMsixTooling>False</EnableMsixTooling>
-	  <WindowsPackageType>None</WindowsPackageType>
+		<EnableMsixTooling>False</EnableMsixTooling>
+		<WindowsPackageType>None</WindowsPackageType>
 
-	  <!--
+		<!--
 		"Packaged" Needs this when developing as an packaged app.
 	  <EnableMsixTooling>True</EnableMsixTooling>
 	  <WindowsPackageType>MSIX</WindowsPackageType>
 	  -->
 
-	  <SelfContained>true</SelfContained>
-	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-	  
-  </PropertyGroup>
+		<SelfContained>true</SelfContained>
+		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 
-  <ItemGroup>
-    <None Remove="Assets\BadgeLogo.scale-100.png" />
-    <None Remove="Assets\BadgeLogo.scale-125.png" />
-    <None Remove="Assets\BadgeLogo.scale-150.png" />
-    <None Remove="Assets\BadgeLogo.scale-200.png" />
-    <None Remove="Assets\BadgeLogo.scale-400.png" />
-    <None Remove="Assets\LargeTile.scale-100.png" />
-    <None Remove="Assets\LargeTile.scale-125.png" />
-    <None Remove="Assets\LargeTile.scale-150.png" />
-    <None Remove="Assets\LargeTile.scale-200.png" />
-    <None Remove="Assets\LargeTile.scale-400.png" />
-    <None Remove="Assets\SmallTile.scale-100.png" />
-    <None Remove="Assets\SmallTile.scale-125.png" />
-    <None Remove="Assets\SmallTile.scale-150.png" />
-    <None Remove="Assets\SmallTile.scale-200.png" />
-    <None Remove="Assets\SmallTile.scale-400.png" />
-    <None Remove="Assets\SplashScreen.scale-100.png" />
-    <None Remove="Assets\SplashScreen.scale-125.png" />
-    <None Remove="Assets\SplashScreen.scale-150.png" />
-    <None Remove="Assets\SplashScreen.scale-200.png" />
-    <None Remove="Assets\SplashScreen.scale-400.png" />
-    <None Remove="Assets\Square150x150Logo.scale-100.png" />
-    <None Remove="Assets\Square150x150Logo.scale-125.png" />
-    <None Remove="Assets\Square150x150Logo.scale-150.png" />
-    <None Remove="Assets\Square150x150Logo.scale-200.png" />
-    <None Remove="Assets\Square150x150Logo.scale-400.png" />
-    <None Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-16.png" />
-    <None Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-24.png" />
-    <None Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-256.png" />
-    <None Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-32.png" />
-    <None Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-48.png" />
-    <None Remove="Assets\Square44x44Logo.altform-unplated_targetsize-16.png" />
-    <None Remove="Assets\Square44x44Logo.altform-unplated_targetsize-24.png" />
-    <None Remove="Assets\Square44x44Logo.altform-unplated_targetsize-256.png" />
-    <None Remove="Assets\Square44x44Logo.altform-unplated_targetsize-32.png" />
-    <None Remove="Assets\Square44x44Logo.altform-unplated_targetsize-48.png" />
-    <None Remove="Assets\Square44x44Logo.scale-100.png" />
-    <None Remove="Assets\Square44x44Logo.scale-125.png" />
-    <None Remove="Assets\Square44x44Logo.scale-150.png" />
-    <None Remove="Assets\Square44x44Logo.scale-200.png" />
-    <None Remove="Assets\Square44x44Logo.scale-400.png" />
-    <None Remove="Assets\Square44x44Logo.targetsize-16.png" />
-    <None Remove="Assets\Square44x44Logo.targetsize-24.png" />
-    <None Remove="Assets\Square44x44Logo.targetsize-256.png" />
-    <None Remove="Assets\Square44x44Logo.targetsize-32.png" />
-    <None Remove="Assets\Square44x44Logo.targetsize-48.png" />
-    <None Remove="Assets\StoreLogo.scale-100.png" />
-    <None Remove="Assets\StoreLogo.scale-125.png" />
-    <None Remove="Assets\StoreLogo.scale-150.png" />
-    <None Remove="Assets\StoreLogo.scale-200.png" />
-    <None Remove="Assets\StoreLogo.scale-400.png" />
-    <None Remove="Assets\SvgIcons\ic_fluent_error_circle_16_color.svg" />
-    <None Remove="Assets\Wide310x150Logo.scale-100.png" />
-    <None Remove="Assets\Wide310x150Logo.scale-125.png" />
-    <None Remove="Assets\Wide310x150Logo.scale-150.png" />
-    <None Remove="Assets\Wide310x150Logo.scale-200.png" />
-    <None Remove="Assets\Wide310x150Logo.scale-400.png" />
-    <None Remove="Memo_for_publish_commands.txt" />
-    <None Remove="Views\Dialogs\InitDialog.xaml" />
-    <None Remove="Views\ShellPage.xaml" />
-  </ItemGroup>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Manifest Include="$(ApplicationManifest)" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="CommunityToolkit.WinUI.Animations" Version="8.3.260402-preview2" />
+		<PackageReference Include="CommunityToolkit.WinUI.Behaviors" Version="8.3.260402-preview2" />
+		<PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.3.260402-preview2" />
+		<PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.3.260402-preview2" />
+		<PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.3.260402-preview2" />
+		<PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" Version="8.3.260402-preview2" />
+		<PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.3.260402-preview2" />
+		<PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.3.260402-preview2" />
+		<PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.3.260402-preview2" />
+		<PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.3.260402-preview2" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
+		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.3.1" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools.MSIX" Version="1.7.260903100">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.WindowsAppSDK.Foundation" Version="2.3.12" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="2.1.9" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.5.1" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.3.9" />
+		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.12" />
+	</ItemGroup>
 
-  <!--
+	<ItemGroup>
+		<Manifest Include="$(ApplicationManifest)" />
+	</ItemGroup>
+
+	<!--
     Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
     Tools extension to be activated for this project even if the Windows App SDK Nuget
     package has not yet been restored.
@@ -154,104 +117,141 @@
 		<ProjectCapability Include="Msix" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-    <PackageReference Include="CommunityToolkit.WinUI.Animations" Version="8.3.260402-preview2" />
-    <PackageReference Include="CommunityToolkit.WinUI.Behaviors" Version="8.3.260402-preview2" />
-    <PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.3.260402-preview2" />
-    <PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.3.260402-preview2" />
-    <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.3.260402-preview2" />
-    <PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" Version="8.3.260402-preview2" />
-    <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.3.260402-preview2" />
-    <PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.3.260402-preview2" />
-    <PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.3.260402-preview2" />
-    <PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.3.260402-preview2" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
-    <PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.3.1" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools.MSIX" Version="1.7.260903100">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.WindowsAppSDK.Foundation" Version="2.3.12" />
-    <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="2.1.9" />
-    <PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.5.1" />
-    <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.3.9" />
-    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.12" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Update="Assets\MPDCtrl.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Assets\Teeth.mp3">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Update="Assets\SvgIcons\ic_fluent_error_circle_16_color.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Assets\MPDCtrl.ico">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-	  <Page Update="Views\Dialogs\InitDialog.xaml">
-		  <SubType>Designer</SubType>
-		  <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	  <Page Update="Views\Dialogs\KeybindingsDialog.xaml">
-	    <SubType>Designer</SubType>
-	  </Page>
-	  <Page Update="Views\Dialogs\ProfileDialog.xaml">
-		  <SubType>Designer</SubType>
-		  <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	  <Page Update="Views\Dialogs\PlaylistRenameToDialog.xaml">
-		  <SubType>Designer</SubType>
-		  <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	  <Page Update="Views\AlbumDetailPage.xaml">
-		  <SubType>Designer</SubType>
-		  <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	  <Page Update="Views\PlaylistItemPage.xaml">
-		  <SubType>Designer</SubType>
-		  <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	  <Page Update="Views\SearchPage.xaml">
-		  <SubType>Designer</SubType>
-		  <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	  <Page Update="Views\FilesPage.xaml">
-		  <SubType>Designer</SubType>
-		  <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	  <Page Update="Views\ArtistsPage.xaml">
-		  <SubType>Designer</SubType>
-		  <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	  <Page Update="Views\AlbumsPage.xaml">
-		  <SubType>Designer</SubType>
-		  <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	  <Page Update="Views\SettingsPage.xaml">
-		  <SubType>Designer</SubType>
-		  <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	  <Page Update="Views\QueuePage.xaml">
-		  <SubType>Designer</SubType>
-		  <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	  <Page Update="Views\Dialogs\SongsAddToDialog.xaml">
-		  <SubType>Designer</SubType>
-		  <Generator>MSBuild:Compile</Generator>
-	  </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<Content Update="Assets\MPDCtrl.ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Assets\Teeth.mp3">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+		<Content Update="Assets\SvgIcons\ic_fluent_error_circle_16_color.svg">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="Assets\MPDCtrl.ico">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="Views\Dialogs\InitDialog.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Views\Dialogs\KeybindingsDialog.xaml">
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Views\Dialogs\ProfileDialog.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Views\Dialogs\PlaylistRenameToDialog.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Views\AlbumDetailPage.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Views\PlaylistItemPage.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Views\SearchPage.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Views\FilesPage.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Views\ArtistsPage.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Views\AlbumsPage.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Views\SettingsPage.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Views\QueuePage.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Views\Dialogs\SongsAddToDialog.xaml">
+			<SubType>Designer</SubType>
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<ItemGroup>
+		<None Remove="Assets\BadgeLogo.scale-100.png" />
+		<None Remove="Assets\BadgeLogo.scale-125.png" />
+		<None Remove="Assets\BadgeLogo.scale-150.png" />
+		<None Remove="Assets\BadgeLogo.scale-200.png" />
+		<None Remove="Assets\BadgeLogo.scale-400.png" />
+		<None Remove="Assets\LargeTile.scale-100.png" />
+		<None Remove="Assets\LargeTile.scale-125.png" />
+		<None Remove="Assets\LargeTile.scale-150.png" />
+		<None Remove="Assets\LargeTile.scale-200.png" />
+		<None Remove="Assets\LargeTile.scale-400.png" />
+		<None Remove="Assets\SmallTile.scale-100.png" />
+		<None Remove="Assets\SmallTile.scale-125.png" />
+		<None Remove="Assets\SmallTile.scale-150.png" />
+		<None Remove="Assets\SmallTile.scale-200.png" />
+		<None Remove="Assets\SmallTile.scale-400.png" />
+		<None Remove="Assets\SplashScreen.scale-100.png" />
+		<None Remove="Assets\SplashScreen.scale-125.png" />
+		<None Remove="Assets\SplashScreen.scale-150.png" />
+		<None Remove="Assets\SplashScreen.scale-200.png" />
+		<None Remove="Assets\SplashScreen.scale-400.png" />
+		<None Remove="Assets\Square150x150Logo.scale-100.png" />
+		<None Remove="Assets\Square150x150Logo.scale-125.png" />
+		<None Remove="Assets\Square150x150Logo.scale-150.png" />
+		<None Remove="Assets\Square150x150Logo.scale-200.png" />
+		<None Remove="Assets\Square150x150Logo.scale-400.png" />
+		<None Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-16.png" />
+		<None Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-24.png" />
+		<None Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-256.png" />
+		<None Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-32.png" />
+		<None Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-48.png" />
+		<None Remove="Assets\Square44x44Logo.altform-unplated_targetsize-16.png" />
+		<None Remove="Assets\Square44x44Logo.altform-unplated_targetsize-24.png" />
+		<None Remove="Assets\Square44x44Logo.altform-unplated_targetsize-256.png" />
+		<None Remove="Assets\Square44x44Logo.altform-unplated_targetsize-32.png" />
+		<None Remove="Assets\Square44x44Logo.altform-unplated_targetsize-48.png" />
+		<None Remove="Assets\Square44x44Logo.scale-100.png" />
+		<None Remove="Assets\Square44x44Logo.scale-125.png" />
+		<None Remove="Assets\Square44x44Logo.scale-150.png" />
+		<None Remove="Assets\Square44x44Logo.scale-200.png" />
+		<None Remove="Assets\Square44x44Logo.scale-400.png" />
+		<None Remove="Assets\Square44x44Logo.targetsize-16.png" />
+		<None Remove="Assets\Square44x44Logo.targetsize-24.png" />
+		<None Remove="Assets\Square44x44Logo.targetsize-256.png" />
+		<None Remove="Assets\Square44x44Logo.targetsize-32.png" />
+		<None Remove="Assets\Square44x44Logo.targetsize-48.png" />
+		<None Remove="Assets\StoreLogo.scale-100.png" />
+		<None Remove="Assets\StoreLogo.scale-125.png" />
+		<None Remove="Assets\StoreLogo.scale-150.png" />
+		<None Remove="Assets\StoreLogo.scale-200.png" />
+		<None Remove="Assets\StoreLogo.scale-400.png" />
+		<None Remove="Assets\SvgIcons\ic_fluent_error_circle_16_color.svg" />
+		<None Remove="Assets\Wide310x150Logo.scale-100.png" />
+		<None Remove="Assets\Wide310x150Logo.scale-125.png" />
+		<None Remove="Assets\Wide310x150Logo.scale-150.png" />
+		<None Remove="Assets\Wide310x150Logo.scale-200.png" />
+		<None Remove="Assets\Wide310x150Logo.scale-400.png" />
+		<None Remove="Memo_for_publish_commands.txt" />
+		<None Remove="Views\Dialogs\InitDialog.xaml" />
+		<None Remove="Views\ShellPage.xaml" />
+	</ItemGroup>
 
-  <!--
+	<!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
     Explorer "Package and Publish" context menu entry to be enabled for this project even if
     the Windows App SDK Nuget package has not yet been restored.
@@ -311,11 +311,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PRIResource Remove="Properties\en-US\**" />
+		<PRIResource Remove="Properties\en-US\**" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PRIResource Remove="Properties\ja-JP\**" />
+		<PRIResource Remove="Properties\ja-JP\**" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Remove="AppPackages\**" />

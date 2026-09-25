@@ -16,7 +16,7 @@ namespace MPDCtrl.Services;
 public sealed class MpcBinaryService : IMpcBinaryService
 {
     private CancellationTokenSource? _cts;
-
+    private readonly object _connectionLock = new();
     private static TcpClient _binaryConnection = new();
     private StreamReader? _binaryReader;
     private StreamWriter? _binaryWriter;
@@ -64,7 +64,16 @@ public sealed class MpcBinaryService : IMpcBinaryService
     {
         ConnectionResult result = new();
 
-        _binaryConnection = new TcpClient();
+        //_binaryConnection = new TcpClient();
+        lock (_connectionLock)
+        {
+            DisposeConnection(
+                ref _binaryConnection,
+                ref _binaryReader,
+                ref _binaryWriter);
+
+            _binaryConnection = new TcpClient();
+        }
 
         _host = host;
         _port = port;
@@ -1130,9 +1139,24 @@ public sealed class MpcBinaryService : IMpcBinaryService
 
     public void MpdBinaryConnectionDisconnect(bool isReconnect)
     {
-        //
         _cts?.Cancel();
 
+        lock (_connectionLock)
+        {
+            DisposeConnection(
+                ref _binaryConnection,
+                ref _binaryReader,
+                ref _binaryWriter);
+
+        }
+
+        if (!isReconnect)
+        {
+            _cts?.Dispose();
+            _cts = null;
+        }
+
+        /*
         try
         {
             _binaryConnection.Client?.Shutdown(SocketShutdown.Both);
@@ -1147,5 +1171,26 @@ public sealed class MpcBinaryService : IMpcBinaryService
         {
             //Debug.WriteLine($"Exception @MpdBinaryConnectionDisconnect {ex}");
         }
+        */
+    }
+
+    private static void DisposeConnection(ref TcpClient connection,ref StreamReader? reader,ref StreamWriter? writer)
+    {
+        try
+        {
+            connection.Client?.Shutdown(SocketShutdown.Both);
+        }
+        catch
+        {
+            // The connection may already be closed.
+        }
+
+        writer?.Dispose();
+        reader?.Dispose();
+        connection.Dispose();
+
+        writer = null;
+        reader = null;
+        connection = new TcpClient();
     }
 }

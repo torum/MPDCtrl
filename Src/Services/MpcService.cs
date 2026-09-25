@@ -63,6 +63,8 @@ public sealed partial class MpcService : IMpcService
 
     #region == Connections ==
 
+    private readonly object _connectionLock = new();
+
     private static TcpClient _commandConnection = new();
     private static StreamReader? _commandReader;
     private static StreamWriter? _commandWriter;
@@ -1203,9 +1205,18 @@ public sealed partial class MpcService : IMpcService
     {
         ConnectionResult result = new();
 
-        IsMpdCommandConnected = false;
+        //_commandConnection = new TcpClient();
+        lock (_connectionLock)
+        {
+            DisposeConnection(
+                ref _commandConnection,
+                ref _commandReader,
+                ref _commandWriter);
 
-        _commandConnection = new TcpClient();
+            _commandConnection = new TcpClient();
+        }
+
+        IsMpdCommandConnected = false;
 
         MpdHost = host;
         MpdPort = port;
@@ -5000,11 +5011,34 @@ public sealed partial class MpcService : IMpcService
     {
         // This needs to be first.
         ConnectionState = ConnectionStatus.Disconnecting;
-
         MpdStop = true;
 
         _cts?.Cancel();
 
+
+        IsBusy?.Invoke(this, true);
+
+        ConnectionState = ConnectionStatus.Disconnecting;
+
+
+        lock (_connectionLock)
+        {
+            DisposeConnection(
+                ref _commandConnection,
+                ref _commandReader,
+                ref _commandWriter);
+
+            DisposeConnection(
+                ref _idleConnection,
+                ref _idleReader,
+                ref _idleWriter);
+        }
+
+
+        IsBusy?.Invoke(this, false);
+        ConnectionState = ConnectionStatus.DisconnectedByUser;
+
+        /*
         try
         {
             IsBusy?.Invoke(this, true);
@@ -5044,6 +5078,7 @@ public sealed partial class MpcService : IMpcService
             IsBusy?.Invoke(this, false);
             ConnectionState = ConnectionStatus.DisconnectedByUser;
         }
+        */
 
         _binaryDownloader.MpdBinaryConnectionDisconnect(isReconnect);
 
@@ -5053,7 +5088,28 @@ public sealed partial class MpcService : IMpcService
         if (!isReconnect)
         {
             _cts?.Dispose();
+            _cts = null;
         }
+    }
+
+    private static void DisposeConnection(ref TcpClient connection,ref StreamReader? reader,ref StreamWriter? writer)
+    {
+        try
+        {
+            connection.Client?.Shutdown(SocketShutdown.Both);
+        }
+        catch
+        {
+            // The connection may already be closed.
+        }
+
+        writer?.Dispose();
+        reader?.Dispose();
+        connection.Dispose();
+
+        writer = null;
+        reader = null;
+        connection = new TcpClient();
     }
 }
 

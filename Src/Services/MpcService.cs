@@ -5015,11 +5015,9 @@ public sealed partial class MpcService : IMpcService
 
         _cts?.Cancel();
 
-
         IsBusy?.Invoke(this, true);
 
         ConnectionState = ConnectionStatus.Disconnecting;
-
 
         lock (_connectionLock)
         {
@@ -5033,7 +5031,6 @@ public sealed partial class MpcService : IMpcService
                 ref _idleReader,
                 ref _idleWriter);
         }
-
 
         IsBusy?.Invoke(this, false);
         ConnectionState = ConnectionStatus.DisconnectedByUser;

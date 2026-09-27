@@ -24,14 +24,12 @@ namespace MPDCtrl.Views;
 public sealed partial class MainWindow : Window
 {
     private readonly MainViewModel _vm;
-
     private readonly SystemMediaTransportControls? _smtc;
     private readonly bool _isMediaTransportControlEnable = true;
-
     private readonly WindowMessageHook? _hook;
     private readonly bool _isGlobalHotKeyEnable = false;
 
-    // Window position and size
+    // Window restore position and size
     private int _winRestoreWidth = 1024;
     private int _winRestoreHeight = 768;
     private int _winRestoreTop = 100;
@@ -39,7 +37,6 @@ public sealed partial class MainWindow : Window
 
     //private readonly UISettings settings;
     private ElementTheme theme = ElementTheme.Default;
-
     private readonly IDispatcherService _dispatcherService;
 
     // TODO: Require CsWinRT 2.3.0-prerelease.251115.2
@@ -51,14 +48,13 @@ public sealed partial class MainWindow : Window
         _vm = vm;
         _dispatcherService = dispatcherService;
 
-        // This is where the MainViewModel is first initilized.
-        //_vm = App.GetService<MainViewModel>();
-
         if (this.AppWindow.Presenter is OverlappedPresenter presenter)
         {
             presenter.PreferredMinimumWidth = 600;
             presenter.PreferredMinimumHeight = 780;
         }
+
+        LoadSettings();
 
         InitializeComponent();
 
@@ -66,8 +62,6 @@ public sealed partial class MainWindow : Window
 
         this.AppWindow.Title = "MPDCtrl";
         this.AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets\\MPDCtrl.ico"));
-
-        LoadSettings();
 
         // It's important to set content as early as here in order to set theme.
         // But make sure to call LoadSettings() before in order to apply settings value for contents.
@@ -101,13 +95,12 @@ public sealed partial class MainWindow : Window
 
         if (_isMediaTransportControlEnable)
         {
-            // Clean this shit up Microsoft!
+            // CLEAN THIS SHIT UP Microsoft!
             //_smtc = SystemMediaTransportControls.GetForCurrentView(); //<- this is only works in UWP. 
 
             //_mediaPlayer = new MediaPlayer();
             ////_mediaPlayer.CommandManager.IsEnabled = false; <- not good if false.
             //_smtc = _mediaPlayer.SystemMediaTransportControls;
-
             _smtc = Windows.Media.SystemMediaTransportControlsInterop.GetForWindow(WinRT.Interop.WindowNative.GetWindowHandle(this));
 
             OnUpdateSongInfoForSystemMediaTransportControls(new SongInfoForSystemMediaTransportControls());
@@ -127,8 +120,6 @@ public sealed partial class MainWindow : Window
 
     private void OnUpdateSongInfoForSystemMediaTransportControls(SongInfoForSystemMediaTransportControls SongInfoForSMTC)
     {
-        //Debug.WriteLine("OnUpdateSongInfoForSystemMediaTransportControls");
-
         if (SongInfoForSMTC is null)
         {
             return;
@@ -166,11 +157,11 @@ public sealed partial class MainWindow : Window
 
     private void OnUpdateSongInfoForSystemMediaTransportControlsButtonStateOnly(Windows.Media.MediaPlaybackStatus playbackStatus)
     {
-        //Debug.WriteLine("OnUpdateSongInfoForSystemMediaTransportControlsButtonStateOnly");
         if (_smtc is null)
         {
             return;
         }
+
         _dispatcherService.TryEnqueue(() =>
         {
             _smtc.PlaybackStatus = playbackStatus;
@@ -199,7 +190,6 @@ public sealed partial class MainWindow : Window
         if (!System.IO.File.Exists(App.AppConfigFilePath))
         {
             // Sets default.
-
             if (Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController.IsSupported())
             {
                 _vm.IsAcrylicSupported = true;
@@ -563,8 +553,6 @@ public sealed partial class MainWindow : Window
                 else if (winState == OverlappedPresenterState.Minimized)
                 {
                     // DONT restore minimized size and pos. bad.
-                    //appWindow.MoveAndResize(new Windows.Graphics.RectInt32(winRestoreleft, winRestoreTop, winRestoreWidth, winRestoreHeight));
-                    //appWindow.ShowOnceWithRequestedStartupState();
 
                     // This should not happen.
                     //(appWindow.Presenter as OverlappedPresenter)!.Restore();
@@ -641,7 +629,6 @@ public sealed partial class MainWindow : Window
                     Kind = MicaKind.Base
                 };
                 vm.Material = SystemBackdropOption.Mica;
-                //TitleBarHelper.UpdateTitleBar(Theme, App.MainWnd);
 
                 vm.IsBackdropEnabled = true;
             }
@@ -655,7 +642,6 @@ public sealed partial class MainWindow : Window
                     Kind = MicaKind.BaseAlt
                 };
                 vm.Material = SystemBackdropOption.MicaAlt;
-                //TitleBarHelper.UpdateTitleBar(Theme, App.MainWnd);
 
                 vm.IsBackdropEnabled = true;
             }
@@ -667,7 +653,6 @@ public sealed partial class MainWindow : Window
                 this.SystemBackdrop = new DesktopAcrylicBackdrop();
 
                 vm.Material = SystemBackdropOption.Acrylic;
-                //TitleBarHelper.UpdateTitleBar(Theme, App.MainWnd);
 
                 vm.IsBackdropEnabled = true;
             }
@@ -684,7 +669,6 @@ public sealed partial class MainWindow : Window
             {
                 root.RequestedTheme = theme;
 
-                //TitleBarHelper.UpdateTitleBar(theme, this);
                 SetCapitionButtonColor();
             }
 
@@ -1052,17 +1036,6 @@ public sealed partial class MainWindow : Window
 
         #endregion
 
-        /*
-        var filePath = App.AppConfigFilePath;
-        if (RuntimeHelper.IsMSIX)
-        {
-            filePath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, App.AppName + ".config");
-        }
-        else
-        {
-            System.IO.Directory.CreateDirectory(App.AppDataFolder);
-        }
-        */
 
         if (!Directory.Exists(App.AppDataFolder))
         {

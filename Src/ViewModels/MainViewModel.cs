@@ -41,6 +41,55 @@ namespace MPDCtrl.ViewModels;
 
 public sealed partial class MainViewModel : ObservableObject
 {
+    private readonly CancellationTokenSource _cts = new();
+    private readonly IMpcService _mpc;
+    private readonly IDialogService _dialogs;
+    private readonly IDispatcherService _dispatcherService;
+
+    #region == Events ==
+
+    // Queue listview ScrollIntoView.
+    public event EventHandler<object>? ScrollIntoView;
+
+    // Queue listview ScrollIntoView and select (for filter and first time loading the queue).
+    public event EventHandler<object>? ScrollIntoViewAndSelect;
+
+    // For status bar message.
+    public event EventHandler<string>? UpdateProgress;
+
+    public event EventHandler? AlbumSelectedNavigateToDetailsPage;
+    public event EventHandler<AlbumEx>? AlbumScrollIntoView;
+    public event EventHandler? AlbumsCollectionHasBeenReset;
+    public event EventHandler? GoBackButtonVisibilityChanged;
+    //public event EventHandler<string>? DebugCommandOutput;
+    //public event EventHandler<string>? DebugIdleOutput;
+    public event EventHandler? DebugCommandClear;
+    public event EventHandler? DebugIdleClear;
+    public event EventHandler<SongInfoForSystemMediaTransportControls>? UpdateSongInfoForSystemMediaTransportControls;
+    public event EventHandler<Windows.Media.MediaPlaybackStatus>? UpdateSongInfoForSystemMediaTransportControlsButtonStateOnly;
+    public event EventHandler? UserCanExecuteChanged;
+
+    #endregion
+
+    public MainViewModel(IMpcService mpcService, IDialogService dialogService, IDispatcherService dispatcherService)
+    {
+        _mpc = mpcService;
+        _dialogs = dialogService;
+        _dispatcherService = dispatcherService;
+
+        InitializeAndSubscribe();
+
+#if DEBUG
+        IsDebugWindowEnabled = false;
+        IsShowDebugWindow = false;
+#else
+        IsDebugWindowEnabled = false;
+        IsShowDebugWindow = false;
+#endif
+    }
+
+    #region == Properties ==
+
     #region == Flags ==
 
     public bool IsBusy
@@ -2383,54 +2432,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     #endregion
 
-    #region == Events ==
-
-    // Queue listview ScrollIntoView.
-    public event EventHandler<object>? ScrollIntoView;
-
-    // Queue listview ScrollIntoView and select (for filter and first time loading the queue).
-    public event EventHandler<object>? ScrollIntoViewAndSelect;
-
-    // For status bar message.
-    public event EventHandler<string>? UpdateProgress;
-
-    public event EventHandler? AlbumSelectedNavigateToDetailsPage;
-    public event EventHandler<AlbumEx>? AlbumScrollIntoView;
-    public event EventHandler? AlbumsCollectionHasBeenReset;
-    public event EventHandler? GoBackButtonVisibilityChanged;
-    //public event EventHandler<string>? DebugCommandOutput;
-    //public event EventHandler<string>? DebugIdleOutput;
-    public event EventHandler? DebugCommandClear;
-    public event EventHandler? DebugIdleClear;
-    public event EventHandler<SongInfoForSystemMediaTransportControls>? UpdateSongInfoForSystemMediaTransportControls;
-    public event EventHandler<Windows.Media.MediaPlaybackStatus>? UpdateSongInfoForSystemMediaTransportControlsButtonStateOnly;
-    public event EventHandler? UserCanExecuteChanged;
-
     #endregion
-
-    //private readonly ResourceLoader _resourceLoader = new();
-    private readonly CancellationTokenSource _cts = new();
-
-    private readonly IMpcService _mpc;
-    private readonly IDialogService _dialogs;
-    private readonly IDispatcherService _dispatcherService;
-
-    public MainViewModel(IMpcService mpcService, IDialogService dialogService, IDispatcherService dispatcherService)
-    {
-        _mpc = mpcService;
-        _dialogs = dialogService;
-        _dispatcherService = dispatcherService;
-
-        InitializeAndSubscribe();
-
-#if DEBUG
-        IsDebugWindowEnabled = false;
-        IsShowDebugWindow = false;
-#else
-        IsDebugWindowEnabled = false;
-        IsShowDebugWindow = false;
-#endif
-    }
 
     #region == Public Methods ==
 

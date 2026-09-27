@@ -25,20 +25,17 @@ public sealed partial class ShellPage : Page
 {
     private long _token;
 
-    public MainViewModel ViewModel
-    {
-        get;
-    }
-
     private readonly IDispatcherService _dispatcherService;
 
     private Type? _currentPage;
 
+    public MainViewModel ViewModel { get; }
+
     public ShellPage(MainViewModel vm, IDispatcherService dispatcherService)
     {
-        ViewModel = vm;//App.GetService<MainViewModel>();
-        //DataContext = ViewModel;
-        _dispatcherService = dispatcherService;//App.GetService<IDispatcherService>();
+        ViewModel = vm;
+        //DataContext = vm;
+        _dispatcherService = dispatcherService;
 
         InitializeComponent();
 
@@ -51,48 +48,22 @@ public sealed partial class ShellPage : Page
         ViewModel.UserCanExecuteChanged += OnUserCanExecuteChanged;
         ViewModel.UpdateProgress += (sender, arg) => { this.OnUpdateProgress(arg); };
         this.ActualThemeChanged += this.This_ActualThemeChanged;
-
-        // Not good because this create instance in addition to navigation view.
-        //NavigationFrame.Content = App.GetService<QueuePage>(); 
-
-        /*
-         * Not good when queuePage.Selected = true;. Better do it in loaded.
-        if (NavigationFrame.Navigate(typeof(QueuePage), NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
-        {
-            _currentPage = typeof(QueuePage);
-            var queuePage = ViewModel.MainMenuItems.FirstOrDefault();
-            if (queuePage != null)
-            {
-                queuePage.Selected = true;
-            }
-        }
-        */
-
-        // Do this at shell page loaded event after everything is initilized even App.MainWnd in app.xaml.cs.
-        // It is too early here to show dialogs.
-        //ViewModel.StartMPC();
-
-        //this.PlaybackPlay.Loaded += (s, e) => PlaybackPlay.Focus(FocusState.Programmatic);
     }
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
         try
         {
-            // Set focus so that space shortcut works.
-            //await FocusManager.TryFocusAsync(this.PlaybackPlay, FocusState.Programmatic);
-
             var main = App.GetService<Views.MainWindow>();
             if (main is not null)
             {
                 main.Activated += MainWindow_Activated;
 
-                // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage)
-                // is loaded, initialized, set, drawn, navigated. So start the connection.
+                // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage) is loaded, initialized, set, drawn, navigated. So start the connection.
 
                 //await ViewModel.StartMpcAsync();
                 // Let's not await, for faster startup. Fire and forget.
-                ViewModel.Start();
+                //ViewModel.Start(); // Everthing is DIed, no longer needed to be here.
             }
             else
             {
@@ -102,6 +73,9 @@ public sealed partial class ShellPage : Page
             // For animation fade
             _token = AlbumCoverImage.RegisterPropertyChangedCallback(Microsoft.UI.Xaml.Controls.Image.SourceProperty, OnSourceChanged);
 
+            //await ViewModel.StartMpcAsync();
+            // Let's not await, for faster startup. Fire and forget.
+            ViewModel.Start();
         }
         catch (Exception ex)
         {
@@ -139,7 +113,7 @@ public sealed partial class ShellPage : Page
         */
 
         // This right here is better. the initial Selected = .. messed up in the constructor.
-        if (this.NavigationFrame.Navigate(typeof(QueuePage), this.NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
+        if (this.NavigationFrame.Navigate(typeof(QueuePage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
         {
             _currentPage = typeof(QueuePage);
             var queuePage = ViewModel.MainMenuItems.FirstOrDefault();
@@ -234,6 +208,7 @@ public sealed partial class ShellPage : Page
 
     public void OnAlbumSelectedNavigateToDetailsPage(object? sender, System.EventArgs e)
     {
+        // Make sure to pass NavigationFrame as a parameter here.
         if (this.NavigationFrame.Navigate(typeof(AlbumDetailPage), this.NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight }))
         {
             _currentPage = typeof(AlbumDetailPage);
@@ -345,7 +320,7 @@ public sealed partial class ShellPage : Page
     {
         if (args.IsSettingsInvoked == true)
         {
-            if (this.NavigationFrame.Navigate(typeof(SettingsPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
+            if (this.NavigationFrame.Navigate(typeof(SettingsPage), null, args.RecommendedNavigationTransitionInfo))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
             {
                 _currentPage = typeof(SettingsPage);
 
@@ -457,7 +432,7 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            if (this.NavigationFrame.Navigate(typeof(QueuePage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
+            if (this.NavigationFrame.Navigate(typeof(QueuePage), null, args.RecommendedNavigationTransitionInfo))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
             {
                 _currentPage = typeof(QueuePage);
                 vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
@@ -469,7 +444,7 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            if (this.NavigationFrame.Navigate(typeof(SearchPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
+            if (this.NavigationFrame.Navigate(typeof(SearchPage), null, args.RecommendedNavigationTransitionInfo))
             {
                 _currentPage = typeof(SearchPage);
                 vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
@@ -485,7 +460,7 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            if (this.NavigationFrame.Navigate(typeof(AlbumsPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
+            if (this.NavigationFrame.Navigate(typeof(AlbumsPage), null, args.RecommendedNavigationTransitionInfo))
             {
                 _currentPage = typeof(AlbumsPage);
                 vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
@@ -497,7 +472,7 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            if (this.NavigationFrame.Navigate(typeof(ArtistsPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
+            if (this.NavigationFrame.Navigate(typeof(ArtistsPage), null, args.RecommendedNavigationTransitionInfo))
             {
                 _currentPage = typeof(ArtistsPage);
                 vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
@@ -509,7 +484,7 @@ public sealed partial class ShellPage : Page
             {
                 return;
             }
-            if (this.NavigationFrame.Navigate(typeof(FilesPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
+            if (this.NavigationFrame.Navigate(typeof(FilesPage), null, args.RecommendedNavigationTransitionInfo))
             {
                 _currentPage = typeof(FilesPage);
                 vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
@@ -529,7 +504,7 @@ public sealed partial class ShellPage : Page
             }
 
             // TODO: I just wanna show NavigationTransition animation without navigation....
-            if (this.NavigationFrame.Navigate(typeof(PlaylistItemPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
+            if (this.NavigationFrame.Navigate(typeof(PlaylistItemPage), null, args.RecommendedNavigationTransitionInfo))
             {
                 _currentPage = typeof(PlaylistItemPage);
                 vm.SelectedNodeMenu = args.SelectedItem as NodeTree;

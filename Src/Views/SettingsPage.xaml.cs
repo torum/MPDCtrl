@@ -7,16 +7,16 @@ namespace MPDCtrl.Views;
 
 public sealed partial class SettingsPage : Page
 {
-    public MainViewModel ViewModel
-    {
-        get;
-    }
-
     public SettingsPage()
     {
         ViewModel = App.GetService<MainViewModel>();
 
         InitializeComponent();
+    }
+
+    public MainViewModel ViewModel
+    {
+        get;
     }
 
     private async void HyperlinkButton_AlbumCacheFolderPath_Click(object sender, RoutedEventArgs e)

@@ -23,18 +23,13 @@ namespace MPDCtrl.Views;
 
 public sealed partial class ShellPage : Page
 {
-    private long _token;
-
     private readonly IDispatcherService _dispatcherService;
-
     private Type? _currentPage;
-
-    public MainViewModel ViewModel { get; }
+    private long _token;
 
     public ShellPage(MainViewModel vm, IDispatcherService dispatcherService)
     {
         ViewModel = vm;
-        //DataContext = vm;
         _dispatcherService = dispatcherService;
 
         InitializeComponent();
@@ -49,6 +44,8 @@ public sealed partial class ShellPage : Page
         ViewModel.UpdateProgress += (sender, arg) => { this.OnUpdateProgress(arg); };
         this.ActualThemeChanged += this.This_ActualThemeChanged;
     }
+
+    public MainViewModel ViewModel { get; }
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
@@ -104,14 +101,6 @@ public sealed partial class ShellPage : Page
 
     private void NavigationView_Loaded(object sender, RoutedEventArgs e)
     {
-        /*
-        if (this.NavigationFrame.Navigate(typeof(SettingsPage), this.NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
-        {
-            _currentPage = typeof(SettingsPage);
-        }
-        return;
-        */
-
         // This right here is better. the initial Selected = .. messed up in the constructor.
         if (this.NavigationFrame.Navigate(typeof(QueuePage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))
         {
@@ -133,6 +122,7 @@ public sealed partial class ShellPage : Page
         // Update interactive regions if the size of the window changes.
         SetRegionsForCustomTitleBar();
     }
+
     private void OnUserCanExecuteChanged(object? sender, EventArgs e)
     {
         VolumeSlider.IsEnabled = ViewModel.SetVolumeCommand.CanExecute(null);//.SetVolumeCanExecute();
@@ -174,7 +164,6 @@ public sealed partial class ShellPage : Page
 
         if (this.BackButton.Visibility != Visibility.Visible)
         {
-            //Debug.WriteLine("BackButton.Visibility != Visibility.Visible");
             width = 0;
             height = 0;
         }
@@ -218,11 +207,6 @@ public sealed partial class ShellPage : Page
     public void SetTitleBar(MainWindow wnd)
     {
         wnd.SetTitleBar(AppTitleBar);
-
-        //SetRegionsForCustomTitleBar();
-
-        // Do this after everything is initilized even App.MainWnd in app.xaml.cs.
-        //ViewModel.StartMPC(this.XamlRoot);
     }
 
     public void OnUpdateProgress(string arg)
@@ -333,85 +317,6 @@ public sealed partial class ShellPage : Page
         {
             return;
         }
-
-        /*
-         * Now uses Selection changed event.
-         * 
-        if (args.InvokedItemContainer.Tag is not string tag || string.IsNullOrWhiteSpace(tag))
-        {
-            Debug.WriteLine("NavigationViewControl_ItemInvoked: Invalid tag or null.");
-            return;
-        }
-
-        var pageTag = args.InvokedItemContainer.Tag.ToString();
-
-        if (pageTag == "queue")
-        {
-            if (_currentPage == typeof(QueuePage))
-            {
-                return;
-            }
-            if (this.NavigationFrame.Navigate(typeof(QueuePage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
-            {
-                _currentPage = typeof(QueuePage);
-            }
-        }
-        else if (pageTag == "albums")
-        {
-            if (_currentPage == typeof(AlbumsPage))
-            {
-                return;
-            }
-            if (this.NavigationFrame.Navigate(typeof(AlbumsPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
-            {
-                _currentPage = typeof(AlbumsPage);
-            }
-        }
-        else if (pageTag == "artists")
-        {
-            if (_currentPage == typeof(ArtistsPage))
-            {
-                return;
-            }
-            if (this.NavigationFrame.Navigate(typeof(ArtistsPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
-            {
-                _currentPage = typeof(ArtistsPage);
-            }
-        }
-        else if (pageTag == "files")
-        {
-            if (_currentPage == typeof(FilesPage))
-            {
-                return;
-            }
-            if (this.NavigationFrame.Navigate(typeof(FilesPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
-            {
-                _currentPage = typeof(FilesPage);
-            }
-        }
-        else if (pageTag == "search")
-        {
-            if (_currentPage == typeof(SearchPage))
-            {
-                return;
-            }
-            if (this.NavigationFrame.Navigate(typeof(SearchPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
-            {
-                _currentPage = typeof(SearchPage);
-            }
-        }
-        else if (pageTag == "playlistItem")
-        {
-            if (_currentPage == typeof(PlaylistItemPage))
-            {
-                return;
-            }
-            if (this.NavigationFrame.Navigate(typeof(PlaylistItemPage), this.NavigationFrame, args.RecommendedNavigationTransitionInfo))
-            {
-                _currentPage = typeof(PlaylistItemPage);
-            }
-        }
-        */
     }
 
     private void NaviView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -519,17 +424,6 @@ public sealed partial class ShellPage : Page
 
             // clear vm selected just in case.
             vm.SelectedNodeMenu = null;
-
-            /*
-            if (args.SelectedItem is not null)
-            {
-                vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
-            }
-            else
-            {
-                vm.SelectedNodeMenu = null;
-            }
-            */
         }
     }
 
@@ -555,12 +449,10 @@ public sealed partial class ShellPage : Page
 
         if (this.NavigationFrame.CanGoBack)
         {
-            //this.BackButton.Visibility = Visibility.Visible;
             this.BackButton.IsEnabled = true;
         }
         else
         {
-            //this.BackButton.Visibility = Visibility.Collapsed;
             this.BackButton.IsEnabled = false;
         }
 
@@ -689,7 +581,6 @@ public sealed partial class ShellPage : Page
 
     private async void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        //
         if (this.NavigationFrame.Navigate(typeof(SettingsPage), this.NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom }))//, args.RecommendedNavigationTransitionInfo //new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }
         {
             _currentPage = typeof(SettingsPage);
@@ -815,8 +706,6 @@ public sealed partial class ShellPage : Page
                 // set this first.
                 args.Handled = true;
 
-                // TODO: Go to settings page.
-                Debug.WriteLine("Show settings page.");
                 ViewModel.GoToSearchPageCommand.Execute(null);
 
                 return;

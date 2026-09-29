@@ -15,8 +15,4 @@ public sealed partial class PlaylistRenameToDialog : Page
     {
         TextBoxPlaylistNameText = TextBoxPlaylistName.Text;
     }
-
-
-
-    //Dialog_Title_NewPlaylistName
 }

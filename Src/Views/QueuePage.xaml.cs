@@ -18,11 +18,6 @@ namespace MPDCtrl.Views;
 
 public sealed partial class QueuePage : Page
 {
-    public MainViewModel ViewModel
-    {
-        get;
-    }
-
     private readonly IDispatcherService _dispatcherService;
 
     public QueuePage()
@@ -35,6 +30,11 @@ public sealed partial class QueuePage : Page
 
         ViewModel.ScrollIntoView += (sender, arg) => { this.OnScrollIntoView(arg); };
         ViewModel.ScrollIntoViewAndSelect += (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
+    }
+
+    public MainViewModel ViewModel
+    {
+        get;
     }
 
     private void OnScrollIntoView(object obj)
@@ -68,7 +68,6 @@ public sealed partial class QueuePage : Page
                 return;
             }
 
-            //song.IsSelected = true; //This won't work in Winui3?
             lb.SelectedItem = song;
             //lb.Focus(FocusState.Programmatic);
 
@@ -84,7 +83,6 @@ public sealed partial class QueuePage : Page
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private async void QueueListview_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
-        //ListView listView = (ListView)sender;
         if (sender is not ListView listView)
         {
             return;
@@ -119,7 +117,6 @@ public sealed partial class QueuePage : Page
         {
             await ViewModel.QueueSelectedPlayCommand.ExecuteAsync(song);
         }
-
     }
 
     private void Page_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
@@ -187,7 +184,6 @@ public sealed partial class QueuePage : Page
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void QueueListview_RightTapped(object sender, RightTappedRoutedEventArgs e)
     {
-        //ListView listView = (ListView)sender;
         if (sender is not ListView listView)
         {
             return;

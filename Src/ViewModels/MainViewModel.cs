@@ -2538,6 +2538,7 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
+    // TODO: Not used anymore?
     public void SetError(string error)
     {
         InfoBarErrMessage = error;
@@ -4743,25 +4744,6 @@ public sealed partial class MainViewModel : ObservableObject
 
         try
         {
-            /*
-            SoftwareBitmap? softwareBitmap = null;
-
-            using (InMemoryRandomAccessStream stream = new InMemoryRandomAccessStream())
-            {
-                // Write the byte array to the stream
-                await stream.WriteAsync(buffer.AsBuffer());
-                stream.Seek(0); // Reset stream position to the beginning
-
-                // Create a BitmapDecoder from the stream
-                BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
-
-                // Get the SoftwareBitmap
-                softwareBitmap = await decoder.GetSoftwareBitmapAsync();
-            }
-
-            return softwareBitmap;
-            */
-
             var bitmapImage = new BitmapImage();
             using (var stream = new InMemoryRandomAccessStream())
             {
@@ -4786,29 +4768,12 @@ public sealed partial class MainViewModel : ObservableObject
 
     private static string? SaveAlbumCoverImage(SongInfoEx? current, AlbumImage? album)
     {
-        /*
-        App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
-        {
-
-        });
-        */
-
         if ((current?.File) != (album?.SongFilePath))
         {
             Debug.WriteLine($"NOT ({current?.File} == {album?.SongFilePath})");
             return null;
         }
-        /*
-        var strArtist = current?.AlbumArtist.Trim();
-        if (string.IsNullOrEmpty(strArtist))
-        {
-            strArtist = "Unknown Artist";
-        }
-        else
-        {
-            strArtist = SanitizeFilename(strArtist);
-        }
-        */
+
         var strArtist = current?.AlbumArtist.Trim();
         if (string.IsNullOrEmpty(strArtist))
         {

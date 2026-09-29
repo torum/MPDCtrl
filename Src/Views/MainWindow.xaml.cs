@@ -1,4 +1,3 @@
-using Microsoft.UI;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -15,7 +14,6 @@ using System.Runtime.InteropServices;
 using System.Xml;
 using System.Xml.Linq;
 using Windows.Media;
-using Windows.Media.Playback;
 using Windows.Storage;
 using WinRT;
 
@@ -28,16 +26,14 @@ public sealed partial class MainWindow : Window
     private readonly bool _isMediaTransportControlEnable = true;
     private readonly WindowMessageHook? _hook;
     private readonly bool _isGlobalHotKeyEnable = false;
+    private readonly IDispatcherService _dispatcherService;
 
-    // Window restore position and size
+    // Window restore position and sizes
     private int _winRestoreWidth = 1024;
     private int _winRestoreHeight = 768;
     private int _winRestoreTop = 100;
     private int _winRestoreLeft = 100;
-
-    //private readonly UISettings settings;
-    private ElementTheme theme = ElementTheme.Default;
-    private readonly IDispatcherService _dispatcherService;
+    private ElementTheme _theme = ElementTheme.Default;
 
     // TODO: Require CsWinRT 2.3.0-prerelease.251115.2
     // https://github.com/dotnet/runtime/issues/121590
@@ -48,6 +44,13 @@ public sealed partial class MainWindow : Window
         _vm = vm;
         _dispatcherService = dispatcherService;
 
+        InitializeComponent();
+
+        this.ExtendsContentIntoTitleBar = true;
+
+        this.AppWindow.Title = "MPDCtrl";
+        this.AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets\\MPDCtrl.ico"));
+
         if (this.AppWindow.Presenter is OverlappedPresenter presenter)
         {
             presenter.PreferredMinimumWidth = 600;
@@ -56,19 +59,12 @@ public sealed partial class MainWindow : Window
 
         LoadSettings();
 
-        InitializeComponent();
-
-        this.ExtendsContentIntoTitleBar = true;
-
-        this.AppWindow.Title = "MPDCtrl";
-        this.AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets\\MPDCtrl.ico"));
-
         // It's important to set content as early as here in order to set theme.
         // But make sure to call LoadSettings() before in order to apply settings value for contents.
         this.Content = shell;//App.GetService<ShellPage>();
 
         // It is necessary to set theme here after the content is set.
-        shell.RequestedTheme = theme;
+        shell.RequestedTheme = _theme;
 
         //// Let's not set caption button color here, because it will affect normal dim when activate/deactivate. Only set caption button color when theme is changed.
         SetCapitionButtonColor();
@@ -210,7 +206,7 @@ public sealed partial class MainWindow : Window
                 _vm.IsBackdropEnabled = true;
             }
 
-            theme = ElementTheme.Default;
+            _theme = ElementTheme.Default;
 
             return;
         }
@@ -609,7 +605,7 @@ public sealed partial class MainWindow : Window
         // Apply theme and backdrop
         if (bd != SystemBackdropOption.None)
         {
-            theme = eleThme;
+            _theme = eleThme;
             _vm.Theme = eleThme;
         }
         _vm.Material = bd;
@@ -664,10 +660,10 @@ public sealed partial class MainWindow : Window
             vm.Material = SystemBackdropOption.None;
             vm.IsBackdropEnabled = false;
             vm.Theme = ElementTheme.Default;
-            theme = ElementTheme.Default;
+            _theme = ElementTheme.Default;
             if (this.Content is ShellPage root)
             {
-                root.RequestedTheme = theme;
+                root.RequestedTheme = _theme;
 
                 SetCapitionButtonColor();
             }

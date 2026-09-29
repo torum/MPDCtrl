@@ -17,11 +17,6 @@ namespace MPDCtrl.Views;
 
 public sealed partial class PlaylistItemPage : Page
 {
-    public MainViewModel ViewModel
-    {
-        get;
-    }
-
     private readonly IDispatcherService _dispatcherService;
 
     public PlaylistItemPage()
@@ -30,6 +25,11 @@ public sealed partial class PlaylistItemPage : Page
         _dispatcherService = App.GetService<IDispatcherService>();
 
         InitializeComponent();
+    }
+
+    public MainViewModel ViewModel
+    {
+        get;
     }
 
     // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2

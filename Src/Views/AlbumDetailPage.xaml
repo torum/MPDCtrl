@@ -29,7 +29,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             
-            <BreadcrumbBar Grid.Row="0" x:Name="BreadcrumbBar1" Margin="0,0,0,0" ItemsSource="{x:Bind BreadcrumbItems, Mode=OneWay}" ItemClicked="BreadcrumbBar_ItemClicked" Visibility="Collapsed">
+            <BreadcrumbBar Grid.Row="0" x:Name="BreadcrumbBar1" Margin="0,0,0,0" ItemsSource="{x:Bind BreadcrumbItems, Mode=OneWay}" Visibility="Collapsed">
                 <BreadcrumbBar.Resources>
                     <x:Double x:Key="BreadcrumbBarChevronFontSize">24</x:Double>
                 </BreadcrumbBar.Resources>

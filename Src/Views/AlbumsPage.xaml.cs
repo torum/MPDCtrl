@@ -19,11 +19,6 @@ namespace MPDCtrl.Views;
 
 public sealed partial class AlbumsPage : Page
 {
-    public MainViewModel ViewModel
-    {
-        get;
-    }
-
     private readonly Compositor _compositor = Microsoft.UI.Xaml.Media.CompositionTarget.GetCompositorForCurrentThread();
     private SpringVector3NaturalMotionAnimation? _springAnimation;
 
@@ -38,6 +33,11 @@ public sealed partial class AlbumsPage : Page
 
         ViewModel.AlbumsCollectionHasBeenReset += this.OnAlbumsCollectionHasBeenReset;
         ViewModel.AlbumScrollIntoView += this.OnAlbumScrollIntoView;
+    }
+
+    public MainViewModel ViewModel
+    {
+        get;
     }
 
     public void OnAlbumScrollIntoView(object? sender, AlbumEx album)

@@ -3,6 +3,8 @@ using System.Linq;
 
 namespace MPDCtrl.Services;
 
+// Not used currently.
+
 internal static class MpdProtocol
 {
     public static string Quote(string value)

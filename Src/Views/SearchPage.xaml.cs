@@ -12,15 +12,15 @@ namespace MPDCtrl.Views;
 
 public sealed partial class SearchPage : Page
 {
-    public MainViewModel ViewModel
-    {
-        get;
-    }
-
     public SearchPage()
     {
         ViewModel = App.GetService<MainViewModel>();
         InitializeComponent();
+    }
+
+    public MainViewModel ViewModel
+    {
+        get;
     }
 
     // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2

@@ -13,13 +13,6 @@ public sealed partial class InitDialog : Page
 {
     private readonly Profile? _pro;
 
-    //private readonly ResourceLoader _resourceLoader = new();
-
-    public MainViewModel ViewModel
-    {
-        get;
-    }
-
     public InitDialog(MainViewModel vm)
     {
         ViewModel = vm;
@@ -30,6 +23,44 @@ public sealed partial class InitDialog : Page
 
         ValidateHostInput();
         ValidatePortInput();
+    }
+
+    public MainViewModel ViewModel
+    {
+        get;
+    }
+
+    public Profile? GetProfile()
+    {
+        if (_pro is null)
+        {
+            return null;
+        }
+
+        _pro.Host = this.TextBoxHost.Text ?? string.Empty;
+        _pro.Host = _pro.Host.Trim();
+
+        if (string.IsNullOrEmpty(this.TextBoxPort.Text))
+        {
+            _pro.Port = (int)6600;
+        }
+        else
+        {
+            try
+            {
+                _pro.Port = int.Parse(this.TextBoxPort.Text.Trim());
+            }
+            catch
+            {
+                _pro.Port = (int)6600;
+            }
+        }
+
+        _pro.Password = this.PasswordBox.Password ?? string.Empty;
+
+        _pro.Name = _pro.Host + ":" + _pro.Port.ToString();
+
+        return _pro;
     }
 
     private async void ValidateHostInput()
@@ -169,38 +200,5 @@ public sealed partial class InitDialog : Page
     private void TextBoxPort_TextChanged(object sender, TextChangedEventArgs e)
     {
         ValidatePortInput();
-    }
-
-    public Profile? GetProfile()
-    {
-        if (_pro is null)
-        {
-            return null;
-        }
-
-        _pro.Host = this.TextBoxHost.Text ?? string.Empty;
-        _pro.Host = _pro.Host.Trim();
-
-        if (string.IsNullOrEmpty(this.TextBoxPort.Text))
-        {
-            _pro.Port = (int)6600;
-        }
-        else
-        {
-            try
-            {
-                _pro.Port = int.Parse(this.TextBoxPort.Text.Trim());
-            }
-            catch
-            {
-                _pro.Port = (int)6600;
-            }
-        }
-
-        _pro.Password = this.PasswordBox.Password ?? string.Empty;
-
-        _pro.Name = _pro.Host + ":" + _pro.Port.ToString();
-
-        return _pro;
     }
 }

@@ -22,7 +22,7 @@ public sealed partial class App : Application
     public const string AppName = "MPDCtrl4";
     private const string AppDeveloper = "torum";
     private static readonly string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-    public static string AppDataFolder { get; private set; } = System.IO.Path.Combine(System.IO.Path.Combine(_envDataFolder, AppDeveloper), AppName);//_envDataFolder + System.IO.Path.DirectorySeparatorChar + _appDeveloper + System.IO.Path.DirectorySeparatorChar + _appName;
+    public static string AppDataFolder { get; private set; } = System.IO.Path.Combine(System.IO.Path.Combine(_envDataFolder, AppDeveloper), AppName);
     public static string AppConfigFilePath { get; private set; } = System.IO.Path.Combine(AppDataFolder, AppName + ".config");
 
     // Temp album cover cache folder.

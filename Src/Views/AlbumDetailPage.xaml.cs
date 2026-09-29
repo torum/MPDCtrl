@@ -20,26 +20,12 @@ public sealed class Breadcrumb
     {
         get; set;
     }
-    /*
-    public string? Page
-    {
-        get; set;
-    }
-    */
 }
 
 public sealed partial class AlbumDetailPage : Page
 {
-    public MainViewModel ViewModel
-    {
-        get;
-    }
-
-    public ObservableCollection<Breadcrumb> BreadcrumbItems = [];
 
     private Frame? _frame;
-
-    //private readonly ResourceLoader _resourceLoader = new();
 
     public AlbumDetailPage()
     {
@@ -50,18 +36,22 @@ public sealed partial class AlbumDetailPage : Page
         var selectedAlbumName = ViewModel.SelectedAlbum?.Name ?? string.Empty;
         var basePageTitle = "MenuTreeItem_Albums".GetLocalized();
 
+        // Currently not used.
         BreadcrumbItems = [
             new() { Name = basePageTitle},
             new() { Name = selectedAlbumName },
         ];
-        /*
-        BreadcrumbBar1.ItemsSource = new ObservableCollection<Breadcrumb>{
-        new() { Name = basePageTitle},
-        new() { Name = selectedAlbumName },
-        };
-        */
-        //BreadcrumbBar1.ItemClicked += BreadcrumbBar_ItemClicked;
+
+        // Currently not used.
+        BreadcrumbBar1.ItemClicked += BreadcrumbBar_ItemClicked;
     }
+
+    public MainViewModel ViewModel
+    {
+        get;
+    }
+
+    public ObservableCollection<Breadcrumb> BreadcrumbItems = [];
 
     private void BreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
     {

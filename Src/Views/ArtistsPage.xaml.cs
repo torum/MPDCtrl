@@ -14,11 +14,6 @@ namespace MPDCtrl.Views;
 
 public sealed partial class ArtistsPage : Page
 {
-    public MainViewModel ViewModel
-    {
-        get;
-    }
-
     private readonly IDispatcherService _dispatcherService;
 
     private ListView? _contextMenuListView;
@@ -29,6 +24,11 @@ public sealed partial class ArtistsPage : Page
         _dispatcherService = App.GetService<IDispatcherService>();
 
         InitializeComponent();
+    }
+
+    public MainViewModel ViewModel
+    {
+        get;
     }
 
     // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2

@@ -49,36 +49,12 @@ public sealed partial class ShellPage : Page
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
-        try
-        {
-            var main = App.GetService<Views.MainWindow>();
-            if (main is not null)
-            {
-                main.Activated += MainWindow_Activated;
+        //await ViewModel.StartMpcAsync();
+        // Let's not await, for faster startup. Fire and forget.
+        ViewModel.Start();
 
-                // Everything (MainWindow including the DispatcherQueue, MainViewModel including settings and ShellPage) is loaded, initialized, set, drawn, navigated. So start the connection.
-
-                //await ViewModel.StartMpcAsync();
-                // Let's not await, for faster startup. Fire and forget.
-                //ViewModel.Start(); // Everthing is DIed, no longer needed to be here.
-            }
-            else
-            {
-                Debug.WriteLine("MainWindow is null. Init order is wrong.");
-            }
-
-            // For animation fade
-            _token = AlbumCoverImage.RegisterPropertyChangedCallback(Microsoft.UI.Xaml.Controls.Image.SourceProperty, OnSourceChanged);
-
-            //await ViewModel.StartMpcAsync();
-            // Let's not await, for faster startup. Fire and forget.
-            ViewModel.Start();
-        }
-        catch (Exception ex)
-        {
-            _ = ex;
-            Debug.WriteLine($"Exception @Page_Loaded::ShellPage: {ex}");
-        }
+        // For animation fade
+        _token = AlbumCoverImage.RegisterPropertyChangedCallback(Microsoft.UI.Xaml.Controls.Image.SourceProperty, OnSourceChanged);
     }
 
     private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -207,6 +183,8 @@ public sealed partial class ShellPage : Page
     public void SetTitleBar(MainWindow wnd)
     {
         wnd.SetTitleBar(AppTitleBar);
+
+        wnd.Activated += MainWindow_Activated;
     }
 
     public void OnUpdateProgress(string arg)

@@ -21,17 +21,10 @@ public abstract partial class Node(string name) : ObservableObject
 /// </summary>
 public partial class NodeTree : Node
 {
-    [ObservableProperty]
-    public partial bool Selected { get; set; }
+    protected NodeTree(string name) : base(name)
+    {
 
-    [ObservableProperty]
-    public partial bool Expanded { get; set; }
-
-    [ObservableProperty]
-    public partial string Tag { get; set; } = string.Empty;
-
-    [ObservableProperty]
-    public partial NodeTree? Parent { get; set; }
+    }
 
     public ObservableCollection<NodeTree> Children
     {
@@ -47,9 +40,16 @@ public partial class NodeTree : Node
         }
     } = [];
 
-    protected NodeTree(string name) : base(name)
-    {
+    [ObservableProperty]
+    public partial bool Selected { get; set; }
 
-    }
+    [ObservableProperty]
+    public partial bool Expanded { get; set; }
+
+    [ObservableProperty]
+    public partial string Tag { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial NodeTree? Parent { get; set; }
 
 }

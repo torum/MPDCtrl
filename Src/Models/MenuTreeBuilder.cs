@@ -85,20 +85,6 @@ public sealed partial class NodeMenuPlaylistItem : NodeMenu
 
 public sealed partial class MenuTreeBuilder : NodeTree
 {
-    public NodeMenuPlaylists PlaylistsDirectory { get; }
-
-    public NodeMenuSearch SearchDirectory { get; }
-
-    public NodeMenuAlbum AlbumsDirectory { get; }
-
-    public NodeMenuArtist ArtistsDirectory { get; }
-
-    public NodeMenuLibrary LibraryDirectory { get; }
-
-    public NodeMenuFiles FilesDirectory { get; }
-
-    public NodeMenuQueue QueueDirectory { get; }
-
     public MenuTreeBuilder(string name) : base(name)
     {
         Microsoft.Windows.ApplicationModel.Resources.ResourceLoader resourceLoader = new();
@@ -187,4 +173,19 @@ public sealed partial class MenuTreeBuilder : NodeTree
         Children.Add(playlists);
         PlaylistsDirectory = playlists;
     }
+
+    public NodeMenuPlaylists PlaylistsDirectory { get; }
+
+    public NodeMenuSearch SearchDirectory { get; }
+
+    public NodeMenuAlbum AlbumsDirectory { get; }
+
+    public NodeMenuArtist ArtistsDirectory { get; }
+
+    public NodeMenuLibrary LibraryDirectory { get; }
+
+    public NodeMenuFiles FilesDirectory { get; }
+
+    public NodeMenuQueue QueueDirectory { get; }
+
 }

@@ -9,17 +9,25 @@ namespace MPDCtrl.Models;
 
 public sealed partial class NodeDirectory : NodeTree
 {
-    public Uri DireUri { get; set; }
-
     public NodeDirectory(string name, Uri direUri) : base(name)
     {
         DireUri = direUri;
         PathIcon = "M20,18H4V8H20M20,6H12L10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6Z";
     }
+
+    public Uri DireUri { get; set; }
+
 }
 
 public sealed partial class NodeFile : Node
 {
+    public NodeFile(string name, Uri fileUri, string originalFileUri) : base(name)
+    {
+        FileUri = fileUri;
+        OriginalFileUri = originalFileUri;
+        PathIcon = "M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,13H11V18A2,2 0 0,1 9,20A2,2 0 0,1 7,18A2,2 0 0,1 9,16C9.4,16 9.7,16.1 10,16.3V11H13V13M13,9V3.5L18.5,9H13Z";
+    }
+
     public Uri FileUri { get; set; }
 
     public string OriginalFileUri { get; set; }
@@ -43,12 +51,6 @@ public sealed partial class NodeFile : Node
     // Workaround for WinUI3's limitation or lack of features. 
     public MainViewModel? ParentViewModel { get; set; }
 
-    public NodeFile(string name, Uri fileUri, string originalFileUri) : base(name)
-    {
-        FileUri = fileUri;
-        OriginalFileUri = originalFileUri;
-        PathIcon = "M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,13H11V18A2,2 0 0,1 9,20A2,2 0 0,1 7,18A2,2 0 0,1 9,16C9.4,16 9.7,16.1 10,16.3V11H13V13M13,9V3.5L18.5,9H13Z";
-    }
 }
 
 public sealed partial class DirectoryTreeBuilder(string name) : NodeTree(name)

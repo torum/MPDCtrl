@@ -2458,8 +2458,9 @@ public sealed partial class MainViewModel : ObservableObject
 
                 CurrentProfile = pro;
 
-                // TODO: let's not await for faster start up.
-                _ = Task.Run(() => Connect(_host, _port), _cts.Token);
+                // TODO: check which is faster (start up).
+                //_ = Task.Run(() => Connect(_host, _port), _cts.Token);
+                await Task.Run(() => Connect(_host, _port), _cts.Token);
 
             }
             catch (Exception ex)
@@ -2478,17 +2479,17 @@ public sealed partial class MainViewModel : ObservableObject
 
         try
         {
-            //await Task.Run(async () => await StartAsync(_host, _port), _cts.Token);
-            // TODO: let's not await for faster start up.
-            _ = Task.Run(() => Connect(_host, _port), _cts.Token);
+            // TODO: check which is faster (start up).
+            //_ = Task.Run(() => Connect(_host, _port), _cts.Token);
+            await Task.Run(() => Connect(_host, _port), _cts.Token);
         }
         catch (Exception ex)
         {
             _ = ex;
-            Debug.WriteLine($"Exception @StartMpcAsync {ex}");
+            Debug.WriteLine($"Exception @Start() {ex}");
             _dispatcherService.TryEnqueue(() =>
             {
-                (Application.Current as App)?.AppendErrorLog("Exception @StartMpcAsync", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                (Application.Current as App)?.AppendErrorLog("Exception @Start()", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
                 (Application.Current as App)?.SaveErrorLog();
             });
         }

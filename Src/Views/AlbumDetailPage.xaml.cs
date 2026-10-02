@@ -77,6 +77,7 @@ public sealed partial class AlbumDetailPage : Page
     {
         if (e.Parameter is not Frame frame)
         {
+            base.OnNavigatedTo(e);
             return;
         }
 

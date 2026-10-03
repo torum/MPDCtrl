@@ -16,7 +16,7 @@ namespace MPDCtrl.Services;
 public sealed class MpcBinaryService : IMpcBinaryService
 {
     private CancellationTokenSource? _cts;
-    private readonly object _connectionLock = new();
+    private readonly Lock _connectionLock = new();
     private static TcpClient _binaryConnection = new();
     private StreamReader? _binaryReader;
     private StreamWriter? _binaryWriter;

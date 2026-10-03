@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using MPDCtrl.Helpers;
 using MPDCtrl.Services;
@@ -33,6 +34,10 @@ public sealed partial class App : Application
     // ErrorLog
     private static readonly string _logFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl4_errors.txt";
     private readonly StringBuilder _errortxt = new();
+
+    //
+    private Task? _appHostStartTask;
+    private Task? _appHostStopTask;
 
 #if DEBUG
     public bool IsSaveErrorLog = true;
@@ -104,37 +109,48 @@ public sealed partial class App : Application
         InitializeComponent();
 
         Host = Microsoft.Extensions.Hosting.Host.
-        CreateDefaultBuilder().
-        UseContentRoot(AppContext.BaseDirectory).
-        ConfigureServices((context, services) =>
-        {
-            // Core Services
-            services.AddSingleton<IMpcService, MpcService>();
-            services.AddSingleton<IMpcBinaryService, MpcBinaryService>();
-            services.AddSingleton<IDialogService, DialogService>();
-            services.AddSingleton<IDispatcherService>(new DispatcherService(CurrentDispatcherQueue));
+            CreateDefaultBuilder().
+            UseContentRoot(AppContext.BaseDirectory).
+            ConfigureLogging((context, logging) =>
+            {
+#if DEBUG
+                logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.Debug);
+                logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Information);
+#else
+                // Strips log destinations and shuts down the framework engines for production
+                logging.ClearProviders(); 
+                logging.AddFilter(null, LogLevel.None); 
+#endif
+            }).
+            ConfigureServices((context, services) =>
+            {
+                // Core Services
+                services.AddSingleton<IMpcService, MpcService>();
+                services.AddSingleton<IMpcBinaryService, MpcBinaryService>();
+                services.AddSingleton<IDialogService, DialogService>();
+                services.AddSingleton<IDispatcherService>(new DispatcherService(CurrentDispatcherQueue));
 
-            // Views and ViewModels
-            services.AddSingleton<MainViewModel>();
-            services.AddSingleton<MainWindow>();
-            services.AddSingleton<ShellPage>();
+                // Views and ViewModels
+                services.AddSingleton<MainViewModel>();
+                services.AddSingleton<MainWindow>();
+                services.AddSingleton<ShellPage>();
 
-            // Pages (Frame creates page instances)
-            // Currently WinUI's Frame.Navigate(Type) does not provide a way for applications to control how a Page instance is created)
-            // So, no DI.
-            //services.AddSingleton<SettingsPage>();
-            //services.AddSingleton<QueuePage>();
-            //services.AddSingleton<AlbumsPage>();
-            //services.AddSingleton<AlbumDetailPage>();
-            //services.AddSingleton<ArtistsPage>();
-            //services.AddSingleton<FilesPage>();
-            //services.AddSingleton<SearchPage>();
-            //services.AddTransient<PlaylistItemPage>();
+                // Pages (Frame creates page instances)
+                // Currently WinUI's Frame.Navigate(Type) does not provide a way for applications to control how a Page instance is created)
+                // So, no DI.
+                //services.AddSingleton<SettingsPage>();
+                //services.AddSingleton<QueuePage>();
+                //services.AddSingleton<AlbumsPage>();
+                //services.AddSingleton<AlbumDetailPage>();
+                //services.AddSingleton<ArtistsPage>();
+                //services.AddSingleton<FilesPage>();
+                //services.AddSingleton<SearchPage>();
+                //services.AddTransient<PlaylistItemPage>();
 
-            // Configuration
-            //services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
-        }).
-        Build();
+                // Configuration
+                //services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
+            }).
+            Build();
 
         Microsoft.UI.Xaml.Application.Current.UnhandledException += App_UnhandledException;
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
@@ -168,6 +184,42 @@ public sealed partial class App : Application
 
         var main = App.GetService<MainWindow>();
         main.AppWindow.Show(true);
+
+        main.Closed += (sender, e) =>
+        {
+            _appHostStopTask = StopAppHostAsync();
+        };
+        _appHostStartTask = StartAppHostAsync();
+    }
+
+    private async Task StartAppHostAsync()
+    {
+        try
+        {
+            await Host.StartAsync();
+        }
+        catch (Exception ex)
+        {
+            AppendErrorLog("AppHost.StartAsync", ex.ToString());
+            SaveErrorLog();
+        }
+    }
+
+    private async Task StopAppHostAsync()
+    {
+        if (_appHostStartTask != null)
+        {
+            await _appHostStartTask;
+        }
+        try
+        {
+            await Host.StopAsync();
+        }
+        catch (Exception ex)
+        {
+            AppendErrorLog("AppHost.StopAsync", ex.ToString());
+            SaveErrorLog();
+        }
     }
 
     private void App_Activated(object? sender, Microsoft.Windows.AppLifecycle.AppActivationArguments e)

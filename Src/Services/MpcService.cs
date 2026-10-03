@@ -63,7 +63,7 @@ public sealed partial class MpcService : IMpcService
 
     #region == Connections ==
 
-    private readonly object _connectionLock = new();
+    private readonly Lock _connectionLock = new();
 
     private static TcpClient _commandConnection = new();
     private static StreamReader? _commandReader;
@@ -144,6 +144,9 @@ public sealed partial class MpcService : IMpcService
 
     public delegate void MpdCurrentQueueChangedEvent(MpcService sender);
     public event MpdCurrentQueueChangedEvent? MpdCurrentQueueChanged;
+
+    public delegate void MpdCurrentSongChangedEvent(MpcService sender);
+    public event MpdCurrentSongChangedEvent? MpdCurrentSongChanged;
 
     public delegate void MpdPlaylistsChangedEvent(MpcService sender);
     public event MpdPlaylistsChangedEvent? MpdPlaylistsChanged;
@@ -2911,7 +2914,7 @@ public sealed partial class MpcService : IMpcService
                 var p = 255;
                 foreach (var strId in Ids)
                 {
-                    cmd = cmd + $"prioid {p} {strId}\n";
+                    cmd += $"prioid {p} {strId}\n";
                     p--;
                     if (p == 0) break;
                 }
@@ -3685,6 +3688,7 @@ public sealed partial class MpcService : IMpcService
             }
 
             // songID
+            var songId = MpdStatus.MpdSongID ?? string.Empty; // Check id is changed or not. If changed, raise event lator. So save the old value here.;
             MpdStatus.MpdSongID = "";
             if (mpdStatusValues.TryGetValue("songid", out string? value))
             {
@@ -3832,9 +3836,13 @@ public sealed partial class MpcService : IMpcService
                 MpdStatus.MpdError = "";
             }
 
-
             // TODO: more?
 
+            // Raise event if songId is changed.
+            if (songId != MpdStatus.MpdSongID)
+            {
+                MpdCurrentSongChanged?.Invoke(this);
+            }
         }
         catch (Exception ex)
         {

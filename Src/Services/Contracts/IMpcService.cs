@@ -39,6 +39,7 @@ public interface IMpcService
     event MpcService.MpdFatalErrorEvent MpdFatalError;
     event MpcService.MpdAlbumArtChangedEvent MpdAlbumArtChanged;
     event MpcService.MpdCurrentQueueChangedEvent MpdCurrentQueueChanged;
+    event MpcService.MpdCurrentSongChangedEvent MpdCurrentSongChanged;
     event MpcService.IsMpdIdleConnectedEvent MpdIdleConnected;
     event MpcService.MpdPlayerStatusChangedEvent MpdPlayerStatusChanged;
     event MpcService.MpdPlaylistsChangedEvent MpdPlaylistsChanged;

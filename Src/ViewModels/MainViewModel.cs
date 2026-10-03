@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -45,6 +46,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly IMpcService _mpc;
     private readonly IDialogService _dialogs;
     private readonly IDispatcherService _dispatcherService;
+    private readonly ILogger<MainViewModel> _logger;
 
     #region == Events ==
 
@@ -71,11 +73,12 @@ public sealed partial class MainViewModel : ObservableObject
 
     #endregion
 
-    public MainViewModel(IMpcService mpcService, IDialogService dialogService, IDispatcherService dispatcherService)
+    public MainViewModel(IMpcService mpcService, IDialogService dialogService, IDispatcherService dispatcherService, ILogger<MainViewModel> logger)
     {
         _mpc = mpcService;
         _dialogs = dialogService;
         _dispatcherService = dispatcherService;
+        _logger = logger;
 
         InitializeAndSubscribe();
 
@@ -2515,7 +2518,8 @@ public sealed partial class MainViewModel : ObservableObject
             _mpc.MpcProgress -= OnMpcProgress;
             _mpc.IsBusy -= OnMpcIsBusy;
 
-            this.UpdateProgress -= (sender, arg) => { this.OnUpdateProgress(arg); };
+            //this.UpdateProgress -= (sender, arg) => { this.OnUpdateProgress(arg); };
+            this.UpdateProgress -= OnUpdateProgress;
 
             if (IsConnected)
             {
@@ -2584,7 +2588,8 @@ public sealed partial class MainViewModel : ObservableObject
         _mpc.MpcProgress += OnMpcProgress;
         _mpc.IsBusy += OnMpcIsBusy;
 
-        this.UpdateProgress += (sender, arg) => { this.OnUpdateProgress(arg); };
+        //this.UpdateProgress += (sender, arg) => { this.OnUpdateProgress(arg); };
+        this.UpdateProgress += OnUpdateProgress;
 
         #endregion
 
@@ -5015,9 +5020,13 @@ public sealed partial class MainViewModel : ObservableObject
             // ATTN: this won't be called if we etablishe the connection before MainWnd is initialized.
             _dispatcherService.TryEnqueue(() =>
             {
-                Debug.WriteLine("OK MPD " + _mpc.MpdVerText + " @OnMpdConnected");
-
                 MpdVersion = _mpc.MpdVerText;
+
+                //Debug.WriteLine($"OK MPD {MpdVersion} @OnMpdIdleConnected");
+                if (_logger.IsEnabled(LogLevel.Information))
+                {
+                    _logger.LogInformation("OK MPD {MPDVer} @OnMpdIdleConnected.", MpdVersion);
+                }
 
                 IsConnected = true;
                 IsConnecting = false;
@@ -5486,7 +5495,7 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
-    private async void OnUpdateProgress(string msg)
+    private async void OnUpdateProgress(object? sender, string msg)
     {
         try
         {

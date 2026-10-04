@@ -7,7 +7,7 @@ MPDCtrl is a Windows desktop client for [MPD (Music Player Daemon)](http://www.m
 For other platforms like Linux, please check out [MPDCtrlX](https://github.com/torum/MPDCtrlX), an [Avalonia UI](https://avaloniaui.net/)-based cross-platform GUI client ported from MPDCtrl.
 
 ## Download  
-Download and install via the [Microsoft Store](https://apps.microsoft.com/store/detail/mpdctrl/9NV2BBJ82BRX) or download the executables directly from the [releases page](https://github.com/torum/MPDCtrl/releases). The store package natively supports x64, x86, and arm64 architectures through Native AOT compilation.
+You can install via the [Microsoft Store](https://apps.microsoft.com/store/detail/mpdctrl/9NV2BBJ82BRX) or download the executables directly from the [releases page](https://github.com/torum/MPDCtrl/releases). The store package natively supports x64, x86, and arm64 architectures through Native AOT compilation for faster performance and memory efficiency.
   
 ## Screenshots
 

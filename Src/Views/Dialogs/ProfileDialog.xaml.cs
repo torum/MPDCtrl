@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using MPDCtrl.Models;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 
@@ -30,7 +31,7 @@ public sealed partial class ProfileDialog : Page
         _pro = pro;
 
         this.TextBoxHost.Text = pro.Host;
-        this.TextBoxPort.Text = pro.Port.ToString();
+        this.TextBoxPort.Text = pro.Port.ToString(CultureInfo.InvariantCulture);
         this.PasswordBox.Password = pro.Password;
         this.IsDefaultCheckBox.IsChecked = pro.IsDefault;
     }
@@ -54,7 +55,7 @@ public sealed partial class ProfileDialog : Page
         {
             try
             {
-                _pro.Port = int.Parse(this.TextBoxPort.Text);
+                _pro.Port = int.Parse(this.TextBoxPort.Text, CultureInfo.InvariantCulture);
             }
             catch
             {
@@ -68,7 +69,7 @@ public sealed partial class ProfileDialog : Page
 
         _pro.IsDefault = this.IsDefaultCheckBox.IsChecked ?? false;
 
-        _pro.Name = _pro.Host + ":" + _pro.Port.ToString();
+        _pro.Name = _pro.Host + ":" + _pro.Port.ToString(CultureInfo.InvariantCulture);
 
         return _pro;
     }
@@ -88,7 +89,7 @@ public sealed partial class ProfileDialog : Page
         {
             try
             {
-                pro.Port = int.Parse(this.TextBoxPort.Text);
+                pro.Port = int.Parse(this.TextBoxPort.Text, CultureInfo.InvariantCulture);
             }
             catch
             {
@@ -100,7 +101,7 @@ public sealed partial class ProfileDialog : Page
 
         pro.IsDefault = this.IsDefaultCheckBox.IsChecked ?? false;
 
-        pro.Name = pro.Host + ":" + pro.Port.ToString();
+        pro.Name = pro.Host + ":" + pro.Port.ToString(CultureInfo.InvariantCulture);
 
         return pro;
     }
@@ -118,7 +119,7 @@ public sealed partial class ProfileDialog : Page
         }
         else
         {
-            if (hostText.Equals("localhost", StringComparison.Ordinal) || hostText.Equals("127.0.0.1", StringComparison.Ordinal))
+            if (hostText.Equals("localhost", StringComparison.OrdinalIgnoreCase) || hostText.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase))
             {
                 isError = false;
             }
@@ -194,7 +195,7 @@ public sealed partial class ProfileDialog : Page
         bool isError;
         string portText = this.TextBoxPort.Text;
 
-        if (portText.Equals("6600", StringComparison.Ordinal))
+        if (portText.Equals("6600", StringComparison.OrdinalIgnoreCase))
         {
             isError = false;
         }

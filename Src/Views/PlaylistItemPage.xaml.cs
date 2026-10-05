@@ -9,6 +9,7 @@ using MPDCtrl.ViewModels;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
 using WinRT;
@@ -109,8 +110,7 @@ public sealed partial class PlaylistItemPage : Page
         {
             Dictionary<string, string> posToNewPos = [];
 
-            var list = PlaylistListview.ItemsSource as ObservableCollection<SongInfo>;
-            if (list is null)
+            if (PlaylistListview.ItemsSource is not ObservableCollection<SongInfo> list)
             {
                 return;
             }
@@ -126,7 +126,7 @@ public sealed partial class PlaylistItemPage : Page
                 if (item.Index != i)
                 {
                     Debug.WriteLine($"Item with ID {item.Title} moved from position {item.Index} to {i}");
-                    posToNewPos.Add(item.Index.ToString(), i.ToString());
+                    posToNewPos.Add(item.Index.ToString(CultureInfo.InvariantCulture), i.ToString(CultureInfo.InvariantCulture));
                 }
                 i++;
             }

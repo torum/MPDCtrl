@@ -9,6 +9,7 @@ using MPDCtrl.ViewModels;
 using MPDCtrl.Views;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -325,7 +326,7 @@ public sealed partial class App : Application
 
         _errortxt.AppendLine(kindTxt + ": " + errorTxt);
         var dt = DateTime.Now;
-        _errortxt.AppendLine($"Occured at {dt.ToString("yyyy/MM/dd HH:mm:ss")}");
+        _errortxt.AppendLine(CultureInfo.InvariantCulture, $"Occured at {dt.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture)}");
         _errortxt.AppendLine("");
     }
 
@@ -345,7 +346,7 @@ public sealed partial class App : Application
         {
             _errortxt.AppendLine("");
             var dt = DateTime.Now;
-            _errortxt.AppendLine($"Saved at {dt.ToString("yyyy/MM/dd HH:mm:ss")}");
+            _errortxt.AppendLine(CultureInfo.InvariantCulture, $"Saved at {dt.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture)}");
 
             var s = _errortxt.ToString();
             if (!string.IsNullOrEmpty(s))

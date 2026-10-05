@@ -29,7 +29,7 @@ public partial class SongInfo : SongFile
             }
             try
             {
-                iTrack = int.Parse(Track);
+                iTrack = int.Parse(Track, CultureInfo.InvariantCulture);
             }
             catch { }
             return iTrack;
@@ -49,7 +49,7 @@ public partial class SongInfo : SongFile
             }
             try
             {
-                iDisc = int.Parse(Disc);
+                iDisc = int.Parse(Disc, CultureInfo.InvariantCulture);
             }
             catch { }
             return iDisc;
@@ -69,8 +69,8 @@ public partial class SongInfo : SongFile
                 {
                     int sec, min, hour, s;
                     //CultureInfo enCulture = new("en-US");
-                    var enCulture = CultureInfo.GetCultureInfo("en-US");
-                    double dtime = double.Parse(Time, enCulture);
+                    //var enCulture = CultureInfo.GetCultureInfo("en-US");
+                    double dtime = double.Parse(Time, CultureInfo.InvariantCulture);
                     sec = Convert.ToInt32(dtime);
 
                     //sec = Int32.Parse(_time);
@@ -97,7 +97,7 @@ public partial class SongInfo : SongFile
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine("Oops@TimeFormated: " + Time + " : " + hour.ToString() + " " + min.ToString() + " " + s.ToString());
+                        System.Diagnostics.Debug.WriteLine("Oops@TimeFormated: " + Time + " : " + hour.ToString(CultureInfo.InvariantCulture) + " " + min.ToString(CultureInfo.InvariantCulture) + " " + s.ToString(CultureInfo.InvariantCulture));
                     }
                 }
             }
@@ -121,8 +121,8 @@ public partial class SongInfo : SongFile
             try
             {
                 //CultureInfo enCulture = new("en-US");
-                var enCulture = CultureInfo.GetCultureInfo("en-US");
-                dtime = double.Parse(Time, enCulture);
+                //var enCulture = CultureInfo.GetCultureInfo("en-US");
+                dtime = double.Parse(Time, CultureInfo.InvariantCulture);
             }
             catch { }
             return dtime;

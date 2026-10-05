@@ -4,6 +4,7 @@ using MPDCtrl.Models;
 using MPDCtrl.ViewModels;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 
@@ -48,7 +49,7 @@ public sealed partial class InitDialog : Page
         {
             try
             {
-                _pro.Port = int.Parse(this.TextBoxPort.Text.Trim());
+                _pro.Port = int.Parse(this.TextBoxPort.Text.Trim(), CultureInfo.InvariantCulture);
             }
             catch
             {
@@ -58,7 +59,7 @@ public sealed partial class InitDialog : Page
 
         _pro.Password = this.PasswordBox.Password ?? string.Empty;
 
-        _pro.Name = _pro.Host + ":" + _pro.Port.ToString();
+        _pro.Name = _pro.Host + ":" + _pro.Port.ToString(CultureInfo.InvariantCulture);
 
         return _pro;
     }
@@ -76,7 +77,7 @@ public sealed partial class InitDialog : Page
         }
         else
         {
-            if (hostText.Equals("localhost", StringComparison.Ordinal) || hostText.Equals("127.0.0.1", StringComparison.Ordinal))
+            if (hostText.Equals("localhost", StringComparison.OrdinalIgnoreCase) || hostText.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase))
             {
                 isError = false;
             }
@@ -153,7 +154,7 @@ public sealed partial class InitDialog : Page
         bool isError;
         string portText = this.TextBoxPort.Text;
 
-        if (portText.Equals("6600", StringComparison.Ordinal))
+        if (portText.Equals("6600", StringComparison.OrdinalIgnoreCase))
         {
             isError = false;
         }

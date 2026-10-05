@@ -8,6 +8,7 @@ using MPDCtrl.Services.Contracts;
 using MPDCtrl.ViewModels;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -24,8 +25,6 @@ public sealed partial class MainWindow : Window
     private readonly MainViewModel _vm;
     private readonly SystemMediaTransportControls? _smtc;
     private readonly bool _isMediaTransportControlEnable = true;
-    private readonly WindowMessageHook? _hook;
-    private readonly bool _isGlobalHotKeyEnable;
     private readonly IDispatcherService _dispatcherService;
 
     // Window restore position and sizes
@@ -71,23 +70,6 @@ public sealed partial class MainWindow : Window
 
         // After the content is set
         shell.SetTitleBar(this);
-
-        _isGlobalHotKeyEnable = false;
-
-        if (_isGlobalHotKeyEnable)
-        {
-            WindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
-            _hook = new WindowMessageHook(this);
-            _hook.Message += OnWindowMessage;
-
-            SetUpHotKey();
-
-            this.Closed += (s, e) =>
-            {
-                CleanUpHotKey();
-                _hook.Dispose();
-            };
-        }
 
         if (_isMediaTransportControlEnable)
         {
@@ -234,25 +216,25 @@ public sealed partial class MainWindow : Window
                 var hoge = mainWindow.Attribute("top");
                 if (hoge != null)
                 {
-                    top = double.Parse(hoge.Value);
+                    top = double.Parse(hoge.Value, CultureInfo.InvariantCulture);
                 }
 
                 hoge = mainWindow.Attribute("left");
                 if (hoge != null)
                 {
-                    left = double.Parse(hoge.Value);
+                    left = double.Parse(hoge.Value, CultureInfo.InvariantCulture);
                 }
 
                 hoge = mainWindow.Attribute("height");
                 if (hoge != null)
                 {
-                    height = double.Parse(hoge.Value);
+                    height = double.Parse(hoge.Value, CultureInfo.InvariantCulture);
                 }
 
                 hoge = mainWindow.Attribute("width");
                 if (hoge != null)
                 {
-                    width = double.Parse(hoge.Value);
+                    width = double.Parse(hoge.Value, CultureInfo.InvariantCulture);
                 }
 
                 hoge = mainWindow.Attribute("state");
@@ -284,7 +266,7 @@ public sealed partial class MainWindow : Window
                         var xbool = xLay.Attribute("navigationViewMenuOpen")?.Value;
                         if (!string.IsNullOrEmpty(xbool))
                         {
-                            if (xbool.Equals("True", StringComparison.Ordinal))
+                            if (xbool.Equals("True", StringComparison.OrdinalIgnoreCase))
                             {
                                 _vm.IsNavigationViewMenuOpen = true;
                             }
@@ -416,7 +398,7 @@ public sealed partial class MainWindow : Window
                         {
                             try
                             {
-                                pro.Port = Int32.Parse(s);
+                                pro.Port = Int32.Parse(s, CultureInfo.InvariantCulture);
                             }
                             catch
                             {
@@ -451,7 +433,7 @@ public sealed partial class MainWindow : Window
                         {
                             try
                             {
-                                pro.Volume = double.Parse(s);
+                                pro.Volume = double.Parse(s, CultureInfo.InvariantCulture);
                             }
                             catch
                             {
@@ -832,11 +814,11 @@ public sealed partial class MainWindow : Window
                 attrs = doc.CreateAttribute("width");
                 if (winState == OverlappedPresenterState.Restored)
                 {
-                    attrs.Value = this.AppWindow.Size.Width.ToString();
+                    attrs.Value = this.AppWindow.Size.Width.ToString(CultureInfo.InvariantCulture);
                 }
                 else
                 {
-                    attrs.Value = _winRestoreWidth.ToString();
+                    attrs.Value = _winRestoreWidth.ToString(CultureInfo.InvariantCulture);
                 }
                 //attrs.Value = this.AppWindow.Size.Width.ToString();
                 mainWindow.SetAttributeNode(attrs);
@@ -844,11 +826,11 @@ public sealed partial class MainWindow : Window
                 attrs = doc.CreateAttribute("height");
                 if (winState == OverlappedPresenterState.Restored)
                 {
-                    attrs.Value = this.AppWindow.Size.Height.ToString();
+                    attrs.Value = this.AppWindow.Size.Height.ToString(CultureInfo.InvariantCulture);
                 }
                 else
                 {
-                    attrs.Value = _winRestoreHeight.ToString();
+                    attrs.Value = _winRestoreHeight.ToString(CultureInfo.InvariantCulture);
                 }
                 //attrs.Value = App.MainWindow.AppWindow.Size.Height.ToString();//App.MainWindow.GetAppWindow().Size.Height.ToString();
                 mainWindow.SetAttributeNode(attrs);
@@ -856,11 +838,11 @@ public sealed partial class MainWindow : Window
                 attrs = doc.CreateAttribute("top");
                 if (winState == OverlappedPresenterState.Restored)
                 {
-                    attrs.Value = this.AppWindow.Position.Y.ToString();
+                    attrs.Value = this.AppWindow.Position.Y.ToString(CultureInfo.InvariantCulture);
                 }
                 else
                 {
-                    attrs.Value = _winRestoreTop.ToString();
+                    attrs.Value = _winRestoreTop.ToString(CultureInfo.InvariantCulture);
                 }
                 //attrs.Value = App.MainWindow.AppWindow.Position.Y.ToString();
                 mainWindow.SetAttributeNode(attrs);
@@ -868,11 +850,11 @@ public sealed partial class MainWindow : Window
                 attrs = doc.CreateAttribute("left");
                 if (winState == OverlappedPresenterState.Restored)
                 {
-                    attrs.Value = this.AppWindow.Position.X.ToString();
+                    attrs.Value = this.AppWindow.Position.X.ToString(CultureInfo.InvariantCulture);
                 }
                 else
                 {
-                    attrs.Value = _winRestoreLeft.ToString();
+                    attrs.Value = _winRestoreLeft.ToString(CultureInfo.InvariantCulture);
                 }
                 //attrs.Value = App.MainWindow.AppWindow.Position.X.ToString();
                 mainWindow.SetAttributeNode(attrs);
@@ -993,7 +975,7 @@ public sealed partial class MainWindow : Window
             xProfile.SetAttributeNode(xAttrs);
 
             xAttrs = doc.CreateAttribute("Port");
-            xAttrs.Value = p.Port.ToString();
+            xAttrs.Value = p.Port.ToString(CultureInfo.InvariantCulture);
             xProfile.SetAttributeNode(xAttrs);
 
             xAttrs = doc.CreateAttribute("Password");
@@ -1011,11 +993,11 @@ public sealed partial class MainWindow : Window
             xAttrs = doc.CreateAttribute("Volume");
             if (p == _vm.CurrentProfile)
             {
-                xAttrs.Value = _vm.Volume.ToString();
+                xAttrs.Value = _vm.Volume.ToString(CultureInfo.InvariantCulture);
             }
             else
             {
-                xAttrs.Value = p.Volume.ToString();
+                xAttrs.Value = p.Volume.ToString(CultureInfo.InvariantCulture);
             }
             xProfile.SetAttributeNode(xAttrs);
 
@@ -1049,7 +1031,7 @@ public sealed partial class MainWindow : Window
     }
 
     #region == Global Hotkey == 
-
+    /*
     // HotKey WM ID
     private const int WM_HOTKEY = 0x0312;
 
@@ -1067,10 +1049,11 @@ public sealed partial class MainWindow : Window
     private const int HOTKEY_ID10 = 0x0010; // MediaNextTrack
     private const int HOTKEY_ID11 = 0x0011; // MediaPreviousTrack
 
-    private readonly IntPtr WindowHandle;
+    //private readonly IntPtr WindowHandle;
     private const int MOD_CONTROL = 0x0002;
     private const int MOD_SHIFT = 0x0004;
-
+    */
+    /*
     private void SetUpHotKey()
     {
         var result1 = RegisterHotKey(WindowHandle, HOTKEY_ID1, MOD_CONTROL, (int)Windows.System.VirtualKey.Space);
@@ -1115,7 +1098,8 @@ public sealed partial class MainWindow : Window
             Debug.WriteLine("HotKey7(Subtract) register failed.");
         }
     }
-
+    */
+    /*
     private void CleanUpHotKey()
     {
         Unregister(HOTKEY_ID1);
@@ -1130,7 +1114,8 @@ public sealed partial class MainWindow : Window
         //Unregister(HOTKEY_ID10);
         //Unregister(HOTKEY_ID11);
     }
-
+    */
+    /*
     private void OnWindowMessage(object? sender, WindowMessageHook.MessageEventArgs e)
     {
         if (e.Message != WM_HOTKEY) return;
@@ -1246,7 +1231,7 @@ public sealed partial class MainWindow : Window
 
         private delegate nint SUBCLASSPROC(nint hWnd, uint uMsg, nint wParam, nint lParam, nint uIdSubclass, nint dwRefData);
     }
-
+    */
     #endregion
 
     #region == Windows.Media.SystemMediaTransportControls ==

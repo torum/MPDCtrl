@@ -9,6 +9,7 @@ using MPDCtrl.ViewModels;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -328,8 +329,7 @@ public sealed partial class QueuePage : Page
         {
             Dictionary<string, string> idToNewPos = [];
 
-            var list = QueueListview.ItemsSource as ObservableCollection<SongInfoEx>;
-            if (list is null)
+            if (QueueListview.ItemsSource is not ObservableCollection<SongInfoEx> list)
             {
                 return;
             }
@@ -342,7 +342,7 @@ public sealed partial class QueuePage : Page
                 if (item.Index != i)
                 {
                     Debug.WriteLine($"Item with ID {item.Id} moved from position {item.Index} to {i}");
-                    idToNewPos.Add(item.Id, i.ToString());
+                    idToNewPos.Add(item.Id, i.ToString(CultureInfo.InvariantCulture));
                 }
                 i++;
             }

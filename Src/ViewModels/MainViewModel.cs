@@ -145,7 +145,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 OnPropertyChanged(nameof(Volume));
 
                 Host = field.Host;
-                Port = field.Port.ToString();
+                Port = field.Port.ToString(CultureInfo.InvariantCulture);
                 _password = field.Password;
                 OnPropertyChanged(nameof(Password));
             }
@@ -236,7 +236,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private int _port = 6600;
     public string Port
     {
-        get => _port.ToString();
+        get => _port.ToString(CultureInfo.InvariantCulture);
         set
         {
             //ClearError(nameof(Port));
@@ -623,13 +623,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     }
 
-    private bool _repeat;
-    public bool Repeat
+    private bool _isRepeat;
+    public bool IsRepeat
     {
-        get => _repeat;
+        get => _isRepeat;
         set
         {
-            _repeat = value;
+            _isRepeat = value;
             OnPropertyChanged();
 
             if (_mpc is null)
@@ -646,13 +646,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    private bool _random;
-    public bool Random
+    private bool _isRandom;
+    public bool IsRandom
     {
-        get => _random;
+        get => _isRandom;
         set
         {
-            _random = value;
+            _isRandom = value;
             OnPropertyChanged();
 
             if (_mpc is null)
@@ -670,13 +670,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    private bool _consume;
-    public bool Consume
+    private bool _isConsume;
+    public bool IsConsume
     {
-        get => _consume;
+        get => _isConsume;
         set
         {
-            _consume = value;
+            _isConsume = value;
             OnPropertyChanged();
 
             if (_mpc is null)
@@ -693,13 +693,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    private bool _single;
-    public bool Single
+    private bool _isSingle;
+    public bool IsSingle
     {
-        get => _single;
+        get => _isSingle;
         set
         {
-            _single = value;
+            _isSingle = value;
             OnPropertyChanged();
 
             if (_mpc is null || _mpc.Status.IsSingle == value)
@@ -1054,7 +1054,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     {
         get
         {
-            field = string.Format($"{"QueuePage_SubTitle_SongCount".GetLocalized()}", Queue.Count);
+            field = string.Format(CultureInfo.InvariantCulture,$"{"QueuePage_SubTitle_SongCount".GetLocalized()}", Queue.Count);
             return field;
         }
     } = "";
@@ -1148,7 +1148,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     {
         get
         {
-            field = string.Format($"{"SearchPage_SubTitle_ResultCount".GetLocalized()}", SearchResult?.Count);
+            field = string.Format(CultureInfo.InvariantCulture,$"{"SearchPage_SubTitle_ResultCount".GetLocalized()}", SearchResult?.Count);
             return field;
         }
     } = "";
@@ -1175,7 +1175,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     {
         get
         {
-            field = string.Format($"{"ArtistPage_SubTitle_ArtistCount".GetLocalized()}", Artists.Count);
+            field = string.Format(CultureInfo.InvariantCulture,$"{"ArtistPage_SubTitle_ArtistCount".GetLocalized()}", Artists.Count);
             return field;
         }
     } = "";
@@ -1189,7 +1189,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 return string.Empty;
             }
 
-            field = string.Format($"{"ArtistPage_SubTitle_ArtistAlbumCount".GetLocalized()}", SelectedAlbumArtist.Albums.Count);
+            field = string.Format(CultureInfo.InvariantCulture,$"{"ArtistPage_SubTitle_ArtistAlbumCount".GetLocalized()}", SelectedAlbumArtist.Albums.Count);
             return field;
         }
     } = "";
@@ -1355,7 +1355,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     {
         get
         {
-            field = string.Format($"{"AlbumPage_SubTitle_AlbumCount".GetLocalized()}", Albums.Count);
+            field = string.Format(CultureInfo.InvariantCulture,$"{"AlbumPage_SubTitle_AlbumCount".GetLocalized()}", Albums.Count);
             return field;
         }
     } = "";
@@ -1425,11 +1425,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
             if (SelectedAlbum is not null)
             {
-                return string.Format($"{"AlbumPage_SubTitle_SelectedAlbumSongsCount".GetLocalized()}", SelectedAlbum.Songs.Count);
+                return string.Format(CultureInfo.InvariantCulture,$"{"AlbumPage_SubTitle_SelectedAlbumSongsCount".GetLocalized()}", SelectedAlbum.Songs.Count);
             }
             else
             {
-                return string.Format($"{"AlbumPage_SubTitle_SelectedAlbumSongsCount".GetLocalized()}", _selectedAlbumSongs.Count);
+                return string.Format(CultureInfo.InvariantCulture,$"{"AlbumPage_SubTitle_SelectedAlbumSongsCount".GetLocalized()}", _selectedAlbumSongs.Count);
             }
         }
     }
@@ -1629,7 +1629,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
             path = path.Replace("/" + filename, "");
 
-            if (path.StartsWith(_selectedNodeDirectory.DireUri.LocalPath))
+            if (path.StartsWith(_selectedNodeDirectory.DireUri.LocalPath, StringComparison.InvariantCultureIgnoreCase))
             {
                 if (!string.IsNullOrEmpty(FilterMusicEntriesQuery))
                 {
@@ -1689,7 +1689,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     {
         get
         {
-            field = string.Format($"{"FilesPage_SubTitle_FileCount".GetLocalized()}", MusicEntries.Count);
+            field = string.Format(CultureInfo.InvariantCulture,$"{"FilesPage_SubTitle_FileCount".GetLocalized()}", MusicEntries.Count);
             return field;
         }
     } = "";
@@ -1713,7 +1713,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     {
         get
         {
-            field = string.Format($"{"PlaylistPage_SubTitle_SongCount".GetLocalized()}", PlaylistSongs.Count);
+            field = string.Format(CultureInfo.InvariantCulture,$"{"PlaylistPage_SubTitle_SongCount".GetLocalized()}", PlaylistSongs.Count);
             return field;
         }
 
@@ -2415,7 +2415,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             // Update RegionsForCustomTitleBar.
             GoBackButtonVisibilityChanged?.Invoke(this, EventArgs.Empty);
         }
-    } = false;
+    }
 
 
     #endregion
@@ -2753,7 +2753,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 {
                     InfoBarErrTitle = MpdVersion;
 
-                    InfoBarErrMessage = string.Format($"{"StatusBarMsg_MPDVersionIsOld".GetLocalized()}", _mpc.MpdVerText);
+                    InfoBarErrMessage = string.Format(CultureInfo.InvariantCulture,$"{"StatusBarMsg_MPDVersionIsOld".GetLocalized()}", _mpc.MpdVerText);
 
                     IsShowErrWindow = true;
                 });
@@ -2984,16 +2984,16 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                     }
                 }
 
-                _random = _mpc.Status.IsRandom;
-                OnPropertyChanged(nameof(Random));
+                _isRandom = _mpc.Status.IsRandom;
+                OnPropertyChanged(nameof(IsRandom));
 
-                _repeat = _mpc.Status.IsRepeat;
-                OnPropertyChanged(nameof(Repeat));
+                _isRepeat = _mpc.Status.IsRepeat;
+                OnPropertyChanged(nameof(IsRepeat));
 
-                _consume = _mpc.Status.IsConsume;
-                OnPropertyChanged(nameof(Consume));
+                _isConsume = _mpc.Status.IsConsume;
+                OnPropertyChanged(nameof(IsConsume));
 
-                _single = _mpc.Status.IsSingle;
+                _isSingle = _mpc.Status.IsSingle;
                 OnPropertyChanged(nameof(Single));
 
                 //start elapsed timer.
@@ -4706,7 +4706,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                             Directory.CreateDirectory(strDirPath);
                             DateTimeOffset dto = new(DateTime.UtcNow);
                             // Get the unix timestamp in seconds
-                            var unixTime = dto.ToUnixTimeSeconds().ToString();
+                            var unixTime = dto.ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture);
 
                             await using StreamWriter file = new(fileTempPath);
                             await file.WriteLineAsync(unixTime);
@@ -4957,31 +4957,31 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     {
         if (size < 1024)
         {
-            return size.ToString("F0") + " bytes";
+            return size.ToString("F0", CultureInfo.InvariantCulture) + " bytes";
         }
         else if ((size >> 10) < 1024)
         {
-            return (size / 1024F).ToString("F1") + " KB";
+            return (size / 1024F).ToString("F1", CultureInfo.InvariantCulture) + " KB";
         }
         else if ((size >> 20) < 1024)
         {
-            return ((size >> 10) / 1024F).ToString("F1") + " MB";
+            return ((size >> 10) / 1024F).ToString("F1", CultureInfo.InvariantCulture) + " MB";
         }
         else if ((size >> 30) < 1024)
         {
-            return ((size >> 20) / 1024F).ToString("F1") + " GB";
+            return ((size >> 20) / 1024F).ToString("F1", CultureInfo.InvariantCulture) + " GB";
         }
         else if ((size >> 40) < 1024)
         {
-            return ((size >> 30) / 1024F).ToString("F1") + " TB";
+            return ((size >> 30) / 1024F).ToString("F1", CultureInfo.InvariantCulture) + " TB";
         }
         else if ((size >> 50) < 1024)
         {
-            return ((size >> 40) / 1024F).ToString("F1") + " PB";
+            return ((size >> 40) / 1024F).ToString("F1", CultureInfo.InvariantCulture) + " PB";
         }
         else
         {
-            return ((size >> 50) / 1024F).ToString("F0") + " EB";
+            return ((size >> 50) / 1024F).ToString("F0", CultureInfo.InvariantCulture) + " EB";
         }
     }
 
@@ -5632,7 +5632,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private async Task SetRandom()
     {
         if (IsBusy) return;
-        await _mpc.MpdSetRandom(_random);
+        await _mpc.MpdSetRandom(_isRandom);
     }
     private bool SetRandomCanExecute()
     {
@@ -5644,7 +5644,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private async Task SetRpeat()
     {
         if (IsBusy) return;
-        await _mpc.MpdSetRepeat(_repeat);
+        await _mpc.MpdSetRepeat(_isRepeat);
     }
     private bool SetRpeatCanExecute()
     {
@@ -5656,7 +5656,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private async Task SetConsume()
     {
         if (IsBusy) return;
-        await _mpc.MpdSetConsume(_consume);
+        await _mpc.MpdSetConsume(_isConsume);
     }
     private bool SetConsumeCanExecute()
     {
@@ -5668,7 +5668,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private async Task SetSingle()
     {
         if (IsBusy) return;
-        await _mpc.MpdSetSingle(_single);
+        await _mpc.MpdSetSingle(_isSingle);
     }
     private bool SetSingleCanExecute()
     {
@@ -5779,13 +5779,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
         try
         {
-            int i = Int32.Parse(song.Pos);
+            int i = Int32.Parse(song.Pos, CultureInfo.InvariantCulture);
 
             if (i == 0) return;
 
             i -= 1;
 
-            idToNewPos.Add(song.Id, i.ToString());
+            idToNewPos.Add(song.Id, i.ToString(CultureInfo.InvariantCulture));
         }
         catch
         {
@@ -5814,13 +5814,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
         try
         {
-            var i = Int32.Parse(song.Pos);
+            var i = Int32.Parse(song.Pos, CultureInfo.InvariantCulture);
 
             if (i >= Queue.Count - 1) return;
 
             i += 1;
 
-            idToNewPos.Add(song.Id, i.ToString());
+            idToNewPos.Add(song.Id, i.ToString(CultureInfo.InvariantCulture));
         }
         catch
         {
@@ -5898,7 +5898,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         int i = 0;
         foreach (var item in sorted)
         {
-            idToNewPos.Add(item.Id, i.ToString());
+            idToNewPos.Add(item.Id, i.ToString(CultureInfo.InvariantCulture));
             i++;
         }
 
@@ -5916,7 +5916,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         int i = 0;
         foreach (var item in sorted)
         {
-            idToNewPos.Add(item.Id, i.ToString());
+            idToNewPos.Add(item.Id, i.ToString(CultureInfo.InvariantCulture));
             i++;
         }
 

@@ -3,24 +3,24 @@ using System.Collections.ObjectModel;
 
 namespace MPDCtrl.Models;
 
-public abstract class Result
+public abstract class MpdResult
 {
     public bool IsWaitFailed = false;
     public bool IsSuccess = false;
     public string ErrorMessage = string.Empty;
 }
 
-public class ConnectionResult : Result
+public class ConnectionResult : MpdResult
 {
 
 }
 
-public class CommandResult : Result
+public class CommandResult : MpdResult
 {
     public string ResultText = string.Empty;
 }
 
-public sealed class CommandBinaryResult : Result
+public sealed class CommandBinaryResult : MpdResult
 {
     public bool IsNoBinaryFound = false;
     public bool IsTimeOut = false;
@@ -30,7 +30,7 @@ public sealed class CommandBinaryResult : Result
     public byte[]? BinaryData;
 }
 
-public sealed class CommandImageResult : Result
+public sealed class CommandImageResult : MpdResult
 {
     public bool IsNoBinaryFound = false;
     public bool IsTimeOut = false;
@@ -47,8 +47,3 @@ public sealed class CommandSearchResult : CommandResult
     public ObservableCollection<SongInfo>? SearchResult;
 }
 
-// TODO: Not used?
-public sealed class IdleResult : CommandResult
-{
-
-}

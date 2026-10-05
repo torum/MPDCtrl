@@ -15,15 +15,15 @@ title: MPDCtrl
 
 # MPDCtrl
 
-MPDCtrl is a Windows client app for [MPD (Music player daemon)](http://www.musicpd.org/). 
+MPDCtrl is a Windows desktop client for [MPD (Music Player Daemon)](http://www.musicpd.org/) built with WinUI.
+
+For other platforms like Linux, please check out [MPDCtrlX](https://github.com/torum/MPDCtrlX), an [Avalonia UI](https://avaloniaui.net/)-based cross-platform GUI client ported from MPDCtrl.
    
 - Requirement:  
 Windows 10+ and a host running MPD.
 
-For other platforms, please check out [MPDCtrlX](https://github.com/torum/MPDCtrlX) which is a cross-platform desktop GUI client app based on [Avalonia UI](https://avaloniaui.net/), a port of WPF-based MPDCtrl.  
-
 ## Download: 
-[Download from Micorsoft Store](https://apps.microsoft.com/store/detail/mpdctrl/9NV2BBJ82BRX)
+You can download and install via the [Microsoft Store](https://apps.microsoft.com/store/detail/mpdctrl/9NV2BBJ82BRX) or download the executables directly from the [releases page](https://github.com/torum/MPDCtrl/releases). The store package natively supports x64, x86, and arm64 architectures through Native AOT compilation.
 
 ## Screenshots
 
@@ -47,7 +47,9 @@ For other platforms, please check out [MPDCtrlX](https://github.com/torum/MPDCtr
 
 ## MPDCtrlX for cross-platoform
 
-[MPDCtrlX](https://github.com/torum/MPDCtrlX) is a cross-platform desktop GUI client app based on [Avalonia UI](https://avaloniaui.net/), a port of WPF-based [MPDCtrl](https://github.com/torum/MPDCtrl).  
+[MPDCtrlX](https://github.com/torum/MPDCtrlX) is a cross-platform version of MPDCtrl. 
+
+Built using Avalonia UI, this application is a direct port of the original MPDCtrl (which has since migrated from WPF to WinUI 3). While cross-platform, MPDCtrlX is specifically optimized for Linux desktop users, offering platform-specific features like native MPRIS (Media Player Remote Interfacing Specification) integration over D-Bus.
 
 <img width="800" alt="MPDCtrlX based on Avalonia UI, a port of WPF-based Windows client MPDCtrl" src="https://github.com/torum/MPDCtrlX/blob/main/Docs/Images/MPDCtrlX-Albums.png?raw=true">
 

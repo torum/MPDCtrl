@@ -26,22 +26,22 @@ public sealed partial class MpcService : IMpcService
 {
     #region == Consts, Properties, etc == 
 
-    public string MpdHost { get; private set; } = "";
+    public string Host { get; private set; } = "";
 
-    public int MpdPort { get; private set; } = 6600;
+    public int Port { get; private set; } = 6600;
 
-    public string MpdPassword { get; private set; } = "";
+    public string Password { get; private set; } = "";
 
     public string MpdVerText { get; private set; } = "";
 
-    public Status MpdStatus { get; private set; } = new();
+    public MpdStatus Status { get; private set; } = new();
 
-    public bool MpdForceSetVolume { get; set; }
+    public bool IsForceSetVolume { get; set; }
 
-    public bool MpdStop { get; set; }
+    public bool IsStop { get; set; }
 
     // You need to either get "status" and "queue" before hand, or "currentsong". 
-    public SongInfoEx? MpdCurrentSong { get; private set; }
+    public SongInfoEx? CurrentSong { get; private set; }
 
     public ObservableCollection<SongInfoEx> CurrentQueue { get; private set; } = [];
 
@@ -200,7 +200,7 @@ public sealed partial class MpcService : IMpcService
         _cts?.Dispose();
         _cts = new CancellationTokenSource();
 
-        MpdStop = false;
+        IsStop = false;
 
         ConnectionResult result = new();
 
@@ -208,8 +208,8 @@ public sealed partial class MpcService : IMpcService
 
         _idleConnection = new TcpClient();
 
-        MpdHost = host;
-        MpdPort = port;
+        Host = host;
+        Port = port;
 
         DebugIdleOutput?.Invoke(this, "TCP Idle Connection: Connecting." + "\n" + "\n");
         MpcProgress?.Invoke(this, "Connecting...");
@@ -220,7 +220,7 @@ public sealed partial class MpcService : IMpcService
         {
             IsBusy?.Invoke(this, true);
 
-            await _idleConnection.ConnectAsync(MpdHost, MpdPort);
+            await _idleConnection.ConnectAsync(Host, Port);
 
             // TODO: always false
             if (_idleConnection.Client is null)
@@ -337,7 +337,7 @@ public sealed partial class MpcService : IMpcService
     {
         //MpcProgress?.Invoke(this, "Sending password...");
 
-        MpdPassword = password;
+        Password = password;
 
         CommandResult ret = new();
 
@@ -360,7 +360,7 @@ public sealed partial class MpcService : IMpcService
     {
         CommandResult ret = new();
 
-        if (MpdStop)
+        if (IsStop)
         {
             Debug.WriteLine("@MpdIdleSendCommand: MpdStop1");
             return ret;
@@ -785,7 +785,7 @@ public sealed partial class MpcService : IMpcService
 
     private async void MpdIdle()
     {
-        if (MpdStop)
+        if (IsStop)
         {
             Debug.WriteLine("@MpdIdle: MpdStop1");
             return;
@@ -876,9 +876,9 @@ public sealed partial class MpcService : IMpcService
 
             while (true)
             {
-                if (MpdStop)
+                if (IsStop)
                 {
-                    Debug.WriteLine("@MpdIdle: MpdStop in while loop.");
+                    Debug.WriteLine("@MpdIdle: IsStop in while loop.");
                     break;
                 }
 
@@ -1192,7 +1192,7 @@ public sealed partial class MpcService : IMpcService
             if (d.IsSuccess)
             {
                 // BinaryConnection start.
-                await _binaryDownloader.MpdBinaryConnectionStart(MpdHost, MpdPort, MpdPassword);
+                await _binaryDownloader.MpdBinaryConnectionStart(Host, Port, Password);
 
                 // Get available commands
                 await MpdCommands();
@@ -1221,8 +1221,8 @@ public sealed partial class MpcService : IMpcService
 
         IsMpdCommandConnected = false;
 
-        MpdHost = host;
-        MpdPort = port;
+        Host = host;
+        Port = port;
 
         DebugCommandOutput?.Invoke(this, "TCP Command Connection: Connecting." + "\n" + "\n");
 
@@ -1230,7 +1230,7 @@ public sealed partial class MpcService : IMpcService
 
         try
         {
-            await _commandConnection.ConnectAsync(MpdHost, MpdPort);
+            await _commandConnection.ConnectAsync(Host, Port);
 
             // TODO: always false
             if (_commandConnection.Client is null)
@@ -1338,7 +1338,7 @@ public sealed partial class MpcService : IMpcService
 
     public async Task<CommandResult> MpdCommandSendPassword(string password = "")
     {
-        MpdPassword = password;
+        Password = password;
 
         CommandResult ret = new();
 
@@ -1371,11 +1371,11 @@ public sealed partial class MpcService : IMpcService
         {
             if (await SemaphoreCommand.WaitAsync(TimeSpan.FromSeconds(5), _cts.Token))
             {
-                if (MpdStop)
+                if (IsStop)
                 {
-                    Debug.WriteLine("@MpdCommandSendCommand: MpdStop");
+                    Debug.WriteLine("@MpdCommandSendCommand: IsStop");
                     ret.IsWaitFailed = true;
-                    ret.ErrorMessage = "WaitAsync failed due to MpdStop. @MpdCommandSendCommand";
+                    ret.ErrorMessage = "WaitAsync failed due to IsStop. @MpdCommandSendCommand";
                     SemaphoreCommand.Release();
                     return ret;
                 }
@@ -1594,11 +1594,11 @@ public sealed partial class MpcService : IMpcService
                 }
                 catch { }
 
-                ConnectionResult newCon = await MpdCommandConnect(MpdHost, MpdPort);
+                ConnectionResult newCon = await MpdCommandConnect(Host, Port);
 
                 if (newCon.IsSuccess)
                 {
-                    CommandResult d = await MpdCommandSendPassword(MpdPassword);
+                    CommandResult d = await MpdCommandSendPassword(Password);
 
                     if (d.IsSuccess)
                     {
@@ -1804,11 +1804,11 @@ public sealed partial class MpcService : IMpcService
                 }
                 catch { }
 
-                ConnectionResult newCon = await MpdCommandConnect(MpdHost, MpdPort);
+                ConnectionResult newCon = await MpdCommandConnect(Host, Port);
 
                 if (newCon.IsSuccess)
                 {
-                    CommandResult d = await MpdCommandSendPassword(MpdPassword);
+                    CommandResult d = await MpdCommandSendPassword(Password);
 
                     if (d.IsSuccess)
                     {
@@ -1946,11 +1946,11 @@ public sealed partial class MpcService : IMpcService
                 }
                 catch { }
 
-                ConnectionResult newCon = await MpdCommandConnect(MpdHost, MpdPort);
+                ConnectionResult newCon = await MpdCommandConnect(Host, Port);
 
                 if (newCon.IsSuccess)
                 {
-                    CommandResult d = await MpdCommandSendPassword(MpdPassword);
+                    CommandResult d = await MpdCommandSendPassword(Password);
 
                     if (d.IsSuccess)
                     {
@@ -2215,9 +2215,9 @@ public sealed partial class MpcService : IMpcService
             {
                 try
                 {
-                    if (MpdStop)
+                    if (IsStop)
                     {
-                        Debug.WriteLine("MpdStop @MpdQueryAlbumArt");
+                        Debug.WriteLine("IsStop @MpdQueryAlbumArt");
                         res.IsSuccess = false;
                         return res;
                     }
@@ -2295,7 +2295,7 @@ public sealed partial class MpcService : IMpcService
                 {
                     DebugCommandOutput?.Invoke(this, "MpdQueryAlbumArt@Timeout. Reconnecting...");
                     // re-connect
-                    var b = await _binaryDownloader.MpdBinaryConnectionStart(MpdHost, MpdPort, MpdPassword);
+                    var b = await _binaryDownloader.MpdBinaryConnectionStart(Host, Port, Password);
                     if (b)
                     {
                         DebugCommandOutput?.Invoke(this, "MpdQueryAlbumArt@Timeout. Reconnecting success.");
@@ -2347,9 +2347,9 @@ public sealed partial class MpcService : IMpcService
             {
                 try
                 {
-                    if (MpdStop)
+                    if (IsStop)
                     {
-                        Debug.WriteLine("MpdStop @MpdQueryAlbumArtForAlbumView");
+                        Debug.WriteLine("IsStop @MpdQueryAlbumArtForAlbumView");
                         res.IsSuccess = false;
                         return res;
                     }
@@ -2385,7 +2385,7 @@ public sealed partial class MpcService : IMpcService
                             {
                                 DebugCommandOutput?.Invoke(this, "MpdQueryAlbumArt@Timeout. Reconnecting...");
                                 // re-connect
-                                var b = await _binaryDownloader.MpdBinaryConnectionStart(MpdHost, MpdPort, MpdPassword);
+                                var b = await _binaryDownloader.MpdBinaryConnectionStart(Host, Port, Password);
                                 if (b)
                                 {
                                     Debug.WriteLine("MpdQueryAlbumArt@Timeout. Reconnecting success.");
@@ -2462,9 +2462,9 @@ public sealed partial class MpcService : IMpcService
             cmd = "playid " + songId;
         }
 
-        if ((MpdStatus.MpdState == Status.MpdPlayState.Play) || (MpdStatus.MpdState == Status.MpdPlayState.Pause))
+        if ((Status.CurrentPlayState == MpdPlayState.Play) || (Status.CurrentPlayState == MpdPlayState.Pause))
         {
-            if (MpdStatus.MpdVolumeIsSet || !MpdForceSetVolume)
+            if (Status.IsVolumeSet || !IsForceSetVolume)
             {
                 CommandResult result = await MpdCommandSendCommand(cmd);
 
@@ -2482,11 +2482,11 @@ public sealed partial class MpcService : IMpcService
                 return result;
             }
         }
-        else if (MpdStatus.MpdState == Status.MpdPlayState.Stop)
+        else if (Status.CurrentPlayState == MpdPlayState.Stop)
         {
             CommandResult result = await MpdCommandSendCommand(cmd);
 
-            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
+            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!Status.IsVolumeSet || IsForceSetVolume))
             {
                 Debug.WriteLine($"MpdPlaybackPlay. State is stop. Sending setvol command separately. {volume}");
                 // MPD's volume is reset to 100% when the state is stop. So set the volume.
@@ -2515,9 +2515,9 @@ public sealed partial class MpcService : IMpcService
 
     public async Task<CommandResult> MpdPlaybackResume(int volume)
     {
-        if ((MpdStatus.MpdState == Status.MpdPlayState.Play) || (MpdStatus.MpdState == Status.MpdPlayState.Pause))
+        if ((Status.CurrentPlayState == MpdPlayState.Play) || (Status.CurrentPlayState == MpdPlayState.Pause))
         {
-            if (MpdStatus.MpdVolumeIsSet || !MpdForceSetVolume)
+            if (Status.IsVolumeSet || !IsForceSetVolume)
             {
                 CommandResult result = await MpdCommandSendCommand("pause 0");
 
@@ -2535,10 +2535,10 @@ public sealed partial class MpcService : IMpcService
                 return result;
             }
         }
-        else if (MpdStatus.MpdState == Status.MpdPlayState.Stop)
+        else if (Status.CurrentPlayState == MpdPlayState.Stop)
         {
             CommandResult result = await MpdCommandSendCommand("pause 0");
-            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
+            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!Status.IsVolumeSet || IsForceSetVolume))
             {
                 Debug.WriteLine($"MpdPlaybackResume. State is stop. Sending setvol command separately. {volume}");
                 // MPD's volume is reset to 100% when the state is stop. So set the volume.
@@ -2567,9 +2567,9 @@ public sealed partial class MpcService : IMpcService
 
     public async Task<CommandResult> MpdPlaybackNext(int volume)
     {
-        if ((MpdStatus.MpdState == Status.MpdPlayState.Play) || (MpdStatus.MpdState == Status.MpdPlayState.Pause))
+        if ((Status.CurrentPlayState == MpdPlayState.Play) || (Status.CurrentPlayState == MpdPlayState.Pause))
         {
-            if (MpdStatus.MpdVolumeIsSet || !MpdForceSetVolume)
+            if (Status.IsVolumeSet || !IsForceSetVolume)
             {
                 CommandResult result = await MpdCommandSendCommand("next");
 
@@ -2587,10 +2587,10 @@ public sealed partial class MpcService : IMpcService
                 return result;
             }
         }
-        else if (MpdStatus.MpdState == Status.MpdPlayState.Stop)
+        else if (Status.CurrentPlayState == MpdPlayState.Stop)
         {
             CommandResult result = await MpdCommandSendCommand("next");
-            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
+            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!Status.IsVolumeSet || IsForceSetVolume))
             {
                 Debug.WriteLine($"MpdPlaybackNext. State is stop. Sending setvol command separately. {volume}");
                 // MPD's volume is reset to 100% when the state is stop. So set the volume.
@@ -2612,9 +2612,9 @@ public sealed partial class MpcService : IMpcService
 
     public async Task<CommandResult> MpdPlaybackPrev(int volume)
     {
-        if ((MpdStatus.MpdState == Status.MpdPlayState.Play) || (MpdStatus.MpdState == Status.MpdPlayState.Pause))
+        if ((Status.CurrentPlayState == MpdPlayState.Play) || (Status.CurrentPlayState == MpdPlayState.Pause))
         {
-            if (MpdStatus.MpdVolumeIsSet || !MpdForceSetVolume)
+            if (Status.IsVolumeSet || !IsForceSetVolume)
             {
                 CommandResult result = await MpdCommandSendCommand("previous");
 
@@ -2632,10 +2632,10 @@ public sealed partial class MpcService : IMpcService
                 return result;
             }
         }
-        else if (MpdStatus.MpdState == Status.MpdPlayState.Stop)
+        else if (Status.CurrentPlayState == MpdPlayState.Stop)
         {
             CommandResult result = await MpdCommandSendCommand("previous");
-            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
+            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!Status.IsVolumeSet || IsForceSetVolume))
             {
                 Debug.WriteLine($"MpdPlaybackPrev. State is stop. Sending setvol command separately. {volume}");
                 // MPD's volume is reset to 100% when the state is stop. So set the volume.
@@ -2680,7 +2680,7 @@ public sealed partial class MpcService : IMpcService
 
     public async Task<CommandResult> MpdSetRepeat(bool on)
     {
-        if (MpdStatus.MpdRepeat == on)
+        if (Status.IsRepeat == on)
         {
             CommandResult f = new()
             {
@@ -2706,7 +2706,7 @@ public sealed partial class MpcService : IMpcService
 
     public async Task<CommandResult> MpdSetRandom(bool on)
     {
-        if (MpdStatus.MpdRandom == on)
+        if (Status.IsRandom == on)
         {
             CommandResult f = new()
             {
@@ -2732,7 +2732,7 @@ public sealed partial class MpcService : IMpcService
 
     public async Task<CommandResult> MpdSetConsume(bool on)
     {
-        if (MpdStatus.MpdConsume == on)
+        if (Status.IsConsume == on)
         {
             CommandResult f = new()
             {
@@ -2758,7 +2758,7 @@ public sealed partial class MpcService : IMpcService
 
     public async Task<CommandResult> MpdSetSingle(bool on)
     {
-        if (MpdStatus.MpdSingle == on)
+        if (Status.IsSingle == on)
         {
             CommandResult f = new()
             {
@@ -3005,7 +3005,7 @@ public sealed partial class MpcService : IMpcService
             return f;
         }
 
-        if ((MpdStatus.MpdState == Status.MpdPlayState.Play) || (MpdStatus.MpdState == Status.MpdPlayState.Pause))
+        if ((Status.CurrentPlayState == MpdPlayState.Play) || (Status.CurrentPlayState == MpdPlayState.Pause))
         {
             string cmd = "command_list_begin" + "\n";
             cmd = cmd + "clear" + "\n";
@@ -3014,7 +3014,7 @@ public sealed partial class MpcService : IMpcService
                 cmd = cmd + "add \"" + Regex.Escape(uri) + "\"\n";
             }
             cmd = cmd + "play" + "\n";
-            if (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume)
+            if (!Status.IsVolumeSet || IsForceSetVolume)
             {
                 cmd = cmd + "setvol " + volume.ToString() + "\n";
             }
@@ -3030,7 +3030,7 @@ public sealed partial class MpcService : IMpcService
 
             return result;
         }
-        else if (MpdStatus.MpdState == Status.MpdPlayState.Stop)
+        else if (Status.CurrentPlayState == MpdPlayState.Stop)
         {
             string cmd = "command_list_begin" + "\n";
             cmd = cmd + "clear" + "\n";
@@ -3052,7 +3052,7 @@ public sealed partial class MpcService : IMpcService
                     await ParseCurrentSong(result2.ResultText);
                 }
                 */
-                if (string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
+                if (string.IsNullOrEmpty(result.ErrorMessage) && (!Status.IsVolumeSet || IsForceSetVolume))
                 {
                     // Needed this...
                     await Task.Delay(200);
@@ -3086,13 +3086,13 @@ public sealed partial class MpcService : IMpcService
             return f;
         }
 
-        if ((MpdStatus.MpdState == Status.MpdPlayState.Play) || (MpdStatus.MpdState == Status.MpdPlayState.Pause))
+        if ((Status.CurrentPlayState == MpdPlayState.Play) || (Status.CurrentPlayState == MpdPlayState.Pause))
         {
             string cmd = "command_list_begin" + "\n";
             cmd = cmd + "clear" + "\n";
             cmd = cmd + "add \"" + Regex.Escape(uri) + "\"\n";
             cmd = cmd + "play" + "\n";
-            if (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume)
+            if (!Status.IsVolumeSet || IsForceSetVolume)
             {
                 cmd = cmd + "setvol " + volume.ToString() + "\n";
             }
@@ -3108,7 +3108,7 @@ public sealed partial class MpcService : IMpcService
 
             return result;
         }
-        else if (MpdStatus.MpdState == Status.MpdPlayState.Stop)
+        else if (Status.CurrentPlayState == MpdPlayState.Stop)
         {
             string cmd = "command_list_begin" + "\n";
             cmd = cmd + "clear" + "\n";
@@ -3126,7 +3126,7 @@ public sealed partial class MpcService : IMpcService
                 //    await ParseCurrentSong(result2.ResultText);
                 //}
 
-                if (string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
+                if (string.IsNullOrEmpty(result.ErrorMessage) && (!Status.IsVolumeSet || IsForceSetVolume))
                 {
                     await Task.Delay(200);
 
@@ -3161,14 +3161,14 @@ public sealed partial class MpcService : IMpcService
 
         playlistName = Regex.Escape(playlistName);
 
-        if ((MpdStatus.MpdState == Status.MpdPlayState.Play) || (MpdStatus.MpdState == Status.MpdPlayState.Pause))
+        if ((Status.CurrentPlayState == MpdPlayState.Play) || (Status.CurrentPlayState == MpdPlayState.Pause))
         {
             string cmd = "command_list_begin" + "\n";
             //cmd = cmd + "stop" + "\n";
             cmd = cmd + "clear" + "\n";
             cmd = cmd + "load \"" + playlistName + "\"\n";
             cmd = cmd + "play" + "\n";
-            if (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume)
+            if (!Status.IsVolumeSet || IsForceSetVolume)
             {
                 cmd = cmd + "setvol " + volume.ToString() + "\n";
             }
@@ -3184,7 +3184,7 @@ public sealed partial class MpcService : IMpcService
 
             return result;
         }
-        else if (MpdStatus.MpdState == Status.MpdPlayState.Stop)
+        else if (Status.CurrentPlayState == MpdPlayState.Stop)
         {
             string cmd = "command_list_begin" + "\n";
             //cmd = cmd + "stop" + "\n";
@@ -3201,7 +3201,7 @@ public sealed partial class MpcService : IMpcService
             //    await ParseCurrentSong(result.ResultText);
             //}
 
-            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!MpdStatus.MpdVolumeIsSet || MpdForceSetVolume))
+            if (result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage) && (!Status.IsVolumeSet || IsForceSetVolume))
             {
                 await Task.Delay(200);
 
@@ -3430,7 +3430,7 @@ public sealed partial class MpcService : IMpcService
 
     private Task<bool> ParseProtocolFeatures(string result)
     {
-        if (MpdStop) { return Task.FromResult(false); }
+        if (IsStop) { return Task.FromResult(false); }
         if (string.IsNullOrEmpty(result)) return Task.FromResult(false);
 
         // Not working with MPD 0.24.4?
@@ -3443,7 +3443,7 @@ public sealed partial class MpcService : IMpcService
 
     private Task<bool> ParseCommands(string result)
     {
-        if (MpdStop) { return Task.FromResult(false); }
+        if (IsStop) { return Task.FromResult(false); }
         if (string.IsNullOrEmpty(result)) return Task.FromResult(false);
         List<string> resultLines = result.Split('\n').ToList();
         if (resultLines.Count == 0) return Task.FromResult(false);
@@ -3467,7 +3467,7 @@ public sealed partial class MpcService : IMpcService
     {
         var idList = new List<string>();
 
-        if (MpdStop) { return Task.FromResult(idList); }
+        if (IsStop) { return Task.FromResult(idList); }
         if (string.IsNullOrEmpty(result)) return Task.FromResult(idList);
 
         List<string> resultLines = result.Split('\n').ToList();
@@ -3495,7 +3495,7 @@ public sealed partial class MpcService : IMpcService
 
     private Task<bool> ParseOutputs(string result)
     {
-        if (MpdStop) { return Task.FromResult(false); }
+        if (IsStop) { return Task.FromResult(false); }
         if (string.IsNullOrEmpty(result)) return Task.FromResult(false);
 
         List<string> resultLines = result.Split('\n').ToList();
@@ -3589,7 +3589,7 @@ public sealed partial class MpcService : IMpcService
 
     private Task<bool> ParseStatus(string result)
     {
-        if (MpdStop) { return Task.FromResult(false); }
+        if (IsStop) { return Task.FromResult(false); }
         if (string.IsNullOrEmpty(result)) return Task.FromResult(false);
 
         if (result.Trim() == "OK")
@@ -3621,7 +3621,7 @@ public sealed partial class MpcService : IMpcService
             });
             */
 
-            MpdStatus.Reset();
+            Status.Reset();
 
             foreach (string line in resultLines)
             {
@@ -3648,17 +3648,17 @@ public sealed partial class MpcService : IMpcService
                 {
                     case "play":
                         {
-                            MpdStatus.MpdState = Status.MpdPlayState.Play;
+                            Status.CurrentPlayState = MpdPlayState.Play;
                             break;
                         }
                     case "pause":
                         {
-                            MpdStatus.MpdState = Status.MpdPlayState.Pause;
+                            Status.CurrentPlayState = MpdPlayState.Pause;
                             break;
                         }
                     case "stop":
                         {
-                            MpdStatus.MpdState = Status.MpdPlayState.Stop;
+                            Status.CurrentPlayState = MpdPlayState.Stop;
                             break;
                         }
                     default:
@@ -3673,26 +3673,26 @@ public sealed partial class MpcService : IMpcService
                 if (!string.IsNullOrEmpty(valueVolume))
                 {
                     //Debug.WriteLine("volume is set to " + valueVolume + " @ParseStatus()");
-                    MpdStatus.MpdVolume = Int32.Parse(valueVolume);
+                    Status.CurrentVolume = Int32.Parse(valueVolume);
 
-                    MpdStatus.MpdVolumeIsReturned = true;
+                    Status.IsVolumeReturned = true;
                 }
                 else
                 {
-                    MpdStatus.MpdVolumeIsReturned = false;
+                    Status.IsVolumeReturned = false;
                 }
             }
             else
             {
-                MpdStatus.MpdVolumeIsReturned = false;
+                Status.IsVolumeReturned = false;
             }
 
             // songID
-            var songId = MpdStatus.MpdSongID ?? string.Empty; // Check id is changed or not. If changed, raise event lator. So save the old value here.;
-            MpdStatus.MpdSongID = "";
+            var songId = Status.CurrentSongID ?? string.Empty; // Check id is changed or not. If changed, raise event lator. So save the old value here.;
+            Status.CurrentSongID = "";
             if (mpdStatusValues.TryGetValue("songid", out string? value))
             {
-                MpdStatus.MpdSongID = value;
+                Status.CurrentSongID = value;
             }
 
             // Repeat opt bool.
@@ -3702,11 +3702,11 @@ public sealed partial class MpcService : IMpcService
                 {
                     if (mpdStatusValues["repeat"] == "1")
                     {
-                        MpdStatus.MpdRepeat = true;
+                        Status.IsRepeat = true;
                     }
                     else
                     {
-                        MpdStatus.MpdRepeat = false;
+                        Status.IsRepeat = false;
                     }
 
                 }
@@ -3723,11 +3723,11 @@ public sealed partial class MpcService : IMpcService
                 {
                     if (Int32.Parse(mpdStatusValues["random"]) > 0)
                     {
-                        MpdStatus.MpdRandom = true;
+                        Status.IsRandom = true;
                     }
                     else
                     {
-                        MpdStatus.MpdRandom = false;
+                        Status.IsRandom = false;
                     }
 
                 }
@@ -3744,11 +3744,11 @@ public sealed partial class MpcService : IMpcService
                 {
                     if (Int32.Parse(mpdStatusValues["consume"]) > 0)
                     {
-                        MpdStatus.MpdConsume = true;
+                        Status.IsConsume = true;
                     }
                     else
                     {
-                        MpdStatus.MpdConsume = false;
+                        Status.IsConsume = false;
                     }
 
                 }
@@ -3765,11 +3765,11 @@ public sealed partial class MpcService : IMpcService
                 {
                     if (Int32.Parse(mpdStatusValues["single"]) > 0)
                     {
-                        MpdStatus.MpdSingle = true;
+                        Status.IsSingle = true;
                     }
                     else
                     {
-                        MpdStatus.MpdSingle = false;
+                        Status.IsSingle = false;
                     }
 
                 }
@@ -3790,8 +3790,8 @@ public sealed partial class MpcService : IMpcService
                 {
                     if (mpdStatusValues["time"].Split(':').Length > 1)
                     {
-                        MpdStatus.MpdSongTime = Double.Parse(mpdStatusValues["time"].Split(':')[1].Trim(), enCulture);
-                        MpdStatus.MpdSongElapsed = Double.Parse(mpdStatusValues["time"].Split(':')[0].Trim(), enCulture);
+                        Status.CurrentSongTime = Double.Parse(mpdStatusValues["time"].Split(':')[1].Trim(), enCulture);
+                        Status.CurrentSongElapsed = Double.Parse(mpdStatusValues["time"].Split(':')[0].Trim(), enCulture);
                     }
                 }
                 catch (FormatException e)
@@ -3805,7 +3805,7 @@ public sealed partial class MpcService : IMpcService
             {
                 try
                 {
-                    MpdStatus.MpdSongElapsed = Double.Parse(value1, enCulture);
+                    Status.CurrentSongElapsed = Double.Parse(value1, enCulture);
                 }
                 catch (Exception e)
                 {
@@ -3818,7 +3818,7 @@ public sealed partial class MpcService : IMpcService
             {
                 try
                 {
-                    MpdStatus.MpdSongTime = Double.Parse(value2, enCulture);
+                    Status.CurrentSongTime = Double.Parse(value2, enCulture);
                 }
                 catch (Exception e)
                 {
@@ -3829,17 +3829,17 @@ public sealed partial class MpcService : IMpcService
             // Error
             if (mpdStatusValues.ContainsKey("error"))
             {
-                MpdStatus.MpdError = mpdStatusValues["error"];
+                Status.CurrentError = mpdStatusValues["error"];
             }
             else
             {
-                MpdStatus.MpdError = "";
+                Status.CurrentError = "";
             }
 
             // TODO: more?
 
             // Raise event if songId is changed.
-            if (songId != MpdStatus.MpdSongID)
+            if (songId != Status.CurrentSongID)
             {
                 MpdCurrentSongChanged?.Invoke(this);
             }
@@ -3866,7 +3866,7 @@ public sealed partial class MpcService : IMpcService
 
     private Task<bool> ParseCurrentSong(string result)
     {
-        if (MpdStop) return Task.FromResult(false);
+        if (IsStop) return Task.FromResult(false);
 
         bool isEmptyResult = false;
 
@@ -3921,8 +3921,8 @@ public sealed partial class MpcService : IMpcService
 
                 if (sng is not null)
                 {
-                    if (MpdCurrentSong?.Id != sng.Id)
-                        MpdCurrentSong = sng;
+                    if (CurrentSong?.Id != sng.Id)
+                        CurrentSong = sng;
                 }
 
                 songValues.Clear();
@@ -3949,7 +3949,7 @@ public sealed partial class MpcService : IMpcService
 
     private async Task<bool> ParsePlaylistInfo(string result)
     {
-        if (MpdStop) return false;
+        if (IsStop) return false;
 
         bool isEmptyResult = false;
 
@@ -4272,9 +4272,9 @@ public sealed partial class MpcService : IMpcService
                 */
 
                 //
-                if (sng.Id == MpdStatus.MpdSongID)
+                if (sng.Id == Status.CurrentSongID)
                 {
-                    MpdCurrentSong = sng;
+                    CurrentSong = sng;
                 }
 
                 return sng;
@@ -4410,7 +4410,7 @@ public sealed partial class MpcService : IMpcService
 
     private Task<bool> ParseListAll(string result)
     {
-        if (MpdStop) return Task.FromResult(false);
+        if (IsStop) return Task.FromResult(false);
 
         if (string.IsNullOrEmpty(result)) return Task.FromResult(false);
 
@@ -4520,7 +4520,7 @@ public sealed partial class MpcService : IMpcService
 
     private Task<bool> ParseListAlbumGroupAlbumArtist(string result)
     {
-        if (MpdStop) return Task.FromResult(false);
+        if (IsStop) return Task.FromResult(false);
 
         if (string.IsNullOrEmpty(result)) return Task.FromResult(false);
 
@@ -4640,7 +4640,7 @@ public sealed partial class MpcService : IMpcService
     {
         var res = new ObservableCollection<SongInfo>();
 
-        if (MpdStop) return Task.FromResult(res);
+        if (IsStop) return Task.FromResult(res);
 
         //App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
         //{
@@ -4773,7 +4773,7 @@ public sealed partial class MpcService : IMpcService
     {
         ObservableCollection<SongInfo> songList = [];
 
-        if (MpdStop) return songList;
+        if (IsStop) return songList;
 
         if (string.IsNullOrEmpty(result)) return songList;
 
@@ -5019,7 +5019,7 @@ public sealed partial class MpcService : IMpcService
     {
         // This needs to be first.
         ConnectionState = ConnectionStatus.Disconnecting;
-        MpdStop = true;
+        IsStop = true;
 
         _cts?.Cancel();
 

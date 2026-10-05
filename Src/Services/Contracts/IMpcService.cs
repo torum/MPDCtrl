@@ -18,13 +18,13 @@ public interface IMpcService
     ObservableCollection<AlbumEx> Albums { get; }
     ObservableCollection<AudioOutput> AudioOutputs { get; }
     List<string> Commands { get; }
-    SongInfoEx? MpdCurrentSong { get; }
-    string MpdHost { get; }
-    string MpdPassword { get; }
-    int MpdPort { get; }
-    Status MpdStatus { get; }
-    bool MpdStop { get; set; }
-    bool MpdForceSetVolume { get; set; }
+    SongInfoEx? CurrentSong { get; }
+    string Host { get; }
+    string Password { get; }
+    int Port { get; }
+    MpdStatus Status { get; }
+    bool IsStop { get; set; }
+    bool IsForceSetVolume { get; set; }
     string MpdVerText { get; }
     ObservableCollection<Playlist> Playlists { get; }
     //ObservableCollection<SongInfo> SearchResult { get; }

@@ -577,7 +577,7 @@ public sealed partial class MainViewModel : ObservableObject
                 return;
             }
 
-            if (Convert.ToDouble(_mpc.MpdStatus.MpdVolume) == _volume)
+            if (Convert.ToDouble(_mpc.Status.CurrentVolume) == _volume)
             {
                 //return;
             }
@@ -636,7 +636,7 @@ public sealed partial class MainViewModel : ObservableObject
             {
                 return;
             }
-            if (_mpc.MpdStatus.MpdRepeat == value)
+            if (_mpc.Status.IsRepeat == value)
             {
                 return;
             }
@@ -660,7 +660,7 @@ public sealed partial class MainViewModel : ObservableObject
                 return;
             }
 
-            if (_mpc.MpdStatus.MpdRandom == value)
+            if (_mpc.Status.IsRandom == value)
             {
                 return;
             }
@@ -683,7 +683,7 @@ public sealed partial class MainViewModel : ObservableObject
             {
                 return;
             }
-            if (_mpc.MpdStatus.MpdConsume == value)
+            if (_mpc.Status.IsConsume == value)
             {
                 return;
             }
@@ -702,7 +702,7 @@ public sealed partial class MainViewModel : ObservableObject
             _single = value;
             OnPropertyChanged();
 
-            if (_mpc is null || _mpc.MpdStatus.MpdSingle == value)
+            if (_mpc is null || _mpc.Status.IsSingle == value)
             {
                 return;
             }
@@ -811,7 +811,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly System.Timers.Timer _elapsedTimer = new(1000); // when using _elapsedTimeMultiplier(other than 1), change this accordingly.
     private void ElapsedTimer(object? sender, System.Timers.ElapsedEventArgs e)
     {
-        if ((_elapsed < Time) && (_mpc.MpdStatus.MpdState == Status.MpdPlayState.Play))
+        if ((_elapsed < Time) && (_mpc.Status.CurrentPlayState == MpdPlayState.Play))
         {
             //Debug.WriteLine($"ElapsedTimer: {_elapsed}/{_time}");
 
@@ -2187,7 +2187,7 @@ public sealed partial class MainViewModel : ObservableObject
 
             field = value;
 
-            _mpc.MpdForceSetVolume = field;
+            _mpc.IsForceSetVolume = field;
 
             OnPropertyChanged();
         }
@@ -2425,7 +2425,7 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     public partial ElementTheme Theme { get; set; } = ElementTheme.Default;
     [ObservableProperty]
-    public partial SystemBackdropOption Material { get; set; } = SystemBackdropOption.Mica;
+    public partial SystemBackdropOptions Material { get; set; } = SystemBackdropOptions.Mica;
     [ObservableProperty]
     public partial bool IsAcrylicSupported { get; set; } = false;
     [ObservableProperty]
@@ -2523,7 +2523,7 @@ public sealed partial class MainViewModel : ObservableObject
 
             if (IsConnected)
             {
-                _mpc.MpdStop = true;
+                _mpc.IsStop = true;
 
                 _mpc.MpdDisconnect(false);
             }
@@ -2569,7 +2569,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     private void InitializeAndSubscribe()
     {
-        _mpc.MpdForceSetVolume = IsForceSetVolumeExplicitly;
+        _mpc.IsForceSetVolume = IsForceSetVolumeExplicitly;
 
         #region == Subscribe to events ==
 
@@ -2690,7 +2690,7 @@ public sealed partial class MainViewModel : ObservableObject
 
         if (result.IsSuccess)
         {
-            var r = await _mpc.MpdCommandConnectionStart(_mpc.MpdHost, _mpc.MpdPort, _mpc.MpdPassword);
+            var r = await _mpc.MpdCommandConnectionStart(_mpc.Host, _mpc.Port, _mpc.Password);
 
             if (r)
             {
@@ -2774,7 +2774,7 @@ public sealed partial class MainViewModel : ObservableObject
 
             if (CurrentSong is not null)
             {
-                if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
+                if (CurrentSong.Id != _mpc.Status.CurrentSongID)
                 {
                     isSongChanged = true;
 
@@ -2782,7 +2782,7 @@ public sealed partial class MainViewModel : ObservableObject
                     CurrentSong.IsPlaying = false;
 
                     //
-                    _mpc.MpdCurrentSong?.IsPlaying = false;
+                    _mpc.CurrentSong?.IsPlaying = false;
                     AlbumCover = null;
                     AlbumArtBitmapSource = null;
                 }
@@ -2790,7 +2790,7 @@ public sealed partial class MainViewModel : ObservableObject
             else
             {
                 // just in case
-                _mpc.MpdCurrentSong?.IsPlaying = false;
+                _mpc.CurrentSong?.IsPlaying = false;
 
                 isCurrentSongWasNull = true;
             }
@@ -2800,7 +2800,7 @@ public sealed partial class MainViewModel : ObservableObject
                 if (isSongChanged || isCurrentSongWasNull)
                 {
                     // Sets Current Song
-                    var item = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
+                    var item = Queue.FirstOrDefault(i => i.Id == _mpc.Status.CurrentSongID);
                     if (item is not null)
                     {
                         //Debug.WriteLine("Currentsong is set. @UpdateStatus()");
@@ -2909,19 +2909,19 @@ public sealed partial class MainViewModel : ObservableObject
                     // Debug.WriteLine("CurrentSong is not changed. @UpdateStatus()");
 
                     var buttonState = Windows.Media.MediaPlaybackStatus.Stopped;
-                    switch (_mpc.MpdStatus.MpdState)
+                    switch (_mpc.Status.CurrentPlayState)
                     {
-                        case Status.MpdPlayState.Play:
+                        case MpdPlayState.Play:
                             {
                                 buttonState = Windows.Media.MediaPlaybackStatus.Playing;
                                 break;
                             }
-                        case Status.MpdPlayState.Pause:
+                        case MpdPlayState.Pause:
                             {
                                 buttonState = Windows.Media.MediaPlaybackStatus.Paused;
                                 break;
                             }
-                        case Status.MpdPlayState.Stop:
+                        case MpdPlayState.Stop:
                             {
                                 buttonState = Windows.Media.MediaPlaybackStatus.Stopped;
                                 break;
@@ -2959,22 +2959,22 @@ public sealed partial class MainViewModel : ObservableObject
             try
             {
                 //Play button
-                PlayButton = _mpc.MpdStatus.MpdState switch
+                PlayButton = _mpc.Status.CurrentPlayState switch
                 {
-                    Status.MpdPlayState.Play => PathPauseButton,
-                    Status.MpdPlayState.Pause => PathPlayButton,
-                    Status.MpdPlayState.Stop => PathPlayButton,
+                    MpdPlayState.Play => PathPauseButton,
+                    MpdPlayState.Pause => PathPlayButton,
+                    MpdPlayState.Stop => PathPlayButton,
                     _ => PlayButton
                 };
 
-                if (_mpc.MpdStatus.MpdVolumeIsReturned)
+                if (_mpc.Status.IsVolumeReturned)
                 {
                     // Only update volume when Playing or Paused. (Because of MPD's strange behavior where it returns volume 100 when stopped)
-                    if (_mpc.MpdStatus.MpdState != Status.MpdPlayState.Stop)
+                    if (_mpc.Status.CurrentPlayState != MpdPlayState.Stop)
                     {
-                        //Debug.WriteLine($"Volume is set to {_mpc.MpdStatus.MpdVolume} @UpdateButtonStatus()");
+                        //Debug.WriteLine($"Volume is set to {_mpc.Status.MpdVolume} @UpdateButtonStatus()");
 
-                        double tmpVol = Convert.ToDouble(_mpc.MpdStatus.MpdVolume);
+                        double tmpVol = Convert.ToDouble(_mpc.Status.CurrentVolume);
                         if (_volume != tmpVol)
                         {
                             // "quietly" update.
@@ -2984,25 +2984,25 @@ public sealed partial class MainViewModel : ObservableObject
                     }
                 }
 
-                _random = _mpc.MpdStatus.MpdRandom;
+                _random = _mpc.Status.IsRandom;
                 OnPropertyChanged(nameof(Random));
 
-                _repeat = _mpc.MpdStatus.MpdRepeat;
+                _repeat = _mpc.Status.IsRepeat;
                 OnPropertyChanged(nameof(Repeat));
 
-                _consume = _mpc.MpdStatus.MpdConsume;
+                _consume = _mpc.Status.IsConsume;
                 OnPropertyChanged(nameof(Consume));
 
-                _single = _mpc.MpdStatus.MpdSingle;
+                _single = _mpc.Status.IsSingle;
                 OnPropertyChanged(nameof(Single));
 
                 //start elapsed timer.
-                if (_mpc.MpdStatus.MpdState == Status.MpdPlayState.Play)
+                if (_mpc.Status.CurrentPlayState == MpdPlayState.Play)
                 {
                     // no need to care about "double" updates for time.
-                    Time = Convert.ToInt32(_mpc.MpdStatus.MpdSongTime);
+                    Time = Convert.ToInt32(_mpc.Status.CurrentSongTime);
                     Time *= _elapsedTimeMultiplier;
-                    _elapsed = Convert.ToInt32(_mpc.MpdStatus.MpdSongElapsed);
+                    _elapsed = Convert.ToInt32(_mpc.Status.CurrentSongElapsed);
                     _elapsed *= _elapsedTimeMultiplier;
                     if (!_elapsedTimer.Enabled)
                         _elapsedTimer.Start();
@@ -3012,9 +3012,9 @@ public sealed partial class MainViewModel : ObservableObject
                     _elapsedTimer.Stop();
 
                     // no need to care about "double" updates for time.
-                    Time = Convert.ToInt32(_mpc.MpdStatus.MpdSongTime);
+                    Time = Convert.ToInt32(_mpc.Status.CurrentSongTime);
                     Time *= _elapsedTimeMultiplier;
-                    _elapsed = Convert.ToInt32(_mpc.MpdStatus.MpdSongElapsed);
+                    _elapsed = Convert.ToInt32(_mpc.Status.CurrentSongElapsed);
                     _elapsed *= _elapsedTimeMultiplier;
                     OnPropertyChanged(nameof(Elapsed));
                     OnPropertyChanged(nameof(ElapsedFormatted));
@@ -3043,15 +3043,15 @@ public sealed partial class MainViewModel : ObservableObject
 
             if (CurrentSong is not null)
             {
-                if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
+                if (CurrentSong.Id != _mpc.Status.CurrentSongID)
                 {
                     // Clear IsPlaying icon
                     CurrentSong.IsPlaying = false;
 
                     // ?
-                    _mpc.MpdCurrentSong?.IsPlaying = false;
+                    _mpc.CurrentSong?.IsPlaying = false;
 
-                    Debug.WriteLine($"CurrentSong.Id != _mpc.MpdStatus.MpdSongID @UpdateCurrentSong()");
+                    Debug.WriteLine($"CurrentSong.Id != _mpc.Status.CurrentSongID @UpdateCurrentSong()");
 
                     // Clear SMTC
                     //Debug.WriteLine($"SetSystemMediaTransportControls (Clearing) @UpdateCurrentSong() ");
@@ -3060,11 +3060,11 @@ public sealed partial class MainViewModel : ObservableObject
             }
             else
             {
-                CurrentSong = _mpc.MpdCurrentSong;
+                CurrentSong = _mpc.CurrentSong;
 
                 if (CurrentSong is null)
                 {
-                    //Debug.WriteLine($"CurrentSong and _mpc.MpdCurrentSong are both null. @UpdateCurrentSong()");
+                    //Debug.WriteLine($"CurrentSong and _mpc.CurrentSong are both null. @UpdateCurrentSong()");
                     // Update SMTC ??
                     //Debug.WriteLine($"SetSystemMediaTransportControls @UpdateCurrentSong() ");
                     //SetSystemMediaTransportControls(CurrentSong, null);
@@ -3112,7 +3112,7 @@ public sealed partial class MainViewModel : ObservableObject
                         UpdateProgress?.Invoke(this, "[UI] Checking current song after Queue update.");
 
                         // Set Current and NowPlaying.
-                        var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
+                        var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.Status.CurrentSongID);
                         if (curitem is not null)
                         {
                             if (CurrentSong is not null)
@@ -3304,7 +3304,7 @@ public sealed partial class MainViewModel : ObservableObject
                     UpdateProgress?.Invoke(this, "[UI] Checking current song after Queue update.");
 
                     // Set Current and NowPlaying.
-                    var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
+                    var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.Status.CurrentSongID);
                     if (curitem is not null)
                     {
                         bool asdf = false;
@@ -3417,7 +3417,7 @@ public sealed partial class MainViewModel : ObservableObject
 
                     if (CurrentSong is not null)
                     {
-                        if (CurrentSong.Id != _mpc.MpdStatus.MpdSongID)
+                        if (CurrentSong.Id != _mpc.Status.CurrentSongID)
                         {
                             isNeedToFindCurrentSong = true;
 
@@ -3425,15 +3425,15 @@ public sealed partial class MainViewModel : ObservableObject
                         }
                         else
                         {
-                            if (_mpc.MpdCurrentSong is not null)
+                            if (_mpc.CurrentSong is not null)
                             {
                                 // This means CurrentSong is already aquired by "currentsong" command.
-                                if (_mpc.MpdCurrentSong.Id == _mpc.MpdStatus.MpdSongID)
+                                if (_mpc.CurrentSong.Id == _mpc.Status.CurrentSongID)
                                 {
                                     // Set Current(again) and NowPlaying.
 
                                     // the reason not to use CurrentSong is that it points different instance (set by "currentsong" command and currentqueue). 
-                                    var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
+                                    var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.Status.CurrentSongID);
                                     if (curitem is not null)
                                     {
                                         CurrentSong = curitem;
@@ -3487,15 +3487,15 @@ public sealed partial class MainViewModel : ObservableObject
                                     }
                                     /*
                                     // the reason not to use CurrentSong is that it points different instance (set by "currentsong" command and currentqueue). 
-                                    _mpc.MpdCurrentSong.IsPlaying = true;
+                                    _mpc.CurrentSong.IsPlaying = true;
 
                                     // just in case. < no. don't override.
                                     //CurrentSong.IsPlaying = true;
 
                                     // currentsong command does not return pos, so it's needed to be set.
-                                    CurrentSong.Index = _mpc.MpdCurrentSong.Index;
+                                    CurrentSong.Index = _mpc.CurrentSong.Index;
 
-                                    _mpc.MpdCurrentSong.IsSelected = true;
+                                    _mpc.CurrentSong.IsSelected = true;
 
                                     if (IsAutoScrollToNowPlaying)
                                         // use ScrollIntoViewAndSelect instead of ScrollIntoView
@@ -3504,13 +3504,13 @@ public sealed partial class MainViewModel : ObservableObject
                                 }
                                 else
                                 {
-                                    Debug.WriteLine("_mpc.MpdCurrentSong.Id != _mpc.MpdStatus.MpdSongID. @UpdateCurrentQueue()");
+                                    Debug.WriteLine("_mpc.CurrentSong.Id != _mpc.Status.CurrentSongID. @UpdateCurrentQueue()");
                                     isNeedToFindCurrentSong = true;
                                 }
                             }
                             else
                             {
-                                //Debug.WriteLine("_mpc.MpdCurrentSong is null. @UpdateCurrentQueue()");
+                                //Debug.WriteLine("_mpc.CurrentSong is null. @UpdateCurrentQueue()");
                                 isNeedToFindCurrentSong = true;
                             }
                         }
@@ -3526,7 +3526,7 @@ public sealed partial class MainViewModel : ObservableObject
                     if (isNeedToFindCurrentSong)
                     {
                         // Set Current and NowPlaying.
-                        var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.MpdStatus.MpdSongID);
+                        var curitem = Queue.FirstOrDefault(i => i.Id == _mpc.Status.CurrentSongID);
                         if (curitem is not null)
                         {
                             //Debug.WriteLine($"Currentsong is set. {curitem.Title}. @UpdateCurrentQueue()");
@@ -3652,19 +3652,19 @@ public sealed partial class MainViewModel : ObservableObject
                 AlbumTitle = songInfo.Album
             };
 
-            switch (_mpc.MpdStatus.MpdState)
+            switch (_mpc.Status.CurrentPlayState)
             {
-                case Status.MpdPlayState.Play:
+                case MpdPlayState.Play:
                     {
                         songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Playing;
                         break;
                     }
-                case Status.MpdPlayState.Pause:
+                case MpdPlayState.Pause:
                     {
                         songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Paused;
                         break;
                     }
-                case Status.MpdPlayState.Stop:
+                case MpdPlayState.Stop:
                     {
                         songInfoForSmtc.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Stopped;
                         break;
@@ -4473,7 +4473,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     private async Task GetAlbumPicturesAsync(IEnumerable<object>? albumExItems)
     {
-        if (_mpc.MpdStop)
+        if (_mpc.IsStop)
         {
             return;
         }
@@ -4512,7 +4512,7 @@ public sealed partial class MainViewModel : ObservableObject
 
             foreach (var item in albumExItems)
             {
-                if (_mpc.MpdStop)
+                if (_mpc.IsStop)
                 {
                     break;
                 }
@@ -4629,7 +4629,7 @@ public sealed partial class MainViewModel : ObservableObject
 
                     foreach (var albumsong in sresult)
                     {
-                        if (_mpc.MpdStop)
+                        if (_mpc.IsStop)
                         {
                             break;
                         }
@@ -5069,9 +5069,9 @@ public sealed partial class MainViewModel : ObservableObject
         });
         */
         /*
-        if (_mpc.MpdStatus.MpdError != "")
+        if (_mpc.Status.MpdError != "")
         {
-            MpdStatusMessage = MpdVersion + ": " + MPDCtrlX.Properties.Resources.MPD_StatusError + " - " + _mpc.MpdStatus.MpdError;
+            MpdStatusMessage = MpdVersion + ": " + MPDCtrlX.Properties.Resources.MPD_StatusError + " - " + _mpc.Status.MpdError;
             MpdStatusButton = _pathMpdAckErrorButton;
         }
         else
@@ -5524,21 +5524,21 @@ public sealed partial class MainViewModel : ObservableObject
 
         if (Queue.Count < 1) { return; }
 
-        switch (_mpc.MpdStatus.MpdState)
+        switch (_mpc.Status.CurrentPlayState)
         {
-            case Status.MpdPlayState.Play:
+            case MpdPlayState.Play:
                 {
                     //State>>Play: So, send Pause command
                     await _mpc.MpdPlaybackPause();
                     break;
                 }
-            case Status.MpdPlayState.Pause:
+            case MpdPlayState.Pause:
                 {
                     //State>>Pause: So, send Resume command
                     await _mpc.MpdPlaybackResume(Convert.ToInt32(_volume));
                     break;
                 }
-            case Status.MpdPlayState.Stop:
+            case MpdPlayState.Stop:
                 {
                     //State>>Stop: So, send Play command
                     await _mpc.MpdPlaybackPlay(Convert.ToInt32(_volume));
@@ -5620,7 +5620,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         if (IsBusy) return;
         double elapsed = _elapsed / _elapsedTimeMultiplier;
-        await _mpc.MpdPlaybackSeek(_mpc.MpdStatus.MpdSongID, elapsed);
+        await _mpc.MpdPlaybackSeek(_mpc.Status.CurrentSongID, elapsed);
     }
     private bool SetSeekCanExecute()
     {
@@ -8296,9 +8296,9 @@ public sealed partial class MainViewModel : ObservableObject
         // Disconnect if connected.
         if (IsConnected)
         {
-            _mpc.MpdStop = true;
+            _mpc.IsStop = true;
             _mpc.MpdDisconnect(true);
-            _mpc.MpdStop = false;
+            _mpc.IsStop = false;
         }
 
         // Save volume.
@@ -8321,7 +8321,7 @@ public sealed partial class MainViewModel : ObservableObject
         Queue.Clear();
         _mpc.CurrentQueue.Clear();
 
-        _mpc.MpdStatus.Reset();
+        _mpc.Status.Reset();
 
         _mainMenuItems.PlaylistsDirectory?.Children.Clear();
 
@@ -8587,7 +8587,7 @@ public sealed partial class MainViewModel : ObservableObject
 
         var main = App.GetService<MainWindow>();
 
-        if (Enum.TryParse(backdrop, out SystemBackdropOption cacheBackdrop))
+        if (Enum.TryParse(backdrop, out SystemBackdropOptions cacheBackdrop))
         {
             //var mainWin = App.GetService<MainWindow>();
             main?.SwitchBackdrop(cacheBackdrop);

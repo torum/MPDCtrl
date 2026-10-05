@@ -1,17 +1,9 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MPDCtrl.ViewModels;
 using System;
 using System.Globalization;
 
 namespace MPDCtrl.Models;
-
-/// <summary>
-/// Generic song file class. (for listall)
-/// </summary>
-public partial class SongFile : ObservableObject
-{
-    public string File { get; set; } = string.Empty;
-}
 
 /// <summary>
 /// SongInfo class. Extends SongFile. (for playlist or search result)
@@ -191,23 +183,4 @@ public partial class SongInfo : SongFile
     public partial bool IsSelected { get; set; }
 
     public int IndexPlusOne => Index + 1;
-}
-
-/// <summary>
-/// Song class with some extra info. Extends SongInfo. (for queue)
-/// </summary>
-public sealed partial class SongInfoEx : SongInfo
-{
-    // Queue specific
-
-    public string Id { get; set; } = string.Empty;
-
-    [ObservableProperty]
-    public partial string Pos { get; set; } = string.Empty;
-
-    [ObservableProperty]
-    public partial bool IsPlaying { get; set; }
-
-    [ObservableProperty]
-    public partial bool IsAlbumCoverNeedsUpdate { get; set; } = true;
 }

@@ -49,12 +49,12 @@ public partial class SystemBackdropEnumToBooleanConverter : IValueConverter
     {
         if (parameter is string enumString)
         {
-            if (!Enum.IsDefined(typeof(SystemBackdropOption), value))
+            if (!Enum.IsDefined(typeof(SystemBackdropOptions), value))
             {
                 throw new ArgumentException("ExceptionEnumToBooleanConverterValueMustBeAnEnum");
             }
 
-            var enumValue = Enum.Parse<SystemBackdropOption>(enumString);
+            var enumValue = Enum.Parse<SystemBackdropOptions>(enumString);
 
             return enumValue.Equals(value);
         }
@@ -66,7 +66,7 @@ public partial class SystemBackdropEnumToBooleanConverter : IValueConverter
     {
         if (parameter is string enumString)
         {
-            return Enum.Parse<SystemBackdropOption>(enumString);
+            return Enum.Parse<SystemBackdropOptions>(enumString);
         }
 
         throw new ArgumentException("ExceptionEnumToBooleanConverterParameterMustBeAnEnumName");

@@ -76,7 +76,7 @@ public sealed partial class InitDialog : Page
         }
         else
         {
-            if (hostText.Equals("localhost") || hostText.Equals("127.0.0.1"))
+            if (hostText.Equals("localhost", StringComparison.Ordinal) || hostText.Equals("127.0.0.1", StringComparison.Ordinal))
             {
                 isError = false;
             }
@@ -153,7 +153,7 @@ public sealed partial class InitDialog : Page
         bool isError;
         string portText = this.TextBoxPort.Text;
 
-        if (portText.Equals("6600"))
+        if (portText.Equals("6600", StringComparison.Ordinal))
         {
             isError = false;
         }

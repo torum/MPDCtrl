@@ -40,7 +40,7 @@ using WinRT;
 
 namespace MPDCtrl.ViewModels;
 
-public sealed partial class MainViewModel : ObservableObject
+public sealed partial class MainViewModel : ObservableObject, IDisposable
 {
     private readonly CancellationTokenSource _cts = new();
     private readonly IMpcService _mpc;
@@ -603,7 +603,7 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
-    private System.Timers.Timer? _volumeDelayTimer = null;
+    private System.Timers.Timer? _volumeDelayTimer;
     private async void DoChangeVolume(object? sender, System.Timers.ElapsedEventArgs e)
     {
         try
@@ -723,7 +723,7 @@ public sealed partial class MainViewModel : ObservableObject
             OnPropertyChanged();
             OnPropertyChanged(nameof(TimeFormatted));
         }
-    } = 0;
+    }
 
     public string TimeFormatted
     {
@@ -742,7 +742,7 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
     private readonly int _elapsedTimeMultiplier = 1;// or 10
-    private int _elapsed = 0;
+    private int _elapsed;
     public int Elapsed
     {
         get => _elapsed;
@@ -797,7 +797,7 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
-    private System.Timers.Timer? _elapsedDelayTimer = null;
+    private System.Timers.Timer? _elapsedDelayTimer;
     private void DoChangeElapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
         if ((_elapsed < Time) && SetSeekCommand.CanExecute(null))
@@ -2191,7 +2191,7 @@ public sealed partial class MainViewModel : ObservableObject
 
             OnPropertyChanged();
         }
-    } = false;
+    }
 
     //
     public bool IsDebugWindowEnabled
@@ -3957,7 +3957,7 @@ public sealed partial class MainViewModel : ObservableObject
                 {
                     if (fuga is not NodeMenuPlaylistItem) continue;
 
-                    if (!string.Equals(playlist, fuga.Name, StringComparison.CurrentCulture)) continue;
+                    if (!string.Equals(playlist, fuga.Name, StringComparison.Ordinal)) continue;
 
                     await Task.Yield();
                     await Task.Delay(1000); // needed this for WinUI3.
@@ -4281,10 +4281,10 @@ public sealed partial class MainViewModel : ObservableObject
 
                         foreach (var song in r.SearchResult)
                         {
-                            if ((!song.AlbumArtist.Equals(album.AlbumArtist, StringComparison.CurrentCulture)) &&
-                                (!song.Artist.Equals(album.AlbumArtist, StringComparison.CurrentCulture))) continue;
+                            if ((!song.AlbumArtist.Equals(album.AlbumArtist, StringComparison.Ordinal)) &&
+                                (!song.Artist.Equals(album.AlbumArtist, StringComparison.Ordinal))) continue;
                             //if (song.Album.Trim() == album.Name.Trim())
-                            if (!song.Album.Equals(album.Name, StringComparison.CurrentCulture)) continue;
+                            if (!song.Album.Equals(album.Name, StringComparison.Ordinal)) continue;
 
                             // WInUI3's walkaround.
                             song.ParentViewModel = this;
@@ -4449,7 +4449,7 @@ public sealed partial class MainViewModel : ObservableObject
 
                 foreach (var song in r.SearchResult)
                 {
-                    if (!song.Album.Equals(slbm.Name, StringComparison.CurrentCulture)) continue;
+                    if (!song.Album.Equals(slbm.Name, StringComparison.Ordinal)) continue;
 
                     // WInUI3's walkaround.
                     song.ParentViewModel = this;
@@ -4651,7 +4651,7 @@ public sealed partial class MainViewModel : ObservableObject
                             aat = albumsong.Artist.Trim();
                         }
 
-                        if (string.Equals(aat, album.AlbumArtist, StringComparison.CurrentCulture))
+                        if (string.Equals(aat, album.AlbumArtist, StringComparison.Ordinal))
                         {
                             //Debug.WriteLine($"GetAlbumPictures: Processing song {albumsong.File} from album {album.Name}");
                             var r = await _mpc.MpdQueryAlbumArtForAlbumView(albumsong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
@@ -7924,7 +7924,7 @@ public sealed partial class MainViewModel : ObservableObject
             return;
         }
 
-        if (!SelectedPlaylistName.Equals(playlist, StringComparison.CurrentCulture))
+        if (!SelectedPlaylistName.Equals(playlist, StringComparison.Ordinal))
         {
             Debug.WriteLine($"({SelectedPlaylistName} != {playlist})");
             return;
@@ -7986,7 +7986,7 @@ public sealed partial class MainViewModel : ObservableObject
         {
             foreach (var hoge in Playlists)
             {
-                if (string.Equals(playlistName, hoge.Name, StringComparison.CurrentCultureIgnoreCase))
+                if (string.Equals(playlistName, hoge.Name, StringComparison.OrdinalIgnoreCase))
                 {
                     match = true;
                     break;
@@ -8617,4 +8617,10 @@ public sealed partial class MainViewModel : ObservableObject
 
     #endregion
 
+    public void Dispose()
+    {
+        _cts?.Dispose();
+
+        //GC.SuppressFinalize(this);
+    }
 }

@@ -4,9 +4,9 @@ namespace MPDCtrl.Models;
 
 public sealed class AlbumImage
 {
-    public bool IsDownloading { get; set; } = false;
+    public bool IsDownloading { get; set; }
 
-    public bool IsSuccess { get; set; } = false;
+    public bool IsSuccess { get; set; }
 
     public string? SongFilePath { get; set; }
 

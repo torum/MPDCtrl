@@ -22,7 +22,7 @@ namespace MPDCtrl.Services;
 #pragma warning disable CA1862
 #pragma warning disable IDE0290
 #pragma warning restore IDE0079 //
-public sealed partial class MpcService : IMpcService
+public sealed partial class MpcService : IMpcService, IDisposable
 {
     #region == Consts, Properties, etc == 
 
@@ -1115,7 +1115,7 @@ public sealed partial class MpcService : IMpcService
                     // mixer: the volume has been changed
                     isPlayer = true;
                 }
-                if (line.ToLower() == "changed: output")
+                if (line.ToLowerInvariant() == "changed: output")
                 {
                     // output: Audio output has been added, removed or modified(e.g.renamed, enabled or disabled)
                     isOutput = true;
@@ -4065,7 +4065,7 @@ public sealed partial class MpcService : IMpcService
                 if (statusValuePair.Length > 1)
                 {
                     //if (SongValues.ContainsKey(StatusValuePair[0].Trim()))
-                    if (statusValuePair[0].Trim().Equals("file"))
+                    if (statusValuePair[0].Trim().Equals("file", StringComparison.Ordinal))
                     {
                         if (songValues.ContainsKey("Id"))
                         {
@@ -4701,7 +4701,7 @@ public sealed partial class MpcService : IMpcService
                 string[] valuePair = line.Split(':');
                 if (valuePair.Length > 1)
                 {
-                    if (valuePair[0].Trim().Equals("file"))
+                    if (valuePair[0].Trim().Equals("file", StringComparison.Ordinal))
                     {
                         // save old one and clear songvalues.
                         if (songValues.ContainsKey("file"))// && SongValues.ContainsKey("duration")
@@ -4824,7 +4824,7 @@ public sealed partial class MpcService : IMpcService
                 string[] valuePair = line.Split(':');
                 if (valuePair.Length > 1)
                 {
-                    if (valuePair[0].Trim().Equals("file"))
+                    if (valuePair[0].Trim().Equals("file", StringComparison.Ordinal))
                     {
                         // Contains means new one.
 
@@ -5115,6 +5115,13 @@ public sealed partial class MpcService : IMpcService
         writer = null;
         reader = null;
         connection = new TcpClient();
+    }
+
+    public void Dispose()
+    {
+        _cts?.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 }
 

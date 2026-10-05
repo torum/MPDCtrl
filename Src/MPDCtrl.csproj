@@ -23,7 +23,7 @@
 
 		<IncludeSymbols>True</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		<EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
@@ -76,6 +76,7 @@
 		<!-- always -->
 		<SelfContained>true</SelfContained>
 		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+		<AnalysisLevel>latest</AnalysisLevel>
 
 	</PropertyGroup>
 

@@ -12,7 +12,7 @@ public partial class Album : ObservableObject
     [ObservableProperty]
     public partial string ReleaseYear { get; set; } = string.Empty;
 
-    public bool IsSongsAcquired { get; set; } = false;
+    public bool IsSongsAcquired { get; set; }
 
     [ObservableProperty]
     public partial ObservableCollection<SongInfo> Songs { get; set; } = [];

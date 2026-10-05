@@ -8,7 +8,7 @@ public sealed class MpdStatus
 
     public bool IsVolumeReturned { get; set; }
 
-    public bool IsVolumeSet { get; set; } = false;
+    public bool IsVolumeSet { get; set; }
 
     public bool IsRepeat { get; set; }
 
@@ -20,9 +20,9 @@ public sealed class MpdStatus
 
     public string CurrentSongID { get; set; } = string.Empty;
 
-    public double CurrentSongTime { get; set; } = 0;
+    public double CurrentSongTime { get; set; }
 
-    public double CurrentSongElapsed { get; set; } = 0;
+    public double CurrentSongElapsed { get; set; }
 
     public string CurrentError { get; set; } = string.Empty;
 

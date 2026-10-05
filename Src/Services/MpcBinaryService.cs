@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace MPDCtrl.Services;
 
-public sealed class MpcBinaryService : IMpcBinaryService
+public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
 {
     private CancellationTokenSource? _cts;
     private readonly Lock _connectionLock = new();
@@ -1192,5 +1192,12 @@ public sealed class MpcBinaryService : IMpcBinaryService
         writer = null;
         reader = null;
         connection = new TcpClient();
+    }
+
+    public void Dispose()
+    {
+        _cts?.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 }

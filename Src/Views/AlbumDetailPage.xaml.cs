@@ -51,7 +51,7 @@ public sealed partial class AlbumDetailPage : Page
         get;
     }
 
-    public ObservableCollection<Breadcrumb> BreadcrumbItems = [];
+    public ObservableCollection<Breadcrumb> BreadcrumbItems { get; set; } = [];
 
     private void BreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
     {

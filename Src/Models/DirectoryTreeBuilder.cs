@@ -80,7 +80,7 @@ public sealed partial class DirectoryTreeBuilder(string name) : NodeTree(name)
                         foreach (var child in parent.Children)
                         {
                             //if (child.Name.ToLower() == asdf.ToLower())
-                            if (string.Equals(child.Name, asdf, StringComparison.CurrentCultureIgnoreCase))
+                            if (string.Equals(child.Name, asdf, StringComparison.OrdinalIgnoreCase))
                             {
                                 // set parent node
                                 parent = child as NodeDirectory;

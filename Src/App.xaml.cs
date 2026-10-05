@@ -40,9 +40,9 @@ public sealed partial class App : Application
     private Task? _appHostStopTask;
 
 #if DEBUG
-    public bool IsSaveErrorLog = true;
+    public bool IsSaveErrorLog { get; set; } = true;
 #else
-    public bool IsSaveErrorLog = false;
+    public bool IsSaveErrorLog { get; set; } = false;
 #endif
 
     private Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue { get; }

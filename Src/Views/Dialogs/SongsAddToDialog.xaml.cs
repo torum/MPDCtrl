@@ -7,9 +7,9 @@ namespace MPDCtrl.Views.Dialogs;
 
 public sealed partial class SongsAddToDialog : Page
 {
-    public bool CreateNewCheckBoxIsChecked = false;
-    public string TextBoxPlaylistNameText = string.Empty;
-    public Playlist? PlaylistComboBoxSelectedItem;
+    public bool CreateNewCheckBoxIsChecked { get; set; }
+    public string TextBoxPlaylistNameText { get; set; } = string.Empty;
+    public Playlist? PlaylistComboBoxSelectedItem { get; set; }
 
     public SongsAddToDialog()
     {

@@ -25,7 +25,7 @@ public sealed partial class MainWindow : Window
     private readonly SystemMediaTransportControls? _smtc;
     private readonly bool _isMediaTransportControlEnable = true;
     private readonly WindowMessageHook? _hook;
-    private readonly bool _isGlobalHotKeyEnable = false;
+    private readonly bool _isGlobalHotKeyEnable;
     private readonly IDispatcherService _dispatcherService;
 
     // Window restore position and sizes
@@ -284,7 +284,7 @@ public sealed partial class MainWindow : Window
                         var xbool = xLay.Attribute("navigationViewMenuOpen")?.Value;
                         if (!string.IsNullOrEmpty(xbool))
                         {
-                            if (xbool.Equals("True"))
+                            if (xbool.Equals("True", StringComparison.Ordinal))
                             {
                                 _vm.IsNavigationViewMenuOpen = true;
                             }

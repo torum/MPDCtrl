@@ -67,9 +67,9 @@ public sealed class DispatcherService : IDispatcherService
     public Task EnqueueAsync(Action action) => _queue.EnqueueAsync(action);
 
     // Awaitable function that returns a value (e.g., getting text from a TextBox)
-    public Task<T> EnqueueAsync<T>(Func<T> function) => _queue.EnqueueAsync(function);
+    public Task<T> EnqueueAsync<T>(Func<T> func) => _queue.EnqueueAsync(func);
 
     // Awaitable async function (e.g., showing a ContentDialog)
-    public Task EnqueueAsync(Func<Task> function) => _queue.EnqueueAsync(function);
+    public Task EnqueueAsync(Func<Task> func) => _queue.EnqueueAsync(func);
 
 }

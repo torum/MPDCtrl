@@ -8,7 +8,7 @@ namespace MPDCtrl.Services.Contracts
         Microsoft.UI.Dispatching.DispatcherQueue DispatcherQueue { get; }
         bool TryEnqueue(Action action);
         Task EnqueueAsync(Action action);
-        Task<T> EnqueueAsync<T>(Func<T> function);
-        Task EnqueueAsync(Func<Task> function);
+        Task<T> EnqueueAsync<T>(Func<T> func);
+        Task EnqueueAsync(Func<Task> func);
     }
 }

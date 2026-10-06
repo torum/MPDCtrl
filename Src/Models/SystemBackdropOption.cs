@@ -1,7 +1,7 @@
 ﻿
 namespace MPDCtrl.Models
 {
-    public enum SystemBackdropOptions
+    public enum SystemBackdropOption
     {
         Mica, MicaAlt, Acrylic, None
     }

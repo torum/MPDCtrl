@@ -76,7 +76,7 @@
 		<!-- always -->
 		<SelfContained>true</SelfContained>
 		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-		<AnalysisLevel>latest</AnalysisLevel>
+		<AnalysisLevel>latest-recommended</AnalysisLevel>
 
 	</PropertyGroup>
 

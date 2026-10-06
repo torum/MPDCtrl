@@ -1434,7 +1434,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
     public ObservableCollection<AlbumEx>? VisibleItemsAlbumsEx
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
         get; set
         {
@@ -2425,7 +2427,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial ElementTheme Theme { get; set; } = ElementTheme.Default;
     [ObservableProperty]
-    public partial SystemBackdropOptions Material { get; set; } = SystemBackdropOptions.Mica;
+    public partial SystemBackdropOption Material { get; set; } = SystemBackdropOption.Mica;
     [ObservableProperty]
     public partial bool IsAcrylicSupported { get; set; } = false;
     [ObservableProperty]
@@ -5025,7 +5027,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 //Debug.WriteLine($"OK MPD {MpdVersion} @OnMpdIdleConnected");
                 if (_logger.IsEnabled(LogLevel.Information))
                 {
+#pragma warning disable CA1848 // Use the LoggerMessage delegates
                     _logger.LogInformation("OK MPD {MPDVer} @OnMpdIdleConnected.", MpdVersion);
+#pragma warning restore CA1848 // Use the LoggerMessage delegates
                 }
 
                 IsConnected = true;
@@ -8587,7 +8591,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
         var main = App.GetService<MainWindow>();
 
-        if (Enum.TryParse(backdrop, out SystemBackdropOptions cacheBackdrop))
+        if (Enum.TryParse(backdrop, out SystemBackdropOption cacheBackdrop))
         {
             //var mainWin = App.GetService<MainWindow>();
             main?.SwitchBackdrop(cacheBackdrop);

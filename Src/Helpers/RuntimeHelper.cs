@@ -6,7 +6,9 @@ namespace MPDCtrl.Helpers;
 public sealed class RuntimeHelper
 {
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+#pragma warning disable CA1838 // Avoid 'StringBuilder' parameters for P/Invokes
     private static extern int GetCurrentPackageFullName(ref int packageFullNameLength, StringBuilder? packageFullName);
+#pragma warning restore CA1838 // Avoid 'StringBuilder' parameters for P/Invokes
 
     public static bool IsMSIX
     {

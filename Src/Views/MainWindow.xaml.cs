@@ -172,7 +172,7 @@ public sealed partial class MainWindow : Window
             {
                 _vm.IsAcrylicSupported = true;
                 SystemBackdrop = new DesktopAcrylicBackdrop();
-                _vm.Material = SystemBackdropOptions.Acrylic;
+                _vm.Material = SystemBackdropOption.Acrylic;
 
                 _vm.IsBackdropEnabled = true;
             }
@@ -183,7 +183,7 @@ public sealed partial class MainWindow : Window
                 {
                     Kind = MicaKind.Base
                 };
-                _vm.Material = SystemBackdropOptions.Mica;
+                _vm.Material = SystemBackdropOption.Mica;
 
                 _vm.IsBackdropEnabled = true;
             }
@@ -196,7 +196,7 @@ public sealed partial class MainWindow : Window
         OverlappedPresenterState? winState = null; // For AOT workaround, don't set default, = OverlappedPresenterState.Restored;
 
         ElementTheme eleThme = ElementTheme.Default;
-        SystemBackdropOptions bd = SystemBackdropOptions.None;
+        SystemBackdropOption bd = SystemBackdropOption.None;
         bool isFoundNewThemeSetting = false;
 
         double top = 100;
@@ -300,7 +300,7 @@ public sealed partial class MainWindow : Window
                 {
                     if (!string.IsNullOrEmpty(xvalue.Value))
                     {
-                        if (Enum.TryParse(xvalue.Value, out SystemBackdropOptions cacheBackdrop))
+                        if (Enum.TryParse(xvalue.Value, out SystemBackdropOption cacheBackdrop))
                         {
                             bd = cacheBackdrop;
                             isFoundNewThemeSetting = true;
@@ -557,13 +557,13 @@ public sealed partial class MainWindow : Window
                 {
                     if (obj is string s)
                     {
-                        if (s == SystemBackdropOptions.Acrylic.ToString())
+                        if (s == SystemBackdropOption.Acrylic.ToString())
                         {
-                            bd = SystemBackdropOptions.Acrylic;
+                            bd = SystemBackdropOption.Acrylic;
                         }
-                        else if (s == SystemBackdropOptions.Mica.ToString())
+                        else if (s == SystemBackdropOption.Mica.ToString())
                         {
-                            bd = SystemBackdropOptions.Mica;
+                            bd = SystemBackdropOption.Mica;
                         }
                     }
                 }
@@ -585,7 +585,7 @@ public sealed partial class MainWindow : Window
         }
 
         // Apply theme and backdrop
-        if (bd != SystemBackdropOptions.None)
+        if (bd != SystemBackdropOption.None)
         {
             _theme = eleThme;
             _vm.Theme = eleThme;
@@ -594,11 +594,11 @@ public sealed partial class MainWindow : Window
         SwitchBackdrop(bd);
     }
 
-    public void SwitchBackdrop(SystemBackdropOptions backdrop)
+    public void SwitchBackdrop(SystemBackdropOption backdrop)
     {
         var vm = App.GetService<MainViewModel>();
 
-        if (backdrop == SystemBackdropOptions.Mica)
+        if (backdrop == SystemBackdropOption.Mica)
         {
             if (Microsoft.UI.Composition.SystemBackdrops.MicaController.IsSupported())
             {
@@ -606,12 +606,12 @@ public sealed partial class MainWindow : Window
                 {
                     Kind = MicaKind.Base
                 };
-                vm.Material = SystemBackdropOptions.Mica;
+                vm.Material = SystemBackdropOption.Mica;
 
                 vm.IsBackdropEnabled = true;
             }
         }
-        else if (backdrop == SystemBackdropOptions.MicaAlt)
+        else if (backdrop == SystemBackdropOption.MicaAlt)
         {
             if (Microsoft.UI.Composition.SystemBackdrops.MicaController.IsSupported())
             {
@@ -619,27 +619,27 @@ public sealed partial class MainWindow : Window
                 {
                     Kind = MicaKind.BaseAlt
                 };
-                vm.Material = SystemBackdropOptions.MicaAlt;
+                vm.Material = SystemBackdropOption.MicaAlt;
 
                 vm.IsBackdropEnabled = true;
             }
         }
-        else if (backdrop == SystemBackdropOptions.Acrylic)
+        else if (backdrop == SystemBackdropOption.Acrylic)
         {
             if (Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController.IsSupported())
             {
                 this.SystemBackdrop = new DesktopAcrylicBackdrop();
 
-                vm.Material = SystemBackdropOptions.Acrylic;
+                vm.Material = SystemBackdropOption.Acrylic;
 
                 vm.IsBackdropEnabled = true;
             }
         }
-        else if (backdrop == SystemBackdropOptions.None)
+        else if (backdrop == SystemBackdropOption.None)
         {
             this.SystemBackdrop = null;
 
-            vm.Material = SystemBackdropOptions.None;
+            vm.Material = SystemBackdropOption.None;
             vm.IsBackdropEnabled = false;
             vm.Theme = ElementTheme.Default;
             _theme = ElementTheme.Default;

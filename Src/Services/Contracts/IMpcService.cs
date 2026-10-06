@@ -99,10 +99,10 @@ public interface IMpcService
     Task<CommandResult> MpdSendIdle();
     Task<CommandResult> MpdSendNoIdle();
     Task<CommandResult> MpdSendUpdate();
-    Task<CommandResult> MpdSetConsume(bool on);
-    Task<CommandResult> MpdSetRandom(bool on);
-    Task<CommandResult> MpdSetRepeat(bool on);
-    Task<CommandResult> MpdSetSingle(bool on);
+    Task<CommandResult> MpdSetConsume(bool isOn);
+    Task<CommandResult> MpdSetRandom(bool isOn);
+    Task<CommandResult> MpdSetRepeat(bool isOn);
+    Task<CommandResult> MpdSetSingle(bool isOn);
     Task<CommandResult> MpdSetVolume(int v);
     Task<CommandResult> MpdToggleOutput(string id);
     Task<CommandResult> MpdClearError();

@@ -34,6 +34,14 @@ public sealed partial class ShellPage : Page
 
         InitializeComponent();
 
+        Loaded += Page_Loaded;
+        Unloaded += Page_Unloaded;
+    }
+
+    public MainViewModel ViewModel { get; }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
         ViewModel.AlbumSelectedNavigateToDetailsPage += this.OnAlbumSelectedNavigateToDetailsPage;
         ViewModel.GoBackButtonVisibilityChanged += this.OnGoBackButtonVisibilityChanged;
         //ViewModel.DebugCommandOutput += (sender, arg) => { this.OnDebugCommandOutput(arg); };
@@ -43,12 +51,7 @@ public sealed partial class ShellPage : Page
         ViewModel.UserCanExecuteChanged += OnUserCanExecuteChanged;
         ViewModel.UpdateProgress += (sender, arg) => { this.OnUpdateProgress(arg); };
         this.ActualThemeChanged += this.This_ActualThemeChanged;
-    }
 
-    public MainViewModel ViewModel { get; }
-
-    private void Page_Loaded(object sender, RoutedEventArgs e)
-    {
         //await ViewModel.StartMpcAsync();
         // Let's not await, for faster startup. Fire and forget.
         ViewModel.Start();

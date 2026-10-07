@@ -29,8 +29,8 @@ public sealed partial class QueuePage : Page
 
         InitializeComponent();
 
-        ViewModel.ScrollIntoView += (sender, arg) => { this.OnScrollIntoView(arg); };
-        ViewModel.ScrollIntoViewAndSelect += (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
+        Loaded += Page_Loaded;
+        Unloaded += Page_Unloaded;
     }
 
     public MainViewModel ViewModel
@@ -38,7 +38,19 @@ public sealed partial class QueuePage : Page
         get;
     }
 
-    private void OnScrollIntoView(object obj)
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        ViewModel.ScrollIntoView += OnScrollIntoView;
+        ViewModel.ScrollIntoViewAndSelect += OnScrollIntoViewAndSelect;
+    }
+
+    private void Page_Unloaded(object sender, RoutedEventArgs e)
+    {
+        ViewModel.ScrollIntoView -= OnScrollIntoView;
+        ViewModel.ScrollIntoViewAndSelect -= OnScrollIntoViewAndSelect;
+    }
+
+    private void OnScrollIntoView(object? sender, object obj)
     {
         if (obj == null) { return; }
 
@@ -51,7 +63,7 @@ public sealed partial class QueuePage : Page
         }
     }
 
-    private void OnScrollIntoViewAndSelect(object obj)
+    private void OnScrollIntoViewAndSelect(object? sender, object obj)
     {
         if (obj == null) { return; }
 
@@ -317,11 +329,6 @@ public sealed partial class QueuePage : Page
         }
     }
 
-    private void Page_Unloaded(object sender, RoutedEventArgs e)
-    {
-        ViewModel.ScrollIntoView -= (sender, arg) => { this.OnScrollIntoView(arg); };
-        ViewModel.ScrollIntoViewAndSelect -= (sender, arg) => { this.OnScrollIntoViewAndSelect(arg); };
-    }
 
     private async void QueueListview_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
     {

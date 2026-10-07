@@ -2500,51 +2500,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    public void CleanUp()
-    {
-        try
-        {
-            // Unsubscribe events to avoid callbacks after shutdown
-            _mpc.MpdIdleConnected -= OnMpdIdleConnected;
-            _mpc.MpdPlayerStatusChanged -= OnMpdPlayerStatusChanged;
-            _mpc.MpdCurrentQueueChanged -= OnMpdCurrentQueueChanged;
-            _mpc.MpdPlaylistsChanged -= OnMpdPlaylistsChanged;
-            _mpc.MpdOutputChanged -= OnMpdOutputChanged;
-            _mpc.DebugCommandOutput -= OnDebugCommandOutput;
-            _mpc.DebugIdleOutput -= OnDebugIdleOutput;
-            _mpc.ConnectionStatusChanged -= OnConnectionStatusChanged;
-            _mpc.ConnectionError -= OnConnectionError;
-            _mpc.MpdAckError -= OnMpdAckError;
-            _mpc.MpdFatalError -= OnMpdFatalError;
-            _mpc.MpdAlbumArtChanged -= OnAlbumArtChanged;
-            _mpc.MpcProgress -= OnMpcProgress;
-            _mpc.IsBusy -= OnMpcIsBusy;
-
-            //this.UpdateProgress -= (sender, arg) => { this.OnUpdateProgress(arg); };
-            this.UpdateProgress -= OnUpdateProgress;
-
-            if (IsConnected)
-            {
-                _mpc.IsStop = true;
-
-                _mpc.MpdDisconnect(false);
-            }
-
-            _cts?.Cancel();
-
-            _cts?.Dispose();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Exception @CleanUp() {ex}");
-            _dispatcherService.TryEnqueue(() =>
-            {
-                (Application.Current as App)?.AppendErrorLog("Exception @CleanUp", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
-                (Application.Current as App)?.SaveErrorLog();
-            });
-        }
-    }
-
     // TODO: Not used anymore?
     public void SetError(string error)
     {
@@ -8623,8 +8578,47 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
-        _cts?.Dispose();
+        try
+        {
+            // Unsubscribe events to avoid callbacks after shutdown
+            _mpc.MpdIdleConnected -= OnMpdIdleConnected;
+            _mpc.MpdPlayerStatusChanged -= OnMpdPlayerStatusChanged;
+            _mpc.MpdCurrentQueueChanged -= OnMpdCurrentQueueChanged;
+            _mpc.MpdPlaylistsChanged -= OnMpdPlaylistsChanged;
+            _mpc.MpdOutputChanged -= OnMpdOutputChanged;
+            _mpc.DebugCommandOutput -= OnDebugCommandOutput;
+            _mpc.DebugIdleOutput -= OnDebugIdleOutput;
+            _mpc.ConnectionStatusChanged -= OnConnectionStatusChanged;
+            _mpc.ConnectionError -= OnConnectionError;
+            _mpc.MpdAckError -= OnMpdAckError;
+            _mpc.MpdFatalError -= OnMpdFatalError;
+            _mpc.MpdAlbumArtChanged -= OnAlbumArtChanged;
+            _mpc.MpcProgress -= OnMpcProgress;
+            _mpc.IsBusy -= OnMpcIsBusy;
 
-        //GC.SuppressFinalize(this);
+            //this.UpdateProgress -= (sender, arg) => { this.OnUpdateProgress(arg); };
+            this.UpdateProgress -= OnUpdateProgress;
+
+            if (IsConnected)
+            {
+                _mpc.IsStop = true;
+
+                _mpc.MpdDisconnect(false);
+            }
+
+            _cts?.Cancel();
+            _cts?.Dispose();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Exception @CleanUp() {ex}");
+            _dispatcherService.TryEnqueue(() =>
+            {
+                (Application.Current as App)?.AppendErrorLog("Exception @CleanUp", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                (Application.Current as App)?.SaveErrorLog();
+            });
+        }
+
+        GC.SuppressFinalize(this);
     }
 }

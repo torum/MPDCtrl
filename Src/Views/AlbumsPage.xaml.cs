@@ -31,8 +31,8 @@ public sealed partial class AlbumsPage : Page
 
         InitializeComponent();
 
-        ViewModel.AlbumsCollectionHasBeenReset += this.OnAlbumsCollectionHasBeenReset;
-        ViewModel.AlbumScrollIntoView += this.OnAlbumScrollIntoView;
+        Loaded += Page_Loaded;
+        Unloaded += Page_Unloaded;
     }
 
     public MainViewModel ViewModel
@@ -345,6 +345,12 @@ public sealed partial class AlbumsPage : Page
                 _ = ViewModel.GetAlbumPictureAsync(album);
             });
         }
+    }
+
+    private void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        ViewModel.AlbumsCollectionHasBeenReset += this.OnAlbumsCollectionHasBeenReset;
+        ViewModel.AlbumScrollIntoView += this.OnAlbumScrollIntoView;
     }
 
     private void Page_Unloaded(object sender, RoutedEventArgs e)

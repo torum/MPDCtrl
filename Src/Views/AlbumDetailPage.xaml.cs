@@ -36,6 +36,7 @@ public sealed partial class AlbumDetailPage : Page
         var selectedAlbumName = ViewModel.SelectedAlbum?.Name ?? string.Empty;
         var basePageTitle = "MenuTreeItem_Albums".GetLocalized();
 
+        /*
         // Currently not used.
         BreadcrumbItems = [
             new() { Name = basePageTitle},
@@ -44,6 +45,7 @@ public sealed partial class AlbumDetailPage : Page
 
         // Currently not used.
         BreadcrumbBar1.ItemClicked += BreadcrumbBar_ItemClicked;
+        */
     }
 
     public MainViewModel ViewModel
@@ -53,6 +55,7 @@ public sealed partial class AlbumDetailPage : Page
 
     public ObservableCollection<Breadcrumb> BreadcrumbItems { get; set; } = [];
 
+    /*
     private void BreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
     {
         if (_frame is null)
@@ -69,6 +72,7 @@ public sealed partial class AlbumDetailPage : Page
             }
         }
     }
+    */
 
     // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
     // https://github.com/dotnet/runtime/issues/121590

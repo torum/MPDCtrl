@@ -81,22 +81,22 @@ public sealed partial class MainWindow : Window
             //_smtc = _mediaPlayer.SystemMediaTransportControls;
             _smtc = Windows.Media.SystemMediaTransportControlsInterop.GetForWindow(WinRT.Interop.WindowNative.GetWindowHandle(this));
 
-            OnUpdateSongInfoForSystemMediaTransportControls(new SongInfoForSystemMediaTransportControls());
+            OnUpdateSongInfoForSystemMediaTransportControls(this, new SongInfoForSystemMediaTransportControls());
 
             _smtc.ButtonPressed += Smtc_ButtonPressed;
-            _vm.UpdateSongInfoForSystemMediaTransportControls += (sender, arg) => { this.OnUpdateSongInfoForSystemMediaTransportControls(arg); };
-            _vm.UpdateSongInfoForSystemMediaTransportControlsButtonStateOnly += (sender, arg) => { this.OnUpdateSongInfoForSystemMediaTransportControlsButtonStateOnly(arg); };
+            _vm.UpdateSongInfoForSystemMediaTransportControls += this.OnUpdateSongInfoForSystemMediaTransportControls;
+            _vm.UpdateSongInfoForSystemMediaTransportControlsButtonStateOnly += this.OnUpdateSongInfoForSystemMediaTransportControlsButtonStateOnly;
 
             this.Closed += (s, e) =>
             {
                 _smtc.ButtonPressed -= Smtc_ButtonPressed;
-                _vm.UpdateSongInfoForSystemMediaTransportControls -= (sender, arg) => { this.OnUpdateSongInfoForSystemMediaTransportControls(arg); };
-                _vm.UpdateSongInfoForSystemMediaTransportControlsButtonStateOnly -= (sender, arg) => { this.OnUpdateSongInfoForSystemMediaTransportControlsButtonStateOnly(arg); };
+                _vm.UpdateSongInfoForSystemMediaTransportControls -= this.OnUpdateSongInfoForSystemMediaTransportControls;
+                _vm.UpdateSongInfoForSystemMediaTransportControlsButtonStateOnly -= this.OnUpdateSongInfoForSystemMediaTransportControlsButtonStateOnly;
             };
         }
     }
 
-    private void OnUpdateSongInfoForSystemMediaTransportControls(SongInfoForSystemMediaTransportControls SongInfoForSMTC)
+    private void OnUpdateSongInfoForSystemMediaTransportControls(object? sender, SongInfoForSystemMediaTransportControls SongInfoForSMTC)
     {
         if (SongInfoForSMTC is null)
         {
@@ -133,7 +133,7 @@ public sealed partial class MainWindow : Window
         });
     }
 
-    private void OnUpdateSongInfoForSystemMediaTransportControlsButtonStateOnly(Windows.Media.MediaPlaybackStatus playbackStatus)
+    private void OnUpdateSongInfoForSystemMediaTransportControlsButtonStateOnly(object? sender, Windows.Media.MediaPlaybackStatus playbackStatus)
     {
         if (_smtc is null)
         {
@@ -723,7 +723,7 @@ public sealed partial class MainWindow : Window
     private void Window_Closed(object sender, WindowEventArgs args)
     {
         // Disconnect from MPD and close socket connection.
-        _vm.CleanUp();
+        //_vm.CleanUp();
 
         SaveSettings();
     }

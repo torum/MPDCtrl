@@ -14,8 +14,7 @@
     xmlns:triggers="using:CommunityToolkit.WinUI"
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
     mc:Ignorable="d"
-    NavigationCacheMode="Required"
-    Loaded="Page_Loaded">
+    NavigationCacheMode="Required">
 
     <Grid x:Name="ContentGrid">
         <Grid.RowDefinitions>

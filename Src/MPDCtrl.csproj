@@ -25,7 +25,9 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 
+		<!-- Code quality -->
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<AnalysisLevel>latest-recommended</AnalysisLevel>
 
 		<!-- Workaround for MS bug: https://github.com/microsoft/WindowsAppSDK/issues/5817 -->
 		<AppxFilterOutUnusedLanguagesResourceFileMaps>false</AppxFilterOutUnusedLanguagesResourceFileMaps>
@@ -76,7 +78,6 @@
 		<!-- always -->
 		<SelfContained>true</SelfContained>
 		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-		<AnalysisLevel>latest-recommended</AnalysisLevel>
 
 	</PropertyGroup>
 

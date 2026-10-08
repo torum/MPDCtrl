@@ -31,22 +31,7 @@ public sealed partial class AlbumDetailPage : Page
     {
         ViewModel = App.GetService<MainViewModel>();
 
-        /*
-        // Currently not used.
-        var selectedAlbumName = ViewModel.SelectedAlbum?.Name ?? string.Empty;
-        var basePageTitle = "MenuTreeItem_Albums".GetLocalized();
-
-        BreadcrumbItems = [
-            new() { Name = basePageTitle},
-            new() { Name = selectedAlbumName },
-        ];
-
-        // Currently not used.
-        BreadcrumbBar1.ItemClicked += BreadcrumbBar_ItemClicked;
-        */
-
         InitializeComponent();
-
     }
 
     public MainViewModel ViewModel
@@ -54,26 +39,7 @@ public sealed partial class AlbumDetailPage : Page
         get;
     }
 
-    //public ObservableCollection<Breadcrumb> BreadcrumbItems { get; set; } = [];
-
-    /*
-    private void BreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
-    {
-        if (_frame is null)
-        {
-            return;
-        }
-
-        if (args.Index == 0)
-        {
-            if (_frame.Navigate(typeof(Views.AlbumsPage), _frame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft }))
-            {
-                // Needed to invoke the same album in AlbumListView
-                //ViewModel.SelectedAlbum = null; <- do it in OnNavigatedFrom.
-            }
-        }
-    }
-    */
+    public ObservableCollection<Breadcrumb> BreadcrumbItems { get; set; } = [];
 
     // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
     // https://github.com/dotnet/runtime/issues/121590
@@ -89,8 +55,6 @@ public sealed partial class AlbumDetailPage : Page
         _frame = frame;
 
         ViewModel.IsGoBackButtonVisible = true;
-
-        //BreadcrumbItems[1].Name = ViewModel.SelectedAlbum?.Name ?? string.Empty;
 
         base.OnNavigatedTo(e);
     }

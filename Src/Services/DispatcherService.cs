@@ -14,7 +14,6 @@ public sealed class DispatcherService : IDispatcherService
     public Microsoft.UI.Dispatching.DispatcherQueue DispatcherQueue => _queue;
 
     public DispatcherService(Microsoft.UI.Dispatching.DispatcherQueue queue)
-
     {
         _queue = queue;
     }
@@ -35,16 +34,22 @@ public sealed class DispatcherService : IDispatcherService
                 catch (System.Runtime.InteropServices.COMException)
                 {
                     // Dispatcher or WinRT object invalid: swallow/log and avoid rethrowing.
+                    Debug.WriteLine("DispatcherService System.Runtime.InteropServices.COMException");
                 }
                 catch (ObjectDisposedException)
                 {
                     // Queue or UI object disposed: swallow/log.
+                    Debug.WriteLine("DispatcherService ObjectDisposedException");
                 }
                 catch (Exception ex)
                 {
                     _ = ex;
                     Debug.WriteLine($"DispatcherService Exception: {ex}");
-                    throw;
+                    (Microsoft.UI.Xaml.Application.Current as App)?.AppendErrorLog("Exception @TryEnqueue in DispatcherService", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                    (Microsoft.UI.Xaml.Application.Current as App)?.SaveErrorLog();
+
+                    // TODO: Not much help if we re-throw here. It will be caught in App_UnhandledException and crash the app. 
+                    //throw;
                 }
             });
         }

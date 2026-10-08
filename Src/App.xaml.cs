@@ -262,6 +262,7 @@ public sealed partial class App : Application
     {
         // TODO: Log and handle exceptions as appropriate.
         // https://docs.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.application.unhandledexception.
+        // "A notable limitation is that the UnhandledException event arguments don’t contain as much detail as the original exception as propagated from app code."
 
         // This does not fire...because of winui3 bugs.
         // see https://github.com/microsoft/microsoft-ui-xaml/issues/5221
@@ -269,14 +270,9 @@ public sealed partial class App : Application
         // This kills app... 
         // https://github.com/microsoft/microsoft-ui-xaml/issues/10447
 
-        Debug.WriteLine("App_UnhandledException", e.Message + $"StackTrace: {e.Exception.StackTrace}, Source: {e.Exception.Source}");
-        AppendErrorLog("App_UnhandledException", e.Message + $"StackTrace: {e.Exception.StackTrace}, Source: {e.Exception.Source}");
-
-        try
-        {
-            SaveErrorLog();
-        }
-        catch (Exception) { }
+        Debug.WriteLine("App_UnhandledException", $"{e.Exception.Message}, {e.Exception.Data}");
+        AppendErrorLog("App_UnhandledException", $"{e.Exception.Message}, {e.Exception.Data}");
+        SaveErrorLog();
 
         e.Handled = true;
     }
@@ -285,6 +281,7 @@ public sealed partial class App : Application
     {
         if (e.Exception.InnerException is not Exception exception)
         {
+            Debug.WriteLine("TaskScheduler_UnobservedTaskException: " + e.ToString());
             return;
         }
 
@@ -299,6 +296,7 @@ public sealed partial class App : Application
     {
         if (e.ExceptionObject is not Exception exception)
         {
+            Debug.WriteLine("CurrentDomain_UnhandledException: " + e.ToString());
             return;
         }
 
@@ -306,14 +304,13 @@ public sealed partial class App : Application
         {
             // can ignore.
             Debug.WriteLine("CurrentDomain_UnhandledException (TaskCanceledException): " + exception.Message);
-            AppendErrorLog("CurrentDomain_UnhandledException (TaskCanceledException)", exception.Message);
+            //AppendErrorLog("CurrentDomain_UnhandledException (TaskCanceledException)", exception.Message);
+            return;
         }
-        else
-        {
-            Debug.WriteLine("CurrentDomain_UnhandledException: " + exception.Message);
-            AppendErrorLog("CurrentDomain_UnhandledException", exception.Message);
-            SaveErrorLog();
-        }
+
+        Debug.WriteLine("CurrentDomain_UnhandledException: " + exception.Message);
+        AppendErrorLog("CurrentDomain_UnhandledException", exception.Message);
+        SaveErrorLog();
     }
 
     public void AppendErrorLog(string kindTxt, string errorTxt)
@@ -326,7 +323,6 @@ public sealed partial class App : Application
         _errortxt.AppendLine(kindTxt + ": " + errorTxt);
         var dt = DateTime.Now;
         _errortxt.AppendLine(CultureInfo.InvariantCulture, $"Occured at {dt.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture)}");
-        _errortxt.AppendLine("");
     }
 
     public void SaveErrorLog()
@@ -343,9 +339,9 @@ public sealed partial class App : Application
 
         if (_errortxt.Length > 0)
         {
-            _errortxt.AppendLine("");
             var dt = DateTime.Now;
             _errortxt.AppendLine(CultureInfo.InvariantCulture, $"Saved at {dt.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture)}");
+            _errortxt.AppendLine("");
 
             var s = _errortxt.ToString();
             if (!string.IsNullOrEmpty(s))

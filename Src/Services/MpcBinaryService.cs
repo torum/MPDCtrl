@@ -65,16 +65,19 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
     {
         ConnectionResult result = new();
 
-        //_binaryConnection = new TcpClient();
-        lock (_connectionLock)
+        // TODO: Currently there is no way to re-connect to the same TcpClient instance, so we need to create a new one.
+        if (_binaryConnection.Client?.Connected == true)
         {
-            DisposeConnection(
-                ref _binaryConnection,
-                ref _binaryReader,
-                ref _binaryWriter);
-
-            _binaryConnection = new TcpClient();
+            lock (_connectionLock)
+            {
+                DisposeConnection(
+                    ref _binaryConnection,
+                    ref _binaryReader,
+                    ref _binaryWriter);
+            }
         }
+
+        _binaryConnection = new TcpClient();
 
         _host = host;
         _port = port;
@@ -232,6 +235,11 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
 
             while (true)
             {
+                if (_cts is null)
+                    break;
+                if (_cts.Token.IsCancellationRequested)
+                    break;
+
                 string? line = await _binaryReader.ReadLineAsync(_cts.Token);
 
                 if (line is not null)
@@ -444,6 +452,11 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
 
                 using (MemoryStream ms = new())
                 {
+                    if (_cts is null)
+                        break;
+                    if (_cts.Token.IsCancellationRequested)
+                        break;
+
                     while ((readSize = await _binaryReader.BaseStream.ReadAsync(buffer, _cts.Token)) > 0)
                     {
                         if (_cts.Token.IsCancellationRequested)
@@ -1091,6 +1104,27 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
 
     private async Task<CommandBinaryResult> MpdReQueryAlbumArt(string uri, int offset, bool isUsingReadpicture, AlbumImage albumCover)
     {
+        if (_cts is null)
+        {
+            CommandBinaryResult f = new()
+            {
+                ErrorMessage = "(_cts is null)",
+                IsSuccess = false
+            };
+            return f;
+        }
+
+        if (_cts.Token.IsCancellationRequested)
+        {
+            Debug.WriteLine("IsCancellationRequested returning @MpdReQueryAlbumArt (Binary)");
+            CommandBinaryResult f = new()
+            {
+                ErrorMessage = "(IsCancellationRequested)",
+                IsSuccess = false
+            };
+            return f;
+        }
+
         if (string.IsNullOrEmpty(uri))
         {
             CommandBinaryResult f = new()

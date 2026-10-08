@@ -183,14 +183,13 @@ public sealed partial class App : Application
             Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().Activated += App_Activated;
         }
 
+        _appHostStartTask = StartAppHostAsync();
         var main = App.GetService<MainWindow>();
-        main.AppWindow.Show(true);
-
         main.Closed += (sender, e) =>
         {
             _appHostStopTask = StopAppHostAsync();
         };
-        _appHostStartTask = StartAppHostAsync();
+        main.AppWindow.Show(true);
     }
 
     private async Task StartAppHostAsync()

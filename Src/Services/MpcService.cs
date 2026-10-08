@@ -105,7 +105,6 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
     private CancellationTokenSource? _cts;// = new();
 
-    // TODO: Not really used...
     public bool IsMpdCommandConnected { get; set; }
     public bool IsMpdIdleConnected { get; set; }
 
@@ -882,6 +881,11 @@ public sealed partial class MpcService : IMpcService, IDisposable
                     break;
                 }
 
+                if (_cts is null)
+                    break;
+                if (_cts.Token.IsCancellationRequested)
+                    break;
+
                 var line = await _idleReader.ReadLineAsync(_cts.Token);
 
                 if (line is not null)
@@ -1207,19 +1211,6 @@ public sealed partial class MpcService : IMpcService, IDisposable
     public async Task<ConnectionResult> MpdCommandConnect(string host, int port)
     {
         ConnectionResult result = new();
-
-        //_commandConnection = new TcpClient();
-        lock (_connectionLock)
-        {
-            DisposeConnection(
-                ref _commandConnection,
-                ref _commandReader,
-                ref _commandWriter);
-
-            _commandConnection = new TcpClient();
-        }
-
-        IsMpdCommandConnected = false;
 
         Host = host;
         Port = port;
@@ -1590,7 +1581,16 @@ public sealed partial class MpcService : IMpcService, IDisposable
                 try
                 {
                     //_commandConnection.Client.Shutdown(SocketShutdown.Both);
-                    _commandConnection.Close();
+                    //_commandConnection.Close();
+                    lock (_connectionLock)
+                    {
+                        DisposeConnection(
+                            ref _commandConnection,
+                            ref _commandReader,
+                            ref _commandWriter);
+
+                        _commandConnection = new TcpClient();
+                    }
                 }
                 catch { }
 
@@ -1800,7 +1800,16 @@ public sealed partial class MpcService : IMpcService, IDisposable
                 try
                 {
                     //_commandConnection.Client.Shutdown(SocketShutdown.Both);
-                    _commandConnection.Close();
+                    //_commandConnection.Close();
+                    lock (_connectionLock)
+                    {
+                        DisposeConnection(
+                            ref _commandConnection,
+                            ref _commandReader,
+                            ref _commandWriter);
+
+                        _commandConnection = new TcpClient();
+                    }
                 }
                 catch { }
 
@@ -1942,7 +1951,16 @@ public sealed partial class MpcService : IMpcService, IDisposable
                 try
                 {
                     //_commandConnection.Client.Shutdown(SocketShutdown.Both);
-                    _commandConnection.Close();
+                    //_commandConnection.Close();
+                    lock (_connectionLock)
+                    {
+                        DisposeConnection(
+                            ref _commandConnection,
+                            ref _commandReader,
+                            ref _commandWriter);
+
+                        _commandConnection = new TcpClient();
+                    }
                 }
                 catch { }
 

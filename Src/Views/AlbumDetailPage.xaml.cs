@@ -31,13 +31,11 @@ public sealed partial class AlbumDetailPage : Page
     {
         ViewModel = App.GetService<MainViewModel>();
 
-        InitializeComponent();
-
+        /*
+        // Currently not used.
         var selectedAlbumName = ViewModel.SelectedAlbum?.Name ?? string.Empty;
         var basePageTitle = "MenuTreeItem_Albums".GetLocalized();
 
-        /*
-        // Currently not used.
         BreadcrumbItems = [
             new() { Name = basePageTitle},
             new() { Name = selectedAlbumName },
@@ -46,6 +44,9 @@ public sealed partial class AlbumDetailPage : Page
         // Currently not used.
         BreadcrumbBar1.ItemClicked += BreadcrumbBar_ItemClicked;
         */
+
+        InitializeComponent();
+
     }
 
     public MainViewModel ViewModel
@@ -53,7 +54,7 @@ public sealed partial class AlbumDetailPage : Page
         get;
     }
 
-    public ObservableCollection<Breadcrumb> BreadcrumbItems { get; set; } = [];
+    //public ObservableCollection<Breadcrumb> BreadcrumbItems { get; set; } = [];
 
     /*
     private void BreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
@@ -89,7 +90,7 @@ public sealed partial class AlbumDetailPage : Page
 
         ViewModel.IsGoBackButtonVisible = true;
 
-        BreadcrumbItems[1].Name = ViewModel.SelectedAlbum?.Name ?? string.Empty;
+        //BreadcrumbItems[1].Name = ViewModel.SelectedAlbum?.Name ?? string.Empty;
 
         base.OnNavigatedTo(e);
     }

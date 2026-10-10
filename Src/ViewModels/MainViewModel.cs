@@ -2531,7 +2531,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
                 // TODO: check which is faster (start up).
                 //_ = Task.Run(() => Connect(_host, _port), _cts.Token);
-                await ConnectAsync(_host, _port);
+                await ConnectAsync(_host, _port, _cts.Token);
 
             }
             catch (Exception ex)
@@ -2552,7 +2552,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         {
             // TODO: check which is faster (start up).
             //_ = Task.Run(() => Connect(_host, _port), _cts.Token);
-            await ConnectAsync(_host, _port);
+            await ConnectAsync(_host, _port, _cts.Token);
         }
         catch (Exception ex)
         {
@@ -2568,12 +2568,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     private readonly SemaphoreSlim _connectGate = new(1, 1);
 
-    private async Task ConnectAsync(string host, int port)
+    private async Task ConnectAsync(string host, int port, CancellationToken cancellationToken)
     {
-        await _connectGate.WaitAsync(_cts.Token);
+        await _connectGate.WaitAsync(cancellationToken);
         try
         {
-            await ConnectCoreAsync(host, port);
+            await ConnectCoreAsync(host, port, cancellationToken);
         }
         finally
         {
@@ -2582,8 +2582,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
 
 
-    private async Task ConnectCoreAsync(string host, int port)
+    private async Task ConnectCoreAsync(string host, int port, CancellationToken cancellationToken)
     {
+        /*
         HostIpAddress = null;
         try
         {
@@ -2623,17 +2624,23 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
             return;
         }
-
+        */
         try
         {
             if (_mpc.ConnectionState != ConnectionStatus.NeverConnected)
             {
                 _mpc.MpdDisconnect(isReconnect: true);
+                _mpc.IsStop = false;
             }
             // Start MPD connection.
             // Let's not await, for faster startup. Fire and forget.
             //_ = Task.Run(() => _mpc.MpdIdleConnect(HostIpAddress.ToString(), port), _cts.Token);
-            await _mpc.MpdIdleConnect(HostIpAddress.ToString(), port);
+            await _mpc.MpdIdleConnect(host, port, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        when (cancellationToken.IsCancellationRequested)
+        {
+            // Expected when the window is closing.
         }
         catch (Exception ex)
         {
@@ -8331,7 +8338,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
         try
         {
-            await ConnectAsync(_host, _port);
+            await ConnectAsync(_host, _port, _cts.Token);
         }
         catch (Exception ex)
         {
@@ -8611,6 +8618,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             //this.UpdateProgress -= (sender, arg) => { this.OnUpdateProgress(arg); };
             this.UpdateProgress -= OnUpdateProgress;
 
+            _cts?.Cancel();
+
             if (IsConnected)
             {
                 _mpc.IsStop = true;
@@ -8618,7 +8627,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 _mpc.MpdDisconnect(false);
             }
 
-            _cts?.Cancel();
             _cts?.Dispose();
         }
         catch (Exception ex)

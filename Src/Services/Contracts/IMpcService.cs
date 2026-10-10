@@ -1,6 +1,7 @@
 using MPDCtrl.Models;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MPDCtrl.Services.Contracts;
@@ -51,13 +52,13 @@ public interface IMpcService
     Task<CommandResult> MpdSinglePlay(string uri, int volume);
     Task<CommandResult> MpdChangePlaylist(string playlistName, int volume);
     Task<CommandResult> MpdClear();
-    Task<ConnectionResult> MpdCommandConnect(string host, int port);
-    Task<bool> MpdCommandConnectionStart(string host, int port, string password);
+    Task<ConnectionResult> MpdCommandConnect(string host, int port, CancellationToken cancellationToken = default);
+    Task<bool> MpdCommandConnectionStart(string host, int port, string password, CancellationToken cancellationToken = default);
     Task<CommandResult> MpdCommandSendPassword(string password = "");
     Task<CommandResult> MpdDeleteId(List<string> ids);
     Task<CommandResult> MpdDeleteId(string id);
     void MpdDisconnect(bool isReconnect);
-    Task<ConnectionResult> MpdIdleConnect(string host, int port);
+    Task<ConnectionResult> MpdIdleConnect(string host, int port, CancellationToken cancellationToken = default);
     //Task<ConnectionResult> MpdIdleConnectionStart(string host, int port, string password);
     Task<CommandResult> MpdIdleQueryCurrentQueue();
     Task<CommandResult> MpdIdleQueryCurrentSong();

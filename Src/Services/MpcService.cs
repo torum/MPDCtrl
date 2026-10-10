@@ -64,13 +64,13 @@ public sealed partial class MpcService : IMpcService, IDisposable
     #region == Connections ==
 
     private readonly Lock _connectionLock = new();
-    private static TcpClient _commandConnection = new();
-    private static StreamReader? _commandReader;
-    private static StreamWriter? _commandWriter;
+    private TcpClient _commandConnection = new();
+    private StreamReader? _commandReader;
+    private StreamWriter? _commandWriter;
 
-    private static TcpClient _idleConnection = new();
-    private static StreamReader? _idleReader;
-    private static StreamWriter? _idleWriter;
+    private TcpClient _idleConnection = new();
+    private StreamReader? _idleReader;
+    private StreamWriter? _idleWriter;
 
     public ConnectionStatus ConnectionState
     {
@@ -112,10 +112,11 @@ public sealed partial class MpcService : IMpcService, IDisposable
     public event MpdOutputChangedEvent? MpdOutputChanged;
     public event MpdAlbumArtChangedEvent? MpdAlbumArtChanged;
     public event MpcProgressEvent? MpcProgress;
+
     #endregion
 
-    private static readonly System.Threading.SemaphoreSlim SemaphoreCommand = new(1, 1);
-    private static readonly System.Threading.SemaphoreSlim SemaphoreBinary = new(1, 1);
+    private readonly System.Threading.SemaphoreSlim SemaphoreCommand = new(1, 1);
+    private readonly System.Threading.SemaphoreSlim SemaphoreBinary = new(1, 1);
 
     private readonly IMpcBinaryService _binaryDownloader;
     private readonly IDispatcherService _dispatcherService;
@@ -147,10 +148,12 @@ public sealed partial class MpcService : IMpcService, IDisposable
     }
     */
 
-    public async Task<ConnectionResult> MpdIdleConnect(string host, int port)
+    public async Task<ConnectionResult> MpdIdleConnect(string host, int port, CancellationToken cancellationToken)
     {
         _cts?.Dispose();
-        _cts = new CancellationTokenSource();
+        //_cts = new CancellationTokenSource();
+        _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        var token = _cts.Token;
 
         IsStop = false;
 
@@ -172,7 +175,7 @@ public sealed partial class MpcService : IMpcService, IDisposable
         {
             IsBusy?.Invoke(this, true);
 
-            await _idleConnection.ConnectAsync(Host, Port);
+            await _idleConnection.ConnectAsync(Host, Port, token);
 
             // TODO: always false
             if (_idleConnection.Client is null)
@@ -207,7 +210,7 @@ public sealed partial class MpcService : IMpcService, IDisposable
                     AutoFlush = true
                 };
 
-                string? response = await _idleReader.ReadLineAsync();
+                string? response = await _idleReader.ReadLineAsync(token);
 
                 if (response is not null)
                 {
@@ -257,6 +260,11 @@ public sealed partial class MpcService : IMpcService, IDisposable
                 ConnectionError?.Invoke(this, "TCP Idle Connection: FAIL to established... Client not connected.");
             }
         }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            _idleConnection.Dispose();
+            throw;
+        }
         catch (SocketException e)
         {
             // TODO: Test.
@@ -279,9 +287,11 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
             ConnectionError?.Invoke(this, "TCP connection error: " + e.Message);
         }
+        finally
+        {
+            IsBusy?.Invoke(this, false);
+        }
 
-
-        IsBusy?.Invoke(this, false);
         return result;
     }
 
@@ -1138,9 +1148,9 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
     #region == Command Connection ==
 
-    public async Task<bool> MpdCommandConnectionStart(string host, int port, string password)
+    public async Task<bool> MpdCommandConnectionStart(string host, int port, string password, CancellationToken cancellationToken = default)
     {
-        ConnectionResult r = await MpdCommandConnect(host, port);
+        ConnectionResult r = await MpdCommandConnect(host, port, cancellationToken);
 
         if (r.IsSuccess)
         {
@@ -1149,7 +1159,7 @@ public sealed partial class MpcService : IMpcService, IDisposable
             if (d.IsSuccess)
             {
                 // BinaryConnection start.
-                await _binaryDownloader.MpdBinaryConnectionStart(Host, Port, Password);
+                await _binaryDownloader.MpdBinaryConnectionStart(Host, Port, Password, cancellationToken);
 
                 // Get available commands
                 await MpdCommands();
@@ -1161,7 +1171,7 @@ public sealed partial class MpcService : IMpcService, IDisposable
         return false;
     }
 
-    public async Task<ConnectionResult> MpdCommandConnect(string host, int port)
+    public async Task<ConnectionResult> MpdCommandConnect(string host, int port, CancellationToken cancellationToken = default)
     {
         ConnectionResult result = new();
 
@@ -1174,7 +1184,7 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
         try
         {
-            await _commandConnection.ConnectAsync(Host, Port);
+            await _commandConnection.ConnectAsync(Host, Port, cancellationToken);
 
             // TODO: always false
             if (_commandConnection.Client is null)
@@ -1209,7 +1219,7 @@ public sealed partial class MpcService : IMpcService, IDisposable
                     AutoFlush = true
                 };
 
-                string? response = await _commandReader.ReadLineAsync();
+                string? response = await _commandReader.ReadLineAsync(cancellationToken);
 
                 if (response is not null)
                 {
@@ -1255,6 +1265,11 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
                 ConnectionError?.Invoke(this, "TCP Command Connection: FAIL to established... Client not connected.");
             }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            _commandConnection.Dispose();
+            throw;
         }
         catch (SocketException e)
         {

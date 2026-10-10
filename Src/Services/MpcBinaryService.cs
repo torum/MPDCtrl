@@ -18,7 +18,7 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
 {
     private CancellationTokenSource? _cts;
     private readonly Lock _connectionLock = new();
-    private static TcpClient _binaryConnection = new();
+    private TcpClient _binaryConnection = new();
     private StreamReader? _binaryReader;
     private StreamWriter? _binaryWriter;
 
@@ -35,12 +35,14 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
 
     }
 
-    public async Task<bool> MpdBinaryConnectionStart(string host, int port, string password)
+    public async Task<bool> MpdBinaryConnectionStart(string host, int port, string password, CancellationToken cancellationToken = default)
     {
         _cts?.Dispose();
-        _cts = new CancellationTokenSource();
+        //_cts = new CancellationTokenSource();
+        _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        var token = _cts.Token;
 
-        ConnectionResult r = await MpdBinaryConnect(host, port);
+        ConnectionResult r = await MpdBinaryConnect(host, port, token);
 
         if (r.IsSuccess)
         {
@@ -61,7 +63,7 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
         return false;
     }
 
-    private async Task<ConnectionResult> MpdBinaryConnect(string host, int port)
+    private async Task<ConnectionResult> MpdBinaryConnect(string host, int port, CancellationToken cancellationToken)
     {
         ConnectionResult result = new();
 
@@ -86,7 +88,7 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
 
         try
         {
-            await _binaryConnection.ConnectAsync(_host, _port);
+            await _binaryConnection.ConnectAsync(_host, _port, cancellationToken);
 
             //TODO: always false
             if (_binaryConnection.Client is null)
@@ -110,7 +112,7 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
                     AutoFlush = true
                 };
 
-                string? response = await _binaryReader.ReadLineAsync();
+                string? response = await _binaryReader.ReadLineAsync(cancellationToken);
                 if (response is not null)
                 {
                     if (response.StartsWith("OK MPD ", StringComparison.InvariantCulture))
@@ -135,6 +137,11 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
             {
                 Debug.WriteLine("**** !client.Client.Connected@MpdBinaryConnect");
             }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            _binaryConnection.Dispose();
+            throw;
         }
         catch (Exception e)
         {

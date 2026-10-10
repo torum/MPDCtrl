@@ -48,6 +48,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly IDispatcherService _dispatcherService;
     private readonly ILogger<MainViewModel> _logger;
 
+    private Task? _initializationTask;
+
     #region == Events ==
 
     // Queue listview ScrollIntoView.
@@ -1454,7 +1456,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             try
             {
                 //GetAlbumPictures(VisibleItemsAlbumsEx); 
-                Task.Run(() => GetAlbumPicturesAsync(VisibleItemsAlbumsEx), _cts.Token);
+                _ = Task.Run(() => GetAlbumPicturesAsync(VisibleItemsAlbumsEx), _cts.Token);
             }
             catch (Exception ex)
             {
@@ -2441,72 +2443,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     #region == Public Methods ==
 
-    // TODO: Convert these public methods to commands.
-
-    public async void Start()
-    {
-        if ((CurrentProfile is null) || (Profiles.Count < 1))
-        {
-            //Debug.WriteLine("(CurrentProfile is null) || (Profiles.Count < 1)");
-
-            try
-            {
-                var pro = await _dialogs.ShowInitDialog(this);
-                if (pro is null)
-                {
-                    return;
-                }
-
-                _password = pro.Password;
-                _host = pro.Host;
-                _port = pro.Port;
-
-                CurrentProfile = pro;
-
-                // TODO: check which is faster (start up).
-                //_ = Task.Run(() => Connect(_host, _port), _cts.Token);
-                await Task.Run(() => Connect(_host, _port), _cts.Token);
-
-            }
-            catch (Exception ex)
-            {
-                _ = ex;
-                Debug.WriteLine($"Exception @StartMpcAsync {ex}");
-                _dispatcherService.TryEnqueue(() =>
-                {
-                    (Application.Current as App)?.AppendErrorLog("Exception @StartMpcAsync", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
-                    (Application.Current as App)?.SaveErrorLog();
-                });
-            }
-
-            return;
-        }
-
-        try
-        {
-            // TODO: check which is faster (start up).
-            //_ = Task.Run(() => Connect(_host, _port), _cts.Token);
-            await Task.Run(() => Connect(_host, _port), _cts.Token);
-        }
-        catch (Exception ex)
-        {
-            _ = ex;
-            Debug.WriteLine($"Exception @Start() {ex}");
-            _dispatcherService.TryEnqueue(() =>
-            {
-                (Application.Current as App)?.AppendErrorLog("Exception @Start()", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
-                (Application.Current as App)?.SaveErrorLog();
-            });
-        }
-    }
-
-    // TODO: Not used anymore?
-    public void SetError(string error)
-    {
-        InfoBarErrMessage = error;
-
-        IsShowErrWindow = true;
-    }
+    public Task InitializeAsync() => _initializationTask ??= StartAsync();
 
     // TODO: make this a command (or make changes so that we don't have to call this from code behind).
     public async Task GetCacheFolderSizeAsync()
@@ -2574,7 +2511,78 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             ];
     }
 
-    private async void Connect(string host, int port)
+    private async Task StartAsync()
+    {
+        if ((CurrentProfile is null) || (Profiles.Count < 1))
+        {
+            try
+            {
+                var pro = await _dialogs.ShowInitDialog(this);
+                if (pro is null)
+                {
+                    return;
+                }
+
+                _password = pro.Password;
+                _host = pro.Host;
+                _port = pro.Port;
+
+                CurrentProfile = pro;
+
+                // TODO: check which is faster (start up).
+                //_ = Task.Run(() => Connect(_host, _port), _cts.Token);
+                await ConnectAsync(_host, _port);
+
+            }
+            catch (Exception ex)
+            {
+                _ = ex;
+                Debug.WriteLine($"Exception @StartAsync {ex}");
+                _dispatcherService.TryEnqueue(() =>
+                {
+                    (Application.Current as App)?.AppendErrorLog("Exception @StartAsync", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                    (Application.Current as App)?.SaveErrorLog();
+                });
+            }
+
+            return;
+        }
+
+        try
+        {
+            // TODO: check which is faster (start up).
+            //_ = Task.Run(() => Connect(_host, _port), _cts.Token);
+            await ConnectAsync(_host, _port);
+        }
+        catch (Exception ex)
+        {
+            _ = ex;
+            Debug.WriteLine($"Exception @StartAsync() {ex}");
+            _dispatcherService.TryEnqueue(() =>
+            {
+                (Application.Current as App)?.AppendErrorLog("Exception @StartAsync()", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                (Application.Current as App)?.SaveErrorLog();
+            });
+        }
+    }
+
+    private readonly SemaphoreSlim _connectGate = new(1, 1);
+
+    private async Task ConnectAsync(string host, int port)
+    {
+        await _connectGate.WaitAsync(_cts.Token);
+        try
+        {
+            await ConnectCoreAsync(host, port);
+        }
+        finally
+        {
+            _connectGate.Release();
+        }
+    }
+
+
+    private async Task ConnectCoreAsync(string host, int port)
     {
         HostIpAddress = null;
         try
@@ -2618,19 +2626,22 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
         try
         {
+            if (_mpc.ConnectionState != MpcService.ConnectionStatus.NeverConnected)
+            {
+                _mpc.MpdDisconnect(isReconnect: true);
+            }
             // Start MPD connection.
-            //await Task.Run(async () => await _mpc.MpdIdleConnect(HostIpAddress.ToString(), port), _cts.Token);
             // Let's not await, for faster startup. Fire and forget.
             //_ = Task.Run(() => _mpc.MpdIdleConnect(HostIpAddress.ToString(), port), _cts.Token);
-            _ = _mpc.MpdIdleConnect(HostIpAddress.ToString(), port);
+            await _mpc.MpdIdleConnect(HostIpAddress.ToString(), port);
         }
         catch (Exception ex)
         {
             _ = ex;
-            Debug.WriteLine($"Exception @StartAsync {ex}");
+            Debug.WriteLine($"Exception @ConnectAsync {ex}");
             _dispatcherService.TryEnqueue(() =>
             {
-                (Application.Current as App)?.AppendErrorLog("Exception @StartAsync", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                (Application.Current as App)?.AppendErrorLog("Exception @ConnectAsync", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
                 (Application.Current as App)?.SaveErrorLog();
             });
         }
@@ -5003,7 +5014,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             });
 
             // 
-            _ = Task.Run(() => LoadInitialDataAsync(), _cts.Token);
+            await LoadInitialDataAsync();
             // Let's not await, for faster startup. Fire and forget.
             //_ = Task.Run(LoadInitialDataAsync, _cts.Token);
         }
@@ -8251,7 +8262,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         IsWorking = true;
         await Task.Yield();
         await Task.Delay(1);
-
+        /*
         // Disconnect if connected.
         if (IsConnected)
         {
@@ -8259,6 +8270,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             _mpc.MpdDisconnect(true);
             _mpc.IsStop = false;
         }
+        */
 
         // Save volume.
         SelectedProfile.Volume = Convert.ToInt32(Volume);
@@ -8319,7 +8331,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
         try
         {
-            _ = Task.Run(() => Connect(_host, _port), _cts.Token);
+            await ConnectAsync(_host, _port);
         }
         catch (Exception ex)
         {

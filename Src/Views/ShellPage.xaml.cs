@@ -40,7 +40,7 @@ public sealed partial class ShellPage : Page
 
     public MainViewModel ViewModel { get; }
 
-    private void Page_Loaded(object sender, RoutedEventArgs e)
+    private async void Page_Loaded(object sender, RoutedEventArgs e)
     {
         ViewModel.AlbumSelectedNavigateToDetailsPage += this.OnAlbumSelectedNavigateToDetailsPage;
         ViewModel.GoBackButtonVisibilityChanged += this.OnGoBackButtonVisibilityChanged;
@@ -52,12 +52,12 @@ public sealed partial class ShellPage : Page
         ViewModel.UpdateProgress += (sender, arg) => { this.OnUpdateProgress(arg); };
         this.ActualThemeChanged += this.This_ActualThemeChanged;
 
-        //await ViewModel.StartMpcAsync();
-        // Let's not await, for faster startup. Fire and forget.
-        ViewModel.Start();
-
         // For animation fade
         _token = AlbumCoverImage.RegisterPropertyChangedCallback(Microsoft.UI.Xaml.Controls.Image.SourceProperty, OnSourceChanged);
+
+        //await ViewModel.StartMpcAsync();
+        // Let's not await, for faster startup. Fire and forget.
+        await ViewModel.InitializeAsync();
     }
 
     private void Page_Unloaded(object sender, RoutedEventArgs e)

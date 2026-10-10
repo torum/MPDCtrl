@@ -26,6 +26,7 @@ public sealed partial class ShellPage : Page
     private readonly IDispatcherService _dispatcherService;
     private Type? _currentPage;
     private long _token;
+    private MainWindow? _mainWindow;
 
     public ShellPage(MainViewModel vm, IDispatcherService dispatcherService)
     {
@@ -49,8 +50,11 @@ public sealed partial class ShellPage : Page
         ViewModel.DebugCommandClear += this.OnDebugCommandClear;
         ViewModel.DebugIdleClear += this.OnDebugIdleClear;
         ViewModel.UserCanExecuteChanged += OnUserCanExecuteChanged;
-        ViewModel.UpdateProgress += (sender, arg) => { this.OnUpdateProgress(arg); };
+        ViewModel.UpdateProgress += this.OnUpdateProgress;
         this.ActualThemeChanged += this.This_ActualThemeChanged;
+
+        //_mainWindow = App.GetService<MainWindow>();
+        //_mainWindow?.Activated += MainWindow_Activated;
 
         // For animation fade
         _token = AlbumCoverImage.RegisterPropertyChangedCallback(Microsoft.UI.Xaml.Controls.Image.SourceProperty, OnSourceChanged);
@@ -69,11 +73,11 @@ public sealed partial class ShellPage : Page
         ViewModel.DebugCommandClear -= this.OnDebugCommandClear;
         ViewModel.DebugIdleClear -= this.OnDebugIdleClear;
         ViewModel.UserCanExecuteChanged -= OnUserCanExecuteChanged;
-        ViewModel.UpdateProgress -= (sender, arg) => { this.OnUpdateProgress(arg); };
+        ViewModel.UpdateProgress -= this.OnUpdateProgress;
         this.ActualThemeChanged -= this.This_ActualThemeChanged;
 
-        var main = App.GetService<Views.MainWindow>();
-        main?.Activated -= MainWindow_Activated;
+        //var main = App.GetService<Views.MainWindow>();
+        _mainWindow?.Activated -= MainWindow_Activated;
 
         AlbumCoverImage.UnregisterPropertyChangedCallback(Microsoft.UI.Xaml.Controls.Image.SourceProperty, _token);
     }
@@ -187,17 +191,18 @@ public sealed partial class ShellPage : Page
     {
         wnd.SetTitleBar(AppTitleBar);
 
-        wnd.Activated += MainWindow_Activated;
+        _mainWindow = wnd;
+        _mainWindow?.Activated += MainWindow_Activated;
     }
 
-    public void OnUpdateProgress(string arg)
+    public void OnUpdateProgress(object? sender, string arg)
     {
         _dispatcherService.TryEnqueue(() =>
         {
             this.StatusBarText.Text = arg;
         });
     }
-
+    /*
     public void OnDebugCommandOutput(string arg)
     {
         // WPF's AppendText() is virtualized and much faster.
@@ -227,6 +232,7 @@ public sealed partial class ShellPage : Page
             //range.Text = arg;
         });
     }
+    */
 
     public void OnDebugCommandClear(object? sender, System.EventArgs e)
     {
@@ -554,7 +560,8 @@ public sealed partial class ShellPage : Page
 
         // Adjust the Slider's Value based on the mouse wheel delta
         // You might want to add a step value or sensitivity factor here
-        SeekSlider.Value += (delta > 0) ? SeekSlider.SmallChange + step : -SeekSlider.SmallChange + step;
+        //SeekSlider.Value += (delta > 0) ? SeekSlider.SmallChange + step : -SeekSlider.SmallChange + step;
+        SeekSlider.Value += Math.Sign(delta) * step;
 
         // Optional: Prevent the event from bubbling up to parent controls
         e.Handled = true;

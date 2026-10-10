@@ -2626,7 +2626,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
         try
         {
-            if (_mpc.ConnectionState != MpcService.ConnectionStatus.NeverConnected)
+            if (_mpc.ConnectionState != ConnectionStatus.NeverConnected)
             {
                 _mpc.MpdDisconnect(isReconnect: true);
             }
@@ -4981,7 +4981,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     #region == MPD events callback == 
 
-    private async void OnMpdIdleConnected(MpcService sender)
+    private async void OnMpdIdleConnected(IMpcService sender)
     {
         try
         {
@@ -5030,7 +5030,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    private void OnMpdPlayerStatusChanged(MpcService sender)
+    private void OnMpdPlayerStatusChanged(IMpcService sender)
     {
         /*
         App.MainWnd?.CurrentDispatcherQueue?.TryEnqueue(() =>
@@ -5054,28 +5054,28 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         UpdateStatus();
     }
 
-    private void OnMpdCurrentQueueChanged(MpcService sender)
+    private void OnMpdCurrentQueueChanged(IMpcService sender)
     {
         UpdateCurrentQueue();
     }
 
-    private void OnMpdPlaylistsChanged(MpcService sender)
+    private void OnMpdPlaylistsChanged(IMpcService sender)
     {
         UpdatePlaylists();
     }
 
-    private void OnAlbumArtChanged(MpcService sender)
+    private void OnAlbumArtChanged(IMpcService sender)
     {
         //
     }
 
-    private void OnMpdOutputChanged(MpcService sender)
+    private void OnMpdOutputChanged(IMpcService sender)
     {
         //Debug.WriteLine("OnMpdOutputChanged");
         UpdateAudioOutputs();
     }
 
-    private void OnDebugCommandOutput(MpcService sender, string data)
+    private void OnDebugCommandOutput(IMpcService sender, string data)
     {
         // Not good because TextBox,RichEditBox,ichTextBlock in WinUI 3 are not virtualized.
         /*
@@ -5086,7 +5086,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         */
     }
 
-    private void OnDebugIdleOutput(MpcService sender, string data)
+    private void OnDebugIdleOutput(IMpcService sender, string data)
     {
         // Not good because TextBox,RichEditBox,ichTextBlock in WinUI 3 are not virtualized.
         /*
@@ -5097,7 +5097,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         */
     }
 
-    private async void OnConnectionError(MpcService sender, string msg)
+    private async void OnConnectionError(IMpcService sender, string msg)
     {
         if (string.IsNullOrEmpty(msg))
             return;
@@ -5121,11 +5121,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    private async void OnConnectionStatusChanged(MpcService sender, MpcService.ConnectionStatus status)
+    private async void OnConnectionStatusChanged(IMpcService sender, ConnectionStatus status)
     {
         try
         {
-            if (status == MpcService.ConnectionStatus.NeverConnected)
+            if (status == ConnectionStatus.NeverConnected)
             {
                 _dispatcherService.TryEnqueue(() =>
                 {
@@ -5143,7 +5143,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 //ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_NeverConnected;
                 Debug.WriteLine("ConnectionStatus_NeverConnected");
             }
-            else if (status == MpcService.ConnectionStatus.Connected)
+            else if (status == ConnectionStatus.Connected)
             {
                 _dispatcherService.TryEnqueue(() =>
                 {
@@ -5160,7 +5160,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 //ConnectionStatusMessage = MPDCtrlX.Properties.Resources.ConnectionStatus_Connected;
                 //Debug.WriteLine("ConnectionStatus_Connected");
             }
-            else if (status == MpcService.ConnectionStatus.Connecting)
+            else if (status == ConnectionStatus.Connecting)
             {
                 _dispatcherService.TryEnqueue(() =>
                 {
@@ -5178,7 +5178,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 //StatusBarMessage = ConnectionStatusMessage;
                 //Debug.WriteLine("ConnectionStatus_Connecting");
             }
-            else if (status == MpcService.ConnectionStatus.ConnectFailTimeout)
+            else if (status == ConnectionStatus.ConnectFailTimeout)
             {
                 _dispatcherService.TryEnqueue(() =>
                 {
@@ -5198,7 +5198,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
                 Debug.WriteLine("ConnectionStatus_ConnectFail_Timeout");
             }
-            else if (status == MpcService.ConnectionStatus.SeeConnectionErrorEvent)
+            else if (status == ConnectionStatus.SeeConnectionErrorEvent)
             {
                 _dispatcherService.TryEnqueue(() =>
                 {
@@ -5214,7 +5214,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 _elapsedTimer.Stop();
                 Debug.WriteLine("ConnectionStatus_SeeConnectionErrorEvent");
             }
-            else if (status == MpcService.ConnectionStatus.Disconnected)
+            else if (status == ConnectionStatus.Disconnected)
             {
                 _dispatcherService.TryEnqueue(() =>
                 {
@@ -5233,7 +5233,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 Debug.WriteLine("ConnectionStatus_Disconnected");
 
             }
-            else if (status == MpcService.ConnectionStatus.DisconnectedByHost)
+            else if (status == ConnectionStatus.DisconnectedByHost)
             {
                 _dispatcherService.TryEnqueue(() =>
                 {
@@ -5253,7 +5253,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 */
                 Debug.WriteLine("ConnectionStatus_DisconnectedByHost");
             }
-            else if (status == MpcService.ConnectionStatus.Disconnecting)
+            else if (status == ConnectionStatus.Disconnecting)
             {
                 _dispatcherService.TryEnqueue(() =>
                 {
@@ -5271,7 +5271,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 */
                 //Debug.WriteLine("ConnectionStatus_Disconnecting");
             }
-            else if (status == MpcService.ConnectionStatus.DisconnectedByUser)
+            else if (status == ConnectionStatus.DisconnectedByUser)
             {
                 _dispatcherService.TryEnqueue(() =>
                 {
@@ -5289,7 +5289,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 */
                 //Debug.WriteLine("ConnectionStatus_DisconnectedByUser");
             }
-            else if (status == MpcService.ConnectionStatus.SendFailNotConnected)
+            else if (status == ConnectionStatus.SendFailNotConnected)
             {
                 _dispatcherService.TryEnqueue(() =>
                 {
@@ -5307,7 +5307,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
                 Debug.WriteLine("ConnectionStatus_SendFail_NotConnected");
             }
-            else if (status == MpcService.ConnectionStatus.SendFailTimeout)
+            else if (status == ConnectionStatus.SendFailTimeout)
             {
                 _dispatcherService.TryEnqueue(() =>
                 {
@@ -5333,7 +5333,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    private async void OnMpdAckError(MpcService sender, string ackMsg, string origin)
+    private async void OnMpdAckError(IMpcService sender, string ackMsg, string origin)
     {
         if (string.IsNullOrEmpty(ackMsg))
             return;
@@ -5380,7 +5380,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    private async void OnMpdFatalError(MpcService sender, string errMsg, string origin)
+    private async void OnMpdFatalError(IMpcService sender, string errMsg, string origin)
     {
         if (string.IsNullOrEmpty(errMsg))
             return;
@@ -5428,7 +5428,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    private void OnMpcProgress(MpcService sender, string msg)
+    private void OnMpcProgress(IMpcService sender, string msg)
     {
         try
         {
@@ -5449,7 +5449,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    private void OnMpcIsBusy(MpcService sender, bool on)
+    private void OnMpcIsBusy(IMpcService sender, bool on)
     {
         try
         {

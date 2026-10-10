@@ -64,7 +64,6 @@ public sealed partial class MpcService : IMpcService, IDisposable
     #region == Connections ==
 
     private readonly Lock _connectionLock = new();
-
     private static TcpClient _commandConnection = new();
     private static StreamReader? _commandReader;
     private static StreamWriter? _commandWriter;
@@ -72,22 +71,6 @@ public sealed partial class MpcService : IMpcService, IDisposable
     private static TcpClient _idleConnection = new();
     private static StreamReader? _idleReader;
     private static StreamWriter? _idleWriter;
-
-    public enum ConnectionStatus
-    {
-        NeverConnected,
-        Connecting,
-        Connected,
-        DisconnectedByUser,
-        DisconnectedByHost,
-        ConnectFailTimeout,
-        ReceiveFailTimeout,
-        SendFailTimeout,
-        SendFailNotConnected,
-        Disconnecting,
-        Disconnected,
-        SeeConnectionErrorEvent
-    }
 
     public ConnectionStatus ConnectionState
     {
@@ -114,51 +97,21 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
     #region == Events == 
 
-    public delegate void IsBusyEvent(MpcService sender, bool on);
     public event IsBusyEvent? IsBusy;
-
-    public delegate void DebugCommandOutputEvent(MpcService sender, string data);
     public event DebugCommandOutputEvent? DebugCommandOutput;
-
-    public delegate void DebugIdleOutputEvent(MpcService sender, string data);
     public event DebugIdleOutputEvent? DebugIdleOutput;
-
-    public delegate void ConnectionStatusChangedEvent(MpcService sender, ConnectionStatus status);
     public event ConnectionStatusChangedEvent? ConnectionStatusChanged;
-
-    public delegate void ConnectionErrorEvent(MpcService sender, string data);
     public event ConnectionErrorEvent? ConnectionError;
-
-    public delegate void IsMpdIdleConnectedEvent(MpcService sender);
     public event IsMpdIdleConnectedEvent? MpdIdleConnected;
-
-    public delegate void MpdAckErrorEvent(MpcService sender, string data, string origin);
     public event MpdAckErrorEvent? MpdAckError;
-
-    public delegate void MpdFatalErrorEvent(MpcService sender, string data, string origin);
     public event MpdFatalErrorEvent? MpdFatalError;
-
-    public delegate void MpdPlayerStatusChangedEvent(MpcService sender);
     public event MpdPlayerStatusChangedEvent? MpdPlayerStatusChanged;
-
-    public delegate void MpdCurrentQueueChangedEvent(MpcService sender);
     public event MpdCurrentQueueChangedEvent? MpdCurrentQueueChanged;
-
-    public delegate void MpdCurrentSongChangedEvent(MpcService sender);
     public event MpdCurrentSongChangedEvent? MpdCurrentSongChanged;
-
-    public delegate void MpdPlaylistsChangedEvent(MpcService sender);
     public event MpdPlaylistsChangedEvent? MpdPlaylistsChanged;
-
-    public delegate void MpdOutputChangedEvent(MpcService sender);
     public event MpdOutputChangedEvent? MpdOutputChanged;
-
-    public delegate void MpdAlbumArtChangedEvent(MpcService sender);
     public event MpdAlbumArtChangedEvent? MpdAlbumArtChanged;
-
-    public delegate void MpcProgressEvent(MpcService sender, string msg);
     public event MpcProgressEvent? MpcProgress;
-
     #endregion
 
     private static readonly System.Threading.SemaphoreSlim SemaphoreCommand = new(1, 1);

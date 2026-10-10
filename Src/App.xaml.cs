@@ -156,7 +156,7 @@ public sealed partial class App : Application
         Microsoft.UI.Xaml.Application.Current.UnhandledException += App_UnhandledException;
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-        this.UnhandledException += App_UnhandledException;
+        //this.UnhandledException += App_UnhandledException;// already subscribed above
     }
 
     protected async override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
@@ -220,6 +220,18 @@ public sealed partial class App : Application
             AppendErrorLog("AppHost.StopAsync", ex.ToString());
             SaveErrorLog();
         }
+        finally
+        {
+            try
+            {
+                Host.Dispose();
+            }
+            catch (Exception ex)
+            {
+                AppendErrorLog("AppHost.Dispose", ex.ToString());
+                SaveErrorLog();
+            }
+        }
     }
 
     private void App_Activated(object? sender, Microsoft.Windows.AppLifecycle.AppActivationArguments e)
@@ -274,7 +286,7 @@ public sealed partial class App : Application
         AppendErrorLog("App_UnhandledException", $"{e.Exception.Message}, {e.Exception.Data}");
         SaveErrorLog();
 
-        e.Handled = true;
+        //e.Handled = true;
     }
 
     private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)

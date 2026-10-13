@@ -1231,7 +1231,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 await GetArtistSongsAsync(field);
                 await Task.Yield();
                 await Task.Delay(100);
-                await GetAlbumPicturesAsync(SelectedArtistAlbums);
+                await GetAlbumPicturesAsync(SelectedArtistAlbums, _cts.Token);
             });
             //}, _cts.Token);
         }
@@ -1436,6 +1436,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
+    private static async Task RunSafeAsync(Func<Task> work, string name)
+    {
+        try { await work().ConfigureAwait(false); }
+        catch (OperationCanceledException) { }
+        catch (Exception ex) { Debug.WriteLine($"{name} failed: {ex}"); }
+    }
+
+    private CancellationTokenSource? _albumPicturesCts;
 #pragma warning disable CA1711 // Identifiers should not have incorrect suffix
     public ObservableCollection<AlbumEx>? VisibleItemsAlbumsEx
 #pragma warning restore CA1711 // Identifiers should not have incorrect suffix
@@ -1448,23 +1456,68 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             field = value;
             //OnPropertyChanged(nameof(VisibleItemsAlbumsEx));
 
+            /*
             if (field is null)
             {
                 return;
             }
 
-            try
-            {
-                //GetAlbumPictures(VisibleItemsAlbumsEx); 
-                _ = Task.Run(() => GetAlbumPicturesAsync(VisibleItemsAlbumsEx), _cts.Token);
-            }
-            catch (Exception ex)
-            {
-                _ = ex;
-                Debug.WriteLine($"VisibleItemsAlbumsEx Exception: {ex}");
-            }
+            //GetAlbumPictures(VisibleItemsAlbumsEx); 
+            //_ = Task.Run(() => GetAlbumPicturesAsync(VisibleItemsAlbumsEx), _cts.Token);
+            var items = field;
+            _ = RunSafeAsync(() => GetAlbumPicturesAsync(items, _cts.Token), nameof(GetAlbumPicturesAsync));
+            */
+
+            // Cancel any previous run.
+            var previous = Interlocked.Exchange(ref _albumPicturesCts, null);
+            CancelAndDispose(previous);
+
+            if (value is null)
+                return;
+
+            // Linked to the VM-wide token so Dispose() also cancels this.
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token);
+            _albumPicturesCts = cts;
+
+            _ = LoadAlbumPicturesSafeAsync(value, cts);
         }
     } = [];
+
+    private async Task LoadAlbumPicturesSafeAsync(ObservableCollection<AlbumEx> items, CancellationTokenSource cts)
+    {
+        try
+        {
+            var token = cts.Token;
+            await Task.Run(() => GetAlbumPicturesAsync(items, token), token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected when superseded or disposed.
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"LoadAlbumPicturesSafeAsync failed: {ex}");
+        }
+        finally
+        {
+            // Dispose only if this is still the current CTS. Otherwise the setter already did.
+            if (Interlocked.CompareExchange(ref _albumPicturesCts, null, cts) == cts)
+            {
+                cts.Dispose();
+            }
+        }
+    }
+
+    private static void CancelAndDispose(CancellationTokenSource? cts)
+    {
+        if (cts is null)
+            return;
+
+        try { cts.Cancel(); }
+        catch (ObjectDisposedException) { }
+        // Don't Dispose here. The running task's finally block may still use it.
+        // A linked CTS that is cancelled and unreferenced is cleaned up by the GC.
+    }
 
     // For Album filter.
     public ObservableCollection<AlbumEx> AlbumsForFilter
@@ -2454,7 +2507,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public async Task GetAlbumPictureAsync(AlbumEx album)
     {
         var list = new ObservableCollection<AlbumEx> { album };
-        await GetAlbumPicturesAsync(list);
+        await GetAlbumPicturesAsync(list, _cts.Token);
     }
 
     #endregion
@@ -4446,7 +4499,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         });
     }
 
-    private async Task GetAlbumPicturesAsync(IEnumerable<object>? albumExItems)
+    private async Task GetAlbumPicturesAsync(IEnumerable<object>? albumExItems, CancellationToken token)
     {
         if (_mpc.IsStop)
         {
@@ -4485,225 +4538,237 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             await Task.Yield();
             await Task.Delay(1);
 
-            foreach (var item in albumExItems)
+            try
             {
-                if (_mpc.IsStop)
+                foreach (var item in albumExItems)
                 {
-                    break;
-                }
+                    if (_mpc.IsStop)
+                    {
+                        break;
+                    }
 
-                if (_cts.Token.IsCancellationRequested)
-                {
-                    Debug.WriteLine("IsCancellationRequested in foreach1 @GetAlbumPictures");
-                    return;
-                }
+                    if (_cts.Token.IsCancellationRequested)
+                    {
+                        Debug.WriteLine("IsCancellationRequested in foreach1 @GetAlbumPictures");
+                        return;
+                    }
 
-                if (item is not AlbumEx album)
-                {
-                    Debug.WriteLine("GetAlbumPictures: item is not AlbumEx, skipping...." + item);
-                    continue;
-                }
+                    token.ThrowIfCancellationRequested();
 
-                if (album is null)
-                {
-                    Debug.WriteLine("GetAlbumPictures: album is null, skipping.");
-                    continue;
-                }
+                    if (item is not AlbumEx album)
+                    {
+                        Debug.WriteLine("GetAlbumPictures: item is not AlbumEx, skipping...." + item);
+                        continue;
+                    }
 
-                if (album.IsImageAcquired)
-                {
-                    //Debug.WriteLine($"GetAlbumPictures: {album.Name} IsImageAcquired is true, skipping.");
-                    continue;
-                }
+                    if (album is null)
+                    {
+                        Debug.WriteLine("GetAlbumPictures: album is null, skipping.");
+                        continue;
+                    }
 
-                if (string.IsNullOrEmpty(album.Name.Trim()))
-                {
-                    //Debug.WriteLine($"GetAlbumPictures: album.Name is null or empty, skipping. {album.AlbumArtist}");
-                    continue;
-                }
+                    if (album.IsImageAcquired)
+                    {
+                        //Debug.WriteLine($"GetAlbumPictures: {album.Name} IsImageAcquired is true, skipping.");
+                        continue;
+                    }
 
-                if (album.IsImageLoading)
-                {
-                    //Debug.WriteLine($"GetAlbumPictures: {album.Name} IsImageLoading is true, skipping.");
-                    continue;
-                }
-                album.IsImageLoading = true;
+                    if (string.IsNullOrEmpty(album.Name.Trim()))
+                    {
+                        //Debug.WriteLine($"GetAlbumPictures: album.Name is null or empty, skipping. {album.AlbumArtist}");
+                        continue;
+                    }
 
-                var strArtist = album.AlbumArtist.Trim(); // album.AlbumArtist already fallback to Artist if none.
-                strArtist = string.IsNullOrEmpty(strArtist) ? "Unknown Artist" : SanitizeFilename(strArtist);
-
-                var strAlbum = album.Name.Trim();
-                strAlbum = string.IsNullOrEmpty(strAlbum) ? "Unknown Album" : SanitizeFilename(strAlbum);
-
-                var filePath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".bmp";
-
-                string fileTempPath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".tmp";
-                if (File.Exists(fileTempPath))
-                {
-                    album.IsImageLoading = false;
-                    continue; // Skip if temp file exists, it means the album art has found to have no image.
-                }
-
-                if (File.Exists(filePath))
-                {
-                    // Load cached album cover.
-
+                    if (album.IsImageLoading)
+                    {
+                        //Debug.WriteLine($"GetAlbumPictures: {album.Name} IsImageLoading is true, skipping.");
+                        continue;
+                    }
                     album.IsImageLoading = true;
 
-                    try
-                    {
-                        BitmapImage? bitmap = new(new Uri(filePath));
-                        album.AlbumImage = bitmap;
-                        album.IsImageAcquired = true;
-                        album.IsImageLoading = false;
-                    }
-                    catch (Exception e)
-                    {
-                        album.IsImageLoading = false;
-                        Debug.WriteLine("GetAlbumPictures: Exception while loading: " + filePath + Environment.NewLine + e.Message);
-                        continue;
-                    }
+                    var strArtist = album.AlbumArtist.Trim(); // album.AlbumArtist already fallback to Artist if none.
+                    strArtist = string.IsNullOrEmpty(strArtist) ? "Unknown Artist" : SanitizeFilename(strArtist);
 
-                    await Task.Delay(5);
+                    var strAlbum = album.Name.Trim();
+                    strAlbum = string.IsNullOrEmpty(strAlbum) ? "Unknown Album" : SanitizeFilename(strAlbum);
 
-                    album.IsImageLoading = false;
-                    //Debug.WriteLine($"GetAlbumPictures: Successfully loaded album art from cache {filePath}");
-                }
-                else
-                {
-                    album.IsImageLoading = true;
+                    var filePath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".bmp";
 
-                    var ret = await SearchAlbumSongsAsync(album.Name);
-                    if (!ret.IsSuccess)
-                    {
-                        Debug.WriteLine("GetAlbumPictures: SearchAlbumSongs failed: " + ret.ErrorMessage);
-
-                        album.IsImageLoading = false;
-                        continue;
-                    }
-
-                    if (ret.SearchResult is null)
+                    string fileTempPath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".tmp";
+                    if (File.Exists(fileTempPath))
                     {
                         album.IsImageLoading = false;
-                        Debug.WriteLine("GetAlbumPictures: ret.SearchResult is null, skipping.");
-                        continue;
+                        continue; // Skip if temp file exists, it means the album art has found to have no image.
                     }
 
-                    var sresult = ret.SearchResult;//new ObservableCollection<SongInfo>(ret.SearchResult);
-                    if (sresult.Count < 1)
+                    if (File.Exists(filePath))
                     {
-                        album.IsImageLoading = false;
-                        Debug.WriteLine("GetAlbumPictures: ret.SearchResult.Count < 1, skipping. -> " + album.Name);
-                        continue;
-                    }
+                        // Load cached album cover.
 
-                    string strDirPath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, strArtist);
-                    bool isWaitFailed = false;
-                    bool isCoverExists = false;
-                    bool isNoAlbumCover = false;
+                        album.IsImageLoading = true;
 
-                    foreach (var albumsong in sresult)
-                    {
-                        if (_mpc.IsStop)
-                        {
-                            break;
-                        }
-
-                        if (_cts.Token.IsCancellationRequested)
-                        {
-                            Debug.WriteLine("IsCancellationRequested in foreach2 @GetAlbumPictures");
-                            return;
-                        }
-
-                        if (albumsong is null)
-                        {
-                            continue;
-                        }
-
-                        var aat = albumsong.AlbumArtist.Trim();
-                        if (string.IsNullOrEmpty(aat))
-                        {
-                            aat = albumsong.Artist.Trim();
-                        }
-
-                        if (string.Equals(aat, album.AlbumArtist, StringComparison.Ordinal))
-                        {
-                            //Debug.WriteLine($"GetAlbumPictures: Processing song {albumsong.File} from album {album.Name}");
-                            var r = await _mpc.MpdQueryAlbumArtForAlbumView(albumsong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
-                            if (!r.IsSuccess)
-                            {
-                                isNoAlbumCover = r.IsNoBinaryFound;
-                                isWaitFailed = r.IsWaitFailed;
-                                //album.IsImageLoading = false; // don't
-                                //Debug.WriteLine($"MpdQueryAlbumArtForAlbumView failed: {r.ErrorMessage}");
-                                continue;
-                            }
-                            if (r.AlbumCover is null) continue;
-                            if (!r.AlbumCover.IsSuccess) continue;
-
-                            album.AlbumImage = await BitmapSourceFromByteArrayAsync(r.AlbumCover.BinaryData);
-
-                            if (r.AlbumCover.BinaryData is not null)
-                            {
-                                Directory.CreateDirectory(strDirPath);
-                                File.WriteAllBytes(filePath, r.AlbumCover.BinaryData);
-                                //Debug.WriteLine($"GetAlbumPictures: Successfully saved album art for {filePath}");
-                            }
-
-                            album.IsImageAcquired = true;
-                            album.IsImageLoading = false;
-
-                            isCoverExists = true;
-
-                            break; // Break after first successful album art retrieval.
-                        }
-                        else
-                        {
-                            //Debug.WriteLine($" {album.Name} > {album.AlbumArtist} : {albumsong.AlbumArtist},  {albumsong.Artist}");
-                        }
-                    }
-
-                    // File saved. Don't save temp file.
-                    if (isCoverExists) continue;
-
-                    // WaitFiled. Don't save temp file.
-                    if (isWaitFailed)
-                    {
-                        album.IsImageLoading = false;
-                        continue;
-                    }
-
-                    if (isNoAlbumCover)
-                    {
-                        // Writes tmp file indicating there was no album cover.
                         try
                         {
-                            Directory.CreateDirectory(strDirPath);
-                            DateTimeOffset dto = new(DateTime.UtcNow);
-                            // Get the unix timestamp in seconds
-                            var unixTime = dto.ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture);
-
-                            await using StreamWriter file = new(fileTempPath);
-                            await file.WriteLineAsync(unixTime);
-                            file.Close();
-                            // Testing
-                            await Task.Delay(10);
+                            BitmapImage? bitmap = new(new Uri(filePath));
+                            album.AlbumImage = bitmap;
+                            album.IsImageAcquired = true;
+                            album.IsImageLoading = false;
                         }
                         catch (Exception e)
                         {
-                            Debug.WriteLine("GetAlbumPictures: Exception while saving album art DUMMY file: " + e.Message);
+                            album.IsImageLoading = false;
+                            Debug.WriteLine("GetAlbumPictures: Exception while loading: " + filePath + Environment.NewLine + e.Message);
+                            continue;
                         }
+
+                        await Task.Delay(5);
+
+                        album.IsImageLoading = false;
+                        //Debug.WriteLine($"GetAlbumPictures: Successfully loaded album art from cache {filePath}");
                     }
+                    else
+                    {
+                        album.IsImageLoading = true;
 
-                    album.IsImageLoading = false;
+                        var ret = await SearchAlbumSongsAsync(album.Name);
+                        if (!ret.IsSuccess)
+                        {
+                            Debug.WriteLine("GetAlbumPictures: SearchAlbumSongs failed: " + ret.ErrorMessage);
 
-                    await Task.Yield();
+                            album.IsImageLoading = false;
+                            continue;
+                        }
+
+                        if (ret.SearchResult is null)
+                        {
+                            album.IsImageLoading = false;
+                            Debug.WriteLine("GetAlbumPictures: ret.SearchResult is null, skipping.");
+                            continue;
+                        }
+
+                        var sresult = ret.SearchResult;//new ObservableCollection<SongInfo>(ret.SearchResult);
+                        if (sresult.Count < 1)
+                        {
+                            album.IsImageLoading = false;
+                            Debug.WriteLine("GetAlbumPictures: ret.SearchResult.Count < 1, skipping. -> " + album.Name);
+                            continue;
+                        }
+
+                        string strDirPath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, strArtist);
+                        bool isWaitFailed = false;
+                        bool isCoverExists = false;
+                        bool isNoAlbumCover = false;
+
+                        foreach (var albumsong in sresult)
+                        {
+                            if (_mpc.IsStop)
+                            {
+                                break;
+                            }
+
+                            if (_cts.Token.IsCancellationRequested)
+                            {
+                                Debug.WriteLine("IsCancellationRequested in foreach2 @GetAlbumPictures");
+                                return;
+                            }
+
+                            if (albumsong is null)
+                            {
+                                continue;
+                            }
+
+                            var aat = albumsong.AlbumArtist.Trim();
+                            if (string.IsNullOrEmpty(aat))
+                            {
+                                aat = albumsong.Artist.Trim();
+                            }
+
+                            if (string.Equals(aat, album.AlbumArtist, StringComparison.Ordinal))
+                            {
+                                //Debug.WriteLine($"GetAlbumPictures: Processing song {albumsong.File} from album {album.Name}");
+                                var r = await _mpc.MpdQueryAlbumArtForAlbumView(albumsong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                                if (!r.IsSuccess)
+                                {
+                                    isNoAlbumCover = r.IsNoBinaryFound;
+                                    isWaitFailed = r.IsWaitFailed;
+                                    //album.IsImageLoading = false; // don't
+                                    //Debug.WriteLine($"MpdQueryAlbumArtForAlbumView failed: {r.ErrorMessage}");
+                                    continue;
+                                }
+                                if (r.AlbumCover is null) continue;
+                                if (!r.AlbumCover.IsSuccess) continue;
+
+                                album.AlbumImage = await BitmapSourceFromByteArrayAsync(r.AlbumCover.BinaryData);
+
+                                if (r.AlbumCover.BinaryData is not null)
+                                {
+                                    Directory.CreateDirectory(strDirPath);
+                                    File.WriteAllBytes(filePath, r.AlbumCover.BinaryData);
+                                    //Debug.WriteLine($"GetAlbumPictures: Successfully saved album art for {filePath}");
+                                }
+
+                                album.IsImageAcquired = true;
+                                album.IsImageLoading = false;
+
+                                isCoverExists = true;
+
+                                break; // Break after first successful album art retrieval.
+                            }
+                            else
+                            {
+                                //Debug.WriteLine($" {album.Name} > {album.AlbumArtist} : {albumsong.AlbumArtist},  {albumsong.Artist}");
+                            }
+                        }
+
+                        // File saved. Don't save temp file.
+                        if (isCoverExists) continue;
+
+                        // WaitFiled. Don't save temp file.
+                        if (isWaitFailed)
+                        {
+                            album.IsImageLoading = false;
+                            continue;
+                        }
+
+                        if (isNoAlbumCover)
+                        {
+                            // Writes tmp file indicating there was no album cover.
+                            try
+                            {
+                                Directory.CreateDirectory(strDirPath);
+                                DateTimeOffset dto = new(DateTime.UtcNow);
+                                // Get the unix timestamp in seconds
+                                var unixTime = dto.ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture);
+
+                                await using StreamWriter file = new(fileTempPath);
+                                await file.WriteLineAsync(unixTime);
+                                file.Close();
+                                // Testing
+                                await Task.Delay(10);
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.WriteLine("GetAlbumPictures: Exception while saving album art DUMMY file: " + e.Message);
+                            }
+                        }
+
+                        album.IsImageLoading = false;
+
+                        await Task.Yield();
+                    }
                 }
             }
+            catch (OperationCanceledException)
+            {
+                // Expected when superseded or disposed.
+            }
+            finally
+            {
+                //IsBusy = false;
+                IsWorking = false;
+                await Task.Yield();
+            }
 
-            //IsBusy = false;
-            IsWorking = false;
-            await Task.Yield();
         });
     }
 
@@ -5926,7 +5991,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
 
 #pragma warning disable IDE0305
-        _ = AddToPlaylist(result.PlaylistName, Queue.Select(s => s.File).ToList());
+        await AddToPlaylist(result.PlaylistName, Queue.Select(s => s.File).ToList());
 #pragma warning restore IDE0305
     }
 
@@ -6047,7 +6112,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        _ = AddToPlaylist(result.PlaylistName, selectedList);
+        await AddToPlaylist(result.PlaylistName, selectedList);
     }
 
     [RelayCommand(CanExecute = nameof(DeleteIdCanExecute))]
@@ -6352,7 +6417,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                     return;
                 }
 
-                _ = AddToPlaylist(result.PlaylistName, uriList);
+                await AddToPlaylist(result.PlaylistName, uriList);
             }
         }
     }
@@ -6546,7 +6611,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        _ = AddToPlaylist(result.PlaylistName, selectedList);
+        await AddToPlaylist(result.PlaylistName, selectedList);
     }
 
     [RelayCommand(CanExecute = nameof(AddToQueueCanExecute))]
@@ -6901,7 +6966,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             SelectedAlbum = album;
 
             var list = new ObservableCollection<AlbumEx> { album };
-            await GetAlbumPicturesAsync(list);
+            await GetAlbumPicturesAsync(list, _cts.Token);
         }
     }
 
@@ -6980,7 +7045,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             // Fetch album cover if not.
             // Use a tmp collection to use existing method.
             var tmpCollection = new ObservableCollection<AlbumEx> { album };
-            await GetAlbumPicturesAsync(tmpCollection);
+            await GetAlbumPicturesAsync(tmpCollection, _cts.Token);
         });
     }
 
@@ -7178,7 +7243,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 return;
             }
 
-            _ = AddToPlaylist(result.PlaylistName, uriList);
+            await AddToPlaylist(result.PlaylistName, uriList);
         }
     }
 
@@ -7337,7 +7402,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                     return;
                 }
 
-                _ = AddToPlaylist(result.PlaylistName, uriList);
+                await AddToPlaylist(result.PlaylistName, uriList);
             }
         }
     }
@@ -7561,7 +7626,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        _ = AddToPlaylist(result.PlaylistName, selectedList);
+        await AddToPlaylist(result.PlaylistName, selectedList);
     }
 
     [RelayCommand(CanExecute = nameof(AddToQueueCanExecute))]

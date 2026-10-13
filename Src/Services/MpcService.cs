@@ -5099,79 +5099,43 @@ public sealed partial class MpcService : IMpcService, IDisposable
         ConnectionState = ConnectionStatus.Disconnecting;
         IsStop = true;
 
-        _cts?.Cancel();
-
-        IsBusy?.Invoke(this, true);
-
-        ConnectionState = ConnectionStatus.Disconnecting;
-
-        lock (_connectionLock)
-        {
-            DisposeConnection(
-                ref _commandConnection,
-                ref _commandReader,
-                ref _commandWriter);
-
-            DisposeConnection(
-                ref _idleConnection,
-                ref _idleReader,
-                ref _idleWriter);
-        }
-
-        IsBusy?.Invoke(this, false);
-        ConnectionState = ConnectionStatus.DisconnectedByUser;
-
-        /*
         try
         {
             IsBusy?.Invoke(this, true);
 
+            _cts?.Cancel();
+
             ConnectionState = ConnectionStatus.Disconnecting;
 
-            _commandConnection.Client?.Shutdown(SocketShutdown.Both);
-            _commandConnection.Close();
-        }
-        catch (Exception ex)
-        {
-            _ = ex;
-            //Debug.WriteLine($"Exception @MpdDisconnect on _commandConnection.Close() {ex}");
+            lock (_connectionLock)
+            {
+                DisposeConnection(
+                    ref _commandConnection,
+                    ref _commandReader,
+                    ref _commandWriter);
+
+                DisposeConnection(
+                    ref _idleConnection,
+                    ref _idleReader,
+                    ref _idleWriter);
+            }
+
+            IsBusy?.Invoke(this, false);
+            ConnectionState = ConnectionStatus.DisconnectedByUser;
+
+            _binaryDownloader.MpdBinaryConnectionDisconnect(isReconnect);
         }
         finally
         {
             IsBusy?.Invoke(this, false);
+
             ConnectionState = ConnectionStatus.DisconnectedByUser;
-        }
 
-        try
-        {
-            IsBusy?.Invoke(this, true);
-
-            ConnectionState = ConnectionStatus.Disconnecting;
-
-            _idleConnection.Client?.Shutdown(SocketShutdown.Both);
-            _idleConnection.Close();
-        }
-        catch (Exception ex)
-        {
-            _ = ex;
-            //Debug.WriteLine($"Exception @MpdDisconnect on _idleConnection.Close() {ex}");
-        }
-        finally
-        {
-            IsBusy?.Invoke(this, false);
-            ConnectionState = ConnectionStatus.DisconnectedByUser;
-        }
-        */
-
-        _binaryDownloader.MpdBinaryConnectionDisconnect(isReconnect);
-
-        ConnectionState = ConnectionStatus.DisconnectedByUser;
-        IsBusy?.Invoke(this, false);
-
-        if (!isReconnect)
-        {
-            _cts?.Dispose();
-            _cts = null;
+            if (!isReconnect)
+            {
+                _cts?.Dispose();
+                _cts = null;
+            }
         }
     }
 
@@ -5186,9 +5150,12 @@ public sealed partial class MpcService : IMpcService, IDisposable
             // The connection may already be closed.
         }
 
-        writer?.Dispose();
-        reader?.Dispose();
-        connection.Dispose();
+        // Dispose can flush and throw on a broken socket. Teardown must never throw,
+        // and a failure in one step must not skip the others.
+        try { writer?.Dispose(); } catch (Exception ex) when (ex is IOException or ObjectDisposedException or SocketException) { }
+        try { reader?.Dispose(); } catch (Exception ex) when (ex is IOException or ObjectDisposedException or SocketException) { }
+        try { connection.Dispose(); } catch (Exception ex) when (ex is IOException or ObjectDisposedException or SocketException) { }
+
 
         writer = null;
         reader = null;
@@ -5198,6 +5165,7 @@ public sealed partial class MpcService : IMpcService, IDisposable
     public void Dispose()
     {
         _cts?.Dispose();
+        _cts = null;
         Debug.WriteLine("MpcService.Dispose() completed.");
 
         GC.SuppressFinalize(this);

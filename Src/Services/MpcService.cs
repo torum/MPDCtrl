@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml.Shapes;
 using MPDCtrl.Models;
 using MPDCtrl.Services.Contracts;
 using System;
@@ -150,9 +151,18 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
     public async Task<ConnectionResult> MpdIdleConnect(string host, int port, CancellationToken cancellationToken)
     {
+        /*
         _cts?.Dispose();
         //_cts = new CancellationTokenSource();
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        var token = _cts.Token;
+        */
+        var oldCts = Interlocked.Exchange(ref _cts, CancellationTokenSource.CreateLinkedTokenSource(cancellationToken));
+        if (oldCts is not null)
+        {
+            try { oldCts.Cancel(); } catch (ObjectDisposedException) { }
+            oldCts.Dispose();
+        }
         var token = _cts.Token;
 
         IsStop = false;
@@ -160,8 +170,16 @@ public sealed partial class MpcService : IMpcService, IDisposable
         ConnectionResult result = new();
 
         IsMpdIdleConnected = false;
-
-        _idleConnection = new TcpClient();
+        try
+        {
+            _idleReader?.Dispose();
+            _idleWriter?.Dispose();
+            _idleConnection.Dispose();
+        }
+        finally
+        {
+            _idleConnection = new TcpClient();
+        }
 
         Host = host;
         Port = port;
@@ -406,6 +424,9 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
             MpcProgress?.Invoke(this, $"[Background] MpdIdleSendCommand::WriteAsync...");
             await _idleWriter.WriteAsync(cmd.Trim() + "\n");
+
+            // no I don't like this below.
+            //await _idleWriter.WriteAsync(cmd.AsMemory(), _cts.Token);
         }
         catch (System.IO.IOException e)
         {
@@ -764,10 +785,25 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
     public void MpdIdleStart()
     {
-        MpdIdle();
+        _ = RunIdleSafeAsync();
     }
 
-    private async void MpdIdle()
+    private async Task RunIdleSafeAsync()
+    {
+        try
+        {
+            await MpdIdleAsync();
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception e)
+        {
+            Debug.WriteLine($"[Unhandled@MpdIdle] {e}");
+            ConnectionState = ConnectionStatus.SeeConnectionErrorEvent;
+            ConnectionError?.Invoke(this, "The connection (idle) failed unexpectedly: " + e.Message);
+        }
+    }
+
+    private async Task MpdIdleAsync()
     {
         if (IsStop)
         {
@@ -1163,7 +1199,8 @@ public sealed partial class MpcService : IMpcService, IDisposable
             //MpcProgress?.Invoke(this, "");
 
             // start over.
-            MpdIdle();
+            //MpdIdle();
+            await RunIdleSafeAsync();
         }
         catch
         {
@@ -3506,12 +3543,64 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
     #region == Response parser methods ==
 
+    // Tags MPD may repeat, joined with "/".
+    private static readonly HashSet<string> MultiValueTags =
+        new(StringComparer.OrdinalIgnoreCase) { "Genre", "Artist", "AlbumArtist", "Composer", "Performer" };
+
+    // Splits "Key: value" at the FIRST ':' only.
+    private static bool TryParseLine(string line, out string key, out string val)
+    {
+        var idx = line.IndexOf(':');
+        if (idx <= 0)
+        {
+            key = val = string.Empty;
+            return false;
+        }
+
+        key = line[..idx].Trim();
+        val = line[(idx + 1)..].TrimStart();   // everything after the first colon
+        return true;
+        /*
+        key = string.Empty;
+        val = string.Empty;
+
+        var idx = line.IndexOf(':');
+        if (idx <= 0)
+            return false;
+
+        key = line[..idx].Trim();
+
+        var start = idx + 1;
+        if (start < line.Length && line[start] == ' ')   // MPD puts exactly one space after the colon
+            start++;
+
+        val = line[start..];
+        return key.Length > 0;
+        */
+    }
+
+    private static void AddTag(Dictionary<string, string> values, string key, string val)
+    {
+        if (values.TryGetValue(key, out var existing))
+        {
+            if (MultiValueTags.Contains(key) && !string.Equals(existing, val, StringComparison.Ordinal))
+            {
+                values[key] = existing + "/" + val;
+            }
+            // else: keep the first value
+        }
+        else
+        {
+            values[key] = val;
+        }
+    }
+
     private Task<bool> ParseProtocolFeatures(string result)
     {
         if (IsStop) { return Task.FromResult(false); }
         if (string.IsNullOrEmpty(result)) return Task.FromResult(false);
 
-        // Not working with MPD 0.24.4?
+        // TODO: maybe I'm missing something...
 
         Debug.WriteLine(result);
 
@@ -3973,8 +4062,9 @@ public sealed partial class MpcService : IMpcService, IDisposable
             var comparer = StringComparer.OrdinalIgnoreCase;
             Dictionary<string, string> songValues = new(comparer);
 
-            foreach (string value in resultLines)
+            foreach (string line in resultLines)
             {
+                /*
                 string[] statusValuePair = value.Trim().Split(':');
                 if (statusValuePair.Length > 1)
                 {
@@ -3990,6 +4080,11 @@ public sealed partial class MpcService : IMpcService, IDisposable
                     {
                         songValues.TryAdd(statusValuePair[0].Trim(), value.Replace(statusValuePair[0].Trim() + ": ", ""));
                     }
+                }
+                */
+                if (TryParseLine(line, out var key, out var val))
+                {
+                    AddTag(songValues, key, val);
                 }
             }
 
@@ -4045,16 +4140,6 @@ public sealed partial class MpcService : IMpcService, IDisposable
         {
             if (resultLines.Count == 0)
                 isEmptyResult = true;
-        }
-
-        if (isEmptyResult)
-        {
-            await _dispatcherService.EnqueueAsync(() =>
-            {
-                CurrentQueue.Clear();
-            });
-
-            return true;
         }
 
         // aka Queue
@@ -4118,6 +4203,17 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
         try
         {
+            if (isEmptyResult)
+            {
+                await _dispatcherService.EnqueueAsync(() =>
+                {
+                    //CurrentQueue.Clear();
+                    CurrentQueue = [];   // replace, never mutate a published collection
+                });
+
+                return true;
+            }
+
             IsBusy?.Invoke(this, true);
 
             ObservableCollection<SongInfoEx> tmpQueue = [];
@@ -4137,8 +4233,36 @@ public sealed partial class MpcService : IMpcService, IDisposable
             if (resultLines is null)
                 return true;
 
-            foreach (string value in resultLines)
+            foreach (string line in resultLines)
             {
+                if (!TryParseLine(line, out var key, out var val))
+                    continue;
+
+                if (key.Equals("file", StringComparison.OrdinalIgnoreCase))
+                {
+                    // A new "file" line starts the next song. Finish the previous one first.
+                    if (songValues.ContainsKey("Id"))
+                    {
+                        SongInfoEx? sng = FillSongInfoEx(songValues, i);
+
+                        if (sng is not null)
+                        {
+                            tmpQueue.Add(sng);
+                            i++;
+
+                            if (i % 100 == 0)
+                                MpcProgress?.Invoke(this, $"[Background] Parsing queue item... ({i})");
+                        }
+                    }
+
+                    songValues.Clear();
+                    songValues[key] = val;   // "file" always starts a fresh song
+                }
+                else
+                {
+                    AddTag(songValues, key, val);
+                }
+                /*
                 string[] statusValuePair = value.Trim().Split(':');
                 if (statusValuePair.Length > 1)
                 {
@@ -4156,7 +4280,8 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
                                 i++;
 
-                                MpcProgress?.Invoke(this, $"[Background] Parsing queue item... ({i})");
+                                //MpcProgress?.Invoke(this, $"[Background] Parsing queue item... ({i})");
+                                if (i % 100 == 0) MpcProgress?.Invoke(this, $"[Background] Parsing queue item... ({i})");
 
                                 songValues.Clear();
                             }
@@ -4171,6 +4296,7 @@ public sealed partial class MpcService : IMpcService, IDisposable
                         songValues.TryAdd(statusValuePair[0].Trim(), value.Replace(statusValuePair[0].Trim() + ": ", ""));
                     }
                 }
+                */
             }
 
             if ((songValues.Count > 0) && songValues.ContainsKey("Id"))
@@ -4197,7 +4323,7 @@ public sealed partial class MpcService : IMpcService, IDisposable
             // test
             MpcProgress?.Invoke(this, "[Background] Updating internal queue list...");
 
-            await _dispatcherService.EnqueueAsync(async () =>
+            await _dispatcherService.EnqueueAsync(() =>
             {
                 //CurrentQueue.Clear();
                 //_queue = tmpQueue;
@@ -4775,6 +4901,37 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
             foreach (string line in resultLines)
             {
+                if (!TryParseLine(line, out var key, out var val))
+                    continue;
+
+                if (key.Equals("file", StringComparison.OrdinalIgnoreCase))
+                {
+                    // A new "file" line starts the next song. Finish the previous one first.
+                    if (songValues.ContainsKey("file"))
+                    {
+                        SongInfo? sng = FillSongInfo(songValues, i);
+
+                        if (sng is not null)
+                        {
+                            //tmpQueue.Add(sng);
+
+                            i++;
+
+                            res.Add(sng);
+
+                            if (i % 100 == 0)
+                                MpcProgress?.Invoke(this, $"[Background] Parsing search result item... ({i})");
+                        }
+                    }
+
+                    songValues.Clear();
+                    songValues[key] = val;   // "file" always starts a fresh song
+                }
+                else
+                {
+                    AddTag(songValues, key, val);
+                }
+                /*
                 //Debug.WriteLine(line);
                 string[] valuePair = line.Split(':');
                 if (valuePair.Length > 1)
@@ -4810,6 +4967,7 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
                     }
                 }
+                */
             }
 
             // last one
@@ -4899,6 +5057,35 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
             foreach (string line in resultLines)
             {
+                if (!TryParseLine(line, out var key, out var val))
+                    continue;
+
+                if (key.Equals("file", StringComparison.OrdinalIgnoreCase))
+                {
+                    // A new "file" line starts the next song. Finish the previous one first.
+                    if (songValues.ContainsKey("file"))
+                    {
+                        SongInfo? sng = FillSongInfo(songValues, i);
+
+                        if (sng is not null)
+                        {
+                            songList.Add(sng);
+                            i++;
+
+                            if (i % 100 == 0)
+                                MpcProgress?.Invoke(this, $"[Background] Parsing playlist item... ({i})");
+                        }
+                    }
+
+                    songValues.Clear();
+                    songValues[key] = val;   // "file" always starts a fresh song
+                }
+                else
+                {
+                    AddTag(songValues, key, val);
+                }
+
+                /*
                 string[] valuePair = line.Split(':');
                 if (valuePair.Length > 1)
                 {
@@ -4932,21 +5119,7 @@ public sealed partial class MpcService : IMpcService, IDisposable
                         //SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].TrimStart() + ": ", ""));
                         songValues.TryAdd(valuePair[0].Trim(), line.Replace(valuePair[0].Trim() + ": ", ""));
                     }
-                    /*
-                    if (!SongValues.ContainsKey(ValuePair[0].Trim()))
-                    {
-                        SongValues.Add(ValuePair[0].Trim(), line.Replace(ValuePair[0].Trim() + ": ", ""));
-                    }
-                    else
-                    {
-                        if (ValuePair[0].Trim() == "Genre")
-                        {
-                            SongValues["Genre"] = SongValues["Genre"] + "/" + line.Replace(ValuePair[0].Trim() + ": ", "");
-                        }
-                    }
                     */
-
-                }
             }
 
             // last one
@@ -5155,7 +5328,6 @@ public sealed partial class MpcService : IMpcService, IDisposable
         try { writer?.Dispose(); } catch (Exception ex) when (ex is IOException or ObjectDisposedException or SocketException) { }
         try { reader?.Dispose(); } catch (Exception ex) when (ex is IOException or ObjectDisposedException or SocketException) { }
         try { connection.Dispose(); } catch (Exception ex) when (ex is IOException or ObjectDisposedException or SocketException) { }
-
 
         writer = null;
         reader = null;

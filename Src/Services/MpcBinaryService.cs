@@ -1231,9 +1231,11 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
             // The connection may already be closed.
         }
 
-        writer?.Dispose();
-        reader?.Dispose();
-        connection.Dispose();
+        // Dispose can flush and throw on a broken socket. Teardown must never throw,
+        // and a failure in one step must not skip the others.
+        try { writer?.Dispose(); } catch (Exception ex) when (ex is IOException or ObjectDisposedException or SocketException) { }
+        try { reader?.Dispose(); } catch (Exception ex) when (ex is IOException or ObjectDisposedException or SocketException) { }
+        try { connection.Dispose(); } catch (Exception ex) when (ex is IOException or ObjectDisposedException or SocketException) { }
 
         writer = null;
         reader = null;
@@ -1243,6 +1245,7 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
     public void Dispose()
     {
         _cts?.Dispose();
+        _cts = null;
         Debug.WriteLine("MpcBinaryService.Dispose() completed.");
 
         GC.SuppressFinalize(this);

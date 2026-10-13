@@ -333,6 +333,11 @@ public sealed partial class MpcService : IMpcService, IDisposable
             Debug.WriteLine("@MpdIdleSendCommand: _cts is null)");
             return ret;
         }
+        if (_cts.IsCancellationRequested)
+        {
+            Debug.WriteLine("@MpdIdleSendCommand: _cts IsCancellationRequested)");
+            return ret;
+        }
 
         MpcProgress?.Invoke(this, $"[Background] MpdIdleSendCommand...");
 
@@ -463,10 +468,15 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
             while (true)
             {
-                var line = await _idleReader.ReadLineAsync(_cts.Token);
+                if (_cts is null)
+                    break;
+                var token = _cts.Token;
+                if (token.IsCancellationRequested)
+                    break;
+                var line = await _idleReader.ReadLineAsync(token);
 
                 //if (_cts.Token.IsCancellationRequested)
-                _cts.Token.ThrowIfCancellationRequested();
+                token.ThrowIfCancellationRequested();
 
                 if (line is not null)
                 {
@@ -594,6 +604,18 @@ public sealed partial class MpcService : IMpcService, IDisposable
             ret.IsSuccess = false;
             ret.ErrorMessage = e.Message;
 
+            return ret;
+        }
+        catch (System.OperationCanceledException e)
+        {
+            if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser) || (ConnectionState == ConnectionStatus.Connecting))
+            {
+                // no problem
+            }
+            // no problem
+            Debug.WriteLine("[OperationCanceledException] ({0}):\n{1}", "ReadLineAsync @MpdIdleSendCommand(): " + ConnectionState.ToString(), e.Message);
+            ret.IsSuccess = false;
+            ret.ErrorMessage = e.Message;
             return ret;
         }
         catch (Exception e)
@@ -755,7 +777,7 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
         if (_cts is null)
         {
-            Debug.WriteLine("@MpdIdle: _cts is null)");
+            Debug.WriteLine("@MpdIdle: _cts is null");
             return;
         }
 
@@ -813,6 +835,15 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
             return;
         }
+        catch (System.OperationCanceledException e)
+        {
+            if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser) || (ConnectionState == ConnectionStatus.Connecting))
+            {
+                // no problem
+            }
+            // no problem
+            Debug.WriteLine("[OperationCanceledException] ({0}):\n{1}", "WriteAsync @MpdIdle(): " + ConnectionState.ToString(), e.Message);
+        }
         catch (Exception e)
         {
             Debug.WriteLine("[Exception@MpdIdle] ({0} ):\n{1}", "WriteAsync", e.Message);
@@ -846,10 +877,11 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
                 if (_cts is null)
                     break;
-                if (_cts.Token.IsCancellationRequested)
+                var token = _cts.Token;
+                if (token.IsCancellationRequested)
                     break;
 
-                var line = await _idleReader.ReadLineAsync(_cts.Token);
+                var line = await _idleReader.ReadLineAsync(token);
 
                 if (line is not null)
                 {
@@ -977,12 +1009,9 @@ public sealed partial class MpcService : IMpcService, IDisposable
             if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser) || (ConnectionState == ConnectionStatus.Connecting))
             {
                 // no problem
-                //Debug.WriteLine("ReadLineAsync canceled due to OperationCanceledException. Disconnecting, now exiting. @MpdIdle()");
             }
-            else
-            {
-                Debug.WriteLine("[OperationCanceledException@MpdIdle] ({0}):\n{1}", "ReadLineAsync @MpdIdle(): " + ConnectionState.ToString(), e.Message);
-            }
+            // no problem
+            Debug.WriteLine("[OperationCanceledException] ({0}):\n{1}", "ReadLineAsync @MpdIdle(): " + ConnectionState.ToString(), e.Message);
         }
         catch (System.InvalidOperationException e)
         {
@@ -1185,6 +1214,7 @@ public sealed partial class MpcService : IMpcService, IDisposable
         try
         {
             await _commandConnection.ConnectAsync(Host, Port, cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
 
             // TODO: always false
             if (_commandConnection.Client is null)
@@ -1341,6 +1371,8 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
                 try
                 {
+                    _cts.Token.ThrowIfCancellationRequested();
+
                     ret = await MpdCommandSendCommandProtected(cmd, false);
                 }
                 finally
@@ -1603,6 +1635,18 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
             return ret;
         }
+        catch (System.OperationCanceledException e)
+        {
+            if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser) || (ConnectionState == ConnectionStatus.Connecting))
+            {
+                // no problem
+            }
+            // no problem
+            Debug.WriteLine("[OperationCanceledException] ({0}):\n{1}", "WriteAsync @MpdCommandSendCommandProtected(): " + ConnectionState.ToString(), e.Message);
+            ret.IsSuccess = false;
+            ret.ErrorMessage = e.Message;
+            return ret;
+        }
         catch (Exception e)
         {
             Debug.WriteLine("Exception@MpdSendCommand: " + cmd.Trim() + " WriteAsync " + e.Message);
@@ -1654,13 +1698,21 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
             while (true)
             {
-                var line = await _commandReader.ReadLineAsync(_cts.Token);
+                if (_cts is null)
+                    break;
+                var token = _cts.Token;
+                if (token.IsCancellationRequested)
+                    break;
 
-                if (_cts.Token.IsCancellationRequested)
+                var line = await _commandReader.ReadLineAsync(token);
+
+                if (token.IsCancellationRequested)
                 {
                     Debug.WriteLine("IsCancellationRequested in while loop @MpdCommandSendCommandProtected");
                     return ret;
                 }
+                // or
+                token.ThrowIfCancellationRequested();
 
                 if (line is not null)
                 {
@@ -1885,6 +1937,18 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
             IsBusy?.Invoke(this, false);
 
+            return ret;
+        }
+        catch (System.OperationCanceledException e)
+        {
+            if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser) || (ConnectionState == ConnectionStatus.Connecting))
+            {
+                // no problem
+            }
+            // no problem
+            Debug.WriteLine("[OperationCanceledException] ({0}):\n{1}", "ReadLineAsync @MpdCommandSendCommandProtected(): " + ConnectionState.ToString(), e.Message);
+            ret.IsSuccess = false;
+            ret.ErrorMessage = e.Message;
             return ret;
         }
         catch (System.IO.IOException e)
@@ -2224,6 +2288,20 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
                     res = await _binaryDownloader.MpdQueryAlbumArt(uri, isUsingReadpicture);
 
+                    if (_cts is null)
+                    {
+                        Debug.WriteLine("_cts is null returning @MpdQueryAlbumArt (Command)");
+                        res.IsSuccess = false;
+                        return res;
+                    }
+
+                    if (_cts.Token.IsCancellationRequested)
+                    {
+                        Debug.WriteLine("IsCancellationRequested returning @MpdQueryAlbumArt (Command)");
+                        res.IsSuccess = false;
+                        return res;
+                    }
+
                     if (res.IsSuccess)
                     {
                         /*
@@ -2270,6 +2348,20 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
             if ((!res.IsSuccess) && res.IsTimeOut)
             {
+                if (_cts is null)
+                {
+                    Debug.WriteLine("_cts is null returning @MpdQueryAlbumArt (Command)");
+                    res.IsSuccess = false;
+                    return res;
+                }
+
+                if (_cts.Token.IsCancellationRequested)
+                {
+                    Debug.WriteLine("IsCancellationRequested returning @MpdQueryAlbumArt (Command)");
+                    res.IsSuccess = false;
+                    return res;
+                }
+
                 if ((ConnectionState == ConnectionStatus.Disconnecting) || (ConnectionState == ConnectionStatus.DisconnectedByUser))
                 {
                     Debug.WriteLine("MpdQueryAlbumArt@Timeout. Disconnecting...");
@@ -5106,6 +5198,7 @@ public sealed partial class MpcService : IMpcService, IDisposable
     public void Dispose()
     {
         _cts?.Dispose();
+        Debug.WriteLine("MpcService.Dispose() completed.");
 
         GC.SuppressFinalize(this);
     }

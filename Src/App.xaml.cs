@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Data;
 using MPDCtrl.Helpers;
 using MPDCtrl.Services;
 using MPDCtrl.Services.Contracts;
@@ -13,6 +14,7 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using WinRT.Interop;
 
@@ -35,7 +37,7 @@ public sealed partial class App : Application
     // ErrorLog
     private static readonly string _logFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl4_errors.txt";
     private readonly StringBuilder _errortxt = new();
-
+    private readonly Lock _errorLogLock = new();
     //
     private Task? _appHostStartTask;
     private Task? _appHostStopTask;
@@ -53,6 +55,7 @@ public sealed partial class App : Application
         get;
     }
 
+    /*
     public static T GetService<T>()
         where T : class
     {
@@ -62,6 +65,11 @@ public sealed partial class App : Application
         }
 
         return service;
+    }
+    */
+    public static T GetService<T>() where T : class
+    {
+        return ((App)Current).Host.Services.GetRequiredService<T>();
     }
 
     public App()
@@ -161,35 +169,50 @@ public sealed partial class App : Application
 
     protected async override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
-        base.OnLaunched(args);
-
-        // Single instance.
-        // https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/applifecycle
-        var mainInstance = Microsoft.Windows.AppLifecycle.AppInstance.FindOrRegisterForKey("MPDCtrlMain");
-        // If the instance that's executing the OnLaunched handler right now
-        // isn't the "main" instance.
-        if (!mainInstance.IsCurrent)
+        try
         {
-            // Redirect the activation (and args) to the "main" instance, and exit.
-            var activatedEventArgs = Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().GetActivatedEventArgs();
-            await mainInstance.RedirectActivationToAsync(activatedEventArgs);
+            base.OnLaunched(args);
 
-            System.Diagnostics.Process.GetCurrentProcess().Kill();
-            return;
+            // Single instance.
+            // https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/applifecycle
+            var mainInstance = Microsoft.Windows.AppLifecycle.AppInstance.FindOrRegisterForKey("MPDCtrlMain");
+            // If the instance that's executing the OnLaunched handler right now
+            // isn't the "main" instance.
+            if (!mainInstance.IsCurrent)
+            {
+                // Redirect the activation (and args) to the "main" instance, and exit.
+                var activatedEventArgs = Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().GetActivatedEventArgs();
+                await mainInstance.RedirectActivationToAsync(activatedEventArgs);
+
+                //System.Diagnostics.Process.GetCurrentProcess().Kill();
+                Environment.Exit(0);
+                return;
+            }
+            else
+            {
+                // Otherwise, register for activation redirection
+                Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().Activated += App_Activated;
+            }
+
+            _appHostStartTask = StartAppHostAsync();
+            var main = App.GetService<MainWindow>();
+            main.Closed += (sender, e) =>
+            {
+                //_appHostStopTask = StopAppHostAsync();
+                ShutdownAppHost();
+            };
+            //main.AppWindow.Show(true);
+            main.Activate();
         }
-        else
+        catch (Exception ex)
         {
-            // Otherwise, register for activation redirection
-            Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().Activated += App_Activated;
-        }
+            Debug.WriteLine($"OnLaunched: {ex}");
+            AppendErrorLog("OnLaunched", ex.ToString());
+            SaveErrorLog();
 
-        _appHostStartTask = StartAppHostAsync();
-        var main = App.GetService<MainWindow>();
-        main.Closed += (sender, e) =>
-        {
-            _appHostStopTask = StopAppHostAsync();
-        };
-        main.AppWindow.Show(true);
+            // Startup failed and the app is in an unknown state, so exit instead of leaving a half-initialized process.
+            Environment.Exit(1);
+        }
     }
 
     private async Task StartAppHostAsync()
@@ -200,24 +223,47 @@ public sealed partial class App : Application
         }
         catch (Exception ex)
         {
-            AppendErrorLog("AppHost.StartAsync", ex.ToString());
+            AppendErrorLog("Host.StartAsync", ex.ToString());
+            SaveErrorLog();
+        }
+    }
+
+    private static readonly TimeSpan _shutdownTimeout = TimeSpan.FromSeconds(5);
+
+    private void ShutdownAppHost()
+    {
+        try
+        {
+            // Run on the thread pool so awaits inside don't capture the UI SynchronizationContext (avoids deadlock).
+            _appHostStopTask ??= Task.Run(StopAppHostAsync);
+
+            if (!_appHostStopTask.Wait(_shutdownTimeout))
+            {
+                AppendErrorLog("ShutdownAppHost", $"Host did not stop within {_shutdownTimeout.TotalSeconds} seconds.");
+                SaveErrorLog();
+            }
+        }
+        catch (Exception ex)
+        {
+            AppendErrorLog("ShutdownAppHost", ex.ToString());
             SaveErrorLog();
         }
     }
 
     private async Task StopAppHostAsync()
     {
-        if (_appHostStartTask != null)
-        {
-            await _appHostStartTask;
-        }
         try
         {
-            await Host.StopAsync();
+            if (_appHostStartTask != null)
+            {
+                await _appHostStartTask.ConfigureAwait(false);
+            }
+
+            await Host.StopAsync(_shutdownTimeout).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            AppendErrorLog("AppHost.StopAsync", ex.ToString());
+            AppendErrorLog("Host.StopAsync", ex.ToString());
             SaveErrorLog();
         }
         finally
@@ -225,10 +271,11 @@ public sealed partial class App : Application
             try
             {
                 Host.Dispose();
+                Debug.WriteLine($"[{DateTimeOffset.UtcNow:O}] Host is disposed.");
             }
             catch (Exception ex)
             {
-                AppendErrorLog("AppHost.Dispose", ex.ToString());
+                AppendErrorLog("Host.Dispose", ex.ToString());
                 SaveErrorLog();
             }
         }
@@ -282,23 +329,30 @@ public sealed partial class App : Application
         // This kills app... 
         // https://github.com/microsoft/microsoft-ui-xaml/issues/10447
 
-        Debug.WriteLine("App_UnhandledException", $"{e.Exception.Message}, {e.Exception.Data}");
-        AppendErrorLog("App_UnhandledException", $"{e.Exception.Message}, {e.Exception.Data}");
+
+        // e.Exception can lose detail when it crosses the WinRT boundary,
+        // but ToString() still gives the best available type, message, HResult and stack trace.
+        var details = $"{e.Exception}{Environment.NewLine}HResult: 0x{e.Exception.HResult:X8}{Environment.NewLine}Message: {e.Message}";
+
+        Debug.WriteLine($"App_UnhandledException: {details}");
+        AppendErrorLog("App_UnhandledException", details);
         SaveErrorLog();
 
-        //e.Handled = true;
+        // Mark as handled only for exceptions that are known to be recoverable.
+        // Leaving it unhandled lets the app terminate, which is safer for unknown states.
+        if (e.Exception is OperationCanceledException)
+        {
+            e.Handled = true;
+        }
     }
 
     private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
-        if (e.Exception.InnerException is not Exception exception)
-        {
-            Debug.WriteLine("TaskScheduler_UnobservedTaskException: " + e.ToString());
-            return;
-        }
+        // Flatten so nested AggregateExceptions are unwrapped, and log full details (type, message, stack trace).
+        var details = e.Exception.Flatten().ToString();
 
-        Debug.WriteLine("TaskScheduler_UnobservedTaskException: " + exception.Message);
-        AppendErrorLog("TaskScheduler_UnobservedTaskException", exception.Message);
+        Debug.WriteLine($"TaskScheduler_UnobservedTaskException: {details}");
+        AppendErrorLog("TaskScheduler_UnobservedTaskException", details);
         SaveErrorLog();
 
         e.SetObserved();
@@ -308,20 +362,25 @@ public sealed partial class App : Application
     {
         if (e.ExceptionObject is not Exception exception)
         {
-            Debug.WriteLine("CurrentDomain_UnhandledException: " + e.ToString());
+            var raw = e.ExceptionObject?.ToString() ?? "Unknown exception object";
+            Debug.WriteLine($"CurrentDomain_UnhandledException: {raw}");
+            AppendErrorLog("CurrentDomain_UnhandledException", raw);
+            SaveErrorLog();
             return;
         }
 
         if (exception is TaskCanceledException)
         {
             // can ignore.
-            Debug.WriteLine("CurrentDomain_UnhandledException (TaskCanceledException): " + exception.Message);
-            //AppendErrorLog("CurrentDomain_UnhandledException (TaskCanceledException)", exception.Message);
+            Debug.WriteLine($"CurrentDomain_UnhandledException (TaskCanceledException): {exception.Message}");
             return;
         }
 
-        Debug.WriteLine("CurrentDomain_UnhandledException: " + exception.Message);
-        AppendErrorLog("CurrentDomain_UnhandledException", exception.Message);
+        // Log full details (type, message, stack trace, inner exceptions).
+        var details = exception.ToString();
+
+        Debug.WriteLine($"CurrentDomain_UnhandledException (IsTerminating={e.IsTerminating}): {details}");
+        AppendErrorLog("CurrentDomain_UnhandledException", details);
         SaveErrorLog();
     }
 
@@ -331,10 +390,12 @@ public sealed partial class App : Application
         {
             return;
         }
-
-        _errortxt.AppendLine(kindTxt + ": " + errorTxt);
-        var dt = DateTime.Now;
-        _errortxt.AppendLine(CultureInfo.InvariantCulture, $"Occured at {dt.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture)}");
+        var timestamp = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
+        lock (_errorLogLock)
+        {
+            _errortxt.AppendLine(kindTxt + ": " + errorTxt);
+            _errortxt.AppendLine(CultureInfo.InvariantCulture, $"Occurred at {timestamp}");
+        }
     }
 
     public void SaveErrorLog()
@@ -349,16 +410,26 @@ public sealed partial class App : Application
             return;
         }
 
-        if (_errortxt.Length > 0)
-        {
-            var dt = DateTime.Now;
-            _errortxt.AppendLine(CultureInfo.InvariantCulture, $"Saved at {dt.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture)}");
-            _errortxt.AppendLine("");
+        var timestamp = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
 
-            var s = _errortxt.ToString();
-            if (!string.IsNullOrEmpty(s))
+        lock (_errorLogLock)
+        {
+            if (_errortxt.Length == 0)
             {
-                File.WriteAllText(_logFilePath, s);
+                return;
+            }
+
+            _errortxt.AppendLine(CultureInfo.InvariantCulture, $"Saved at {timestamp}");
+            _errortxt.AppendLine();
+
+            try
+            {
+                File.WriteAllText(_logFilePath, _errortxt.ToString());
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                // The error logger must never throw from inside an exception handler.
+                Debug.WriteLine($"SaveErrorLog failed: {ex.Message}");
             }
         }
     }

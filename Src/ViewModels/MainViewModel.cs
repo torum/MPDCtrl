@@ -8618,16 +8618,19 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             //this.UpdateProgress -= (sender, arg) => { this.OnUpdateProgress(arg); };
             this.UpdateProgress -= OnUpdateProgress;
 
-            _cts?.Cancel();
-
-            if (IsConnected)
+            try
             {
-                _mpc.IsStop = true;
-
-                _mpc.MpdDisconnect(false);
+                _cts?.Cancel();
+            }
+            finally
+            {
+                if (IsConnected)
+                {
+                    _mpc.IsStop = true;
+                    _mpc.MpdDisconnect(false);
+                }
             }
 
-            _cts?.Dispose();
         }
         catch (Exception ex)
         {
@@ -8637,6 +8640,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 (Application.Current as App)?.AppendErrorLog("Exception @CleanUp", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
                 (Application.Current as App)?.SaveErrorLog();
             });
+        }
+        finally
+        {
+            _cts?.Dispose();
+            Debug.WriteLine("MainViewModel.Dispose() completed.");
         }
 
         GC.SuppressFinalize(this);

@@ -51,14 +51,15 @@
 		<CsWinRTAotWarningLevel>3</CsWinRTAotWarningLevel>
 
 		<!-- Comment out this when creating an unpackaged single non-aot self-contained exe file in the command-line.  
-		<PublishAot>True</PublishAot>
-		<PublishTrimmed>True</PublishTrimmed>
 		<NativeDebugSymbols>true</NativeDebugSymbols>
 		<StripSymbols>false</StripSymbols>
 		<DebugType>full</DebugType>
+		<PublishSingleFile>false</PublishSingleFile>
 		-->
 
 		<!-- Needs this when creating an unpackaged single self-contained exe file in the command-line. 
+		<PublishAot>false</PublishAot>
+		<PublishTrimmed>false</PublishTrimmed>
 		<WindowsPackageType>None</WindowsPackageType>
 		<PublishSingleFile>true</PublishSingleFile>
 		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>

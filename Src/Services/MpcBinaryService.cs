@@ -246,10 +246,11 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
             {
                 if (_cts is null)
                     break;
-                if (_cts.Token.IsCancellationRequested)
+                var token = _cts.Token;
+                if (token.IsCancellationRequested)
                     break;
 
-                string? line = await _binaryReader.ReadLineAsync(_cts.Token);
+                string? line = await _binaryReader.ReadLineAsync(token);
 
                 if (line is not null)
                 {
@@ -463,12 +464,13 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
                 {
                     if (_cts is null)
                         break;
-                    if (_cts.Token.IsCancellationRequested)
+                    var token = _cts.Token;
+                    if (token.IsCancellationRequested)
                         break;
 
-                    while ((readSize = await _binaryReader.BaseStream.ReadAsync(buffer, _cts.Token)) > 0)
+                    while ((readSize = await _binaryReader.BaseStream.ReadAsync(buffer, token)) > 0)
                     {
-                        if (_cts.Token.IsCancellationRequested)
+                        if (token.IsCancellationRequested)
                         {
                             Debug.WriteLine("IsCancellationRequested in while loop @MpdBinarySendBinaryCommand");
                             return ret;
@@ -1241,6 +1243,7 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
     public void Dispose()
     {
         _cts?.Dispose();
+        Debug.WriteLine("MpcBinaryService.Dispose() completed.");
 
         GC.SuppressFinalize(this);
     }

@@ -8,7 +8,6 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using MPDCtrl.Helpers;
 using MPDCtrl.Models;
-using MPDCtrl.Services;
 using MPDCtrl.Services.Contracts;
 using MPDCtrl.Views;
 using System;
@@ -20,7 +19,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -2505,7 +2503,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     public Task InitializeAsync() => _initializationTask ??= StartAsync();
 
-    // TODO: make this a command (or make changes so that we don't have to call this from code behind).
     public async Task GetCacheFolderSizeAsync()
     {
         AlbumCacheFolderSizeFormatted = ToFileSizeString(await GetFolderSizeAsync(App.AlbumCoverCacheFolder).ConfigureAwait(true));
@@ -2515,6 +2512,74 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     {
         var list = new ObservableCollection<AlbumEx> { album };
         await GetAlbumPicturesAsync(list, _cts.Token);
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            // Unsubscribe events to avoid callbacks after shutdown
+            _mpc.MpdIdleConnected -= OnMpdIdleConnected;
+            _mpc.MpdPlayerStatusChanged -= OnMpdPlayerStatusChanged;
+            _mpc.MpdCurrentQueueChanged -= OnMpdCurrentQueueChanged;
+            _mpc.MpdPlaylistsChanged -= OnMpdPlaylistsChanged;
+            _mpc.MpdOutputChanged -= OnMpdOutputChanged;
+            _mpc.DebugCommandOutput -= OnDebugCommandOutput;
+            _mpc.DebugIdleOutput -= OnDebugIdleOutput;
+            _mpc.ConnectionStatusChanged -= OnConnectionStatusChanged;
+            _mpc.ConnectionError -= OnConnectionError;
+            _mpc.MpdAckError -= OnMpdAckError;
+            _mpc.MpdFatalError -= OnMpdFatalError;
+            _mpc.MpdAlbumArtChanged -= OnAlbumArtChanged;
+            _mpc.MpcProgress -= OnMpcProgress;
+            _mpc.IsBusy -= OnMpcIsBusy;
+
+            this.UpdateProgress -= OnUpdateProgress;
+
+            _elapsedTimer.Elapsed -= ElapsedTimer;
+            _elapsedTimer.Stop();
+            _elapsedTimer.Dispose();
+
+            if (_elapsedDelayTimer is not null)
+            {
+                _elapsedDelayTimer.Elapsed -= DoChangeElapsed;
+                _elapsedDelayTimer.Stop();
+                _elapsedDelayTimer.Dispose();
+            }
+
+            try
+            {
+                _cts?.Cancel();
+            }
+            finally
+            {
+                if (IsConnected)
+                {
+                    _mpc.IsStop = true;
+                    _mpc.MpdDisconnect(false);
+                }
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Exception @CleanUp() {ex}");
+            _dispatcherService.TryEnqueue(() =>
+            {
+                (Application.Current as App)?.AppendErrorLog("Exception @CleanUp", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
+                (Application.Current as App)?.SaveErrorLog();
+            });
+        }
+        finally
+        {
+            //_cts?.Dispose();
+            // Don't dispose _cts or _connectGate here while tasks may still use them.
+            // Cancellation plus the GC is enough. Disposing risks ObjectDisposedException in
+            // GetAlbumPictureAsync and ConnectAsync after shutdown.
+            Debug.WriteLine("MainViewModel.Dispose() completed.");
+        }
+
+        GC.SuppressFinalize(this);
     }
 
     #endregion
@@ -8845,71 +8910,4 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     #endregion
 
-    public void Dispose()
-    {
-        try
-        {
-            // Unsubscribe events to avoid callbacks after shutdown
-            _mpc.MpdIdleConnected -= OnMpdIdleConnected;
-            _mpc.MpdPlayerStatusChanged -= OnMpdPlayerStatusChanged;
-            _mpc.MpdCurrentQueueChanged -= OnMpdCurrentQueueChanged;
-            _mpc.MpdPlaylistsChanged -= OnMpdPlaylistsChanged;
-            _mpc.MpdOutputChanged -= OnMpdOutputChanged;
-            _mpc.DebugCommandOutput -= OnDebugCommandOutput;
-            _mpc.DebugIdleOutput -= OnDebugIdleOutput;
-            _mpc.ConnectionStatusChanged -= OnConnectionStatusChanged;
-            _mpc.ConnectionError -= OnConnectionError;
-            _mpc.MpdAckError -= OnMpdAckError;
-            _mpc.MpdFatalError -= OnMpdFatalError;
-            _mpc.MpdAlbumArtChanged -= OnAlbumArtChanged;
-            _mpc.MpcProgress -= OnMpcProgress;
-            _mpc.IsBusy -= OnMpcIsBusy;
-
-            this.UpdateProgress -= OnUpdateProgress;
-
-            _elapsedTimer.Elapsed -= ElapsedTimer;
-            _elapsedTimer.Stop();
-            _elapsedTimer.Dispose();
-
-            if (_elapsedDelayTimer is not null)
-            {
-                _elapsedDelayTimer.Elapsed -= DoChangeElapsed;
-                _elapsedDelayTimer.Stop();
-                _elapsedDelayTimer.Dispose();
-            }
-
-            try
-            {
-                _cts?.Cancel();
-            }
-            finally
-            {
-                if (IsConnected)
-                {
-                    _mpc.IsStop = true;
-                    _mpc.MpdDisconnect(false);
-                }
-            }
-
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Exception @CleanUp() {ex}");
-            _dispatcherService.TryEnqueue(() =>
-            {
-                (Application.Current as App)?.AppendErrorLog("Exception @CleanUp", $"{ex.Message} {Environment.NewLine}StackTrace: {ex.StackTrace}, Source: {ex.Source}");
-                (Application.Current as App)?.SaveErrorLog();
-            });
-        }
-        finally
-        {
-            //_cts?.Dispose();
-            // Don't dispose _cts or _connectGate here while tasks may still use them.
-            // Cancellation plus the GC is enough. Disposing risks ObjectDisposedException in
-            // GetAlbumPictureAsync and ConnectAsync after shutdown.
-            Debug.WriteLine("MainViewModel.Dispose() completed.");
-        }
-
-        GC.SuppressFinalize(this);
-    }
 }

@@ -240,12 +240,15 @@ public sealed partial class App : Application
             if (!_appHostStopTask.Wait(_shutdownTimeout))
             {
                 AppendErrorLog("ShutdownAppHost", $"Host did not stop within {_shutdownTimeout.TotalSeconds} seconds.");
-                SaveErrorLog();
             }
         }
         catch (Exception ex)
         {
             AppendErrorLog("ShutdownAppHost", ex.ToString());
+        }
+        finally
+        {
+            // Save error logs if any.
             SaveErrorLog();
         }
     }
@@ -264,7 +267,6 @@ public sealed partial class App : Application
         catch (Exception ex)
         {
             AppendErrorLog("Host.StopAsync", ex.ToString());
-            SaveErrorLog();
         }
         finally
         {
@@ -276,7 +278,11 @@ public sealed partial class App : Application
             catch (Exception ex)
             {
                 AppendErrorLog("Host.Dispose", ex.ToString());
-                SaveErrorLog();
+            }
+            finally
+            {
+                // Save error logs if any.
+                //SaveErrorLog(); // Already called in ShutdownAppHost
             }
         }
     }

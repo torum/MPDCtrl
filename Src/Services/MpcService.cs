@@ -1,4 +1,3 @@
-using Microsoft.UI.Xaml.Shapes;
 using MPDCtrl.Models;
 using MPDCtrl.Services.Contracts;
 using System;

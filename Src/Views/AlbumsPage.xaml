@@ -199,7 +199,7 @@
                         <Setter Property="Height" Value="260" />
                         <Setter Property="Width" Value="230" />
                         <Setter Property="Padding" Value="10,16,10,0" />
-                        <Setter Property="Margin" Value="0,0,24,0" />
+                        <Setter Property="Margin" Value="0,0,2,0" />
                     </Style>
                 </ListView.ItemContainerStyle>
             </ListView>
@@ -213,7 +213,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="48,0,48,0" />
-                        <Setter Target="BodyGrid.Margin" Value="44,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="24,0,0,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>
@@ -222,7 +222,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="HeaderGrid.Margin" Value="48,0,48,0" />
-                        <Setter Target="BodyGrid.Margin" Value="20,0,0,0" />
+                        <Setter Target="BodyGrid.Margin" Value="12,0,0,0" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState>

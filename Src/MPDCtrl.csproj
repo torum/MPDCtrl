@@ -94,7 +94,7 @@
 		<PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.3.260402-preview2" />
 		<PackageReference Include="CommunityToolkit.WinUI.Helpers" Version="8.3.260402-preview2" />
 		<PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.3.260402-preview2" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.13" />
 		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.3.1" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools.MSIX" Version="1.7.260930100">
 			<PrivateAssets>all</PrivateAssets>
@@ -104,7 +104,7 @@
 		<PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="2.1.9" />
 		<PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.5.1" />
 		<PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.3.9" />
-		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.12" />
+		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.13" />
 	</ItemGroup>
 
 	<ItemGroup>

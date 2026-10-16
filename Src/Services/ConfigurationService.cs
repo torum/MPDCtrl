@@ -16,9 +16,9 @@ using System.Xml.Linq;
 namespace MPDCtrl.Services;
 
 /*
- * WinUI3 does not provide a way to get the restore bounds of a window when it is maximized or minimized.
+ * WinUI3/AvaloniaUI does not provide a way to get the restore bounds of a window like WPF does when it is maximized or minimized.
  * So, we need to manually track the restore bounds of the window when it is in the restored state.
- * AppWindow_Changed and Window_SizeChanged event handlers are called when the window state changes, such as when the window is maximized, minimized, or restored.
+ * AppWindow_Changed(WinUI3)/Window_PositionChanged(AvaloniaUI) and Window_SizeChanged event handlers are called when the window state changes, such as when the window is maximized, minimized, or restored.
  * Make sure to update the restore bounds when the window is in the restored state.
  * Also, use Window_Activated event handler to update the restore bounds when the window is activated, because sometimes the window state change events are not fired when the window is activated.
  * This way, even if the window is closed while maximized or minimized, we can still save the restore bounds to the configuration file.

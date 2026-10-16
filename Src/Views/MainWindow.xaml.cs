@@ -35,6 +35,8 @@ public sealed partial class MainWindow : Window
     private int _winRestoreLeft = 100;
     private ElementTheme _theme = ElementTheme.Default;
 
+    private bool _isClosing;
+
     [DynamicWindowsRuntimeCast(typeof(OverlappedPresenter))]
     //[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     public MainWindow(MainViewModel vm, ShellPage shell, IDispatcherService dispatcherService, IConfigurationService configurationService)
@@ -500,6 +502,8 @@ public sealed partial class MainWindow : Window
 
     private void Window_Closed(object sender, WindowEventArgs args)
     {
+        Debug.WriteLine("Window_Closed");
+
         // Unsubscribe events that subscribed in the ctr.
         this.Closed -= Window_Closed;
         this.AppWindow?.Closing -= AppWindow_Closing;
@@ -516,6 +520,13 @@ public sealed partial class MainWindow : Window
     [DynamicWindowsRuntimeCast(typeof(OverlappedPresenter))]
     private async void AppWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)
     {
+        Debug.WriteLine("AppWindow_Closing");
+
+        if (_isClosing) return;
+        _isClosing = true;
+
+        args.Cancel = true;
+
         _vm.UpdateSettings();
 
         #region == Save Configuration ==
@@ -644,6 +655,8 @@ public sealed partial class MainWindow : Window
         await _configurationService.SaveConfigurationAsync();
 
         #endregion
+
+        this.Close();
     }
 
     #region == Global Hotkey == 

@@ -1,8 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Data;
 using MPDCtrl.Helpers;
 using MPDCtrl.Services;
 using MPDCtrl.Services.Contracts;
@@ -38,9 +35,6 @@ public sealed partial class App : Application
     private static readonly string _logFilePath = System.Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + System.IO.Path.DirectorySeparatorChar + "MPDCtrl4_errors.txt";
     private readonly StringBuilder _errortxt = new();
     private readonly Lock _errorLogLock = new();
-    //
-    private Task? _appHostStartTask;
-    private Task? _appHostStopTask;
 
 #if DEBUG
     public bool IsSaveErrorLog { get; set; } = true;
@@ -50,26 +44,12 @@ public sealed partial class App : Application
 
     private Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue { get; }
 
-    public IHost Host
-    {
-        get;
-    }
+    public IServiceProvider ServiceProvider { get; private set; } = null!;
 
-    /*
-    public static T GetService<T>()
-        where T : class
-    {
-        if ((Application.Current as App)!.Host.Services.GetService(typeof(T)) is not T service)
-        {
-            throw new ArgumentException($"{typeof(T)} needs to be registered in ConfigureServices within App.xaml.cs.");
-        }
-
-        return service;
-    }
-    */
     public static T GetService<T>() where T : class
     {
-        return ((App)Current).Host.Services.GetRequiredService<T>();
+        //return ((App)Current).ServiceProvider.GetRequiredService<T>();
+        return (App.Current as App)!.ServiceProvider.GetRequiredService<T>();
     }
 
     public App()
@@ -117,49 +97,37 @@ public sealed partial class App : Application
 
         InitializeComponent();
 
-        Host = Microsoft.Extensions.Hosting.Host.
-            CreateDefaultBuilder().
-            UseContentRoot(AppContext.BaseDirectory).
-            ConfigureLogging((context, logging) =>
-            {
-#if DEBUG
-                logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.Debug);
-                logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Information);
-#else
-                // Strips log destinations and shuts down the framework engines for production
-                logging.ClearProviders(); 
-                logging.AddFilter(null, LogLevel.None); 
-#endif
-            }).
-            ConfigureServices((context, services) =>
-            {
-                // Core Services
-                services.AddSingleton<IMpcService, MpcService>();
-                services.AddSingleton<IMpcBinaryService, MpcBinaryService>();
-                services.AddSingleton<IDialogService, DialogService>();
-                services.AddSingleton<IDispatcherService>(new DispatcherService(CurrentDispatcherQueue));
+        var services = new ServiceCollection();
 
-                // Views and ViewModels
-                services.AddSingleton<MainViewModel>();
-                services.AddSingleton<MainWindow>();
-                services.AddSingleton<ShellPage>();
+        // Core Services
+        services.AddSingleton<IMpcService, MpcService>();
+        services.AddSingleton<IMpcBinaryService, MpcBinaryService>();
+        services.AddSingleton<IDialogService, DialogService>();
+        services.AddSingleton<IDispatcherService>(new DispatcherService(CurrentDispatcherQueue));
+        services.AddSingleton<IConfigurationService, ConfigurationService>();
 
-                // Pages (Frame creates page instances)
-                // Currently WinUI's Frame.Navigate(Type) does not provide a way for applications to control how a Page instance is created)
-                // So, no DI.
-                //services.AddSingleton<SettingsPage>();
-                //services.AddSingleton<QueuePage>();
-                //services.AddSingleton<AlbumsPage>();
-                //services.AddSingleton<AlbumDetailPage>();
-                //services.AddSingleton<ArtistsPage>();
-                //services.AddSingleton<FilesPage>();
-                //services.AddSingleton<SearchPage>();
-                //services.AddTransient<PlaylistItemPage>();
+        // Views and ViewModels
+        services.AddSingleton<MainViewModel>();
+        services.AddSingleton<MainWindow>();
+        services.AddSingleton<ShellPage>();
 
-                // Configuration
-                //services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
-            }).
-            Build();
+        // Pages (Frame creates page instances)
+        // Currently WinUI's Frame.Navigate(Type) does not provide a way for applications to control how a Page instance is created)
+        // So, no DI.
+        //services.AddSingleton<SettingsPage>();
+        //services.AddSingleton<QueuePage>();
+        //services.AddSingleton<AlbumsPage>();
+        //services.AddSingleton<AlbumDetailPage>();
+        //services.AddSingleton<ArtistsPage>();
+        //services.AddSingleton<FilesPage>();
+        //services.AddSingleton<SearchPage>();
+        //services.AddTransient<PlaylistItemPage>();
+
+        // Configuration
+        //services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
+
+        // Build the provider
+        ServiceProvider = services.BuildServiceProvider();
 
         Microsoft.UI.Xaml.Application.Current.UnhandledException += App_UnhandledException;
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
@@ -194,12 +162,15 @@ public sealed partial class App : Application
                 Microsoft.Windows.AppLifecycle.AppInstance.GetCurrent().Activated += App_Activated;
             }
 
-            _appHostStartTask = StartAppHostAsync();
+            var configurationService = ServiceProvider.GetRequiredService<IConfigurationService>();
+            configurationService.Initialize(AppConfigFilePath);
+            await configurationService.LoadConfigurationAsync();
+
+            //_appHostStartTask = StartAppHostAsync();
             var main = App.GetService<MainWindow>();
             main.Closed += (sender, e) =>
             {
-                //_appHostStopTask = StopAppHostAsync();
-                ShutdownAppHost();
+                //ShutdownAppHost();
             };
             //main.AppWindow.Show(true);
             main.Activate();
@@ -215,6 +186,8 @@ public sealed partial class App : Application
         }
     }
 
+    // Old IHost approach. Not used now, but keep for reference.
+    /*
     private async Task StartAppHostAsync()
     {
         try
@@ -286,6 +259,7 @@ public sealed partial class App : Application
             }
         }
     }
+    */
 
     private void App_Activated(object? sender, Microsoft.Windows.AppLifecycle.AppActivationArguments e)
     {

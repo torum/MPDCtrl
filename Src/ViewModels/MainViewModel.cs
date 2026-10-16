@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI;
-using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -44,7 +43,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly IMpcService _mpc;
     private readonly IDialogService _dialogs;
     private readonly IDispatcherService _dispatcherService;
-    private readonly ILogger<MainViewModel> _logger;
+    private readonly IConfigurationService _configurationService;
 
     private Task? _initializationTask;
 
@@ -73,12 +72,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     #endregion
 
-    public MainViewModel(IMpcService mpcService, IDialogService dialogService, IDispatcherService dispatcherService, ILogger<MainViewModel> logger)
+    public MainViewModel(IMpcService mpcService, IDialogService dialogService, IDispatcherService dispatcherService, IConfigurationService configurationService)
     {
         _mpc = mpcService;
         _dialogs = dialogService;
         _dispatcherService = dispatcherService;
-        _logger = logger;
+        _configurationService = configurationService;
+
+        ApplySettings();
 
         InitializeAndSubscribe();
 
@@ -89,6 +90,64 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         IsDebugWindowEnabled = false;
         IsShowDebugWindow = false;
 #endif
+    }
+
+    private void ApplySettings()
+    {
+        var config = _configurationService.CurrentConfiguration;
+
+        IsNavigationViewMenuOpen = config.IsNavigationViewMenuOpen;
+        Theme = config.Theme;
+        Material = config.SystemBackdrop;
+
+        IsUpdateOnStartup = config.IsUpdateOnStartup;
+        IsDownloadAlbumArtEmbeddedUsingReadPicture = config.IsDownloadAlbumArtEmbeddedUsingReadPicture;
+        IsAutoScrollToNowPlaying = config.IsAutoScrollToNowPlaying;
+        IsArtistSortWithoutThePrefix = config.IsArtistSortWithoutThePrefix;
+        IsAlbumSortWithoutThePrefix = config.IsAlbumSortWithoutThePrefix;
+        IsForceSetVolumeExplicitly = config.IsForceSetVolumeExplicitly;
+
+        foreach (var profile in config.Profiles)
+        {
+            Profiles.Add(profile);
+            if (profile.IsDefault)
+            {
+                CurrentProfile = profile;
+            }
+        }
+
+        CurrentProfile ??= config.CurrentProfile;
+
+        if (Profiles.Count > 0 && CurrentProfile is null)
+        {
+            var prof = Profiles.FirstOrDefault(x => x.IsDefault);
+            CurrentProfile = prof ?? Profiles[0];
+        }
+
+    }
+
+    public void UpdateSettings()
+    {
+        var config = _configurationService.CurrentConfiguration;
+        config.IsNavigationViewMenuOpen = IsNavigationViewMenuOpen;
+        config.Theme = Theme;
+        config.SystemBackdrop = Material;
+        config.IsUpdateOnStartup = IsUpdateOnStartup;
+        config.IsDownloadAlbumArtEmbeddedUsingReadPicture = IsDownloadAlbumArtEmbeddedUsingReadPicture;
+        config.IsAutoScrollToNowPlaying = IsAutoScrollToNowPlaying;
+        config.IsArtistSortWithoutThePrefix = IsArtistSortWithoutThePrefix;
+        config.IsAlbumSortWithoutThePrefix = IsAlbumSortWithoutThePrefix;
+        config.IsForceSetVolumeExplicitly = IsForceSetVolumeExplicitly;
+        config.Profiles.Clear();
+        foreach (var profile in Profiles)
+        {
+            config.Profiles.Add(profile);
+        }
+        if (CurrentProfile is not null)
+        {
+            CurrentProfile?.Volume = Volume;
+            config.CurrentProfile = CurrentProfile;
+        }
     }
 
     #region == Properties ==
@@ -280,106 +339,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             _password = value;
 
             OnPropertyChanged();
-        }
-    }
-
-    public static string Encrypt(string s)
-    {
-        if (string.IsNullOrEmpty(s)) { return ""; }
-
-        byte[] entropy = [0x72, 0xa2, 0x12, 0x04];
-
-        // Uses System.Security.Cryptography.ProtectedData
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            try
-            {
-                byte[] userData = System.Text.Encoding.UTF8.GetBytes(s);
-                byte[] encryptedData = System.Security.Cryptography.ProtectedData.Protect(userData, entropy, System.Security.Cryptography.DataProtectionScope.CurrentUser);
-
-                return System.Convert.ToBase64String(encryptedData);
-            }
-            catch
-            {
-                Debug.WriteLine($"Encrypt fail.");
-                return s;
-            }
-        }
-        //else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        else
-        {
-            string encryptionKey = "withas";
-            byte[] sBytes = Encoding.Unicode.GetBytes(s);
-            using (System.Security.Cryptography.Aes encryptor = System.Security.Cryptography.Aes.Create())
-            {
-                // Obsolete and deprecated in .NET 10.
-                //Rfc2898DeriveBytes pdb = new(encryptionKey, entropy, 10000, HashAlgorithmName.SHA1);
-                //encryptor.Key = pdb.GetBytes(32);
-                //encryptor.IV = pdb.GetBytes(16);
-                // New since .NET 10.
-                encryptor.Key = Rfc2898DeriveBytes.Pbkdf2(encryptionKey, entropy, 10000, HashAlgorithmName.SHA1, 32);
-                encryptor.IV = Rfc2898DeriveBytes.Pbkdf2(encryptionKey, entropy, 10000, HashAlgorithmName.SHA1, 16);
-
-                using MemoryStream ms = new();
-                using (CryptoStream cs = new(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
-                {
-                    cs.Write(sBytes, 0, sBytes.Length);
-                    cs.Close();
-                }
-                s = Convert.ToBase64String(ms.ToArray());
-            }
-            return s;
-        }
-    }
-
-    public static string Decrypt(string s)
-    {
-        if (string.IsNullOrEmpty(s)) { return ""; }
-
-        byte[] entropy = [0x72, 0xa2, 0x12, 0x04];
-
-        // Uses System.Security.Cryptography.ProtectedData
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            try
-            {
-                byte[] encryptedData = System.Convert.FromBase64String(s);
-                byte[] userData = System.Security.Cryptography.ProtectedData.Unprotect(encryptedData, entropy, DataProtectionScope.CurrentUser);
-
-                return System.Text.Encoding.UTF8.GetString(userData);
-            }
-            catch
-            {
-                Debug.WriteLine($"Decrypt fail.");
-                return "";
-            }
-        }
-        //else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        else
-        {
-            string encryptionKey = "withas";
-            s = s.Replace(" ", "+");
-            byte[] sBytes = Convert.FromBase64String(s);
-            using (System.Security.Cryptography.Aes encryptor = System.Security.Cryptography.Aes.Create())
-            {
-                // Obsolete and deprecated in .NET 10.
-                //Rfc2898DeriveBytes pdb = new(encryptionKey, entropy, 10000, HashAlgorithmName.SHA1);
-                //encryptor.Key = pdb.GetBytes(32);
-                //encryptor.IV = pdb.GetBytes(16);
-                // New since .NET 10.
-                encryptor.Key = Rfc2898DeriveBytes.Pbkdf2(encryptionKey, entropy, 10000, HashAlgorithmName.SHA1, 32);
-                encryptor.IV = Rfc2898DeriveBytes.Pbkdf2(encryptionKey, entropy, 10000, HashAlgorithmName.SHA1, 16);
-
-                using MemoryStream ms = new();
-                using (CryptoStream cs = new(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
-                {
-                    cs.Write(sBytes, 0, sBytes.Length);
-                    cs.Close();
-                }
-                s = Encoding.Unicode.GetString(ms.ToArray());
-            }
-
-            return s;
         }
     }
 
@@ -5231,13 +5190,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             {
                 MpdVersion = _mpc.MpdVerText;
 
-                //Debug.WriteLine($"OK MPD {MpdVersion} @OnMpdIdleConnected");
-                if (_logger.IsEnabled(LogLevel.Information))
-                {
-#pragma warning disable CA1848 // Use the LoggerMessage delegates
-                    _logger.LogInformation("OK MPD {MPDVer} @OnMpdIdleConnected.", MpdVersion);
-#pragma warning restore CA1848 // Use the LoggerMessage delegates
-                }
+                Debug.WriteLine($"OK MPD {MpdVersion}");
 
                 IsConnected = true;
                 IsConnecting = false;
@@ -5598,9 +5551,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
+    [GeneratedRegex(@"[\[].+?[\]]")]
+    private static partial Regex CleanMpdMessageRegex();
     private static string CleanMpdMessage(string msg)
     {
-        var s = Regex.Replace(msg, @"[\[].+?[\]]", string.Empty);
+        var s = CleanMpdMessageRegex().Replace(msg, string.Empty);
         return s.Replace("ACK ", string.Empty).Replace("{} ", string.Empty);
     }
 

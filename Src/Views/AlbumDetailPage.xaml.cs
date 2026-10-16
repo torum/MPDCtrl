@@ -41,8 +41,6 @@ public sealed partial class AlbumDetailPage : Page
 
     public ObservableCollection<Breadcrumb> BreadcrumbItems { get; set; } = [];
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(Frame))]
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
@@ -75,8 +73,6 @@ public sealed partial class AlbumDetailPage : Page
         base.OnNavigatedFrom(e); // Always call the base implementation
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(ListView))]
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void AlbumSongsListView_RightTapped(object sender, RightTappedRoutedEventArgs e)
@@ -142,6 +138,7 @@ public sealed partial class AlbumDetailPage : Page
         }
         */
     }
+
     private static T? FindParent<T>(DependencyObject child) where T : DependencyObject
     {
         DependencyObject parent = VisualTreeHelper.GetParent(child);

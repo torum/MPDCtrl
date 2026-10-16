@@ -111,8 +111,6 @@ public sealed partial class AlbumsPage : Page
     }
 
     // Find the ScrollViewer in the visual tree
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(ScrollViewer))]
     private static ScrollViewer? FindScrollViewer(DependencyObject obj)
     {
@@ -138,8 +136,6 @@ public sealed partial class AlbumsPage : Page
         _springAnimation.FinalValue = new Vector3(finalValue);
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void Border_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
@@ -153,8 +149,6 @@ public sealed partial class AlbumsPage : Page
         ele.StartAnimation(_springAnimation);
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void Border_PointerExited(object sender, PointerRoutedEventArgs e)
     {
@@ -201,8 +195,6 @@ public sealed partial class AlbumsPage : Page
         UpdateVisibleItems(this.AlbumsListView, scrollViewer);
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
     private void UpdateVisibleItems(ListView listView, ScrollViewer scrollViewer)
     {
@@ -309,8 +301,6 @@ public sealed partial class AlbumsPage : Page
         }
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(ListView))]
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void FilterAlbumListBox_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)

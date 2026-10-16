@@ -26,8 +26,6 @@ public sealed partial class FilesPage : Page
         get;
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(ListView))]
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void ListView_RightTapped(object sender, RightTappedRoutedEventArgs e)
@@ -121,8 +119,6 @@ public sealed partial class FilesPage : Page
         }
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void TreeView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {

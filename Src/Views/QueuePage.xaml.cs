@@ -90,8 +90,6 @@ public sealed partial class QueuePage : Page
         });
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(ListView))]
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private async void QueueListview_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -153,8 +151,6 @@ public sealed partial class QueuePage : Page
         }
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(ListView))]
     [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
@@ -190,8 +186,6 @@ public sealed partial class QueuePage : Page
         await ViewModel.QueueSelectedPlayCommand.ExecuteAsync(song);
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(ListView))]
     [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
@@ -276,8 +270,6 @@ public sealed partial class QueuePage : Page
         }
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(ListView))]
     [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]

@@ -445,8 +445,6 @@ public sealed partial class ShellPage : Page
 
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(TextBox))]
     [DynamicWindowsRuntimeCast(typeof(ListView))]
     [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
@@ -490,8 +488,6 @@ public sealed partial class ShellPage : Page
         Task.Run(() => ViewModel.PlayCommand.Execute(null));
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(TextBox))]
     [DynamicWindowsRuntimeCast(typeof(ListView))]
     [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
@@ -532,8 +528,6 @@ public sealed partial class ShellPage : Page
         //e.Handled = true;
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(UIElement))]
     private void VolumeSlider_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
     {
@@ -548,8 +542,6 @@ public sealed partial class ShellPage : Page
         e.Handled = true;
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(UIElement))]
     private void SeekSlider_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
     {
@@ -596,8 +588,6 @@ public sealed partial class ShellPage : Page
         SetRegionsForCustomTitleBar();
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(NavigationViewItem))]
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void NavigationViewItem_DragOver(object sender, DragEventArgs e)
@@ -631,8 +621,6 @@ public sealed partial class ShellPage : Page
         e.Handled = true;
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(NavigationViewItem))]
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private async void NavigationViewItem_Drop(object sender, DragEventArgs e)

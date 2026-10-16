@@ -33,8 +33,6 @@ public sealed partial class PlaylistItemPage : Page
         get;
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(ListView))]
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void PlaylistListview_RightTapped(object sender, RightTappedRoutedEventArgs e)
@@ -178,8 +176,6 @@ public sealed partial class PlaylistItemPage : Page
         }
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(ListView))]
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void FilterPlaylistSongListBox_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)

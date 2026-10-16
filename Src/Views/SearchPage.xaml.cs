@@ -25,8 +25,6 @@ public sealed partial class SearchPage : Page
         get;
     }
 
-    // TEMP: Require CsWinRT 2.3.0-prerelease.251115.2
-    // https://github.com/dotnet/runtime/issues/121590
     [DynamicWindowsRuntimeCast(typeof(ListView))]
     [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
     [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]

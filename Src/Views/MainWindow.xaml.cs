@@ -224,14 +224,9 @@ public sealed partial class MainWindow : Window
 
         //OverlappedPresenterState? winState = null; // For AOT workaround, don't set default, = OverlappedPresenterState.Restored;
 
-        // TODO:
-        bool isFoundNewThemeSetting = false;
-
         var config = _configurationService.CurrentConfiguration;
 
-
-        Debug.WriteLine($"MainWindow Configuration: Width={config.MainWindow.Width}, Height={config.MainWindow.Height}, Top={config.MainWindow.Top}, Left={config.MainWindow.Left}, RestoreWidth={config.MainWindow.RestoreWidth}, RestoreHeight={config.MainWindow.RestoreHeight}, RestoreTop={config.MainWindow.RestoreTop}, RestoreLeft={config.MainWindow.RestoreLeft}");
-
+        //Debug.WriteLine($"MainWindow Configuration: Width={config.MainWindow.Width}, Height={config.MainWindow.Height}, Top={config.MainWindow.Top}, Left={config.MainWindow.Left}, RestoreWidth={config.MainWindow.RestoreWidth}, RestoreHeight={config.MainWindow.RestoreHeight}, RestoreTop={config.MainWindow.RestoreTop}, RestoreLeft={config.MainWindow.RestoreLeft}");
 
         if (config.MainWindow.Width < 500)
         {
@@ -306,43 +301,6 @@ public sealed partial class MainWindow : Window
 
                 // Sets restore size and position.
                 appWindow.MoveAndResize(new Windows.Graphics.RectInt32(config.MainWindow.Left, config.MainWindow.Top, config.MainWindow.Width, config.MainWindow.Height));
-            }
-        }
-
-        // TODO: time to remove?
-        // For the strictly backward compatibility reason, load preference from localsetting.
-        if (RuntimeHelper.IsMSIX && (!isFoundNewThemeSetting))
-        {
-            if (ApplicationData.Current.LocalSettings.Values.TryGetValue("AppSystemBackdropOption", out var obj))
-            {
-                if (obj is not null)
-                {
-                    if (obj is string s)
-                    {
-                        if (s == SystemBackdropOption.Acrylic.ToString())
-                        {
-                            config.SystemBackdrop = SystemBackdropOption.Acrylic;
-                        }
-                        else if (s == SystemBackdropOption.Mica.ToString())
-                        {
-                            config.SystemBackdrop = SystemBackdropOption.Mica;
-                        }
-                    }
-                }
-            }
-
-            if (ApplicationData.Current.LocalSettings.Values.TryGetValue("AppBackgroundRequestedTheme", out var obj2))
-            {
-                if (obj2 is not null)
-                {
-                    if (obj2 is string themeName)
-                    {
-                        if (Enum.TryParse(themeName, out ElementTheme cacheTheme))
-                        {
-                            config.Theme = cacheTheme;
-                        }
-                    }
-                }
             }
         }
 

@@ -79,9 +79,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         _dispatcherService = dispatcherService;
         _configurationService = configurationService;
 
-        ApplySettings();
-
         InitializeAndSubscribe();
+
+        ApplySettings();
 
 #if DEBUG
         IsDebugWindowEnabled = false;
@@ -116,14 +116,18 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             }
         }
 
-        CurrentProfile ??= config.CurrentProfile;
-
+        // Just in case, if no profile is set as default, we set the first one as current profile.
         if (Profiles.Count > 0 && CurrentProfile is null)
         {
             var prof = Profiles.FirstOrDefault(x => x.IsDefault);
             CurrentProfile = prof ?? Profiles[0];
         }
 
+        // Just in case, if no profile is set as default.
+        CurrentProfile ??= config.CurrentProfile;
+
+        // Sets the SelectedProfile to the CurrentProfile, so that the UI reflects the current profile.
+        SelectedProfile = CurrentProfile;
     }
 
     public void UpdateSettings()

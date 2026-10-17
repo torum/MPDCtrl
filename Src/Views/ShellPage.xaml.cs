@@ -27,13 +27,19 @@ public sealed partial class ShellPage : Page
     private Type? _currentPage;
     private long _token;
     private MainWindow? _mainWindow;
+    private readonly IConfigurationService _configurationService;
 
-    public ShellPage(MainViewModel vm, IDispatcherService dispatcherService)
+    public ShellPage(MainViewModel vm, IDispatcherService dispatcherService, IConfigurationService configurationService)
     {
         ViewModel = vm;
         _dispatcherService = dispatcherService;
+        _configurationService = configurationService;
 
         InitializeComponent();
+
+        // Set the initial state of the NavigationView's menu open state based on the configuration
+        // Must be done here, otherwise the NavigationView will always start closed.
+        ViewModel.IsNavigationViewMenuOpen = _configurationService.CurrentConfiguration.IsNavigationViewMenuOpen;
 
         Loaded += Page_Loaded;
         Unloaded += Page_Unloaded;

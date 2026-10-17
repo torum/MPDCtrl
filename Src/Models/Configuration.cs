@@ -23,7 +23,7 @@ public class Configuration
 
     public WindowSettings MainWindow { get; set; } = new WindowSettings();
 
-    public bool IsNavigationViewMenuOpen { get; set; }
+    public bool IsNavigationViewMenuOpen { get; set; } = true;
 
     public ElementTheme Theme { get; set; } = ElementTheme.Default;
 

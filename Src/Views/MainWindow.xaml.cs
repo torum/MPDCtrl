@@ -316,7 +316,7 @@ public sealed partial class MainWindow : Window
 
     public void SwitchBackdrop(SystemBackdropOption backdrop)
     {
-        var vm = App.GetService<MainViewModel>();
+        //var vm = App.GetService<MainViewModel>();
 
         if (backdrop == SystemBackdropOption.Mica)
         {
@@ -326,9 +326,9 @@ public sealed partial class MainWindow : Window
                 {
                     Kind = MicaKind.Base
                 };
-                vm.Material = SystemBackdropOption.Mica;
+                _vm.Material = SystemBackdropOption.Mica;
 
-                vm.IsBackdropEnabled = true;
+                _vm.IsBackdropEnabled = true;
             }
         }
         else if (backdrop == SystemBackdropOption.MicaAlt)
@@ -339,9 +339,9 @@ public sealed partial class MainWindow : Window
                 {
                     Kind = MicaKind.BaseAlt
                 };
-                vm.Material = SystemBackdropOption.MicaAlt;
+                _vm.Material = SystemBackdropOption.MicaAlt;
 
-                vm.IsBackdropEnabled = true;
+                _vm.IsBackdropEnabled = true;
             }
         }
         else if (backdrop == SystemBackdropOption.Acrylic)
@@ -350,18 +350,18 @@ public sealed partial class MainWindow : Window
             {
                 this.SystemBackdrop = new DesktopAcrylicBackdrop();
 
-                vm.Material = SystemBackdropOption.Acrylic;
+                _vm.Material = SystemBackdropOption.Acrylic;
 
-                vm.IsBackdropEnabled = true;
+                _vm.IsBackdropEnabled = true;
             }
         }
         else if (backdrop == SystemBackdropOption.None)
         {
             this.SystemBackdrop = null;
 
-            vm.Material = SystemBackdropOption.None;
-            vm.IsBackdropEnabled = false;
-            vm.Theme = ElementTheme.Default;
+            _vm.Material = SystemBackdropOption.None;
+            _vm.IsBackdropEnabled = false;
+            _vm.Theme = ElementTheme.Default;
             _theme = ElementTheme.Default;
             if (this.Content is ShellPage root)
             {

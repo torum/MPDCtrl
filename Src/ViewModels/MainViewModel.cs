@@ -96,7 +96,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     {
         var config = _configurationService.CurrentConfiguration;
 
-        IsNavigationViewMenuOpen = config.IsNavigationViewMenuOpen;
+        IsNavigationViewMenuOpen = config.IsNavigationViewMenuOpen;// This has no effect since the NavigationView's IsPaneOpen property is bound to the ViewModel's IsNavigationViewMenuOpen property, which is set in the ShellPage.xaml.cs constructor. This line is kept for consistency and future-proofing.
+        
         Theme = config.Theme;
         Material = config.SystemBackdrop;
 

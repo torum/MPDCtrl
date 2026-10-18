@@ -716,9 +716,5 @@ public sealed class ConfigurationService : IConfigurationService
                 (App.Current as App)?.AppendErrorLog("Exception@OnWindowClosing", ex.Message);
             });
         }
-
-        // Save error logs.
-        _dispatcherService.TryEnqueue(() => { (App.Current as App)?.SaveErrorLog(); });
-
     }
 }

@@ -166,13 +166,7 @@ public sealed partial class App : Application
             configurationService.Initialize(AppConfigFilePath);
             await configurationService.LoadConfigurationAsync();
 
-            //_appHostStartTask = StartAppHostAsync();
             var main = App.GetService<MainWindow>();
-            main.Closed += (sender, e) =>
-            {
-                //ShutdownAppHost();
-            };
-            //main.AppWindow.Show(true);
             main.Activate();
         }
         catch (Exception ex)

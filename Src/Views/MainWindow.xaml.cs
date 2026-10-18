@@ -473,6 +473,9 @@ public sealed partial class MainWindow : Window
         // If we use IHost, we can remove this and let IHost manage lifetime of those.
         // * Disconnect from MPD and close socket connection.
         _vm.Dispose();
+
+        // Save error logs if any.
+        _dispatcherService.TryEnqueue(() => { (App.Current as App)?.SaveErrorLog(); });
     }
 
     [DynamicWindowsRuntimeCast(typeof(OverlappedPresenter))]

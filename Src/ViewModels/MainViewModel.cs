@@ -5209,6 +5209,10 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 if ((Profiles.Count <= 0) && (CurrentProfile is not null))
                 {
                     Profiles.Add(CurrentProfile);
+                    // First profile is always default.
+                    CurrentProfile.IsDefault = true;
+                    // Set selected profile to current profile.
+                    SelectedProfile = CurrentProfile;
                 }
             });
 

@@ -45,9 +45,9 @@ public sealed partial class MainWindow : Window
         _dispatcherService = dispatcherService;
         _configurationService = configurationService;
 
-        LoadSettings();
-
         InitializeComponent();
+
+        LoadSettings();
 
         this.ExtendsContentIntoTitleBar = true;
 

@@ -236,11 +236,13 @@ public sealed partial class ProfileDialog : Page
 
     private void TextBoxHost_TextChanged(object sender, TextChangedEventArgs e)
     {
-        ValidateHostInput();
+        // Let's not validate host input on every keystroke.
+        //ValidateHostInput();
     }
 
     private void TextBoxPort_TextChanged(object sender, TextChangedEventArgs e)
     {
-        ValidatePortInput();
+        // Let's not validate port input on every keystroke.
+        //ValidatePortInput();
     }
 }

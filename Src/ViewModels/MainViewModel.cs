@@ -2670,7 +2670,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-
     private async Task ConnectCoreAsync(string host, int port, CancellationToken cancellationToken)
     {
         /*

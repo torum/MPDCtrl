@@ -53,6 +53,16 @@ public sealed class ConfigurationService : IConfigurationService
         CurrentConfiguration = new Models.Configuration();
         _xdoc = null;
         _isInitialized = true;
+
+        var folderPath = Path.GetDirectoryName(configFilePath);
+        if (folderPath is not null)
+        {
+            System.IO.Directory.CreateDirectory(folderPath);
+        }
+        else
+        {
+            throw new InvalidOperationException("Invalid configuration file path.");
+        }
     }
 
     public async Task<Models.Configuration> LoadConfigurationAsync()
@@ -86,7 +96,7 @@ public sealed class ConfigurationService : IConfigurationService
 
         try
         {
-            _xdoc = XDocument.Load(App.AppConfigFilePath);
+            _xdoc = XDocument.Load(_configFilePath);
             if (_xdoc.Root is null)
             {
                 return config;
@@ -490,10 +500,10 @@ public sealed class ConfigurationService : IConfigurationService
             throw new InvalidOperationException("ConfigurationService is not initialized.");
         }
 
-        // TODO: Make sure Window and settings have been fully loaded and not overriding with empty data.
+        // Make sure Window and settings have been fully loaded and not overriding with empty data.
         if (!_isConfigLoaded)
         {
-            // Don't return, because we want to save the configuration even if it hasn't been loaded yet, like the first time.
+            // Should be fine now. -> Don't return, because we want to save the configuration even if it hasn't been loaded yet, like the first time.
             //return;
         }
         if (string.IsNullOrEmpty(_configFilePath))
@@ -698,22 +708,23 @@ public sealed class ConfigurationService : IConfigurationService
 
         try
         {
+            // Now this is redundant, because we already create the directory in Initialize() method.
             if (!Directory.Exists(App.AppDataFolder))
             {
                 Directory.CreateDirectory(App.AppDataFolder);
             }
 
             //doc.Save(App.AppConfigFilePath);
-            var temporaryPath = App.AppConfigFilePath + ".tmp";
+            var temporaryPath = _configFilePath + ".tmp";
             doc.Save(temporaryPath);
-            File.Move(temporaryPath, App.AppConfigFilePath, overwrite: true);
+            File.Move(temporaryPath, _configFilePath, overwrite: true);
         }
         //catch (System.IO.FileNotFoundException) { }
         catch (Exception ex)
         {
             _dispatcherService.TryEnqueue(() =>
             {
-                (App.Current as App)?.AppendErrorLog("Exception@OnWindowClosing", ex.Message);
+                (App.Current as App)?.AppendErrorLog("Exception@SaveConfigurationAsync", ex.ToString());
             });
         }
     }

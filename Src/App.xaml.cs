@@ -39,7 +39,7 @@ public sealed partial class App : Application
 #if DEBUG
     public bool IsSaveErrorLog { get; set; } = true;
 #else
-    public bool IsSaveErrorLog { get; set; } = false;
+    public bool IsSaveErrorLog { get; set; }
 #endif
 
     private Microsoft.UI.Dispatching.DispatcherQueue? CurrentDispatcherQueue { get; }

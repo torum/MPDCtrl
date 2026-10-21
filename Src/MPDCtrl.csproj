@@ -50,7 +50,7 @@
 		<Optimize>true</Optimize>
 		<CsWinRTAotWarningLevel>3</CsWinRTAotWarningLevel>
 
-		<!-- Comment out this when creating an unpackaged single non-aot self-contained exe file in the command-line.  
+		<!-- Comment out this when creating an unpackaged single non-aot self-contained exe file in the command-line. 
 		<NativeDebugSymbols>true</NativeDebugSymbols>
 		<StripSymbols>false</StripSymbols>
 		<DebugType>full</DebugType>
@@ -71,13 +71,14 @@
 		<EnableMsixTooling>False</EnableMsixTooling>
 		<WindowsPackageType>None</WindowsPackageType>
 
-		<!-- "Packaged" Needs this when developing or publishing as an packaged app.
+		<!-- "Packaged" Needs this when developing or publishing as an packaged app. 
 		<EnableMsixTooling>True</EnableMsixTooling>
 		<WindowsPackageType>MSIX</WindowsPackageType>
 
 		<PublishAot>true</PublishAot>
 		<PublishTrimmed>true</PublishTrimmed>
 		<PublishSingleFile>false</PublishSingleFile>
+		<AppxPackageIncludePrivateSymbols>true</AppxPackageIncludePrivateSymbols>
 		-->
 
 		<!-- always -->

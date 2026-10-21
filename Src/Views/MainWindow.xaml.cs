@@ -47,12 +47,12 @@ public sealed partial class MainWindow : Window
 
         InitializeComponent();
 
-        LoadSettings();
-
         this.ExtendsContentIntoTitleBar = true;
 
         this.AppWindow.Title = "MPDCtrl";
         this.AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets\\MPDCtrl.ico"));
+
+        LoadSettings();
 
         if (this.AppWindow.Presenter is OverlappedPresenter presenter)
         {

@@ -342,6 +342,9 @@ public sealed partial class QueuePage : Page
                 {
                     Debug.WriteLine($"Item with ID {item.Id} moved from position {item.Index} to {i}");
                     idToNewPos.Add(item.Id, i.ToString(CultureInfo.InvariantCulture));
+
+                    // Reset the IsSelected property to false because of some visual glitch in the ListView when dragging items.
+                    item.IsSelected = false;
                 }
                 i++;
             }
@@ -349,6 +352,8 @@ public sealed partial class QueuePage : Page
             if (idToNewPos.Count > 0 && ViewModel.QueueListviewMovePosCommand.CanExecute(idToNewPos))
             {
                 await ViewModel.QueueListviewMovePosCommand.ExecuteAsync(idToNewPos);
+                // Clear the selection because we reset the datacontext's IsSelected property. Keep the selection in sync.
+                QueueListview.SelectedItems?.Clear();
             }
         }
         else if (args.DropResult == DataPackageOperation.None)

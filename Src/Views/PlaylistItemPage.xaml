@@ -12,7 +12,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-    NavigationCacheMode="Required"
+    NavigationCacheMode="Disabled"
     PreviewKeyDown="Page_PreviewKeyDown">
 
     <Grid x:Name="ContentGrid">

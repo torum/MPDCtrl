@@ -8,4 +8,5 @@ public interface IConfigurationService
     Task<Models.Configuration> LoadConfigurationAsync();
     Task SaveConfigurationAsync();
     Models.Configuration CurrentConfiguration { get; }
+    string ConfigFilePath { get; }
 }

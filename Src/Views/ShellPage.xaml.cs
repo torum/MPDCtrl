@@ -65,6 +65,8 @@ public sealed partial class ShellPage : Page
         // For animation fade
         _token = AlbumCoverImage.RegisterPropertyChangedCallback(Microsoft.UI.Xaml.Controls.Image.SourceProperty, OnSourceChanged);
 
+        await Task.Yield(); // Ensure the UI thread is free to process the Loaded event before starting initialization.
+
         //await ViewModel.StartMpcAsync();
         // Let's not await, for faster startup. Fire and forget.
         await ViewModel.InitializeAsync();
@@ -397,8 +399,10 @@ public sealed partial class ShellPage : Page
             if (_currentPage == typeof(PlaylistItemPage))
             {
                 // Set SelectedNodeMenu here. Don't JUST return for PlaylistItemPage, otherwise it won't load playlist.
-                vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
-                return;
+                //vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
+
+                //return;
+                this.NavigationFrame.Content = null; // Clear the current content to force a reload of the PlaylistItemPage
             }
 
             // TODO: I just wanna show NavigationTransition animation without navigation....

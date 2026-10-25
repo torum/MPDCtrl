@@ -46,6 +46,8 @@ public sealed class ConfigurationService : IConfigurationService
 
     public Models.Configuration CurrentConfiguration { get; private set; }
 
+    public string ConfigFilePath => _configFilePath ?? string.Empty;
+
     public void Initialize(string configFilePath)
     {
         _configFilePath = configFilePath;

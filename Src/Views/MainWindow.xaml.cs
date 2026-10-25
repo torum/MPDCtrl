@@ -194,7 +194,7 @@ public sealed partial class MainWindow : Window
             _vm.IsBackdropEnabled = true;
         }
 
-        if (!System.IO.File.Exists(App.AppConfigFilePath))
+        if (!System.IO.File.Exists(_configurationService.ConfigFilePath))
         {
             // Sets default.
             if (Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController.IsSupported())

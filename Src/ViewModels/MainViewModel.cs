@@ -6049,7 +6049,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
         await _mpc.MpdMoveId(idToNewPos);
     }
-    private bool QueueListviewMoveCanExecute()
+    public bool QueueListviewMoveCanExecute()
     {
         if (!_mpc.Commands.Contains("moveid")) { return false; }
         return true;
@@ -8467,7 +8467,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
     }
-    private bool PlaylistMovePosCanExecute()
+    public bool PlaylistMovePosCanExecute()
     {
         if (!_mpc.Commands.Contains("playlistmove")) { return false; }
         return true;

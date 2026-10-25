@@ -352,9 +352,10 @@ public sealed partial class QueuePage : Page
             if (idToNewPos.Count > 0 && ViewModel.QueueListviewMovePosCommand.CanExecute(idToNewPos))
             {
                 await ViewModel.QueueListviewMovePosCommand.ExecuteAsync(idToNewPos);
-                // Clear the selection because we reset the datacontext's IsSelected property. Keep the selection in sync.
-                QueueListview.SelectedItems?.Clear();
             }
+
+            // Clear the selection because we reset the datacontext's IsSelected property. Keep the selection in sync.
+            QueueListview.SelectedItems?.Clear();
         }
         else if (args.DropResult == DataPackageOperation.None)
         {

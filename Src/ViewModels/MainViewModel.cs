@@ -19,10 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -129,6 +126,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
         // Sets the SelectedProfile to the CurrentProfile, so that the UI reflects the current profile.
         SelectedProfile = CurrentProfile;
+
+        Volume = CurrentProfile?.Volume ?? 30;
     }
 
     public void UpdateSettings()
@@ -144,14 +143,19 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         config.IsAlbumSortWithoutThePrefix = IsAlbumSortWithoutThePrefix;
         config.IsForceSetVolumeExplicitly = IsForceSetVolumeExplicitly;
         config.Profiles.Clear();
-        foreach (var profile in Profiles)
-        {
-            config.Profiles.Add(profile);
-        }
         if (CurrentProfile is not null)
         {
             CurrentProfile?.Volume = Volume;
             config.CurrentProfile = CurrentProfile;
+        }
+        foreach (var profile in Profiles)
+        {
+            if (ReferenceEquals(profile, CurrentProfile))
+            {
+                profile.Volume = Volume;
+            }
+
+            config.Profiles.Add(profile);
         }
     }
 

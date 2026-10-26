@@ -130,8 +130,8 @@
         <!-- InfoBars -->
         <Grid Grid.Row="2">
             <InfoBar Title="{x:Bind ViewModel.InfoBarInfoTitle, Mode=OneWay}" IsOpen="{x:Bind ViewModel.IsShowInfoWindow, Mode=TwoWay}" IsIconVisible="True" IsClosable="True" Severity="Informational" Message="{x:Bind ViewModel.InfoBarInfoMessage, Mode=OneWay}" />
-            <InfoBar Title="{x:Bind ViewModel.InfoBarAckTitle, Mode=OneWay}" IsOpen="{x:Bind ViewModel.IsShowAckWindow, Mode=TwoWay}" IsIconVisible="True" IsClosable="True" Severity="Warning" Message="{x:Bind ViewModel.InfoBarAckMessage, Mode=OneWay}" />
-            <InfoBar Title="{x:Bind ViewModel.InfoBarErrTitle, Mode=OneWay}" IsOpen="{x:Bind ViewModel.IsShowErrWindow, Mode=TwoWay}" IsIconVisible="True" IsClosable="True" Severity="Error" Message="{x:Bind ViewModel.InfoBarErrMessage, Mode=OneWay}" />
+            <InfoBar Title="{x:Bind ViewModel.InfoBarAckTitle, Mode=OneWay}" IsOpen="{x:Bind ViewModel.IsShowAckWindow, Mode=TwoWay}" IsIconVisible="True" IsClosable="True" Severity="Informational" Message="{x:Bind ViewModel.InfoBarAckMessage, Mode=OneWay}" />
+            <InfoBar Title="{x:Bind ViewModel.InfoBarErrTitle, Mode=OneWay}" IsOpen="{x:Bind ViewModel.IsShowErrWindow, Mode=TwoWay}" IsIconVisible="True" IsClosable="True" Severity="Warning" Message="{x:Bind ViewModel.InfoBarErrMessage, Mode=OneWay}" />
         </Grid>
 
         <!-- Debug windows -->
@@ -303,7 +303,8 @@
                             </ToggleButton>
                         </controls:WrapPanel>
 
-                        <Slider x:Name="VolumeSlider" Orientation="Vertical" PointerWheelChanged="VolumeSlider_PointerWheelChanged" ToolTipService.ToolTip="Ctrl+Plus/Ctrl+Minus" AccessKey="V" Value="{x:Bind ViewModel.Volume,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" HorizontalAlignment="Right" Margin="0,10,10,10">
+                        <Slider x:Name="VolumeSlider" Orientation="Vertical" PointerWheelChanged="VolumeSlider_PointerWheelChanged" ToolTipService.ToolTip="Ctrl+Plus/Ctrl+Minus" AccessKey="V" Value="{x:Bind ViewModel.Volume,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Minimum="0" Maximum="100" HorizontalAlignment="Right" Margin="0,10,10,10"
+                                Visibility="{x:Bind ViewModel.IsVolumeVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                         </Slider>
 
                     </StackPanel>

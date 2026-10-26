@@ -23,8 +23,10 @@ public interface IMpcService
     string Password { get; }
     int Port { get; }
     MpdStatus Status { get; }
+    int MixerVolume { get; set; }
+    bool IsMixerEnabled { get; set; }
     bool IsStop { get; set; }
-    bool IsForceSetVolume { get; set; }
+    //bool IsForceSetVolume { get; set; }
     string MpdVerText { get; }
     ObservableCollection<Playlist> Playlists { get; }
 
@@ -104,5 +106,7 @@ public interface IMpcService
     Task<CommandResult> MpdSetSingle(bool isOn);
     Task<CommandResult> MpdSetVolume(int v);
     Task<CommandResult> MpdToggleOutput(string id);
+    Task<CommandResult> MpdQueryCommands();
+    Task<CommandResult> MpdGetVol();
     Task<CommandResult> MpdClearError();
 }

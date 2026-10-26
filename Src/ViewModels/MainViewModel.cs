@@ -103,8 +103,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         IsAutoScrollToNowPlaying = config.IsAutoScrollToNowPlaying;
         IsArtistSortWithoutThePrefix = config.IsArtistSortWithoutThePrefix;
         IsAlbumSortWithoutThePrefix = config.IsAlbumSortWithoutThePrefix;
-        IsForceSetVolumeExplicitly = config.IsForceSetVolumeExplicitly;
+        //IsForceSetVolumeExplicitly = config.IsForceSetVolumeExplicitly;
 
+        //config.Profiles.Clear();
         foreach (var profile in config.Profiles)
         {
             Profiles.Add(profile);
@@ -143,13 +144,15 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         config.IsAutoScrollToNowPlaying = IsAutoScrollToNowPlaying;
         config.IsArtistSortWithoutThePrefix = IsArtistSortWithoutThePrefix;
         config.IsAlbumSortWithoutThePrefix = IsAlbumSortWithoutThePrefix;
-        config.IsForceSetVolumeExplicitly = IsForceSetVolumeExplicitly;
-        config.Profiles.Clear();
+        //config.IsForceSetVolumeExplicitly = IsForceSetVolumeExplicitly;
+
         if (CurrentProfile is not null)
         {
             CurrentProfile?.Volume = Volume;
             config.CurrentProfile = CurrentProfile;
         }
+
+        config.Profiles.Clear();
         foreach (var profile in Profiles)
         {
             if (ReferenceEquals(profile, CurrentProfile))
@@ -594,6 +597,19 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
 
     }
+
+    public bool IsVolumeVisible
+    {
+        get;
+        set
+        {
+            if (field == value)
+                return;
+
+            field = value;
+            OnPropertyChanged();
+        }
+    } = true;
 
     private bool _isRepeat;
     public bool IsRepeat
@@ -2210,6 +2226,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     } = true;
 
+    /*
     public bool IsForceSetVolumeExplicitly
     {
         get; set
@@ -2224,6 +2241,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             OnPropertyChanged();
         }
     }
+    */
 
     //
     public bool IsDebugWindowEnabled
@@ -2558,7 +2576,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
     private void InitializeAndSubscribe()
     {
-        _mpc.IsForceSetVolume = IsForceSetVolumeExplicitly;
+        //_mpc.IsForceSetVolume = IsForceSetVolumeExplicitly;
 
         #region == Subscribe to events ==
 
@@ -2773,6 +2791,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                         }
                     }
 
+                    UpdateVolume();
+
                     result = await _mpc.MpdIdleQueryStatus();
 
                     if (result.IsSuccess)
@@ -2835,6 +2855,23 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         {
             IsBusy = false;
         }
+    }
+
+    private void UpdateVolume()
+    {
+        _dispatcherService.TryEnqueue(() =>
+        {
+            if (_mpc.IsMixerEnabled)
+            {
+                IsVolumeVisible = true;
+                _volume = _mpc.MixerVolume;
+                OnPropertyChanged(nameof(Volume));
+            }
+            else
+            {
+                IsVolumeVisible = false;
+            }
+        });
     }
 
     private void UpdateStatus()
@@ -3901,6 +3938,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         {
             UpdateProgress?.Invoke(this, "[UI] Updating the audio outputs...");
             AudioOutputs = new ObservableCollection<AudioOutput>(_mpc.AudioOutputs);
+
+            var enaled = AudioOutputs.FirstOrDefault<AudioOutput>(a => a.IsEnabled);
+            if (enaled is null)
+            {
+                IsVolumeVisible = false;
+            }
 
             UpdateProgress?.Invoke(this, "");
         });
@@ -8792,12 +8835,30 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
 
         if (string.IsNullOrEmpty(item.Id))
+        {
             return;
+        }
+
         if (AudioOutputs.Count == 0)
+        {
             return;
+        }
 
         //Debug.WriteLine($"Toggling audio output with id: {item.Id}");
         await _mpc.MpdToggleOutput(item.Id);
+
+        // Check if mixer is enabled or not, and update IsVolumeVisible accordingly.
+        await _mpc.MpdGetVol();
+        if (_mpc.IsMixerEnabled)
+        {
+            IsVolumeVisible = true;
+            _volume = _mpc.MixerVolume;
+            OnPropertyChanged(nameof(Volume));
+        }
+        else
+        {
+            IsVolumeVisible = false;
+        }
     }
     private bool AudioOutputToggleCanExecute()
     {

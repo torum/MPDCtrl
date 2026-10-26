@@ -36,6 +36,7 @@ public sealed partial class MainWindow : Window
     private ElementTheme _theme = ElementTheme.Default;
 
     private bool _isClosing;
+    private bool _isAllowClose;
 
     [DynamicWindowsRuntimeCast(typeof(OverlappedPresenter))]
     //[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
@@ -483,10 +484,14 @@ public sealed partial class MainWindow : Window
     {
         Debug.WriteLine("AppWindow_Closing");
 
+        if (_isAllowClose) return;
+
+        args.Cancel = true;
+
         if (_isClosing) return;
         _isClosing = true;
 
-        args.Cancel = true;
+        sender.Hide();
 
         _vm.UpdateSettings();
 
@@ -616,6 +621,8 @@ public sealed partial class MainWindow : Window
         await _configurationService.SaveConfigurationAsync();
 
         #endregion
+
+        _isAllowClose = true;
 
         this.Close();
     }

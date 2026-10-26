@@ -127,7 +127,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         // Sets the SelectedProfile to the CurrentProfile, so that the UI reflects the current profile.
         SelectedProfile = CurrentProfile;
 
-        Volume = CurrentProfile?.Volume ?? 30;
+        // set this "quietly"
+        _volume = CurrentProfile?.Volume ?? 30;
+        OnPropertyChanged(nameof(Volume));
     }
 
     public void UpdateSettings()

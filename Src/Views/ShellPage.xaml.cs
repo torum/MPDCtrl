@@ -402,7 +402,7 @@ public sealed partial class ShellPage : Page
                 //vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
 
                 //return;
-                this.NavigationFrame.Content = null; // Clear the current content to force a reload of the PlaylistItemPage
+                //this.NavigationFrame.Content = null; // Clear the current content to force a reload of the PlaylistItemPage
             }
 
             // TODO: I just wanna show NavigationTransition animation without navigation....

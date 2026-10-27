@@ -581,7 +581,7 @@ SOFTWARE.</value>
     <value>Move to selected artist</value>
   </data>
   <data name="Settings_Opts_ForceSetVolumeExplicitly.Content" xml:space="preserve">
-    <value>Always remember and set the volume explicitly</value>
+    <value>Override volume (Use this only if the "mixer_type" is set to "hardware").</value>
   </data>
   <data name="PageMenu_Refresh.ToolTipService.ToolTip" xml:space="preserve">
     <value>Refresh</value>

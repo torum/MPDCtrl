@@ -8,7 +8,7 @@ public sealed class MpdStatus
 
     public bool IsVolumeReturned { get; set; }
 
-    public bool IsVolumeSet { get; set; }
+    //public bool IsVolumeSet { get; set; }
 
     public bool IsRepeat { get; set; }
 
@@ -29,7 +29,7 @@ public sealed class MpdStatus
     public void Reset()
     {
         CurrentVolume = 20;
-        IsVolumeSet = false;
+        //IsVolumeSet = false;
         IsVolumeReturned = false;
         IsRepeat = false;
         IsRandom = false;

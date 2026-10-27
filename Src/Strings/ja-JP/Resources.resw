@@ -582,7 +582,7 @@ SOFTWARE.</value>
     <value>選択したアーティストへ移動</value>
   </data>
   <data name="Settings_Opts_ForceSetVolumeExplicitly.Content" xml:space="preserve">
-    <value>常に音量を記憶して明示的に設定する</value>
+    <value>音量を上書きする（"mixer_type"を"hardware"にしている場合にのみ指定してください）。</value>
   </data>
   <data name="PageMenu_Refresh.ToolTipService.ToolTip" xml:space="preserve">
     <value>最新の状態に更新</value>

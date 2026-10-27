@@ -103,7 +103,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         IsAutoScrollToNowPlaying = config.IsAutoScrollToNowPlaying;
         IsArtistSortWithoutThePrefix = config.IsArtistSortWithoutThePrefix;
         IsAlbumSortWithoutThePrefix = config.IsAlbumSortWithoutThePrefix;
-        //IsForceSetVolumeExplicitly = config.IsForceSetVolumeExplicitly;
+        IsForceSetVolumeExplicitly = config.IsForceSetVolumeExplicitly;
 
         //config.Profiles.Clear();
         foreach (var profile in config.Profiles)
@@ -144,7 +144,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         config.IsAutoScrollToNowPlaying = IsAutoScrollToNowPlaying;
         config.IsArtistSortWithoutThePrefix = IsArtistSortWithoutThePrefix;
         config.IsAlbumSortWithoutThePrefix = IsAlbumSortWithoutThePrefix;
-        //config.IsForceSetVolumeExplicitly = IsForceSetVolumeExplicitly;
+        config.IsForceSetVolumeExplicitly = IsForceSetVolumeExplicitly;
 
         if (CurrentProfile is not null)
         {
@@ -2226,7 +2226,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     } = true;
 
-    /*
     public bool IsForceSetVolumeExplicitly
     {
         get; set
@@ -2236,12 +2235,28 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
             field = value;
 
-            _mpc.IsForceSetVolume = field;
+            if (_mpc.IsMixerEnabled)
+            {
+                _mpc.IsForceSetVolume = false;
+                IsVolumeVisible = true;
+            }
+            else
+            {
+                if (field)
+                {
+                    IsVolumeVisible = true;
+                    _mpc.IsForceSetVolume = true;
+                }
+                else
+                {
+                    IsVolumeVisible = false;
+                    _mpc.IsForceSetVolume = false;
+                }
+            }
 
             OnPropertyChanged();
         }
     }
-    */
 
     //
     public bool IsDebugWindowEnabled
@@ -2866,10 +2881,22 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 IsVolumeVisible = true;
                 _volume = _mpc.MixerVolume;
                 OnPropertyChanged(nameof(Volume));
+                _mpc.IsForceSetVolume = false;
+                Debug.WriteLine($"MixerVolume: {_volume} @UpdateVolume()");
             }
             else
             {
-                IsVolumeVisible = false;
+                if (IsForceSetVolumeExplicitly)
+                {
+                    IsVolumeVisible = true;
+                    _mpc.IsForceSetVolume = true;
+                }
+                else
+                {
+                    IsVolumeVisible = false;
+                    _mpc.IsForceSetVolume = false;
+                }
+                Debug.WriteLine($"Mixer is not enabled. @UpdateVolume() IsForceSetVolumeExplicitly: {IsForceSetVolumeExplicitly}");
             }
         });
     }
@@ -3101,21 +3128,22 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                     _ => PlayButton
                 };
 
-                if (_mpc.Status.IsVolumeReturned)
+                if (_mpc.Status.IsVolumeReturned && _mpc.Status.CurrentPlayState != MpdPlayState.Stop) //_mpc.IsMixerEnabled && 
                 {
                     // Only update volume when Playing or Paused. (Because of MPD's strange behavior where it returns volume 100 when stopped)
-                    if (_mpc.Status.CurrentPlayState != MpdPlayState.Stop)
-                    {
-                        //Debug.WriteLine($"Volume is set to {_mpc.Status.MpdVolume} @UpdateButtonStatus()");
+                    Debug.WriteLine($"Volume is set to {_mpc.Status.CurrentVolume} @UpdateButtonStatus()");
 
-                        double tmpVol = Convert.ToDouble(_mpc.Status.CurrentVolume);
-                        if (_volume != tmpVol)
-                        {
-                            // "quietly" update.
-                            _volume = tmpVol;
-                            OnPropertyChanged(nameof(Volume));
-                        }
+                    double tmpVol = Convert.ToDouble(_mpc.Status.CurrentVolume);
+                    if (_volume != tmpVol)
+                    {
+                        // "quietly" update.
+                        _volume = tmpVol;
+                        OnPropertyChanged(nameof(Volume));
                     }
+                }
+                else
+                {
+                    Debug.WriteLine($"Volume is not set, Status.CurrentVolume: {_mpc.Status.CurrentVolume}, IsMixerEnabled:{_mpc.IsMixerEnabled} && IsVolumeReturned:{_mpc.Status.IsVolumeReturned} && CurrentPlayState:{_mpc.Status.CurrentPlayState} @UpdateButtonStatus()");
                 }
 
                 _isRandom = _mpc.Status.IsRandom;
@@ -6551,13 +6579,15 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        await _dispatcherService.EnqueueAsync(async () =>
+        await _dispatcherService.EnqueueAsync(() =>
         {
             Queue.Clear();
             CurrentSong = null;
-
-            await _mpc.MpdSinglePlay(song.File, Convert.ToInt32(_volume));
         });
+
+        var list = new List<string>();
+        list.Add(song.File);
+        await _mpc.MpdMultiplePlay(list, Convert.ToInt32(_volume));
     }
     private bool SongsPlayCanExecute()
     {
@@ -7679,13 +7709,15 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        await _dispatcherService.EnqueueAsync(async () =>
+        await _dispatcherService.EnqueueAsync(() =>
         {
             Queue.Clear();
             CurrentSong = null;
-
-            await _mpc.MpdSinglePlay(song.OriginalFileUri, Convert.ToInt32(_volume));
         });
+
+        var list = new List<string>();
+        list.Add(song.OriginalFileUri);
+        await _mpc.MpdMultiplePlay(list, Convert.ToInt32(_volume));
     }
 
     [RelayCommand(CanExecute = nameof(AddToQueueCanExecute))]

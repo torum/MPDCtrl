@@ -1224,7 +1224,10 @@ public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
     {
         try
         {
-            connection.Client?.Shutdown(SocketShutdown.Both);
+            if (connection.Client?.Connected == true)
+            {
+                connection.Client?.Shutdown(SocketShutdown.Both);
+            }
         }
         catch
         {

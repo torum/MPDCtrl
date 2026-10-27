@@ -26,7 +26,7 @@ public interface IMpcService
     int MixerVolume { get; set; }
     bool IsMixerEnabled { get; set; }
     bool IsStop { get; set; }
-    //bool IsForceSetVolume { get; set; }
+    bool IsForceSetVolume { get; set; }
     string MpdVerText { get; }
     ObservableCollection<Playlist> Playlists { get; }
 
@@ -51,7 +51,7 @@ public interface IMpcService
     Task<CommandResult> MpdAdd(string uri);
     Task<CommandResult> MpdAddAfter(string uri);
     Task<CommandResult> MpdMultiplePlay(List<string> uris, int volume);
-    Task<CommandResult> MpdSinglePlay(string uri, int volume);
+    //Task<CommandResult> MpdSinglePlay(string uri, int volume);
     Task<CommandResult> MpdChangePlaylist(string playlistName, int volume);
     Task<CommandResult> MpdClear();
     Task<ConnectionResult> MpdCommandConnect(string host, int port, CancellationToken cancellationToken = default);

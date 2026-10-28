@@ -18,8 +18,8 @@
 		<PackageIcon>MPDCtrl.ico</PackageIcon>
 		<ApplicationIcon>Assets\MPDCtrl.ico</ApplicationIcon>
 
-		<VersionPrefix>4.1.8.0</VersionPrefix>
-		<FileVersion>4.1.8.0</FileVersion>
+		<VersionPrefix>4.1.9.0</VersionPrefix>
+		<FileVersion>4.1.9.0</FileVersion>
 
 		<IncludeSymbols>True</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -57,18 +57,18 @@
 		<PublishSingleFile>true</PublishSingleFile>
 		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 		-->
-		<!-- "Unpackaged" Needs this when developing as an unpackaged app.
 
-		-->
+		<!-- "Unpackaged" Needs this when developing as an unpackaged app. -->
 		<EnableMsixTooling>False</EnableMsixTooling>
 		<WindowsPackageType>None</WindowsPackageType>
+		
 
-		<!-- "Packaged" Needs this when developing or publishing as an packaged app. 
+		<!-- "Packaged" Needs this when developing or publishing as a packaged app. 
 		<EnableMsixTooling>True</EnableMsixTooling>
 		<WindowsPackageType>MSIX</WindowsPackageType>
 		-->
 
-		<!-- AoT and trimming settings for publishing as a packaged app.
+		<!-- AoT and trimming settings for publishing as a packaged app. 
 		<PublishAot>true</PublishAot>
 		<PublishTrimmed>true</PublishTrimmed>
 		<PublishSingleFile>false</PublishSingleFile>

@@ -322,6 +322,7 @@ public sealed partial class QueuePage : Page
     }
 
 
+    [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
     private async void QueueListview_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
     {
         if (args.DropResult == DataPackageOperation.Move)
@@ -343,19 +344,26 @@ public sealed partial class QueuePage : Page
                     Debug.WriteLine($"Item with ID {item.Id} moved from position {item.Index} to {i}");
                     idToNewPos.Add(item.Id, i.ToString(CultureInfo.InvariantCulture));
 
+                    // Not working for the second time.
                     // Reset the IsSelected property to false because of some visual glitch in the ListView when dragging items.
+                    var container = sender.ContainerFromItem(item) as ListViewItem;
+                    container?.IsSelected = false;
                     item.IsSelected = false;
                 }
+
                 i++;
             }
+
+            // Not working for the second time.
+            // Clear the selection because we reset the datacontext's IsSelected property. Keep the selection in sync.
+            sender.SelectedItem = null;
+            sender.SelectedItems?.Clear();
+            sender.ClearValue(ListViewBase.SelectedItemProperty);
 
             if (idToNewPos.Count > 0 && ViewModel.QueueListviewMovePosCommand.CanExecute(idToNewPos))
             {
                 await ViewModel.QueueListviewMovePosCommand.ExecuteAsync(idToNewPos);
             }
-
-            // Clear the selection because we reset the datacontext's IsSelected property. Keep the selection in sync.
-            QueueListview.SelectedItems?.Clear();
         }
         else if (args.DropResult == DataPackageOperation.None)
         {
@@ -378,6 +386,7 @@ public sealed partial class QueuePage : Page
             {
                 //Debug.WriteLine($"Start dragging item with ID {song.Id} at position {song.Index}");
                 list.Add(song);
+                //song.IsSelected = false;
             }
         }
         e.Data.Properties.Add("QueueListViewDragItems", list);

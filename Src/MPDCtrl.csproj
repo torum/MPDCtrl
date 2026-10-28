@@ -103,10 +103,10 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.WindowsAppSDK.Foundation" Version="2.3.12" />
-		<PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="2.1.9" />
-		<PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.5.1" />
-		<PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.3.9" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.Foundation" Version="2.6.4" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="2.6.4" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.6.4" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.6.4" />
 		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.14" />
 	</ItemGroup>
 

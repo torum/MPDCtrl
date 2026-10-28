@@ -83,85 +83,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 #if DEBUG
         IsDebugWindowEnabled = false;
         IsShowDebugWindow = false;
-#else
-        IsDebugWindowEnabled = false;
-        IsShowDebugWindow = false;
 #endif
-    }
-
-    private void ApplySettings()
-    {
-        var config = _configurationService.CurrentConfiguration;
-
-        IsNavigationViewMenuOpen = config.IsNavigationViewMenuOpen;// This has no effect since the NavigationView's IsPaneOpen property is bound to the ViewModel's IsNavigationViewMenuOpen property, which is set in the ShellPage.xaml.cs constructor. This line is kept for consistency and future-proofing.
-        
-        Theme = config.Theme;
-        Material = config.SystemBackdrop;
-
-        IsUpdateOnStartup = config.IsUpdateOnStartup;
-        IsDownloadAlbumArtEmbeddedUsingReadPicture = config.IsDownloadAlbumArtEmbeddedUsingReadPicture;
-        IsAutoScrollToNowPlaying = config.IsAutoScrollToNowPlaying;
-        IsArtistSortWithoutThePrefix = config.IsArtistSortWithoutThePrefix;
-        IsAlbumSortWithoutThePrefix = config.IsAlbumSortWithoutThePrefix;
-        IsForceSetVolumeExplicitly = config.IsForceSetVolumeExplicitly;
-
-        //config.Profiles.Clear();
-        foreach (var profile in config.Profiles)
-        {
-            Profiles.Add(profile);
-            if (profile.IsDefault)
-            {
-                CurrentProfile = profile;
-            }
-        }
-
-        // Just in case, if no profile is set as default, we set the first one as current profile.
-        if (Profiles.Count > 0 && CurrentProfile is null)
-        {
-            var prof = Profiles.FirstOrDefault(x => x.IsDefault);
-            CurrentProfile = prof ?? Profiles[0];
-        }
-
-        // Just in case, if no profile is set as default.
-        CurrentProfile ??= config.CurrentProfile;
-
-        // Sets the SelectedProfile to the CurrentProfile, so that the UI reflects the current profile.
-        SelectedProfile = CurrentProfile;
-
-        // set this "quietly"
-        _volume = CurrentProfile?.Volume ?? 30;
-        OnPropertyChanged(nameof(Volume));
-    }
-
-    public void UpdateSettings()
-    {
-        var config = _configurationService.CurrentConfiguration;
-        config.IsNavigationViewMenuOpen = IsNavigationViewMenuOpen;
-        config.Theme = Theme;
-        config.SystemBackdrop = Material;
-        config.IsUpdateOnStartup = IsUpdateOnStartup;
-        config.IsDownloadAlbumArtEmbeddedUsingReadPicture = IsDownloadAlbumArtEmbeddedUsingReadPicture;
-        config.IsAutoScrollToNowPlaying = IsAutoScrollToNowPlaying;
-        config.IsArtistSortWithoutThePrefix = IsArtistSortWithoutThePrefix;
-        config.IsAlbumSortWithoutThePrefix = IsAlbumSortWithoutThePrefix;
-        config.IsForceSetVolumeExplicitly = IsForceSetVolumeExplicitly;
-
-        if (CurrentProfile is not null)
-        {
-            CurrentProfile?.Volume = Volume;
-            config.CurrentProfile = CurrentProfile;
-        }
-
-        config.Profiles.Clear();
-        foreach (var profile in Profiles)
-        {
-            if (ReferenceEquals(profile, CurrentProfile))
-            {
-                profile.Volume = Volume;
-            }
-
-            config.Profiles.Add(profile);
-        }
     }
 
     #region == Properties ==
@@ -2517,6 +2439,37 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         await GetAlbumPicturesAsync(list, _cts.Token);
     }
 
+    public void UpdateSettings()
+    {
+        var config = _configurationService.CurrentConfiguration;
+        config.IsNavigationViewMenuOpen = IsNavigationViewMenuOpen;
+        config.Theme = Theme;
+        config.SystemBackdrop = Material;
+        config.IsUpdateOnStartup = IsUpdateOnStartup;
+        config.IsDownloadAlbumArtEmbeddedUsingReadPicture = IsDownloadAlbumArtEmbeddedUsingReadPicture;
+        config.IsAutoScrollToNowPlaying = IsAutoScrollToNowPlaying;
+        config.IsArtistSortWithoutThePrefix = IsArtistSortWithoutThePrefix;
+        config.IsAlbumSortWithoutThePrefix = IsAlbumSortWithoutThePrefix;
+        config.IsForceSetVolumeExplicitly = IsForceSetVolumeExplicitly;
+
+        if (CurrentProfile is not null)
+        {
+            CurrentProfile?.Volume = Volume;
+            config.CurrentProfile = CurrentProfile;
+        }
+
+        config.Profiles.Clear();
+        foreach (var profile in Profiles)
+        {
+            if (ReferenceEquals(profile, CurrentProfile))
+            {
+                profile.Volume = Volume;
+            }
+
+            config.Profiles.Add(profile);
+        }
+    }
+
     public void Dispose()
     {
         try
@@ -2588,6 +2541,50 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     #endregion
 
     #region == Private Methods ==
+
+    private void ApplySettings()
+    {
+        var config = _configurationService.CurrentConfiguration;
+
+        IsNavigationViewMenuOpen = config.IsNavigationViewMenuOpen;// This has no effect since the NavigationView's IsPaneOpen property is bound to the ViewModel's IsNavigationViewMenuOpen property, which is set in the ShellPage.xaml.cs constructor. This line is kept for consistency and future-proofing.
+
+        Theme = config.Theme;
+        Material = config.SystemBackdrop;
+
+        IsUpdateOnStartup = config.IsUpdateOnStartup;
+        IsDownloadAlbumArtEmbeddedUsingReadPicture = config.IsDownloadAlbumArtEmbeddedUsingReadPicture;
+        IsAutoScrollToNowPlaying = config.IsAutoScrollToNowPlaying;
+        IsArtistSortWithoutThePrefix = config.IsArtistSortWithoutThePrefix;
+        IsAlbumSortWithoutThePrefix = config.IsAlbumSortWithoutThePrefix;
+        IsForceSetVolumeExplicitly = config.IsForceSetVolumeExplicitly;
+
+        //config.Profiles.Clear();
+        foreach (var profile in config.Profiles)
+        {
+            Profiles.Add(profile);
+            if (profile.IsDefault)
+            {
+                CurrentProfile = profile;
+            }
+        }
+
+        // Just in case, if no profile is set as default, we set the first one as current profile.
+        if (Profiles.Count > 0 && CurrentProfile is null)
+        {
+            var prof = Profiles.FirstOrDefault(x => x.IsDefault);
+            CurrentProfile = prof ?? Profiles[0];
+        }
+
+        // Just in case, if no profile is set as default.
+        CurrentProfile ??= config.CurrentProfile;
+
+        // Sets the SelectedProfile to the CurrentProfile, so that the UI reflects the current profile.
+        SelectedProfile = CurrentProfile;
+
+        // set this "quietly"
+        _volume = CurrentProfile?.Volume ?? 30;
+        OnPropertyChanged(nameof(Volume));
+    }
 
     private void InitializeAndSubscribe()
     {
@@ -6169,6 +6166,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         if (idToNewPos.Count == 0) return;
 
         if (Queue.Count <= 1) return;
+
+        SelectedQueueSong = null;
 
         await _mpc.MpdMoveId(idToNewPos);
     }

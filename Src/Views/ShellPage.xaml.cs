@@ -119,7 +119,7 @@ public sealed partial class ShellPage : Page
         VolumeSlider.IsEnabled = ViewModel.SetVolumeCommand.CanExecute(null);//.SetVolumeCanExecute();
         SeekSlider.IsEnabled = ViewModel.SetSeekCommand.CanExecute(null);
 
-        RepeatButton.IsEnabled = ViewModel.SetRpeatCommand.CanExecute(null);
+        RepeatButton.IsEnabled = ViewModel.SetRepeatCommand.CanExecute(null);
         SingleButton.IsEnabled = ViewModel.SetSingleCommand.CanExecute(null);
         RandomButton.IsEnabled = ViewModel.SetRandomCommand.CanExecute(null);
         ConsumeButton.IsEnabled = ViewModel.SetConsumeCommand.CanExecute(null);

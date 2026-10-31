@@ -24,7 +24,7 @@ namespace MPDCtrl.Services;
 #pragma warning disable CA1862
 #pragma warning disable IDE0290
 #pragma warning restore IDE0079 //
-public sealed partial class MpcService : IMpcService, IDisposable
+public sealed partial class MpcService : IMpcService
 {
     #region == Consts, Properties, etc == 
 
@@ -1630,9 +1630,9 @@ public sealed partial class MpcService : IMpcService, IDisposable
                         DisposeConnection(
                             ref _commandConnection,
                             ref _commandReader,
-                            ref _commandWriter);
+                            ref _commandWriter, true);
 
-                        _commandConnection = new TcpClient();
+                        //_commandConnection = new TcpClient();
                     }
                 }
                 catch { }
@@ -1869,9 +1869,9 @@ public sealed partial class MpcService : IMpcService, IDisposable
                         DisposeConnection(
                             ref _commandConnection,
                             ref _commandReader,
-                            ref _commandWriter);
+                            ref _commandWriter, true);
 
-                        _commandConnection = new TcpClient();
+                        //_commandConnection = new TcpClient();
                     }
                 }
                 catch { }
@@ -2032,9 +2032,9 @@ public sealed partial class MpcService : IMpcService, IDisposable
                         DisposeConnection(
                             ref _commandConnection,
                             ref _commandReader,
-                            ref _commandWriter);
+                            ref _commandWriter, true);
 
-                        _commandConnection = new TcpClient();
+                        //_commandConnection = new TcpClient();
                     }
                 }
                 catch { }
@@ -5500,12 +5500,12 @@ public sealed partial class MpcService : IMpcService, IDisposable
                 DisposeConnection(
                     ref _commandConnection,
                     ref _commandReader,
-                    ref _commandWriter);
+                    ref _commandWriter, isReconnect);
 
                 DisposeConnection(
                     ref _idleConnection,
                     ref _idleReader,
-                    ref _idleWriter);
+                    ref _idleWriter, isReconnect);
             }
 
             IsBusy?.Invoke(this, false);
@@ -5523,11 +5523,13 @@ public sealed partial class MpcService : IMpcService, IDisposable
             {
                 _cts?.Dispose();
                 _cts = null;
+
+                Debug.WriteLine("MpcService.MpdDisconnect() completed.");
             }
         }
     }
 
-    private static void DisposeConnection(ref TcpClient connection,ref StreamReader? reader,ref StreamWriter? writer)
+    private static void DisposeConnection(ref TcpClient connection,ref StreamReader? reader,ref StreamWriter? writer, bool isReconnect)
     {
         try
         {
@@ -5549,7 +5551,10 @@ public sealed partial class MpcService : IMpcService, IDisposable
 
         writer = null;
         reader = null;
-        connection = new TcpClient();
+        if (isReconnect)
+        {
+            connection = new TcpClient();
+        }
     }
 
     public void Dispose()

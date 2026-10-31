@@ -1,10 +1,11 @@
 using MPDCtrl.Models;
-using System.Threading.Tasks;
+using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace MPDCtrl.Services.Contracts;
 
-public interface IMpcBinaryService
+public interface IMpcBinaryService: IDisposable
 {
     //AlbumImage AlbumCover { get; }
 

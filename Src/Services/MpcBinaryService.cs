@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MPDCtrl.Services;
 
-public sealed partial class MpcBinaryService : IMpcBinaryService, IDisposable
+public sealed partial class MpcBinaryService : IMpcBinaryService
 {
     private CancellationTokenSource? _cts;
     private readonly Lock _connectionLock = new();

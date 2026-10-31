@@ -1,4 +1,5 @@
 using MPDCtrl.Models;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MPDCtrl.Services.Contracts;
 
-public interface IMpcService
+public interface IMpcService: IDisposable
 {
     ConnectionStatus ConnectionState { get; }
     ObservableCollection<SongInfoEx> CurrentQueue { get; }

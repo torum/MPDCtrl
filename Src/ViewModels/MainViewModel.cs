@@ -551,9 +551,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 return;
             }
 
-            //Task.Run(SetRpeat, _cts.Token);
-            //_ = SetRpeat();
-            _ = RunSafeAsync(SetRpeat, nameof(SetRpeat));
+            //Task.Run(SetRepeat, _cts.Token);
+            //_ = SetRepeat();
+            _ = RunSafeAsync(SetRepeat, nameof(SetRepeat));
         }
     }
 
@@ -2516,6 +2516,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 }
             }
 
+            try
+            {
+                _mpc.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Exception @Dispose() _mpc.Dispose() {ex}");
+            }
         }
         catch (Exception ex)
         {
@@ -3985,7 +3993,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             PauseCommand.NotifyCanExecuteChanged();
             StopCommand.NotifyCanExecuteChanged();
             SetRandomCommand.NotifyCanExecuteChanged();
-            SetRpeatCommand.NotifyCanExecuteChanged();
+            SetRepeatCommand.NotifyCanExecuteChanged();
             SetConsumeCommand.NotifyCanExecuteChanged();
             SetSingleCommand.NotifyCanExecuteChanged();
             SetVolumeCommand.NotifyCanExecuteChanged();
@@ -5229,7 +5237,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    private async Task RunSafeAsync(Func<Task> work, string name, bool continueOnCapturedContext = true)
+    private async Task RunSafeAsync(Func<Task> work, string name, bool continueOnCapturedContext = false)
     {
         try 
         {
@@ -5969,13 +5977,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         return true;
     }
 
-    [RelayCommand(CanExecute = nameof(SetRpeatCanExecute))]
-    private async Task SetRpeat()
+    [RelayCommand(CanExecute = nameof(SetRepeatCanExecute))]
+    private async Task SetRepeat()
     {
         if (IsBusy) return;
         await _mpc.MpdSetRepeat(_isRepeat);
     }
-    private bool SetRpeatCanExecute()
+    private bool SetRepeatCanExecute()
     {
         if (!_mpc.Commands.Contains("repeat")) { return false; }
         return true;

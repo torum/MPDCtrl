@@ -32,7 +32,6 @@ public sealed partial class MainWindow : Window
     private bool _isAllowClose;
 
     [DynamicWindowsRuntimeCast(typeof(OverlappedPresenter))]
-    //[DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     public MainWindow(MainViewModel vm, ShellPage shell, IDispatcherService dispatcherService, IConfigurationService configurationService)
     {
         _vm = vm;

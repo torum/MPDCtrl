@@ -509,7 +509,7 @@ SOFTWARE.</value>
     <value>Previous (Ctrl+Left/Ctrl+B)</value>
   </data>
   <data name="PlaybackControl_Play.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Play/Pause (Ctrl+P, *Space)</value>
+    <value>Play/Pause (Ctrl+P, Ctrl+Alt+Space)</value>
   </data>
   <data name="PlaybackControl_Next.ToolTipService.ToolTip" xml:space="preserve">
     <value>Next (Ctrl+Right/Ctrl+N)</value>

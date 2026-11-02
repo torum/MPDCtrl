@@ -510,7 +510,7 @@ SOFTWARE.</value>
     <value>前の曲 (Ctrl+Left/Ctrl+B)</value>
   </data>
   <data name="PlaybackControl_Play.ToolTipService.ToolTip" xml:space="preserve">
-    <value>再生・一時停止 (Ctrl+P, *Space)</value>
+    <value>再生・一時停止 (Ctrl+P, Ctrl+Alt+Space)</value>
   </data>
   <data name="PlaybackControl_Next.ToolTipService.ToolTip" xml:space="preserve">
     <value>次の曲 (Ctrl+Right/Ctrl+N)</value>

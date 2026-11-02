@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.System;
@@ -452,18 +453,9 @@ public sealed partial class ShellPage : Page
         {
             this.BackButton.IsEnabled = false;
         }
-
     }
 
-    [DynamicWindowsRuntimeCast(typeof(TextBox))]
-    [DynamicWindowsRuntimeCast(typeof(ListView))]
-    [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
-    [DynamicWindowsRuntimeCast(typeof(Button))]
-    [DynamicWindowsRuntimeCast(typeof(RadioButton))]
-    [DynamicWindowsRuntimeCast(typeof(CheckBox))]
-    [DynamicWindowsRuntimeCast(typeof(ToggleButton))]
-    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
-    private void Page_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
+    private async void Page_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
     {
         Windows.System.VirtualKey releasedKey = e.OriginalKey;
 
@@ -472,40 +464,21 @@ public sealed partial class ShellPage : Page
             return;
         }
 
-        XamlRoot currentXamlRoot = this.Content.XamlRoot;
-        var focusedElement = FocusManager.GetFocusedElement(currentXamlRoot);
-        if ((focusedElement is TextBox) || (focusedElement is ListView) || (focusedElement is ListViewItem)
-            || (focusedElement is Button) || (focusedElement is RadioButton) || (focusedElement is CheckBox) || (focusedElement is ToggleButton))
-        {
-            // Do nothing.
-            return;
-        }
-
         // Get the state of the Alt key for the current thread
         var altKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Menu);
+        var ctrlKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control);
         // Check if the Alt key is in the "Down" state
         bool isAltPressed = altKeyState.HasFlag(CoreVirtualKeyStates.Down);
-        if (isAltPressed)
+        bool isCtrlPressed = ctrlKeyState.HasFlag(CoreVirtualKeyStates.Down);
+        if (isAltPressed && isCtrlPressed)
         {
-            // Do nothing.
+            ViewModel.PlayCommand.Execute(null);
+
+            e.Handled = true;
             return;
         }
-
-        // Disable space key down.
-        //e.Handled = true;
-
-        //
-        Task.Run(() => ViewModel.PlayCommand.Execute(null));
     }
 
-    [DynamicWindowsRuntimeCast(typeof(TextBox))]
-    [DynamicWindowsRuntimeCast(typeof(ListView))]
-    [DynamicWindowsRuntimeCast(typeof(ListViewItem))]
-    [DynamicWindowsRuntimeCast(typeof(Button))]
-    [DynamicWindowsRuntimeCast(typeof(RadioButton))]
-    [DynamicWindowsRuntimeCast(typeof(CheckBox))]
-    [DynamicWindowsRuntimeCast(typeof(ToggleButton))]
-    [DynamicWindowsRuntimeCast(typeof(FrameworkElement))]
     private void Page_PreviewKeyUp(object sender, KeyRoutedEventArgs e)
     {
         Windows.System.VirtualKey releasedKey = e.OriginalKey;
@@ -515,27 +488,18 @@ public sealed partial class ShellPage : Page
             return;
         }
 
-        XamlRoot currentXamlRoot = this.Content.XamlRoot;
-        var focusedElement = FocusManager.GetFocusedElement(currentXamlRoot);
-        if ((focusedElement is TextBox) || (focusedElement is ListView) || (focusedElement is ListViewItem)
-            || (focusedElement is Button) || (focusedElement is RadioButton) || (focusedElement is CheckBox) || (focusedElement is ToggleButton))
-        {
-            // Do nothing.
-            return;
-        }
-
         // Get the state of the Alt key for the current thread
         var altKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Menu);
+        var ctrlKeyState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control);
         // Check if the Alt key is in the "Down" state
         bool isAltPressed = altKeyState.HasFlag(CoreVirtualKeyStates.Down);
-        if (isAltPressed)
+        bool isCtrlPressed = ctrlKeyState.HasFlag(CoreVirtualKeyStates.Down);
+        if (isAltPressed && isCtrlPressed)
         {
             // Do nothing.
+            e.Handled = true;
             return;
         }
-
-        // Disable space key down.
-        //e.Handled = true;
     }
 
     [DynamicWindowsRuntimeCast(typeof(UIElement))]

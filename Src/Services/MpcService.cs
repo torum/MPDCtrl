@@ -2815,7 +2815,7 @@ public sealed partial class MpcService : IMpcService
 
     public async Task<CommandResult> MpdPlaybackPrev(int volume)
     {
-        return await SendWithVolume("nepreviousxt", volume);
+        return await SendWithVolume("previous", volume);
         /*
         CommandResult result = await MpdCommandSendCommand("previous");
 

@@ -112,7 +112,8 @@ public sealed partial class MpcBinaryService : IMpcBinaryService
                     AutoFlush = true
                 };
 
-                string? response = await _binaryReader.ReadLineAsync(cancellationToken);
+                //string? response = await _binaryReader.ReadLineAsync(cancellationToken);
+                string? response = await ReadMpdLineAsync(tcpStream, cancellationToken);
                 if (response is not null)
                 {
                     if (response.StartsWith("OK MPD ", StringComparison.InvariantCulture))
@@ -250,7 +251,8 @@ public sealed partial class MpcBinaryService : IMpcBinaryService
                 if (token.IsCancellationRequested)
                     break;
 
-                string? line = await _binaryReader.ReadLineAsync(token);
+                //string? line = await _binaryReader.ReadLineAsync(token);
+                string? line = await ReadMpdLineAsync(_binaryReader.BaseStream, token);
 
                 if (line is not null)
                 {
@@ -363,548 +365,166 @@ public sealed partial class MpcBinaryService : IMpcBinaryService
 
     private async Task<CommandBinaryResult> MpdBinarySendBinaryCommand(string cmd, AlbumImage albumCover)
     {
-        CommandBinaryResult ret = new();
+        CommandBinaryResult result = new();
 
-        if (_cts is null)
+        CommandBinaryResult Fail(string message, bool isTimeout = false)
         {
-            ret.IsSuccess = false;
-            return ret;
+            result.IsSuccess = false;
+            result.ErrorMessage = message;
+            result.IsTimeOut = isTimeout;
+            albumCover.IsDownloading = false;
+            return result;
         }
 
-        if (_cts.Token.IsCancellationRequested)
-        {
-            Debug.WriteLine("IsCancellationRequested returning @MpdBinarySendBinaryCommand");
-            return ret;
-        }
+        if (_cts is null) return Fail("Connection cancellation token is not available.");
 
-        // TODO: always false
-        if (_binaryConnection.Client is null)
-        {
-            Debug.WriteLine("@MpdBinarySendBinaryCommand: " + "TcpClient.Client is null");
+        CancellationToken token = _cts.Token;
 
-            ret.IsSuccess = false;
-            ret.ErrorMessage = "TcpClient.Client is null";
+        if (token.IsCancellationRequested) return Fail("The operation was canceled.");
 
-            return ret;
-        }
+        if (_binaryWriter is null || _binaryReader is null) return Fail("The binary connection is not initialized.");
 
-        if ((_binaryWriter is null) || (_binaryReader is null))
-        {
-            Debug.WriteLine("@MpdBinarySendBinaryCommand: " + "_binaryWriter or _binaryReader is null");
+        if (!_binaryConnection.Connected) return Fail("The binary connection is not connected.");
 
-            ret.IsSuccess = false;
-            ret.ErrorMessage = "_binaryWriter or _binaryReader is null";
+        Stream stream = _binaryReader.BaseStream;
 
-            return ret;
-        }
-
-        if (!_binaryConnection.Client.Connected)
-        {
-            Debug.WriteLine("@MpdBinarySendBinaryCommand: " + "NOT IsMpdBinaryCommandConnected");
-
-            ret.IsSuccess = false;
-            ret.ErrorMessage = "NOT IsMpdBinaryCommandConnected";
-
-            return ret;
-        }
-
-        // WriteAsync
         try
         {
             await _binaryWriter.WriteAsync(cmd.Trim() + "\n");
-        }
-        catch (IOException e)
-        {
-            // IOException : Unable to write data to the transport connection
 
-            Debug.WriteLine("Exception@MpdBinarySendBinaryCommand: " + cmd.Trim() + " WriteAsync " + e.Message);
+            bool binaryFound = false;
 
-            ret.IsTimeOut = true; // re-try.
-
-            ret.IsSuccess = false;
-            ret.ErrorMessage = e.Message;
-
-            return ret;
-
-        }
-        catch (Exception e)
-        {
-            Debug.WriteLine("Exception@MpdBinarySendBinaryCommand: " + cmd.Trim() + " WriteAsync " + e.Message);
-
-            ret.IsSuccess = false;
-            ret.ErrorMessage = e.Message;
-
-            return ret;
-        }
-
-        // ReadAsync
-        try
-        {
-            StringBuilder stringBuilder = new();
-
-            byte[] bin = [];
-
-            bool isAck = false;
-            string ackText = "";
-            bool isErr = false;
-            string errText = "";
-            bool isNullReturn = false;
-            bool isBinaryFound = false;
-
-            bool isWaitForOk = true;
-
-            while (isWaitForOk)
+            // Read response headers up to "binary: N" or the final "OK"/"ACK".
+            while (true)
             {
-                int readSize = 0;
-                int bufferSize = 5000;
-                byte[] buffer = new byte[bufferSize];
-                byte[] bindata = [];
+                token.ThrowIfCancellationRequested();
 
-                using (MemoryStream ms = new())
+                string? line = await ReadMpdLineAsync(stream, token);
+                if (line is null) return Fail("Unexpected end of stream while reading the MPD response.", isTimeout: true);
+
+                if (line.StartsWith("ACK", StringComparison.OrdinalIgnoreCase)) return Fail(line);
+
+                if (line.Equals("OK", StringComparison.Ordinal))
                 {
-                    if (_cts is null)
-                        break;
-                    var token = _cts.Token;
-                    if (token.IsCancellationRequested)
-                        break;
+                    result.IsNoBinaryFound = true;
+                    return Fail("No binary data was returned for the requested artwork.");
+                }
 
-                    while ((readSize = await _binaryReader.BaseStream.ReadAsync(buffer, token)) > 0)
+                if (line.StartsWith("size:", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!int.TryParse(
+                            line["size:".Length..].Trim(),
+                            NumberStyles.None,
+                            CultureInfo.InvariantCulture,
+                            out int wholeSize) ||
+                        wholeSize < 0)
                     {
-                        if (token.IsCancellationRequested)
-                        {
-                            Debug.WriteLine("IsCancellationRequested in while loop @MpdBinarySendBinaryCommand");
-                            return ret;
-                        }
-
-                        ms.Write(buffer, 0, readSize);
-
-                        if (readSize < bufferSize)
-                        {
-                            break;
-                        }
+                        return Fail("Invalid size header in the MPD response.");
                     }
 
-                    bindata = ms.ToArray();
+                    result.WholeSize = wholeSize;
+
+                    if (wholeSize > 20_000_000) return Fail($"Artwork is too large: {wholeSize} bytes.");
                 }
-
-                if (bindata.Length == 0)
+                else if (line.StartsWith("type:", StringComparison.OrdinalIgnoreCase))
                 {
-                    isNullReturn = true;
-
-                    isWaitForOk = false;
+                    result.Type = line["type:".Length..].Trim();
                 }
-                else
+                else if (line.StartsWith("binary:", StringComparison.OrdinalIgnoreCase))
                 {
-                    bin = CombineByteArray(bin, bindata);
-
-                    string res = Encoding.Default.GetString(bindata, 0, bindata.Length);
-
-#pragma warning disable IDE0305 
-                    List<string> values = res.Split("\n").ToList();
-#pragma warning restore IDE0305 
-
-                    foreach (var line in values)
+                    if (!int.TryParse(
+                            line["binary:".Length..].Trim(),
+                            NumberStyles.None,
+                            CultureInfo.InvariantCulture,
+                            out int chunkSize) ||
+                        chunkSize <= 0)
                     {
-                        if (line is not null)
-                        {
-                            if (line.StartsWith("ACK", StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                Debug.WriteLine("ack line @MpdBinarySendCommand: " + cmd.Trim() + " and " + line);
-
-                                if (!string.IsNullOrEmpty(line))
-                                    stringBuilder.Append(line + "\n");
-
-                                ret.ErrorMessage = line;
-                                ackText = line;
-                                isAck = true;
-
-                                isWaitForOk = false;
-
-                                break;
-                            }
-                            else if (line.StartsWith("error", StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                Debug.WriteLine("error line @MpdBinarySendCommand: " + cmd.Trim() + " and " + line);
-
-                                isErr = true;
-                                errText = line;
-                                ret.ErrorMessage = line;
-
-                                if (!string.IsNullOrEmpty(line))
-                                    stringBuilder.Append(line + "\n");
-                            }
-                            else if (line.StartsWith("changed: ", StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                if (!string.IsNullOrEmpty(line))
-                                    stringBuilder.Append(line + "\n");
-                            }
-                            else if (line.StartsWith("size: ", StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                if (!string.IsNullOrEmpty(line))
-                                    stringBuilder.Append(line + "\n");
-#pragma warning disable IDE0305
-                                List<string> s = line.Split(':').ToList();
-#pragma warning restore IDE0305
-                                if (s.Count > 1)
-                                {
-                                    if (Int32.TryParse(s[1], out int i))
-                                    {
-                                        ret.WholeSize = i;
-                                    }
-                                }
-                            }
-                            else if (line.StartsWith("type: ", StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                if (!string.IsNullOrEmpty(line))
-                                    stringBuilder.Append(line + "\n");
-#pragma warning disable IDE0305
-                                List<string> s = line.Split(':').ToList();
-#pragma warning restore IDE0305
-                                if (s.Count > 1)
-                                {
-                                    ret.Type = s[1].Trim();
-                                }
-                            }
-                            else if (line.StartsWith("binary: ", StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                isBinaryFound = true;
-
-                                if (!string.IsNullOrEmpty(line))
-                                    stringBuilder.Append(line + "\n");
-
-                                stringBuilder.Append("{binary data}" + "\n");
-#pragma warning disable IDE0305
-                                List<string> s = line.Split(':').ToList();
-#pragma warning restore IDE0305
-                                if (s.Count > 1)
-                                {
-                                    if (Int32.TryParse(s[1], out int i))
-                                    {
-                                        ret.ChunkSize = i;
-                                    }
-                                }
-                            }
-                            else if (line == "OK")
-                            {
-                                ret.IsSuccess = true;
-
-                                if (!string.IsNullOrEmpty(line))
-                                    stringBuilder.Append(line + "\n");
-
-                                isWaitForOk = false;
-                                break;
-                            }
-                            else
-                            {
-                                // This should be binary data if not reading correctly above.
-                            }
-                        }
-                        else
-                        {
-                            isNullReturn = true;
-
-                            isWaitForOk = false;
-                            break;
-                        }
+                        return Fail("Invalid binary size header in the MPD response.");
                     }
+
+                    if (chunkSize > 20_000_000) return Fail($"Artwork chunk is too large: {chunkSize} bytes.");
+
+                    result.ChunkSize = chunkSize;
+                    result.BinaryData = new byte[chunkSize];
+
+                    // TCP reads are arbitrary-sized; read exactly the advertised payload length.
+                    await stream.ReadExactlyAsync(result.BinaryData.AsMemory(), token);
+                    binaryFound = true;
+                    break;
                 }
             }
 
-            if (isNullReturn)
+            // The payload is followed by a line break and then the command status.
+            // Read lines until the response's final status, without interpreting payload bytes as text.
+            while (true)
             {
-                Debug.WriteLine("@MpdBinarySendBinaryCommand ReadAsync isNullReturn");
+                token.ThrowIfCancellationRequested();
 
-                ret.ErrorMessage = "ReadAsync@MpdBinarySendBinaryCommand received null data";
-                ret.IsSuccess = false;
-                ret.IsTimeOut = true; // re-try.
+                string? line = await ReadMpdLineAsync(stream, token);
+                if (line is null)
+                    return Fail("Unexpected end of stream after the MPD binary payload.", isTimeout: true);
 
-                return ret;
-            }
-            else
-            {
-                if (isAck)
+                if (string.IsNullOrEmpty(line))
+                    continue;
+
+                if (line.StartsWith("ACK", StringComparison.OrdinalIgnoreCase))
+                    return Fail(line);
+
+                if (line.Equals("OK", StringComparison.Ordinal))
                 {
-                    // Ignore "file not exists" for now.
-                    //MpdAckError?.Invoke(this, ackText + " (@MCGB)");
+                    result.IsSuccess = binaryFound;
+                    if (!result.IsSuccess)
+                    {
+                        result.IsNoBinaryFound = true;
+                        return Fail("No binary data was returned for the requested artwork.");
+                    }
 
-                    Debug.WriteLine("@MpdBinarySendBinaryCommand ReadAsync isAck");
-
-                    ret.ErrorMessage = ackText + " (@MpdBinarySendBinaryCommand)";
-                    //ret.IsSuccess = false;
-                    //return ret;
-                }
-
-                if (isErr)
-                {
-                    //MpdFatalError?.Invoke(this, ackText + " (@MCGB)");
-
-                    Debug.WriteLine("@MpdBinarySendBinaryCommand ReadAsync isErr");
-
-                    ret.ErrorMessage = errText + " (@MpdBinarySendBinaryCommand)";
-                    //ret.IsSuccess = false;
-                    //return ret;
-                }
-
-                if (isBinaryFound)
-                {
-                    return ParseAlbumImageData(bin, albumCover);
-                }
-                else
-                {
-                    ret.IsNoBinaryFound = true;
-                    ret.ErrorMessage = "No binary data found. AlbumArt doesn't exists or ... needs to be a albumart command instead of readpicture? (@MpdBinarySendBinaryCommand)";
-                    ret.IsSuccess = false;
-                    return ret;
+                    return result;
                 }
             }
-        }
-        catch (InvalidOperationException e)
-        {
-            // The stream is currently in use by a previous operation on the stream.
-
-            Debug.WriteLine("InvalidOperationException@MpdBinarySendBinaryCommand: " + cmd.Trim() + " ReadAsync ---- " + e.Message);
-
-            ret.IsSuccess = false;
-            ret.ErrorMessage = e.Message;
-
-            return ret;
         }
         catch (OperationCanceledException e)
         {
-            Debug.WriteLine("ReadLineAsync canceled due to ConnectionStatus. Disconnecting, now exiting. @MpdBinarySendBinaryCommand" + e.Message);
-            ret.IsSuccess = false;
-            ret.ErrorMessage = e.Message;
-
-            return ret;
+            return Fail(e.Message);
+        }
+        catch (EndOfStreamException e)
+        {
+            return Fail(e.Message, isTimeout: true);
         }
         catch (IOException e)
         {
-            // IOException : Unable to write data to the transport connection
-
-            Debug.WriteLine("IOException@MpdBinarySendBinaryCommand: " + cmd.Trim() + " ReadAsync ---- " + e.Message);
-
-            ret.IsTimeOut = true; // re-try.
-
-            ret.IsSuccess = false;
-            ret.ErrorMessage = e.Message;
-
-            return ret;
+            return Fail(e.Message, isTimeout: true);
         }
         catch (Exception e)
         {
-            Debug.WriteLine("Exception@MpdBinarySendBinaryCommand: " + cmd.Trim() + " ReadAsync ---- " + e.Message);
-
-            ret.IsSuccess = false;
-            ret.ErrorMessage = e.Message;
-
-            return ret;
+            return Fail(e.Message);
         }
     }
 
-    private CommandBinaryResult ParseAlbumImageData(byte[] data, AlbumImage albumCover)
+    private static async Task<string?> ReadMpdLineAsync(Stream stream, CancellationToken cancellationToken)
     {
-        CommandBinaryResult r = new();
+        using MemoryStream lineBytes = new();
+        byte[] oneByte = new byte[1];
 
-        //if (MpdStop) return r;
-
-        if (_cts is null)
+        while (true)
         {
-            r.IsSuccess = false;
-            albumCover.IsDownloading = false;
-            return r;
-        }
+            int bytesRead = await stream.ReadAsync(oneByte.AsMemory(), cancellationToken);
 
-        if (_cts.Token.IsCancellationRequested)
-        {
-            Debug.WriteLine("IsCancellationRequested returning @ParseAlbumImageData");
-            albumCover.IsDownloading = false;
-            return r;
-        }
+            if (bytesRead == 0) return null;
 
-        if (data.Length > 20000000) //2000000000
-        {
-            Debug.WriteLine("**ParseAlbumImageData: binary file size too big: " + data.Length.ToString(CultureInfo.InvariantCulture));
-            r.IsSuccess = false;
-            r.ErrorMessage = "ParseAlbumImageData: binary file size too big: " + data.Length.ToString(CultureInfo.InvariantCulture);
-            albumCover.IsDownloading = false;
-            return r;
-        }
-
-        if (string.IsNullOrEmpty(albumCover.SongFilePath))
-        {
-            Debug.WriteLine("**ParseAlbumImageData: File path is not set.");
-            r.IsSuccess = false;
-            r.ErrorMessage = "ParseAlbumImageData: File path is not set.";
-            albumCover.IsDownloading = false;
-            return r;
-        }
-
-        if (!albumCover.IsDownloading)
-        {
-            Debug.WriteLine("**ParseAlbumImageData: IsDownloading = false. Downloading canceld? .");
-
-            albumCover.IsDownloading = false;
-            return r;
-        }
-
-        try
-        {
-            int gabStart = 0;
-            int gabEnd = 0;
-
-            string res = Encoding.Default.GetString(data, 0, data.Length);
-
-            int binSize = 0;
-            int binResSize = 0;
-
-#pragma warning disable IDE0305
-            List<string> values = res.Split('\n').ToList();
-#pragma warning restore IDE0305
-
-            bool found = false;
-            foreach (var val in values)
+            if (oneByte[0] == (byte)'\n')
             {
-                if (val.StartsWith("size: ", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    found = true;
-
-                    gabStart = gabStart + val.Length + 1;
-#pragma warning disable IDE0305
-                    List<string> s = val.Split(':').ToList();
-#pragma warning restore IDE0305
-                    if (s.Count > 1)
-                    {
-                        if (Int32.TryParse(s[1], out int i))
-                        {
-                            binSize = i;
-
-                            r.WholeSize = i;
-                        }
-                    }
-                }
-                else if (val.StartsWith("type: ", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    gabStart = gabStart + val.Length + 1;
-#pragma warning disable IDE0305
-                    List<string> s = val.Split(':').ToList();
-#pragma warning restore IDE0305
-                    if (s.Count > 1)
-                    {
-                        r.Type = s[1];
-                    }
-
-                }
-                else if (val.StartsWith("binary: ", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    gabStart = gabStart + val.Length + 1;
-#pragma warning disable IDE0305
-                    List<string> s = val.Split(':').ToList();
-#pragma warning restore IDE0305
-                    if (s.Count > 1)
-                    {
-                        if (Int32.TryParse(s[1], out int i))
-                        {
-                            binResSize = i;
-
-                            r.ChunkSize = binResSize;
-                        }
-                    }
-                }
-                else if (val == "OK")
-                {
-                    if (found)
-                    {
-                        gabEnd = gabEnd + val.Length + 1;
-                    }
-                    else
-                    {
-                        gabStart = gabStart + val.Length + 1;
-                    }
-                }
-                else if (val.StartsWith("ACK", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    // ACK shouldn't be here.
-
-                    if (found)
-                    {
-                        gabEnd = gabEnd + val.Length + 1;
-                    }
-                    else
-                    {
-                        gabStart = gabStart + val.Length + 1;
-                    }
-                }
-                else if (val.StartsWith("changed:", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    if (found)
-                    {
-                        gabEnd = gabEnd + val.Length + 1;
-                    }
-                    else
-                    {
-                        gabStart = gabStart + val.Length + 1;
-                    }
-                }
-                else
-                {
-                    // should be binary...
-                }
+                return Encoding.UTF8
+                    .GetString(lineBytes.GetBuffer(), 0, checked((int)lineBytes.Length))
+                    .TrimEnd('\r');
             }
 
-            gabEnd++;
+            lineBytes.WriteByte(oneByte[0]);
 
-            if (binSize > 20000000)
+            if (lineBytes.Length > 64 * 1024)
             {
-                Debug.WriteLine("binary file too big: " + binSize.ToString(CultureInfo.InvariantCulture) + " " + albumCover.SongFilePath);
-
-                r.IsSuccess = false;
-                r.ErrorMessage = "ParseAlbumImageData: binary file too big: " + binSize.ToString(CultureInfo.InvariantCulture) + " " + albumCover.SongFilePath;
-                albumCover.IsDownloading = false;
-
-                return r;
+                throw new InvalidDataException("MPD response line exceeded the maximum allowed length.");
             }
-
-            if ((binSize == 0))
-            {
-                Debug.WriteLine("binary file size is Zero: " + binSize.ToString(CultureInfo.InvariantCulture) + ", " + binResSize.ToString(CultureInfo.InvariantCulture) + ", " + data.Length.ToString(CultureInfo.InvariantCulture));
-
-                r.IsSuccess = false;
-                r.ErrorMessage = "ParseAlbumImageData: binary file size is Zero.";
-                albumCover.IsDownloading = false;
-
-                return r;
-            }
-
-            if (binResSize != ((data.Length - gabStart) - gabEnd))
-            {
-                Debug.WriteLine("binary file size mismatch: " + binSize.ToString(CultureInfo.InvariantCulture) + ", [" + binResSize.ToString(CultureInfo.InvariantCulture) + ", " + (data.Length - gabStart - gabEnd) + "], " + data.Length.ToString(CultureInfo.InvariantCulture));
-                r.IsSuccess = false;
-                r.ErrorMessage = "ParseAlbumImageData: binary file size mismatch.";
-                albumCover.IsDownloading = false;
-
-                return r;
-            }
-
-            r.WholeSize = binSize;
-            r.ChunkSize = binResSize;
-
-            byte[] resBinary = new byte[data.Length - gabStart - gabEnd];
-            Array.Copy(data, gabStart, resBinary, 0, resBinary.Length);
-
-            r.BinaryData = resBinary;
-
-            r.IsSuccess = true;
-
-            return r;
-
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine("Error@ParseAlbumImageData (l): " + ex.Message);
-            r.IsSuccess = false;
-            r.ErrorMessage = ex.Message;
-            albumCover.IsDownloading = false;
-            return r;
         }
     }
 

@@ -2662,7 +2662,7 @@ public sealed partial class MpcService : IMpcService
 
                     Debug.WriteLine($"SendWithVolume. State is stop. Sending setvol command separately. Volume: {volume}");
 
-                    await Task.Delay(120);
+                    await Task.Delay(200);
                     await MpdCommandSendCommand($"setvol {volume}");
                 }
 

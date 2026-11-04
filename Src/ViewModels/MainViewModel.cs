@@ -3161,7 +3161,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 OnPropertyChanged(nameof(IsConsume));
 
                 _isSingle = _mpc.Status.IsSingle;
-                OnPropertyChanged(nameof(Single));
+                OnPropertyChanged(nameof(IsSingle));
 
                 //start elapsed timer.
                 if (_mpc.Status.CurrentPlayState == MpdPlayState.Play)

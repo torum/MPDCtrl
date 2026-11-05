@@ -816,7 +816,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             {
                 if (!nml.IsAcquired || (MusicDirectories.Count <= 1) && (MusicEntries.Count == 0))
                 {
-                    _ = GetFilesAsync(nml);
+                    //_ = GetFilesAsync(nml);
+                    _ = RunSafeAsync(() => GetFilesAsync(nml), nameof(GetFilesAsync), false);
                 }
             }
             else if (value is NodeMenuPlaylists)
@@ -832,7 +833,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
                     if ((nmpli.PlaylistSongs.Count == 0) || nmpli.IsUpdateRequied)
                     {
-                        _ = GetPlaylistSongsAsync(nmpli);
+                        //_ = GetPlaylistSongsAsync(nmpli);
+                        _ = RunSafeAsync(() => GetPlaylistSongsAsync(nmpli), nameof(GetPlaylistSongsAsync), false);
                     }
                 });
 
@@ -1140,8 +1142,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             }
 
             OnPropertyChanged(nameof(ArtistPageSubTitleArtistAlbumCount));
-
-            //Task.Run(async () =>
+            /*
             _dispatcherService.TryEnqueue(async () =>
             {
                 await Task.Yield();
@@ -1151,7 +1152,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 await Task.Delay(100);
                 await GetAlbumPicturesAsync(SelectedArtistAlbums, _cts.Token);
             });
-            //}, _cts.Token);
+            */
+            _ = RunSafeAsync(() => GetArtistSongsAsync(field), nameof(GetArtistSongsAsync), false);
+            _ = RunSafeAsync(() => GetAlbumPicturesAsync(SelectedArtistAlbums, _cts.Token), nameof(GetAlbumPicturesAsync), false);
         }
     }
 
@@ -4774,175 +4777,183 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                     }
                     album.IsImageLoading = true;
 
-                    var strArtist = album.AlbumArtist.Trim(); // album.AlbumArtist already fallback to Artist if none.
-                    strArtist = string.IsNullOrEmpty(strArtist) ? "Unknown Artist" : SanitizeFilename(strArtist);
-
-                    var strAlbum = album.Name.Trim();
-                    strAlbum = string.IsNullOrEmpty(strAlbum) ? "Unknown Album" : SanitizeFilename(strAlbum);
-
-                    var filePath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".bmp";
-
-                    string fileTempPath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".tmp";
-                    if (File.Exists(fileTempPath))
+                    try
                     {
-                        album.IsImageLoading = false;
-                        continue; // Skip if temp file exists, it means the album art has found to have no image.
-                    }
 
-                    if (File.Exists(filePath))
-                    {
-                        // Load cached album cover.
+                        var strArtist = album.AlbumArtist.Trim(); // album.AlbumArtist already fallback to Artist if none.
+                        strArtist = string.IsNullOrEmpty(strArtist) ? "Unknown Artist" : SanitizeFilename(strArtist);
 
-                        album.IsImageLoading = true;
+                        var strAlbum = album.Name.Trim();
+                        strAlbum = string.IsNullOrEmpty(strAlbum) ? "Unknown Album" : SanitizeFilename(strAlbum);
 
-                        try
-                        {
-                            BitmapImage? bitmap = new(new Uri(filePath));
-                            album.AlbumImage = bitmap;
-                            album.IsImageAcquired = true;
-                            album.IsImageLoading = false;
-                        }
-                        catch (Exception e)
+                        var filePath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".bmp";
+
+                        string fileTempPath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".tmp";
+                        if (File.Exists(fileTempPath))
                         {
                             album.IsImageLoading = false;
-                            Debug.WriteLine("GetAlbumPictures: Exception while loading: " + filePath + Environment.NewLine + e.Message);
-                            continue;
+                            continue; // Skip if temp file exists, it means the album art has found to have no image.
                         }
 
-                        await Task.Delay(5);
-
-                        album.IsImageLoading = false;
-                        //Debug.WriteLine($"GetAlbumPictures: Successfully loaded album art from cache {filePath}");
-                    }
-                    else
-                    {
-                        album.IsImageLoading = true;
-
-                        var ret = await SearchAlbumSongsAsync(album.Name);
-                        if (!ret.IsSuccess)
+                        if (File.Exists(filePath))
                         {
-                            Debug.WriteLine("GetAlbumPictures: SearchAlbumSongs failed: " + ret.ErrorMessage);
+                            // Load cached album cover.
 
-                            album.IsImageLoading = false;
-                            continue;
-                        }
+                            album.IsImageLoading = true;
 
-                        if (ret.SearchResult is null)
-                        {
-                            album.IsImageLoading = false;
-                            Debug.WriteLine("GetAlbumPictures: ret.SearchResult is null, skipping.");
-                            continue;
-                        }
-
-                        var sresult = ret.SearchResult;//new ObservableCollection<SongInfo>(ret.SearchResult);
-                        if (sresult.Count < 1)
-                        {
-                            album.IsImageLoading = false;
-                            Debug.WriteLine("GetAlbumPictures: ret.SearchResult.Count < 1, skipping. -> " + album.Name);
-                            continue;
-                        }
-
-                        string strDirPath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, strArtist);
-                        bool isWaitFailed = false;
-                        bool isCoverExists = false;
-                        bool isNoAlbumCover = false;
-
-                        foreach (var albumsong in sresult)
-                        {
-                            if (_mpc.IsStop)
-                            {
-                                break;
-                            }
-
-                            if (_cts.Token.IsCancellationRequested)
-                            {
-                                Debug.WriteLine("IsCancellationRequested in foreach2 @GetAlbumPictures");
-                                return;
-                            }
-
-                            if (albumsong is null)
-                            {
-                                continue;
-                            }
-
-                            var aat = albumsong.AlbumArtist.Trim();
-                            if (string.IsNullOrEmpty(aat))
-                            {
-                                aat = albumsong.Artist.Trim();
-                            }
-
-                            if (string.Equals(aat, album.AlbumArtist, StringComparison.Ordinal))
-                            {
-                                //Debug.WriteLine($"GetAlbumPictures: Processing song {albumsong.File} from album {album.Name}");
-                                var r = await _mpc.MpdQueryAlbumArtForAlbumView(albumsong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
-                                if (!r.IsSuccess)
-                                {
-                                    isNoAlbumCover = r.IsNoBinaryFound;
-                                    isWaitFailed = r.IsWaitFailed;
-                                    //album.IsImageLoading = false; // don't
-                                    //Debug.WriteLine($"MpdQueryAlbumArtForAlbumView failed: {r.ErrorMessage}");
-                                    continue;
-                                }
-                                if (r.AlbumCover is null) continue;
-                                if (!r.AlbumCover.IsSuccess) continue;
-
-                                album.AlbumImage = await BitmapSourceFromByteArrayAsync(r.AlbumCover.BinaryData);
-
-                                if (r.AlbumCover.BinaryData is not null)
-                                {
-                                    Directory.CreateDirectory(strDirPath);
-                                    File.WriteAllBytes(filePath, r.AlbumCover.BinaryData);
-                                    //Debug.WriteLine($"GetAlbumPictures: Successfully saved album art for {filePath}");
-                                }
-
-                                album.IsImageAcquired = true;
-                                album.IsImageLoading = false;
-
-                                isCoverExists = true;
-
-                                break; // Break after first successful album art retrieval.
-                            }
-                            else
-                            {
-                                //Debug.WriteLine($" {album.Name} > {album.AlbumArtist} : {albumsong.AlbumArtist},  {albumsong.Artist}");
-                            }
-                        }
-
-                        // File saved. Don't save temp file.
-                        if (isCoverExists) continue;
-
-                        // WaitFiled. Don't save temp file.
-                        if (isWaitFailed)
-                        {
-                            album.IsImageLoading = false;
-                            continue;
-                        }
-
-                        if (isNoAlbumCover)
-                        {
-                            // Writes tmp file indicating there was no album cover.
                             try
                             {
-                                Directory.CreateDirectory(strDirPath);
-                                DateTimeOffset dto = new(DateTime.UtcNow);
-                                // Get the unix timestamp in seconds
-                                var unixTime = dto.ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture);
-
-                                await using StreamWriter file = new(fileTempPath);
-                                await file.WriteLineAsync(unixTime);
-                                file.Close();
-                                // Testing
-                                await Task.Delay(10);
+                                BitmapImage? bitmap = new(new Uri(filePath));
+                                album.AlbumImage = bitmap;
+                                album.IsImageAcquired = true;
+                                album.IsImageLoading = false;
                             }
                             catch (Exception e)
                             {
-                                Debug.WriteLine("GetAlbumPictures: Exception while saving album art DUMMY file: " + e.Message);
+                                album.IsImageLoading = false;
+                                Debug.WriteLine("GetAlbumPictures: Exception while loading: " + filePath + Environment.NewLine + e.Message);
+                                continue;
                             }
+
+                            await Task.Delay(5);
+
+                            album.IsImageLoading = false;
+                            //Debug.WriteLine($"GetAlbumPictures: Successfully loaded album art from cache {filePath}");
                         }
+                        else
+                        {
+                            album.IsImageLoading = true;
 
+                            var ret = await SearchAlbumSongsAsync(album.Name);
+                            if (!ret.IsSuccess)
+                            {
+                                Debug.WriteLine("GetAlbumPictures: SearchAlbumSongs failed: " + ret.ErrorMessage);
+
+                                album.IsImageLoading = false;
+                                continue;
+                            }
+
+                            if (ret.SearchResult is null)
+                            {
+                                album.IsImageLoading = false;
+                                Debug.WriteLine("GetAlbumPictures: ret.SearchResult is null, skipping.");
+                                continue;
+                            }
+
+                            var sresult = ret.SearchResult;//new ObservableCollection<SongInfo>(ret.SearchResult);
+                            if (sresult.Count < 1)
+                            {
+                                album.IsImageLoading = false;
+                                Debug.WriteLine("GetAlbumPictures: ret.SearchResult.Count < 1, skipping. -> " + album.Name);
+                                continue;
+                            }
+
+                            string strDirPath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, strArtist);
+                            bool isWaitFailed = false;
+                            bool isCoverExists = false;
+                            bool isNoAlbumCover = false;
+
+                            foreach (var albumsong in sresult)
+                            {
+                                if (_mpc.IsStop)
+                                {
+                                    break;
+                                }
+
+                                if (_cts.Token.IsCancellationRequested)
+                                {
+                                    Debug.WriteLine("IsCancellationRequested in foreach2 @GetAlbumPictures");
+                                    return;
+                                }
+
+                                if (albumsong is null)
+                                {
+                                    continue;
+                                }
+
+                                var aat = albumsong.AlbumArtist.Trim();
+                                if (string.IsNullOrEmpty(aat))
+                                {
+                                    aat = albumsong.Artist.Trim();
+                                }
+
+                                if (string.Equals(aat, album.AlbumArtist, StringComparison.Ordinal))
+                                {
+                                    //Debug.WriteLine($"GetAlbumPictures: Processing song {albumsong.File} from album {album.Name}");
+                                    var r = await _mpc.MpdQueryAlbumArtForAlbumView(albumsong.File, IsDownloadAlbumArtEmbeddedUsingReadPicture);
+                                    if (!r.IsSuccess)
+                                    {
+                                        isNoAlbumCover = r.IsNoBinaryFound;
+                                        isWaitFailed = r.IsWaitFailed;
+                                        //album.IsImageLoading = false; // don't
+                                        //Debug.WriteLine($"MpdQueryAlbumArtForAlbumView failed: {r.ErrorMessage}");
+                                        continue;
+                                    }
+                                    if (r.AlbumCover is null) continue;
+                                    if (!r.AlbumCover.IsSuccess) continue;
+
+                                    album.AlbumImage = await BitmapSourceFromByteArrayAsync(r.AlbumCover.BinaryData);
+
+                                    if (r.AlbumCover.BinaryData is not null)
+                                    {
+                                        Directory.CreateDirectory(strDirPath);
+                                        File.WriteAllBytes(filePath, r.AlbumCover.BinaryData);
+                                        //Debug.WriteLine($"GetAlbumPictures: Successfully saved album art for {filePath}");
+                                    }
+
+                                    album.IsImageAcquired = true;
+                                    album.IsImageLoading = false;
+
+                                    isCoverExists = true;
+
+                                    break; // Break after first successful album art retrieval.
+                                }
+                                else
+                                {
+                                    //Debug.WriteLine($" {album.Name} > {album.AlbumArtist} : {albumsong.AlbumArtist},  {albumsong.Artist}");
+                                }
+                            }
+
+                            // File saved. Don't save temp file.
+                            if (isCoverExists) continue;
+
+                            // WaitFiled. Don't save temp file.
+                            if (isWaitFailed)
+                            {
+                                album.IsImageLoading = false;
+                                continue;
+                            }
+
+                            if (isNoAlbumCover)
+                            {
+                                // Writes tmp file indicating there was no album cover.
+                                try
+                                {
+                                    Directory.CreateDirectory(strDirPath);
+                                    DateTimeOffset dto = new(DateTime.UtcNow);
+                                    // Get the unix timestamp in seconds
+                                    var unixTime = dto.ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture);
+
+                                    await using StreamWriter file = new(fileTempPath);
+                                    await file.WriteLineAsync(unixTime);
+                                    file.Close();
+                                    // Testing
+                                    await Task.Delay(10);
+                                }
+                                catch (Exception e)
+                                {
+                                    Debug.WriteLine("GetAlbumPictures: Exception while saving album art DUMMY file: " + e.Message);
+                                }
+                            }
+
+                            album.IsImageLoading = false;
+
+                            await Task.Yield();
+                        }
+                    }
+                    finally
+                    {
                         album.IsImageLoading = false;
-
-                        await Task.Yield();
                     }
                 }
             }

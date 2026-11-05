@@ -9,25 +9,18 @@
     xmlns:mod="using:MPDCtrl.Models" 
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+    KeyboardAcceleratorPlacementMode="Hidden"
     NavigationCacheMode="Required"
     mc:Ignorable="d"
     PreviewKeyDown="Page_PreviewKeyDown" PreviewKeyUp="Page_PreviewKeyUp">
-    <Grid x:Name="RootGrid" KeyboardAcceleratorPlacementMode="Hidden">
-        <Grid.KeyboardAccelerators>
-            <KeyboardAccelerator Key="F1" Modifiers="None" Invoked="KeyboardAccelerator_Invoked"/>
-            <KeyboardAccelerator Key="S" Modifiers="Control" Invoked="KeyboardAccelerator_Invoked"/>
-            <KeyboardAccelerator Key="Subtract" Modifiers="Control" Invoked="KeyboardAccelerator_Invoked"/>
-            <KeyboardAccelerator Key="Add" Modifiers="Control" Invoked="KeyboardAccelerator_Invoked"/>
-        </Grid.KeyboardAccelerators>
-        <!--
-        <Grid.Resources>
-            <Storyboard x:Name="FadeInStoryboard">
-                <DoubleAnimation Storyboard.TargetName="RootGrid"
-                                 Storyboard.TargetProperty="Opacity"
-                                 From="0.0" To="1.0" Duration="0:0:0.5" />
-            </Storyboard>
-        </Grid.Resources>
-        -->
+
+    <Page.KeyboardAccelerators>
+        <KeyboardAccelerator Key="F1" Modifiers="None" Invoked="KeyboardAccelerator_Invoked"/>
+        <KeyboardAccelerator Key="S" Modifiers="Control" Invoked="KeyboardAccelerator_Invoked"/>
+        <KeyboardAccelerator Key="Subtract" Modifiers="Control" Invoked="KeyboardAccelerator_Invoked"/>
+        <KeyboardAccelerator Key="Add" Modifiers="Control" Invoked="KeyboardAccelerator_Invoked"/>
+    </Page.KeyboardAccelerators>
+    <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="42"/>
             <RowDefinition Height="*"/>

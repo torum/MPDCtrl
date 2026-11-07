@@ -19,6 +19,7 @@
         <KeyboardAccelerator Key="S" Modifiers="Control" Invoked="KeyboardAccelerator_Invoked"/>
         <KeyboardAccelerator Key="Subtract" Modifiers="Control" Invoked="KeyboardAccelerator_Invoked"/>
         <KeyboardAccelerator Key="Add" Modifiers="Control" Invoked="KeyboardAccelerator_Invoked"/>
+        <KeyboardAccelerator Key="Left" Modifiers="Menu" Invoked="KeyboardAccelerator_Invoked" />
     </Page.KeyboardAccelerators>
     <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>

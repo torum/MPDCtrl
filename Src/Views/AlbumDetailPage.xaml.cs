@@ -32,6 +32,9 @@ public sealed partial class AlbumDetailPage : Page
         ViewModel = App.GetService<MainViewModel>();
 
         InitializeComponent();
+
+        Loaded += (s, e) => AlbumSongsListView.Focus(FocusState.Programmatic);
+
     }
 
     public MainViewModel ViewModel
@@ -55,6 +58,11 @@ public sealed partial class AlbumDetailPage : Page
         ViewModel.IsGoBackButtonVisible = true;
 
         base.OnNavigatedTo(e);
+
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            this.AlbumSongsListView.Focus(FocusState.Programmatic);
+        });
     }
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)

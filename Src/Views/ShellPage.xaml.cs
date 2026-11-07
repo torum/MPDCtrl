@@ -187,12 +187,18 @@ public sealed partial class ShellPage : Page
         );
     }
 
+    [DynamicWindowsRuntimeCast(typeof(UIElement))]
     public void OnAlbumSelectedNavigateToDetailsPage(object? sender, System.EventArgs e)
     {
         // Make sure to pass NavigationFrame as a parameter here.
         if (this.NavigationFrame.Navigate(typeof(AlbumDetailPage), this.NavigationFrame, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight }))
         {
             _currentPage = typeof(AlbumDetailPage);
+
+            if (NavigationFrame.Content is UIElement content)
+            {
+                DispatcherQueue.TryEnqueue(() => content.Focus(FocusState.Programmatic));
+            }
         }
     }
 
@@ -438,6 +444,7 @@ public sealed partial class ShellPage : Page
         }
     }
 
+    [DynamicWindowsRuntimeCast(typeof(UIElement))]
     private void NavigationFrame_Navigated(object sender, NavigationEventArgs e)
     {
         if (this.NavigationFrame is null)
@@ -452,6 +459,11 @@ public sealed partial class ShellPage : Page
         else
         {
             this.BackButton.IsEnabled = false;
+        }
+
+        if (NavigationFrame.Content is UIElement content)
+        {
+            DispatcherQueue.TryEnqueue(() => content.Focus(FocusState.Programmatic));
         }
     }
 
@@ -671,6 +683,7 @@ public sealed partial class ShellPage : Page
                 {
                     ViewModel.VolumeDownCommand.Execute(null);
                 }
+                return;
             }
             else if (args.KeyboardAccelerator.Key == Windows.System.VirtualKey.Add)
             {
@@ -682,6 +695,23 @@ public sealed partial class ShellPage : Page
                 {
                     ViewModel.VolumeUpCommand.Execute(null);
                 }
+                return;
+            }
+        }
+
+        if (args.KeyboardAccelerator.Modifiers == Windows.System.VirtualKeyModifiers.Menu)
+        {
+            if (args.KeyboardAccelerator.Key == Windows.System.VirtualKey.Left)
+            {
+                // set this first.
+                args.Handled = true;
+
+                if (this.NavigationFrame != null && this.NavigationFrame.CanGoBack)
+                {
+                    this.NavigationFrame.GoBack();
+                }
+
+                return;
             }
         }
     }

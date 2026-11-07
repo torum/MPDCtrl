@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Navigation;
 using MPDCtrl.Models;
 using MPDCtrl.Services.Contracts;
 using MPDCtrl.ViewModels;
@@ -339,6 +340,8 @@ public sealed partial class AlbumsPage : Page
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
+        this.Focus(FocusState.Programmatic);
+
         ViewModel.AlbumsCollectionHasBeenReset += this.OnAlbumsCollectionHasBeenReset;
         ViewModel.AlbumScrollIntoView += this.OnAlbumScrollIntoView;
     }
@@ -347,5 +350,16 @@ public sealed partial class AlbumsPage : Page
     {
         ViewModel.AlbumsCollectionHasBeenReset -= this.OnAlbumsCollectionHasBeenReset;
         ViewModel.AlbumScrollIntoView -= this.OnAlbumScrollIntoView;
+    }
+
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+
+        // Wait until the visual tree is ready, otherwise Focus may fail silently.
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            this.Focus(FocusState.Programmatic);
+        });
     }
 }

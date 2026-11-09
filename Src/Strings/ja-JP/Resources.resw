@@ -590,4 +590,7 @@ SOFTWARE.</value>
   <data name="ListviewItemContextMenu_AddToQueueAfterCurrent.Text" xml:space="preserve">
     <value>次に再生</value>
   </data>
+  <data name="Settings_Opts_UseUniformAlbumImageStretch.Content" xml:space="preserve">
+    <value>アルバムカバーが正方形でないときに画像をクロップしない</value>
+  </data>
 </root>

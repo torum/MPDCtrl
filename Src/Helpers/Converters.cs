@@ -1,6 +1,9 @@
 ﻿using Microsoft.UI.Text;
 using Microsoft.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Media;
 using System;
+using System.Globalization;
+using WinRT;
 
 namespace MPDCtrl.Helpers
 {
@@ -42,6 +45,30 @@ namespace MPDCtrl.Helpers
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             throw new NotImplementedException(); // Not needed for slider tooltips
+        }
+    }
+
+    public sealed partial class AlbumImageStretchConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is bool boolValue && boolValue)
+            {
+                return Stretch.Uniform;
+            }
+
+            return Stretch.UniformToFill;
+        }
+
+        [DynamicWindowsRuntimeCast(typeof(Stretch))]
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            if (value is Stretch stretchValue)
+            {
+                return stretchValue == Stretch.Uniform;
+            }
+
+            return false;
         }
     }
 }

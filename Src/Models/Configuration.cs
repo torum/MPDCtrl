@@ -45,4 +45,7 @@ public class Configuration
 
     public bool IsForceSetVolumeExplicitly { get; set; }
 
+    public bool IsUseUniformAlbumImageStretch { get; set; }
+    
+
 }

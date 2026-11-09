@@ -393,8 +393,22 @@ public sealed class ConfigurationService : IConfigurationService
                         config.IsForceSetVolumeExplicitly = false;
                     }
                 }
+
+                hoge = opts.Attribute("IsUseUniformAlbumImageStretch");
+                if (hoge is not null)
+                {
+                    if (hoge.Value == "True")
+                    {
+                        config.IsUseUniformAlbumImageStretch = true;
+
+                    }
+                    else
+                    {
+                        config.IsUseUniformAlbumImageStretch = false;
+                    }
+                }
             }
-            
+
             #endregion
 
             #region == Profiles  ==
@@ -653,6 +667,11 @@ public sealed class ConfigurationService : IConfigurationService
         //
         attrs = doc.CreateAttribute("isForceSetVolumeExplicitly");
         attrs.Value = config.IsForceSetVolumeExplicitly ? "True" : "False";
+        opts.SetAttributeNode(attrs);
+
+        //
+        attrs = doc.CreateAttribute("IsUseUniformAlbumImageStretch");
+        attrs.Value = config.IsUseUniformAlbumImageStretch ? "True" : "False";
         opts.SetAttributeNode(attrs);
 
         /// 

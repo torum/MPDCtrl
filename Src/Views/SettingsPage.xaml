@@ -213,6 +213,10 @@
                                 <CheckBox x:Uid="Settings_Opts_ForceSetVolumeExplicitly" IsChecked="{x:Bind ViewModel.IsForceSetVolumeExplicitly, Mode=TwoWay}" Margin="0,12,0,12"/>
                             </controls:SettingsCard>
 
+                            <controls:SettingsCard Header="" Description="" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
+                                <CheckBox x:Uid="Settings_Opts_UseUniformAlbumImageStretch" IsChecked="{x:Bind ViewModel.IsUseUniformAlbumImageStretch, Mode=TwoWay}" Margin="0,12,0,12"/>
+                            </controls:SettingsCard>
+
                         </controls:SettingsExpander.Items>
                     </controls:SettingsExpander>
 

@@ -2232,6 +2232,20 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             }
         }
     }
+
+    public bool IsUseUniformAlbumImageStretch
+    {
+        get; set
+        {
+            if (field == value)
+                return;
+
+            field = value;
+
+            OnPropertyChanged();
+        }
+    }
+
     #endregion
 
     #region == Settings ==
@@ -2454,6 +2468,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         config.IsArtistSortWithoutThePrefix = IsArtistSortWithoutThePrefix;
         config.IsAlbumSortWithoutThePrefix = IsAlbumSortWithoutThePrefix;
         config.IsForceSetVolumeExplicitly = IsForceSetVolumeExplicitly;
+        config.IsUseUniformAlbumImageStretch = IsUseUniformAlbumImageStretch;
 
         if (CurrentProfile is not null)
         {
@@ -2568,6 +2583,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         IsArtistSortWithoutThePrefix = config.IsArtistSortWithoutThePrefix;
         IsAlbumSortWithoutThePrefix = config.IsAlbumSortWithoutThePrefix;
         IsForceSetVolumeExplicitly = config.IsForceSetVolumeExplicitly;
+        IsUseUniformAlbumImageStretch = config.IsUseUniformAlbumImageStretch;
 
         //config.Profiles.Clear();
         foreach (var profile in config.Profiles)
@@ -4466,6 +4482,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                 Albums = new ObservableCollection<AlbumEx>(_mpc.Albums.OrderBy(x => x.AlbumArtist, comp)); // COPY. // Sort 
             }
 
+            // Workaround for WinUI3's limitation or lack of features.
+            foreach (var album in Albums)
+            {
+                album.ParentViewModel = this;
+            }
+
             UpdateProgress?.Invoke(this, "");
 
             IsWorking = false;
@@ -4795,6 +4817,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                             continue; // Skip if temp file exists, it means the album art has found to have no image.
                         }
 
+                        album.ParentViewModel = this;
+
                         if (File.Exists(filePath))
                         {
                             // Load cached album cover.
@@ -4903,7 +4927,6 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
 
                                     album.IsImageAcquired = true;
                                     album.IsImageLoading = false;
-
                                     isCoverExists = true;
 
                                     break; // Break after first successful album art retrieval.

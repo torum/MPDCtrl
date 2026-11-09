@@ -25,6 +25,7 @@
 
             <helpers:ElementThemeEnumToBooleanConverter x:Key="ElementThemeEnumToBooleanConverter" />
             <helpers:SystemBackdropEnumToBooleanConverter x:Key="SystemBackdropEnumToBooleanConverter" />
+            <helpers:AlbumImageStretchConverter x:Key="AlbumImageStretchConverter" />
 
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />

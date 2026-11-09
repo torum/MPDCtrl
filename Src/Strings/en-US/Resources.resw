@@ -589,4 +589,7 @@ SOFTWARE.</value>
   <data name="ListviewItemContextMenu_AddToQueueAfterCurrent.Text" xml:space="preserve">
     <value>Play next</value>
   </data>
+  <data name="Settings_Opts_UseUniformAlbumImageStretch.Content" xml:space="preserve">
+    <value>Do not crop when Album cover is not squire.</value>
+  </data>
 </root>

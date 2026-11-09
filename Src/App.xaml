@@ -27,6 +27,8 @@
             <helpers:SystemBackdropEnumToBooleanConverter x:Key="SystemBackdropEnumToBooleanConverter" />
             <helpers:AlbumImageStretchConverter x:Key="AlbumImageStretchConverter" />
 
+            <helpers:NullToVisibilityInverseConverter x:Key="NullToVisibilityInverseConverter"/>
+
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <!-- Other merged dictionaries here -->

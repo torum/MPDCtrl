@@ -63,10 +63,10 @@
 		<WindowsPackageType>None</WindowsPackageType>
 		
 
-		<!-- "Packaged" Needs this when developing or publishing as a packaged app. 
+		<!-- "Packaged" Needs this when developing or publishing as a packaged app.
 		<EnableMsixTooling>True</EnableMsixTooling>
-		<WindowsPackageType>MSIX</WindowsPackageType>
-		-->
+		<WindowsPackageType>MSIX</WindowsPackageType> -->
+		
 
 		<!-- AoT and trimming settings for publishing as a packaged app. 
 		<PublishAot>true</PublishAot>

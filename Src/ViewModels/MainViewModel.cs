@@ -4808,9 +4808,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
                         var strAlbum = album.Name.Trim();
                         strAlbum = string.IsNullOrEmpty(strAlbum) ? "Unknown Album" : SanitizeFilename(strAlbum);
 
-                        var filePath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".bmp";
+                        var filePath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, strArtist, strAlbum) + ".bmp";
 
-                        string fileTempPath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".tmp";
+                        string fileTempPath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, strArtist, strAlbum) + ".tmp";
                         if (File.Exists(fileTempPath))
                         {
                             album.IsImageLoading = false;
@@ -5065,7 +5065,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         }
 
         string strDirPath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, strArtist);
-        string filePath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, System.IO.Path.Combine(strArtist, strAlbum)) + ".bmp";
+        string filePath = System.IO.Path.Combine(App.AlbumCoverCacheFolder, strArtist, strAlbum) + ".bmp";
         try
         {
             //album?.AlbumImageSource?.Save(filePath, 100);

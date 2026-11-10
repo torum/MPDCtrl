@@ -23,12 +23,12 @@ public sealed partial class App : Application
     public const string AppName = "MPDCtrl4";
     private const string AppDeveloper = "torum";
     private static readonly string _envDataFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-    public static string AppDataFolder { get; private set; } = System.IO.Path.Combine(System.IO.Path.Combine(_envDataFolder, AppDeveloper), AppName);
+    public static string AppDataFolder { get; private set; } = System.IO.Path.Combine(_envDataFolder, AppDeveloper, AppName);
     public static string AppConfigFilePath { get; private set; } = System.IO.Path.Combine(AppDataFolder, AppName + ".config");
 
     // Temp album cover cache folder.
     private static readonly string _envAppLocalFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData); // Use Local instead of temp path. //System.IO.Path.GetTempPath();
-    private static readonly string _envAppLocalAppFolder = System.IO.Path.Combine((System.IO.Path.Combine(_envAppLocalFolder, AppDeveloper)), AppName);
+    private static readonly string _envAppLocalAppFolder = System.IO.Path.Combine(_envAppLocalFolder, AppDeveloper, AppName);
     public static string AlbumCoverCacheFolder { get; private set; } = System.IO.Path.Combine(_envAppLocalAppFolder, "AlbumCoverCache");
 
     // ErrorLog
@@ -60,11 +60,11 @@ public sealed partial class App : Application
         {
             Debug.WriteLine("IsMSIX");
             var envDataFolder = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
-            AppDataFolder = System.IO.Path.Combine(System.IO.Path.Combine(envDataFolder, AppDeveloper), AppName);
+            AppDataFolder = System.IO.Path.Combine(envDataFolder, AppDeveloper, AppName);
             AppConfigFilePath = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, AppName + ".config");
             //AppConfigFilePath = System.IO.Path.Combine(AppDataFolder, AppName + ".config"); // Ops. should have been this...
             var envAppLocalCahceFolder = Windows.Storage.ApplicationData.Current.LocalCacheFolder.Path;
-            AlbumCoverCacheFolder = System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.Combine(envAppLocalCahceFolder, AppDeveloper), AppName), "AlbumCoverCache");
+            AlbumCoverCacheFolder = System.IO.Path.Combine(envAppLocalCahceFolder, AppDeveloper, AppName, "AlbumCoverCache");
         }
         else
         {

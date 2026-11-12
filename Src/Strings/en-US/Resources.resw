@@ -590,6 +590,6 @@ SOFTWARE.</value>
     <value>Play next</value>
   </data>
   <data name="Settings_Opts_UseUniformAlbumImageStretch.Content" xml:space="preserve">
-    <value>Do not crop when Album cover is not squire.</value>
+    <value>Do not crop when Album cover is not square.</value>
   </data>
 </root>

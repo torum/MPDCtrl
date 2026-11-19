@@ -24,6 +24,7 @@
 
 		<IncludeSymbols>True</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<StripSymbols>false</StripSymbols>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 
 		<!-- Code quality -->
@@ -40,11 +41,11 @@
 		<AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
 		<GenerateTestArtifacts>True</GenerateTestArtifacts>
 		<AppxBundle>Always</AppxBundle>
+		<AppxPackageDir>AppPackages\</AppxPackageDir>
 		<AppxBundlePlatforms>x86|x64|arm64</AppxBundlePlatforms>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 		<StartupObject>MPDCtrl.Program</StartupObject>
 		<AssemblyName>MPDCtrl</AssemblyName>
-
 		<IsAotCompatible>true</IsAotCompatible>
 		<SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
 		<TrimmerSingleWarn>false</TrimmerSingleWarn>
@@ -56,10 +57,6 @@
 		<PublishTrimmed>false</PublishTrimmed>
 		<WindowsPackageType>None</WindowsPackageType>
 		<PublishSingleFile>true</PublishSingleFile> -->
-		<!-- <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract> 
-		ETSDK1244: 'IncludeAllContentForSelfExtract' enables a legacy compatibility mode that extracts all managed assemblies to disk at startup. 
-		Prefer the default in-memory single-file behavior by removing the 'IncludeAllContentForSelfExtract' property from your project.
-		-->
 
 		<!-- "Unpackaged" Needs this when developing as an unpackaged app. -->
 		<EnableMsixTooling>False</EnableMsixTooling>
@@ -99,14 +96,24 @@
 		<PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.3.260402-preview2" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0" />
 		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.3.1" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2957" />
+		<!--
+		Microsoft.Windows.SDK.BuildTools.WinApp adds first-class support for
+		`dotnet run` on packaged WinUI apps: it hooks the .NET CLI Run target to
+		register a debug identity via the winapp CLI and launch the app with
+		package identity (AUMID).
+		Set <EnableWinAppRunSupport>false</EnableWinAppRunSupport> in a
+		<PropertyGroup> above to opt out.
+		-->
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools.WinApp" Version="0.8.0" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools.MSIX" Version="1.7.261102100">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.WindowsAppSDK.Foundation" Version="2.6.5" />
-		<PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="2.6.5" />
-		<PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.6.5" />
-		<PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.6.5" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.Foundation" Version="2.7.0" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="2.7.0" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.7.0" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.7.0" />
 		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="11.0.0" />
 	</ItemGroup>
 
@@ -123,18 +130,18 @@
 		<ProjectCapability Include="Msix" />
 	</ItemGroup>
 
-	<!--
-    Microsoft.Windows.SDK.BuildTools.WinApp adds first-class support for
-    `dotnet run` on packaged WinUI apps: it hooks the .NET CLI Run target to
-    register a debug identity via the winapp CLI and launch the app with
-    package identity (AUMID).
-    Set <EnableWinAppRunSupport>false</EnableWinAppRunSupport> in a
-    <PropertyGroup> above to opt out.
-  -->
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2957" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools.WinApp" Version="0.8.0" />
-	</ItemGroup>
+	<!-- Workaround for a bug in Microsoft.Windows.SDK.BuildTools.MSIX -->
+	<PropertyGroup Condition="'$(RuntimeIdentifier)'=='win-x64'">
+		<PdbCmfx64ExeFullPath>C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.52.37025\bin\Hostx64\x64\mspdbcmf.exe</PdbCmfx64ExeFullPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(RuntimeIdentifier)'=='win-x86'">
+		<PdbCmfx64ExeFullPath>C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.52.37025\bin\Hostx64\x86\mspdbcmf.exe</PdbCmfx64ExeFullPath>
+	</PropertyGroup>
+	
+	<PropertyGroup Condition="'$(RuntimeIdentifier)'=='win-arm64'">
+		<PdbCmfx64ExeFullPath>C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.52.37025\bin\Hostx64\arm64\mspdbcmf.exe</PdbCmfx64ExeFullPath>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<Content Update="Assets\MPDCtrl.ico">

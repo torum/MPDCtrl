@@ -26,6 +26,7 @@ public sealed partial class ShellPage : Page
 {
     private readonly IDispatcherService _dispatcherService;
     private Type? _currentPage;
+    private bool _restoringNavigationSelection;
     private long _token;
     private MainWindow? _mainWindow;
     private readonly IConfigurationService _configurationService;
@@ -323,7 +324,7 @@ public sealed partial class ShellPage : Page
 
     private void NaviView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
-        if (sender is null)
+        if (sender is null || _restoringNavigationSelection)
         {
             return;
         }
@@ -401,22 +402,18 @@ public sealed partial class ShellPage : Page
         {
             // don't change page here.
         }
-        else if (args.SelectedItem is NodeMenuPlaylistItem)
+        else if (args.SelectedItem is NodeMenuPlaylistItem playlist)
         {
-            if (_currentPage == typeof(PlaylistItemPage))
+            if (_currentPage == typeof(PlaylistItemPage) && vm.SelectedNodeMenu == playlist)
             {
-                // Set SelectedNodeMenu here. Don't JUST return for PlaylistItemPage, otherwise it won't load playlist.
-                //vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
-
-                //return;
-                //this.NavigationFrame.Content = null; // Clear the current content to force a reload of the PlaylistItemPage
+                return;
             }
 
-            // TODO: I just wanna show NavigationTransition animation without navigation....
-            if (this.NavigationFrame.Navigate(typeof(PlaylistItemPage), null, args.RecommendedNavigationTransitionInfo))
+            // Each history entry needs the playlist identity, not just the shared page type.
+            if (this.NavigationFrame.Navigate(typeof(PlaylistItemPage), playlist.Name, args.RecommendedNavigationTransitionInfo))
             {
                 _currentPage = typeof(PlaylistItemPage);
-                vm.SelectedNodeMenu = args.SelectedItem as NodeTree;
+                vm.SelectedNodeMenu = playlist;
             }
         }
         else
@@ -452,6 +449,13 @@ public sealed partial class ShellPage : Page
             return;
         }
 
+        _currentPage = e.SourcePageType;
+
+        if (e.NavigationMode == NavigationMode.Back || e.NavigationMode == NavigationMode.Forward)
+        {
+            RestoreNavigationSelection(e);
+        }
+
         if (this.NavigationFrame.CanGoBack)
         {
             this.BackButton.IsEnabled = true;
@@ -464,6 +468,69 @@ public sealed partial class ShellPage : Page
         if (NavigationFrame.Content is UIElement content)
         {
             DispatcherQueue.TryEnqueue(() => content.Focus(FocusState.Programmatic));
+        }
+    }
+
+    private void RestoreNavigationSelection(NavigationEventArgs e)
+    {
+        var menuItems = ViewModel.MainMenuItems.SelectMany(EnumerateMenuItems);
+        NodeTree? selected = null;
+
+        if (e.SourcePageType == typeof(PlaylistItemPage))
+        {
+            selected = menuItems.OfType<NodeMenuPlaylistItem>()
+                .FirstOrDefault(item => string.Equals(item.Name, e.Parameter as string, StringComparison.Ordinal));
+            if (selected is null)
+            {
+                Debug.WriteLine($"Could not restore playlist navigation selection: {e.Parameter}");
+            }
+        }
+        else if (e.SourcePageType == typeof(QueuePage))
+            selected = menuItems.OfType<NodeMenuQueue>().FirstOrDefault();
+        else if (e.SourcePageType == typeof(SearchPage))
+            selected = menuItems.OfType<NodeMenuSearch>().FirstOrDefault();
+        else if (e.SourcePageType == typeof(AlbumsPage) || e.SourcePageType == typeof(AlbumDetailPage))
+            selected = menuItems.OfType<NodeMenuAlbum>().FirstOrDefault();
+        else if (e.SourcePageType == typeof(ArtistsPage))
+            selected = menuItems.OfType<NodeMenuArtist>().FirstOrDefault();
+        else if (e.SourcePageType == typeof(FilesPage))
+            selected = menuItems.OfType<NodeMenuFiles>().FirstOrDefault();
+        else if (e.SourcePageType != typeof(SettingsPage))
+            Debug.WriteLine($"Could not restore navigation selection for page: {e.SourcePageType}");
+
+        _restoringNavigationSelection = true;
+        try
+        {
+            foreach (var item in menuItems)
+            {
+                if (item != selected && item.Selected)
+                {
+                    item.Selected = false;
+                }
+            }
+
+            NaviView.SelectedItem = selected;
+            if (selected is not null)
+            {
+                selected.Selected = true;
+            }
+            ViewModel.SelectedNodeMenu = selected;
+        }
+        finally
+        {
+            _restoringNavigationSelection = false;
+        }
+    }
+
+    private static IEnumerable<NodeTree> EnumerateMenuItems(NodeTree item)
+    {
+        yield return item;
+        foreach (var child in item.Children)
+        {
+            foreach (var descendant in EnumerateMenuItems(child))
+            {
+                yield return descendant;
+            }
         }
     }
 

@@ -778,9 +778,12 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             {
                 _dispatcherService.TryEnqueue(() =>
                 {
+                    if (SelectedNodeMenu is not null)
+                        return;
+
                     SelectedPlaylistName = string.Empty;
                     RenamedSelectPendingPlaylistName = string.Empty;
-                    PlaylistSongs.Clear();
+                    PlaylistSongs = [];
                 });
 
                 return;
@@ -828,6 +831,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             {
                 _dispatcherService.TryEnqueue(() =>
                 {
+                    if (SelectedNodeMenu != nmpli)
+                        return;
+
                     PlaylistSongs = nmpli.PlaylistSongs;
                     SelectedPlaylistName = nmpli.Name;
 

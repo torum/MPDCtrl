@@ -65,6 +65,20 @@ public sealed partial class App : Application
             //AppConfigFilePath = System.IO.Path.Combine(AppDataFolder, AppName + ".config"); // Ops. should have been this...
             var envAppLocalCahceFolder = Windows.Storage.ApplicationData.Current.LocalCacheFolder.Path;
             AlbumCoverCacheFolder = System.IO.Path.Combine(envAppLocalCahceFolder, AppDeveloper, AppName, "AlbumCoverCache");
+
+            /*
+             * need to migrate legacy config file from old AppData folder to new AppData folder for MSIX.
+            var appDataRoot = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
+            var legacyConfigFilePath = System.IO.Path.Combine(appDataRoot, AppName + ".config");
+            AppDataFolder = System.IO.Path.Combine(appDataRoot, AppDeveloper, AppName);
+            AppConfigFilePath = System.IO.Path.Combine(AppDataFolder, AppName + ".config");
+
+            if (!System.IO.File.Exists(AppConfigFilePath) && System.IO.File.Exists(legacyConfigFilePath))
+            {
+                System.IO.Directory.CreateDirectory(AppDataFolder);
+                System.IO.File.Move(legacyConfigFilePath, AppConfigFilePath);
+            }
+            */
         }
         else
         {

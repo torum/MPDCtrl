@@ -35,6 +35,7 @@
 		<AppxFilterOutUnusedLanguagesResourceFileMaps>false</AppxFilterOutUnusedLanguagesResourceFileMaps>
 
 		<AppxPackageIncludePrivateSymbols>true</AppxPackageIncludePrivateSymbols>
+		<AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
 		<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
 		<AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
 		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
@@ -125,7 +126,7 @@
     Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
     Tools extension to be activated for this project even if the Windows App SDK Nuget
     package has not yet been restored.
-  -->
+	-->
 	<ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
 		<ProjectCapability Include="Msix" />
 	</ItemGroup>
@@ -136,7 +137,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(RuntimeIdentifier)'=='win-x86'">
-		<PdbCmfx64ExeFullPath>C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.52.37025\bin\Hostx64\x86\mspdbcmf.exe</PdbCmfx64ExeFullPath>
+		<PdbCmfx86ExeFullPath>C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.52.37025\bin\Hostx64\x86\mspdbcmf.exe</PdbCmfx86ExeFullPath>
 	</PropertyGroup>
 	
 	<PropertyGroup Condition="'$(RuntimeIdentifier)'=='win-arm64'">
